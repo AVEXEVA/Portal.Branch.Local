@@ -1,0 +1,1 @@
+<?php if(isset($_POST['menuTab']) && isset($_POST['menuObject']) && in_array($_POST['menuObject'],array('location','job','unit','customer','ticket')){$_SESSION['menuObjects'][$_POST['menuObject']] = $_POST['menuTab'];}?>

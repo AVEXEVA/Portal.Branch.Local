@@ -1,0 +1,58 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php if( isset( $_GET[ 'Bootstrap' ] ) ){
+  switch( $_GET[ 'Bootstrap' ] ){
+    case '5.1':?><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous"><?php break;
+    default:?><link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=3" rel="stylesheet"><?php break;
+    break;
+  }
+} else {?>
+  <link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=3" rel="stylesheet">
+<?php }?>
+<?PHP
+IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER['SCRIPT_NAME'], 1, strlen( $_SERVER['SCRIPT_NAME'] ) - 5 ) . '/index.php') ){
+  require('/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER[ 'SCRIPT_NAME' ], 1, strlen( $_SERVER[ 'SCRIPT_NAME' ] ) - 5 . '/index.php' ) );
+} else {
+  switch( $_SERVER[ 'SCRIPT_NAME' ] ){ 
+    case '/portal/ticket.php' : 
+          ?><link href='https://www.nouveauelevator.com/portal/cgi-bin/css/page/ticket.css?v=<?php echo rand(1000, 999999999);?>' rel='stylesheet'><?php
+          break;
+        case ( preg_match('/\/portal\/cgi-bin\/php\/element\/ticket\//', $_SERVER[ 'SCRIPT_NAME' ] ) ? true : false ) : 
+          ?><link href='https://www.nouveauelevator.com/portal/cgi-bin/css/page/ticket.css?v=<?php echo rand(1000, 999999999);?>' rel='stylesheet'><?php
+          break;
+        default:
+          break;
+    }
+}?>
+
+<?php if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/animation.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/print.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/class.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/wrapper.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/gui.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/navbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<style>
+/*Fonts*/
+@font-face {
+  font-family: 'BankGothic';
+  src: url('https://www.nouveautexas.com/portal/cgi-bin/css/font/bankgothic-md-bt-medium-webfont.eot');
+  src: url('https://www.nouveautexas.com/portal/cgi-bin/css/font/bank-gothic-md-bt-medium-1361510860.ttf')  format('truetype');
+}
+.BankGothic { font-family:'BankGothic'; }
+</style>
+<?php 
+if( $_SESSION[ 'User' ] == 895 ){?>
+  <style>
+    @media screen and (min-width:1980px){
+        #page-wrapper {
+        padding-left:16.666%;
+        padding-right:16.666%;
+      }    
+    }
+  
+  </style>
+<?php }
+?>

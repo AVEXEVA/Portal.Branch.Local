@@ -1,0 +1,1 @@
+<?php $My_Privileges = (isset($My_Privileges)) ? array_merge($My_Privileges,array('Ticket','Unit','Job','Violation','Location','Route','Map','Location','Time','Route')) : array('Ticket','Unit','Job','Violation','Location','Route','Map','Location','Time','Route'); ?>

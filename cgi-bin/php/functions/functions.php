@@ -1,0 +1,12 @@
+<?php
+if(!function_exists('isMobile')){require(PROJECT_ROOT.'php/functions/isMobile.php');}
+if(!function_exists('proper')){require(PROJECT_ROOT.'php/functions/proper.php');}
+if(!function_exists('utf8ize')){require(PROJECT_ROOT.'php/functions/utf8ize.php');}
+if(!function_exists('mssql_escape')){require(PROJECT_ROOT.'php/functions/mssqll_escape.php');}
+if(!function_exists('fixArrayKey')){require(PROJECT_ROOT.'php/functions/fixArrayKey.php');}
+if(!function_exists('sqlsrv_errors')){require(PROJECT_ROOT.'php/functions/sqlsrv_errors.php');}
+if(!function_exists('php_errors')){require(PROJECT_ROOT.'php/functions/php_errors.php');}
+if(!function_exists('rate')){require(PROJECT_ROOT.'php/functions/rate.php');}
+if(!function_exists('interestAndPrincipal')){require(PROJECT_ROOT.'php/functions/interestAndPrincipal.php');}
+if(!function_exists('s_datediff')){require(PROJECT_ROOT.'php/functions/dateDifference.php');}
+?>
