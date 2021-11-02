@@ -38,8 +38,8 @@ IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $
 /*Fonts*/
 @font-face {
   font-family: 'BankGothic';
-  src: url('https://beta.nouveauelevator.com/portal/cgi-bin/css/font/bankgothic-md-bt-medium-webfont.eot');
-  src: url('https://beta.nouveauelevator.com/portal/cgi-bin/css/font/bank-gothic-md-bt-medium-1361510860.ttf')  format('truetype');
+  src: url('cgi-bin/css/font/bankgothic-md-bt-medium-webfont.eot');
+  src: url('cgi-bin/css/font/bank-gothic-md-bt-medium-1361510860.ttf')  format('truetype');
 }
 .BankGothic { font-family:'BankGothic'; }
 </style>

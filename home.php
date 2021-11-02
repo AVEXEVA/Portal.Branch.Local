@@ -6,7 +6,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	if ( FALSE ) {
 
-	} elseif( in_array( $_SESSION[ 'User' ], array( 4, 6 ) ) && isset( $_GET[ 'Version' ] ) ){
+	} elseif( in_array( $_SESSION[ 'User' ], array( 250, 895 ) ) && isset( $_GET[ 'Version' ] ) ){
 		$_SESSION[ 'Version' ] = $_GET[ 'Version' ];
   		switch( $_GET[ 'Version' ] ){
 	  		case 'Beta' : 
@@ -16,7 +16,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  			require('home2021h.php');
 	  			break;
 	  	}
-	} elseif( in_array( $_SESSION[ 'User' ], array( 4, 6 ) ) ) {
+	} elseif( in_array( $_SESSION[ 'User' ], array( 250, 895 ) ) ) {
 		require( 'home-choice.php' );
 	} else {
 	  	require('home2021h.php');
