@@ -15,7 +15,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $_SESSION[ 'Hash' ]
       )
     );
-    $My_Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+    $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
     $result = sqlsrv_query(
       $NEI,
       " SELECT  *,
@@ -27,7 +27,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $_SESSION[ 'User' ]
       )
     );
-    $My_User = sqlsrv_fetch_array($result);
+    $User = sqlsrv_fetch_array($result);
     //Privileges
   $result = sqlsrv_query(
     $NEI,
@@ -38,13 +38,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
        $_SESSION[ 'User' ]
      )
   );
-    	$My_Privileges = array();
-    	if( $result ){while( $My_Privilege = sqlsrv_fetch_array( $result ) ){ $My_Privileges [ $My_Privilege [ 'Access_Table' ] ] = $My_Privilege;} }
-        if(!isset( $My_Connection [ 'ID' ] )
-    	   	|| !isset( $My_Privileges ['Invoice' ] )
-    	  		|| $My_Privileges['Invoice']['User_Privilege']  < 4
-    	  		|| $My_Privileges['Invoice']['Group_Privilege'] < 4
-    	  		|| $My_Privileges['Invoice']['Other_Privilege'] < 4){
+    	$Privileges = array();
+    	if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges [ $Privilege [ 'Access_Table' ] ] = $Privilege;} }
+        if(!isset( $Connection [ 'ID' ] )
+    	   	|| !isset( $Privileges ['Invoice' ] )
+    	  		|| $Privileges['Invoice']['User_Privilege']  < 4
+    	  		|| $Privileges['Invoice']['Group_Privilege'] < 4
+    	  		|| $Privileges['Invoice']['Other_Privilege'] < 4){
     				?><?php require('../404.html');?><?php }
         else {
     		sqlsrv_query(
@@ -181,17 +181,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   				loadingRecords : "<div style='text-align:center;'><div class='sk-cube-grid' style='display:inline-block;position:relative;';><div class='sk-cube sk-cube1' style='background-color:#cc0000'></div><div class='sk-cube sk-cube2' style='background-color:#cc0000'></div><div class='sk-cube sk-cube3' style='background-color:#cc0000'></div><div class='sk-cube sk-cube4' style='background-color:#cc0000'></div><div class='sk-cube sk-cube5' style='background-color:#cc0000'></div><div class='sk-cube sk-cube6' style='background-color:#cc0000'></div><div class='sk-cube sk-cube7' style='background-color:#cc0000'></div><div class='sk-cube sk-cube8' style='background-color:#cc0000'></div><div class='sk-cube sk-cube9' style='background-color:#cc0000'></div></div><div class='sk-cube-grid' style='display:inline-block;position:relative;top:-45px;'><div class='sk-cube sk-cube1' style='background-color:#00007f'></div><div class='sk-cube sk-cube2' style='background-color:#00007f'></div><div class='sk-cube sk-cube3' style='background-color:#00007f'></div><div class='sk-cube sk-cube4' style='background-color:#00007f'></div><div class='sk-cube sk-cube5' style='background-color:#00007f'></div><div class='sk-cube sk-cube6' style='background-color:#00007f'></div><div class='sk-cube sk-cube7' style='background-color:#00007f'></div><div class='sk-cube sk-cube8' style='background-color:#00007f'></div><div class='sk-cube sk-cube9' style='background-color:#00007f'></div></div><div class='sk-cube-grid' style='display:inline-block;position:relative;top:-84px;'><div class='sk-cube sk-cube1' style='background-color:gold'></div><div class='sk-cube sk-cube2' style='background-color:gold'></div><div class='sk-cube sk-cube3' style='background-color:gold'></div><div class='sk-cube sk-cube4' style='background-color:gold'></div><div class='sk-cube sk-cube5' style='background-color:gold'></div><div class='sk-cube sk-cube6' style='background-color:gold'></div><div class='sk-cube sk-cube7' style='background-color:gold'></div><div class='sk-cube sk-cube8' style='background-color:gold'></div><div class='sk-cube sk-cube9' style='background-color:gold'></div></div></div><div style='font-size:72px;text-align:center;' class='BankGothic'>Nouveau Elevator</div><div style='font-size:42px;text-align:center;'><i>Raising Your Life</i></div>"
   			}
       } );
-      $('#Table_Collections tbody').on('click', 'td.details-control', function () {
-        var tr = $(this).closest('tr');
-        var row = Table_Collections.row( tr );
-        if ( row.child.isShown() ) {
-          row.child.hide();
-          tr.removeClass('shown');
-        } else {
-          row.child( formatCollection(row.data()) ).show();
-          tr.addClass('shown');
-			}
-		} );
 		function hrefCollections(){hrefRow('Table_Collections','invoice');}
 		$('Table#Table_Collections').on('draw.dt',function(){hrefCollections();});
 		function redraw( ){ Table_Collections.draw( ); }

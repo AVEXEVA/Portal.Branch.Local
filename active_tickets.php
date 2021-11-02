@@ -1,39 +1,59 @@
-<?php 
+<?php
 session_start();
 require('cgi-bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
-	   	|| !isset($My_Privileges['Ticket'])
-	  		|| $My_Privileges['Ticket']['User_Privilege']  < 4
-	  		|| $My_Privileges['Ticket']['Group_Privilege'] < 4){
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT *
+            FROM      Connection
+            WHERE     Connection.Connector = ?
+            AND       Connection.Hash  = ?;",
+      array(
+          $_SESSION[ 'User' ],
+          $_SESSION[ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+    $result = sqlsrv_query(
+      $NEI,
+      "   SELECT *,
+		                  Emp.fFirst AS First_Name,
+                      Emp.Last   AS Last_Name
+		      FROM        Emp
+          WHERE       Emp.ID = ?;",
+      array(
+          $_SESSION[ 'User' ]
+      )
+  );
+
+    $User = sqlsrv_fetch_array( $result );
+    $result = sqlsrv_query(
+        $NEI,
+      "    SELECT *
+           FROM       Privilege
+           WHERE      Privilege.User_ID = ?;",
+      array(
+          $_SESSION [ 'User' ]
+      )
+  );
+	$Privileges = array();
+	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if(	!isset($Connection['ID'])
+	   	|| !isset($Privileges['Ticket'])
+	  		|| $Privileges['Ticket']['User_Privilege']  < 4
+	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
+  		sqlsrv_query(
+        $NEI,
+        " INSERT INTO Activity( [User], [Date], [Page] )
+          VALUES ( ?, ?, ? );",
+        array(
+          $_SESSION [ 'User' ],
+          date("Y-m-d H:i:s"),
+          "active_tickets.php"
+        )
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +61,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
     <?php require(PROJECT_ROOT."css/index.php");?>
     <?php require(PROJECT_ROOT.'js/index.php');?>
 </head>
@@ -100,7 +120,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<th></th>
 							<th></th>
 							<th></th>
-							<th></th>                                            
+							<th></th>
 							<th>Description</th>
 						</thead>
 					</table>
@@ -112,7 +132,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
@@ -127,52 +147,56 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     <!-- Custom Date Filters-->
     <script src="../dist/js/filters.js"></script>
-    <script>
-	var Editor_Tickets = new $.fn.dataTable.Editor({
-		ajax: "php/post/Ticket.php",
-		table: "#Table_Tickets",
-		template: '#Form_Ticket',
-		formOptions: {
-			inline: {
-				submit: "allIfChanged"
-			}
-		},
-		idSrc: "ID",
-		fields : [{
-			label: "ID",
-			name: "ID"
-		},{
-			label: "Location",
-			name: "Location",
-			type:"select",
-			options: [<?php
-				$r = sqlsrv_query($NEI,"
-					SELECT   Loc.Tag AS Location
-					FROM     nei.dbo.Loc
-					GROUP BY Loc.Tag
-					ORDER BY Loc.Tag ASC
-				;");
+  <script>
+	  var Editor_Tickets = new $.fn.dataTable.Editor({
+              		ajax: "php/post/Ticket.php",
+              		table: "#Table_Tickets",
+              		template: '#Form_Ticket',
+              		formOptions: {
+                  inline: {
+                  submit: "allIfChanged"
+              		}
+              		},
+              		idSrc: "ID",
+              		fields : [{
+              		label: "ID",
+              		name: "ID"
+              		},{
+              		label: "Location",
+              		name: "Location",
+              		type:"select",
+              		options:
+                  [<?php
+        $result = sqlsrv_query($NEI,
+
+              "  SELECT   Loc.Tag AS Location
+					       FROM     nei.dbo.Loc
+                 GROUP BY Loc.Tag
+                 ORDER BY Loc.Tag ASC;"
+    );
 				$Locations = array();
-				if($r){while($Location = sqlsrv_fetch_array($r)){
-					$Location['Location'] = str_replace("'","",$Location['Location']);
-					$Locations[] = '{' . "label: '{$Location['Location']}', value:'{$Location['Location']}'" . '}';
-				}}
+				if( $result ){while( $Location = sqlsrv_fetch_array( $result )
+          ){
+					$Location[ 'Location' ] = str_replace( "'" , "" , $Location[ 'Location' ]
+    );
+					$Locations[] = '{' . "label: '{ $Location[ 'Location' ]}', value:'{ $Location[ 'Location' ]}'" . '}';
+			    }}
 				echo implode(",",$Locations);
-			?>]
-		},{
-			label: "Mechanic",
-			name: "Mechanic",
-			type: "select",
-			options: [<?php 
-				$r = sqlsrv_query($NEI,"
-					SELECT   Emp.fFirst + ' ' + Emp.Last AS Mechanic
-					FROM     Emp
-					WHERE    Emp.Field = 1
-					GROUP BY Emp.fFirst + ' ' + Emp.Last
-					ORDER BY Emp.fFirst + ' ' + Emp.Last ASC
-				;");
+			    ?>]
+		      },{
+          			label: "Mechanic",
+          			name:  "Mechanic",
+          			type:  "select",
+          			options: [<?php
+				$result = sqlsrv_query($NEI,
+              "SELECT   Emp.fFirst + ' ' + Emp.Last AS Mechanic
+               FROM     Emp
+               WHERE    Emp.Field = 1
+               GROUP BY Emp.fFirst + ' ' + Emp.Last
+               ORDER BY Emp.fFirst + ' ' + Emp.Last ASC;"
+      );
 				$Statuses = array();
-				if($r){while($Status = sqlsrv_fetch_array($r)){$Statuses[] = '{' . "label: '{$Status['Mechanic']}', value:'{$Status['Mechanic']}'" . '}';}}
+				if($result){while($Status = sqlsrv_fetch_array($result)){$Statuses[] = '{' . "label: '{$Status['Mechanic']}', value:'{$Status['Mechanic']}'" . '}';}}
 				echo implode(",",$Statuses);
 			?>]
 		},{
@@ -184,14 +208,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			name: "Status",
 			type: "select",
 			options: [<?php
-				$r = sqlsrv_query($NEI,"
+				$result = sqlsrv_query($NEI,"
 					SELECT   TickOStatus.Type AS Status
 					FROM     nei.dbo.TickOStatus
 					GROUP BY TickOStatus.Type
 					ORDER BY TickOStatus.Type ASC
 				;");
 				$Statuses = array();
-				if($r){while($Status = sqlsrv_fetch_array($r)){$Statuses[] = '{' . "label: '{$Status['Status']}', value:'{$Status['Status']}'" . '}';}}
+				if($result){while($Status = sqlsrv_fetch_array($result)){$Statuses[] = '{' . "label: '{$Status['Status']}', value:'{$Status['Status']}'" . '}';}}
 				echo implode(",",$Statuses);
 			?>]
 		},{
@@ -236,13 +260,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			name:"Unit_State",
 			type:"select",
 			options: [<?php
-				$r = sqlsrv_query($NEI,"
+				$result = sqlsrv_query($NEI,"
 					SELECT Elev.State AS State
 					FROM   nei.dbo.Elev
 						   LEFT JOIN nei.dbo.Loc ON Elev.Loc = Loc.Loc
 				;");
 				$Units = array();
-				if($r){while($Unit = sqlsrv_fetch_array($r)){$Units[] = '{' . "label: '{$Unit['State']}', value:'{$Unit['State']}'" . '}';}}
+				if($result){while($Unit = sqlsrv_fetch_array($result)){$Units[] = '{' . "label: '{$Unit['State']}', value:'{$Unit['State']}'" . '}';}}
 				echo implode(",",$Units);
 			?>]
 		},{
@@ -339,20 +363,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				"orderable":      false,
 				"data":           null,
 				"defaultContent": ''
-			},{ 
-				"data": "ID" 
-			},{ 
+			},{
+				"data": "ID"
+			},{
 				"data": "Location"
 			},{
 				"data": "Job_Description"
-			},{ 
+			},{
 				"data": "Mechanic"
-			},{ 
+			},{
 				"data": "Worked",
 				render: function(data){if(data != null){return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}else{return null;}}
-			},{ 
+			},{
 				"data": "Status"
-			},{ 
+			},{
 				"data": "Description"
 			},{
 				"data":"Unit_State",
@@ -362,25 +386,25 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				"data":"Unit_Label",
 				"visible":false,
 				"searchable":true
-			},{ 
+			},{
 				"data": "Street",
 				"visible":false
-			},{ 
+			},{
 				"data": "City",
 				"visible":false
-			},{ 
+			},{
 				"data": "State",
 				"visible":false
-			},{ 
+			},{
 				"data": "Zip",
 				"visible":false
-			},{ 
+			},{
 				"data": "Route",
 				"visible":false
-			},{ 
+			},{
 				"data": "Division",
 				"visible":false
-			},{ 
+			},{
 				"data": "Maintenance",
 				"visible":false,
 				"render":function(data){
@@ -404,21 +428,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					'pdf',
 					'print'
 				]
-			},{ 	
-				extend: "create", 
-				editor: Editor_Tickets 
-			},{ 
-				extend: "edit",   
-				editor: Editor_Tickets 
-			},{ 
-				extend : "remove", 
-				editor : Editor_Tickets 
-			},{ 
+			},{
+				extend: "create",
+				editor: Editor_Tickets
+			},{
+				extend: "edit",
+				editor: Editor_Tickets
+			},{
+				extend : "remove",
+				editor : Editor_Tickets
+			},{
 				text : "View",
 				action:function(e,dt,node,config){
 					document.location.href = 'ticket.php?ID=' + $("#Table_Tickets tbody tr.selected td:nth-child(2)").html();
 				}
-			},{ 
+			},{
 				text : "Preview",
 				action:function(e,dt,node,config){
 					$("tr.selected").each(function(){
@@ -454,28 +478,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	} );*/
 	<?php if(!$Mobile){?>
 	yadcf.init(Table_Tickets,[
-		{   
+		{
 			column_number:1,
 			filter_type:"auto_complete",
 			filter_default_label:"ID"
-		},{   
+		},{
 			column_number:2,
 			filter_default_label:"Location"
-		},{   
+		},{
 			column_number:3,
 			filter_default_label:"Job"
-		},{   
+		},{
 			column_number:4,
 			filter_default_label:"Mechanic"
-		},{   
+		},{
 			column_number:5,
 			filter_type: "range_date",
 			date_format: "mm/dd/yyyy",
 			filter_delay: 500
-		},{   
+		},{
 			column_number:6,
 			filter_default_label:"Status"
-		}/*,{   
+		}/*,{
 			column_number:7,
 			filter_type: "range_number_slider",
 			filter_delay: 500
@@ -485,7 +509,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	stylizeYADCF();<?php }?>
 	var expandTicketButton = true;
 	$("Table#Table_Tickets").on("draw.dt",function(){
-		if(!expandTicketButton){$("Table#Table_Tickets tbody tr:not(.shown) td:first-child").each(function(){$(this).click();});} 
+		if(!expandTicketButton){$("Table#Table_Tickets tbody tr:not(.shown) td:first-child").each(function(){$(this).click();});}
 		else {$("Table#Table_Tickets tbody tr.shown td:first-child").each(function(){$(this).click();});}
 	});
 	//setTimeout(function(){initialize()},1000);

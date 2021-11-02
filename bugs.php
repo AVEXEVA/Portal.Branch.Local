@@ -1,59 +1,66 @@
-<?php 
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-session_start();
-require('cgi-bin/php/index.php');
-$serverName = "172.16.12.45";
-$connectionOptions = array(
-    "Database" => "nei",
-    "Uid" => "sa",
-    "PWD" => "SQLABC!23456",
-    'ReturnDatesAsStrings'=>true
-);
-//Establishes the connection
-$conn = sqlsrv_connect($serverName, $connectionOptions);
-$connectionOptions['Database'] = 'Portal';
-$conn2 = sqlsrv_connect($serverName, $connectionOptions);
-$connectionOptions['Database'] = 'Portal';
-$Portal = sqlsrv_connect($serverName, $connectionOptions);
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-
-    $r = sqlsrv_query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($conn2,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = FALSE;
-    if(isset($My_Privileges['Admin']) && $My_Privileges['Admin']['User_Privilege'] >= 7 && $My_Privileges['Admin']['Group_Privilege'] >= 7 && $My_Privileges['Admin']['Other_Privilege'] >= 7){$Privileged = TRUE;}
-    sqlsrv_query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "bugs.php"));
-    if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=profile.php';</script></head></html><?php }
-    else {
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-if(count($_POST) > 0 && is_numeric($_POST['Severity']) && strlen($_POST['Name']) > 0 && strlen($_POST['Description']) > 0){
-$Name        = $_POST['Name'];
-$Severity    = $_POST['Severity'];
-$Description = $_POST['Description'];
-$Suggestion  = $_POST['Suggestion'];
-$Parameters  = array($Name,$Severity,$Description,$Suggestion);
-$r = sqlsrv_query($Portal,"
-    INSERT INTO Bug(Name, Severity, Description, Suggestion)
-    VALUES(?,?,?,?)
-;",$Parameters);
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-?><!DOCTYPE html>
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+		        FROM        Connection
+            WHERE       Connection.Connector = ?
+            AND         Connection.Hash  = ?;",
+        array(
+            $_SESSION[ 'User' ],
+            $_SESSION[ 'Hash' ]
+        )
+    );
+    $Connection = sqlsrv_fetch_array( $result );
+    //User
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *,
+                    Emp.fFirst AS First_Name,
+                    Emp.Last   AS Last_Name
+            FROM    Emp
+            WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+    $User = sqlsrv_fetch_array( $result );
+    //Privileges
+	$result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+	$Privileges = array();
+	if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+    if(	!isset( $Connection[ 'ID' ] )
+	   	|| !isset($Privileges[ 'Admin' ])
+	  		|| $Privileges[ 'Admin' ][ 'User_Privilege' ]  < 4
+	  		|| $Privileges[ 'Admin' ][ 'Group_Privilege' ] < 4
+        || $Privileges[ 'Admin' ][ 'Other_Privilege' ] < 4){
+				?><?php require( '../404.html' );?><?php }
+    else {
+if(count( $_POST ) > 0 && is_numeric( $_POST [ 'Severity' ] ) && strlen( $_POST [ 'Name' ] ) > 0 && strlen( $_POST [ 'Description' ] ) > 0 ) {
+
+            $Name        = $_POST[ 'Name' ];
+            $Severity    = $_POST[ 'Severity' ];
+            $Description = $_POST[ 'Description' ];
+            $Suggestion  = $_POST[ 'Suggestion' ];
+            $Parameters  = array($Name,$Severity,$Description,$Suggestion);
+    $result = sqlsrv_query( $Portal,
+            "INSERT INTO Bug(Name, Severity, Description, Suggestion)
+             VALUES(?,?,?,?);",
+    $Parameters);
+
+}?><!DOCTYPE html>
 <html lang="en">
 <head>
     <?php require(PROJECT_ROOT.'php/meta.php');?>
@@ -77,18 +84,20 @@ $r = sqlsrv_query($Portal,"
                             <br />
                             <div class="tab-content">
                                 <div class="tab-pane fade in active" id="bugs-pills">
-                                    <?php $r = sqlsrv_query($Portal,"
-                                        SELECT 
-                                            Bug.ID, 
-                                            Bug.Name, 
-                                            Bug.Description, 
-                                            Bug.Resolution, 
-                                            Bug.Fixed, 
-                                            Bug.Suggestion, 
-                                            Severity.Name AS Severity 
-                                        FROM Bug LEFT JOIN Severity ON Bug.Severity = Severity.ID
-                                    ;");
-                                    if($r){while($Bug = sqlsrv_fetch_array($r)){?>
+                                    <?php $result = sqlsrv_query($Portal,
+                                        "   SELECT
+                                            Bug.ID,
+                                            Bug.Name,
+                                            Bug.Description,
+                                            Bug.Resolution,
+                                            Bug.Fixed,
+                                            Bug.Suggestion,
+                                            Severity.Name AS Severity
+                                            FROM Bug
+                                            LEFT JOIN Severity
+                                            ON Bug.Severity = Severity.ID;"
+                                );
+                                    if($result){while($Bug = sqlsrv_fetch_array($result)){?>
                                     <div class='row'>
                                         <div class='col-md-2'>Name:</div><div class='col-md-10'><?php echo $Bug['Name'];?></div>
                                         <div class='col-md-2'>Severity:</div><div class='col-md-10'><?php echo $Bug['Severity'];?></div>
@@ -103,9 +112,13 @@ $r = sqlsrv_query($Portal,"
                                         <div class='input-group'><label for='Name' class=''>Name&nbsp;</label><input class='form-control' name="Name" type="text" /></div>
                                         <div class='input-group'>
                                             <label for='Severity' class=''>Severity&nbsp;</label>
-                                            <select name='Severity' class='form-control'><?php 
-                                                $r = sqlsrv_query($Portal,"SELECT * FROM Severity;");
-                                                if($r){while($Severity = sqlsrv_fetch_array($r)){?><option value='<?php echo $Severity['ID'];?>'><?php echo $Severity['Name'];?></option><?php }}
+                                            <select name='Severity' class='form-control'><?php
+                                                $result = sqlsrv_query(
+                                                  $Portal, "SELECT *
+                                                            FROM Severity;"
+                                );
+                                                if( $result ){while( $Severity = sqlsrv_fetch_array( $result ))
+                                                  {?><option value='<?php echo $Severity [ 'ID' ];?>'><?php echo $Severity [ 'Name' ];?></option><?php }}
                                             ?></select>
                                         </div>
                                         <div class='input-group'><label for='Description' class=''>Description&nbsp;</label><textarea class='form-control' name='Description' cols='60' rows='5'></textarea></div>
@@ -131,4 +144,5 @@ $r = sqlsrv_query($Portal,"
 </html>
  <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=profile.php';</script></head></html><?php }?>
+} else {
+?><html><head><script>document.location.href='../login.php?Forward=profile.php';</script></head></html><?php }?>
