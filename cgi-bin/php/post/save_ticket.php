@@ -60,7 +60,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
     $r2 = sqlsrv_query($NEI,"SELECT * FROM TicketDPDA WHERE TicketDPDA.ID = ?;",array($_POST['ID']));
     if($r && is_array(sqlsrv_fetch_array($r)) && $r2 && is_array(sqlsrv_fetch_array($r2))){
-      /*Complete Ticket to Review*/
+      /*Complete Ticket to Review*/ 
       sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
       /*Receipt*/
       /*$r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.[File] WHERE [File].Ticket = ?",array($_POST['ID']));
@@ -70,17 +70,41 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $r = sqlsrv_query($Portal,"INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
         $r = sqlsrv_query($NEI,"INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), date("Y-m-d H:i:s"), NULL, NULL, 0));
       }*/
-      if(isset($_FILES['Receipt']['tmp_name']) && strlen($_FILES['Receipt']['tmp_name']) > 0){
-        ob_start();
-        $image = imagecreatefromstring(file_get_contents($_FILES['Receipt']['tmp_name']));
-        imagejpeg($image, null, 50);
-        $image = ob_get_clean();
-        $image = base64_encode($image);
-        $File_Name = 'nei_TCK'. $_POST['ID'] . '_' . rand(0,9999999);
-        /*$r = sqlsrv_query($Portal,"SET TEXTSIZE 10000000;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], array($image, SQLSRV_PARAM_IN,
-      SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), $_SESSION['User'], $_POST['ID']));*/
-        $r = sqlsrv_query($NEI,"SET TEXTSIZE 10000000;INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], array($image, SQLSRV_PARAM_IN,
-      SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), date("Y-m-d H:i:s"), $File_Name, NULL, 0));
+      if(isset($_FILES['Receipt']) && count($_FILES['Receipt']) > 0){
+        $Count = count($_FILES['Receipt']['tmp_name']);
+        $index = 0;
+        while( $index < $Count ){
+          if(isset($_FILES['Receipt']['tmp_name'][ $index ]) && strlen($_FILES['Receipt']['tmp_name'][ $index ]) > 0){
+            ob_start();
+            $image = imagecreatefromstring(file_get_contents($_FILES['Receipt']['tmp_name'][ $index ]));
+            imagejpeg($image, null, 50);
+            $image = ob_get_clean();
+            $image = base64_encode($image);
+            $File_Name = 'nei_TCK'. $_POST['ID'] . '_' . rand(0,9999999) . '_' . $index;
+            /*$r = sqlsrv_query($Portal,"SET TEXTSIZE 2147483647;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'][ $index ], $_FILES['Receipt']['type'][ $index ], array($image, SQLSRV_PARAM_IN,
+          SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), $_SESSION['User'], $_POST['ID']));*/
+            $r = sqlsrv_query(
+              $NEI,
+              " SET TEXTSIZE 2147483647;
+                INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) 
+                VALUES(?, ?, ?, ?, ?, ?);", 
+              array(
+                $_POST['ID'], 
+                array(
+                  $image, 
+                  SQLSRV_PARAM_IN,
+                  SQLSRV_PHPTYPE_STREAM( SQLSRV_ENC_BINARY ),
+                  SQLSRV_SQLTYPE_VARBINARY( 'max' ) 
+                ), 
+                date( "Y-m-d H:i:s" ), 
+                $File_Name, 
+                NULL, 
+                0
+              )
+            ); 
+          }
+          $index++;
+        }
       }
       if(isset($_FILES['Chargeable_Image']['tmp_name']) && strlen($_FILES['Chargeable_Image']['tmp_name']) > 0){
         ob_start();
@@ -136,8 +160,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       if($r){
         $row = sqlsrv_fetch_array($r);
         if(is_array($row)){
-          sqlsrv_query($NEI,"INSERT INTO TechLocation(TicketID, TechID, ActionGroup, Action, Latitude, Longitude, Altitude, Accuracy, DateTimeRecorded) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
-          array($_POST['ID'],  $My_User['fWork'], "On site time", "Updated on site time to " . date("h:i A"), $row['Latitude'], $row['Longitude'], 0, 0, date("Y-m-d H:i:s",strtotime('-5 hours', strtotime($row['Time_Stamp'])))));
+          sqlsrv_query(
+            $NEI,
+            " INSERT INTO TechLocation( TicketID, TechID, ActionGroup, Action, Latitude, Longitude, Altitude, Accuracy, DateTimeRecorded ) 
+              VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ? );",
+            array(
+              $_POST['ID'],  
+              $My_User['fWork'], 
+              'On site time', 
+              'Updated completed time to ' . date('h:i A'), $row['Latitude'], $row['Longitude'], 
+              0, 
+              0, 
+              date('Y-m-d H:i:s')
+            )
+          );
         }
       }
       /*Signature*/

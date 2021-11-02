@@ -570,7 +570,7 @@ if($_SESSION['User'] == '895'){
     </div>
     <div class='row expenses'>
       <div class='col-xs-4'><i class="fa fa-paperclip fa-1x fa-fw" aria-hidden="true"></i> Photo:</div>
-      <div class='col-xs-8'><form id='Receipt' enctype='multipart/form-data' method='POST'><input type='file' name='Receipt'  style='color:white !important;' /></form></div>
+      <div class='col-xs-8'><form id='Receipt' enctype='multipart/form-data' method='POST'><input multiple='multiple' type='file' name='Receipt[]'  style='color:white !important;' /></form></div>
     </div>
   </div>
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution</h4></div>
@@ -826,7 +826,7 @@ if($_SESSION['User'] == '895'){
     <div class='row expenses'>
       <div class='col-xs-4'><i class="fa fa-paperclip fa-1x fa-fw" aria-hidden="true"></i> Photo:</div>
       <?php
-        $r = sqlsrv_query($Portal,"SELECT [TicketPic].[PicData] FROM TicketPic WHERE [TicketPic].TicketID = ? AND [TicketPic].PictureName LIKE '%TCK%';",array($_GET['ID']));
+        $r = sqlsrv_query($NEI,"SELECT [TicketPic].[PicData] FROM TicketPic WHERE [TicketPic].TicketID = ? AND [TicketPic].PictureName LIKE '%TCK%';",array($_GET['ID']));
         $i = 0;
         if($r){while($row = sqlsrv_fetch_array($r)){
           $row['Type'] = 'image/jpeg';
@@ -853,7 +853,7 @@ if($_SESSION['User'] == '895'){
     <div class='email row'>
       <div class='col-xs-4'><?php $Icons->Email(1);?> Email:</div>
       <div class='col-xs-8'><?php
-      $r = sqlsrv_query($Portal,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ?;",array($_GET['ID']));
+      $r = sqlsrv_query($NEI,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ?;",array($_GET['ID']));
       $i = 0;
       if($r){while($row = sqlsrv_fetch_array($r)){
         if($i == 0){echo $row['Email'];}
@@ -977,7 +977,7 @@ if($_SESSION['User'] == '895'){
     </div>
     <div class='row expenses'>
       <div class='col-xs-4'><i class="fa fa-paperclip fa-1x fa-fw" aria-hidden="true"></i> Photo:</div>
-      <div class='col-xs-8'><form id='Receipt' enctype='multipart/form-data' method='POST'><input type='hidden' name='ID' value='<?php echo $_GET['ID'];?>' /><input type='file' name='Receipt' style='color:white !important;'/></form></div>
+      <div class='col-xs-8'><form id='Receipt' enctype='multipart/form-data' method='POST'><inputtype='hidden' name='ID' value='<?php echo $_GET['ID'];?>' /><input  multiple='multiple' type='file' name='Receipt[]' style='color:white !important;'/></form></div>
     </div>
   </div>
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution</h4></div>
@@ -1041,7 +1041,7 @@ if($_SESSION['User'] == '895'){
       <script>
       var availableEmails = [
         <?php
-          $r = sqlsrv_query($Portal,
+          $r = sqlsrv_query($NEI,
           " SELECT Ticket_Email.Email
             FROM (
                     ( SELECT TicketD.Loc AS Location_ID,
@@ -1054,7 +1054,7 @@ if($_SESSION['User'] == '895'){
                       FROM TicketO
                       WHERE TicketO.LID = ?)
                     ) AS Tickets
-                    INNER JOIN Portal.dbo.Ticket_Email ON Ticket_Email.Ticket = Tickets.ID
+                    INNER JOIN Ticket_Email ON Ticket_Email.Ticket = Tickets.ID
             GROUP BY  Ticket_Email.Email;",array($Ticket['Location_ID'],$Ticket['Location_ID']));
           $Emails = array();
           if($r){while($row = sqlsrv_fetch_array($r)){

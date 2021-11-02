@@ -1,6 +1,8 @@
 <?php
-session_start();
-require('cgi-bin/php/index.php');
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( ); 
+    require( '/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php' );
+}
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,
     " SELECT  *

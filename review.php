@@ -244,71 +244,77 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
 							$Selected_Supervisors = array_map('ucfirst',$Selected_Supervisors);
                             if((in_array(ucfirst(strtolower($Mechanic['Super'])),$Selected_Supervisors) && !in_array($Mechanic['Super'],array('Office','Warehouse','firemen','Dean','Office','Firemen','',' ','  '))) || $_GET['Supervisors'] == '' || $_GET['Supervisors'] == 'All'){
                                 ?>
-                            <tr style='cursor:pointer;' class="odd gradeX hoverGray" onClick="document.location.href='time_sheet2.php?Mechanic=<?php echo $Mechanic['ID'];?>'">
+                            <tr style='cursor:pointer;' class="odd gradeX hoverGray" rel='<?php echo $Mechanic[ 'ID' ];?>'>
                                 <?php $Total = 0;?>
                                 <td class='Last_Name'><?php echo $Mechanic['Last'];?></td>
                                 <td class='First_Name'><?php echo $Mechanic['fFirst'];?></td>
-                                <td class='Thursday' style='font-weight:bold;'><?php
-                                    $Thursday = date('Y-m-d',strtotime($_GET['Date'] . ' -6 days'));
+                                <?php $Thursday = date('Y-m-d',strtotime($_GET['Date'] . ' -6 days'));?>
+                                <td class='day Thursday' style='font-weight:bold;' rel='<?php echo $Thursday;?>'><?php
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Thursday'><?php
+                                <td class='day Thursday' rel='<?php echo $Thursday;?>'><?php
                                     //$Thursday = date('Y-m-d',strtotime($_GET['Date'] . ' -6 days'));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Friday' style='font-weight:bold;'><?php
-                                    $Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));
+                                    <?php $Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));?>
+                                <td class='day Friday' style='font-weight:bold;' rel='<?php echo $Friday;?>'><?php
+                                    
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Friday'><?php
+                                    <?php $Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));?>
+                                <td class='day Friday' rel='<?php echo $Friday;?>'><?php
                                     //$Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Saturday' style='font-weight:bold;'><?php
-                                    $Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));
+                                <td class='day Saturday' style='font-weight:bold;' rel='<?php echo $Saturday;?>'><?php
+                                    
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Saturday'><?php
+                                <td class='day Saturday' rel='<?php echo $Saturday;?>'><?php
                                     //$Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Sunday' style='font-weight:bold;'><?php
-                                    $Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));
+                                    <?php $Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));?>
+                                <td class='day Sunday' style='font-weight:bold;' rel='<?php echo $Sunday;?>'><?php
+                                    
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Sunday'><?php
+                                <td class='day Sunday' rel='<?php echo $Sunday;?>'><?php
                                     //$Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Monday' style='font-weight:bold;'><?php
-                                    $Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));
+                                    <?php $Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));?>
+                                <td class='day Monday' style='font-weight:bold;' rel='<?php echo $Monday;?>'><?php
+                                    
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Monday'><?php
+                                <td class='day Monday' rel='<?php echo $Monday;?>'><?php
                                     //$Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Tuesday' style='font-weight:bold;'><?php
-                                    $Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));
+                                    <?php $Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));?>
+                                <td class='day Tuesday' style='font-weight:bold;' rel='<?php echo $Tuesday;?>'><?php
+                                    
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Tuesday'><?php
+                                <td class='day Tuesday' rel='<?php echo $Tuesday;?>'><?php
                                     //$Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Wednesday' style='font-weight:bold;'><?php
-                                    $Wednesday = date('Y-m-d',strtotime($_GET['Date']));
+                                    <?php $Wednesday = date('Y-m-d',strtotime($_GET['Date']));?>
+                                <td class='day Wednesday' style='font-weight:bold;' rel='<?php echo $Wednesday;?>'><?php
+                                    
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Wednesday'><?php
+                                <td class='day Wednesday' rel='<?php echo $Wednesday;?>'><?php
                                     //$Wednesday = date('Y-m-d',strtotime($_GET['Date']));
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
-                                <td class='Total' style='font-weight:bold;'><?php
+                                <td class='week Total' style='font-weight:bold;' rel='<?php echo $Thursday;?>'><?php
                                     $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];
                                 ?></td>
-                                <td class='Total'><?php
+                                <td class='week Total' rel='<?php echo $Thursday;?>'><?php
                                     $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];
                                 ?></td>
@@ -343,7 +349,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                 var Mechanics   = $("select[name='Mechanics']").val();
                 var Week_Ending = $("input[name='Week_Ending']").val();
                 document.location.href='review.php?Supervisors=' + Supervisors + '&Mechanics=' + Mechanics + "&Date=" + Week_Ending;
-            }
+            } 
             $( "input[name='Week_Ending']" ).datepicker({
                 beforeShowDay: function( date ){
                   return [ ( date.getDay( ) == 3 ), '' ]; },
@@ -353,28 +359,42 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
             $('select#Supervisors').html($('#Supervisors option').sort(function (a, b) {return a.text == b.text ? 0 : a.text < b.text ? -1 : 1}));
         </script>
         <script>
-            $('table#Review').DataTable({
-                responsive: true,
-                lengthMenu     : [ 
-                    [ -1, 10, 25, 50, 100 ],
-                    [ 'All',10,25,50,100 ] 
-                ],
-                initComplete   : function( ){ },
-                footerCallback : function( row, data, start, end, display ) {
-                    var api = this.api();
-                    api.columns( '.sum', { page: 'current' } ).every(function () {
-                        var sum = api
-                            .cells( null, this.index(), { page: 'current'} )
-                            .render('display')
-                            .reduce(function (a, b) {
-                                var x = parseFloat(a) || 0;
-                                var y = parseFloat(b) || 0;
-                                return x + y;
-                            }, 0);
-                        $( this.footer( ) ).html( sum );
+            var days = document.getElementsByClassName( 'day' );
+            for(let i = 0; i < days.length; i++) {
+                days[ i ].addEventListener( 'click', function( event ){
+                    var link = this;
+                    $( '.ticket, .tickets, .tickets-header, .tickets-footer' ).each( function(){ $( this ).remove( ); })
+                    $.ajax({
+                        url  : 'cgi-bin/php/get/reviewDay.php',
+                        data : {
+                            User : $( link ).parent().attr( 'rel' ),
+                            Date : link.getAttribute( 'rel' ),
+                        },
+                        method : 'GET',
+                        success : function( response ){ 
+                            $( link ).parent().after( response );
+                        }
                     });
-                }
-            });
+                });
+            }
+            var weeks = document.getElementsByClassName( 'week' );
+            for(let i = 0; i < weeks.length; i++) {
+                weeks[ i ].addEventListener( 'click', function( event ){
+                    var link = this;
+                    $( '.ticket, .tickets' ).each( function(){ $( this ).remove( ); })
+                    $.ajax({
+                        url  : 'cgi-bin/php/get/reviewWeek.php',
+                        data : {
+                            User : $( link ).parent().attr( 'rel' ),
+                            Date : link.getAttribute( 'rel' ),
+                        },
+                        method : 'GET',
+                        success : function( response ){ 
+                            $( link ).parent().after( response );
+                        }
+                    });
+                });
+            }
         </script>
     </div>
 </body>
