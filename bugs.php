@@ -48,98 +48,102 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         || $Privileges[ 'Admin' ][ 'Other_Privilege' ] < 4){
 				?><?php require( '../404.html' );?><?php }
     else {
-if(count( $_POST ) > 0 && is_numeric( $_POST [ 'Severity' ] ) && strlen( $_POST [ 'Name' ] ) > 0 && strlen( $_POST [ 'Description' ] ) > 0 ) {
-
-            $Name        = $_POST[ 'Name' ];
-            $Severity    = $_POST[ 'Severity' ];
-            $Description = $_POST[ 'Description' ];
-            $Suggestion  = $_POST[ 'Suggestion' ];
-            $Parameters  = array($Name,$Severity,$Description,$Suggestion);
-    $result = sqlsrv_query( $Portal,
-            "INSERT INTO Bug(Name, Severity, Description, Suggestion)
-             VALUES(?,?,?,?);",
-    $Parameters);
-
+if(     count( $_POST ) > 0
+    &&  is_numeric( $_POST[ 'Severity' ] )
+    &&  strlen( $_POST[ 'Name' ] ) > 0
+    && strlen( $_POST[ 'Description' ] ) > 0
+) {
+  $Name        = $_POST[ 'Name' ];
+  $Severity    = $_POST[ 'Severity' ];
+  $Description = $_POST[ 'Description' ];
+  $Suggestion  = $_POST[ 'Suggestion' ];
+  $Parameters  = array(
+    $Name,
+    $Severity,
+    $Description,
+    $Suggestion
+  );
+  $result = sqlsrv_query(
+    $Portal,
+    " INSERT INTO Bug(Name, Severity, Description, Suggestion)
+      VALUES(?,?,?,?);",
+    $Parameters
+  );
 }?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
-    <title>Nouveau Texas | Portal</title>    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( PROJECT_ROOT . 'php/meta.php' );?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>    \
+    <?php require( PROJECT_ROOT . 'css/index.php' );?>
+    <?php require( PROJECT_ROOT . 'js/index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-            <div class='row'>
-                <div class="col-lg-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading"><h2>Bugs</h2></div>
-                        <div class='panel-body'>
-                            <ul class="nav nav-tabs">
-                                <li class="active"><a href="#bugs-pills" data-toggle="tab"><?php $Icons->Info();?> Bugs</a></li>
-                                <li class=""><a href="#add-bug-pills" data-toggle="tab"><?php $Icons->Financial();?> Add Bugs</a></li>
-                            </ul>
-                            <br />
-                            <div class="tab-content">
-                                <div class="tab-pane fade in active" id="bugs-pills">
-                                    <?php $result = sqlsrv_query($Portal,
-                                        "   SELECT
-                                            Bug.ID,
-                                            Bug.Name,
-                                            Bug.Description,
-                                            Bug.Resolution,
-                                            Bug.Fixed,
-                                            Bug.Suggestion,
-                                            Severity.Name AS Severity
-                                            FROM Bug
-                                            LEFT JOIN Severity
-                                            ON Bug.Severity = Severity.ID;"
-                                );
-                                    if($result){while($Bug = sqlsrv_fetch_array($result)){?>
-                                    <div class='row'>
-                                        <div class='col-md-2'>Name:</div><div class='col-md-10'><?php echo $Bug['Name'];?></div>
-                                        <div class='col-md-2'>Severity:</div><div class='col-md-10'><?php echo $Bug['Severity'];?></div>
-                                        <div class='col-md-2'>Description:</div><div class='col-md-10'><?php echo $Bug['Description'];?></div>
-                                        <div class='col-md-2'>Suggestion:</div><div class='col-md-10'><?php echo strlen($Bug['Suggestion']) > 0 ? $Bug['Suggestion'] : '&nbsp;';?></div>
-                                        <div class='col-md-2'>Resolution:</div><div class='col-md-10'><?php echo strlen($Bug['Resolution']) > 0 ? $Bug['Resolution'] : '&nbsp;';?></div>
-                                        <div class='col-md-2'>Fixed:</div><div class='col-md-10'><?php echo strlen($Bug['Fixed']) > 0 ? $Bug['Fixed'] : '&nbsp;';?></div>
-                                    </div><hr /><?php }}?>
-                                </div>
-                                <div class='tab-pane fade in' id='add-bug-pills'>
-                                    <form action="bugs.php" method='POST'>
-                                        <div class='input-group'><label for='Name' class=''>Name&nbsp;</label><input class='form-control' name="Name" type="text" /></div>
-                                        <div class='input-group'>
-                                            <label for='Severity' class=''>Severity&nbsp;</label>
-                                            <select name='Severity' class='form-control'><?php
-                                                $result = sqlsrv_query(
-                                                  $Portal, "SELECT *
-                                                            FROM Severity;"
-                                );
-                                                if( $result ){while( $Severity = sqlsrv_fetch_array( $result ))
-                                                  {?><option value='<?php echo $Severity [ 'ID' ];?>'><?php echo $Severity [ 'Name' ];?></option><?php }}
-                                            ?></select>
-                                        </div>
-                                        <div class='input-group'><label for='Description' class=''>Description&nbsp;</label><textarea class='form-control' name='Description' cols='60' rows='5'></textarea></div>
-
-                                        <div class='input-group'><label for='Suggestion' class=''>Suggestion&nbsp;</label><textarea class='form-control' name='Suggestion' cols='60' rows='5'></textarea></div>
-                                        <hr />
-                                        <div class='input-group'><input type='submit' value='Submit Bug' class='form-control' /></div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  <div id="wrapper">
+    <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <div id="page-wrapper" class='content'>
+      <div class="panel panel-primary">
+        <div class="panel-heading"><h2>Bugs</h2></div>
+        <div class='panel-body'>
+          <ul class="nav nav-tabs">
+              <li class="active"><a href="#bugs-pills" data-toggle="tab"><?php $Icons->Info();?> Bugs</a></li>
+              <li class=""><a href="#add-bug-pills" data-toggle="tab"><?php $Icons->Financial();?> Add Bugs</a></li>
+          </ul>
+          <br />
+          <div class="tab-content">
+            <div class="tab-pane fade in active" id="bugs-pills"><?php
+                $result = sqlsrv_query($Portal,
+                    "   SELECT  Bug.ID,
+                                Bug.Name,
+                                Bug.Description,
+                                Bug.Resolution,
+                                Bug.Fixed,
+                                Bug.Suggestion,
+                                Severity.Name AS Severity
+                        FROM    Bug
+                                LEFT JOIN Severity ON Bug.Severity = Severity.ID;"
+              );
+              if($result){while($Bug = sqlsrv_fetch_array($result)){
+                ?><div class='row'>
+                    <div class='col-md-2'>Name:</div><div class='col-md-10'><?php echo $Bug['Name'];?></div>
+                    <div class='col-md-2'>Severity:</div><div class='col-md-10'><?php echo $Bug['Severity'];?></div>
+                    <div class='col-md-2'>Description:</div><div class='col-md-10'><?php echo $Bug['Description'];?></div>
+                    <div class='col-md-2'>Suggestion:</div><div class='col-md-10'><?php echo strlen($Bug['Suggestion']) > 0 ? $Bug['Suggestion'] : '&nbsp;';?></div>
+                    <div class='col-md-2'>Resolution:</div><div class='col-md-10'><?php echo strlen($Bug['Resolution']) > 0 ? $Bug['Resolution'] : '&nbsp;';?></div>
+                    <div class='col-md-2'>Fixed:</div><div class='col-md-10'><?php echo strlen($Bug['Fixed']) > 0 ? $Bug['Fixed'] : '&nbsp;';?></div>
                 </div>
+                <hr /><?php
+              }}?>
             </div>
+            <div class='tab-pane fade in' id='add-bug-pills'>
+              <form action="bugs.php" method='POST'>
+                  <div class='input-group'><label for='Name' class=''>Name&nbsp;</label><input class='form-control' name="Name" type="text" /></div>
+                  <div class='input-group'>
+                      <label for='Severity' class=''>Severity&nbsp;</label>
+                      <select name='Severity' class='form-control'><?php
+                          $result = sqlsrv_query(
+                            $Portal, "SELECT *
+                                      FROM Severity;"
+                        );
+                          if( $result ){while( $Severity = sqlsrv_fetch_array( $result ))
+                            {?><option value='<?php echo $Severity [ 'ID' ];?>'><?php echo $Severity [ 'Name' ];?></option><?php }}
+                      ?></select>
+                  </div>
+                  <div class='input-group'><label for='Description' class=''>Description&nbsp;</label><textarea class='form-control' name='Description' cols='60' rows='5'></textarea></div>
+
+                  <div class='input-group'><label for='Suggestion' class=''>Suggestion&nbsp;</label><textarea class='form-control' name='Suggestion' cols='60' rows='5'></textarea></div>
+                  <hr />
+                  <div class='input-group'><input type='submit' value='Submit Bug' class='form-control' /></div>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  </div>
+  <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+  <?php require(PROJECT_ROOT.'js/datatables.php');?>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 </body>
 </html>
  <?php
