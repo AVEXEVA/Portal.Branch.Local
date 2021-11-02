@@ -977,7 +977,7 @@ if($_SESSION['User'] == '895'){
     </div>
     <div class='row expenses'>
       <div class='col-xs-4'><i class="fa fa-paperclip fa-1x fa-fw" aria-hidden="true"></i> Photo:</div>
-      <div class='col-xs-8'><form id='Receipt' enctype='multipart/form-data' method='POST'><inputtype='hidden' name='ID' value='<?php echo $_GET['ID'];?>' /><input  multiple='multiple' type='file' name='Receipt[]' style='color:white !important;'/></form></div>
+      <div class='col-xs-8'><form id='Receipt' enctype='multipart/form-data' method='POST'><input type='hidden' name='ID' value='<?php echo $_GET['ID'];?>' /><input multiple='multiple'  type='file' name='Receipt[]' style='color:white !important;'/></form></div>
     </div>
   </div>
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution</h4></div>
