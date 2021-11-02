@@ -73,8 +73,33 @@ if(     count( $_POST ) > 0
 <html lang="en">
 <head>
     <?php require( PROJECT_ROOT . 'php/meta.php' );?>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>    \
-    <?php require( PROJECT_ROOT . 'css/index.php' );?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php require('cgi-bin/css/index.php');?>
+    <style>
+      .form-group>label:first-child {
+          min-width  : 175px;
+          text-align : right;
+      }
+      .hoverGray:hover {
+          background-color : gold !important;
+      }
+      table#Table_Bugs tbody tr, table#Table_Bugs tbody tr td a {
+          color : black !important;
+      }
+      table#Table_Bugs tbody tr:nth-child( even ) {
+          background-color : rgba( 240, 240, 240, 1 ) !important;
+      }
+      table#Table_Bugs tbody tr:nth-child( odd ) {
+          background-color : rgba( 255, 255, 255, 1 ) !important;
+      }
+      .paginate_button {
+        background-color : rgba( 255, 255, 255, .7 ) !important;
+      }
+      .paginate_button:hover {
+        color : white !important;
+      }
+      </style>
     <?php require( PROJECT_ROOT . 'js/index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
@@ -85,58 +110,39 @@ if(     count( $_POST ) > 0
       <div class="panel panel-primary">
         <div class="panel-heading"><h2>Bugs</h2></div>
         <div class='panel-body'>
-          <ul class="nav nav-tabs">
-              <li class="active"><a href="#bugs-pills" data-toggle="tab"><?php $Icons->Info();?> Bugs</a></li>
-              <li class=""><a href="#add-bug-pills" data-toggle="tab"><?php $Icons->Financial();?> Add Bugs</a></li>
-          </ul>
-          <br />
-          <div class="tab-content">
-            <div class="tab-pane fade in active" id="bugs-pills"><?php
-                $result = sqlsrv_query($Portal,
-                    "   SELECT  Bug.ID,
-                                Bug.Name,
-                                Bug.Description,
-                                Bug.Resolution,
-                                Bug.Fixed,
-                                Bug.Suggestion,
-                                Severity.Name AS Severity
-                        FROM    Bug
-                                LEFT JOIN Severity ON Bug.Severity = Severity.ID;"
-              );
-              if($result){while($Bug = sqlsrv_fetch_array($result)){
-                ?><div class='row'>
-                    <div class='col-md-2'>Name:</div><div class='col-md-10'><?php echo $Bug['Name'];?></div>
-                    <div class='col-md-2'>Severity:</div><div class='col-md-10'><?php echo $Bug['Severity'];?></div>
-                    <div class='col-md-2'>Description:</div><div class='col-md-10'><?php echo $Bug['Description'];?></div>
-                    <div class='col-md-2'>Suggestion:</div><div class='col-md-10'><?php echo strlen($Bug['Suggestion']) > 0 ? $Bug['Suggestion'] : '&nbsp;';?></div>
-                    <div class='col-md-2'>Resolution:</div><div class='col-md-10'><?php echo strlen($Bug['Resolution']) > 0 ? $Bug['Resolution'] : '&nbsp;';?></div>
-                    <div class='col-md-2'>Fixed:</div><div class='col-md-10'><?php echo strlen($Bug['Fixed']) > 0 ? $Bug['Fixed'] : '&nbsp;';?></div>
-                </div>
-                <hr /><?php
-              }}?>
-            </div>
-            <div class='tab-pane fade in' id='add-bug-pills'>
-              <form action="bugs.php" method='POST'>
-                  <div class='input-group'><label for='Name' class=''>Name&nbsp;</label><input class='form-control' name="Name" type="text" /></div>
-                  <div class='input-group'>
-                      <label for='Severity' class=''>Severity&nbsp;</label>
-                      <select name='Severity' class='form-control'><?php
-                          $result = sqlsrv_query(
-                            $Portal, "SELECT *
-                                      FROM Severity;"
-                        );
-                          if( $result ){while( $Severity = sqlsrv_fetch_array( $result ))
-                            {?><option value='<?php echo $Severity [ 'ID' ];?>'><?php echo $Severity [ 'Name' ];?></option><?php }}
-                      ?></select>
-                  </div>
-                  <div class='input-group'><label for='Description' class=''>Description&nbsp;</label><textarea class='form-control' name='Description' cols='60' rows='5'></textarea></div>
-
-                  <div class='input-group'><label for='Suggestion' class=''>Suggestion&nbsp;</label><textarea class='form-control' name='Suggestion' cols='60' rows='5'></textarea></div>
-                  <hr />
-                  <div class='input-group'><input type='submit' value='Submit Bug' class='form-control' /></div>
-              </form>
-            </div>
-          </div>
+            <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
+                <thead><tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                    <th>Suggestion</th>
+                    <th>Resolution</th>
+                    <th>Fixed</th>
+                </tr></thead>
+                <tbody><?php
+            $result = sqlsrv_query($Portal,
+                "   SELECT  Bug.ID,
+                            Bug.Name,
+                            Bug.Description,
+                            Bug.Resolution,
+                            Bug.Fixed,
+                            Bug.Suggestion,
+                            Severity.Name AS Severity
+                    FROM    Bug
+                            LEFT JOIN Severity ON Bug.Severity = Severity.ID;"
+          );
+          if($result){while($Bug = sqlsrv_fetch_array($result)){
+            ?><tr>
+                <td><?php echo $Bug['Name'];?></td>
+                <td><?php echo $Bug['Severity'];?></td>
+                <td><?php echo $Bug['Description'];?></td>
+                <td><?php echo strlen($Bug['Suggestion']) > 0 ? $Bug['Suggestion'] : '&nbsp;';?></td>
+                <td><?php echo strlen($Bug['Resolution']) > 0 ? $Bug['Resolution'] : '&nbsp;';?></td>
+                <td><?php echo strlen($Bug['Fixed']) > 0 ? $Bug['Fixed'] : '&nbsp;';?></td>
+            </tr>
+            <?php
+          }}?></tbody></table>
         </div>
       </div>
     </div>
@@ -144,6 +150,54 @@ if(     count( $_POST ) > 0
   <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
   <?php require(PROJECT_ROOT.'js/datatables.php');?>
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script>
+    var Table_Bugs = $('#Table_Bugs').DataTable( {
+        dom        : 'tp',
+        processing : true,
+        serverSide : true,
+        responsive : true,
+        autoWidth  : false,
+        paging     : true,
+        searching  : false,
+        ajax       : {
+        url : 'cgi-bin/php/get/Contracts2.php',
+        data : function( d ){
+            d = {
+                    start : d.start,
+                    length : d.length,
+                    order : {
+                        column : d.order[0].column,
+                        dir : d.order[0].dir
+                    }
+                };
+                d.Search = $('input[name="Search"]').val( );
+                d.ID = $('input[name="ID"]').val( );
+                d.Customer = $('input[name="Customer"]').val( );
+                d.Location = $('input[name="Location"]').val( );
+                d.Start_Date = $('input[name="Start_Date"]').val( );
+                d.End_Date = $('input[name="End_Date"]').val( );
+                d.Cycle = $('select[name="Cycle"]').val( );
+                return d;
+            }
+        },
+        columns: [
+            {
+                data    : 'ID'
+            },{
+                data    : 'Name'
+            },{
+                data    : 'Description'
+            },{
+                data    : 'Severity'
+            },{
+                data    : 'Suggestion'
+            },{
+                data    : 'Resolution'
+            },{
+                data    : 'Fixed'
+            }
+    } );
+  </script>
 </body>
 </html>
  <?php

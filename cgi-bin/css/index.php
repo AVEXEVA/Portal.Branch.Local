@@ -5,10 +5,9 @@
     default:?><link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=3" rel="stylesheet"><?php break;
     break;
   }
-} else {?>
-  <link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=3" rel="stylesheet">
-<?php }?>
-<?PHP
+} else {
+  require( 'cgi-bin/library/bootstrap/index.php' );
+}
 IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER['SCRIPT_NAME'], 1, strlen( $_SERVER['SCRIPT_NAME'] ) - 5 ) . '/index.php') ){
   require('/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER[ 'SCRIPT_NAME' ], 1, strlen( $_SERVER[ 'SCRIPT_NAME' ] ) - 5 . '/index.php' ) );
 } else {
@@ -25,15 +24,15 @@ IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $
 }?>
 
 <?php if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/animation.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/print.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/class.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/wrapper.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/gui.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/navbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/animation.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/print.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/class.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/wrapper.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/gui.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/navbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <style>
 /*Fonts*/
 @font-face {
@@ -43,16 +42,3 @@ IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $
 }
 .BankGothic { font-family:'BankGothic'; }
 </style>
-<?php 
-if( $_SESSION[ 'User' ] == 895 ){?>
-  <style>
-    @media screen and (min-width:1980px){
-        #page-wrapper {
-        padding-left:16.666%;
-        padding-right:16.666%;
-      }    
-    }
-  
-  </style>
-<?php }
-?>

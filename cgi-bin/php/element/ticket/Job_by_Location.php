@@ -1,6 +1,8 @@
-<?php 
-session_start();
-require('../../../php/index.php');
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( ); 
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
 function contains($needle, $haystack)
 {
     return strpos($haystack, $needle) !== false;
