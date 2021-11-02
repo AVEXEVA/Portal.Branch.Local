@@ -1,40 +1,63 @@
 <?php
-session_start();
-require('cgi-bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
-		SELECT *
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-	   	|| !isset($My_Privileges['Sales_Admin'])
-	  		|| $My_Privileges['Sales_Admin']['User_Privilege']  < 4
-	  		|| $My_Privileges['Sales_Admin']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Sales_Admin']['Other_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+		    FROM    Connection
+		    WHERE       Connection.Connector = ?
+                    AND Connection.Hash  = ?;",
+        array(
+            $_SESSION[ 'User' ],
+            $_SESSION[ 'Hash' ]
+        )
+    );
+    $Connection = sqlsrv_fetch_array( $result );
+    //User
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *,
+                    Emp.fFirst AS First_Name,
+                    Emp.Last   AS Last_Name
+            FROM    Emp
+            WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+    $User = sqlsrv_fetch_array( $result );
+    //Privileges
+	$result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+	$Privileges = array();
+	if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+    if(	!isset( $Connection[ 'ID' ] )
+	   	|| !isset($Privileges[ 'Sales_Admin' ])
+	  		|| $Privileges[ 'Sales_Admin' ][ 'User_Privilege' ]  < 4
+	  		|| $Privileges[ 'Sales_Admin' ][ 'Group_Privilege' ] < 4
+        || $Privileges[ 'Sales_Admin' ][ 'Other_Privilege' ] < 4){
+				?><?php require( '../404.html' );?><?php }
     else {
-		sqlsrv_query($NEI,"
-			INSERT INTO Activity([User], [Date], [Page])
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "accounts_v2019.php"));
+      sqlsrv_query(
+          $NEI,
+          "   INSERT INTO Activity([User], [Date], [Page])
+              VALUES( ?, ?, ? );",
+          array(
+              $_SESSION['User'],
+              date( 'Y-m-d H:i:s' ),
+              'accounts_v2019.php'
+          )
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +65,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    
+    <meta name="author" content="Peter D. Speranza">
     <title>Nouveau Elevator Portal</title>
     <?php require(PROJECT_ROOT."css/index.php");?>
     <?php require(PROJECT_ROOT.'js/index.php');?>
@@ -70,7 +93,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           </div>
 			<table id='Table_Customers' class='display' cellspacing='0' width='100%' max-height='800px'>
 				<thead>
-          		<th>Loc</th>
+          <th>Location</th>
 					<th>Customer</th>
 					<th>Customer</th>
 					<th>Territory</th>
@@ -82,16 +105,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<th>Profit</th>
 					<th>Profit %</th>
 					<th>Overhead</th>
-          			<th>Profit w/ OH</th>
-          			<th>Bills</th>
+          <th>Profit w/ OH</th>
+          <th>Bills</th>
 					<th>Profit w/ OH w/o Bills </th>
-          			<th>Profit Percentage</th>
-			        <th>Grade</th>
-			        <th></th>
+          <th>Profit Percentage</th>
+          <th>Grade</th>
+          <th></th>
 				</thead>
 			</table>
-        </div>
     </div>
+  </div>
 	<!-- Bootstrap Core JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -104,34 +127,34 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       background-color:#f0f0f0 !important;
     }
     </style>
-    <!-- Custom Date Filters--> 
+    <!-- Custom Date Filters-->
     <script src="../dist/js/filters.js"></script>
     <style>
     .Totals.dtrg-group.dtrg-end.dtrg-level-0>td {
         color :black !important;
     }
     @media not print {
-      .agood {
-        color:darkgreen;
-      }
-      .vgood {
-        color:green;
-      }
-      .good {
-        color:lime;
-      }
-      .middle {
-        color:gray;
-      }
-      .bad {
-        color:pink;
-      }
-      .vbad {
-        color:red;
-      }
-      .tbad {
-        color:darkred;
-      }
+    .agood {
+      color:darkgreen;
+    }
+    .vgood {
+      color:green;
+    }
+    .good {
+      color:lime;
+    }
+    .middle {
+      color:gray;
+    }
+    .bad {
+      color:pink;
+    }
+    .vbad {
+      color:red;
+    }
+    .tbad {
+      color:darkred;
+    }
     }
     tr.group,
     tr.group:hover {
@@ -160,33 +183,33 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 dom     : 'Bfrtip',
                 paging  : false,
                 order   : [[ groupColumn, 'asc' ]],
-				buttons : [
-					'copy', 
-					'excel',
-					'csv', 
-					'pdf',
-					'print'
-				],
+        				buttons : [
+      					'copy',
+      					'excel',
+      					'csv',
+      					'pdf',
+      					'print'
+        				],
                 columns : [
-                    { "data": "Location_ID", "className":"hidden"},
-                    { "data": "Customer_Name",  "visible": false, "targets": groupColumn },
-                    { "data": "Customer_N",  "visible": false},
-                    { "data": "Territory_Name"},
-                    { 'data': 'Route_Name'},
-                    { "data": "Location_Name"},
-                    { "data": "Invoices_Sum"},
-                    { "data": "Materials_Sum"}, 
-                    { "data": "Labor_Sum"},
-                    { "data": "Profit"},
-                    { "data": "Profit_Percentage_Raw"},
-                    { "data": "Overhead"},
-                    { "data": "Profit_with_Overhead"},
-                    { "data": "Bills_Sum"},
-                    { "data": "Profit_with_Overhead_without_Bills"},
-                    { "data": "Profit_Percentage"},
-                    { "data": 'Grade', 'className':'hidden'},
-                    { "data": "Active", "visible": false}
-                    //,{ "data": "Cost_Margin"}
+                { "data": "Location_ID", "className":"hidden"},
+                { "data": "Customer_Name",  "visible": false, "targets": groupColumn },
+                { "data": "Customer_N",  "visible": false},
+                { "data": "Territory_Name"},
+                { 'data': 'Route_Name'},
+                { "data": "Location_Name"},
+                { "data": "Invoices_Sum"},
+                { "data": "Materials_Sum"},
+                { "data": "Labor_Sum"},
+                { "data": "Profit"},
+                { "data": "Profit_Percentage_Raw"},
+                { "data": "Overhead"},
+                { "data": "Profit_with_Overhead"},
+                { "data": "Bills_Sum"},
+                { "data": "Profit_with_Overhead_without_Bills"},
+                { "data": "Profit_Percentage"},
+                { "data": 'Grade', 'className':'hidden'},
+                { "data": "Active", "visible": false}
+                //,{ "data": "Cost_Margin"}
                 ],
                 drawCallback: function ( settings ) {
                     var api = this.api();
@@ -200,10 +223,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             );
 
                             last = group;
-                        }
-                    } );
-                },
-                rowGroup: {
+                          }
+                        } );
+                      },
+                      rowGroup: {
                       startRender: null,
                       endRender: function ( rows, group ) {
                         var Invoices_Sum = rows
@@ -381,9 +404,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           $("input[name='Start']").datepicker();
           $("input[name='End']").datepicker();
         });
-    </script>
-</body>
-</html>
+      </script>
+    </body>
+  </html>
 <?php
     }
 } else {?><html><head><script>document.location.href='../login.php?Forward=accounts_v2019.php';</script></head></html><?php }?>

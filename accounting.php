@@ -7,9 +7,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $result = sqlsrv_query(
         $NEI,
         "   SELECT  *
-		    FROM    Connection
-		    WHERE       Connection.Connector = ?
-                    AND Connection.Hash  = ?;",
+		        FROM        Connection
+            WHERE       Connection.Connector = ?
+            AND         Connection.Hash  = ?;",
         array(
             $_SESSION[ 'User' ],
             $_SESSION[ 'Hash' ]
@@ -36,13 +36,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
-            $_SESSION['User']
+            $_SESSION[ 'User' ]
         )
     );
 	$Privileges = array();
 	if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
     if(	!isset( $Connection[ 'ID' ] )
-	   	|| !isset($Privileges[ 'Contract' ])
+	   	|| !isset($Privileges[ 'Admin' ])
 	  		|| $Privileges[ 'Admin' ][ 'User_Privilege' ]  < 4
 	  		|| $Privileges[ 'Admin' ][ 'Group_Privilege' ] < 4
         || $Privileges[ 'Admin' ][ 'Other_Privilege' ] < 4){
