@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  if( in_array( $_SESSION['User'], array( 4, 6 ) ) ){?>
+  if( in_array( $_SESSION['User'], array( 250, 895 ) ) ){?>
   	<html>
   	<head>
   		<style>
