@@ -646,7 +646,7 @@ if($_SESSION['User'] == '895'){
           var ctx = document.getElementById('signature').getContext('2d');
           ctx.drawImage(img, 0, 0);
       }
-      img.src = 'https://www.nouveautexas.com/portal/media/images/signatures/<?php echo $_GET['ID'];?>.jpg';
+      img.src = 'https://beta.nouveauelevator.com/portal/media/images/signatures/<?php echo $_GET['ID'];?>.jpg';
       </script>
       <script>
       $(document).ready(function(){

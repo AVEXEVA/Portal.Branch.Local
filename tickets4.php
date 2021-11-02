@@ -134,7 +134,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
 		</div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script>

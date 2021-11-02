@@ -47,13 +47,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require(PROJECT_ROOT."css/index.php");?>
     <?php require(PROJECT_ROOT.'js/index.php');?>
     <script> function refresh(){ document.location.href='accounts_v2019.php?Start=' + $("input[name='Start']").val() + '&End=' + $("input[name='End']").val(); } </script>
-    <script src="../vendor/flot/excanvas.min.js"></script>
-    <script src="../vendor/flot/jquery.flot.js"></script>
-    <script src="../vendor/flot/jquery.flot.pie.js"></script>
-    <script src="../vendor/flot/jquery.flot.resize.js"></script>
-    <script src="../vendor/flot/jquery.flot.time.js"></script>
-    <script src="../vendor/flot/jquery.flot.categories.js"></script>
-    <script src="../vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.resize.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.time.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.categories.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
 </head>
 <body onload="finishLoadingPage();"
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -94,7 +94,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
 	<!-- Bootstrap Core JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
     <script src='https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js'></script>

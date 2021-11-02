@@ -178,8 +178,8 @@ else {$Clouseout = '';}?>
                 </div>
             </div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../vendor/metisMenu/metisMenu.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
     <script src="../dist/js/sb-admin-2.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
     <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>

@@ -1649,7 +1649,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			</div>
 		</div><?php }?>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <script src="../dist/js/sb-admin-2.js"></script>
 </body>

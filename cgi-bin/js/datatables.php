@@ -13,10 +13,10 @@
 <link rel="stylesheet" type="text/css" href="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
 <!--<link rel='stylesheet' href='https://www.nouveauelevator.com/portal/css/jquery.dataTables.yadcf.css'>-->
 
-<script data-pagespeed-no-defer src="../vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script data-pagespeed-no-defer src="../vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-<script data-pagespeed-no-defer src="../vendor/datatables-responsive/dataTables.responsive.js"></script>
-<!--<script data-pagespeed-no-defer src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>-->
+<script data-pagespeed-no-defer src="https://www.nouveauelevator.com/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script data-pagespeed-no-defer src="https://www.nouveauelevator.com/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+<script data-pagespeed-no-defer src="https://www.nouveauelevator.com/vendor/datatables-responsive/dataTables.responsive.js"></script>
+<!--<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin//js/jquery.dataTables.yadcf.js"></script>-->
 
 <link rel='stylesheet' href="https://cdn.datatables.net/select/1.2.4/css/select.dataTables.min.css">
 <link rel='stylesheet' href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.bootstrap.min.css">
@@ -44,25 +44,25 @@
 <script data-pagespeed-no-defer src="https://cdn.datatables.net/fixedheader/3.1.3/js/dataTables.fixedHeader.min.js"></script>
 
 
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/dataTables.editor.css">
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/editor.bootstrap.min.css">
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/editor.bootstrap4.min.css">
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/editor.dataTables.min.css">
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/editor.foundation.min.css">
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/editor.jqueryui.min.css">
-<link rel="stylesheet" href="cgi-bin/Editor-1.7.0/css/editor.semanticui.min.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/dataTables.editor.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.bootstrap.min.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.bootstrap4.min.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.dataTables.min.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.foundation.min.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.jqueryui.min.css">
+<link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.semanticui.min.css">
 
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/dataTables.editor.min.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/editor.bootstrap.min.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/editor.bootstrap4.min.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/editor.foundation.min.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/editor.jqueryui.min.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/editor.semanticui.min.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/dataTables.editor.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/dataTables.editor.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/dataTables.editor.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/dataTables.editor.js"></script>
-<script data-pagespeed-no-defer src="cgi-bin//Editor-1.7.0/js/dataTables.editor.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/dataTables.editor.min.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/editor.bootstrap.min.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/editor.bootstrap4.min.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/editor.foundation.min.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/editor.jqueryui.min.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/editor.semanticui.min.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/dataTables.editor.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/dataTables.editor.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/dataTables.editor.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/dataTables.editor.js"></script>
+<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/cgi-bin///Editor-1.7.0/js/dataTables.editor.js"></script>
 
 <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
 <script data-page-speed-no-defre src="//cdn.datatables.net/plug-ins/1.10.18/sorting/datetime-moment.js"></script>

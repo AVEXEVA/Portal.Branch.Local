@@ -107,7 +107,7 @@ if(isMobile() || true){?><!DOCTYPE html>
             </div>
         </div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script> 

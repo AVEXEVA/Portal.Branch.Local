@@ -116,8 +116,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../vendor/metisMenu/metisMenu.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>

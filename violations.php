@@ -123,7 +123,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
     <?php require('cgi-bin/js/datatables.php');?>
     <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>

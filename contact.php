@@ -80,10 +80,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	</style>
     <!-- Bootstrap Core JavaScript -->
     <!-- Bootstrap Core JavaScript -->
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="../vendor/metisMenu/metisMenu.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
 
     <?php require('cgi-bin/js/datatables.php');?>
     <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
@@ -102,13 +102,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
     div.data {display:inline-block;width:300px;vertical-align:top;}
     </style>
-    <script src="../vendor/flot/excanvas.min.js"></script>
-    <script src="../vendor/flot/jquery.flot.js"></script>
-    <script src="../vendor/flot/jquery.flot.pie.js"></script>
-    <script src="../vendor/flot/jquery.flot.resize.js"></script>
-    <script src="../vendor/flot/jquery.flot.time.js"></script>
-    <script src="../vendor/flot/jquery.flot.categories.js"></script>
-    <script src="../vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.resize.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.time.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.categories.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
 	
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAycrIPh5udy_JLCQHLNlPup915Ro4gPuY"></script>
 	

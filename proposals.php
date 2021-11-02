@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( ); 
-    require( '/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,"
@@ -47,14 +47,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta name="author" content="Peter D. Speranza">
 	<title>Nouveau Texas | Portal</title>
 	<?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( '/var/www/nouveautexas.com/html/portal/cgi-bin/css/index.php' );?>
+    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/css/index.php' );?>
     <style>
         .form-group>label:first-child {
             min-width  : 175px;
             text-align : right;
         }
     </style>
-    <?php require( '/var/www/nouveautexas.com/html/portal/cgi-bin/js/index.php' );?>
+    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/js/index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -134,7 +134,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script>

@@ -1,7 +1,7 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
   session_start();
-  require('/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php');
+  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
 }
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){

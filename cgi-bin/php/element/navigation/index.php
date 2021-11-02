@@ -66,7 +66,7 @@ elseif($Today == 'Tuesday'){$Wednesday = date('m/d/Y', strtotime($Today . ' +1 d
     <div class="navbar-header" style="float:left;">
         <a class="navbar-brand BankGothic" href="home.php" style='font-size:30px;color:white;'>
             <img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='padding-right:5px;' align='left' />
-           <span style='font-size:20px;'>Nouveau Texas</span>
+           <span style='font-size:20px;'><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></span>
         </a>
     </div>
   <?php /*<div class="btn btn-dark show-on-hover mobile-btn" style="float:left;padding:0px !important;marin:0px !important;position:relative;top:5px;">

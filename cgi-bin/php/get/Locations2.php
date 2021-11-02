@@ -158,7 +158,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           Location.Maint 	  AS Maintained,
 			    		            Location.Status 	AS Status
                   FROM    Loc AS Location
-                          LEFT JOIN OwnerWithRol AS Customer ON Location.Owner = Customer.ID
+                          LEFT JOIN (
+                              SELECT  Owner.ID,
+                                      Rol.Name,
+                                      Owner.Status 
+                              FROM    Owner 
+                                      LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                          ) AS Customer ON Location.Owner = Customer.ID
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
@@ -180,7 +186,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			    Location.Maint 		AS Maintained,
 			    Location.Status 	AS Status
 		FROM    Loc AS Location
-		        LEFT JOIN OwnerWithRol AS Customer ON Location.Owner = Customer.ID
+		        LEFT JOIN (
+                SELECT  Owner.ID,
+                        Rol.Name,
+                        Owner.Status 
+                FROM    Owner 
+                        LEFT JOIN Rol ON Owner.Rol = Rol.ID
+            ) AS Customer ON Location.Owner = Customer.ID
 		WHERE   ({$conditions}) AND ({$search})";
 
     $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );

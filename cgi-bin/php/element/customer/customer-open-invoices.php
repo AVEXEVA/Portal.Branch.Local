@@ -66,8 +66,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div id="page-wrapper" class='content' style='overflow:auto !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
         </div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../vendor/metisMenu/metisMenu.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="../dist/js/moment.js"></script>
@@ -77,8 +77,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="../dist/js/filters.js"></script>
 
     <!-- Morris Charts JavaScript -->
-    <script src="../vendor/raphael/raphael.min.js"></script>
-    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/morrisjs/morris.min.js"></script>
 		});
 	</script>
 </body>

@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( ); 
-    require( '/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset(
         $_SESSION['User'],$_SESSION['Hash'])){
@@ -539,14 +539,14 @@ if($Mechanic > 0){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="../vendor/metisMenu/metisMenu.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
 
     <!-- Morris Charts JavaScript -->
-    <!--<script src="../vendor/raphael/raphael.min.js"></script>
-    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <!--<script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/morrisjs/morris.min.js"></script>
     <script src="../data/morris-data.php"></script>-->
 
     <?php require('cgi-bin/js/datatables.php');?>

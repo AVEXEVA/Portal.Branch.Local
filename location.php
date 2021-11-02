@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( ); 
-    require( '/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -307,7 +307,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		</div>
 	</div>
 	<style>.border-seperate { border-bottom:3px solid #333333; }</style>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <style>
@@ -315,13 +315,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
     div.data {display:inline-block;width:300px;vertical-align:top;}
     </style>
-    <script src="../vendor/flot/excanvas.min.js"></script>
-    <script src="../vendor/flot/jquery.flot.js"></script>
-    <script src="../vendor/flot/jquery.flot.pie.js"></script>
-    <script src="../vendor/flot/jquery.flot.resize.js"></script>
-    <script src="../vendor/flot/jquery.flot.time.js"></script>
-    <script src="../vendor/flot/jquery.flot.categories.js"></script>
-    <script src="../vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.resize.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.time.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.categories.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAycrIPh5udy_JLCQHLNlPup915Ro4gPuY"></script>
 	<script>
 	function clickTab(Tab,Subtab){
