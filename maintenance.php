@@ -1110,10 +1110,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="../vendor/metisMenu/metisMenu.js"></script>    
+    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
@@ -1124,12 +1124,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     <!-- JQUERY UI Javascript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="../vendor/flot/excanvas.min.js"></script>
-    <script src="../vendor/flot/jquery.flot.js"></script>
-    <script src="../vendor/flot/jquery.flot.pie.js"></script>
-    <script src="../vendor/flot/jquery.flot.resize.js"></script>
-    <script src="../vendor/flot/jquery.flot.time.js"></script>
-    <script src="../vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.resize.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.time.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
     <?php /*require(PROJECT_ROOT."js/chart/maintenance_jobs.php");?>
     <?php require(PROJECT_ROOT."js/pie/maintenance_jobs_by_division.php");?>
     <?php require(PROJECT_ROOT."js/pie/maintenance_jobs_hours_by_division.php");?>

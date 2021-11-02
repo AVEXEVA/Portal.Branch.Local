@@ -1,10 +1,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Bootstrap Core CSS -->
-<link href="../vendor/bootstrap/css/bootstrap.css?v=2" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=2" rel="stylesheet">
 
 <!-- MetisMenu CSS -->
-<link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
 
 <!-- Custom CSS -->
 <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
@@ -13,10 +13,10 @@
 <link href="cgi-bin/css/sbadmin2-sidebar-toggle.css" rel="stylesheet" type="text/css">
 
 <!-- Morris Charts CSS -->
-<link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+<link href="https://www.nouveauelevator.com/vendor/morrisjs/morris.css" rel="stylesheet">
 
 <!-- Custom Fonts -->
-<link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="https://www.nouveauelevator.com/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
 <!-- JQUERY UI CSS-->
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">

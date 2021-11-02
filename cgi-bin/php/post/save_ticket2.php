@@ -67,10 +67,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $r = sqlsrv_query($Portal,"INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
         $r = sqlsrv_query($NEI,"INSERT INTO nei.dbo.TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), date("Y-m-d H:i:s"), NULL, NULL, 0));
       }*/
-      if(isset($_FILES['Receipt']['tmp_name'])){
-        $File_Name = 'nei_TCK'. $_POST['ID'] . '_' . rand(0,9999999);
-        $r = sqlsrv_query($Portal,"SET TEXTSIZE 999999999;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
-        $r = sqlsrv_query($NEI,"SET TEXTSIZE 999999999;INSERT INTO nei.dbo.TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), date("Y-m-d H:i:s"), $File_Name, NULL, 0));
+      if(isset($_FILES['Receipt']) && count($_FILES['Receipt']) > 0){
+        $Count = count($_FILES['Receipt']['tmp_name']);
+        $index = 0;
+        while( $index < $Count ){
+          if(isset($_FILES['Receipt']['tmp_name'][ $index ]) && strlen($_FILES['Receipt']['tmp_name'][ $index ]) > 0){
+            ob_start();
+            $image = imagecreatefromstring(file_get_contents($_FILES['Receipt']['tmp_name'][ $index ]));
+            imagejpeg($image, null, 50);
+            $image = ob_get_clean();
+            $image = base64_encode($image);
+            $File_Name = 'nei_TCK'. $_POST['ID'] . '_' . rand(0,9999999) . '_' . $index;
+            /*$r = sqlsrv_query($Portal,"SET TEXTSIZE 2147483647;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'][ $index ], $_FILES['Receipt']['type'][ $index ], array($image, SQLSRV_PARAM_IN,
+          SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), $_SESSION['User'], $_POST['ID']));*/
+            $r = sqlsrv_query($NEI,"SET TEXTSIZE 2147483647;INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], array($image, SQLSRV_PARAM_IN,
+          SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), date("Y-m-d H:i:s"), $File_Name, NULL, 0)); 
+          }
+          $index++;
+        }
       }
       /*Time*/
       //var_dump($_FILES['Receipt']);

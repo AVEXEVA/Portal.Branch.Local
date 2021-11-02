@@ -2,7 +2,7 @@
 <?php if( isset( $_GET[ 'Bootstrap' ] ) ){
   switch( $_GET[ 'Boostrap' ] ){
     case '5.1':?><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script><?php break;
-    default:?><script src="../vendor/bootstrap/js/bootstrap.min.js"></script><?php break;
+    default:?><script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script><?php break;
     break;
   }
 } else { /*AT END OF FILE?*/ }?>

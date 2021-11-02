@@ -37,7 +37,7 @@
 				</div>
 			</div>
 		<?php if(!isMobile()){?>
-			<div style='font-size:72px;text-align:center;' class='BankGothic'>Nouveau Texas</div>
+			<div style='font-size:72px;text-align:center;' class='BankGothic'><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></div>
 			<div style='font-size:42px;text-align:center;'><i>Raising Your Life</i></div>
 		<?php }?>
 		</div>

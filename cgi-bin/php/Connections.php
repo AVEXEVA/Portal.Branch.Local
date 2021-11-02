@@ -1,5 +1,15 @@
 <?php
 $Databases = array(
+    'Demo' => sqlsrv_connect( 
+        '172.16.12.45',
+        array(
+            "Database" => "Demo",
+            "Uid" => "sa",
+            "PWD" => "SQLABC!23456",
+            'ReturnDatesAsStrings'=>true,
+            "CharacterSet" => "UTF-8"
+        )
+    ),
     'NEI' => sqlsrv_connect(
         '172.16.12.45',
         array(
@@ -71,13 +81,12 @@ $Databases = array(
         )
     )
 );
-$Database = 'N-TX';
+$Database = 'Demo';
 $Databases[ 'Default' ] = $Databases[ $Database ];
 
-//~By Peter D. Speranza
 $IP = "172.16.12.45";
 $Options = array(
-    "Database" => "N-TX",
+    "Database" => "Demo",
     "Uid" => "sa",
     "PWD" => "SQLABC!23456",
     'ReturnDatesAsStrings'=>true,
@@ -86,8 +95,7 @@ $Options = array(
 $NEI = sqlsrv_connect($IP, $Options);
 $Options['Database'] = 'Portal';
 $Portal = sqlsrv_connect($IP, $Options);
-/*$Options['Database'] = 'demo';
-$demo = sqlsrv_connect($IP, $Options);*/
+
 $Options['Database'] = 'Paradox';
 $Paradox = sqlsrv_connect($IP, $Options);
 $IP = "172.16.12.44";

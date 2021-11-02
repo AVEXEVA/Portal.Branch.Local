@@ -1,5 +1,5 @@
 <!-- jQuery -->
-<script data-pagespeed-no-defer src="../vendor/jquery/jquery.min.js"></script>
+<script data-pagespeed-no-defer src="https://www.nouveauelevator.com/vendor/jquery/jquery.min.js"></script>
 
 <!-- jQuery UI  -->
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>

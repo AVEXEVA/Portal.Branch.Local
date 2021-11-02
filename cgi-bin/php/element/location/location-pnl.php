@@ -231,7 +231,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			border-bottom:3px solid #333333;
 		}
 	</style>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require('cgi-bin/js/datatables.php');?>
     <!-- JQUERY UI Javascript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -240,13 +240,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
     div.data {display:inline-block;width:300px;vertical-align:top;}
     </style>
-    <script src="../vendor/flot/excanvas.min.js"></script>
-    <script src="../vendor/flot/jquery.flot.js"></script>
-    <script src="../vendor/flot/jquery.flot.pie.js"></script>
-    <script src="../vendor/flot/jquery.flot.resize.js"></script>
-    <script src="../vendor/flot/jquery.flot.time.js"></script>
-    <script src="../vendor/flot/jquery.flot.categories.js"></script>
-    <script src="../vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.resize.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.time.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.categories.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
 </body>
 </html>
 <?php

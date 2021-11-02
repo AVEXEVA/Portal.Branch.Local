@@ -211,7 +211,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  }
 	  </style>
 	  <!-- Bootstrap Core JavaScript -->
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
 

@@ -428,7 +428,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class='nav-icon'><?php $Icons->Violation(3);?></div>
 				<div class ='nav-text'>Violations</div>
 			</div><?php } ?>
-		<div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='https://www.nouveautexas.com/';">
+		<div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='https://beta.nouveauelevator.com/';">
 			<div class='nav-icon'><?php $Icons->Web(3);?></div>
 			<div class ='nav-text'>Website</div>
 		</div>
@@ -446,7 +446,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			</div><?php }?>
 		</div>
     </div>
-    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 

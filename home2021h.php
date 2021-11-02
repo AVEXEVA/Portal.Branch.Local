@@ -1,11 +1,11 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( ); 
-    require( '/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(     !isset( $Databases[ 'Default' ], $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
     ||  !connection_privileged( $Databases[ 'Default' ], $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] ) ){
-        header( 'Location: https://www.nouveautexas.com/login.php' );
+        header( 'Location: https://beta.nouveauelevator.com/login.php' );
         exit; }
 $result = sqlsrv_query(
   $Databases[ 'Default' ],
@@ -464,7 +464,7 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
             </div>
           </div>
         </div>
-        <script src='../vendor/bootstrap/js/bootstrap.min.js'></script>
+        <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
         <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
         <?php require('cgi-bin/js/datatables.php');?>
         <style></style>
@@ -863,7 +863,7 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
     </section>
   </div>
 </div>
-<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 </body>
 </html>

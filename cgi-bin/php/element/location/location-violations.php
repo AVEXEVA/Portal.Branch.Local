@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( ); 
-    require( '/var/www/nouveautexas.com/html/portal/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
@@ -101,7 +101,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(     !isset( $Connection[ 'ID' ] )  
         ||  !$Privileged 
         ||  !is_numeric( $_GET[ 'ID' ] ) ){
-            /*?><html><head><script>document.location.href="https://www.nouveautexas.com/login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php*/ }
+            /*?><html><head><script>document.location.href="https://beta.nouveauelevator.com/login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php*/ }
     else {
         sqlsrv_query(
             $NEI,
