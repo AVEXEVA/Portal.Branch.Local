@@ -1,0 +1,43 @@
+<div class='popup bg-dark overflow-auto row g-0'>
+   	<div class='col-md-6 offset-md-3 col-12 card card-primary border-0'>
+   		<div class='card-heading bg-primary text-center p-2'>COVID 19 Questionaire</div>
+      	<div class='card-body bg-dark text-white p-3'>
+         	<form id='COVID_19_Questionaire'>
+	            <div class='row'>
+	               	<div class='col-12'>Have you experienced a fever of 100.4 degrees F or greater, a new cough, new loss of taste or smell or shortness of breath within the past 10 days?</div>
+	               	<div class='col-12'>&nbsp;</div>
+	               	<div class='col-6 text-center bg-success' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_1' value='No' /> No</div>
+	               	<div class='col-6 text-center bg-danger' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_1' value='Yes' /> Yes</div>
+	           	</div>
+	           	<div class='row'><div class='col-12'>&nbsp;</div></div>
+	           	<div class='row'>
+	               	<div class='col-12'>In the past 10 days, have you gotten a positive result from a COVID-19 test that tested saliva or used a nose or throat swab? (not a blood test)</div>
+	               	<div class='col-12'>&nbsp;</div>
+	               	<div class='col-6 text-center bg-success' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_2' value='No' /> No</div>
+	               	<div class='col-6 text-center bg-danger' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_2' value='Yes' /> Yes</div>
+	               	
+	           	</div>
+	           	<div class='row'><div class='col-12'>&nbsp;</div></div>
+	           	<div class='row'>
+	               	<div class='col-12'>To the best of your knowledge, in the past 14 days, have you been in close contact (within 6 feet for at least 10 minutes) with anyone while they had Covid-19?</div>
+	               	<div class='col-12'>&nbsp;</div>
+	               	<div class='col-6 text-center bg-success' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_3' value='No' /> No</div>
+	               	<div class='col-6 text-center bg-danger' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_3' value='Yes' /> Yes</div>
+	           	</div>
+	           	<div class='row'><div class='col-12'>&nbsp;</div></div>
+	           	<div class='row'>
+	               	<div class='col-12'>In the past 14 days, have you traveled internationally or returned from a state identified by New York State as having widespread community transmission of COVID-19 (other than just passing through the restricted state for less than 24 hours)? Visit https://coronavirus.health.ny.gov/covid-19-travel-advisory for applicable states.</div>
+	               	<div class='col-12'>&nbsp;</div>
+	               	<div class='col-6 text-center bg-success' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_4' value='No' /> No</div>
+	               	<div class='col-6 text-center bg-danger' onClick="$(this).children('input').prop( 'checked', !$(this).children('input').prop('checked') );"><input type='radio' name='COVID_19_Questionaire_4' value='Yes' /> Yes</div>
+	           	</div>
+	           	<div class='row'><div class='col-12'>&nbsp;</div></div>
+				<div class='row'><div class='col-12'>&nbsp;</div></div>
+				<div class='row'>
+	               <div class='col-6 text-center'><button class='bg-success text-center' type='button' onClick='submit_COVID_19_Questionaire(this);'>Acknowledge</button></div>
+	               <div class='col-6 text-center'><button class='bg-danger text-center' type='button' onClick='$(".popup").remove( );'>Close</button></div>
+	            </div>
+         	</form>
+      	</div>
+   	</div>
+</div>

@@ -1,11 +1,12 @@
 <script data-pagespeed-no-defer src="https://www.nouveauelevator.com/vendor/jquery/jquery.min.js"></script>
-<?php if( isset( $_GET[ 'Bootstrap' ] ) ){
-  switch( $_GET[ 'Boostrap' ] ){
+<?php
+  $_GET[ 'Bootstrap' ] = isset( $_GET[ 'Bootstrap' ] ) ? $_GET[ 'Bootstrap' ] : null;
+  switch( $_GET[ 'Bootstrap' ] ){
     case '5.1':?><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script><?php break;
     default:?><script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script><?php break;
     break;
   }
-} else { /*AT END OF FILE?*/ }?>
+?>
 <?php if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><script data-pagespeed-no-defer src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script><?php }?>
 <script src="https://www.nouveauelevator.com/portal/cgi-bin/js/functions.js"></script>
 <script src="https://www.nouveauelevator.com/portal/cgi-bin/js/onload.js"></script>
@@ -23,3 +24,4 @@ if( file_exists( bin_js . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] ),
   require( bin_js . 'page/' .  substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '/index.php' );
 }
 ?>
+<?php require( bin_js . 'datatables.php');?>

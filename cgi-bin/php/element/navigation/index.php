@@ -62,7 +62,7 @@ elseif($Today == 'Tuesday'){$Wednesday = date('m/d/Y', strtotime($Today . ' +1 d
     padding-top:10px;
 }
 </style>
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="border-color:#151515 !important;margin-bottom: 0 !important;;background-color:#151515;color:white;">
+<nav class="navbar navbar-default navbar-static-top" role="navigation" style="border-color:#151515 !important;margin-bottom: 0 !important;;background-color:#151515;color:white;z-index:1;">
     <div class="navbar-header" style="float:left;">
         <a class="navbar-brand BankGothic" href="home.php" style='font-size:30px;color:white;'>
             <img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='padding-right:5px;' align='left' />

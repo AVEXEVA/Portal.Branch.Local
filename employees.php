@@ -15,85 +15,77 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_Privileges   = array();
     while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
     $Privileged   = FALSE;
-    if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Ticket']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+    if(isset($My_Privileges['User']) && $My_Privileges['User']['User_Privilege'] >= 4 && $My_Privileges['User']['Group_Privilege'] >= 4 && $My_Privileges['User']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "employees.php"));
     if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=directory.php';</script></head></html><?php }
     else {
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>    
     <title>Nouveau Texas | Portal</title>    
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php 
+        require( bin_meta . 'index.php' );
+        require( bin_css  . 'index.php' );
+        require( bin_js   . 'index.php' );
+    ?>
 </head>
-<body onload=''>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading"><h3>Employees</h3></div>
-                        <div class="panel-body">
-                            <table id='Table_Employees' class='display' cellspacing='0' width='100%'>
-                                <thead>
-                                    <th title="Employee Work ID">Work ID</th>
-                                    <th title="Employee's First Name">First Name</th>
-                                    <th title="Employee's First Name">Last Name</th>
-                                    <th title="Employee's Supervisor">Supervisor</th>
-                                </thead>
-                               <tfooter>
-                                    <th title="Employee Work ID">Work ID</th>
-                                    <th title="Employee's First Name">First Name</th>
-                                    <th title="Employee's First Name">Last Name</th>
-                                    <th title="Employee's Supervisor">Supervisor</th>
-                                </tfooter>
-                            </table>
-                        </div>
-                    </div>
+<body onload='finishLoadingPage();'>
+    <div id='wrapper'>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
+        <div id='page-wrapper' class='content'>
+            <div class='panel panel-primary'>
+                <div class='panel-heading'><h4><?php $Icons->User( 1 );?> Employees</h4></div>
+                <div class='panel-body'>
+                    <table id='Table_Employees' class='display' cellspacing='0' width='100%'>
+                        <thead>
+                            <th title='ID'>Work ID</th>
+                            <th title='First Name'>First Name</th>
+                            <th title='Last Name'>Last Name</th>
+                            <th title='Supervisor'>Supervisor</th>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="../dist/js/moment.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src='https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js'></script>
+    <?php require( bin_js . 'index.php' );?>
+    <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
     <script>
         function hrefEmployees(){
-            $("#Table_Employees tbody tr").each(function(){
+            $('#Table_Employees tbody tr').each(function(){
                 $(this).on('click',function(){
-                    document.location.href="tickets.php?Mechanic=" + $(this).children(":first-child").html();
+                    document.location.href='tickets.php?Mechanic=' + $(this).children(':first-child').html();
                 });
              });
         }
         $(document).ready(function() {
             var table = $('#Table_Employees').DataTable( {
-                "ajax": {
-                    "url":"cgi-bin/php/get/Employees.php",
-                    "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
+                ajax : {
+                    url     : 'cgi-bin/php/get/Employees.php'
                 },
-                "columns": [
-                    { "data": "ID"},
-                    { "data": "Last_Name"},
-                    { "data": "First_Name"},
-                    { "data": "Supervisor"}
+                columns : [
+                    { 
+                        data : ID 
+                    },{ 
+                        data : 'Last_Name'
+                    },{ 
+                        data : 'First_Name'
+                    },{ 
+                        data : 'Supervisor'
+                    }
                 ],
-                "order": [[1, 'asc']],
-                "language":{
-                    "loadingRecords":""
+                order : [ [1, 'asc' ] ],
+                language : {
+                    loadingRecords : ''
                 },
-                "lengthMenu":[[10,25,50,100,500,-1],[10,25,50,100,500,"All"]],
-                "initComplete":function(){
+                lengthMenu : [[10,25,50,100,500,-1],[10,25,50,100,500,'All']],
+                initComplete : function( ){
                     hrefEmployees();
                     $("input[type='search'][aria-controls='Table_Employees']").on('keyup',function(){hrefEmployees();});       
                     $('#Table_Employees').on( 'page.dt', function () {setTimeout(function(){hrefEmployees();},100);});
-                    $("#Table_Employees th").on("click",function(){setTimeout(function(){hrefEmployees();},100);});
-                    finishLoadingPage();
+                    $('#Table_Employees th').on('click',function(){setTimeout(function(){hrefEmployees();},100);});
                 }   
 
             } );
