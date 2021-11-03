@@ -1,0 +1,32 @@
+@media print {
+  a[href]:after { content: none !important; }
+	#wrapper { overflow-y:auto !important; }
+	#page-wrapper { height:auto !improtant; }
+	body { height:auto !important; }
+	.dataTables_scrollBody {
+		height:auto !important;
+		overflow:auto !important;
+		max-height:none !important;
+	}
+	.dt-buttons { display:none !important; }
+	.nav-tabs.nav { display:none !important; }
+  div#page-wrapper { margin:0px !important; }
+  .no-print {
+    display:none !important;
+    height:0px !important;
+    margin:0px;
+    padding:0px;
+  }
+  .print {
+    display:block !important;
+    page-break-before:avoid;
+  }
+  hr {
+    margin-bottom:10px;
+    margin-top:10px;
+  }
+  pre { white-space: normal !important; }
+  .dataTables_wrapper div.row:nth-child(1) {
+      display:none;
+  }
+}

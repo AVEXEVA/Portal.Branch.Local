@@ -5,12 +5,11 @@
     default:?><link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=3" rel="stylesheet"><?php break;
     break;
   }
-} else {?>
-  <link href="https://www.nouveauelevator.com/vendor/bootstrap/css/bootstrap.css?v=3" rel="stylesheet">
-<?php }?>
-<?PHP
-IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER['SCRIPT_NAME'], 1, strlen( $_SERVER['SCRIPT_NAME'] ) - 5 ) . '/index.php') ){
-  require('/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER[ 'SCRIPT_NAME' ], 1, strlen( $_SERVER[ 'SCRIPT_NAME' ] ) - 5 . '/index.php' ) );
+} else {
+  require( bin_library . 'bootstrap/index.php' );
+}
+IF( file_exists( bin_css . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '.css') ){
+  ?><link rel='stylesheet' href='<?php echo ( 'cgi-bin/css/page/' .  substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '.css' );?>?v=<?php echo rand(1000,999999999);?>'><?php
 } else {
   switch( $_SERVER[ 'SCRIPT_NAME' ] ){ 
     case '/portal/ticket.php' : 
@@ -22,18 +21,17 @@ IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $
         default:
           break;
     }
-}?>
-
-<?php if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/animation.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/print.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/class.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/wrapper.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/gui.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="https://www.nouveauelevator.com/portal/cgi-bin/css/navbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+}
+if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
+<link href="cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/animation.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/print.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/class.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/wrapper.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/gui.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/navbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <style>
 /*Fonts*/
 @font-face {
@@ -43,16 +41,3 @@ IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $
 }
 .BankGothic { font-family:'BankGothic'; }
 </style>
-<?php 
-if( $_SESSION[ 'User' ] == 895 ){?>
-  <style>
-    @media screen and (min-width:1980px){
-        #page-wrapper {
-        padding-left:16.666%;
-        padding-right:16.666%;
-      }    
-    }
-  
-  </style>
-<?php }
-?>

@@ -18,3 +18,8 @@
     $("div[tab='" + Tab + "']").click( ); 
   }
 </script>
+<?php 
+if( file_exists( bin_js . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '/index.php') ){
+  require( bin_js . 'page/' .  substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '/index.php' );
+}
+?>

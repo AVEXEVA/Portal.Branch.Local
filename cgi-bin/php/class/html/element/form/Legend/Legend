@@ -1,0 +1,4 @@
+<?php
+class Legend extends Element {
+	public function Legend(){?><Legend <?php parent::Attributes();?>><?php echo parent::__get('Rel');?></Legend><?php }
+}?>

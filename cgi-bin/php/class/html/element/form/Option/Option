@@ -1,0 +1,5 @@
+<?php 
+class Option extends Element {
+	public $Value;
+	public function Option(){?><Option <?php parent::Attributes();?>><?php echo parent::__get('Rel');?></Option><?php }
+}?>

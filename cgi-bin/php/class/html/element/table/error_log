@@ -1,0 +1,7 @@
+[31-Jan-2021 14:38:21 UTC] PHP Parse error:  syntax error, unexpected '?>', expecting function (T_FUNCTION) or const (T_CONST) in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/TBODY.php on line 9
+[31-Jan-2021 14:38:24 UTC] PHP Parse error:  syntax error, unexpected '?>', expecting function (T_FUNCTION) or const (T_CONST) in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/TD.php on line 4
+[31-Jan-2021 14:38:29 UTC] PHP Parse error:  syntax error, unexpected '?>', expecting function (T_FUNCTION) or const (T_CONST) in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/TFOOT.php on line 9
+[31-Jan-2021 14:38:33 UTC] PHP Parse error:  syntax error, unexpected '?>', expecting function (T_FUNCTION) or const (T_CONST) in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/TH.php on line 6
+[31-Jan-2021 14:38:39 UTC] PHP Parse error:  syntax error, unexpected '?>', expecting function (T_FUNCTION) or const (T_CONST) in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/THEAD.php on line 9
+[31-Jan-2021 14:38:44 UTC] PHP Parse error:  syntax error, unexpected ';' in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/TR.php on line 8
+[31-Jan-2021 14:38:47 UTC] PHP Parse error:  syntax error, unexpected '?>', expecting function (T_FUNCTION) or const (T_CONST) in /home/avexeva/public_html/a/XIO/Language/PHP/CLASS/HTML/ELEMENT/TABLE/Table.php on line 13

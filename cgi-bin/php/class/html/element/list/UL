@@ -1,0 +1,4 @@
+<?php Class UL extends Element {
+	public $LIS = array();
+	public function UL(){?><UL <?php parent::Attributes();?>><?php for($i=0;$i<count($this->LIS);$i++){$this->LIS[$i]->LI();}?></UL><?php }
+}?>

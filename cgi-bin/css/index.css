@@ -1,0 +1,30 @@
+html {
+  min-height:100%;
+  webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  height:100%;
+}
+body {
+  min-height:100%;
+  background-size:cover;
+  height:100%;
+  background-color:#1d1d1d !important;
+  color:white !important;
+}
+
+input:valid {  }
+input:invalid { background-color:#ff3232; }
+
+input, textarea, select, option {
+  background-color:white !important;
+}
+
+pre {
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

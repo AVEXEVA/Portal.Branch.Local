@@ -1,0 +1,33 @@
+table tbody tr.odd {
+  background-color:#3d3d3d !important;
+  color:white;
+}
+table tbody tr.even {
+  background-color:#2d2d2d !important;
+  color:white;
+}
+table.display.dataTable tbody tr[role='row'] td.sorting_1 {
+  background-color:#3d3d3d !important;
+  color:white !important;
+}
+
+table.dataTable tr.dtrg-group td{background-color:#1d1d1d;color:white;}
+table.dataTable tr.dtrg-group.dtrg-level-0 td{/*font-weight:bold;*/}
+table.dataTable tr.dtrg-group.dtrg-level-1 td,table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#5d5d5d;color:white;padding-top:0.25em;padding-bottom:0.25em;padding-left:2em;font-size:0.9em}
+
+div#page-wrapper .panel-primary .panel-body table tbody tr td.sorting_1 { background-color:transparent !important; color:inherit !important; }
+
+table#Table_Tickets tbody tr, #Table_Units tbody tr, #Table_Customers tbody tr, #Table_Violations tbody tr, #Table_Proposals tbody tr, #Table_Jobs tbody tr, #Table_Invoices tbody tr, #Table_Locations tbody tr {cursor:pointer;}
+
+table#Table_Tickets tbody tr { height:50px; }
+table#Table_Tickets tbody tr td { padding:5px; padding-top:12.5px; }
+table#Table_Tickets tbody tr.gold { background-color:gold !important; color:black !important; }
+table#Table_Tickets tbody tr.red { background-color:red !important; color:black !important; }
+table#Table_Tickets tbody tr.blue.odd { background-color:#007bc5 !important; color:white !important; }
+table#Table_Tickets tbody tr.blue.even { background-color:#005b92 !important; color:white !important; }
+table#Table_Tickets tbody tr.light.odd { background-color:whitesmoke !important; color:black !important; }
+table#Table_Tickets tbody tr.light.even { background-color:#e0e0e0 !important; color:black !important; }
+table#Table_Tickets tbody tr.green.odd { background-color:#a1f1a1 !important; color:black !important; }
+table#Table_Tickets tbody tr.green.even { background-color:#90ee90 !important; color:black !important; }
+
+td.indent { width:0px; }

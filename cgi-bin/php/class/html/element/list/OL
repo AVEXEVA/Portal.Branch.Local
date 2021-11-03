@@ -1,0 +1,4 @@
+<?php Class OL extends Element {
+	public $LIS = array();
+	public function OL(){?><OL <?php parent::Attributes();?>><?php for($i=0;$i<count($this->LIS);$i++){$this->LIS[$i]->LI();}?></OL><?php }
+}?>

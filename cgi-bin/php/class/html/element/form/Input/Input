@@ -1,0 +1,10 @@
+<?php 
+class Input extends Element {
+	//Variables
+	//Attributes
+	public $Placeholder;
+	public $Type = 'Text';
+	//Functions
+	public function Input(){?><Input <?php parent::Attributes();?> /><?php }
+}
+?>

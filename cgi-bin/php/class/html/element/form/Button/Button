@@ -1,0 +1,7 @@
+<?php 
+class Button extends Element {
+	//Variables
+	public $Type;
+	//Function
+	public function Button(){?><Button <?php parent::Attributes();?>><?php echo $this->Rel;?></Button><?php }
+}?>

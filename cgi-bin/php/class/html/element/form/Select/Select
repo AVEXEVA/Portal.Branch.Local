@@ -1,0 +1,8 @@
+<?php 
+class Select extends Element {
+	//Variables
+	//Elements
+	public $Options = array();
+	//Functions
+	public function Select(){?><Select <?php parent::Attributes();?>><?php for($i=0;$i<count($this->Options);$i++){$this->Options[$i]->Option();}?></Select><?php }
+}?>
