@@ -80,7 +80,7 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
     </style>
     <style>
       .Home-Screen-Option {
-        border:1px solid darkgray;
+        border:1px solid gold;
       }
       #clock-menu>.row.Dashboard {
         padding-bottom:20px;
@@ -89,7 +89,7 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
         .Home-Screen-Option {
           /*order-radius:100px;*/
           padding:25px;
-          border:1px solid darkgray;
+          border:1px solid gold;
           margin:auto;
           margin-top: 25px;
         }
@@ -255,7 +255,7 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
             if( is_null( $row[ 'Picture' ] ) ){
               ?><div class='col-xs-4'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php
             } else {
-              ?><div class='col-xs-4'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;border-radius:100px;' /></button></div><?php
+              ?><div class='col-xs-4'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;border:1px solid red;border-radius:100px;' /></button></div><?php
             }
           } else {?><div class='col-xs-4'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php }?>
         <script>

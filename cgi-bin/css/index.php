@@ -21,9 +21,8 @@ IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $
         default:
           break;
     }
-}?>
-
-<?php if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
+}
+if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
 <link href="cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">

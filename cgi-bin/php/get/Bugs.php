@@ -74,7 +74,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
     if( isset($_GET[ 'Severity' ] ) && !in_array( $_GET[ 'Severity' ], array( '', ' ', null ) ) ){
       $params[] = $_GET['Severity'];
-      $conditions[] = "Severity.Name LIKE '%' + ? + '%'";
+      $conditions[] = "Severity.ID LIKE '%' + ? + '%'";
     }
 
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
@@ -88,7 +88,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $params[] = $_GET['Search'];
       $search[] = "Bug.Description LIKE '%' + ? + '%'";
 
-      $params[] = $_GET['Severity'];
+      $params[] = $_GET['Search'];
       $search[] = "Severity.Name LIKE '%' + ? + '%'";
 
     }

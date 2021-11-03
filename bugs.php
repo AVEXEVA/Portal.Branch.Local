@@ -103,50 +103,64 @@ if(     count( $_POST ) > 0
     <?php require( PROJECT_ROOT . 'js/index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
-  <div id="wrapper">
-    <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
-    <div id="page-wrapper" class='content'>
-      <div class="panel panel-primary">
-        <div class="panel-heading"><h2>Bugs</h2></div>
-        <div class='panel-body'>
-            <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
-                <thead><tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Severity</th>
-                    <th>Suggestion</th>
-                    <th>Resolution</th>
-                    <th>Fixed</th>
-                </tr></thead>
-                <tbody><?php
-            $result = sqlsrv_query($Portal,
-                "   SELECT  Bug.ID,
-                            Bug.Name,
-                            Bug.Description,
-                            Bug.Resolution,
-                            Bug.Fixed,
-                            Bug.Suggestion,
-                            Severity.Name AS Severity
-                    FROM    Bug
-                            LEFT JOIN Severity ON Bug.Severity = Severity.ID;"
-          );
-          if($result){while($Bug = sqlsrv_fetch_array($result)){
-            ?><tr>
-                <td><?php echo $Bug['Name'];?></td>
-                <td><?php echo $Bug['Severity'];?></td>
-                <td><?php echo $Bug['Description'];?></td>
-                <td><?php echo strlen($Bug['Suggestion']) > 0 ? $Bug['Suggestion'] : '&nbsp;';?></td>
-                <td><?php echo strlen($Bug['Resolution']) > 0 ? $Bug['Resolution'] : '&nbsp;';?></td>
-                <td><?php echo strlen($Bug['Fixed']) > 0 ? $Bug['Fixed'] : '&nbsp;';?></td>
-            </tr>
-            <?php
-          }}?></tbody></table>
+    <div id="wrapper">
+        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <div id="page-wrapper" class='content'>
+          <div class="panel panel-primary">
+            <div class='panel-heading'><h4><?php $Icons->Contract( );?> Contracts</h4></div>
+                <div class='panel-body no-print' id='Filters' style='border-bottom:1px solid #1d1d1d;'>
+                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
+                    <div class='form-group row'>
+                        <label class='col-auto'>Search:</label>
+                        <div class='col-auto'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
+                    </div>
+                    <div class='form-group row'><div class='col-xs-12'>&nbsp;</div></div>
+                    <div class='form-group row'>
+                        <label class='col-auto'>ID:</label>
+                        <div class='col-auto'><input type='text' name='ID' placeholder='ID' onChange='redraw( );' /></div>
+                    </div>
+                    <div class='form-group row'>
+                        <label class='col-auto'>Name:</label>
+                        <div class='col-auto'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' /></div>
+                    </div>
+                    <div class='form-group row'>
+                        <label class='col-auto'>Description:</label>
+                        <div class='col-auto'><input type='text' name='Description' placeholder='Description' onChange='redraw( );' /></div>
+                    </div>
+                    <div class='form-group row'>
+                        <label class='col-auto'>Severity:</label>
+                        <div class='col-auto'><select name='Severity' onChange='redraw( );'>
+                            <option value=''>Select</option>
+                            <?php 
+                                $result = sqlsrv_query( 
+                                    $Portal,
+                                    "   SELECT  *
+                                        FROM    Portal.dbo.Severity;",
+                                    array( )
+                                ); 
+                                if( $result ){ while( $row = sqlsrv_Fetch_array( $result ) ){ ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
+                            ?>
+                        </select></div>
+                    </div>
+                    <div class='form-group row'><div class='col-auto'>&nbsp;</div></div>
+                </div>
+                <div class='panel-body'>
+                    <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
+                        <thead><tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Severity</th>
+                            <th>Suggestion</th>
+                            <th>Resolution</th>
+                            <th>Fixed</th>
+                        </tr></thead>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
   <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
   <?php require(PROJECT_ROOT.'js/datatables.php');?>
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -160,7 +174,7 @@ if(     count( $_POST ) > 0
         paging     : true,
         searching  : false,
         ajax       : {
-        url : 'cgi-bin/php/get/Contracts2.php',
+        url : 'cgi-bin/php/get/Bugs.php',
         data : function( d ){
             d = {
                     start : d.start,
@@ -168,15 +182,13 @@ if(     count( $_POST ) > 0
                     order : {
                         column : d.order[0].column,
                         dir : d.order[0].dir
-                    }
+                    } 
                 };
                 d.Search = $('input[name="Search"]').val( );
                 d.ID = $('input[name="ID"]').val( );
-                d.Customer = $('input[name="Customer"]').val( );
-                d.Location = $('input[name="Location"]').val( );
-                d.Start_Date = $('input[name="Start_Date"]').val( );
-                d.End_Date = $('input[name="End_Date"]').val( );
-                d.Cycle = $('select[name="Cycle"]').val( );
+                d.Name = $('input[name="Name"]').val( );
+                d.Description = $('input[name="Description"]').val( );
+                d.Severity = $('select[name="Severity"]').val( );
                 return d;
             }
         },
@@ -196,7 +208,11 @@ if(     count( $_POST ) > 0
             },{
                 data    : 'Fixed'
             }
+        ]
     } );
+    function redraw( ){ Table_Bugs.draw(); }
+    function hrefBugs(){hrefRow('Table_Bugs','bug');}
+    $('Table#Table_Bugs').on('draw.dt',function(){hrefBugs();});
   </script>
 </body>
 </html>
