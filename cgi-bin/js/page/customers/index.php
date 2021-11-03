@@ -1,25 +1,22 @@
-<script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-<?php require('cgi-bin/js/datatables.php');?>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-  <script>
+<script>
     var Table_Customers = $('#Table_Customers').DataTable( {
     ajax      : {
       url : 'cgi-bin/php/get/Customers2.php',
       data : function( d ){
-          d = {
-              start : d.start,
-              length : d.length,
-              order : {
-                  column : d.order[0].column,
-                  dir : d.order[0].dir
-              }
-          };
-          d.Search = $('input[name="Search"]').val( );
-          d.Name = $('input[name="Name"]').val( );
-          d.Status = $('select[name="Status"]').val( );
-          return d;
-      }
-    },
+        d = {
+            start : d.start,
+            length : d.length,
+            order : {
+                column : d.order[0].column,
+                dir : d.order[0].dir
+            }
+        };
+        d.Search = $('input[name="Search"]').val( );
+        d.Name = $('input[name="Name"]').val( );
+        d.Status = $('select[name="Status"]').val( );
+        return d;
+    }
+  },
     processing : true,
     serverSide : true,
     responsive : true,
