@@ -1,300 +1,136 @@
 <?php
-session_start();
-require('index.php');
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
-        SELECT *
-        FROM   Connection
-        WHERE  Connection.Connector = ?
-               AND Connection.Hash = ?
-    ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
-        SELECT Emp.*,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name
-        FROM   Emp
-        WHERE  Emp.ID = ?
-    ;", array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User);
-    $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
-        SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( ); 
+    require( '/var/www/portal.live.local/html/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $r = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+          FROM    Connection
+          WHERE   Connection.Connector = ?
+                  AND Connection.Hash = ?;",
+        array(
+          $_SESSION[ 'User' ],
+          $_SESSION[ 'Hash' ]
+        )
+      );
+    $Connection = sqlsrv_fetch_array( $r );
+    $User = sqlsrv_query(
+        $NEI,
+        "   SELECT  Emp.*,
+                    Emp.fFirst AS First_Name,
+                    Emp.Last   AS Last_Name
+            FROM    Emp
+            WHERE   Emp.ID = ?;",
+        array(
+          $_SESSION[ 'User' ]
+        )
+    );
+    $User = sqlsrv_fetch_array( $User );
+    $r = sqlsrv_query(
+        $NEI,
+        "   SELECT  Privilege.Access_Table,
+                    Privilege.User_Privilege,
+                    Privilege.Group_Privilege,
+                    Privilege.Other_Privilege
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array( 
+          $_SESSION[ 'User' ] 
+        ) 
+    );
+    $Privleges = array();
+    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privleges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
-    if( isset($My_Privileges['Location'])
+    if( isset( $Privleges[ 'Location' ] )
         && (
-				$My_Privileges['Location']['Other_Privilege'] >= 4
-			||	$My_Privileges['Location']['Group_Privlege'] >= 4
-			||  $My_Privileges['Location']['User_Privilege'] >= 4
-		)
-	 ){
-            $Privileged = True;}
+            $Privleges[ 'Location' ][ 'Group_Privilege' ] >= 4
+        ||  $Privleges[ 'Location' ][ 'User_Privilege' ]  >= 4
+      )
+    ){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-$conn = $NEI;
+    $conn = $NEI;
 
-    /*
-     * Script:    DataTables server-side script for PHP and MySQL
-     * Copyright: 2010 - Allan Jardine
-     * License:   GPL v2 or BSD (3-point)
-     */
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * Easy set variables
-     */
-
-    /* Array of database columns which should be read and sent back to DataTables. Use a space where
-     * you want to insert a non-database field (for example a counter or static image)
-     */
-    $aColumns = array( 'Loc', 'Tag', 'Owner', 'Address', 'City', 'State', 'Zip', 'Route', 'Zone', 'Maint' );
-
-    /* Indexed column (used for fast and accurate table cardinality) */
-    $sIndexColumn = "Loc";
-
-    /* DB table to use */
-    $sTable = "Loc";
-
-
-    /*
-     * Paging
-     */
-    $sLimit = "";
-	$_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-	$_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
-
+    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
+    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
     $Start = $_GET['iDisplayStart'];
     $Length = $_GET['iDisplayLength'];
+    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
 
-    $End = $Length == '-1' ? 9999999999 : intval($Start) + intval($Length);
+    $search = array( );
+    if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
+      
+      $params[] = $_GET['Search'];
+      $search[] = "Loc.Tag LIKE '%' + ? + '%'";
 
-    if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
-    {
-    $sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS
-                                FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY ";
     }
 
+    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+    $params[] = $Start;
+    $params[] = $End;
+    $Columns = array(
+      0 =>  'Loc.Loc',
+      1 =>  'Loc.Tag',
+      2 =>  'Loc.ID'
+    );
+    $Order = isset( $Columns[ $_GET['order']['column'] ] )
+        ? $Columns[ $_GET['order']['column'] ]
+        : "Loc.Tag";
+    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
+      ? $_GET['order']['dir']
+      : 'ASC';
 
-    /*
-     * Ordering
-     */
+    $sQuery = " SELECT *
+                FROM (
+                    SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                            Loc.Loc             AS Loc,
+                            Loc.Tag             AS Tag,
+                            Loc.ID
+                    FROM    Loc
+                    WHERE   ({$search})
+                ) AS Tbl
+                WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
 
-    $sOrder = "";
-    if ( isset( $_GET['order'][0]['column'] ) )
-    {
-        $sOrder = "ORDER BY  ";
-        $sOrder .= $aColumns[$_GET['order'][0]['column']] . " " . $_GET['order'][0]['dir'];
-        /*for ( $i=0 ; $i<intval( $_GET['iSortingCols'] ) ; $i++ )
-        {
-            if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
-            {
-                $sOrder .= $aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."
-                    ".addslashes( $_GET['sSortDir_'.$i] ) .", ";
-            }
-        }
+    $rResult = sqlsrv_query(
+      $conn,  
+      $sQuery, 
+      $params 
+    ) or die(print_r(sqlsrv_errors()));
 
-        $sOrder = substr_replace( $sOrder, "", -2 );
-        if ( $sOrder == "ORDER BY" )
-        {
-            $sOrder = "";
-        }*/
-    }
+    $sQueryRow = "
+        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                Loc.Loc             AS Loc,
+                Loc.Tag             AS Tag
+        FROM    Loc
+        WHERE   ({$search});";
 
-
-    /*
-     * Filtering
-     * NOTE this does not match the built-in DataTables filtering which does it
-     * word by word on any field. It's possible to do here, but concerned about efficiency
-     * on very large tables, and MySQL's regex functionality is very limited
-     */
-    $sWhere = "";
-	$_GET['sSearch'] = isset($_GET['search']['value']) ? $_GET['search']['value'] : "";
-	if(isset($_SESSION['Forward-Backward'],$_SESSION['Forward-Backward']['Locations'])) {
-		$_SESSION['Forward-Backward']['Locations'] = $_GET['search']['value'];
-	} else {
-		$_SESSION['Forward-Backward'] = array('Locations'=>'');
-	}
-    if ( $_GET['sSearch'] != "" )
-    {
-        $sWhere = "WHERE (";
-        for ( $i=0 ; $i<count($aColumns) ; $i++ )
-        {
-            $sWhere .= $aColumns[$i]." LIKE '%".addslashes( $_GET['sSearch'] )."%' OR ";
-        }
-        $sWhere = substr_replace( $sWhere, "", -3 );
-        $sWhere .= ')';
-    }
-
-    /* Individual column filtering */
-    for ( $i=0 ; $i<count($aColumns) ; $i++ )
-    {
-        if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-        {
-            if ( $sWhere == "" )
-            {
-                $sWhere = "WHERE ";
-            }
-            else
-            {
-                $sWhere .= " AND ";
-            }
-            $sWhere .= $aColumns[$i]." LIKE '%".addslashes($_GET['sSearch_'.$i])."%' ";
-        }
-    }
-
-
-    /*
-     * SQL queries
-     * Get data to display
-     */
-    $pWhere = $sWhere;
-    $sWhere = !isset($sWhere) || $sWhere == '' ? "WHERE '1'='1'" : $sWhere;
-	if($My_Privileges['Location']['Other_Privilege'] >= 4 || TRUE){
-		$sQuery = "
-			SELECT *
-			FROM
-			 (
-				SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-				FROM $sTable
-				$sWhere
-        AND Loc.Status = 0
-			) A
-			WHERE A.ROW_COUNT BETWEEN $Start AND $End
-		";
-	} else {
-		$sQuery = "
-			SELECT *
-			FROM
-			 (
-				SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-				FROM $sTable
-				$sWhere
-				AND Loc.Loc IN
-					(
-						SELECT Tickets.Location_ID
-						FROM
-						(
-							(
-								SELECT   TicketO.LID AS Location_ID
-								FROM     TicketO
-										 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketO.LID
-							)
-							UNION ALL
-							(
-								SELECT   TicketD.Loc AS Location_ID
-								FROM     TicketD
-										 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketD.Loc
-							)
-						) AS Tickets
-						GROUP BY Tickets.Location_ID
-					)
-			 ) A
-			WHERE A.ROW_COUNT BETWEEN $Start AND $End
-		";
-	}
-
-    $rResult = sqlsrv_query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
-
-    /* Data set length after filtering */
-	if($My_Privileges['Location']['Other_Privilege'] >= 4 || TRUE){
-		$sQueryRow = "
-			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
-			FROM   $sTable
-			$sWhere
-      AND Loc.Status = 0
-		;";
-	} else {
-		$sQueryRow = "
-			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
-			FROM   $sTable
-			$sWhere
-			AND  Loc.Loc IN
-					(
-						SELECT Tickets.Location_ID
-						FROM
-						(
-							(
-								SELECT   TicketO.LID AS Location_ID
-								FROM     TicketO
-										 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketO.LID
-							)
-							UNION ALL
-							(
-								SELECT   TicketD.Loc AS Location_ID
-								FROM     TicketD
-										 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketD.Loc
-							)
-						) AS Tickets
-						GROUP BY Tickets.Location_ID
-					)
-		";
-	}
-    $params = array();
     $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = sqlsrv_query( $conn, $sQueryRow , $params, $options );
+    $stmt = sqlsrv_query( $conn, $sQueryRow , $params, $options ) or die(print_r(sqlsrv_errors()));
 
     $iFilteredTotal = sqlsrv_num_rows( $stmt );
 
-
-    //echo "TOTAL " . $iFilteredTotal;
-    /* Total data set length */
-    $sQuery = "
-        SELECT COUNT(".$sIndexColumn.")
-        FROM   $sTable
-    ";
-    $rResultTotal = sqlsrv_query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
+    $params = array(
+      $DateStart,
+      $DateEnd
+    );
+    $sQuery = " SELECT  COUNT( Loc.Loc )
+                FROM    Loc;";
+    $rResultTotal = sqlsrv_query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
-
-
-
-    /*
-     * Output
-     */
     $output = array(
-        "sEcho" => intval($_GET['sEcho']),
-        "iTotalRecords" => $iTotal,
-        "iTotalDisplayRecords" => $iFilteredTotal,
-        "aaData" => array()
+        'sEcho'         =>  intval($_GET['sEcho']),
+        'iTotalRecords'     =>  $iTotal,
+        'iTotalDisplayRecords'  =>  $iFilteredTotal,
+        'aaData'        =>  array()
     );
-
-    while ( $aRow = sqlsrv_fetch_array( $rResult ) )
-    {
-        $row = array();
-        for ( $i=0 ; $i<count($aColumns) ; $i++ )
-        {
-            if ( $aColumns[$i] == "version" )
-            {
-                /* Special output formatting for 'version' column */
-                $row[] = ($aRow[ $aColumns[$i] ]=="0") ? '-' : $aRow[ $aColumns[$i] ];
-            }
-            else if ( $aColumns[$i] != ' ' )
-            {
-                /* General output */
-                $row[] = $aRow[ $aColumns[$i] ];
-            }
-        }
-        $output['aaData'][] = $row;
+ 
+    while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+      $output['aaData'][]       = $Row;
     }
-
     echo json_encode( $output );
-	}
-}
+}}
 ?>

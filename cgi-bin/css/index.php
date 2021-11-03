@@ -8,8 +8,8 @@
 } else {
   require( bin_library . 'bootstrap/index.php' );
 }
-IF( file_exists( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/css/page/' . substr( $_SERVER['SCRIPT_NAME'], 1, strlen( $_SERVER['SCRIPT_NAME'] ) - 5 ) . '/index.php') ){
-  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/css/page/' . substr( $_SERVER[ 'SCRIPT_NAME' ], 1, strlen( $_SERVER[ 'SCRIPT_NAME' ] ) - 5 . '/index.php' ) );
+IF( file_exists( bin_css . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '.css') ){
+  ?><link rel='stylesheet' href='<?php echo ( 'cgi-bin/css/page/' .  substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '.css' );?>?v=<?php echo rand(1000,999999999);?>'><?php
 } else {
   switch( $_SERVER[ 'SCRIPT_NAME' ] ){ 
     case '/portal/ticket.php' : 
