@@ -1,0 +1,58 @@
+<div class='popup bg-dark'>
+	<div class='col-md-6 offset-md-3 col-12 card card-primary border-0'>
+		<div class='card-heading bg-primary text-center p-2'>Acknowledgement of Safety</div>
+		<div class='card-body bg-dark text-white p-3'>
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Hardhat</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='Hardhat' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Safety Book</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='Safety_Book' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>First Aid Kit</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='First_Aid_Kit' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Dust Masks</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='Dusk_Masks' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Lock Out Kit</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='Lock_Out_Kit' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Safety Glasses</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='Safety_Glasses' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>GFCI</label> 
+				<div class='col-6'><input class='safety' value='checked' type='checkbox' name='GFCI' /></div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Select All</label> 
+				<div class='col-6'><input class='safety' value='checked' name='Select_All_Safety' onChange='changeSelectAllSafety();' type='checkbox' /></div> 
+			</div> 
+			<div class='row'> 
+				<div class='col-12'>&nbsp;</div> 
+			</div> 
+			<div class='row'> 
+				<div class='col-12'>&nbsp;</div> 
+			</div> 
+			<div class='row'> 
+				<label class='col-6 border-bottom border-white'>Safety Harness Set</label> 
+				<div class='col-6'><input value='checked' type='checkbox' name='Safety_Harness_Set' /></div> 
+			</div> 
+			<div class='row'><div class='col-12'>&nbsp;</div></div>
+			<div class='row'>
+				<div class='col-6'>
+					<button class='text-center bg-success' onClick='submit_Acknowledgement_of_Safety(this);'>Acknowledge</button>
+				</div>
+				<div class='col-6'>
+					<button class='text-center bg-danger' onClick='$(".popup").remove( );'>Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
