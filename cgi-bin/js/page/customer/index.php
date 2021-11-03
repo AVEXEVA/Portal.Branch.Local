@@ -17,6 +17,6 @@ function someFunction(link,URL){
   });
 }
 $(document).ready(function(){
-  //$("div.Screen-Tabs>div>div:first-child").click();
+  $("div.Screen-Tabs>div>div:first-child").click();
 });
 </script>
