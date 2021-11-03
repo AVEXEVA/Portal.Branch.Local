@@ -1,0 +1,24 @@
+<style>
+  .form-group>label:first-child {
+      min-width  : 175px;
+      text-align : right;
+  }
+  .hoverGray:hover {
+      background-color : gold !important;
+  }
+  table#Table_Contracts tbody tr, table#Table_Contracts tbody tr td a {
+      color : black !important;
+  }
+  table#Table_Contracts tbody tr:nth-child( even ) {
+      background-color : rgba( 240, 240, 240, 1 ) !important;
+  }
+  table#Table_Contracts tbody tr:nth-child( odd ) {
+      background-color : rgba( 255, 255, 255, 1 ) !important;
+  }
+  .paginate_button {
+    background-color : rgba( 255, 255, 255, .7 ) !important;
+  }
+  .paginate_button:hover {
+    color : white !important;
+  }
+  </style>

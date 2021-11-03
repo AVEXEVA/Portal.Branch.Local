@@ -1,35 +1,78 @@
 <?php
 session_start();
-require('cgi-bin/php/index.php');
+require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-        $My_User = sqlsrv_fetch_array($r);
-        $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($NEI,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-        $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-        $Privileged = FALSE;
-        if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['User_Privilege'] >= 6 && $My_Privileges['Invoice']['Group_Privilege'] >= 4 && $My_Privileges['Invoice']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+  if(isset($_SESSION[ 'User' ],
+           $_SESSION[ 'Hash' ] ) ) {
+        $result = sqlsrv_query(
+            $NEI,
+          '     SELECT  *
+          FROM      Connection
+          WHERE         Connector = ?
+                        AND Hash = ?;',
+          array(
+                $_SESSION['User'],
+                $_SESSION['Hash']
+          )
+    );
+          $array = sqlsrv_fetch_array( $result );
+          if(!isset(
+              $_SESSION[ 'Branch' ]) || $_SESSION[ 'Branch' ] == 'Nouveau Elevator'){
+            $result= sqlsrv_query(
+              $NEI,
+            '      SELECT   *,
+                          Emp.fFirst AS First_Name,
+                          Emp.Last   AS Last_Name
+                   FROM   Emp
+                   WHERE  Emp.ID= ?',
+          array(
+            $_SESSION[ 'User' ]
+          )
+    );
+          $User = sqlsrv_fetch_array( $result );
+          $Field = ($User[ 'Field' ] == 1
+              && $User[ 'Title' ] != 'OFFICE') ? True : False;
+          $result = sqlsrv_query(
+            $NEI,
+          '       SELECT Access_Table,
+                         User_Privilege,
+                         Group_Privilege,
+                         Other_Privilege
+                  FROM   Privilege
+                  WHERE  User_ID = ?;',
+          array(
+            $_SESSION[ 'User' ]
+          )
+    );
+  $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2[ 'Access_Table' ]] = $array2;}
+    $Privileged = FALSE;
+      if(isset($Privileges[ 'Invoice' ])
+        && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 6
+        && $Privileges[' Invoice' ][ 'Group_Privilege' ] >= 4
+        && $Privileges[ 'Invoice' ][ 'Other_Privilege' ] >= 4) {$Privileged = TRUE;}
         else {
-            //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
-        }
-    } elseif($_SESSION['Branch'] == 'Customer' && is_numeric($_GET['ID'])){
-            $r =  sqlsrv_query( $NEI,"SELECT Ref FROM Invoice LEFT JOIN Loc ON Invoice.Loc = Loc.Loc WHERE Invoice.Ref='{$_GET['ID']}' AND Loc.Owner = '{$_SESSION['Branch_ID']}';");
-            $Privileged = $r ? TRUE : FALSE;
+      //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "invoice.php"));
+    } elseif(
+      $_SESSION[ 'Branch' ] == 'Customer' && is_numeric($_GET[ 'ID' ] ) ) {
+            $result =  sqlsrv_query(
+               $NEI,
+               '    SELECT Ref
+                    FROM  Invoice LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
+                    WHERE Invoice.Ref='{$_GET[ 'ID' ] }' AND Loc.Owner = '{$_SESSION[ 'Branch_ID' ]}';');
+               $Privileged = $result ? TRUE : FALSE;
+    }
+  sqlsrv_query($Portal,'INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);',
+  array(
+    $_SESSION[ 'User' ],
+      date('Y-m-d H:i:s'),
+           'invoice.php')
+    );
     if(!isset($array['ID']) || !is_numeric($_GET['ID'])  || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
-            "SELECT
+        $result = sqlsrv_query($NEI,
+            'SELECT
                 TOP 1
                 Invoice.Ref 			AS ID,
                 Invoice.fDesc 			AS Description,
@@ -69,24 +112,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 LEFT JOIN Emp AS Route_Mechanic ON Route.Mech = Route_Mechanic.fWork
                 LEFT JOIN JobType               ON Job.Type = JobType.ID
             WHERE
-                Invoice.Ref='{$_GET['ID']}'");
-        $data = sqlsrv_fetch_array($r);
+                Invoice.Ref='{$_GET[ 'ID' ]}'');
+        $data = sqlsrv_fetch_array($result);
 
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require(bin_meta.'index.php');?>
     <title>Nouveau Texas | Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require(bin_css.'index.php');?>
+    <?php require(bin_js.'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
-    <div id="wrapper" style='overflow:auto !important;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
+    <div id='wrapper' style='overflow:auto !important;' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION['Toggle_Menu'] : null;?>'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
         <?php require(PROJECT_ROOT.'php/element/loading.php');?>
-        <div id="page-wrapper" class='content' style='overflow:auto !important;'>
+        <div id='page-wrapper' class='content' style='overflow:auto !important;'>
             <div class='' style='display:none;'>
-                <div class="panel panel-primary">
+                <div class='panel panel-primary'>
                     <div class='panel-heading'><h3><?php $Icons->Invoice();?> Invoice</h3></div>
                     <div class='panel-body'>
                         <div class='col-md-4'>
@@ -97,27 +140,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <div class='panel-body'>
                                     <div class='row'>
                                         <div class='col-xs-4'><div><b>ID:</b></div></div>
-                                        <div class='col-xs-8'><?php echo $data['ID'];?></div>
+                                        <div class='col-xs-8'><?php echo $data[ 'ID' ];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Description:</b></div>
-                                        <div class='col-xs-8'><?php echo $data['Description'];?></div>
+                                        <div class='col-xs-8'><?php echo $data[ 'Description' ];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Date:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["fDate"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['fDate'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Amount:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["Amount"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['Amount'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Sales Tax:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["STax"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['STax'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Total:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["Total"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['Total'];?></div>
                                     </div>
                                 </div>
                             </div>
@@ -127,11 +170,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <div class='panel-heading'>Customer Details</div>
                                 <div class='panel-body'>
                                     <div class='row'><div class='col-xs-4'><div><b>ID:</b></div></div><div class='col-xs-8'><?php echo $data['Customer_ID'];?></div></div>
-                                    <div class='row'><div class='col-xs-4'><b>Name:</b></div><div class='col-xs-8'><a href="customer.php?ID=<?php echo $data['Customer_ID'];?>"><?php echo $data['Customer_Name'];?></a></div></div>
-                                    <div class='row'><div class='col-xs-4'><b>Street:</b></div><div class='col-xs-8'><?php echo $data["Customer_Street"];?></div></div>
-                                    <div class='row'><div class='col-xs-4'><b>City:</b></div><div class='col-xs-8'><?php echo $data["Customer_City"];?></div></div>
-                                    <div class='row'><div class='col-xs-4'><b>State:</b></div><div class='col-xs-8'><?php echo $data["Customer_State"];?></div></div>
-                                    <div class='row'><div class='col-xs-4'><b>Zip:</b></div><div class='col-xs-8'><?php echo $data["Customer_Zip"];?></div></div>
+                                    <div class='row'><div class='col-xs-4'><b>Name:</b></div><div class='col-xs-8'><a href='customer.php?ID=<?php echo $data['Customer_ID'];?>'><?php echo $data['Customer_Name'];?></a></div></div>
+                                    <div class='row'><div class='col-xs-4'><b>Street:</b></div><div class='col-xs-8'><?php echo $data['Customer_Street'];?></div></div>
+                                    <div class='row'><div class='col-xs-4'><b>City:</b></div><div class='col-xs-8'><?php echo $data['Customer_City'];?></div></div>
+                                    <div class='row'><div class='col-xs-4'><b>State:</b></div><div class='col-xs-8'><?php echo $data['Customer_State'];?></div></div>
+                                    <div class='row'><div class='col-xs-4'><b>Zip:</b></div><div class='col-xs-8'><?php echo $data['Customer_Zip'];?></div></div>
                                 </div>
                             </div>
                         </div>
@@ -145,31 +188,31 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Tag:</b></div>
-                                        <div class='col-xs-8'><a href="<?php echo (strlen($data['Location_ID']) > 0) ? 'location.php?ID=' . $data['Location_ID'] : '#';?>"><?php echo $data["Location_Tag"];?></a></div>
+                                        <div class='col-xs-8'><a href='<?php echo (strlen($data['Location_ID']) > 0) ? 'location.php?ID=' . $data['Location_ID'] : '#';?>'><?php echo $data['Location_Tag'];?></a></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Street:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["Street"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['Street'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>City:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["City"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['City'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>State:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["State"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['State'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Zip:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["Zip"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['Zip'];?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Route:</b></div>
-                                        <div class='col-xs-8'><?php if(!$Field || $_SESSION['User'] == $data["Route_Mechanic_ID"]){?><a href="route.php?ID=<?php echo $data["Route_ID"];?>"><?php echo $data["Route_Mechanic_First_Name"] . " " . $data['Route_Mechanic_Last_Name'];?></a><?php } else {?><?php echo $data["Route_Mechanic_First_Name"] . " " . $data['Route_Mechanic_Last_Name'];?><?php }?></div>
+                                        <div class='col-xs-8'><?php if(!$Field || $_SESSION['User'] == $data['Route_Mechanic_ID']){?><a href='route.php?ID=<?php echo $data['Route_ID'];?>'><?php echo $data['Route_Mechanic_First_Name'] . ' ' . $data['Route_Mechanic_Last_Name'];?></a><?php } else {?><?php echo $data['Route_Mechanic_First_Name'] . ' ' . $data['Route_Mechanic_Last_Name'];?><?php }?></div>
                                     </div>
                                     <div class='row'>
                                         <div class='col-xs-4'><b>Zone:</b></div>
-                                        <div class='col-xs-8'><?php echo $data["Zone"];?></div>
+                                        <div class='col-xs-8'><?php echo $data['Zone'];?></div>
                                     </div>
                                 </div>
                             </div>
@@ -177,15 +220,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     </div>
                     <div class='row'>
                         <div class='col-md-12'>
-                            <div class="panel panel-green">
-                                <div class="panel-heading">
+                            <div class='panel panel-green'>
+                                <div class='panel-heading'>
                                     Invoice Items
                                 </div>
-                                <div class="panel-body">
+                                <div class='panel-body'>
                                     <table id='Table_Invoice_Items' class='display' cellspacing='0' width='100%'>
                                         <thead>
-                                            <th title="Date">Date</th>
-                                            <th title="Invoice">Description</th>
+                                            <th title='Date'>Date</th>
+                                            <th title='Invoice'>Description</th>
                                             <th>Amount</th>
                                         </thead>
                                     </table>
@@ -195,15 +238,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     </div>
                     <div class='row'>
                         <div class='col-md-12'>
-                            <div class="panel panel-red">
-                                <div class="panel-heading">
+                            <div class='panel panel-red'>
+                                <div class='panel-heading'>
                                     Payments
                                 </div>
-                                <div class="panel-body">
+                                <div class='panel-body'>
                                     <table id='Table_Payments' class='display' cellspacing='0' width='100%'>
                                         <thead>
-                                            <th title="Date">Date</th>
-                                            <th title="Invoice">Description</th>
+                                            <th title='Date'>Date</th>
+                                            <th title='Invoice'>Description</th>
                                             <th>Amount</th>
                                         </thead>
                                     </table>
@@ -253,14 +296,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 </div>
                 <div class='row' style='font-size:12px;'>
                     <div class='col-xs-2'>&nbsp;</div>
-                    <div class='col-xs-4'><?php echo $data['Customer_City'] . ", " . $data['Customer_State'] . " " . $data['Customer_Zip'];?></div>
+                    <div class='col-xs-4'><?php echo $data['Customer_City'] . ', ' . $data['Customer_State'] . ' ' . $data['Customer_Zip'];?></div>
                     <div class='col-xs-2' style='text-align:right;'><b>Amount:</b></div>
                     <div class='col-xs-4'><?php echo substr(money_format('%.2n',$data['Amount']),0);?></div>
                 </div>
                 <div class='row' style='font-size:12px;'>
                     <div class='col-xs-6'>&nbsp;</div>
                     <div class='col-xs-2' style='text-align:right;'><b>Paid:</b></div>
-                    <div class='col-xs-4'><?php echo isset($data['Paid']) ? substr(money_format('%.2n',$data['Paid']),0) : "$0.00";?></div>
+                    <div class='col-xs-4'><?php echo isset($data['Paid']) ? substr(money_format('%.2n',$data['Paid']),0) : '$0.00';?></div>
                 </div>
                 <div class='row'>&nbsp;</div>
                 <div class='row' style='border:2px solid black;'>
@@ -281,25 +324,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <div class='col-xs-2' style='border-left:2px solid black;'><?php echo proper($data['Job_Type']);?></div>
                     <div style='clear:both;'></div>
                 </div>
-                <style>
-                #Table_Invoice tr:first-child td, #Table_Invoice th {
-                    padding:15px;
-                }
-                #Table_Invoice th {
-                    border:1px solid black;
-                }
-                #Table_Invoice th {
-                    background-color:#9a9a9a !important;
-                    font-weight:bold;
-                }
-                #Table_Invoice td {
-                    font-size:12px;
-                }
-                body {
-                  -webkit-print-color-adjust: exact;
-                }
-                </style>
-                <div class='row'>&nbsp;</div>
+              <div class='row'>&nbsp;</div>
                 <div class='row'>
                     <table id='Table_Invoice' cellpadding='5px' width='100%' style='border:2px solid black;'>
                         <thead>
@@ -351,99 +376,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <h4 style='text-align:center;'><b>Nouveau Elevator Industries, Inc.</b></h4>
                     <div style='text-align:center;'>47-55 37th Street LIC, NY 11101 TEL:718.349.4700 FAX: 718.383.3218</div>
                 </div>
-            </div>
-			<script>
-				var here;
-			<?php
-			$r = sqlsrv_query($NEI,"SELECT TicketO.ID AS Ticket_ID FROM TicketD WHERE TicketO.Invoice = ?",array($_GET['ID']));
-			if($r){while($Ticket = sqlsrv_fetch_array($r)){?>
-				$(document).ready(function(){
-					var TicketID = <?php echo $Ticket['Ticket_ID'];?>;
-					$.ajax({
-						url:"short-ticket.php?ID=" + TicketID,
-						method:"GET",
-						success:function(code){
-							$("div#page-wrapper.content").append(code);
-						}
-					});
-				});
-			<?php }}?>
-			<?php
-			$r = sqlsrv_query($NEI,"SELECT TicketD.ID AS Ticket_ID FROM TicketD WHERE TicketD.Invoice = ?",array($_GET['ID']));
-			if($r){while($Ticket = sqlsrv_fetch_array($r)){?>
-				$(document).ready(function(){
-					var TicketID = <?php echo $Ticket['Ticket_ID'];?>;
-					$.ajax({
-						url:"short-ticket.php?ID=" + TicketID,
-						method:"GET",
-						success:function(code){
-							$("div#page-wrapper.content").append(code);
-						}
-					});
-				});
-			<?php }}?>
-			<?php
-			$r = sqlsrv_query($NEI,"SELECT TicketDArchive.ID AS Ticket_ID FROM TicketDArchive WHERE TicketDArchive.Invoice = ?",array($_GET['ID']));
-			if($r){while($Ticket = sqlsrv_fetch_array($r)){?>
-				$(document).ready(function(){
-					var TicketID = <?php echo $Ticket['Ticket_ID'];?>;
-					$.ajax({
-						url:"short-ticket.php?ID=" + TicketID,
-						method:"GET",
-						success:function(code){
-							$("div#page-wrapper.content").append(code);
-						}
-					});
-				});
-			<?php }}?>
-
-			</script>
+           </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
-    <?php require('cgi-bin/js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="../dist/js/moment.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-    <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
-
-    <script>
-    $(document).ready(function(){
-        var Table_Invoice_Items = $('#Table_Invoice_Items').DataTable( {
-            "ajax": "cgi-bin/php/get/Items_by_Invoice.php?ID=<?php echo $_GET['ID'];?>",
-            "columns": [
-                { "data": "Dated"},
-                { "data": "Description"},
-                { "data": "Amount"}
-            ],
-            "order": [[1, 'asc']],
-            "language":{
-                "loadingRecords":""
-            },
-            "initComplete":function(){
-            }
-        } );
-        var Table_Payments = $('#Table_Payments').DataTable( {
-            "ajax": "cgi-bin/php/get/Payments_by_Invoice.php?ID=<?php echo $_GET['ID'];?>",
-            "columns": [
-                { "data": "Dated"},
-                { "data": "Description"},
-                { "data": "Amount"}
-            ],
-            "order": [[1, 'asc']],
-            "language":{
-                "loadingRecords":""
-            },
-            "initComplete":function(){}
-        } );
-    });
-    </script>
-    <?php require(PROJECT_ROOT.'php/js/chart/invoice_history.php');?>
+<?php require(PROJECT_ROOT.'php/js/chart/invoice_history.php');?>
 </body>
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href="../login.php?Forward=invoice<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href='../login.php?Forward=invoice<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? 's.php' : '.php?ID={$_GET['ID']}';?>';</script></head></html><?php }?>
