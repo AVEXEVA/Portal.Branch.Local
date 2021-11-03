@@ -25,9 +25,10 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-  <?php require('cgi-bin/php/meta.php');?>
-  <title>Nouveau Elevator Portal</title>
-  <?php require('cgi-bin/css/index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+  <?php require( bin_meta . 'index.php' );?>
+  <?php require( bin_css  . 'index.php' );?>
+  <?php require( bin_js   . 'index.php' );?>
   <style>
       button.slim {
         background: none;
@@ -39,7 +40,7 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
         outline: inherit;
       }
       #main-menu .panel {
-        margin:25px;
+        margin:25px; 
         padding:0px;
         -webkit-box-shadow: 0px 1px 25px rgba(237, 237, 237, 0.50);
         -moz-box-shadow:    0px 1px 25px rgba(237, 237, 237, 0.50);
@@ -77,8 +78,6 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
         padding:0px;
         list-style-type:none;
       }
-    </style>
-    <style>
       .Home-Screen-Option {
         border:1px solid gold;
       }
@@ -109,17 +108,12 @@ $Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'B
         background-color:gold !important;
         color:black !important;
       }
-      .
-    </style>
-  <style>
-    .nav-text{ text-align: center; }
-    .nav-icon{ text-align: center; }
-    
+      .nav-text{ text-align: center; }
+      .nav-icon{ text-align: center; }
   </style>
-  <?php require('cgi-bin/js/index.php');?>
 </head>
 <body style='background-color:#0a0a0a !important;'>
-  <?php require('cgi-bin/php/element/navigation/index.php');?>
+  <?php require( bin_php .'element/navigation/index.php');?>
   <div id='page-wrapper' class='content' style='display:block;'>
     <script>
     var checked = true;

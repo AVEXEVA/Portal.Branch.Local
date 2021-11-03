@@ -1,0 +1,3 @@
+<?php Class LI extends Element {
+	public function LI(){?><LI <?php parent::Attributes();?>><?php parent::HTML();?></LI>
+}?>

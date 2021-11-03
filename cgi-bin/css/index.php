@@ -6,10 +6,10 @@
     break;
   }
 } else {
-  require( 'cgi-bin/library/bootstrap/index.php' );
+  require( bin_library . 'bootstrap/index.php' );
 }
-IF( file_exists( '/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER['SCRIPT_NAME'], 1, strlen( $_SERVER['SCRIPT_NAME'] ) - 5 ) . '/index.php') ){
-  require('/var/www/portal.live.local/html/cgi-bin/css/page/' . substr( $_SERVER[ 'SCRIPT_NAME' ], 1, strlen( $_SERVER[ 'SCRIPT_NAME' ] ) - 5 . '/index.php' ) );
+IF( file_exists( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/css/page/' . substr( $_SERVER['SCRIPT_NAME'], 1, strlen( $_SERVER['SCRIPT_NAME'] ) - 5 ) . '/index.php') ){
+  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/css/page/' . substr( $_SERVER[ 'SCRIPT_NAME' ], 1, strlen( $_SERVER[ 'SCRIPT_NAME' ] ) - 5 . '/index.php' ) );
 } else {
   switch( $_SERVER[ 'SCRIPT_NAME' ] ){ 
     case '/portal/ticket.php' : 

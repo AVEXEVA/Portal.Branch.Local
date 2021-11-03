@@ -1,0 +1,12 @@
+<?php 
+NAMESPACE \HTML\ELEMENT\BODY;
+CLASS A EXTENDS \HTML\ELEMENT\BODY\INDEX {
+  //Variables
+  ///ARGUMENTS
+  PUBLIC $HREF;
+  //Functions
+  ///MAGIC
+  PUBLIC FUNCTION __HTML( ){
+    ?><A <?PHP PARENT::__HTML_ATTRIBUTES();?>><?PHP ECHO PARENT::__get( 'CONTENT' );?></A><?PHP 
+  }
+}?>

@@ -1,0 +1,3 @@
+<?php class TextArea extends Element {
+	public function TextArea(){?><TextArea <?php parent::Attributes();?>><?php echo parent::__get('Rel');?></TextArea><?php }
+}?>

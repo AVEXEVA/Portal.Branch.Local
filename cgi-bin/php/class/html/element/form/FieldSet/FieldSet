@@ -1,0 +1,16 @@
+<?php 
+class FieldSet extends Element {
+	//Elements
+	$Legend;
+	$Labels = array();
+	$Fields = array();
+	//Functions
+	public function FieldSet(){
+		?><FieldSet <?php parent::Attributes();?>><?php if(count($this->Labels) == count($this->Fields)){
+			if(is_object($this->Legend)){$this->Legend->Legend();}
+			for($i=0;$i<count($this->Labels);$i++){?><DIV Class='Set'><?php $this->Labels[$i]->Label();?><?php $this->Fields[$i]->Field();?></DIV><?php }
+		} else {
+			for($i=0;$i<count($this->Fields);$i++){?><?php $this->Fields[$i]->Field();?><?php }
+		}?></FieldSet><?php
+	}
+}?>
