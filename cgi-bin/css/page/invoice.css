@@ -1,0 +1,18 @@
+<style>
+#Table_Invoice tr:first-child td, #Table_Invoice th {
+    padding:15px;
+}
+#Table_Invoice th {
+    border:1px solid black;
+}
+#Table_Invoice th {
+    background-color:#9a9a9a !important;
+    font-weight:bold;
+}
+#Table_Invoice td {
+    font-size:12px;
+}
+body {
+  -webkit-print-color-adjust: exact;
+}
+</style>

@@ -42,10 +42,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	$Privileges = array();
 	if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
     if(	!isset( $Connection[ 'ID' ] )
-	   	|| !isset($Privileges[ 'Contract' ])
-	  		|| $Privileges[ 'Contract' ][ 'User_Privilege' ]  < 4
-	  		|| $Privileges[ 'Contract' ][ 'Group_Privilege' ] < 4
-        || $Privileges[ 'Contract' ][ 'Other_Privilege' ] < 4){
+	   	|| !isset($Privileges[ 'Contracts' ])
+	  		|| $Privileges[ 'Contracts' ][ 'User_Privilege' ]  < 4
+	  		|| $Privileges[ 'Contracts' ][ 'Group_Privilege' ] < 4
+        || $Privileges[ 'Contracts' ][ 'Other_Privilege' ] < 4){
 				?><?php require( '../404.html' );?><?php }
     else {
   		sqlsrv_query(
@@ -69,30 +69,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require('cgi-bin/css/index.php');?>
-    <style>
-      .form-group>label:first-child {
-          min-width  : 175px;
-          text-align : right;
-      }
-      .hoverGray:hover {
-          background-color : gold !important;
-      }
-      table#Table_Contracts tbody tr, table#Table_Contracts tbody tr td a {
-          color : black !important;
-      }
-      table#Table_Contracts tbody tr:nth-child( even ) {
-          background-color : rgba( 240, 240, 240, 1 ) !important;
-      }
-      table#Table_Contracts tbody tr:nth-child( odd ) {
-          background-color : rgba( 255, 255, 255, 1 ) !important;
-      }
-      .paginate_button {
-        background-color : rgba( 255, 255, 255, .7 ) !important;
-      }
-      .paginate_button:hover {
-        color : white !important;
-      }
-      </style>
     <?php require('cgi-bin/js/index.php');?>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
@@ -169,83 +145,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     </div>
   </div>
   <!-- Bootstrap Core JavaScript -->
-  <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-  <?php require( 'cgi-bin/js/datatables.php' );?>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-  <script>
-  	var Table_Contracts = $('#Table_Contracts').DataTable( {
-  		dom 	   : 'tp',
-      processing : true,
-      serverSide : true,
-      responsive : true,
-      autoWidth  : false,
-  		paging     : true,
-  		searching  : false,
-  		ajax       : {
-        url : 'cgi-bin/php/get/Contracts2.php',
-        data : function( d ){
-          d = {
-              start : d.start,
-              length : d.length,
-              order : {
-                  column : d.order[0].column,
-                  dir : d.order[0].dir
-              }
-          };
-          d.Search = $('input[name="Search"]').val( );
-          d.ID = $('input[name="ID"]').val( );
-          d.Customer = $('input[name="Customer"]').val( );
-          d.Location = $('input[name="Location"]').val( );
-          d.Start_Date = $('input[name="Start_Date"]').val( );
-          d.End_Date = $('input[name="End_Date"]').val( );
-          d.Cycle = $('select[name="Cycle"]').val( );
-          return d;
-        }
-      },
-  		columns: [
-  			{
-  				data 	: 'ID'
-  			},{
-  				data 	: 'Customer'
-  			},{
-  				data 	: 'Location'
-  			},{
-  				data 	: 'Job'
-  			},{
-  				data 	: 'Start_Date'
-  			},{
-  				data 	: 'Amount'
-  			},{
-  				data 	: 'Length',
-  				render  : function( data ){ return data + ' months'; }
-  			},{
-  				data 	: 'Cycle'
-  			},{
-  				data 	: 'End_Date'
-  			},{
-  				data 	: 'Escalation_Factor'
-  			},{
-  				data 	: 'Escalation_Date'
-  			},{
-  				data 	: 'Escalation_Type'
-  			},{
-  				data 	: 'Escalation_Cycle'
-  			},{
-  				data 	: 'Link',
-  				render  : function( d ){ return d !== null ? "<a href='" + d + "'>" + d + "</a>" : ''; }
-  			},{
-  				data 	: 'Remarks'
-  			}
-  		]
-  	} );
-    //Datepickers
-    $('input[name="Start_Date"]').datepicker( { } );
-    $('input[name="End_Date"]').datepicker( { } );
-    //Events
-    function redraw( ){ Table_Contracts.draw(); }
-    function hrefContracts(){hrefRow('Table_Contracts','contract');}
-    $('Table#Table_Contracts').on('draw.dt',function(){hrefContracts();});
-  </script>
+<?php require( 'cgi-bin/js/datatables.php' );?>
 </body>
 </html>
 <?php

@@ -1,0 +1,10 @@
+<style>
+    .panel {background-color:transparent !important;}
+    .panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
+    .nav-tabs > li:not(.active) {background-color:rgba(255,255,255,.6) !important;}
+    .panel-heading {font-family: 'BankGothic' !important;}
+    .shadow {box-shadow:0px 5px 5px 0px;}
+    @media print {
+        div#wrapper {overflow:visible;}
+    }
+</style>
