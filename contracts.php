@@ -71,7 +71,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <?php require('cgi-bin/css/index.php');?>
     <?php require('cgi-bin/js/index.php');?>
 </head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
+<body onload='finishLoadingPage();'>
   <div id='wrapper'>
     <?php require( 'cgi-bin/php/element/navigation/index.php' );?>
     <?php require( 'cgi-bin/php/element/loading.php' );?>

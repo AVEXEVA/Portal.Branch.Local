@@ -1,4 +1,29 @@
 <script>
+  function changePanel( link ){
+      changePanelHeading( $( link ).hasClass( 'active' ) ? null : $( link).attr( 'card' ) );
+      changePanelBody( $( link ).attr( 'card' ) );
+  }
+  function changePanelHeading( card ){
+      $(".dashboard .card-heading ul li ").each(function(){ 
+        if( card === null ){
+          $( this ).addClass( 'show' ); 
+          $( this ).removeClass( 'active' );
+      } else if ( card != $( this ).attr( 'card ') ) {
+        $( this ).removeClass( 'show' );
+      } else {
+        $( this ).addClass( 'active' );
+      }
+    });
+    if( card != null ){
+      $( ".dashboard .card-heading ul li[card='" + card + "']").addClass( 'active' );
+    }
+  } 
+  function changePanelBody( card ){
+    $(".dashboard .card-body").each(function(){ $( this ).removeClass( 'active' ); });
+    $(".dashboard .card-body[card='" + card + "']").addClass( 'active' );
+  }
+</script>
+<script>
 var checked = true;
 function changeSelectAllSafety(){
   $(".popup input.safety").each(function(){
@@ -6,9 +31,17 @@ function changeSelectAllSafety(){
   });
   checked = !checked;
 }
-var safety_acknowledgement_popup = "<div class='popup' style='background-color:#1d1d1d;color:black;top:50px;position:absolute;left:0;width:100%;height:100%;'><div class='panel panel-primary'><div class='panel-heading' style='padding-top:25px;'> Acknowledgement of Safety <h2></div><div class='panel-body' style='padding:25px;'> <div class='row'> <div class='col-xs-6'>Hardhat</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='Hardhat' /></div> </div> <div class='row'> <div class='col-xs-6'>Safety Book</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='Safety_Book' /></div> </div> <div class='row'> <div class='col-xs-6'>First Aid Kit</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='First_Aid_Kit' /></div> </div> <div class='row'> <div class='col-xs-6'>Dust Masks</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='Dusk_Masks' /></div> </div> <div class='row'> <div class='col-xs-6'>Lock Out Kit</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='Lock_Out_Kit' /></div> </div> <div class='row'> <div class='col-xs-6'>Safety Glasses</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='Safety_Glasses' /></div> </div> <div class='row'> <div class='col-xs-6'>GFCI</div> <div class='col-xs-6'><input class='safety' value='checked' type='checkbox' name='GFCI' /></div> </div> <div class='row'> <div class='col-xs-6'>Select All</div> <div class='col-xs-6'><input class='safety' value='checked' name='Select_All_Safety' onChange='changeSelectAllSafety();' type='checkbox' /></div> </div> <div class='row'> <div class='col-xs-12'>&nbsp;</div> </div> <div class='row'> <div class='col-xs-12'>&nbsp;</div> </div> <div class='row'> <div class='col-xs-6'>Safety Harness Set</div> <div class='col-xs-6'><input value='checked' type='checkbox' name='Safety_Harness_Set' /></div> </div> <div class='row'><div class='col-xs-12'>&nbsp;</div></div><div class='row'><div class='col-xs-12'>&nbsp;</div></div><div class='row'><div class='col-xs-12'><button onClick='submit_Acknowledgement_of_Safety(this);' style='width:90%;margin-left:5%;margin-right:5%;border:1px solid black;height:50px;color:black !important;background-color:lightgray;text-align:center;'>Acknowledgement of Safety</button></div></div></div>";
+var safety_acknowledgement_popup;
+$.ajax({
+  url : 'cgi-bin/php/element/attendance/safety.html',
+  success : function( html ){ safety_acknowledgement_popup = html; }
+});
 var dt_notes = '';
-var covid_19_questionaire_popup = "<div class='popup' style='background-color:#1d1d1d;color:black;top:50px;position:absolute;left:0;width:100%;height:100%;'><div class='panel panel-primary'><div class='panel-heading' style='padding-top:25px;'> COVID 19 Questionaire<h2></div><div class='panel-body' style='padding:25px;'><form id='COVID_19_Questionaire'><div class='row'><div class='col-xs-12'>Have you experienced a fever of 100.4 degrees F or greater, a new cough, new loss of taste or smell or shortness of breath within the past 10 days?</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_1' value='No' /> No</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_1' value='Yes' /> Yes</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'>In the past 10 days, have you gotten a positive result from a COVID-19 test that tested saliva or used a nose or throat swab? (not a blood test)</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_2' value='No' /> No</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_2' value='Yes' /> Yes</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'>To the best of your knowledge, in the past 14 days, have you been in close contact (within 6 feet for at least 10 minutes) with anyone while they had Covid-19?</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_3' value='No' /> No</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_3' value='Yes' /> Yes</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'>In the past 14 days, have you traveled internationally or returned from a state identified by New York State as having widespread community transmission of COVID-19 (other than just passing through the restricted state for less than 24 hours)? Visit https://coronavirus.health.ny.gov/covid-19-travel-advisory for applicable states.</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_4' value='No' /> No</div><div class='col-xs-6'><input type='radio' name='COVID_19_Questionaire_4' value='Yes' /> Yes</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'><button name='submitCOVID19Questionaire' type='button' onClick='submit_COVID_19_Questionaire(this);' style='width:90%;margin-left:5%;margin-right:5%;border:1px solid black;height:50px;color:black !important;background-color:lightgray;text-align:center;'>Submit Questionaire</button></div></form></div></div>";
+var covid_19_questionaire_popup;
+$.ajax({
+  url : 'cgi-bin/php/element/attendance/covid-19.html',
+  success : function( html ){ covid_19_questionaire_popup = html; }
+});
 function attendance_clock(link){
   //Notes
   if($("textarea[name='notes_in']").length > 0){dt_notes = $("textarea[name='notes_in']").val();}
@@ -64,29 +97,31 @@ function complete_clockout(){
   }
 }
 function submit_Acknowledgement_of_Safety(link){
-  if(!$("input[name='Hardhat']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  if(!$("input[name='Safety_Book']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  if(!$("input[name='First_Aid_Kit']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  if(!$("input[name='Dusk_Masks']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  if(!$("input[name='Lock_Out_Kit']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  if(!$("input[name='Safety_Glasses']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  if(!$("input[name='GFCI']").is(':checked')){alert('You must have all of your safety equipment in order to clock in');return;}
-  $("body").css("overflow","visible");
-  $(link).html("Saving <img src='media/images/spinner.gif' height='25px' width='auto' />");
-  $(link).attr('disabled','disabled')
-  $("div.popup").replaceWith(covid_19_questionaire_popup);
+  if(     !$("input[name='Hardhat']").is(':checked')
+      ||  !$("input[name='Safety_Book']").is(':checked')
+      ||  !$("input[name='First_Aid_Kit']").is(':checked')
+      ||  !$("input[name='Dusk_Masks']").is(':checked')
+      ||  !$("input[name='Lock_Out_Kit']").is(':checked')
+      ||  !$("input[name='Safety_Glasses']").is(':checked')
+      ||  !$("input[name='GFCI']").is(':checked')
+  ){  
+      alert('You must have all of your safety equipment in order to clock in');
+      return;
+  }
+  $("div.popup").replaceWith( covid_19_questionaire_popup );
 }
 function submit_COVID_19_Questionaire(link){
-  if($("input[name='COVID_19_Questionaire_1']:checked").length == 0){ alert('Please answer all questions'); return; }
-  else if($("input[name='COVID_19_Questionaire_2']:checked").length == 0){ alert('Please answer all questions'); return; }
-  else if($("input[name='COVID_19_Questionaire_3']:checked").length == 0){ alert('Please answer all questions'); return; }
-  else if($("input[name='COVID_19_Questionaire_4']:checked").length == 0){ alert('Please answer all questions'); return; }
-
+  if(     $("input[name='COVID_19_Questionaire_1']:checked").length == 0
+      ||  $("input[name='COVID_19_Questionaire_2']:checked").length == 0
+      ||  $("input[name='COVID_19_Questionaire_3']:checked").length == 0
+      ||  $("input[name='COVID_19_Questionaire_4']:checked").length == 0
+  ){ 
+    alert('Please answer all questions'); return; 
+  }
   $(link).html("Saving <img src='media/images/spinner.gif' height='25px' width='auto' />");
   $(link).attr('disabled','disabled')
-
   $.ajax({
-    url:'cgi-bin/php/post/COVID19Questionaire.php',
+    url:'cgi-bin/php/post/covid-19-questionaire.php',
     data:{
       1 : $("input[name='COVID_19_Questionaire_1']:checked").val(),
       2 : $("input[name='COVID_19_Questionaire_2']:checked").val(),
@@ -99,7 +134,12 @@ function submit_COVID_19_Questionaire(link){
         alert('An employee who does not pass the screening questions must not report to work and should report to their supervisor.');
           document.location.href='home.php';
       } else {
-        $.ajax({method:"POST",data:{Notes : dt_notes}, url:"cgi-bin/php/post/clock_in.php",success:function(code){ document.location.href='home.php'; }});
+        $.ajax( {
+          method:"POST",
+          data:{Notes : dt_notes}, 
+          url:"cgi-bin/php/post/clock_in.php",
+          success:function(code){ document.location.href='home.php'; }
+        } );
       }
     }
   });
@@ -109,5 +149,203 @@ function clock_in_menu(){
 }
 function clock_out_menu(){
   $("body").append("<div class='popup' style='background-color:#1d1d1d;color:white !important;top:0;position:absolute;left:0;width:100%;height:100%;'><div class='panel panel-primary'><div class='panel-heading'><div class='row'><div class='col-xs-12'>&nbsp;</div></div><div class='row'><div class='col-xs-12'>&nbsp;</div></div></div><div class='panel-heading'>Clock In Notes</div><div class='panel-body'><div class='row'><div class='col-xs-12'>&nbsp;</div></div><div class='row'><div class='col-xs-12'><textarea name='notes_out' style='width:100%;color:black;' rows='10'></textarea></div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'>&nbsp;</div><div class='col-xs-12'><input style='color:black;width:100%;height:50px;' rel='out_notes' type='button' onClick='attendance_clock(this);' value='Save' /></div></div></div></div>");
+}
+var grouping_id = 5;
+var grouping_name = 'Level';
+var collapsedGroups = [];
+var groupParent = [];
+$( document ).ready( function(){
+  var Table_Tickets = $('#Table_Tickets').DataTable( {
+    dom: 'tp',
+    ajax: {
+      url: 'cgi-bin/php/get/Work2.php',
+      dataSrc:function(json){
+        if( !json.data ){ json.data = []; }
+        return json.data;}
+    },
+    columns: [
+      {
+        className: 'indent',
+        data : 'Tag',
+        render : function(data, type, row, meta){
+          if(type === 'display'){return '<?php $Icons->Ticket(1);?>';}
+          return data;
+        },
+        sortable : true,
+        visible : false
+      },{
+        data : 'ID'
+      },{
+        data : 'Status'
+      },{
+        data : 'Date',
+        render: function(data) {
+          if(data === null){return data;}
+          else {return data.substr(5,2) + '/' + data.substr(8,2) + '/' + data.substr(0,4);}}
+      },{
+        data : 'Unit_State',
+        render:function(data, type, row, meta){
+          if(type === 'display'){
+            if(row.Unit_State === null){return '';}
+            return row.Unit_State + ', </br>' + row.Unit_Label;
+          }
+          return row.Unit_State;
+        }
+      },{
+        data : 'Level',
+        render: function(data, type, row, meta){
+          return data;
+        }
+      },{
+        data : 'Priority',
+        render: function(data, type, row, meta){
+          return data == 1 ? 'Yes' : 'No';
+        },
+        visible : false
+      }
+    ],
+    order: [ [ 5, 'asc' ], [0, 'asc' ] ],
+    initComplete : function(){ },
+    paging : false,
+    createdRow : function( row, data, dataIndex ) {
+      if ( data['Status'] == 'On Site' || data['Status'] == 'En Route') { $(row).addClass('gold'); } 
+      else if( data['Priority'] == 1 && data['Status'] != 'Reviewing' && data['Status'] != 'Completed'){ $(row).addClass('red'); } 
+      else if ( data['Level'] == 'Service Call' && data['Status'] != 'Reviewing' && data['Status'] != 'Completed' && data['Status'] != 'Signed' ){ $(row).addClass('blue'); } 
+      else if( data['Status'] == 'Signed' ){ $(row).addClass('green'); } 
+      else if (data['Status'] != 'Reviewing' && data['Status'] != 'Completed' ){ $(row).addClass('light'); }
+    },
+    rowGroup: { 
+      // Uses the 'row group' plugin
+      dataSrc: [
+        'Level',
+        'Location'
+      ],
+      startRender: function(rows, group, level) {
+        groupParent[level] = group;
+
+        var groupAll = '';
+        for (var i = 0; i < level; i++) {groupAll += groupParent[i]; if (collapsedGroups[groupAll]) {return;}}
+        groupAll += group;
+
+        if ((typeof(collapsedGroups[groupAll]) == 'undefined') || (collapsedGroups[groupAll] === null)) {collapsedGroups[groupAll] = true;} //True = Start collapsed. False = Start expanded.
+
+        var collapsed = collapsedGroups[groupAll];
+        var newTickets = 0;
+        rows.nodes().each(function(r) {
+          if(( $(r).children(':nth-child(2)').html() != 'On Site' && $(r).children(':nth-child(2)').html() != 'En Route'  && $(r).children(':nth-child(6)').html() != 'Yes') || $(r).children(':nth-child(2)').html() == 'Reviewing' || $(r).children(':nth-child(2)').html() == 'Signed' || $(r).children(':nth-child(2)').html() == 'Completed'){
+            r.style.display = (collapsed ? 'none' : '');
+          }
+          var start = new Date();
+          start.setHours(0,0,0,0);
+          var end = new Date();
+          end.setHours(23,59,59,999);
+          if( new Date($(r).children(':nth-child(3)').html()) >= start && new Date($(r).children(':nth-child(3)').html()) < end && $(r).children(':nth-child(2)').html() != 'Reviewing' && $(r).children(':nth-child(2)').html() != 'Signed' && $(r).children(':nth-child(2)').html() != 'Completed'){ newTickets++; }
+        });
+        var newString = newTickets > 0 ? ', ' + newTickets + ' new' : '';
+        return $('<tr/>').append('<td colspan="5">' + group  + ' ( ' + rows.count() + ' total' + newString + ' ) </td>').attr('data-name', groupAll).toggleClass('collapsed', collapsed);
+      }
+    },
+    drawCallback : function ( settings ) { 
+      hrefTickets( ); 
+    }
+  } );
+});
+$('tbody').on('click', 'tr.dtrg-start', function () {
+    var name = $(this).data('name');
+    collapsedGroups[name] = !collapsedGroups[name];
+    Table_Tickets.draw( );
+});
+function hrefTickets( ){ hrefRow( 'Table_Tickets', 'ticket'); }
+function redrawTickets( ) { Table_Tickets.order( [ [ grouping_id, 'asc' ] ] ).draw( ); }
+var isChromium = window.chrome,
+  winNav = window.navigator,
+  vendorName = winNav.vendor,
+  isOpera = winNav.userAgent.indexOf("OPR") > -1,
+  isIEedge = winNav.userAgent.indexOf("Edge") > -1,
+  isIOSChrome = winNav.userAgent.match("CriOS");
+$(document).ready(function(){
+  var Table_Locations = $('#Table_Locations').DataTable( {
+    dom      : 'tp',
+    processing : true,
+    serverSide : true,
+    responsive : true,
+    ajax      : {
+            url : 'cgi-bin/php/get/Locations2.php',
+            data : function( d ){
+                d = {
+                    start : d.start,
+                    length : d.length,
+                    order : {
+                        column : d.order[0].column,
+                        dir : d.order[0].dir
+                    }
+                };
+                d.Search = $('input[name="Search"]').val( );
+                d.ID = $('input[name="ID"]').val( );
+                d.Name = $('input[name="Name"]').val( );
+                d.Customer = $('input[name="Customer"]').val( );
+                d.City = $('input[name="City"]').val( );
+                d.Street = $('input[name="Street"]').val( );
+                d.Maintained = $('select[name="Maintained"]').val( );
+                d.Status = $('select[name="Status"]').val( );
+                return d; 
+            }
+        },
+    columns   : [
+      {
+        data    : 'ID',
+        className : 'hidden'
+      },{ 
+        data : 'Name'
+      },{
+        data : 'Customer'
+      },{
+        data : 'City'
+      },{
+        data : 'Street'
+      },{
+        className : 'hidden',
+        data   : 'Maintained',
+        render : function ( data ){
+          return data == 1
+            ? 'Yes'
+            : 'No';
+        }
+        
+      },{
+        className : 'hidden',
+        data   : 'Status', 
+        render : function ( data ){
+          return data == 0 
+            ? 'Yes'
+            : 'No';
+        }
+      }
+    ],
+    autoWidth : false,
+    paging    : true,
+    searching : false
+  } );
+});
+function redrawLocations( ){ Table_Locations.draw( ); }
+function hrefLocations(){hrefRow("Table_Locations","location");}
+$("Table#Table_Locations").on("draw.dt",function(){hrefLocations();});
+function browseProfilePicture( ){
+  $("body").append( "<div id='UploadProfilePicture' class='hidden' style='background-color:#1d1d1d;color:white !important;top:0;position:absolute;left:0;width:100%;height:100%;'><form><div class='panel panel-primary'><div class='panel-heading'><h3>Upload User Picture</h3></div><div class='panel-body'><div class='row'><div class='col-12'><input onChange='uploadProfilePicture( );' type='file' name='Profile' /></div></div></div></div></form></div>");
+  $("#UploadProfilePicture input").click( );
+}
+function uploadProfilePicture( ){
+  var formData = new FormData( $( '#UploadProfilePicture form' ) [ 0 ] );
+  $.ajax({
+    url : 'cgi-bin/php/post/uploadProfilePicture.php',
+    method : 'POST',
+    cache: false,
+    processData: false,
+    contentType: false,
+    data: formData,
+    timeout:10000,
+    success: function( ){ document.location.href = 'home.php'; }
+  });
+  $("#UploadProfilePiocture").remove( );
 }
 </script>
