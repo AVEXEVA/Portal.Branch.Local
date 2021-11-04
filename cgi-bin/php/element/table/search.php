@@ -1,0 +1,1 @@
+<input type='text' name='Search' placeholder='Search' onChange='redraw( );' />

@@ -1,9 +1,12 @@
-div#page-wrapper {
-  background-color:transparent !important;
-  padding-top:50px !important;
-  min-height:0px !important;
+#wrapper, #page-wrapper {
+  height : 100%;
 }
-div#page-wrapper>div.row>div.col-lg-12 { padding:0px; }
+div#page-wrapper {
+  padding-top:50px;
+  box-sizing : border-box;
+  overflow-x : hidden;
+  overflow-y : scroll;
+}
 div#page-wrapper.loading { display:block; }
 div#page-wrapper.content { display:none; }
 <?php if(!isMobile()){?>#page-wrapper { height:100%; }<?php }?>
@@ -16,7 +19,6 @@ div#wrapper.toggled ul.collapse.in:not([aria-expanded]) { display:none !importan
 @media only screen and (min-width: 1000px){
   #page-wrapper {
     min-height: 800px;
-    background-color: white;
   }
   div#page-wrapper { padding-top:50px; }
   .nav-tabs { border:0px; }

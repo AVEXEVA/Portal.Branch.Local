@@ -58,7 +58,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
     $Start = $_GET['iDisplayStart'];
     $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
+    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length) + 5;
 
     $conditions = array();
     if( isset($_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ] ) ){
@@ -150,12 +150,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       0 =>  'Contract.ID',
       1 =>  'Customer.Name',
       2 =>  'Loc.Tag',
-      3 =>  'Job.ID',
+      3 =>  'Job.fDesc',
       4 =>  'Contract.BStart',
-      5 =>  'Contract.BAmt',
-      6 =>  'Contract.BLenght',
-      7 =>  'Contract.BCycle',
-      8 =>  'Contract.BFinish',
+      5 =>  'Contract.BFinish',
+      6 =>  'Contract.BAmt',
+      7 =>  'Contract.BLenght',
+      8 =>  'Contract.BCycle',
       9 =>  'Contract.BEscFact',
       10 => 'Contract.EscLast',
       11 => 'Contract.BEscType',
@@ -176,8 +176,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Contract.ID         AS ID,
                             Customer.Name       AS Customer,
                             Loc.Tag             AS Location,
-                            Contract.Job        AS Job,
+                            Job.fDesc           AS Job,
                             Contract.BStart     AS Start_Date,
+                            Contract.BFinish    AS End_Date,
                             Contract.BAmt       AS Amount,
                             Contract.BLenght    AS Length,
                             CASE    WHEN Contract.BCycle = 0 THEN 'Monthly' 
@@ -189,7 +190,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                     WHEN Contract.BCycle = 6 THEN 'Never'
                                     ELSE 'Error'
                             END AS Cycle,
-                            Contract.BFinish    AS End_Date,
                             Contract.BEscFact   AS Escalation_Factor,
                             Contract.EscLast    AS Escalation_Date,
                             Contract.BEscType   AS Escalation_Type,
@@ -220,8 +220,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 Contract.ID         AS ID,
                 Customer.Name       AS Customer,
                 Loc.Tag             AS Location,
-                Contract.Job        AS Job,
+                Job.fDesc           AS Job,
                 Contract.BStart     AS Start_Date,
+                Contract.BFinish    AS End_Date,
                 Contract.BAmt       AS Amount,
                 Contract.BLenght    AS Length,
                 CASE    WHEN Contract.BCycle = 0 THEN 'Monthly' 
@@ -233,7 +234,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         WHEN Contract.BCycle = 6 THEN 'Never'
                         ELSE 'Error'
                 END AS Cycle,
-                Contract.BFinish    AS End_Date,
                 Contract.BEscFact   AS Escalation_Factor,
                 Contract.EscLast    AS Escalation_Date,
                 Contract.BEscType   AS Escalation_Type,
@@ -270,18 +270,49 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'sEcho'         =>  intval($_GET['sEcho']),
         'iTotalRecords'     =>  $iTotal,
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
-        'aaData'        =>  array()
+        'aaData'        =>  array(),
+        'options' => array( )
     );
  
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Start_Date' ]      = date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
-      $Row[ 'End_Date' ]        = date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
-      $Row[ 'Escalation_Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
+      $Row[ 'Start_Date' ]      = date( 'Y-m-d', strtotime( $Row[ 'Start_Date' ] ) );
+      $Row[ 'End_Date' ]        = date( 'Y-m-d', strtotime( $Row[ 'End_Date' ] ) );
+      $Row[ 'Escalation_Date' ] = date( 'Y-m-d', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
       preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
       $Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
     }
+    $output[ 'options' ][ 'Cycle' ] = array( 
+      array(
+        'label' => 'Monthly',
+        'value' => 0
+      ),
+      array(
+        'label' => 'Bi-Monthly',
+        'value' => 1
+      ),
+      array(
+        'label' => 'Quarterly',
+        'value' => 2
+      ),
+      array(
+        'label' => 'Trimester',
+        'value' => 3
+      ),
+      array(
+        'label' => 'Semi-Annually',
+        'value' => 4
+      ),
+      array(
+        'label' => 'Annually',
+        'value' => 5
+      ),
+      array(
+        'label' => 'Never',
+        'value' => 6
+      )
+    );
     echo json_encode( $output );
 }}
 ?>
