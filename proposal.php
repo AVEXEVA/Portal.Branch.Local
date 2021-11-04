@@ -1,31 +1,66 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
-        SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-        FROM   Portal.dbo.Privilege
-        WHERE  User_ID = ?
-    ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+if(isset(
+  $_SESSION['User'],
+  $_SESSION['Hash'] ) ) {
+        $result = sqlsrv_query(
+          $NEI,
+            "   SELECT  *
+                FROM    Connection
+                WHERE   Connector = ?
+                        AND Hash = ?;",
+        array(
+          $_SESSION['User'],
+          $_SESSION['Hash']
+      )
+  );
+        $array = sqlsrv_fetch_array($result);
+        $result= sqlsrv_query(
+          $NEI,
+          "   SELECT    *, fFirst
+              AS        First_Name, Last as Last_Name
+              FROM Emp
+              WHERE ID= ?",
+          array(
+            $_SESSION[ 'User' ]
+      )
+  );
+        $User = sqlsrv_fetch_array($result);
+        $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != "OFFICE") ? True : False;
+        $result = sqlsrv_query(
+          $Portal,
+          "   SELECT Access_Table,
+                     User_Privilege,
+                     Group_Privilege,
+                     Other_Privilege
+              FROM   Privilege
+              WHERE  User_ID = ?;",
+        array(
+          $_SESSION[ 'User' ]
+      )
+  );
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2[ 'Access_Table' ]] = $array2;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Proposal']) && $My_Privileges['Proposal']['User_Privilege'] >= 6 && $My_Privileges['Proposal']['Group_Privilege'] >= 4 && $My_Privileges['Proposal']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+    if(isset($Privileges[ 'Proposal' ]) && $Privileges[ 'Proposal' ][ 'User_Privilege' ] >= 6 && $Privileges[ 'Proposal' ][ 'Group_Privilege' ] >= 4 && $Privileges[ 'Proposal' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
     else {
         //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "proposal.php"));
-    if(!isset($array['ID']) || !is_numeric($_GET['ID'])  || !$Privileged){?><html><head><script></script></head></html><?php }
+    sqlsrv_query(
+      $Portal,
+      "   INSERT INTO Activity([User], [Date], [Page])
+          VALUES(?,?,?);",
+      array(
+        $_SESSION['User'],
+                  date("Y-m-d H:i:s"),
+                      "proposal.php"));
+    if(!isset($array[ 'ID' ]) || !is_numeric($_GET[ 'ID' ])  || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
         $ID = $_GET['ID'];
-        $r = sqlsrv_query(
+        $result = sqlsrv_query(
             $NEI,
             "   SELECT  TOP 1
                         Estimate.ID             AS  ID,
@@ -49,34 +84,29 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name,
-                                      Owner.Status 
-                              FROM    Owner 
+                                      Owner.Status
+                              FROM    Owner
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Loc.Owner = Customer.ID
                         LEFT JOIN Rol           ON  Rol.ID          = Estimate.RolID
-                WHERE   Estimate.ID = ?;", 
-            array( 
-                $_GET[ 'ID' ] 
-            ) 
+                WHERE   Estimate.ID = ?;",
+            array(
+                $_GET[ 'ID' ]
+            )
         );
-        $Estimate = sqlsrv_fetch_array( $r );
+        $Estimate = sqlsrv_fetch_array( $result );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>    
-    <title>Nouveau Elevator Portal</title>    
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <style>
-        .row { 
-            padding : 5px;
-        }
-    </style>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require(bin_meta.'index.php');?>
+    <title>Nouveau Elevator Portal</title>
+    <?php require(bin_css.'index.php');?>
+    <?php require(bin_js.'index.php');?>
 </head>
 <body onload="finishLoadingPage();">
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <div id="wrapper" class="<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>">
+        <?php require(bin_php.'element/navigation/index.php');?>
+        <?php require(bin_php.'element/loading.php');?>
         <div id="page-wrapper" class='content' style='background-color : white !important; color : black !important;'>
             <div class='row'>
                 <div class='col-xs-12' style='text-align:center;'>
@@ -182,15 +212,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="../dist/js/moment.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-    <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
 </body>
 </html>
 <?php
