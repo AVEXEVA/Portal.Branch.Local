@@ -58,7 +58,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
     $Start = $_GET['iDisplayStart'];
     $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
+    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length) + 5;
 
     $conditions = array();
     if( isset($_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ] ) ){
@@ -152,10 +152,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       2 =>  'Loc.Tag',
       3 =>  'Job.ID',
       4 =>  'Contract.BStart',
-      5 =>  'Contract.BAmt',
-      6 =>  'Contract.BLenght',
-      7 =>  'Contract.BCycle',
-      8 =>  'Contract.BFinish',
+      5 =>  'Contract.BFinish',
+      6 =>  'Contract.BAmt',
+      7 =>  'Contract.BLenght',
+      8 =>  'Contract.BCycle',
       9 =>  'Contract.BEscFact',
       10 => 'Contract.EscLast',
       11 => 'Contract.BEscType',
@@ -178,6 +178,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Loc.Tag             AS Location,
                             Contract.Job        AS Job,
                             Contract.BStart     AS Start_Date,
+                            Contract.BFinish    AS End_Date,
                             Contract.BAmt       AS Amount,
                             Contract.BLenght    AS Length,
                             CASE    WHEN Contract.BCycle = 0 THEN 'Monthly' 
@@ -189,7 +190,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                     WHEN Contract.BCycle = 6 THEN 'Never'
                                     ELSE 'Error'
                             END AS Cycle,
-                            Contract.BFinish    AS End_Date,
                             Contract.BEscFact   AS Escalation_Factor,
                             Contract.EscLast    AS Escalation_Date,
                             Contract.BEscType   AS Escalation_Type,
@@ -222,6 +222,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 Loc.Tag             AS Location,
                 Contract.Job        AS Job,
                 Contract.BStart     AS Start_Date,
+                Contract.BFinish    AS End_Date,
                 Contract.BAmt       AS Amount,
                 Contract.BLenght    AS Length,
                 CASE    WHEN Contract.BCycle = 0 THEN 'Monthly' 
@@ -233,7 +234,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         WHEN Contract.BCycle = 6 THEN 'Never'
                         ELSE 'Error'
                 END AS Cycle,
-                Contract.BFinish    AS End_Date,
                 Contract.BEscFact   AS Escalation_Factor,
                 Contract.EscLast    AS Escalation_Date,
                 Contract.BEscType   AS Escalation_Type,

@@ -1,9 +1,11 @@
-div#page-wrapper {
-  background-color:transparent !important;
-  padding-top:50px !important;
-  min-height:0px !important;
+#wrapper, #page-wrapper {
+  height : 100%;
 }
-div#page-wrapper>div.row>div.col-lg-12 { padding:0px; }
+div#page-wrapper {
+  padding-top:50px;
+  box-sizing : border-box;
+  overflow : hidden;
+}
 div#page-wrapper.loading { display:block; }
 div#page-wrapper.content { display:none; }
 <?php if(!isMobile()){?>#page-wrapper { height:100%; }<?php }?>
