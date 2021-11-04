@@ -17,3 +17,6 @@
 .panel-heading.heading-light {
 	background-color:#454545 !important;
 }
+.card.card-full {
+	height : 100%;
+}

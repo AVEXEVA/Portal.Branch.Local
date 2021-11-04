@@ -25,7 +25,7 @@ IF( file_exists( bin_css . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] )
 if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"><?php }?>
 <link href="cgi-bin/css/index.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/table.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
-<link href="cgi-bin/css/panel.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/card.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/animation.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/print.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/class.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
@@ -33,6 +33,8 @@ if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="s
 <link href="cgi-bin/css/gui.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/navbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="cgi-bin/css/popup.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<!--<link href="cgi-bin/css/datepicker.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">-->
+<link href="cgi-bin/css/color.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <style>
 /*Fonts*/
 @font-face {
