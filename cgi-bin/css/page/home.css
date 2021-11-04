@@ -29,14 +29,10 @@ ul.panel-links {
   .link-page>div {
     padding:25px;
     margin:auto;
-    margin-top: 25px;
   }
   #page-wrapper {
     padding-left:16.666%;
     padding-right:16.666%;
-  }
-  .dashboard {
-    padding:20px;
   }
 }
 .link-page>div:hover {

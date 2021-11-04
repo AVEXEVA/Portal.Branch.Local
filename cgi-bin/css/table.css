@@ -25,8 +25,11 @@ th input {
 	width : 100%;
 }
 
-table.dataTable tbody tr.selected.even, table.dataTable tbody tr.selected.odd {
+table.dataTable tbody tr.selected.even td, table.dataTable tbody tr.selected.odd td {
 	background-color : gold !important;
+	color : black !important;
+}
+table.dataTable tbody tr td a {
 	color : black !important;
 }
 table.dataTable tbody tr:nth-child( even ) {
@@ -34,4 +37,20 @@ table.dataTable tbody tr:nth-child( even ) {
 }
 table.dataTable tbody tr:nth-child( odd ) {
     background-color : rgba( 255, 255, 255, 1 );
+}
+table.dataTable tbody tr.child li {
+	list-style-type : none;
+	display : flex;
+}
+table.dataTable tbody tr.child td span.dtr-title {
+	width : 100px;
+	font-weight:bold;
+	text-align : right;
+	padding-right:5px;
+}
+table.dataTable tbody tr.child td span.dtr-data {
+	padding-left : 5px;
+}
+div.dataTables_scrollBody {
+	z-index: 1;
 }

@@ -4,7 +4,8 @@
 div#page-wrapper {
   padding-top:50px;
   box-sizing : border-box;
-  overflow : hidden;
+  overflow-x : hidden;
+  overflow-y : scroll;
 }
 div#page-wrapper.loading { display:block; }
 div#page-wrapper.content { display:none; }
@@ -18,7 +19,6 @@ div#wrapper.toggled ul.collapse.in:not([aria-expanded]) { display:none !importan
 @media only screen and (min-width: 1000px){
   #page-wrapper {
     min-height: 800px;
-    background-color: white;
   }
   div#page-wrapper { padding-top:50px; }
   .nav-tabs { border:0px; }

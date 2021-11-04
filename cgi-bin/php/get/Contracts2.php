@@ -150,7 +150,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       0 =>  'Contract.ID',
       1 =>  'Customer.Name',
       2 =>  'Loc.Tag',
-      3 =>  'Job.ID',
+      3 =>  'Job.fDesc',
       4 =>  'Contract.BStart',
       5 =>  'Contract.BFinish',
       6 =>  'Contract.BAmt',
@@ -176,7 +176,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Contract.ID         AS ID,
                             Customer.Name       AS Customer,
                             Loc.Tag             AS Location,
-                            Contract.Job        AS Job,
+                            Job.fDesc           AS Job,
                             Contract.BStart     AS Start_Date,
                             Contract.BFinish    AS End_Date,
                             Contract.BAmt       AS Amount,
@@ -220,7 +220,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 Contract.ID         AS ID,
                 Customer.Name       AS Customer,
                 Loc.Tag             AS Location,
-                Contract.Job        AS Job,
+                Job.fDesc           AS Job,
                 Contract.BStart     AS Start_Date,
                 Contract.BFinish    AS End_Date,
                 Contract.BAmt       AS Amount,
@@ -270,18 +270,49 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'sEcho'         =>  intval($_GET['sEcho']),
         'iTotalRecords'     =>  $iTotal,
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
-        'aaData'        =>  array()
+        'aaData'        =>  array(),
+        'options' => array( )
     );
  
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Start_Date' ]      = date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
-      $Row[ 'End_Date' ]        = date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
-      $Row[ 'Escalation_Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
+      $Row[ 'Start_Date' ]      = date( 'Y-m-d', strtotime( $Row[ 'Start_Date' ] ) );
+      $Row[ 'End_Date' ]        = date( 'Y-m-d', strtotime( $Row[ 'End_Date' ] ) );
+      $Row[ 'Escalation_Date' ] = date( 'Y-m-d', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
       preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
       $Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
     }
+    $output[ 'options' ][ 'Cycle' ] = array( 
+      array(
+        'label' => 'Monthly',
+        'value' => 0
+      ),
+      array(
+        'label' => 'Bi-Monthly',
+        'value' => 1
+      ),
+      array(
+        'label' => 'Quarterly',
+        'value' => 2
+      ),
+      array(
+        'label' => 'Trimester',
+        'value' => 3
+      ),
+      array(
+        'label' => 'Semi-Annually',
+        'value' => 4
+      ),
+      array(
+        'label' => 'Annually',
+        'value' => 5
+      ),
+      array(
+        'label' => 'Never',
+        'value' => 6
+      )
+    );
     echo json_encode( $output );
 }}
 ?>

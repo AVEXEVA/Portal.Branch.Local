@@ -1,9 +1,71 @@
+
 $( document ).ready( function() {
+  var Editor_Contracts = new $.fn.dataTable.Editor( {
+    idSrc    : 'ID',
+    ajax     : 'index.php',
+    table    : '#Table_Contracts',
+    template : '#Form_Lead',
+    formOptions: {
+      inline: {
+        submit: 'allIfChanged'
+      }
+    },
+    fields : [
+      {
+        label : 'Customer',
+        name  : 'Customer',
+        type  : 'readonly', 
+        attr:{ 
+          disabled:true
+        }
+      },{
+        label : 'Location',
+        name  : 'Location',
+        type  : 'readonly', 
+        attr:{ 
+          disabled : true 
+        }
+      },{
+        label : 'Job',
+        name  : 'Job',
+        type  : 'readonly', 
+        attr:{ 
+          disabled:true
+        }
+      },{
+        label : 'Start',
+        name  : 'Start_Date',
+        type  : 'datetime'
+      },{
+        label : 'End',
+        name  : 'End_Date',
+        type  : 'datetime'
+      },{
+        label : 'Length',
+        name  : 'Length'
+      },{
+        label : 'Amount',
+        name  : 'Amount'
+      },{
+        label : 'Cycle',
+        name  : 'Cycle',
+        type  : 'select'
+      },{
+        label : 'Escalation Factor',
+        name  : 'Escalation_Factor'
+      },{
+        label : 'Escalation Date',
+        name  : 'Escalation_Date'
+      }
+    ]
+  });
+  $('#Table_Contracts').on( 'click', 'tbody td:not(.control)', function (e) {
+    Editor_Contracts.inline( this );
+  } );
   var Table_Contracts = $('#Table_Contracts').DataTable( {
-    dom 	   : "<'row'<'col-sm-3 search'><'col-sm-7'><'col-sm-2'B>><'row'<'col-sm-12't>>",
+    dom 	   : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
     processing     : true,
     serverSide     : true,
-    responsive     : true,
     autoWidth      : false,
     searching      : false,
     lengthChange   : false,
@@ -13,7 +75,16 @@ $( document ).ready( function() {
     scrollCollapse : true,
     paging         : true,
     orderCellsTop  : true,
-    select         : true,
+    responsive     : {
+      details : {
+        type   : 'column',
+        target : 0
+      }
+    },
+    select         : {
+      style : 'multi',
+      selector : 'td.control'
+    },
     ajax       : {
       url : 'cgi-bin/php/get/Contracts2.php',
       data : function( d ){
@@ -38,6 +109,7 @@ $( document ).ready( function() {
     },
     columns: [
       {
+        className : 'control',
         data 	: 'ID'
       },{
         data 	: 'Customer'
@@ -59,8 +131,7 @@ $( document ).ready( function() {
       },{
         data 	: 'Escalation_Factor'
       },{
-        data 	: 'Escalation_Date',
-        visible : false
+        data 	: 'Escalation_Date'
       },{
         data 	: 'Escalation_Type',
         visible : false
@@ -76,29 +147,16 @@ $( document ).ready( function() {
       }
     ],
     initComplete : function( ){
-      $.ajax( {
-        url : 'cgi-bin/php/element/table/search.php',
-        success : function( html ){ $("div.search").html( html ); }
-      } );
+      $("div.search").html( "<input type='text' name='Search' placeholder='Search' onChange='$(\"#Table_Contracts\").DataTable().ajax.reload( );' />" );
       $( 'input.redraw' ).bind( 'change', function(){
         Table_Contracts.draw() 
       });
       $('input.date').datepicker( { } );
     },
     buttons: [
-      {
-        text : 'View',
-        action : function( e, dt, node, config ){
-          var selected = Table_Contracts.rows( { selected : true } )[ 0 ][ 0 ];
-          if( selected !== undefined ){
-            var ID = Table_Contracts.row( selected ).data( ).ID;
-            if( $.isNumeric( ID ) ){
-              document.location.href = 'contract.php?ID=' + ID;  
-            }  
-          }
-          
-        }
-      },
+      { extend: 'create', editor: Editor_Contracts },
+      { extend: 'edit',   editor: Editor_Contracts },
+      { extend: 'remove', editor: Editor_Contracts },
       'print',
       'copy',
       'csv'
