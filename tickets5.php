@@ -93,6 +93,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             <th class='text-white border border-white' title='On Site'>On Site</th>
                             <th class='text-white border border-white' title='Completed'>Completed</th>
                             <th class='text-white border border-white' title='Hours'>Hours</th>
+                            <th class='text-white border border-white' title='LSD'>LSD</th>
                             
                         </tr><tr>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' /></th>
@@ -174,14 +175,29 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                 </div>
                             </th>
                             <th class='text-white border border-white' title='Hours'><input class='redraw form-control ' type='text' name='Hours' /></th>
-                            
+                            <th class='text-white border border-white' title='Hours'><select class='redraw' name='LSD'>
+                                <option value=''>Select</option>
+                                <option value='0'>Running</option>
+                                <option value='1'>Left Shutdown</option>
+                            </select></th>
                         </tr></thead>
                     </table>
                 </div>
             </div>
         </div>
     </div>
+    <style>
+        .dataTable tbody tr td .row .col-12 {
+            max-width : 150px;
+            overflow  : hidden;
+        }
+    </style>
     <script>
+    var Editor_Tickets = new $.fn.dataTable.Editor( {
+        idSrc    : 'ID',
+        ajax     : 'index.php',
+        table    : '#Table_Contracts'
+    } );
     var Table_Tickets = $('#Table_Tickets').DataTable( {
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
@@ -208,7 +224,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         },
         ajax: {
                 url     : 'cgi-bin/php/get/Tickets2.php',
-                data:function(d){
+                data    : function(d){
                     d = {
                         start : d.start, 
                         length : d.length,
@@ -219,6 +235,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         search : $('input[name="Search"]').val()
                     };
                     d.ID             = $('input[name="ID"]').val( );
+                    d.Person         = $('input[name="Person"]').val( );
                     d.Customer       = $('input[name="Customer"]').val( );
                     d.Location       = $('input[name="Location"]').val( );
                     d.Unit           = $('input[name="Unit"]').val( );
@@ -234,6 +251,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     d.Time_Site_End       = $('input[name="Time_Site_End"]').val( );
                     d.Time_Completed_Start     = $('input[name="Time_Completed_Start"]').val( );
                     d.Time_Completed_End       = $('input[name="Time_Completed_End"]').val( );
+                    d.LSD       = $('select[name="LSD"]').val( );
                     return d;
                 }
         },
@@ -395,6 +413,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             },{
                 data : 'Hours',
                 defaultContent :"0"
+            },{
+                data : 'LSD',
+                render : function( data, type, row, meta ){
+                    switch ( type ){
+                        case 'display':
+                            return row.LSD == 1
+                                ? 'LSD'
+                                : 'Running';
+                        default :
+                            return data;
+                    }
+                }
             }
         ],
         initComplete : function( ){
@@ -408,6 +438,31 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           } );
         },
         buttons: [
+            {
+                text: 'Email Ticket',
+                action: function ( e, dt, node, config ) {
+                    var rows = dt.rows( { selected : true } ).indexes( );
+                    var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                    $.ajax({
+                        url : 'cgi-bin/php/post/emailTicket.php',
+                        method : 'POST',
+                        data : {
+                            email : prompt( "What email would you like to send the ticket to?"),
+                            data : dte
+                        },
+                        success : function( response ){
+                            console.log( response );
+                        }
+                    })
+                    /*var xhr = new XMLHttpRequest( );
+                    xhr.open("POST", 'cgi-bin/php/post/emailTicket.php', true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.send(JSON.stringify());*/
+                }
+            },
+            { extend: 'create', editor: Editor_Tickets },
+            { extend: 'edit',   editor: Editor_Tickets },
+            { extend: 'remove', editor: Editor_Tickets },
             'print',
             'copy',
             'csv'

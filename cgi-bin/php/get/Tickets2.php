@@ -78,6 +78,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Ticket.ID LIKE '%' + ? + '%'";
 	    }
+	    if( isset( $_GET[ 'Person' ] ) && !in_array( $_GET[ 'Person' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Person'];
+	      $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
+	    }
 	    if( isset( $_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Customer'];
 	      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
@@ -137,6 +141,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    if( isset( $_GET[ 'Time_Completed_End' ] ) && !in_array( $_GET[ 'Time_Completed_End' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Time_Completed_End'];
 	      $conditions[] = "Ticket.Time_Completed <= ?";
+	    }
+	    if( isset( $_GET[ 'LSD' ] ) && !in_array( $_GET[ 'LSD' ], array( '', ' ', null ) ) ){
+	      //$parameters[] = $_GET['LSD'];
+	      switch( $_GET[ 'LSD'] ){
+	      	case 0:	$conditions[ ] = "Ticket.Resolution NOT LIKE '%LSD%'";break;
+	      	case 1:	$conditions[ ] = "Ticket.Resolution LIKE '%LSD%'";break;
+	      	default : break;
+	      }
 	    }
 	    //var_dump( $_GET[ 'Time_Route_Start' ] );
 		/*Search Filters*/
@@ -209,7 +221,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						END AS Time_Route,
 						CASE 	WHEN Ticket.Time_Completed = '1899-12-30 00:00:00.000' THEN null 
 								ELSE Ticket.Time_Completed 
-						END AS Time_Completed
+						END AS Time_Completed,
+						CASE 	WHEN Ticket.Resolution LIKE '%LSD%' THEN 1
+								ELSE 0 
+						END AS LSD
 				FROM 	(
 							(
 								SELECT 	TicketO.ID       	AS ID,
@@ -224,7 +239,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				           	     		0                   AS Payroll,
 				           	     		TicketO.TimeRoute 	AS Time_Route,
 				           	     		TicketO.TimeSite    AS Time_Site,
-				           	     		TicketO.TimeComp    AS Time_Completed
+				           	     		TicketO.TimeComp    AS Time_Completed,
+				           	     		'' 					AS Resolution
 						 		FROM   	TicketO
 						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
 	                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
@@ -241,7 +257,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										TicketD.ClearPR 	AS Payroll,
 										TicketD.TimeRoute 	AS Time_Route,
 				           	     		TicketD.TimeSite    AS Time_Site,
-				           	     		TicketD.TimeComp    AS Time_Completed
+				           	     		TicketD.TimeComp    AS Time_Completed,
+				           	     		TicketD.DescRes 	AS Resolution
 							 	FROM   	TicketD
 							)
 						) AS Ticket
@@ -283,7 +300,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			           	     		0                   AS Payroll,
 			           	     		TicketO.TimeRoute 	AS Time_Route,
 			           	     		TicketO.TimeSite    AS Time_Site,
-			           	     		TicketO.TimeComp    AS Time_Completed
+			           	     		TicketO.TimeComp    AS Time_Completed,
+				           	     		'' 					AS Resolution
 					 		FROM   	TicketO
 					        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
                 					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
@@ -300,7 +318,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									TicketD.ClearPR AS Payroll,
 									TicketD.TimeRoute 	AS Time_Route,
 			           	     		TicketD.TimeSite    AS Time_Site,
-			           	     		TicketD.TimeComp    AS Time_Completed
+			           	     		TicketD.TimeComp    AS Time_Completed,
+				           	     		TicketD.DescRes 	AS Resolution
 						 	FROM   	TicketD
 						)
 					) AS Ticket
