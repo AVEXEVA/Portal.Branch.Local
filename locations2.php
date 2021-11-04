@@ -1,6 +1,6 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -23,9 +23,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			   		Emp.Last   AS Last_Name
 			FROM   	Emp
 			WHERE  	Emp.ID = ?;",
-		array( 
-			$_SESSION[ 'User' ] 
-		) 
+		array(
+			$_SESSION[ 'User' ]
+		)
 	);
     $User = sqlsrv_fetch_array( $r );
 	$r = sqlsrv_query(
@@ -51,7 +51,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 				VALUES(?,?,?);",
 			array(
 				$_SESSION['User'],
-				date("Y-m-d H:i:s"), 
+				date("Y-m-d H:i:s"),
 				'Locations.php'
 			)
 		);
@@ -62,7 +62,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    
+    <meta name="author" content="Peter D. Speranza">
     <title><?php echo $_SESSION[ 'Branch' ] == '' ? 'Nouveau' : $_SESSION[ 'Branch' ]; ?> | Portal</title>
     <?php require('cgi-bin/css/index.php');?>
     <style>#Table_Locations { font-size:12px; }</style>
@@ -137,79 +137,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <?php require('cgi-bin/js/datatables.php');?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script>
-		var isChromium = window.chrome,
-			winNav = window.navigator,
-			vendorName = winNav.vendor,
-			isOpera = winNav.userAgent.indexOf("OPR") > -1,
-			isIEedge = winNav.userAgent.indexOf("Edge") > -1,
-			isIOSChrome = winNav.userAgent.match("CriOS");
-		var Table_Locations = $('#Table_Locations').DataTable( {
-			dom 	   : 'tlp',
-	        processing : true,
-	        serverSide : true,
-	        responsive : true,
-	        autoWidth : false,
-			paging    : true,
-			searching : false,
-			ajax      : {
-	            url : 'cgi-bin/php/get/Locations2.php',
-	            data : function( d ){
-	                d = {
-	                    start : d.start,
-	                    length : d.length,
-	                    order : {
-	                        column : d.order[0].column,
-	                        dir : d.order[0].dir
-	                    }
-	                };
-	                d.Search = $('input[name="Search"]').val( );
-	                d.ID = $('input[name="ID"]').val( );
-	                d.Name = $('input[name="Name"]').val( );
-	                d.Customer = $('input[name="Customer"]').val( );
-	                d.City = $('input[name="City"]').val( );
-	                d.Street = $('input[name="Street"]').val( );
-	                d.Maintained = $('select[name="Maintained"]').val( );
-	                d.Status = $('select[name="Status"]').val( );
-	                return d; 
-	            }
-	        },
-			columns   : [
-				{
-					data 	  : 'ID',
-					className : 'hidden'
-				},{
-					data : 'Name'
-				},{
-					data : 'Customer'
-				},{
-					data : 'City'
-				},{
-					data : 'Street'
-				},{
-					data   : 'Maintained',
-					render : function ( data ){
-						return data == 1
-							?	'Yes'
-							: 	'No';
-					}
-				},{
-					data   : 'Status',
-					render : function ( data ){
-						return data == 0 
-							?	'Yes'
-							: 	'No';
-					}
-				}
-			]
-		} );
-		function redraw( ){ Table_Locations.draw( ); }
-		function hrefLocations(){hrefRow("Table_Locations","location");}
-		$("Table#Table_Locations").on("draw.dt",function(){hrefLocations();});
-    </script>
 </body>
 </html>
 <?php

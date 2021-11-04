@@ -1,0 +1,4 @@
+.form-group>label:first-child {
+    min-width  : 175px;
+    text-align : right;
+}
