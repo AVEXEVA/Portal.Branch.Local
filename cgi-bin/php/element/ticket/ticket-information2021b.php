@@ -1,6 +1,6 @@
 <?php
 if(session_id() == '' || !isset($_SESSION)) {
-    session_start();
+    session_start( [ 'read_and_close' => true ] );
 }
 require('../../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){

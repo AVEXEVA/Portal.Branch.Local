@@ -58,7 +58,7 @@ exit;
 
 require 'vendor/autoload.php';
 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 
 $providerName = '';
 

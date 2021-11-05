@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,"
@@ -99,7 +99,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta name="author" content="Peter D. Speranza">    
 	<title>Nouveau Texas | Portal</title>    
     <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_js . 'index.php');?>
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">

@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('index.php');
 set_time_limit ( 120 );
 ini_set('memory_limit','1024M');

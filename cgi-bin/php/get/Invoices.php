@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -227,7 +227,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	}
 }?>
 <?php /*
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));

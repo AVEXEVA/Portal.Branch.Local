@@ -203,7 +203,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							       FROM (
 								   
 								   (
-											SELECT 	Top 10 
+											SELECT 	Top 100
 													Ticket.ID 						AS ID,
 													Customer.ID  					AS Customer_ID,
 													Customer.Name 					AS Customer_Name,
@@ -261,8 +261,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$rResult = sqlsrv_query(
 			$NEI,
 			$Query,
-			$parameters,
-			array( 'Scrollable' => SQLSRV_CURSOR_KEYSET )
+			$parameters
 		) or die(print_r(sqlsrv_errors()));
 
 		$output = array( );

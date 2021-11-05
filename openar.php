@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,"
@@ -40,10 +40,10 @@ if(isMobile()){?>
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;<?php if(!isMobile()){ ?>height:100%;background-image:url('http://www.nouveauelevator.com/Images/Backgrounds/New_York_City_Skyline.jpg');webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;<?php } ?>">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
 	<title>Nouveau Texas | Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
 	<style>
 		.panel {background-color:transparent !important;}
 		.panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}

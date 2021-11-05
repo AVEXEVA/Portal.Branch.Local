@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -54,10 +54,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>    
+    <?php require( bin_meta . 'index.php');?>    
     <title>Nouveau Elevator Portal</title>    
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" style='overflow:auto !important;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">

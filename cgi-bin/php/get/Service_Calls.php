@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 ini_set('memory_limit','512M');
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){

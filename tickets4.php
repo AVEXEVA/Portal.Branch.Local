@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+    session_start( [ 'read_and_close' => true ] ); 
     require( '/var/www/portal.live.local/html/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -58,11 +58,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Elevator Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
+    <?php require( bin_css . 'index.php');?>
     <style>#Filters { max-width: 500px; }</style>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_js . 'index.php');?>
 
 </head>
 

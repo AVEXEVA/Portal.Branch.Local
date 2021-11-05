@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+    session_start( [ 'read_and_close' => true ] ); 
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -20,9 +20,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User         = sqlsrv_fetch_array($User);
     $Field        = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $r            = sqlsrv_query($Portal,"
+    $r            = sqlsrv_query($NEI,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-        FROM   Portal.dbo.Privilege
+        FROM   Privilege
         WHERE User_ID = '{$_SESSION['User']}'
     ;");
     $Privileges   = array();

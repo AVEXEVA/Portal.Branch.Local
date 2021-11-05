@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('index.php');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

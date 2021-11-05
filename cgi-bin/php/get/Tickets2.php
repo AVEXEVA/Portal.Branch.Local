@@ -184,34 +184,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $conditions[] = "Ticket.Time_Completed <= ?";
 	    }
 	    if( isset( $_GET[ 'LSD' ] ) && !in_array( $_GET[ 'LSD' ], array( '', ' ', null ) ) ){
-	      //$parameters[] = $_GET['LSD'];
 	      switch( $_GET[ 'LSD'] ){
 	      	case 0:	$conditions[ ] = "Ticket.Resolution NOT LIKE '%LSD%'";break;
 	      	case 1:	$conditions[ ] = "Ticket.Resolution LIKE '%LSD%'";break;
 	      	default : break;
 	      }
 	    }
-	    //var_dump( $_GET[ 'Time_Route_Start' ] );
+	    
 		/*Search Filters*/
-		if( isset( $_GET[ 'search' ] ) ){
-
-
-			$search[] = " Ticket.ID LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-			
-			$search[] = " Location.Tag LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-
-			$search[] = " Unit.State + ' - ' + Unit.Unit LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-
-			$search[] = " CAST( Job.ID AS VARCHAR( 32 ) ) + ' - ' + Job.fDesc LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-
-			$search[] = " Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-
-		}
+		//if( isset( $_GET[ 'search' ] ) ){ }
 		
 
 		/*Concatenate Filters*/
@@ -223,6 +204,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
 
 		/*Order && Direction*/
+		//update columns from bin/js/tickets/table.js
 		$Columns = array(
 			0 =>  'Ticket.ID',
 			1 =>  'Location.Tag',
@@ -405,16 +387,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    $sQuery = " SELECT  COUNT(Ticket.ID)
 	                FROM    (
 	                	(
-	                		SELECT 	TicketO.ID,
-	                				TicketO.fWork
+	                		SELECT 	TicketO.ID
 	                		FROM 	TicketO
 	                	) UNION ALL (
-	                		SELECT 	TicketD.ID,
-	                				TicketD.fWork 
+	                		SELECT 	TicketD.ID
 	                		FROM 	TicketD
 	                	)
-	            	) AS Ticket
-	            	WHERE 	Ticket.fWork = ?;";
+	            	) AS Ticket;";
 	    $rResultTotal = sqlsrv_query(
 	    	$NEI,  
 	    	$sQuery, 

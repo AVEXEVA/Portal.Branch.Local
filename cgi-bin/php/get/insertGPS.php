@@ -9,7 +9,7 @@ function to_array(&$object=''){
   // FOR EACH ITEM, RECURSE VALUE
   foreach($object as &$Value){to_array($Value);}
 }
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('../../../cgi-bin/php/index.php');
 if(isset($_GET['Token']) && $_GET['Token'] == 'DF58BF2A46732848E8784426E2EB4D9DBDA030D7A80509F6B192AD4FCDC23555E81D7A67F9C4C712BE09D38601559FA23B175BEB7B802F9B8A3CA41917F46428'){
   $_GET['Phone'] = json_decode($_GET['Phone']);

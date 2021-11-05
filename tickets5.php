@@ -152,7 +152,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             <th class='text-white border border-white' title='Date'>
                                 <div class='row g-0'>
                                     <input class='col-12 date redraw' type='text' name='Start_Date' value='<?php echo isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null;?>' />
-                                    <input class='col-12 date' type='text' name='End_Date' value='<?php echo isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null;?>' />
+                                    <input class='col-12 date redraw' type='text' name='End_Date' value='<?php echo isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null;?>' />
                                 </div>
                             </th>
                             <th class='text-white border border-white' title='Time Route'>

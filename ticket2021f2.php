@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+    session_start( [ 'read_and_close' => true ] ); 
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -203,9 +203,9 @@ if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Sig
 <html lang="en">
 <head>
     <title>Nouveau Texas Portal</title>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_meta . 'index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
     <script src="cgi-bin/js/slider-noui.js"></script>
     <link href='cgi-bin/css/slider-noui.css' rel='stylesheet' />
     <style type="text/css" media="print">

@@ -17,7 +17,7 @@ class index extends \index {
   //functions
   ///magic
   public function __construct( $_args  = array( ) ){
-    if( session_id( ) == '' || !isset( $_SESSION )) { session_start( ); }
+    if( session_id( ) == '' || !isset( $_SESSION )) { session_start( [ 'read_and_close' => true ] ); }
     parent::__construct( 
       array(
         'session'    => array( 

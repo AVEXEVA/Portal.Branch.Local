@@ -1,6 +1,6 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
-  session_start();
+  session_start( [ 'read_and_close' => true ] );
   require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
 }
 ini_set('display_errors', 1);
@@ -58,10 +58,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   	   ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "map.php"));?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Elevator Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
     <!--ToolTipster-->
     <!--<link rel="stylesheet" type="text/css" href="cgi-bin/libraries/tooltipster/tooltipster.bundle.min.css" />
     <style>

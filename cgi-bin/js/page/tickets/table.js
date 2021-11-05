@@ -60,7 +60,6 @@ $(document).ready(function( ){
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
-        autoWidth      : false,
         searching      : false,
         lengthChange   : false,
         scrollResize   : true,

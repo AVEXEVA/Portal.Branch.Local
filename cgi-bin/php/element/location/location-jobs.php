@@ -1,6 +1,6 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
-  session_start();
+  session_start( [ 'read_and_close' => true ] );
   require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
 }
 setlocale(LC_MONETARY, 'en_US');

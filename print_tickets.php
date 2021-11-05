@@ -61,8 +61,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <meta name="author" content="Peter D. Speranza">
     <title>Nouveau Elevator Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
 <?php 

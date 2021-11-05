@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');

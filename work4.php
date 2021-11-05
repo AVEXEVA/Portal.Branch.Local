@@ -1,5 +1,5 @@
 <?php
-if(session_id() == '' || !isset($_SESSION) ){ session_start(); }
+if(session_id() == '' || !isset($_SESSION) ){ session_start( [ 'read_and_close' => true ] ); }
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
   $r = sqlsrv_query(

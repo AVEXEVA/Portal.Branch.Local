@@ -1,7 +1,7 @@
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-session_start();
+session_start( [ 'read_and_close' => true ] );
 set_time_limit (120);
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){

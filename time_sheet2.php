@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+    session_start( [ 'read_and_close' => true ] ); 
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset(
@@ -125,10 +125,10 @@ if($Mechanic > 0){
 }?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Elevator Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
 </head>
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">

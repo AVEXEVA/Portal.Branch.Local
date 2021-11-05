@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 
 require('cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
@@ -31,10 +31,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Contact = sqlsrv_fetch_array($r);?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>    
+    <?php require( bin_meta . 'index.php');?>    
     <title>Nouveau Texas | Portal</title>    
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
 	<style>
 		.panel {background-color:transparent !important;}
 		.panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
