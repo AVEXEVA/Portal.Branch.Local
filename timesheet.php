@@ -130,7 +130,7 @@ if($Mechanic > 0){
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<h4 style='text-align:center;background-color:whitesmoke;color:black;margin:0px;padding:10px;'>My Timesheet</h4>
 			<style>
@@ -344,10 +344,10 @@ if($Mechanic > 0){
 			</div>
 		</div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Morris Charts JavaScript -->
     <!--<script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
@@ -356,13 +356,13 @@ if($Mechanic > 0){
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <script>
         function refresh_this(link){document.location.href='time_sheet2.php?Date=' + $(link).attr('rel') + '&Type=' + $(link).attr('class') + "&Mechanic=<?php echo $Mechanic;?>";}

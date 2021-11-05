@@ -87,7 +87,7 @@ else {$Clouseout = '';}?>
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -178,12 +178,12 @@ else {$Clouseout = '';}?>
                 </div>
             </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
+    
+    
     <?php require('cgi-bin/js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
-	<script src="../dist/js/moment.js"></script>
+    
+	
     <script>  
         function hrefTickets(){
             $("#Table_Tickets tbody tr").each(function(){
@@ -256,7 +256,7 @@ else {$Clouseout = '';}?>
     </script>
 
     <!-- Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
 </body>
 </html>
 <?php

@@ -53,8 +53,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
   <div id='container'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
             <div class="row">
                 <div class="col-lg-12">
@@ -206,10 +206,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyBzxfjkN8x4t6TcuynQhk3cfo2AkXmHGiY"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBzxfjkN8x4t6TcuynQhk3cfo2AkXmHGiY"></script>

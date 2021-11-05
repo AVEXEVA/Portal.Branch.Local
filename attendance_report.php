@@ -54,8 +54,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:#1d1d1d;height:100%;">
 <div id='container' style='min-height:100%;height:100%;'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-    <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <?php require( bin_php . 'element/navigation/index.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
     <div id="page-wrapper" class='content'>
       <div class='panel panel-primary'>
         <div class='panel-heading'>Attendance Report</div>
@@ -85,18 +85,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   </div>
 </div>
 <!-- Bootstrap Core JavaScript -->
-<script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+
 
 <!-- Metis Menu Plugin JavaScript -->
-<script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+
 
 <?php require(PROJECT_ROOT.'js/datatables.php');?>
-<script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+
 <!-- Custom Theme JavaScript -->
-<script src="../dist/js/sb-admin-2.js"></script>
+
 
 <!-- JQUERY UI Javascript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
 <script>
 var Attendance_Report = null;
 $(document).ready(function(){

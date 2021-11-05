@@ -93,8 +93,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;color:black !important;">
     <div id='container' style='min-height:100%;height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;background-color:white;'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class='panel panel-primary'>
             <div class='panel-heading'>
@@ -452,9 +452,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         </div>
     </div>
 	</div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <link href="cgi-bin/libraries/fixedHeader.css" rel="stylesheet" type="text/css" media="screen">
     <script src="cgi-bin/libraries/fixedHeader.js"></script>
     <script>

@@ -79,7 +79,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='overflow-y:scroll;height:100%;background-color:#1d1d1d !important;color:white !important;'>
     <div id="wrapper" style='height:100%;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
             <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
             <style>
@@ -168,23 +168,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require('cgi-bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <?php if( !isMobile() && false ){?>
     <script>
         function hrefLocations(){hrefRow("Table_Locations","location");}

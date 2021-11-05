@@ -231,10 +231,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			border-bottom:3px solid #333333;
 		}
 	</style>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require('cgi-bin/js/datatables.php');?>
     <!-- JQUERY UI Javascript -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}

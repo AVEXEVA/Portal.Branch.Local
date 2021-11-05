@@ -212,7 +212,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <div id='container' style='min-height:100%;height:100%;'>
     <div id='wrapper' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>' style='height:100%;'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc'></script>
       <div id='page-wrapper' class='content'>
 		<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='job.php?ID=<?php echo $_GET[ 'ID' ];?>'><?php $Icons->Job();?> Job: <?php echo $Job[ 'Job_Name' ];?></a></h4>

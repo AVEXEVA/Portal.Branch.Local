@@ -486,13 +486,13 @@ if($Mechanic > 0){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
 	<?php require('cgi-bin/js/dropdown-scroll.js');?>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <?php require("cgi-bin/js/datatables.php");?>
 </body>

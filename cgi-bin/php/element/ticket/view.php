@@ -245,7 +245,7 @@ white-space: normal !important;
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <div class='no-print'>
 				<div class="panel panel-primary" style='margin-bottom:0px;'>
@@ -572,10 +572,10 @@ white-space: normal !important;
     
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Morris Charts JavaScript -->
     <script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
@@ -583,10 +583,10 @@ white-space: normal !important;
     <script src="../data/morris-data.php"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     
     <script type="text/javascript">
   function initialize() {

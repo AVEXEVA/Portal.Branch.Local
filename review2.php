@@ -81,22 +81,22 @@ if($r){
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <script>
         function refresh_get(){
             var Supervisors = $("select[name='Supervisors']").val();
@@ -157,8 +157,8 @@ if($r){
 </head>
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">

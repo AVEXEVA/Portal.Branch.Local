@@ -263,15 +263,15 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  }
 	  </style>
 	  <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
 	<script>
 	$(document).ready(function(){$("input[name='Date']").datepicker();});

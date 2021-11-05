@@ -69,7 +69,7 @@ if(isMobile() || true){
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id='wrapper' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
 			<div class='panel panel-primary'>
 				<div class='panel-heading'>

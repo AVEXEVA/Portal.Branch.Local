@@ -162,6 +162,12 @@ $image_result = sqlsrv_query(
           <div class ='nav-text'>Attendance</div>
         </div>
       </div><?php }?>
+      <div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='bugs.php'">
+        <div class='p-1 border border-white'>
+          <div class='nav-icon'><?php $Icons->Customer(3);?></div>
+          <div class ='nav-text'>Errors</div>
+        </div>
+      </div>
       <?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >=4){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='collections.php'">
         <div class='p-1 border border-white'>
           <div class='nav-icon'><?php $Icons->Collection(3);?></div>

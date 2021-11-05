@@ -79,7 +79,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
   <div id='wrapper' style='background-color:#1d1d1d !important;color:white !important;'>
     <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
     <div id='page-wrapper' class='content'>
 		  <div class='panel panel-primary' style='margin-bottom:0px;'>
 				<div class='panel-heading'>

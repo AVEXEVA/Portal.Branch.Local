@@ -133,7 +133,7 @@ if($Mechanic > 0){
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class='row'>
                 <div class='col-lg-12'>
@@ -538,9 +538,9 @@ if($Mechanic > 0){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require('cgi-bin/js/datatables.php');?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <script>
         function refresh_this(link){document.location.href='time_sheet2.php?Date=' + $(link).attr('rel') + '&Type=' + $(link).attr('class') + "&Mechanic=<?php echo $_GET['Mechanic'];?>";}
         $('#dataTables-example').DataTable({

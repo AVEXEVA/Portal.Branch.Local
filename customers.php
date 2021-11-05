@@ -67,7 +67,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     <div id='container' style='min-height:100%;height:100%;'>
         <div id="wrapper" style='height:100%;'>
             <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-            <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+            <?php require( bin_php . 'element/loading.php');?>
             <div id="page-wrapper" class='content' style='background-color:transparent !important;'>
                 <div class="panel panel-primary">
                     <div class="panel-heading">

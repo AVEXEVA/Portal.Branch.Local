@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
 				<div class="panel-heading"><h3 style='margin:0px;'><?php $Icons->Requisition();?> Requisition</h3></div>
@@ -1012,24 +1012,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
 
 	<!--  if you want iE6 not to poke select boxes thru your dropdowns, you need ... -->
 	<script type="text/javascript" src="js/jquery.bgiframe.min.js"></script>

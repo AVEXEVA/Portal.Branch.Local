@@ -163,7 +163,7 @@ if($Mechanic > 0){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.min.js"></script>
@@ -174,10 +174,10 @@ if($Mechanic > 0){
     <script src="../data/morris-data.php"></script>-->
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <script>
         /*function filter(){

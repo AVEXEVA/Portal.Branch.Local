@@ -53,8 +53,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
         <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <div class='row'>
@@ -104,7 +104,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <br />
                             <div class="tab-content" id="main-tab-content">
 								<div class='tab-pane fade in' id='loading-pills'>
-									<?php require(PROJECT_ROOT.'php/element/loading.php');?>
+									<?php require( bin_php . 'element/loading.php');?>
 								</div>
                             </div>
                         </div>
@@ -115,21 +115,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
 	</div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
 	<script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>

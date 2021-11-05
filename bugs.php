@@ -105,7 +105,7 @@ if(     count( $_POST ) > 0
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class="panel panel-primary">
             <div class='panel-heading'><h4><?php $Icons->Contract( );?> Contracts</h4></div>
@@ -161,9 +161,9 @@ if(     count( $_POST ) > 0
             </div>
         </div>
     </div>
-  <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+  
   <?php require(PROJECT_ROOT.'js/datatables.php');?>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  
   <script>
     var Table_Bugs = $('#Table_Bugs').DataTable( {
         dom        : 'tp',

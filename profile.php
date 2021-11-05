@@ -69,7 +69,7 @@ if($Mechanic > 0){
 <body>
 
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
         <div id="page-wrapper">
 			<div class='panel panel-primary'>
 				<div class='panel-heading'><?php echo proper($User['fFirst'] . " " . $User['Last_Name']);?></div>
@@ -190,13 +190,13 @@ if($Mechanic > 0){
     </div>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
 	<?php require('cgi-bin/js/dropdown-scroll.js');?>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 </body>
 </html>
  <?php

@@ -54,7 +54,7 @@ if(isMobile()){?><!DOCTYPE html>
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:#1d1d1d;color:white;">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;overflow-y:scroll;'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
 				<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='location.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Territory();?> Territory: <?php echo $Territory['Territory_Name'];?></a></h4>
 			<style>
@@ -213,21 +213,21 @@ if(isMobile()){?><!DOCTYPE html>
 	</div>
     <!-- Bootstrap Core JavaScript -->
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require('cgi-bin/js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	
 
 	<script src="cgi-bin/js/fragment/formatTicket.js"></script>
     <style>

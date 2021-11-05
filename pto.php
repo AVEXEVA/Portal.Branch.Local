@@ -48,7 +48,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body>
 <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
   <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-  <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+  <?php require( bin_php . 'element/loading.php');?>
   <div id="page-wrapper" class='content' style='height:100%;'>
    <div class="panel panel-primary" style='margin-bottom:0px;height:100%;overflow-y:scroll;'>
      <div class="panel-heading">Paid Time Off</div>
@@ -128,10 +128,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   </div>
 </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Morris Charts JavaScript -->
     <!--<script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
@@ -139,19 +139,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="../data/morris-data.php"></script>-->
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}

@@ -47,8 +47,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -68,11 +68,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
+    
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+    
     <script>
         $(document).ready(function() {
             var Table_Connections = $('#Table_Connections').DataTable( {

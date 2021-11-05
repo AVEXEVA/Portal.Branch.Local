@@ -43,8 +43,8 @@ if(is_numeric($_GET['Mechanic'])){
 else {  $Mechanic = $User;  }?>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
             </div> 
@@ -184,15 +184,15 @@ else {  $Mechanic = $User;  }?>
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
+    
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="../dist/js/moment.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+    
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <script>
         var reset_loc = 0;
         $(document).ready(function(){

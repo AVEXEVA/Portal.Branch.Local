@@ -110,7 +110,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
         }
     </style>
     <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/js/index.php' );?>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/js/datatables.php' );?>
 </head>
 <body onload='finishLoadingPage();'>

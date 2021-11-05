@@ -49,8 +49,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload="finishLoadingPage();" style='height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
             <div class='row'>
                 <div class="col-lg-12">
@@ -1168,17 +1168,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
+        
 
     <?php require('cgi-bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
     
     <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>

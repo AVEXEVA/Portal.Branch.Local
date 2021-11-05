@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload="finishLoadingPage();" style='background-color:#1d1d1d;'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
     <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
     <div id="page-wrapper" class='content' style='<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
       <div class='panel-primary'>
         <div class='panel-heading' onClick='document.location.href="work.php";'><h4 style=''><?php $Icons->Location();?> Location: New</h4></div>
@@ -211,15 +211,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  }
 	  </style>
 	  <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
 	<script>
 	$(document).ready(function(){$("input[name='Date']").datepicker();});

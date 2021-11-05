@@ -34,7 +34,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -76,26 +76,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="https://www.nouveauelevator.com/vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- DataTables JavaScript -->
     <script src="https://www.nouveauelevator.com/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/datatables-responsive/dataTables.responsive.js"></script>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <script>
         function hrefEmployees(){
             $("#Employees_Table tbody tr").each(function(){

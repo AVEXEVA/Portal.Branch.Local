@@ -42,7 +42,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -110,19 +110,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
     <style>
     </style>
     <script>  
@@ -193,7 +193,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         });
     </script>
     <!-- Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
 </body>
 </html>
 <?php

@@ -63,7 +63,7 @@ if(isMobile()){?>
     <div id='container' style='min-height:100%;height:100%;'>
 		<div id="wrapper" style='height:100%;'>
 			<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-			<?php require(PROJECT_ROOT.'php/element/loading.php');?>
+			<?php require( bin_php . 'element/loading.php');?>
 			<div id="page-wrapper" class='content' style='background-color:transparent !important;'>
 				<div class="row">
 					<div class="col-lg-12">
@@ -132,15 +132,15 @@ if(isMobile()){?>
 			</div>
 		</div>
 	</div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
+    
     <?php require('cgi-bin/js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="../dist/js/moment.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+    
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <script>
         var Editor_Customers = new $.fn.dataTable.Editor({
 			ajax: "php/post/Customer.php?ID=<?php echo $_GET['ID'];?>",

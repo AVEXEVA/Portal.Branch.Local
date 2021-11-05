@@ -68,7 +68,7 @@ while($a= sqlsrv_fetch_array($r)){}
 <body onload=''>
     <div id="wrapper">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -114,11 +114,11 @@ while($a= sqlsrv_fetch_array($r)){}
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
+    
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+    
     <script>
         function hrefEmployees(){$("#Table_Privileges tbody tr").each(function(){$(this).on('click',function(){document.location.href="privilege.php?User_ID=" + $(this).children(":first-child").html();});});}
         $(document).ready(function() {

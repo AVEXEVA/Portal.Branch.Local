@@ -81,7 +81,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload="finishLoadingPage();"
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div>
               Start <input type='text' name='Start' value='<?php echo $_GET['Start'];?>' style='color:black;' />
@@ -116,8 +116,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     </div>
   </div>
 	<!-- Bootstrap Core JavaScript -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+	
+    
     <?php require('cgi-bin/js/datatables.php');?>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
     <script src='https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js'></script>
@@ -128,7 +128,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
     </style>
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     .Totals.dtrg-group.dtrg-end.dtrg-level-0>td {
         color :black !important;
