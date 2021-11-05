@@ -1,29 +1,66 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-        SELECT *
-        FROM   Connection
-        WHERE  Connection.Connector = ?
-               AND Connection.Hash  = ?
-    ;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-        SELECT *,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name,
-               Emp.Field  AS Field
-        FROM   Emp
-        WHERE  Emp.ID = ?
-    ;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-    $r = $database->query(null,"
-        SELECT *
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION['User']));
-    $My_Privileges = array();
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+                FROM    Connection
+                WHERE       Connection.Connector = ?
+                    AND Connection.Hash  = ?;",
+        array(
+            $_SESSION[ 'User' ],
+            $_SESSION[ 'Hash' ]
+        )
+    );
+    $Connection = sqlsrv_fetch_array( $result );
+    //User
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *,
+                    Emp.fFirst AS First_Name,
+                    Emp.Last   AS Last_Name
+            FROM    Emp
+            WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+    $User = sqlsrv_fetch_array( $result );
+    //Privileges
+    $result = sqlsrv_query(
+        $NEI,
+        "   SELECT  *
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+    if( !isset( $Connection[ 'ID' ] )
+        || !isset($Privileges[ 'Report' ])
+            || $Privileges[ 'Report' ][ 'User_Privilege' ]  < 4
+            || $Privileges[ 'Report' ][ 'Group_Privilege' ] < 4
+            || $Privileges[ 'Report' ][ 'Other_Privilege' ] < 4
+    ){
+        ?><?php require( '../404.html' );?><?php
+    } else {
+        sqlsrv_query(
+          $NEI,
+          "   INSERT INTO Activity([User], [Date], [Page])
+              VALUES( ?, ?, ? );",
+          array(
+              $_SESSION['User'],
+              date( 'Y-m-d H:i:s' ),
+              'reports.php'
+          )
+      );
 ?><!DOCTYPE html>
 
 <html lang="en">
@@ -141,26 +178,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
   </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-    
+
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 
     <!-- Custom Date Filters-->
-    
+
 
 </body>
 </html>
 <?php
     }
+}?>

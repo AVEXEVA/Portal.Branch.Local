@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 $serverName = "172.16.12.45";
@@ -10,16 +10,32 @@ $connectionOptions = array(
 );
 //Establishes the connection
 $conn = sqlsrv_connect($serverName, $connectionOptions);
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $User = addslashes($_SESSION['User']);
-    $Hash = addslashes($_SESSION['Hash']);
-    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector='{$User}' AND Hash='{$Hash}'");
+if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ])){
+    $User = addslashes($_SESSION[ 'User' ]);
+    $Hash = addslashes($_SESSION[ 'Hash' ]);
+    $r = sqlsrv_query(
+      $conn,
+      "   SELECT  *
+          FROM Connection
+          WHERE Connector='{$User}'
+          AND Hash='{$Hash}'");
     $array = sqlsrv_fetch_array($r);
-    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID='{$User}'");
+    $User = sqlsrv_query(
+      $conn,
+      "   SELECT    *, fFirst AS First_Name, Last as Last_Name
+          FROM Emp WHERE ID='{$User}'");
     $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "directory.php"));
-    if(!isset($array['ID']) || $Field ){?><html><head><script>document.location.href='../login.php?Forward=directory.php';</script></head></html><?php }
+    $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != 'OFFICE') ? True : False;
+    sqlsrv_query(
+      $conn2,
+      "   INSERT INTO Activity([User], [Date], [Page])
+          VALUES(?,?,?);",
+    array(
+      $_SESSION[ 'User' ],
+          date("Y-m-d H:i:s"),
+              "directory.php")
+    );
+    if(!isset($array[ 'ID' ]) || $Field ){?><html><head><script>document.location.href='../login.php?Forward=directory.php';</script></head></html><?php }
     else {
 ?><!DOCTYPE html>
 <html lang="en">
@@ -32,9 +48,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload=''>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
+    <div id="wrapper" class="<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>">
+        <?php require(bin_php.'html/navigation.php');?>
+        <?php require(bin_php.'php/element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -67,77 +83,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     </div>
                 </div>
             </div>
-        <!-- /#page-wrapper -->
         </div>
     </div>
-    <!-- /#wrapper -->
-
-    <!-- jQuery -->
-    <script src="https://www.nouveauelevator.com/vendor/jquery/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    
-
-    <!-- Metis Menu Plugin JavaScript -->
-    
-
-    <!-- DataTables JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/datatables-responsive/dataTables.responsive.js"></script>
-    <!-- Custom Theme JavaScript -->
-    
-
-    <!--Moment JS Date Formatter-->
-    
-
-    <!-- JQUERY UI Javascript -->
-    
-
-    <!-- Custom Date Filters-->
-    
-    <script>
-        function hrefEmployees(){
-            $("#Employees_Table tbody tr").each(function(){
-                $(this).on('click',function(){
-                    document.location.href="tickets.php?Mechanic=" + $(this).children(":first-child").html();
-                });
-             });
-        }
-        $(document).ready(function() {
-            var table = $('#Employees_Table').DataTable( {
-                "ajax": {
-                    "url":"cgi-bin/php/get/Employees.php",
-                    "dataSrc":function(json){
-                        if(!json.data){
-                            json.data = [];
-                        }
-                        return json.data;
-                    }
-                },
-                "columns": [
-                    { "data" : "ID"},
-                    { "data" : "Last_Name"},
-                    { "data" : "First_Name"},
-                    { "data" : "Supervisor"}
-                ],
-                "order": [[1, 'asc']],
-                "language":{
-                    "loadingRecords":""
-                },
-                "initComplete":function(){
-                    hrefEmployees();
-                    $("input[type='search'][aria-controls='Employees_Table']").on('keyup',function(){hrefEmployees();});       
-                    $('#Employees_Table').on( 'page.dt', function () {setTimeout(function(){hrefEmployees();},100);});
-                    $("#Employees_Table th").on("click",function(){setTimeout(function(){hrefEmployees();},100);});
-                    finishLoadingPage();
-                }   
-
-            } );
-        } );
-    </script>
 </body>
-
 </html>
 <?php
     }

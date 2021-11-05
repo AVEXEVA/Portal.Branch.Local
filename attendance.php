@@ -1,53 +1,70 @@
-    <?php
-    session_start( [ 'read_and_close' => true ] );
-    require('cgi-bin/php/index.php');
-    setlocale(LC_MONETARY, 'en_US');
-    if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ])){
-          $result = $database->query(null,
-          "SELECT *
-           FROM Connection
-           WHERE Connector = ? AND Hash = ?;",
-           array($_SESSION[ 'User' ],$_SESSION[ 'Hash' ])
-         );
-    $array = sqlsrv_fetch_array($result);
-    if(!isset($_SESSION[ 'Branch' ]) || $_SESSION[ 'Branch' ] == 'Nouveau Elevator'){
-        $result= $database->query(null,
-          "SELECT *, First
-           AS First_Name, Last as Last_Name
-           FROM Emp
-           WHERE ID= ?",array($_SESSION[ 'User' ])
-         );
-        $User = sqlsrv_fetch_array($result);
-        $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != 'OFFICE') ? True : False;
-        $result = $database->query($Portal,
-        "   SELECT Access_Table,
-                   User_Privilege,
-                   Group_Privilege,
-                   Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION[ 'User' ]
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Attendance' ])
+      ||  $Privileges[ 'Attendance' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Attendance' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Attendance' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    sqlsrv_query(
+      $NEI,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'attendance.php'
       )
     );
-        $Privileges = array();
-        while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2[ 'Access_Table' ]] = $array2;}
-        $Privileged = FALSE;
-        if(isset($Privileges[ 'Time' ]) && $Privileges[ 'Time' ][ 'User_Privilege' ] >= 4 && $Privileges[ 'Time' ][ 'Group_Privilege' ] >= 4 && $Privileges['Time']['Other_Privilege'] >= 4){
-        	$Privileged = TRUE;
-		   }
-    }
-        //
-        if(!isset(
-          $array[ 'ID' ]) || !$Privileged){require( '401.html' );}
-        else {
-    		$database->query(
-          $Portal,
-          "INSERT INTO Activity([User],
-           [Date], [Page])
-           VALUES(?,?,?);",
-         array($_SESSION[ 'User' ],
-         date("Y-m-d H:i:s"), "collector.php")
-    );
+
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;background-image:url('http://www.nouveauelevator.com/Images/Backgrounds/New_York_City_Skyline.jpg');webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -141,42 +158,6 @@
         </div>
     </div>
 	</div>
-    <!-- Bootstrap Core JavaScript -->
-    
-
-    <!-- Metis Menu Plugin JavaScript -->
-    
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    <!-- Custom Theme JavaScript -->
-    
-
-    <!--Moment JS Date Formatter-->
-    
-
-    <!-- JQUERY UI Javascript -->
-    
-
-	<script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.resize.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.time.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.symbol.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.axislabels.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
-	<style>
-    div.column {display:inline-block;vertical-align:top;}
-    div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
-    div.data {display:inline-block;width:300px;vertical-align:top;}
-    div#map * {overflow:visible;}
-    </style>
-    <script>
-	$(document).ready(function(){
-		$("a[tab='overview-pills']").click();
-	});
-	</script>
 </body>
 </html>
 <?php

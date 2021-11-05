@@ -1,42 +1,69 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-        $My_User = sqlsrv_fetch_array($r);
-        $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-        $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-        $Privileged = FALSE;
-        if(isset($My_Privileges['Time']) && $My_Privileges['Time']['User_Privilege'] >= 4 && $My_Privileges['Time']['Group_Privilege'] >= 4 && $My_Privileges['Time']['Other_Privilege'] >= 4){
-        	$Privileged = TRUE;
-		    }
-    }
-    //
-    if(!isset($array['ID']) || !$Privileged){require('401.html');}
-    else {
-      if(isset($_POST) && count($_POST) > 0){
-        $r = $database->query(null,"SELECT Max(ID) AS ID FROM nei.dbo.Unavailable;");
-        $ID = sqlsrv_fetch_array($r)['ID'] + 1;
-        $r = $database->query(null,"INSERT INTO nei.dbo.Unavailable(ID, fDate, Worker, fDesc, AllDay, StartTime, EndTime, Remarks) VALUES(?, ?, ?, ?, ?, ?, ?, ?);",array($ID, $_POST['fDate'], $_POST['fWork'], $_POST['fDesc'], $_POST['AllDay'], date("H:i",strtotime($_POST['StartTime'])), date("H:i",strtotime($_POST['EndTime'])), $_POST['Remarks']));
-        if( ($errors = sqlsrv_errors() ) != null) {
-        foreach( $errors as $error ) {
-            echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
-            echo "code: ".$error[ 'code']."<br />";
-            echo "message: ".$error[ 'message']."<br />";
-        }
-    }
-      }
-		$database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "attendance2.php"));
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Time' ])
+      ||  $Privileges[ 'Time' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Time' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Time' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    sqlsrv_query(
+      $NEI,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'attendance2.php'
+      )
+    );
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -47,23 +74,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_js . 'index.php');?>
     <link rel='stylesheet' href='cgi-bin/libraries/timepicker/jquery.timepicker.min.css' />
     <script src='cgi-bin/libraries/timepicker/jquery.timepicker.min.js'></script>
-	<style>
-		.panel {background-color:transparent !important;}
-		.panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
-		.nav-tabs > li:not(.active) {background-color:rgba(255,255,255,.6) !important;}
-		.panel-heading {font-family: 'BankGothic' !important;}
-		.shadow {box-shadow:0px 5px 5px 0px;}
-		<?php if(isMobile()){?>
-		.panel-body {padding:0px !important;}
-		<?php }?>
-
-			div#wrapper {
-				overflow:scroll;
-			}
-		@media print {
-			div#wrapper {overflow:visible;}
-		}
-	</style>
 </head>
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
@@ -82,7 +92,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 <div class='col-xs-12'>End: <input name='End'  value='<?php echo isset($_GET['End']) ? $_GET['End'] : '';?>'   /></div>
                 <div class='col-xs-12'><input type='submit' value='Search' /></div>-->
                 <div class='col-xs-12'>Supervisor: <select name='Supervisor'><?php
-                  $r = $database->query(null,"SELECT tblWork.Super FROM nei.dbo.tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
+                  $r = \singleton\database::getInstance()->query((
+                    null,
+                      "   SELECT   tblWork.Super
+                          FROM     tblWork
+                          GROUP BY tblWork.Super
+                          ORDER BY tblWork.Super
+                          ASC;");
                   if($r){while($row = sqlsrv_fetch_array($r)){
                     ?><option value='<?php echo $row['Super'];?>' <?php if(isset($_GET['Supervisor']) && $_GET['Supervisor'] == $row['Super']){?>selected<?php }?>><?php echo $row['Super'];?></option><?php
                   }}
@@ -211,81 +227,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 </tbody>
             </table>
             </div>
-            <style>
-            .popup input, .popup select {
-              color:black !important;
-            }
-            </style>
-            <script>
-            $("div#container").on('click',function(e){
-            	if($(e.target).closest('.popup').length === 0 && $(e.target).closest('td').length === 0){
-            		$('.popup').fadeOut(300);
-            		$('.popup').remove();
-            	}
-            });
-              function schedule_pto(fDate, fWork, fFirst, Last){
-                var pto = "<div class='popup' style=''><form action='#' method='POST'><div class='panel panel-primary'><div class='panel-heading'>Schedule Paid Time Off</div><div class='panel-body' style='padding:10px;'><div class='row'><div class='col-xs-4'>First Name:</div><div class='col-xs-8'>" + fFirst + "</div><div class='col-xs-4'>Last Name:</div><div class='col-xs-8'>" + Last + "</div><input type='hidden' value='" + fWork + "' name='fWork' /><input type='hidden' value='" + fDate + "' name='fDate' /><div class='col-xs-4'>All Day</div><div class='col-xs-8'><select name='AllDay'><option value='Yes'>Yes</option><option value='No'>No</option></select></div><div class='col-xs-4'>Start Time:</div><div class='col-xs-8'><input type='text' name='StartTime' /></div><div class='col-xs-4'>End Time</div><div class='col-xs-8'><input type='text' name='EndTime' /></div><div class='col-xs-4'>Description</div><div class='col-xs-8'><input type='hidden' name='Remarks' value='OUT' /><select name='fDesc'><option value='Sick'>Sick</option><option value='Vacation'>Vacation</option><option value='No Pay'>No Pay</option><option value='Personal Day'>Personal Day</option><option value='En Lieu'>En Lieu</option><option value='Medical Day'>Medical Day</option><option value='Other'>Other</option></select></div><div class='col-xs-4'>&nbsp;</div><div class='col-xs-8'><input type='submit' value='Submit' /></div></div></div></div></form></div>";
-                $("body").append(pto);
-                $("input[name='StartTime']").timepicker();
-                $("input[name='EndTime']").timepicker();
-
-              }
-            </script>
-            <style>
-              .popup {
-                position:absolute;
-                z-index:99;
-                left:20%;
-                right:20%;
-                top:20%;
-                bottom:20%;
-                height:60%;
-                width:60%;
-                background-color:white;
-                padding:0px;
-              }
-            </style>
           </div>
         </div>
     </div>
 	</div>
-    <!-- Bootstrap Core JavaScript -->
-    
-
-    <!-- Metis Menu Plugin JavaScript -->
-    
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    <!-- Custom Theme JavaScript -->
-    
-
-    <!--Moment JS Date Formatter-->
-    
-
-    <!-- JQUERY UI Javascript -->
-    
-
-
-    <link href="cgi-bin/libraries/fixedHeader.css" rel="stylesheet" type="text/css" media="screen">
-    <script src="cgi-bin/libraries/fixedHeader.js"></script>
-    <script>
-      $(document).ready(function(){
-        $('#attendance').fixedHeaderTable({height: '650', width:'1500' });
-        $(".fht-table-wrapper").css("height","100%");
-      });
-    </script>
-	<style>
-    div.column {display:inline-block;vertical-align:top;}
-    div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
-    div.data {display:inline-block;width:300px;vertical-align:top;}
-    div#map * {overflow:visible;}
-    </style>
-    <script>
-	$(document).ready(function(){
-		$("a[tab='overview-pills']").click();
-	});
-	</script>
+<link href="cgi-bin/libraries/fixedHeader.css" rel="stylesheet" type="text/css" media="screen">
 </body>
 </html>
 <?php

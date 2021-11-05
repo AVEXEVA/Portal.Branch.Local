@@ -1,0 +1,10 @@
+  .panel {background-color:transparent !important;}
+  .panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
+  .nav-tabs > li:not(.active) {background-color:rgba(255,255,255,.6) !important;}
+  .panel-body {padding:0px !important;}
+		.border-seperate {
+			border-bottom:3px solid #333333;
+		}
+  div.column {display:inline-block;vertical-align:top;}
+  div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
+  div.data {display:inline-block;width:300px;vertical-align:top;}

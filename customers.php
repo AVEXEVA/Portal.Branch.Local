@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     //Connection
-    $result = $database->query(
-        null,
+    $result = sqlsrv_query(
+        $NEI,
         "   SELECT  *
             FROM    Connection
             WHERE       Connection.Connector = ?
@@ -18,7 +18,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     );
     $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
     //User
-    $result = $database->query(null,
+    $result = sqlsrv_query($NEI,
        "   SELECT *,
                   Emp.fFirst AS First_Name,
                   Emp.Last   AS Last_Name
@@ -29,7 +29,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     );
     $User = sqlsrv_fetch_array($result);
     //Privileges
-    $result = $database->query(null,
+    $result = sqlsrv_query($NEI,
      "   SELECT *
          FROM   Privilege
          WHERE  Privilege.User_ID = ?
@@ -46,8 +46,8 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
             || $Privileges[ 'Customer' ][ 'Other_Privilege' ] < 4){
                 ?><?php require('../404.html');?><?php }
     else {
-        $database->query(
-          null,
+        sqlsrv_query(
+          $NEI,
           " INSERT INTO Activity([User], [Date], [Page] ) VALUES( ?, ?, ? );",
           array(
             $_SESSION['User'],
@@ -67,12 +67,12 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     <div id='container' style='min-height:100%;height:100%;'>
         <div id="wrapper" style='height:100%;'>
             <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-            <?php require( bin_php . 'element/loading.php');?>
+            <?php require(PROJECT_ROOT.'php/element/loading.php');?>
             <div id="page-wrapper" class='content' style='background-color:transparent !important;'>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
 	                    <div class='row'>
-	                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customers</div>
+	                        <div class='col-xs-10'><h4><?php $Icons->Customer( 1 );?> Customers</div>
 	                        <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
 	                    </div>
 	                </div>
