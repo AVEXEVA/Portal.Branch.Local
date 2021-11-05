@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 			   AND Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = sqlsrv_query($NEI,"
+	$My_User    = $database->query(null,"
 		SELECT Emp.*,
 			   Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	;", array($_SESSION['User']));
 	$My_User = sqlsrv_fetch_array($My_User);
 	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = sqlsrv_query($Portal,"
+	$r = $database->query($Portal,"
 		SELECT Privilege.Access_Table,
 			   Privilege.User_Privilege,
 			   Privilege.Group_Privilege,
@@ -42,7 +42,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         if($Mechanic > 0){
 
             $Call_Sign = "";
-            $r = sqlsrv_query($NEI,"select * from Emp where ID = '" . $Mechanic . "'");
+            $r = $database->query(null,"select * from Emp where ID = '" . $Mechanic . "'");
             $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
             $Call_Sign = $array['CallSign'];
             $Alias = $array['fFirst'][0] . $array['Last'];
@@ -60,7 +60,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if($Start_Date <= $Today && $Today <= $End_Date){$Today = "'1' = '1'";}
 			else {$Today = "'1' = '2'";}
 
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Tickets.*,
 					   Loc.ID            AS Account,
 					   Loc.Tag           AS Tag,

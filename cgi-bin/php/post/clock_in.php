@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Connection
-  $result = sqlsrv_query(
-    $NEI,
+  $result = $database->query(
+    null,
     " SELECT  * 
       FROM    Connection 
       WHERE       Connector = ? 
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
   $Connection = sqlsrv_fetch_array( $result );
   //User
-  $result = sqlsrv_query(
-    $NEI,
+  $result = $database->query(
+    null,
     " SELECT  *, 
               fFirst AS First_Name, 
               Last as Last_Name 
@@ -31,8 +31,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
   $User = sqlsrv_fetch_array( $result );
   //Privileges
-  $result = sqlsrv_query(
-    $NEI,
+  $result = $database->query(
+    null,
     " SELECT  Access_Table, 
               User_Privilege, 
               Group_Privilege, 
@@ -47,8 +47,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result )){ $Privilege[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
   if(!isset($Connection['ID'])){?><html><head></head></html><?php }
   else {
-    sqlsrv_query(
-      $NEI,
+    $database->query(
+      null,
       " INSERT INTO Activity([User], [Date], [Page]) 
         VALUES( ?, ?, ? );",
       array(
@@ -58,8 +58,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
     );
     $_POST[ 'Notes' ] = isset( $_POST[ 'Notes' ] ) ? $_POST[ 'Notes' ] : '';
-    sqlsrv_query(
-      $NEI, 
+    $database->query(
+      null, 
       " INSERT INTO Attendance( [User], [Start], [Start_Notes] ) 
         VALUES( ?, ?, ? );",
       array(

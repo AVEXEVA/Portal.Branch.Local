@@ -2,8 +2,8 @@
 if(session_id() == '' || !isset($_SESSION) ){ session_start( [ 'read_and_close' => true ] ); }
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query(
-    $NEI,
+  $r = $database->query(
+    null,
     " SELECT *
 		  FROM   Connection
 		  WHERE  Connection.Connector = ?
@@ -14,8 +14,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     )
   );
   $Connection = sqlsrv_fetch_array( $r, SQLSRV_FETCH_ASSOC );
-  $r = sqlsrv_query(
-    $NEI,
+  $r = $database->query(
+    null,
     " SELECT  *,
   		        Emp.fFirst AS First_Name,
   			      Emp.Last   AS Last_Name
@@ -26,8 +26,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     )
   );
   $User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query(
-    $NEI,
+	$r = $database->query(
+    null,
     " SELECT *
 		  FROM   Privilege
 		  WHERE  Privilege.User_ID = ?;",
@@ -41,8 +41,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-  		sqlsrv_query(
-        $NEI,
+  		$database->query(
+        null,
         " INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",
         array(
           $_SESSION['User'],
@@ -79,7 +79,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
   <div id='wrapper' style='background-color:#1d1d1d !important;color:white !important;'>
     <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
     <div id='page-wrapper' class='content'>
 		  <div class='panel panel-primary' style='margin-bottom:0px;'>
 				<div class='panel-heading'>
@@ -129,7 +129,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           className: 'indent',
           data : 'Tag',
           render : function(data, type, row, meta){
-            if(type === 'display'){return '<?php $Icons->Ticket(1);?>';}
+            if(type === 'display'){return '<?php \singleton\fontawesome::getInstance( )->Ticket(1);?>';}
             return data;
           },
           sortable : true,

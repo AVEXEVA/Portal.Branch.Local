@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-    	$My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    	$My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($My_User);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -19,27 +19,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && $My_Privileges['Job']['Group_Privilege'] >= 4 && $My_Privileges['Job']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif($My_Privileges['Job']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-			$a = sqlsrv_query($NEI,"
+			$a = $database->query(null,"
 				SELECT Job.Loc
 				FROM nei.dbo.Job
 				WHERE Job.ID = ?
 			;",array($_GET['ID']));
 			$loc = sqlsrv_fetch_array($a)['Loc'];
-            $r = sqlsrv_query(  $NEI,"
+            $r = $database->query(  null,"
 				SELECT *
 				FROM 		nei.dbo.Job
 				LEFT JOIN 	nei.dbo.TicketO ON Job.ID = TicketO.Job
 				WHERE 		TicketO.LID= ?
 					AND 	TicketO.fWork= ?
 			;",array($loc,$My_User['fWork']));
-            $r2 = sqlsrv_query( $NEI,"
+            $r2 = $database->query( null,"
 				SELECT *
 				FROM 		nei.dbo.Job
 				LEFT JOIN 	nei.dbo.TicketD ON Job.ID = TicketD.Job
 				WHERE 		TicketD.Loc= ?
 							AND TicketD.fWork= ?
 			;",array($loc,$My_User['fWork']));
-			$r3 = sqlsrv_query( $NEI,"
+			$r3 = $database->query( null,"
 				SELECT *
 				FROM 		nei.dbo.Job
 				LEFT JOIN 	nei.dbo.TicketDArchive ON Job.ID = TicketDArchive.Loc
@@ -55,7 +55,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //
     if(!isset($array['ID'])  || !is_numeric($_GET['ID']) || !$Privileged ){require("401.html");}
     else {
-       $r = sqlsrv_query($NEI,"
+       $r = $database->query(null,"
 			SELECT TOP 1
                 Job.ID                AS Job_ID,
                 Job.fDesc             AS Job_Name,
@@ -119,7 +119,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12' style=''>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Modernization();?>Active Modernizations</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Modernization();?>Active Modernizations</h3></div>
 								<div class='panel-body'>
 									<table id='Table_Active_Modernizations' class='display' cellspacing='0' width='100%'>
 										<thead>
@@ -149,7 +149,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-12' style=''>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Modernization();?>Modernization Job Items</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Modernization();?>Modernization Job Items</h3></div>
 								<div class='panel-body'>
 									<table id='Table_Modernization_Job_Items' class='display' cellspacing='0' width='100%'>
 										<thead>

@@ -3,13 +3,13 @@
     <ul class="nav nav-third-level collapse">
     	<?php if(isset($My_Privileges['Executive']) && $My_Privileges['Executive']['Other_Privilege'] >= 4){?><?php }?>
 	   <li>
-            <a href="purchasing.php"><?php $Icons->Job();?> <span class=''>Tracker</span></a>
+            <a href="purchasing.php"><?php \singleton\fontawesome::getInstance( )->Job();?> <span class=''>Tracker</span></a>
         </li>
         <li>
-            <a href="job_item_search.php"><?php $Icons->Job();?><span class=''>Job Item Search</span></a>
+            <a href="job_item_search.php"><?php \singleton\fontawesome::getInstance( )->Job();?><span class=''>Job Item Search</span></a>
         </li>
         <li>
-            <a href="rmas.php"><?php $Icons->Job();?> <span class=''>RMAs</span></a>
+            <a href="rmas.php"><?php \singleton\fontawesome::getInstance( )->Job();?> <span class=''>RMAs</span></a>
         </li>
     </ul>
 </li>

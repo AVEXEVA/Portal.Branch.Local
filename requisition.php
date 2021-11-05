@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -31,11 +31,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         || !is_numeric($_GET['ID'])){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "requisition.phpID={$_GET['ID']}"));
-    $r = sqlsrv_query($Portal,
+    $r = $database->query($Portal,
       " SELECT  Requisition.*,
                 Loc.Tag AS Location_Tag,
                 DropOff.Tag AS DropOff_Tag,
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         WHERE Requisition.ID = ?
       ;",array($_GET['ID']));
     $Requisition = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.Requisition_Item WHERE Requisition_Item.Requisition = ?;",array($_GET['ID']));
+    $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Requisition_Item WHERE Requisition_Item.Requisition = ?;",array($_GET['ID']));
     $Requisition_Items = array();
     if($r){while($row = sqlsrv_fetch_array($r)){$Requisition_Items[] = $row;}}
 ?><!DOCTYPE html>
@@ -110,7 +110,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class='print' style='overflow:hidden;'>
             <div class='row'>
@@ -270,66 +270,66 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
           </div>
     			<div class="panel panel-primary no-print">
-    				<div class="panel-heading" onClick="document.location.href='requisitions.php'"><h3 style='margin:0px;'><?php $Icons->Requisition();?> Requisition #<?php echo $Requisition['ID'];?></h3></div>
+    				<div class="panel-heading" onClick="document.location.href='requisitions.php'"><h3 style='margin:0px;'><?php \singleton\fontawesome::getInstance( )->Requisition();?> Requisition #<?php echo $Requisition['ID'];?></h3></div>
     				<div class="panel-body" style=''>
     					<div class='row'><div class='col-xs-12'>&nbsp;</div></div>
               <div class="row">
-    						<div class='col-xs-4'><?php $Icons->User(1);?> User:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->User(1);?> User:</div>
     						<div class='col-xs-8'><input disabled type='text' name='User_Name' size='15' value='<?php echo $Requisition['User_Name'];?>' /></div>
     					</div>
     					<div class="row">
-    						<div class='col-xs-4'><?php $Icons->Calendar(1);?> Date:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</div>
     						<div class='col-xs-8'><input disabled type='text' name='Date' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Date']));?>' /></div>
     					</div>
     					<div class="row">
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> Required</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Required</div>
     						<div class='col-xs-8'><input disabled type='text' name='Required' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Required']));?>' /></div>
     					</div>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
               <div class='row'>
-      					<div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+      					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
       					<div class='col-xs-8'><?php echo $Requisition['Location_Tag'];?></div>
               </div>
               <div class='row'>
-      					<div class='col-xs-4'><?php $Icons->Location(1);?> Drop Off:</div>
+      					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Drop Off:</div>
       					<div class='col-xs-8'><?php echo $Requisition['DropOff_Tag'];?></div>
               </div>
               <div class='row'>
-                <div class='col-xs-4'><?php $Icons->Unit(1);?> Unit:</div>
+                <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
                 <div class='col-xs-8'><?php echo $Requisition['Unit_State'];?></div>
               </div>
               <div class='row'>
-                <div class='col-xs-4'><?php $Icons->Job(1);?> Job:</div>
+                <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
                 <div class='col-xs-8'><?php echo $Requisition['Job_Name'];?></div>
               </div>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     					<div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> Shutdown:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Shutdown:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='Shutdown' <?php echo isset($Requisition['Shutdown']) && $Requisition['Shutdown'] == 1 ? 'checked' : '';?> /></div>
     					</div>
     					<div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> A.S.A.P.:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> A.S.A.P.:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='ASAP' <?php echo isset($Requisition['ASAP']) && $Requisition['ASAP'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> Rush:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Rush:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='Rush' <?php echo isset($Requisition['Rush']) && $Requisition['Rush'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> L/S/D.:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> L/S/D.:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='LSD' <?php echo isset($Requisition['LSD']) && $Requisition['LSD'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> F.R.M.:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> F.R.M.:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='FRM' <?php echo isset($Requisition['FRM']) && $Requisition['FRM'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-                <div class='col-xs-12'><?php $Icons->Paragraph(1);?> Notes:</div>
+                <div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Paragraph(1);?> Notes:</div>
                 <div class='col-xs-12'><textarea name='Notes' style='width:100%;' rows='9' disabled><?php echo isset($Requisition['Notes']) ? $Requisition['Notes'] : NULL;?></textarea></div>
               </div>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
             </div>
-            <div class='panel-heading'><h3><?php $Icons->Purchase();?> Items</h3></div>
+            <div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Purchase();?> Items</h3></div>
             <div class='panel-body'>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     					<div class='row'>
@@ -370,24 +370,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
 
 	<!--  if you want iE6 not to poke select boxes thru your dropdowns, you need ... -->
 	<script type="text/javascript" src="js/jquery.bgiframe.min.js"></script>

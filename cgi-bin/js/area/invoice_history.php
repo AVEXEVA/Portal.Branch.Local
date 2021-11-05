@@ -1,6 +1,6 @@
 <script>
 <?php
-$r = sqlsrv_query($NEI,"
+$r = $database->query(null,"
     SELECT 
         Trans.fDesc           AS Description,
         Trans.Amount          AS Amount

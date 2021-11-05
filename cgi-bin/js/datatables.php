@@ -50,8 +50,8 @@
 -->
 
 
-<link rel="stylesheet" href="cgi-bin/library/datatable/editor.css">
-<script data-pagespeed-no-defer src="https://www.nouveauelevator.com/portal/cgi-bin/Editor-1.7.0/js/dataTables.editor.min.js"></script>
+<link rel="stylesheet" href="cgi-bin/library/datatable/edit-client/dataTables.editor.css">
+<script data-pagespeed-no-defer src="cgi-bin/library/datatable/editor-client/js/dataTables.editor.min.js"></script>
 
 <link rel='stylesheet' href='https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css'>
 <script src='https://cdn.datatables.net/datetime/1.1.1/js/dataTables.dateTime.min.js'></script>

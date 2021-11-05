@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Privilege.Access_Table,
                Privilege.User_Privilege,
                Privilege.Group_Privilege,
@@ -40,7 +40,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-$conn = $NEI;
+$conn = null;
 
     /*
      * Script:    DataTables server-side script for PHP and MySQL
@@ -213,7 +213,7 @@ $conn = $NEI;
 		";
 	}
 
-    $rResult = sqlsrv_query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    $rResult = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
 
     /* Data set length after filtering */
 	if($My_Privileges['Job']['Other_Privilege'] >= 4 || TRUE){
@@ -256,7 +256,7 @@ $conn = $NEI;
 		";
 	}
     $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = sqlsrv_query( $conn, $sQueryRow , $params, $options );
+    $stmt = $database->query( $conn, $sQueryRow , $params, $options );
 
     $iFilteredTotal = sqlsrv_num_rows( $stmt );
 
@@ -267,7 +267,7 @@ $conn = $NEI;
         SELECT COUNT(".$sIndexColumn.")
         FROM   $sTable
     ";
-    $rResultTotal = sqlsrv_query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 

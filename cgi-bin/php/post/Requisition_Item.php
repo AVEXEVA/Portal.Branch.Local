@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -35,11 +35,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				$data = array();
 				foreach($_POST['data'] as $ID=>$Requisition_Item){
 					$Requisition_Item['ID'] = intval($ID);
-					$r = sqlsrv_query($NEI,"
+					$r = $database->query(null,"
 						INSERT INTO Portal.dbo.Requisition_Item(Product, Quantity, Requisition)
 						VALUES(?,?,?)
 					;",array($Requisition_Item['Product'],$Requisition_Item['Quantity'],$_GET['ID']));
-					$r = sqlsrv_query($NEI,"SELECT Max(ID) AS ID FROM Portal.dbo.Item");
+					$r = $database->query(null,"SELECT Max(ID) AS ID FROM Portal.dbo.Item");
 					$Requisition_Item['ID'] = sqlsrv_fetch_array($r)['ID'];
 					$data[] = $Requisition_Item;
 				}

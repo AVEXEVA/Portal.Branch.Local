@@ -12,7 +12,7 @@ function gd(year, month, day) {
             $totals = array();
             //if(FALSE){while($array = sqlsrv_fetch_array($job_result)){$Jobs[] = "[JOBLABOR].[JOB #]='{$array['ID']}'";}}
             //$Jobs = implode(" OR ",$Jobs);
-            $tickets = sqlsrv_query($NEI,"
+            $tickets = $database->query(null,"
                 SELECT TicketD.EDate AS Date,
 					   TicketD.Total AS Total
 				FROM   nei.dbo.TicketD

@@ -1,48 +1,120 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('../../../../cgi-bin/php/index.php');
-setlocale(LC_MONETARY, 'en_US');
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( [ 'read_and_close' => true ] ); 
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User);
-    $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
-        SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-        FROM   Privilege
-        WHERE  User_ID = ?
-    ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    //Connection
+    $Connection = $database->query(
+        null,
+        "   SELECT  Connection.* 
+            FROM    Connection 
+            WHERE   Connection.Connector = ? 
+                    AND Connection.Hash = ?;",
+        array(
+            $_SESSION['User'],
+            $_SESSION['Hash']
+        )
+    );
+    $Connection = sqlsrv_fetch_array($Connection);
+
+    //User
+    $User = $database->query(
+        null,
+        "   SELECT  Emp.*, 
+                    Emp.fFirst  AS First_Name, 
+                    Emp.Last    AS Last_Name 
+            FROM    Emp 
+            WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION['User']
+        )
+    );
+    $User = sqlsrv_fetch_array($User);
+
+    //Privileges
+    $r = $database->query(
+        null,
+        "   SELECT  Privilege.Access_Table, 
+                    Privilege.User_Privilege, 
+                    Privilege.Group_Privilege, 
+                    Privilege.Other_Privilege
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+    $Privileges = array();
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  $NEI,"
-		SELECT 	*
-		FROM 	TicketO
-		WHERE 	TicketO.LID='{$_GET['ID']}'
-				AND fWork='{$My_User['fWork']}'");
-        $r2 = sqlsrv_query( $NEI,"
-		SELECT 	*
-		FROM 	TicketD
-		WHERE 	TicketD.Loc='{$_GET['ID']}'
-				AND fWork='{$My_User['fWork']}'");
-        $r3 = sqlsrv_query( $NEI,"
-		SELECT 	*
-		FROM 	TicketDArchive
-		WHERE 	TicketDArchive.Loc='{$_GET['ID']}'
-				AND fWork='{$My_User['fWork']}'");
-        $r = sqlsrv_fetch_array($r);
-        $r2 = sqlsrv_fetch_array($r2);
-		$r3 = sqlsrv_fetch_array($r3);
-        $Privileged = (is_array($r) || is_array($r2) || is_array($r3)) ? TRUE : FALSE;
+    if( isset($Privileges['Location']) 
+        && $Privileges['Location']['User_Privilege'] >= 4 
+        && $Privileges['Location']['Group_Privilege'] >= 4 
+        && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        $r = $database->query(  
+            null,
+            "   SELECT  Count( Ticket.ID ) AS Count 
+                FROM    (
+                            SELECT  Ticket.ID,
+                                    Ticket.Location,
+                                    Ticket.Field,
+                                    Sum( Ticket.Count ) AS Count
+                            FROM (
+                                (
+                                    SELECT      TicketO.ID,
+                                                TicketO.LID AS Location,
+                                                TicketO.fWork AS Field,
+                                                Count( TicketO.ID ) AS Count
+                                    FROM        TicketO
+                                    GROUP BY    TicketO.ID,
+                                                TicketO.LID,
+                                                TicketO.fWork
+                                ) UNION ALL (
+                                    SELECT      TicketD.ID,
+                                                TicketD.Loc AS Location,
+                                                TicketD.fWork AS Field, 
+                                                Count( TicketD.ID ) AS Count
+                                    FROM        TicketD
+                                    GROUP BY    TicketD.ID,
+                                                TicketD.Loc,
+                                                TicketD.fWork
+                                )
+                            ) AS Ticket
+                            GROUP BY    Ticket.ID,
+                                        Ticket.Location,
+                                        Ticket.Field
+                        ) AS Ticket
+                        LEFT JOIN Emp AS Employee ON Ticket.Field = Employee.fWork
+                WHERE   Employee.ID = ?
+                        AND Ticket.Location = ?;",
+            array( 
+                $_SESSION[ 'User' ],
+                $_GET[ 'ID' ]
+            )
+        );
+        $Tickets = 0;
+        if ( $r ){ $Tickets = sqlsrv_fetch_array( $r )[ 'Count' ]; }
+        $Privileged =  $Tickets > 0 ? true : false;
     }
-    sqlsrv_query($NEI,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
-    if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
+    if(     !isset( $Connection[ 'ID' ] )  
+        ||  !$Privileged 
+        ||  !is_numeric( $_GET[ 'ID' ] ) ){
+            ?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
+        $database->query(
+            null,
+            "   INSERT INTO Activity([User], [Date], [Page]) 
+                VALUES(?,?,?);",
+            array(
+                $_SESSION['User'],
+                date('Y-m-d H:i:s'), 
+                'location-feed.php?ID=' . $_GET[ 'ID' ]
+            )
+        );
         $ID = $_GET['ID'];
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Name,
@@ -135,7 +207,7 @@ var Editor_Proposals = new $.fn.dataTable.Editor({
         name:"Location",
         type:"select",
         options: [<?php
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT   Loc.Tag AS Location
                 FROM     Loc
                 WHERE    Loc.Owner = ?

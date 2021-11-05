@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 $_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -32,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Violation']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "compliance.php"));
@@ -47,8 +47,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
 <div id='container'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-      <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-      <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+      <?php require( bin_php . 'element/navigation/index.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
       <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
         <div class='panel-panel-primary'>
           <div class='panel-heading'><h2>Code Compliance</h2></div>
@@ -61,7 +61,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
             <div class='row'>
               <div class='col-xs-3' style='background-color:black;color:white;border:1px solid white;'>Total: <?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -73,7 +73,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-3' style='border:1px solid black;'>Total: <?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -86,7 +86,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-3' style='background-color:black;color:white;border:1px solid white;'>Total: <?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -98,7 +98,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-3' style='border:1px solid black;'>Total: <?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -113,7 +113,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='row'>
               <?php $Division_Name = "DIVISION #1";?>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Code:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -124,7 +124,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Sales:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Job Created:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -147,7 +147,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               ?></div>
               <?php $Division_Name = "DIVISION #2";?>
               <div class='col-xs-1' style='border:1px solid black;'>Code:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -158,7 +158,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>Sales:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -169,7 +169,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>Job Created:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -181,7 +181,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               ?></div>
               <?php $Division_Name = "DIVISION #3";?>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Code:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -192,7 +192,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Sales:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -203,7 +203,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Job Created:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -215,7 +215,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               ?></div>
               <?php $Division_Name = "DIVISION #4";?>
               <div class='col-xs-1' style='border:1px solid black;'>Code:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -226,7 +226,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>Sales:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -237,7 +237,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>Job Created:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -251,7 +251,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='row'>
               <?php $Division_Name = "DIVISION #1";?>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>DOB:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -265,7 +265,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>E-Filed:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -276,7 +276,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Contract Canceled:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -288,7 +288,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               ?></div>
               <?php $Division_Name = "DIVISION #2";?>
               <div class='col-xs-1' style='border:1px solid black;'>DOB:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -302,7 +302,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>E-Filed:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -313,7 +313,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>Contract Canceled:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -325,7 +325,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               ?></div>
               <?php $Division_Name = "DIVISION #3";?>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>DOB:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -339,7 +339,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>E-Filed:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -350,7 +350,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Contract Canceled:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -362,7 +362,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               ?></div>
               <?php $Division_Name = "DIVISION #4";?>
               <div class='col-xs-1' style='border:1px solid black;'>DOB:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -376,7 +376,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>E-Filed:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -387,7 +387,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? sqlsrv_fetch_array($r)['Count'] : 0;
               ?></div>
               <div class='col-xs-1' style='border:1px solid black;'>Contract Canceled:<?
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
                     FROM    nei.dbo.Violation
                             LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
@@ -407,7 +407,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-8' id='Timeline' style='height:600px;overflow-y:scroll;border:3px solid black;'>
               </div>
               <div class='col-xs-4' id='Locations' style='height:600px;overflow-y:scroll;border:3px solid black;'><?php
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT    Loc.Tag AS Location_Tag,
                               Zone.Name AS Division_Name,
                               Count(Violation.ID) AS Count
@@ -502,7 +502,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
             <div class='row'>
               <?php $rows = array();
-              $r = sqlsrv_query($NEI,
+              $r = $database->query(null,
               "   SELECT  *
                   FROM
                   (
@@ -553,7 +553,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               }?>
               <div class='col-xs-6' style='border:3px solid black;'><h3><?php echo $count;?> Due Violations</h3></div>
               <?php
-              $r = sqlsrv_query($NEI,"SELECT Count(Violation.ID) AS Count FROM nei.dbo.Violation WHERE Violation.Status = 'Code';");
+              $r = $database->query(null,"SELECT Count(Violation.ID) AS Count FROM nei.dbo.Violation WHERE Violation.Status = 'Code';");
               $count = sqlsrv_fetch_array($r)['Count'];
               ?>
               <div class='col-xs-6' style='border:3px solid black;'><h3><?php echo $count;?> Violations in Code Department</h3></div>
@@ -573,7 +573,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               }}
               ?></div>
               <?php
-              $r = sqlsrv_query($NEI,"SELECT Violation.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Elev.State AS Unit_State FROM nei.dbo.Violation LEFT JOIN nei.dbo.Loc ON Violation.Loc = Loc.Loc LEFT JOIN nei.dbo.Zone ON Zone.ID = Loc.Zone LEFT JOIN nei.dbo.Elev ON Violation.Elev = Elev.ID WHERE Violation.Status = 'Code' ORDER BY Zone.NAme ASC, Loc.Tag ASC;");
+              $r = $database->query(null,"SELECT Violation.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Elev.State AS Unit_State FROM nei.dbo.Violation LEFT JOIN nei.dbo.Loc ON Violation.Loc = Loc.Loc LEFT JOIN nei.dbo.Zone ON Zone.ID = Loc.Zone LEFT JOIN nei.dbo.Elev ON Violation.Elev = Elev.ID WHERE Violation.Status = 'Code' ORDER BY Zone.NAme ASC, Loc.Tag ASC;");
               $rows = array();
               if($r){while($row = sqlsrv_fetch_array($r)){
                 $rows[] = $row;
@@ -597,7 +597,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
             <div class='row'>
               <div class='col-xs-6' style='height:600px;overflow-y:scroll;border:3px solid black;'><?php
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                   " SELECT  Loc.Tag AS Location_Tag,
                             Count(Violation.ID) AS Violation_Count,
                             Emp.fFirst + ' ' + Emp.Last AS Employee_Name,
@@ -634,7 +634,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }}
               ?></div>
               <div class='col-xs-6' style='height:600px;overflow-y:scroll;border:3px solid black;'><?php
-                $r = sqlsrv_query($NEI,"SELECT TicketO.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Emp.fFirst + ' ' + Emp.Last AS Employee_Name, TickOStatus.Type AS Status FROM nei.dbo.TicketO LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE TicketO.Level = 4 ORDER BY TicketO.CDate ASC;");
+                $r = $database->query(null,"SELECT TicketO.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Emp.fFirst + ' ' + Emp.Last AS Employee_Name, TickOStatus.Type AS Status FROM nei.dbo.TicketO LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE TicketO.Level = 4 ORDER BY TicketO.CDate ASC;");
                 if($r){while($row = sqlsrv_fetch_array($r)){
                   ?><div class='row' ondblclick="popupTicket(<?php echo $row['ID'];?>);">
                     <div class='col-xs-2'><?php echo date("m/d/Y",strtotime($row['CDate']));?></div>

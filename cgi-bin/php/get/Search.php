@@ -2,9 +2,9 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $SQL_Result_Privileges = sqlsrv_query($Portal,"
+    $SQL_Result_Privileges = $database->query($Portal,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE User_ID='{$_SESSION['User']}'
@@ -24,7 +24,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Job_fDate = "Job.fDate LIKE '%" . str_replace(" ","%' OR Job.fDate LIKE '%",$Keyword) . "%'";
             $Job_Status = "Job_Status.Status LIKE '%" . str_replace(" ","%' OR Job_Status.Status LIKE '%",$Keyword) . "%'";
             if($My_Privileges['Job']['User_Privilege'] >= 4 && $My_Privileges['Job']['Group_Privilege'] >= 4 && $My_Privileges['Job']['Other_Privilege'] >= 4){
-                $SQL_Result_Jobs = sqlsrv_query($NEI,"
+                $SQL_Result_Jobs = $database->query(null,"
                     SELECT DISTINCT
                         Job.ID                  AS  ID,
                         'Job'                   AS  Object,
@@ -47,14 +47,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             } else {
                 $SQL_Jobs = array();
                 if($My_Privileges['Job']['Group_Privilege'] >= 4){
-                    $SQL_Result_Jobs = sqlsrv_query($NEI,"
+                    $SQL_Result_Jobs = $database->query(null,"
                         SELECT TicketO.Job AS Job
                         FROM   nei.dbo.TicketO
                                LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
                         WHERE  Emp.ID = '{$_SESSION['User']}'
                     ;");
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Jobs[] = "Job.ID='{$array['Job']}'";}
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT TicketD.Job AS Job
                         FROM   nei.dbo.TicketD
                                LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -64,7 +64,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
                 }
                 if($My_Privileges['Job']['User_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT DISTINCT Job.ID AS Job
                         FROM   nei.dbo.Job
                                LEFT JOIN nei.dbo.Loc       ON Elev.Loc = Loc.Loc)
@@ -77,7 +77,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 $SQL_Jobs = array_unique($SQL_Jobs);
                 if(count($SQL_Jobs) > 0){
                     $SQL_Jobs = implode(' OR ',$SQL_Jobs);
-                    $SQL_Result_Jobs = sqlsrv_query($NEI,"
+                    $SQL_Result_Jobs = $database->query(null,"
                         SELECT DISTINCT
                                Job.ID                  AS  ID,
                                'Job'                   AS  Object,
@@ -102,7 +102,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
         }
         if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4 && $My_Privileges['Customer']['Group_Privilege'] >= 4 && $My_Privileges['Customer']['Other_Privilege'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("customer",array_map("strtolower",$Keywords)))){
-            $SQL_Result_Customers = sqlsrv_query($NEI,"
+            $SQL_Result_Customers = $database->query(null,"
                 SELECT DISTINCT
                     OwnerWithRol.ID         AS ID,
                     'Customer'              AS Object,
@@ -131,7 +131,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Emp_fFirst = "Emp.fFirst LIKE '%" . str_replace(" ","%' OR Emp.fFirst LIKE '%",$Keyword) . "%'";
             $Emp_Last = "Emp.Last LIKE '%" . str_replace(" ","%' OR Emp.Last LIKE '%",$Keyword) . "%'";
             if($My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Ticket']['Other_Privilege'] >= 4){
-            	$r = sqlsrv_query($NEI,"
+            	$r = $database->query(null,"
                     SELECT TicketO.ID                  AS ID,
                            'Ticket'                    AS Object,
                            TicketO.fDesc               AS Name, 
@@ -152,7 +152,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;");
                 $Tickets = array();
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT TicketD.ID              AS ID,
                            'Ticket'                AS Object,
                            TicketD.fDesc           AS Name,
@@ -173,7 +173,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                            OR {$Emp_Last}*/
                 ;");
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT 
 						TicketDArchive.ID       AS ID,
 						'Ticket'                AS Object,
@@ -198,7 +198,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;");
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
             } elseif($My_Privileges['Ticket']['User_Privilege'] >= 4) {
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT 
                         TicketO.ID                  AS ID,
                         'Ticket'                    AS Object,
@@ -225,7 +225,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
                     if($array['ClearPR'] != 1){$array['ClearPR'] = 0;}
                     $Tickets[$array['ID']] = $array;}}
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT 
                         TicketD.ID              AS  ID,
                         'Ticket'                AS  Object,
@@ -251,7 +251,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
                     $Tickets[$array['ID']] = $array;
                     $Tickets[$array['ID']]['Status'] = "Completed";}}
-                   $r = sqlsrv_query($NEI,"
+                   $r = $database->query(null,"
                     SELECT 
                         TicketDArchive.ID       AS  ID,
                         'Ticket'                AS  Object,
@@ -285,7 +285,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Location_State = "Loc.State LIKE '%" . str_replace(" ","%' OR Loc.State LIKE '%",$Keyword) . "%'";
             $Location_Zip = "Loc.Zip LIKE '%" . str_replace(" ","%' OR Loc.Zip LIKE '%",$Keyword) . "%'";
             if($My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){
-                $SQL_Result_Locations = sqlsrv_query($NEI,"
+                $SQL_Result_Locations = $database->query(null,"
                     SELECT DISTINCT
                         Loc.Loc     AS ID,
                         'Location'  AS Object,
@@ -306,7 +306,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             } else {
                 $SQL_Locations = array();
                 if($My_Privileges['Location']['Group_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT 
                             LID                 AS Location
                         FROM 
@@ -317,7 +317,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     ;");
                     
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT 
                             Loc                 AS Location
                         FROM 
@@ -330,7 +330,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
                 }
                 if($My_Privileges['Location']['User_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT Loc.Loc          AS Location
                         FROM 
                             (Loc
@@ -344,7 +344,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 $SQL_Locations = array_unique($SQL_Locations);
                 if(count($SQL_Locations) > 0){
                     $SQL_Locations = implode(' OR ',$SQL_Locations);
-                    $SQL_Result_Locations = sqlsrv_query($NEI,"
+                    $SQL_Result_Locations = $database->query(null,"
                         SELECT DISTINCT
                             Loc.Loc     AS ID,
                             'Location'  AS Object,
@@ -374,7 +374,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Unit_Loc = "Loc.Loc LIKE '%" . str_replace(" ","%' OR Loc.Loc LIKE '%",$Keyword) . "%'";
             $Unit_Tag = "Loc.Tag LIKE '%" . str_replace(" ","%' OR Loc.Tag LIKE '%",$Keyword) . "%'";
             if($My_Privileges['Unit']['User_Privilege'] > 4 && $My_Privileges['Unit']['Group_Privilege'] > 4 && $My_Privileges['Unit']['Other_Privilege'] > 4){
-                $SQL_Result_Units = sqlsrv_query($NEI,"
+                $SQL_Result_Units = $database->query(null,"
                     SELECT DISTINCT
                         Elev.ID         AS  ID,
                         'Unit'          AS  Object,
@@ -402,7 +402,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             } else {
                 $SQL_Units = array();
                 if($My_Privileges['Unit']['Group_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT 
                             LElev               AS Unit
                         FROM 
@@ -412,7 +412,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             Emp.ID = '{$_SESSION['User']}'
                     ;");
                     if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Elev.ID='{$array['Unit']}'";}}
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT 
                             Elev                AS Unit
                         FROM 
@@ -425,7 +425,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Elev.ID='{$array['Unit']}'";}}
                 }
                 if($My_Privileges['Unit']['User_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT Elev.ID          AS Unit
                         FROM 
                             ((Elev
@@ -440,7 +440,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 $SQL_Units = array_unique($SQL_Units);
                 if(count($SQL_Units) > 0){
                     $SQL_Units = implode(' OR ',$SQL_Units);
-                    $SQL_Result_Units = sqlsrv_query($NEI,"
+                    $SQL_Result_Units = $database->query(null,"
                         SELECT DISTINCT
                             Elev.ID                 AS  ID,
                             'Unit'                  AS  Object,
@@ -473,7 +473,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Invoice_Ref = "Invoice.Ref LIKE '%" . str_replace(" ","%' OR Invoice.Ref LIKE '%",$Keyword) . "%'";
             $Invoice_fDesc = "Invoice.fDesc LIKE '%" . str_replace(" ","%' OR Invoice.fDesc LIKE '%",$Keyword) . "%'";
             $Invoice_Total = "Invoice.Total LIKE '%" . str_replace(" ","%' OR Invoice.Total LIKE '%",$Keyword) . "%'";
-            $SQL_Result_Invoices = sqlsrv_query($NEI,"
+            $SQL_Result_Invoices = $database->query(null,"
                 SELECT 
                     Invoice.Ref         AS  ID,
                     'Invoice'           AS  Object,
@@ -499,7 +499,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Proposal_fDate = "Estimate.fDate LIKE '%" . str_replace(" ","%' OR Estimate.fDate LIKE '%",$Keyword) . "%'";
             $Proposal_Cost = "Estimate.Cost LIKE '%" . str_replace(" ","%' OR Estimate.Cost LIKE '%",$Keyword) . "%'";
             $Proposal_Price = "Estimate.Price LIKE '%" . str_replace(" ","%' OR Estimate.Price LIKE '%",$Keyword) . "%'";
-            $SQL_Result_Proposals = sqlsrv_query($NEI,"
+            $SQL_Result_Proposals = $database->query(null,"
                 SELECT 
                     Estimate.ID             AS  ID,
                     'Proposal'              AS  'Object',

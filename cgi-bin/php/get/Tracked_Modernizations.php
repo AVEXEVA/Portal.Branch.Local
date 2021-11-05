@@ -2,9 +2,9 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE User_ID = ? AND Access_Table='Job'
@@ -14,7 +14,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         $data = array();
         if($My_Privileges['User_Privilege'] >= 4 && $My_Privileges['Group_Privilege'] >= 4 && $My_Privileges['Other_Privilege'] >= 4){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Modernization.*,
                        Modernization.ID                    AS  ID,
                        Job.ID                              AS  Job,
@@ -75,7 +75,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
             if($r){
                 while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
-                    $r2 = sqlsrv_query($Portal,"
+                    $r2 = $database->query($Portal,"
                         SELECT   Mod_Tracker.Time_Stamp, Mod_Status.Title
                         FROM     Mod_Tracker
                                  LEFT JOIN Mod_Status ON Mod_Tracker.Status = Mod_Status.ID

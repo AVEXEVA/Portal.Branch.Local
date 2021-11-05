@@ -2,12 +2,12 @@
 function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 var job_profit_data = [<?php 
 	$data = array();
-	$job_result = sqlsrv_query($NEI,"
+	$job_result = $database->query(null,"
 		SELECT * 
 		FROM   Job
 		WHERE  Job.ID = ?
 	;",array($_GET['ID']));
-	$invoice_result = sqlsrv_query($NEI,"
+	$invoice_result = $database->query(null,"
 		SELECT    Invoice.fDate as fDate,
 				  Invoice.Amount as Amount
 		FROM      nei.dbo.Invoice
@@ -15,7 +15,7 @@ var job_profit_data = [<?php
 				  AND Invoice.fDate >= '2013-01-01 00:00:00.000'
 		ORDER BY fDate ASC
 	;",array($_GET['ID']));
-	$job_item_result = sqlsrv_query($Paradox,"
+	$job_item_result = $database->query($Paradox,"
 		SELECT [JOBLABOR].[WEEK ENDING]    AS fDate,
 			   [JOBLABOR].[TOTAL COST]     AS Amount
 		FROM   Paradox.dbo.JOBLABOR
@@ -45,7 +45,7 @@ var job_profit_data = [<?php
 		}
 	}
 	ksort($dates);
-	$job_item_result = sqlsrv_query($NEI,"
+	$job_item_result = $database->query(null,"
 		SELECT JobI.fDate as fDate,
 			   JobI.Amount as Amount
 		FROM   JobI
@@ -62,7 +62,7 @@ var job_profit_data = [<?php
 		}
 	}
 	ksort($dates);
-	$job_item_result = sqlsrv_query($NEI,"
+	$job_item_result = $database->query(null,"
 		SELECT   JobI.fDate as fDate,
 				 JobI.Amount as Amount
 		FROM     JobI
@@ -79,7 +79,7 @@ var job_profit_data = [<?php
 		}
 	}
 	ksort($dates);
-	$job_item_result = sqlsrv_query($NEI,"
+	$job_item_result = $database->query(null,"
 		SELECT   JobI.fDate as fDate,
 				 JobI.Amount as Amount
 		FROM     JobI

@@ -4,13 +4,13 @@ require('cgi-bin/php/index.php');
 require('php/class/Customer.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,7 +25,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //
     if(!isset($array['ID']) || !$Privileged){?><html><head><script>document.location.href="../login.php?Forward=customer<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-		sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "collector.php"));
+		$database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "collector.php"));
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;background-image:url('http://www.nouveauelevator.com/Images/Backgrounds/New_York_City_Skyline.jpg');webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -54,15 +54,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
         <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <div class='row'>
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3><?php $Icons->Customer();?>Collector: <?php echo $My_User['fFirst'] . ' ' . $My_User['Last'];?></h3>
+                            <h3><?php \singleton\fontawesome::getInstance( )->Customer();?>Collector: <?php echo $My_User['fFirst'] . ' ' . $My_User['Last'];?></h3>
                         </div>
                         <script>
                         var asyncArray = new Array();
@@ -99,13 +99,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         </script>
                         <div class="panel-body">
                             <ul class="nav nav-tabs BankGothic"> 
-                                <li class=''><a href="#" tab="overview-pills" 	onClick="asyncPage(this);" ><?php $Icons->Info();?>Overview</a></li>
-								<li class=''><a href='#' tab='tables-pills' onClick='asyncPage(this);'><?php $Icons->Table();?>Tables</a></li>
+                                <li class=''><a href="#" tab="overview-pills" 	onClick="asyncPage(this);" ><?php \singleton\fontawesome::getInstance( )->Info();?>Overview</a></li>
+								<li class=''><a href='#' tab='tables-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Table();?>Tables</a></li>
                             </ul>
                             <br />
                             <div class="tab-content" id="main-tab-content">
 								<div class='tab-pane fade in' id='loading-pills'>
-									<?php require(PROJECT_ROOT.'php/element/loading.php');?>
+									<?php require( bin_php . 'element/loading.php');?>
 								</div>
                             </div>
                         </div>
@@ -116,21 +116,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
 	</div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 	
 	<script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>

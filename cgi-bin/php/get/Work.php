@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 			   AND Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = sqlsrv_query($NEI,"
+	$My_User    = $database->query(null,"
 		SELECT Emp.*,
 			   Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	;", array($_SESSION['User']));
 	$My_User = sqlsrv_fetch_array($My_User);
 	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT Privilege.Access_Table,
 			   Privilege.User_Privilege,
 			   Privilege.Group_Privilege,
@@ -39,7 +39,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	else {
       //$Type = $_GET['Type'] == 'Service_Calls' ? "Tickets.Level = 1" : "Tickets.Level <> 1";
       $Type = '';
-			$r = sqlsrv_query($NEI,
+			$r = $database->query(null,
       "   SELECT Tickets.*,
 					   Loc.ID            AS Account,
 					   Loc.Tag           AS Tag,
@@ -148,7 +148,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					$i++;
 				}
 			}
-      $r = sqlsrv_query($NEI,"SELECT Tickets.*,
+      $r = $database->query(null,"SELECT Tickets.*,
            Loc.ID            AS Account,
            Loc.Tag           AS Tag,
            Loc.Tag           AS Location,

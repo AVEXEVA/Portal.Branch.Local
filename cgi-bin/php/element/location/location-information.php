@@ -3,12 +3,12 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../../cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    $My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ?
@@ -18,17 +18,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Privileged = FALSE;
     if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  $NEI,"
+        $r = $database->query(  null,"
         SELECT  *
         FROM    TicketO
         WHERE   TicketO.LID='{$_GET['ID']}'
                 AND fWork='{$My_User['fWork']}'");
-        $r2 = sqlsrv_query( $NEI,"
+        $r2 = $database->query( null,"
         SELECT  *
         FROM    TicketD
         WHERE   TicketD.Loc='{$_GET['ID']}'
                 AND fWork='{$My_User['fWork']}'");
-        $r3 = sqlsrv_query( $NEI,"
+        $r3 = $database->query( null,"
         SELECT  *
         FROM    TicketDArchive
         WHERE   TicketDArchive.Loc='{$_GET['ID']}'
@@ -38,10 +38,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $r3 = sqlsrv_fetch_array($r3);
         $Privileged = (is_array($r) || is_array($r2) || is_array($r3)) ? TRUE : FALSE;
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Location_Name,
@@ -91,7 +91,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			}
 			else { $end = 30;}
 			$End_Date = date('Y-m') . "-" . $end . " 23:59:59.999";
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 			SELECT Tickets.*,
 				   Loc.ID                      AS Customer,
 				   Loc.Tag                     AS Location,
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			}
 
 		}
-		$row_count = sqlsrv_query($NEI,"
+		$row_count = $database->query(null,"
 					SELECT Count(Tickets.ID) AS Open_Tickets
 					FROM (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '0' ) AS Tickets
 
@@ -185,7 +185,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		",array($_GET['ID']));
 		//echo $r ? number_format(sqlsrv_fetch_array($row_count)['Open_Tickets']) : 0;
 
-		$row_count2 =  sqlsrv_query($NEI,"
+		$row_count2 =  $database->query(null,"
                     SELECT Count(Tickets.ID) AS Open_Tickets
                     FROM   (
                                 (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '0' )
@@ -195,7 +195,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		//echo $r ? number_format(sqlsrv_fetch_array($row_count2)['Open_Tickets']) : 0;
 			   $open_tickets = number_format(sqlsrv_fetch_array($row_count2)['Open_Tickets']);
 
-		$row_count3 =  sqlsrv_query($NEI,"
+		$row_count3 =  $database->query(null,"
                     SELECT Count(Tickets.ID) AS Assigned_Tickets
                     FROM   (
                                 (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '1')
@@ -204,7 +204,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		//echo $r ? number_format(sqlsrv_fetch_array($row_count3)['Assigned_Tickets']) : 0;
 				$assigned_tickets =  number_format(sqlsrv_fetch_array($row_count3)['Assigned_Tickets']);
 
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
                     SELECT Tickets, Count(*) AS Count_of_Tickets
                     FROM   TicketO
                      GROUP BY TicketO.fWork
@@ -215,61 +215,61 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			//echo (($open_tickets + $assigned_tickets) / $total );
 	?>
 
-			<div class='col-xs-4'><?php $Icons->Location(1);?> Name:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Name:</div>
 			<div class='col-xs-8'><?php echo $Location['Location_Name'];?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Tag:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Tag:</div>
 			<div class='col-xs-8'><?php echo $Location['Location_Tag'];?></div>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Address(1);?> Street:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Street:</div>
 			<div class='col-xs-8'><?php echo strlen($Location['Location_Street']) ? $Location['Location_Street'] : "&nbsp;";?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
 			<div class='col-xs-8'><?php echo strlen($Location['Location_City']) ? $Location['Location_City'] : "&nbsp;";?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
 			<div class='col-xs-8'><?php echo strlen($Location['Location_State']) ? $Location['Location_State'] : "&nbsp;";?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Zip:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
 			<div class='col-xs-8'><?php echo strlen($Location['Location_Zip']) ? $Location['Location_Zip'] : "&nbsp;";?></div>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-            <div class='col-xs-4'><?php $Icons->Territory(1);?> Territory:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Territory(1);?> Territory:</div>
             <div class='col-xs-8'><?php echo isset($Location['Territory_Name']) && $Location['Territory_Name'] != '' ? $Location['Territory_Name'] : "&nbsp;";?></div>
-			<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other_Privilege'] >= 4){?><div class='col-xs-4'><?php $Icons->Collection(1);?> Balance:</div>
+			<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other_Privilege'] >= 4){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Balance:</div>
             <div class='col-xs-8'><?php echo isset($Location['Location_Balance']) && $Location['Location_Balance'] != '' ? money_format('%.2n',$Location['Location_Balance']) : "&nbsp;";?></div><?php }?>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Route();?> Route:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
             <div class='col-xs-8'><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
 			</div>
-			<div class='col-xs-4'><?php $Icons->Resident(1);?> Resident:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Resident(1);?> Resident:</div>
             <div class='col-xs-8'><?php echo isset($Location['Resident_Mechanic']) && $Location['Resident_Mechanic'] != '' ? proper($Location['Resident_Mechanic']) : "No";?></div>
             <?php if(isset($Location['Route_Mechanic_Phone_Number']) && strlen($Location['Route_Mechanic_Phone_Number']) > 0){?>
-			<div class='col-xs-4'><?php $Icons->Phone();?> Phone:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Phone();?> Phone:</div>
 			<?php $number = $Location['Route_Mechanic_Phone_Number'];?>
 			<div class='col-xs-8'><a href="tel:<?php echo $number;?>"><?php echo $number;?></a></div><?php }?>
-			<?php /*<?php if(strlen($Location['Route_Mechanic_Email']) > 0){?><div class='col-xs-4'><?php $Icons->Email(1);?> Email:</div>
+			<?php /*<?php if(strlen($Location['Route_Mechanic_Email']) > 0){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
             <div class='col-xs-8'><a href="mailto:<?php echo $Location['Route_Mechanic_Email'];?>"><?php echo $Location['Route_Mechanic_Email'];?></a></div><?php }?>*/?>
-			<div class='col-xs-4'><?php $Icons->Division(1);?> Division:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
             <div class='col-xs-8'><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
 		</div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-            <div class='col-xs-4'><?php $Icons->Unit(1);?> Units</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Elevators FROM Elev WHERE Loc='{$_GET['ID']}';");
+                $r = $database->query(null,"SELECT Count(ID) AS Count_of_Elevators FROM Elev WHERE Loc='{$_GET['ID']}';");
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Elevators']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Job(1);?> Jobs</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Jobs FROM Job WHERE Loc='{$_GET['ID']}' ;");
+                $r = $database->query(null,"SELECT Count(ID) AS Count_of_Jobs FROM Job WHERE Loc='{$_GET['ID']}' ;");
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Violation(1);?> Violations</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Jobs FROM Violation WHERE Loc='{$_GET['ID']}';");
+                $r = $database->query(null,"SELECT Count(ID) AS Count_of_Jobs FROM Violation WHERE Loc='{$_GET['ID']}';");
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Ticket(1);?> Tickets</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Tickets.ID) AS Count_of_Tickets
                     FROM   (
                                 (SELECT ID FROM TicketO WHERE TicketO.LID = ?)
@@ -281,9 +281,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;",array($_GET['ID'],$_GET['ID'],$_GET['ID']));
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Proposal(1);?> Proposals</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Estimate.ID) AS Count_of_Tickets
                     FROM   Estimate
                     WHERE  Estimate.LocID = ?
@@ -291,9 +291,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
             ?></div>
             <?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other'] >= 4){?>
-            <div class='col-xs-4'><?php $Icons->Invoice(1);?>Collections</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?>Collections</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Ref) AS Count_of_Invoices
                     FROM   OpenAR
                     WHERE  Loc='{$_GET['ID']}' AND Invoice.Status = 1;
@@ -301,9 +301,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Invoices']) : 0;
             ?></div><?php }?>
 			<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal'] >=4 ) {?>
-            <div class='col-xs-4'><?php $Icons->Legal(1);?> Lawsuits</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Legal(1);?> Lawsuits</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(ID) AS Count_of_Legal_Jobs
                     FROM   Job
                     WHERE  Job.Loc = ?

@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Texas'){
-        sqlsrv_query($NEI,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -20,13 +20,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4 && $My_Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4){
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Elev.Loc AS Location_ID
 				FROM   Elev
 				WHERE  Elev.ID = ?
 			;",array($_GET['ID'] ));
 			$Location_ID = sqlsrv_fetch_array($r)['Location_ID'];
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
 			SELECT Tickets.*
 			FROM
 			(
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             foreach($_POST as $key=>$value){
 				if($key == 'Price'){continue;}
 				if($key == 'Type'){continue;}
-                sqlsrv_query($NEI,"
+                $database->query(null,"
                     UPDATE ElevTItem
                     SET    ElevTItem.Value     = ?
                     WHERE  ElevTItem.Elev      = ?
@@ -72,21 +72,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;",array($value,$_GET['ID'],$key));
             }
 			if(isset($_POST['Price'])){
-				sqlsrv_query($NEI,"
+				$database->query(null,"
 					UPDATE Elev
 					SET    Elev.Price = ?
 					WHERE  Elev.ID    = ?
 				;",array($_POST['Price'],$_GET['ID']));
 			}
 			if(isset($_POST['Type'])){
-				sqlsrv_query($NEI,"
+				$database->query(null,"
 					UPDATE Elev
 					SET    Elev.Type = ?
 					WHERE  Elev.ID    = ?
 				;",array($_POST['Type'],$_GET['ID']));
 			}
         }
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                 Elev.ID,
                 Elev.Unit           AS Unit,
@@ -130,7 +130,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Unit = sqlsrv_fetch_array($r);
         $unit = $Unit;
         $data = $Unit;
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT *
             FROM   ElevTItem
             WHERE  ElevTItem.ElevT    = 1
@@ -139,17 +139,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         if($r2){while($array = sqlsrv_fetch_array($r2)){$Unit[$array['fDesc']] = $array['Value'];}}
         $sQuery = "SELECT Item.* FROM Device.dbo.Item WHERE Item.Device = ? AND Item.Type = ?;";
         $params = array($_GET['ID'], 'Sling');
-        $r = sqlsrv_query($database_Device, $sQuery, $params);
+        $r = $database->query($database_Device, $sQuery, $params);
         if($r){
           $Item = sqlsrv_fetch_array($r);
           $sQuery = "SELECT Product.* FROM Device.dbo.Product WHERE Product.ID = ?";
           $params = array($Item['Product']);
-          $r = sqlsrv_query($database_Device, $sQuery, $params);
+          $r = $database->query($database_Device, $sQuery, $params);
           if($r){
             $Product = sqlsrv_fetch_array($r);
             $sQuery = "SELECT Generator.* FROM Device.dbo.Generator WHERE Generator.Item = ?";
             $params = array($Item['ID']);
-            $r = sqlsrv_query($database_Device, $sQuery, $params);
+            $r = $database->query($database_Device, $sQuery, $params);
             if($r){
               $Generator = sqlsrv_fetch_array($r);
             }

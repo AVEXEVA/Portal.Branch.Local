@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = sqlsrv_fetch_array($User);
 
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         && $Privileges['Unit']['Group_Privilege'] >= 4 
         && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Count( Ticket.Count ) AS Count 
                 FROM    (
                             SELECT  Ticket.Unit,
@@ -98,8 +98,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             ?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
         $data = array( );
-        $r = sqlsrv_query(
-        	$NEI,
+        $r = $database->query(
+        	null,
         	"	SELECT 	TicketO.ID                  AS ID,
 					   	TicketO.ID                  AS Ticket_ID,
 				   		TicketO.fDesc               AS Description,

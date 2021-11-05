@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
                 FROM    Connection
                 WHERE       Connection.Connector = ?
@@ -19,8 +19,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *,
                     Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -32,8 +32,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 //CONNECT TO SERVER
 //GET OPEN TICKETS
 if(is_numeric($_GET['ID'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT
                 TicketO.*,
                 Loc.Tag             AS Tag,
@@ -103,7 +103,7 @@ if(is_numeric($_GET['ID'])){
     $Ticket['Loc'] = $Ticket['LID'];
     $Ticket['Status'] = ($Ticket['Status'] == 'Completed') ? "Reviewing" : $Ticket['Status'];
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketD.*,
                 Loc.Tag             AS Tag,
@@ -151,7 +151,7 @@ if(is_numeric($_GET['ID'])){
 
     }
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketDArchive.*,
                 Loc.Tag             AS Tag,
@@ -199,16 +199,16 @@ if(is_numeric($_GET['ID'])){
         $Ticket = sqlsrv_fetch_array($r);
     }
 }
-$r = sqlsrv_query($NEI,"SELECT PDATicketSignature.Signature AS Signature FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ? AND PDATicketSignature.SignatureType = 'C';",array($_GET['ID']));
+$r = $database->query(null,"SELECT PDATicketSignature.Signature AS Signature FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ? AND PDATicketSignature.SignatureType = 'C';",array($_GET['ID']));
 if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Signature'];}}
 if($Ticket['Table2'] == 'TicketO'){
-  $r = sqlsrv_query($NEI,"SELECT * FROM TicketDPDA WHERE ID = ?;",array($_GET['ID']));
+  $r = $database->query(null,"SELECT * FROM TicketDPDA WHERE ID = ?;",array($_GET['ID']));
   $Ticket2 = sqlsrv_fetch_array($r);
 } elseif($Ticket['Table2'] == 'TicketD'){
-  $r = sqlsrv_query($NEI,"SELECT * FROM TicketD WHERE ID = ?;",array($_GET['ID']));
+  $r = $database->query(null,"SELECT * FROM TicketD WHERE ID = ?;",array($_GET['ID']));
   $Ticket2 = sqlsrv_fetch_array($r);
 } elseif($Ticket['Table2'] == 'TicketDArchive'){
-  $r = sqlsrv_query($NEI,"SELECT * FROM TicketDArchive WHERE ID = ?;",array($_GET['ID']));
+  $r = $database->query(null,"SELECT * FROM TicketDArchive WHERE ID = ?;",array($_GET['ID']));
   $Ticket2 = sqlsrv_fetch_array($r);
 }
 ?>

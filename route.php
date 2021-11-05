@@ -4,12 +4,12 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(isset($My_Privileges['Route']) && $My_Privileges['Route']['User_Privilege'] >= 4 && $My_Privileges['Route']['Group_Privilege'] >= 4 && $My_Privileges['Route']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     else {
         if(is_numeric($_GET['ID'])){
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                 "SELECT
                     Route.ID        AS  ID,
                     Route.Name      AS  Route,
@@ -37,10 +37,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             if($My_Privileges['Route']['User_Privilege'] >= 4 && $_SESSION['User'] == $Route['Employee_ID']){$Privileged = TRUE;}
         }
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=route<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT
                 Route.ID             AS ID,
                 Route.Name           AS Route,
@@ -79,9 +79,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='overflow-y:scroll;height:100%;background-color:#1d1d1d !important;color:white !important;'>
     <div id="wrapper" style='height:100%;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-            <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
+            <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
             <style>
             .nav-text{
                 font-weight: bold;
@@ -124,42 +124,42 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='Screen-Tabs shadower'>
                 <div class='row'>
                     <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-information.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Information(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                             <div class ='nav-text'>Information</div>
                     </div>
                     <?php
-                    $r = sqlsrv_query($NEI,"SELECT Elev.ID FROM Elev LEFT JOIN Loc ON Elev.Loc = Loc.Loc WHERE Loc.Route = ?;",array($_GET['ID']));
+                    $r = $database->query(null,"SELECT Elev.ID FROM Elev LEFT JOIN Loc ON Elev.Loc = Loc.Loc WHERE Loc.Route = ?;",array($_GET['ID']));
                     if($r){
                       $Units = array();
                       while($row = sqlsrv_fetch_array($r)){$Units[] = $row['ID'];}
                       if(count($Units) > 0){
                         $Units = "WHERE (CM_Unit.Elev_ID = " . implode(" OR CM_Unit.Elev_ID = ",$Units) . ")";
-                        $r = sqlsrv_query($database_Device,"SELECT CM_Unit.* FROM Device.dbo.CM_Unit {$Units}");
+                        $r = $database->query($database_Device,"SELECT CM_Unit.* FROM Device.dbo.CM_Unit {$Units}");
                         if($r && is_array(sqlsrv_fetch_array($r))){
                         ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-faults.php?ID=<?php echo $_GET['ID'];?>');">
-                                <div class='nav-icon'><?php $Icons->Information(3);?></div>
+                                <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                                 <div class ='nav-text'>Faults</div>
                         </div><?php }
                       }
                     }?>
                     <?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-locations.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Location(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
                             <div class ='nav-text'>Locations</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-units.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Unit(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
                             <div class ='nav-text'>Units</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-violations.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Violation(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
                             <div class ='nav-text'>Violations</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Other_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='user.php?ID=<?php echo $_GET['ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->User(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
                             <div class ='nav-text'>User</div>
                     </div><?php }?>
                 </div>
@@ -168,23 +168,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require('cgi-bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <?php if( !isMobile() && false ){?>
     <script>
         function hrefLocations(){hrefRow("Table_Locations","location");}

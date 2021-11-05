@@ -4,13 +4,13 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID={$_GET['ID']}"));
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID={$_GET['ID']}"));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ?
@@ -21,9 +21,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($My_Privileges['Ticket']['User_Privilege'] >= 6 && !isset($_GET['ID'])){$Privileged = TRUE;}
     elseif($My_Privileges['Ticket']['Group_Privilege'] >= 4){
-        $r = sqlsrv_query(  $NEI,"SELECT LID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}'");
-        $r2 = sqlsrv_query( $NEI,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$_GET['ID']}'");
-        $r3 = sqlsrv_query( $NEI,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
+        $r = $database->query(  null,"SELECT LID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}'");
+        $r2 = $database->query( null,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$_GET['ID']}'");
+        $r3 = $database->query( null,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
         $r = sqlsrv_fetch_array($r);
         $r2 = sqlsrv_fetch_array($r2);
         $r3 = sqlsrv_fetch_array($r3);
@@ -32,9 +32,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         elseif(is_array($r2)){$Location = $r2['Loc'];}
         elseif(is_array($r3)){$Location = $r3['Loc'];}
         if(!is_null($Location)){
-            $r = sqlsrv_query(  $NEI,"SELECT ID FROM TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
-            $r2 = sqlsrv_query( $NEI,"SELECT ID FROM TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
-            $r3 = sqlsrv_query( $NEI,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
+            $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
+            $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
+            $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
             if($r || $r2 || $r3){
                 if($r){$a = sqlsrv_fetch_array($r);}
                 if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -46,9 +46,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         }
         if(!$Privileged){
             if($My_Privileges['Ticket']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-                $r = sqlsrv_query(  $NEI,"SELECT ID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
-                $r2 = sqlsrv_query( $NEI,"SELECT ID FROM TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
-                $r3 = sqlsrv_query( $NEI,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
                 if($r || $r2 || $r3){
                     if($r){$a = sqlsrv_fetch_array($r);}
                     if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -64,7 +64,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
 $Ticket = null;
 if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT
                 TicketO.*,
                 Loc.Tag             AS Tag,
@@ -109,7 +109,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
     $Ticket['Loc'] = $Ticket['LID'];
     $Ticket['Status'] = ($Ticket['Status'] == 'Completed') ? "Reviewing" : $Ticket['Status'];
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketD.*,
                 Loc.Tag             AS Tag,
@@ -152,7 +152,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
         $Ticket = sqlsrv_fetch_array($r);
     }
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketDArchive.*,
                 Loc.Tag             AS Tag,
@@ -196,7 +196,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
                 TicketDArchive.ID = ?;",array($_GET['ID']));
         $Ticket = sqlsrv_fetch_array($r);
     }
-$r = sqlsrv_query($NEI,"SELECT PDATicketSignature.Signature AS Signature FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?",array($_GET['ID']));
+$r = $database->query(null,"SELECT PDATicketSignature.Signature AS Signature FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?",array($_GET['ID']));
 if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Signature'];}}?>
 <!DOCTYPE html>
 <html lang="en">
@@ -247,14 +247,14 @@ white-space: normal !important;
 <body onload="finishLoadingPage();" style='background-color:#2d2d2d !important;color:white !important;/*overscroll-behavior: contain;*/'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>;">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='overflow-x:hidden;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <?php if(!isMobile() && false){?>
             <div class='print'>
 				<div class="panel panel-primary" style='margin-bottom:0px;'>
 					<div class="panel-heading">
 						<div style='float:left;'>
-							<h3><?php $Icons->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
+							<h3><?php \singleton\fontawesome::getInstance( )->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
 						</div>
 						<div style='clear:both;'></div>
 					</div>
@@ -266,10 +266,10 @@ white-space: normal !important;
 									<div class='panel-body'>
 										<div style='font-size:24px;text-decoration:underline;'><b>
 											<?php /*Need to make one big row and multiple cols*/?>
-											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php $Icons->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='location.php?ID=<?php echo $Ticket['Location_ID'];?>'><?php $Icons->Location();?> <?php echo $Ticket['Tag'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='job.php?ID=<?php echo $Ticket['Job_ID'];?>'><?php $Icons->Job();?> <?php echo $Ticket['Job_Description'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><?php $Icons->User();?> <?php echo proper($Ticket['First_Name'] . " " . $Ticket['Last_Name']);?></div></div>
+											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='location.php?ID=<?php echo $Ticket['Location_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> <?php echo $Ticket['Tag'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='job.php?ID=<?php echo $Ticket['Job_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Job();?> <?php echo $Ticket['Job_Description'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->User();?> <?php echo proper($Ticket['First_Name'] . " " . $Ticket['Last_Name']);?></div></div>
 										</b></div>
 									</div>
 								</div>
@@ -456,7 +456,7 @@ white-space: normal !important;
 									</div>
 									<div class='panel-body' style='height:200px;overflow-y:scroll;'>
 										<?php
-											$r = sqlsrv_query($NEI,"
+											$r = $database->query(null,"
 												SELECT TOP 100 TechLocation.*
 												FROM TechLocation
 												WHERE TicketID = '" . $Ticket['ID'] . "'
@@ -573,7 +573,7 @@ white-space: normal !important;
                 </div>
             </div>
 			<?php } else {?>
-                    <h4 style='margin:0px;padding:10px;<?php if($Ticket['Assigned'] >= 2 && $Ticket['Assigned'] <= 3){?>background-color:gold;<?php } else {?>background-color:whitesmoke;<?php }?>border-bottom:1px solid darkgray;'><a href='work.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Ticket();?> Ticket: <?php echo $_GET['ID'];?> - <?php echo $Ticket['Tag'];?> - <?php echo $Ticket['Unit_State'];?></a></h4>
+                    <h4 style='margin:0px;padding:10px;<?php if($Ticket['Assigned'] >= 2 && $Ticket['Assigned'] <= 3){?>background-color:gold;<?php } else {?>background-color:whitesmoke;<?php }?>border-bottom:1px solid darkgray;'><a href='work.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Ticket();?> Ticket: <?php echo $_GET['ID'];?> - <?php echo $Ticket['Tag'];?> - <?php echo $Ticket['Unit_State'];?></a></h4>
                     <style>
                     .nav-text{
                         font-weight: bold;
@@ -623,36 +623,36 @@ white-space: normal !important;
             <div class='Screen-Tabs shadower'>
                 <div class='row'>
                     <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'ticket-information2021f.php?ID=<?php echo $_GET['ID'];?><?php if(isset($_GET['Edit'])){?>&Edit=True<?php }?><?php if(isset($_GET['Ticket_Update'])){?>&Ticket_Update=1<?php }?>');">
-                            <div class='nav-icon'><?php $Icons->Information(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                             <div class ='nav-text'>Information</div>
                     </div>
                     <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='customer.php?ID=<?php echo $Ticket['Customer_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Customer(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
                             <div class ='nav-text'>Customer</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='location.php?ID=<?php echo $Ticket['Location_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Location(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
                             <div class ='nav-text'>Location</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='job.php?ID=<?php echo $Ticket['Job_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Job(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
                             <div class ='nav-text'>Job</div>
                     </div><?php }?>
                     <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'ticket-map.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Map(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
                             <div class ='nav-text'>Map</div>
                     </div>
                     <?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='unit.php?ID=<?php echo $Ticket['Unit_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Unit(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
                             <div class ='nav-text'>Unit</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['User']) && $My_Privileges['User']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='user.php?ID=<?php echo $Ticket['Employee_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->User(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
                             <div class ='nav-text'>User</div>
                     </div><?php }?>
 
@@ -667,16 +667,16 @@ white-space: normal !important;
 
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 <?php if(!isMobile()){?>
     <script type="text/javascript">
   function initialize() {
@@ -690,7 +690,7 @@ white-space: normal !important;
         myOptions);
     var marker = new Array();
 <?php
-$r = sqlsrv_query($NEI,"
+$r = $database->query(null,"
     SELECT TOP 100 TechLocation.*
     FROM TechLocation
     WHERE TicketID = '" . $Ticket['ID'] . "';");

@@ -3,7 +3,7 @@
 $(function() {
     <?php 
     $Vars = array();
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT 
             TicketD.Total AS Total,
             JobType.Type AS Job_Type

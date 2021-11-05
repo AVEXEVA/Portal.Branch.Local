@@ -2,8 +2,8 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT *
             FROM      Connection
             WHERE     Connection.Connector = ?
@@ -14,8 +14,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
     );
     $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-    $result = sqlsrv_query(
-      $NEI,
+    $result = $database->query(
+      null,
       "   SELECT *,
 		                  Emp.fFirst AS First_Name,
                       Emp.Last   AS Last_Name
@@ -27,8 +27,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
 
     $User = sqlsrv_fetch_array( $result );
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
       "    SELECT *
            FROM       Privilege
            WHERE      Privilege.User_ID = ?;",
@@ -44,8 +44,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-  		sqlsrv_query(
-        $NEI,
+  		$database->query(
+        null,
         " INSERT INTO Activity( [User], [Date], [Page] )
           VALUES ( ?, ?, ? );",
         array(
@@ -67,11 +67,11 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h3><?php $Icons->Ticket();?> Active Tickets</h3></div>
+				<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Ticket();?> Active Tickets</h3></div>
 				<div class="panel-body">
 					<div id='Form_Ticket'>
 						<div class="panel panel-primary">
@@ -129,24 +129,24 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
   <script>
 	  var Editor_Tickets = new $.fn.dataTable.Editor({
               		ajax: "php/post/Ticket.php",
@@ -167,7 +167,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
               		type:"select",
               		options:
                   [<?php
-        $result = sqlsrv_query($NEI,
+        $result = $database->query(null,
 
               "  SELECT   Loc.Tag AS Location
 					       FROM     nei.dbo.Loc
@@ -188,7 +188,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           			name:  "Mechanic",
           			type:  "select",
           			options: [<?php
-				$result = sqlsrv_query($NEI,
+				$result = $database->query(null,
               "SELECT   Emp.fFirst + ' ' + Emp.Last AS Mechanic
                FROM     Emp
                WHERE    Emp.Field = 1
@@ -208,7 +208,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			name: "Status",
 			type: "select",
 			options: [<?php
-				$result = sqlsrv_query($NEI,"
+				$result = $database->query(null,"
 					SELECT   TickOStatus.Type AS Status
 					FROM     nei.dbo.TickOStatus
 					GROUP BY TickOStatus.Type
@@ -260,7 +260,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			name:"Unit_State",
 			type:"select",
 			options: [<?php
-				$result = sqlsrv_query($NEI,"
+				$result = $database->query(null,"
 					SELECT Elev.State AS State
 					FROM   nei.dbo.Elev
 						   LEFT JOIN nei.dbo.Loc ON Elev.Loc = Loc.Loc

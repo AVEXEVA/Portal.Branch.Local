@@ -2,23 +2,23 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 $serverName = "172.16.12.45";
-$NEIectionOptions = array(
+nullectionOptions = array(
     "Database" => "nei",
     "Uid" => "sa",
     "PWD" => "SQLABC!23456",
     'ReturnDatesAsStrings'=>true
 );
 //Establishes the connection
-$NEI = sqlsrv_connect($serverName, $NEIectionOptions);
-$NEIectionOptions['Database'] = 'Portal';
-$Portal = sqlsrv_connect($serverName, $NEIectionOptions);
+null = sqlsrv_connect($serverName, nullectionOptions);
+nullectionOptions['Database'] = 'Portal';
+$Portal = sqlsrv_connect($serverName, nullectionOptions);
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && $My_Privileges['Job']['Group_Privilege'] >= 4 && $My_Privileges['Job']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=modernizations.php';</script></head></html><?php }
     else {
-        $r = sqlsrv_query($Portal,"SELECT * FROM Insured_Company WHERE ID=?",array($_GET['ID']));
+        $r = $database->query($Portal,"SELECT * FROM Insured_Company WHERE ID=?",array($_GET['ID']));
         $Insured_Companis = array();
         $date = new DateTime("now");
         if($r){while($array = sqlsrv_fetch_array($r)){$Insured_Companies[$array['ID']] = $array;}}
@@ -37,7 +37,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <td><?php echo $data['Company'];?></td>
             <td><input type='checkbox' <?php if($data['Active'] == 1){?> checked='checked' <?php }?> /></td>
             <td class='Worksmans'><?php 
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     SELECT * 
                     FROM Insurance 
                     WHERE Company = ? AND Insurance.Type='Worksmans'
@@ -56,7 +56,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 } else {?><button onClick="newInsurance();" style='background-color:yellow;color:black;'>No Insurance</button><?php }
             ?></td>
             <td class='Auto'><?php 
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     SELECT * 
                     FROM Insurance 
                     WHERE Company = ? AND Insurance.Type='Auto'
@@ -75,7 +75,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 } else {?><button onClick="newInsurance();" style='background-color:yellow;color:black;'>No Insurance</button><?php }
             ?></td>
             <td class='Liability'><?php 
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     SELECT * 
                     FROM Insurance 
                     WHERE Company = ? AND Insurance.Type='Liability'
@@ -94,7 +94,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 } else {?><button onClick="newInsurance();" style='background-color:yellow;color:black;'>No Insurance</button><?php }
             ?></td>
             <td class='Umbrella'><?php 
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     SELECT * 
                     FROM Insurance 
                     WHERE Company = ? AND Insurance.Type='Umbrella'

@@ -6,7 +6,7 @@ var invoices_data = [
 	$job_result = true;
 	if($job_result){
 		$dates = array();
-		$invoice_result = sqlsrv_query($NEI,"
+		$invoice_result = $database->query(null,"
 			SELECT Invoice.Amount AS Amount,
 				   Invoice.fDate as fDate
 			FROM   nei.dbo.Invoice

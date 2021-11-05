@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION[ 'User' ],
          $_SESSION[ 'Hash' ] ) ) {
-        $result = sqlsrv_query(
-          $NEI,
+        $result = $database->query(
+          null,
         '   SELECT  *
     		FROM    Connection
     		WHERE       Connection.Connector = ?
@@ -17,8 +17,8 @@ if(isset($_SESSION[ 'User' ],
         )
     );
         $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-        $result = sqlsrv_query(
-          $NEI,
+        $result = $database->query(
+          null,
         '   SELECT    *,
     		           Emp.fFirst AS First_Name,
     			         Emp.Last   AS Last_Name
@@ -29,8 +29,8 @@ if(isset($_SESSION[ 'User' ],
         )
     );
       $User = sqlsrv_fetch_array($result);
-    	$result = sqlsrv_query(
-          $NEI,
+    	$result = $database->query(
+          null,
       '     SELECT    *
     		    FROM   Privilege
     		    WHERE  Privilege.User_ID = ?;',
@@ -45,8 +45,8 @@ if(isset($_SESSION[ 'User' ],
 	  		|| $My_Privileges[ 'Job' ][ 'Group_Privilege' ] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query(
-      $NEI,
+		$database->query(
+      null,
       '   INSERT INTO Activity([User], [Date], [Page])
 			    VALUES(?, ?, ?);',
     array($_SESSION[ 'User' ],
@@ -69,12 +69,12 @@ if(isMobile() || true){
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id='wrapper' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
 			<div class='panel panel-primary'>
 				<div class='panel-heading'>
                     <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Job( 1 );?> Jobs</div>
+                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Job( 1 );?> Jobs</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick='$('#Filters').toggle();'>+/-</button></div>
                     </div>
                 </div>

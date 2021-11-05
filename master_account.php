@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 setlocale(LC_MONETARY, 'en_US');
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -19,15 +19,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
         $Privileged = FALSE;
         if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4 && $My_Privileges['Customer']['Group_Privilege'] >= 4 && $My_Privileges['Customer']['Other_Privilege'] >= 4){
-            sqlsrv_query($Portal,"INShERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
+            $database->query($Portal,"INShERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
             $Privileged = TRUE;}
         elseif($My_Privileges['Customer']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 ){
-            sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
-            $r = sqlsrv_query(  $NEI,"
+            $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
+            $r = $database->query(  null,"
                 SELECT TicketO.ID AS ID 
                 FROM nei.dbo.TicketO LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc
                 WHERE Loc.Owner = ?;",array($_GET['ID']));
-            $r2 = sqlsrv_query(  $NEI,"
+            $r2 = $database->query(  null,"
                 SELECT TicketD.ID AS ID 
                 FROM nei.dbo.TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc
                 WHERE Loc.Owner = ?;",array($_GET['ID']));
@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <meta charset="utf-8">
 </head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     OwnerWithRol.ID      AS Customer_ID,
                     OwnerWithRol.Name    AS Name,
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             WHERE   Master_Account.Master = ?
 		;",array($_GET['ID']));
         $Customer = sqlsrv_fetch_array($r);
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT 
                 Job.ID AS ID
             FROM 
@@ -78,34 +78,34 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
         <div id="page-wrapper" class='content' style='<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <div class='row'>
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3><?php $Icons->Customer();?>Account: <?php echo $Customer['Name'];?>
+                            <h3><?php \singleton\fontawesome::getInstance( )->Customer();?>Account: <?php echo $Customer['Name'];?>
                                 <?php if($Customer['Status'] == 0 && FALSE){?><img src='../Images/Icons/Inactive.png' style='height:35px;' /><?php }?>
                             </h3>
                         </div>
                         <div class="panel-body">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#basic-pills" data-toggle="tab"><?php $Icons->Info();?>Basic</a></li>
-                                <li class=''><a href="#locations-pills"  data-toggle="tab"><?php $Icons->Location();?>Locations</a></li>
-                                <li class=''><a href="#units-pills"      data-toggle="tab"><?php $Icons->Unit();?>Units</a></li>
-                                <li class=''><a href="#jobs-pills"       data-toggle="tab"><?php $Icons->Job();?>Jobs</a></li>
-                                <li class='' onClick="setTimeout(function(){initialize()},1000);"><a href="#tickets-pills"    data-toggle="tab"><?php $Icons->Ticket();?>Tickets</a></li>
-                                <li><a href="#maintenance-pills" data-toggle="tab"><?php $Icons->Maintenance();?> Maintenance</a></li>
-                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?><li class=''><a href="#financials-pills" data-toggle="tab"><?php $Icons->Financial();?>Financials</a></li><?php }?>
-                                <li class=''><a href="#violations-pills" data-toggle="tab"><?php $Icons->Violation();?>Violations</a></li>
-                                <li class=''><a href="#workers-pills" data-toggle="tab"><?php $Icons->User();?>Workers</a></li>
-                                <li class=''><a href="#contracts-pills"  data-toggle="tab"><?php $Icons->Contract();?>Contracts</a></li>
-                                <li class=''><a href="#proposals-pills"  data-toggle="tab"><?php $Icons->Proposal();?>Proposals</a></li>
-                                <li class=''><a href="#invoices-pills"   data-toggle="tab"><?php $Icons->Invoice();?>Invoices</a></li>
-                                <li class=''><a href="#collections-pills"  data-toggle="tab"><?php $Icons->Collection();?>Collections</a></li>
-                                <!--<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && $My_Privileges['Legal']['Group_Privilege'] >= 4 && $My_Privileges['Legal']['Other_Privilege'] >= 4){?><li class=''><a href="#legal-pills"  data-toggle="tab"><?php $Icons->Legal();?>Legal</a></li><?php }?>-->
+                                <li class="active"><a href="#basic-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Info();?>Basic</a></li>
+                                <li class=''><a href="#locations-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Location();?>Locations</a></li>
+                                <li class=''><a href="#units-pills"      data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</a></li>
+                                <li class=''><a href="#jobs-pills"       data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Job();?>Jobs</a></li>
+                                <li class='' onClick="setTimeout(function(){initialize()},1000);"><a href="#tickets-pills"    data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</a></li>
+                                <li><a href="#maintenance-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance</a></li>
+                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?><li class=''><a href="#financials-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Financial();?>Financials</a></li><?php }?>
+                                <li class=''><a href="#violations-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Violation();?>Violations</a></li>
+                                <li class=''><a href="#workers-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->User();?>Workers</a></li>
+                                <li class=''><a href="#contracts-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Contract();?>Contracts</a></li>
+                                <li class=''><a href="#proposals-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Proposal();?>Proposals</a></li>
+                                <li class=''><a href="#invoices-pills"   data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</a></li>
+                                <li class=''><a href="#collections-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Collection();?>Collections</a></li>
+                                <!--<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && $My_Privileges['Legal']['Group_Privilege'] >= 4 && $My_Privileges['Legal']['Other_Privilege'] >= 4){?><li class=''><a href="#legal-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Legal();?>Legal</a></li><?php }?>-->
                             </ul>
                             <br />
                             <div class="tab-content">
@@ -121,28 +121,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             <br />
                                             <div class='row' style='padding-left:25px;'>
                                                 <div class='row'><div class='col-xs-12'><b><u>Customer Information</u></b></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Location();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Location();
+                                                    $r = $database->query(null,"
                                                         SELECT Count(Loc.Loc) as Count_of_Locations
                                                         FROM nei.dbo.Loc LEFT JOIN Portal.dbo.Master_Account ON Loc.Owner = Master_Account.Customer
                                                         WHERE Master_Account.Master = ?
                                                     ;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Locations'] : 0;
                                                 ?> <i>Locations</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Unit();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Unit();
+                                                    $r = $database->query(null,"
                                                         SELECT DISTINCT Count(Elev.ID) AS Count_of_Elevators 
                                                         FROM nei.dbo.Elev LEFT JOIN nei.dbo.Loc ON Elev.Loc = Loc.Loc LEFT JOIN Portal.dbo.Master_Account ON Loc.Owner = Master_Account.Customer
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Elevators'] : 0;?> <i>Units</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Job();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Job();
+                                                    $r = $database->query(null,"
                                                         SELECT DISTINCT Count(Job.ID) AS Count_of_Jobs 
                                                         FROM nei.dbo.Job LEFT JOIN nei.dbo.Loc ON Loc.Loc = Job.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Jobs'] : 0;?> <i>Jobs</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Ticket();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Ticket();
+                                                    $r = $database->query(null,"
                                                         SELECT Count(TicketD.ID) AS Count_of_Tickets 
                                                         FROM 
                                                             nei.dbo.TicketD 
@@ -153,7 +153,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND NOT (TicketD.DescRes    LIKE    '%Voided%')
                                                             AND TicketD.Total > 0;",array($_GET['ID']));
                                                     $Count_of_Tickets = $r ? sqlsrv_fetch_array($r)['Count_of_Tickets'] : 0;
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Count(TicketDArchive.ID) AS Count_of_Tickets 
                                                         FROM 
                                                             nei.dbo.TicketDArchive 
@@ -163,7 +163,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             Master_Account.Master = ?
                                                             AND NOT (TicketDArchive.DescRes    LIKE    '%Voided%');",array($_GET['ID']));
                                                     $Count_of_Tickets =  $r ? $Count_of_Tickets + sqlsrv_fetch_array($r)['Count_of_Tickets'] : $Count_of_Tickets;
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Count(TicketO.ID) AS Count_of_Tickets 
                                                         FROM 
                                                             nei.dbo.TicketO 
@@ -172,20 +172,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                         WHERE 
                                                             Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? $Count_of_Tickets + sqlsrv_fetch_array($r)['Count_of_Tickets'] : $Count_of_Tickets;?> <i>Tickets</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Invoice();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Invoice();
+                                                    $r = $database->query(null,"
                                                         SELECT DISTINCT Count(Invoice.Ref) AS Count_of_Invoices 
                                                         FROM nei.dbo.Invoice LEFT JOIN nei.dbo.Loc ON Loc.Loc = Invoice.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Invoices'] : 0;?> <i>Invoices</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Proposal();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Proposal();
+                                                    $r = $database->query(null,"
                                                         SELECT Count(Estimate.ID) AS Count_of_Proposals 
                                                         FROM (nei.dbo.Estimate LEFT JOIN nei.dbo.Job ON Estimate.Job = Job.ID) LEFT JOIN nei.dbo.Loc ON Job.Loc = Loc.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Proposals'] : 0;?> <i>Proposals</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Collection();
-                                                    $r = sqlsrv_query($NEI,"
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Collection();
+                                                    $r = $database->query(null,"
                                                         SELECT DISTINCT Count(OpenAR.TransID) AS Count_of_Outstanding_Invoices 
                                                         FROM nei.dbo.OpenAR LEFT JOIN nei.dbo.Loc ON Loc.Loc = OpenAR.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
@@ -203,7 +203,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								                        <div class="panel-body">
 								                            <div id='Worker_Feed' style='border:3px solid #337ab7;'><table id='Table_Worker_Feed'><tbody>
 			                                                    <?php 
-			                                                    $r = sqlsrv_query($NEI,"
+			                                                    $r = $database->query(null,"
 			                                                        SELECT 
 			                                                            TicketO.*,
 			                                                            TicketO.ID AS TicketID,
@@ -250,7 +250,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			                                                	</tr></thead>
 			                                                	<tbody>
 			                                                    <?php 
-			                                                    $r = sqlsrv_query($NEI,"
+			                                                    $r = $database->query(null,"
 			                                                        SELECT 
 			                                                            TicketO.*,
 			                                                            TicketO.ID       AS TicketID,
@@ -308,7 +308,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-d 00:00:00.000', strtotime('-7 days'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS SumTotal
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -324,7 +324,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-01 00:00:00.000', strtotime('now'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS SumTotal
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -340,7 +340,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-d 00:00:00.000', strtotime("first day of last month"));
                                                                 $End_Date = date("Y-m-d 23:59:59.999", strtotime("last day of last month"));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS SumTotal
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -356,7 +356,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-01-01 00:00:00.000', strtotime('now'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS SumTotal
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -388,7 +388,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-d 00:00:00.000', strtotime('-7 days'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -404,7 +404,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-01 00:00:00.000', strtotime('now'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -420,7 +420,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-d 00:00:00.000', strtotime("first day of last month"));
                                                                 $End_Date = date("Y-m-d 23:59:59.999", strtotime('last day of last month'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -436,7 +436,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-01-01 00:00:00.000', strtotime('now'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -468,7 +468,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-d 00:00:00.000', strtotime('-7 days'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -484,7 +484,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-01 00:00:00.000', strtotime('now'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -500,7 +500,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-m-d 00:00:00.000', strtotime("first day of last month"));
                                                                 $End_Date = date("Y-m-d 23:59:59.999", strtotime('last day of last month'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -516,7 +516,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                 <td><?php 
                                                                 $Start_Date = date('Y-01-01 00:00:00.000', strtotime('now'));
                                                                 $End_Date = date("Y-m-d H:i:s", strtotime('now'));
-                                                                $r = sqlsrv_query($NEI,"
+                                                                $r = $database->query(null,"
                                                                     SELECT SUM(TicketD.Total) AS Total
                                                                     FROM (TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID
                                                                     WHERE 
@@ -632,7 +632,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     <tr>
                                                         <td><b>Revenue</b></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_2012
                                                                 FROM 
                                                                     Invoice
@@ -644,7 +644,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_2012),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_2013
                                                                 FROM 
                                                                     Invoice
@@ -656,7 +656,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_2013),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_2014
                                                                 FROM 
                                                                     Invoice
@@ -668,7 +668,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_2014),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_2015
                                                                 FROM 
                                                                     Invoice
@@ -680,7 +680,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_2015),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_2016
                                                                 FROM 
                                                                     Invoice
@@ -692,7 +692,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_2016),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_2017
                                                                 FROM 
                                                                     Invoice
@@ -704,7 +704,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_2017),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_3_Year
                                                                 FROM 
                                                                     Invoice
@@ -716,7 +716,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Revenue_3_Year),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT Sum(Amount) AS Total_Revenue_5_Year
                                                                 FROM 
                                                                     Invoice
@@ -731,7 +731,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     <tr>
                                                         <td><b>Labor</b></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2012
                                                                 FROM 
@@ -745,7 +745,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2012-01-01 00:00:00.000' AND JobI.fDate < '2013-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_2012 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2012'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2012
                                                                 FROM 
@@ -759,7 +759,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_2012),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2013
                                                                 FROM 
@@ -773,7 +773,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2013-01-01 00:00:00.000' AND JobI.fDate < '2014-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_2013 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2013'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2013
                                                                 FROM 
@@ -787,7 +787,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_2013),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2014
                                                                 FROM 
@@ -801,7 +801,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2014-01-01 00:00:00.000' AND JobI.fDate < '2015-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_2014 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2014'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2014
                                                                 FROM 
@@ -815,7 +815,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_2014),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2015
                                                                 FROM 
@@ -829,7 +829,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2015-01-01 00:00:00.000' AND JobI.fDate < '2016-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_2015 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2015'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2015
                                                                 FROM 
@@ -843,7 +843,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_2015),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2016
                                                                 FROM 
@@ -857,7 +857,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2016-01-01 00:00:00.000' AND JobI.fDate < '2017-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_2016 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2016'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2016
                                                                 FROM 
@@ -871,7 +871,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_2016),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2017
                                                                 FROM 
@@ -886,7 +886,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             ;");
                                                             
                                                             $Temp_Labor_2017 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2017'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2017
                                                                 FROM 
@@ -897,7 +897,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND convert(date,[WEEK ENDING]) < '2017-03-30 00:00:00.000'
                                                             ;");
                                                             $Total_Labor_2017 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2017'] : 0;
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_2017
                                                                 FROM 
@@ -914,7 +914,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_2017),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_3_Year
                                                                 FROM 
@@ -928,7 +928,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2015-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_3_Year
                                                                 FROM 
@@ -939,7 +939,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND convert(date,[WEEK ENDING]) < '2017-03-30 00:00:00.000'
                                                             ;");
                                                             $Total_Labor_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : 0;
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_3_Year
                                                                 FROM 
@@ -956,7 +956,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Labor_3_Year),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_5_Year
                                                                 FROM 
@@ -970,7 +970,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND JobI.fDate >= '2013-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                             ;");
                                                             $Temp_Labor_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_5_Year'] : 0;
-                                                            $r = sqlsrv_query($Paradox,"
+                                                            $r = $database->query($Paradox,"
                                                                 SELECT 
                                                                     SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_5_Year
                                                                 FROM 
@@ -981,7 +981,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                                     AND convert(date,[WEEK ENDING]) < '2017-03-30 00:00:00.000'
                                                             ;");
                                                             $Total_Labor_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_5_Year'] : 0;
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Labor_5_Year
                                                                 FROM 
@@ -1001,7 +1001,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     <tr style='border-bottom:1px solid black;'>
                                                         <td><b>Materials</b></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_2012
                                                                 FROM 
@@ -1018,7 +1018,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_2012),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_2013
                                                                 FROM 
@@ -1035,7 +1035,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_2013),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_2014
                                                                 FROM 
@@ -1052,7 +1052,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_2014),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_2015
                                                                 FROM 
@@ -1069,7 +1069,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_2015),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_2016
                                                                 FROM 
@@ -1086,7 +1086,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_2016),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_2017
                                                                 FROM 
@@ -1103,7 +1103,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_2017),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_3_Year
                                                                 FROM 
@@ -1120,7 +1120,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             echo substr(money_format('%i',$Total_Materials_3_Year),4);
                                                         ?></td>
                                                         <td><?php 
-                                                            $r = sqlsrv_query($NEI,"
+                                                            $r = $database->query(null,"
                                                                 SELECT 
                                                                     Sum(JobI.Amount) AS Total_Materials_5_Year
                                                                 FROM 
@@ -1553,24 +1553,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
@@ -1591,7 +1591,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <?php 
             $Start_Date            = date('Y-m-d H:i:s', strtotime('-30 days'));
             $End_Date              = date('Y-m-d H:i:s', strtotime('now'));
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
             SELECT 
                 TechLocation.*,
                 Emp.fFirst AS First_Name,
@@ -1813,7 +1813,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     '<td>'+d.Description+'</td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td><a href="invoice.php?ID='+d.Invoice+'"  target="_blank"><?php $Icons->Collection();?>View Invoice</a></td>'+
+                    '<td><a href="invoice.php?ID='+d.Invoice+'"  target="_blank"><?php \singleton\fontawesome::getInstance( )->Collection();?>View Invoice</a></td>'+
                 '</tr>'+
             '</table>';
         }

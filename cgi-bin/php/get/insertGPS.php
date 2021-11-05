@@ -15,6 +15,6 @@ if(isset($_GET['Token']) && $_GET['Token'] == 'DF58BF2A46732848E8784426E2EB4D9DB
   $_GET['Phone'] = json_decode($_GET['Phone']);
   to_array($_GET['Phone']);
   if(isset($_GET['Phone']['imei'])){
-    sqlsrv_query($Portal,"INSERT INTO Portal.dbo.Phone_GPS(Phone, Latitude, Longitude, Altitude, [TimeStamp]) VALUES(?, ?, ?, ?, ?);",array($_GET['Phone']['imei'],$_GET['Latitude'],$_GET['Longitude'],$_GET['Sea_Level'], date("Y-m-d H:i:s")));
+    $database->query($Portal,"INSERT INTO Portal.dbo.Phone_GPS(Phone, Latitude, Longitude, Altitude, [TimeStamp]) VALUES(?, ?, ?, ?, ?);",array($_GET['Phone']['imei'],$_GET['Latitude'],$_GET['Longitude'],$_GET['Sea_Level'], date("Y-m-d H:i:s")));
   }
 }?>

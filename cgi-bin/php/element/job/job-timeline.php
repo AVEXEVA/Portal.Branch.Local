@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	//Connection
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	"	SELECT 	*
 			FROM   	Connection
 			WHERE  		Connection.Connector = ?
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	);
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result    = sqlsrv_query(
-		$NEI,
+	$result    = $database->query(
+		null,
 		"	SELECT 	Emp.*,
 			   		Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
 	$User = sqlsrv_fetch_array( $result );
-	$result = sqlsrv_query(
-		$NEI,
+	$result = $database->query(
+		null,
 		"	SELECT 	Privilege.Access_Table,
 			   		Privilege.User_Privilege,
 			   		Privilege.Group_Privilege,
@@ -56,8 +56,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		&& 	$Privileges[ 'Job' ][ 'User_Privilege' ] >= 4
 		&& 	$Privileges[ 'Job' ][ 'Group_Privilege' ] >= 4 
 		&& 	is_numeric( $_GET[ 'ID' ] )
-	){		$r = sqlsrv_query(
-				$NEI,
+	){		$r = $database->query(
+				null,
 				"	SELECT Job.Loc AS Location_ID
 					FROM   Job
 					WHERE  Job.ID = ?;", 
@@ -66,8 +66,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 				)
 			);
 			$Location_ID = sqlsrv_fetch_array($r)['Location_ID'];
-			$result = sqlsrv_query(
-				$NEI,
+			$result = $database->query(
+				null,
 				"	SELECT 	Tickets.ID
 					FROM 	(
 								(
@@ -95,8 +95,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			isset( $Privileges[ 'Job' ] )
 		&& 	$Privileges[ 'Job' ][ 'User_Privilege' ] >= 4
 		&& 	is_numeric( $_GET[ 'ID' ] )
-	){		$result = sqlsrv_query(
-				$NEI,
+	){		$result = $database->query(
+				null,
 				"	SELECT 	Tickets.ID
 					FROM  	(
 								(
@@ -126,8 +126,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     	|| 	!$Privileged){
     		require("401.html");
    	} else {
-    	sqlsrv_query(
-    		$NEI,
+    	$database->query(
+    		null,
     		"	INSERT INTO Activity([User], [Date], [Page])
     			VALUES(?,?,?);",
     		array(
@@ -136,8 +136,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     			'job.php?ID=' . $_GET['ID']
     		)
     	);
-       	$r = sqlsrv_query(
-       		$NEI,
+       	$r = $database->query(
+       		null,
        		"	SELECT 	TOP 1
                 		Job.ID                AS Job_ID,
                 		Job.fDesc             AS Job_Name,
@@ -197,7 +197,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
        $Job = sqlsrv_fetch_array($r);
 ?><div class='row' style='font-size:20px;'><?php
 $Timeline = array();
-$SQL_Completed_Tickets = sqlsrv_query($NEI,"
+$SQL_Completed_Tickets = $database->query(null,"
 	SELECT Tickets.ID,
 		   Tickets.EDate  AS Date,
 		   Tickets.Object AS Object,
@@ -226,7 +226,7 @@ if($SQL_Completed_Tickets){while($Ticket = sqlsrv_fetch_array($SQL_Completed_Tic
 	if(!isset($Timeline[date('Y-m-d',strtotime($Ticket['Date']))])){$Timeline[date('Y-m-d',strtotime($Ticket['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Ticket['Date']))][] = $Ticket;
 }}
-$SQL_Created_Tickets = sqlsrv_query($NEI,"
+$SQL_Created_Tickets = $database->query(null,"
 	SELECT Tickets.ID,
 		   Tickets.CDate  AS Date,
 		   Tickets.Object AS Object,
@@ -255,7 +255,7 @@ if($SQL_Created_Tickets){while($Ticket = sqlsrv_fetch_array($SQL_Created_Tickets
 	if(!isset($Timeline[date('Y-m-d',strtotime($Ticket['Date']))])){$Timeline[date('Y-m-d',strtotime($Ticket['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Ticket['Date']))][] = $Ticket;
 }}
-$SQL_Completed_Jobs = sqlsrv_query($NEI,"
+$SQL_Completed_Jobs = $database->query(null,"
 	SELECT Job.ID,
 		   Job.CloseDate AS Date,
 		   'Job'         AS Object,
@@ -271,7 +271,7 @@ if($SQL_Completed_Jobs){while($Job = sqlsrv_fetch_array($SQL_Completed_Jobs)){
 	if(!isset($Timeline[date('Y-m-d',strtotime($Job['Date']))])){$Timeline[date('Y-m-d',strtotime($Job['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Job['Date']))][] = $Job;
 }}
-$SQL_Created_Jobs = sqlsrv_query($NEI,"
+$SQL_Created_Jobs = $database->query(null,"
 	SELECT Job.ID,
 		   Job.fDate  AS Date,
 		   'Job'      AS Object,
@@ -286,7 +286,7 @@ if($SQL_Created_Jobs){while($Job = sqlsrv_fetch_array($SQL_Created_Jobs)){
 	$Timeline[date('Y-m-d',strtotime($Job['Date']))][] = $Job;
 }}
 
-$SQL_Created_Estimates = sqlsrv_query($NEI,"
+$SQL_Created_Estimates = $database->query(null,"
 	SELECT Estimate.ID,
 		   Estimate.fDate  AS Date,
 		   'Proposal'      AS Object,
@@ -302,7 +302,7 @@ if($SQL_Created_Estimates){while($Estimate = sqlsrv_fetch_array($SQL_Created_Est
 	$Timeline[date('Y-m-d',strtotime($Estimate['Date']))][] = $Estimate;
 }}
 if(isset($Privileges['Location']) && $Privileges['Location']['Other_Privilege'] >= 4){
-	$SQL_Paid_Invoices = sqlsrv_query($NEI,"
+	$SQL_Paid_Invoices = $database->query(null,"
 		SELECT Trans.ID      AS ID,
 			   Trans.fDate   AS Date,
 			   'Transaction' AS Object,
@@ -321,7 +321,7 @@ if(isset($Privileges['Location']) && $Privileges['Location']['Other_Privilege'] 
 		if(!isset($Timeline[date('Y-m-d',strtotime($Payment['Date']))])){$Timeline[date('Y-m-d',strtotime($Payment['Date']))] = array();}
 		$Timeline[date('Y-m-d',strtotime($Payment['Date']))][] = $Payment;
 	}}
-	$SQL_Created_Invoices = sqlsrv_query($NEI,"
+	$SQL_Created_Invoices = $database->query(null,"
 		SELECT Invoice.Ref   AS ID,
 			   Invoice.fDate AS Date,
 			   'Invoice'     AS Object,
@@ -339,7 +339,7 @@ if(isset($Privileges['Location']) && $Privileges['Location']['Other_Privilege'] 
 
 }
 
-$SQL_Created_Violation = sqlsrv_query($NEI,"
+$SQL_Created_Violation = $database->query(null,"
 	SELECT Violation.ID    AS ID,
 		   Violation.fdate AS Date,
 		   'Violation'     AS Object,
@@ -354,7 +354,7 @@ if($SQL_Created_Violation){while($Violation = sqlsrv_fetch_array($SQL_Created_Vi
 	if(!isset($Timeline[date('Y-m-d',strtotime($Violation['Date']))])){$Timeline[date('Y-m-d',strtotime($Violation['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Violation['Date']))][] = $Violation;
 }}
-$SQL_Overdue_Violations = sqlsrv_query($NEI,"
+$SQL_Overdue_Violations = $database->query(null,"
 	SELECT *,
 		   Violations.Due_Date  AS Date,
 		   'Overdue'            AS Field
@@ -416,7 +416,7 @@ if($SQL_Overdue_Violations){while($Violation = sqlsrv_fetch_array($SQL_Overdue_V
 	$Timeline['20'. substr($Violation['Date'],6,2) . '-' .substr($Violation['Date'],0,2) . '-' . substr($Violation['Date'],3,2)][] = $Violation;
 
 }}
-$SQL_Contract_Starts = sqlsrv_query($NEI,"
+$SQL_Contract_Starts = $database->query(null,"
 	SELECT Contract.Job    AS ID,
 		   Contract.BStart AS Date,
 		   'Contract'      AS Object,
@@ -443,7 +443,7 @@ if($SQL_Contract_Starts){while($Contract = sqlsrv_fetch_array($SQL_Contract_Star
 	}
 }}
 if(isset($Privileges['Location']) && $Privileges['Location']['Other_Privilege'] >= 4){
-	$SQL_Overdue_Invoices = sqlsrv_query($NEI,"
+	$SQL_Overdue_Invoices = $database->query(null,"
 		SELECT OpenAR.Ref AS ID,
 			   OpenAR.Due AS Date,
 			   'OpenAR'   AS Object,
@@ -468,31 +468,31 @@ if(count($Timeline) > 0){foreach($Timeline as $Date=>$DayTimeline){
 	foreach($DayTimeline as $Instance){
 		//$Instance['Date'] = date('m/d/Y',strtotime($Instance['Date']));
 		if(substr($Instance['Object'],0,6) == 'Ticket' && $Instance['Field'] == 'Completed'){
-			?><div class='col-md-12'><a style='color:white;' href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Ticket();?> Completed <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Ticket();?> Completed <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,6) == 'Ticket' && $Instance['Field'] == 'Created'){
-			?><div class='col-md-12'><a style='color:white;' href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Ticket();?> Created <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Ticket();?> Created <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,3) == 'Job' && $Instance['Field'] == 'Created'){
-			?><div class='col-md-12'><a style='color:white;' href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Job();?> Created Job #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Job();?> Created Job #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,3) == 'Job' && $Instance['Field'] == 'Completed'){
-			?><div class='col-md-12'><a style='color:white;' href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Job();?> Completed Job #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Job();?> Completed Job #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,8) == 'Proposal' && $Instance['Field'] == 'Created'){
-			?><div class='col-md-12'><a style='color:white;' href='proposal.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Proposal();?> Created Proposal #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='proposal.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Proposal();?> Created Proposal #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,7) == 'Invoice' && $Instance['Field'] == 'Created'){
-			?><div class='col-md-12'><a style='color:white;' href='invoice.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Invoice();?> Created Invoice #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='invoice.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Invoice();?> Created Invoice #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,10) == 'Violation' && $Instance['Field'] == 'Created'){
-			?><div class='col-md-12'><a style='color:white;' href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Created Violation #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Created Violation #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif($Instance['Object'] == 'Transaction' && $Instance['Field'] == 'Paid'){
-			?><div class='col-md-12'><a style='color:white;' href='transaction.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Invoice();?> Paid Invoice #<?php echo $Instance['Ref'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='transaction.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Invoice();?> Paid Invoice #<?php echo $Instance['Ref'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,10) == 'Violation' && $Instance['Field'] == 'Overdue'){
-			?><div class='col-md-12'><a style='color:white;' href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Overdue Violation #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Overdue Violation #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,10) == 'Job' && $Instance['Field'] == 'Overdue'){
-			?><div class='col-md-12'><a style='color:white;' href='job.php?ID=<?php echo $Instance['Job'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Overdue Violation Job #<?php echo $Instance['Job'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='job.php?ID=<?php echo $Instance['Job'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Overdue Violation Job #<?php echo $Instance['Job'];?></a></div><?php
 		} elseif($Instance['Object'] == 'Contract' && $Instance['Field'] == 'Starts'){
-			?><div class='col-md-12'><a style='color:white;' href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Contract();?> Contract Starts Job #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Contract();?> Contract Starts Job #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif($Instance['Object'] == 'Contract' && $Instance['Field'] == 'Billed'){
-			?><div class='col-md-12'><a style='color:white;' href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Contract();?> Contract Billed Job #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Contract();?> Contract Billed Job #<?php echo $Instance['ID'];?></a></div><?php
 		} elseif(substr($Instance['Object'],0,10) == 'OpenAR' && $Instance['Field'] == 'Overdue'){
-			?><div class='col-md-12'><a style='color:white;' href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Overdue Invoice #<?php echo $Instance['ID'];?></a></div><?php
+			?><div class='col-md-12'><a style='color:white;' href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Overdue Invoice #<?php echo $Instance['ID'];?></a></div><?php
 		}
 	}
 }}

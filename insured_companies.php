@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Job']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "insured_companies.php"));
@@ -40,14 +40,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if(strlen($_POST['Start_Date']) > 0){$_POST['Start_Date'] = date_format(date_create_from_format('m/d/Y',$_POST['Start_Date']),'Y-m-d 00:00:00.000');}
                 if(strlen($_POST['End_Date']) > 0){$_POST['End_Date'] = date_format(date_create_from_format('m/d/Y',$_POST['End_Date']),'Y-m-d 00:00:00.000');}
                 $_POST['Company'] = intval($_POST['Company']);
-                $r = sqlsrv_query($Portal,"SELECT * FROM Insurance WHERE Company=? AND Type = ?",array($_POST['Company'],$_POST['Type']));
+                $r = $database->query($Portal,"SELECT * FROM Insurance WHERE Company=? AND Type = ?",array($_POST['Company'],$_POST['Type']));
                 if($r && sqlsrv_fetch_array($r)){
-                    sqlsrv_query($Portal,"UPDATE Insurance SET Start_Date = ?, End_Date = ? WHERE Company = ? AND Type = ?",array($_POST['Start_Date'],$_POST['End_Date'],$_POST['Company'],$_POST['Type']));
+                    $database->query($Portal,"UPDATE Insurance SET Start_Date = ?, End_Date = ? WHERE Company = ? AND Type = ?",array($_POST['Start_Date'],$_POST['End_Date'],$_POST['Company'],$_POST['Type']));
                 } else {
-                    sqlsrv_query($Portal,"INSERT INTO Insurance(Company, Start_Date, End_Date, Type) VALUES(?,?,?,?);",array($_POST['Company'],$_POST['Start_Date'],$_POST['End_Date'],$_POST['Type']));
+                    $database->query($Portal,"INSERT INTO Insurance(Company, Start_Date, End_Date, Type) VALUES(?,?,?,?);",array($_POST['Company'],$_POST['Start_Date'],$_POST['End_Date'],$_POST['Type']));
                 }
             } elseif(isset($_POST['Company_Name'])){
-                sqlsrv_query($Portal,"INSERT INTO Insured_Company(Company) VALUES(?)",array($_POST['Company_Name']));
+                $database->query($Portal,"INSERT INTO Insured_Company(Company) VALUES(?)",array($_POST['Company_Name']));
             }
         }?><!DOCTYPE html>
 <html lang="en">
@@ -62,15 +62,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class='panel-heading'><h4>
                             <div style='display:inline-block;'>
-                                <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php $Icons->Unit();?>Tracked Permits / Insurances</span>
+                                <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Tracked Permits / Insurances</span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
                             <div style='clear:both;'></div>
@@ -132,16 +132,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <tbody>
                                     <tr><td colspan='9' style='text-align:center;background-color:#9eabcd;font-weight:bold;cursor:pointer;' onClick="newCompany();">Add New Insured Company</td></tr>
                                     <?php 
-                                    $r = sqlsrv_query($Portal,"SELECT * FROM Insured_Company ORDER BY Company ASC");
+                                    $r = $database->query($Portal,"SELECT * FROM Insured_Company ORDER BY Company ASC");
                                     $Insured_Companis = array();
                                     $date = new DateTime("now");
                                     if($r){while($array = sqlsrv_fetch_array($r)){$Insured_Companies[$array['ID']] = $array;}}
                                     foreach($Insured_Companies as $ID=>$data){?><tr class='Insurance'>
                                         <td rel='<?php echo $data['ID'];?>' Company='<?php echo $data['Company'];?>'><?php echo $data['Company'];?></td>
                                         <td style='display:none;'><input type='checkbox' <?php if($data['Active'] == 1){?> checked='checked' <?php }?> /></td>
-                                        <?php if(sqlsrv_fetch_array(sqlsrv_query($Portal,"SELECT * FROM Insurance WHERE Company = ? AND Insurance.Type = 'DOB'",array($data['ID']))) == FALSE && strtolower(substr($data['Company'],0,2)) != 'ea' && strtolower(substr($data['Company'],0,3)) != 'ebn'){?>
+                                        <?php if(sqlsrv_fetch_array($database->query($Portal,"SELECT * FROM Insurance WHERE Company = ? AND Insurance.Type = 'DOB'",array($data['ID']))) == FALSE && strtolower(substr($data['Company'],0,2)) != 'ea' && strtolower(substr($data['Company'],0,3)) != 'ebn'){?>
                                         <td class='Worksmans'><?php 
-                                            $r = sqlsrv_query($Portal,"
+                                            $r = $database->query($Portal,"
                                                 SELECT * 
                                                 FROM Insurance 
                                                 WHERE Company = ? AND Insurance.Type='Worksmans'
@@ -162,7 +162,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             } else {?><button onClick="newInsurance(this);" style='background-color:yellow;color:black;'>No Insurance</button><?php }
                                         ?></td>
                                         <td class='Auto'><?php 
-                                            $r = sqlsrv_query($Portal,"
+                                            $r = $database->query($Portal,"
                                                 SELECT * 
                                                 FROM Insurance 
                                                 WHERE Company = ? AND Insurance.Type='Auto'
@@ -183,7 +183,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             } else {?><button onClick="newInsurance(this);" style='background-color:yellow;color:black;'>No Insurance</button><?php }
                                         ?></td>
                                         <td class='Liability'><?php 
-                                            $r = sqlsrv_query($Portal,"
+                                            $r = $database->query($Portal,"
                                                 SELECT * 
                                                 FROM Insurance 
                                                 WHERE Company = ? AND Insurance.Type='Liability'
@@ -204,7 +204,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             } else {?><button onClick="newInsurance(this);" style='background-color:yellow;color:black;'>No Insurance</button><?php }
                                         ?></td>
                                         <td class='Umbrella'><?php 
-                                            $r = sqlsrv_query($Portal,"
+                                            $r = $database->query($Portal,"
                                                 SELECT * 
                                                 FROM Insurance 
                                                 WHERE Company = ? AND Insurance.Type='Umbrella'
@@ -227,7 +227,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <?php } else {?>
                                         <td colspan='4'></td>
                                         <td class='DOB'><?php 
-                                            $r = sqlsrv_query($Portal,"
+                                            $r = $database->query($Portal,"
                                                 SELECT * 
                                                 FROM Insurance 
                                                 WHERE Company = ? AND Insurance.Type='DOB'
@@ -264,21 +264,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
+        
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <script>
         $(document).ready(function(){
             var Table_Insured_Companies = $("#Table_Insured_Companies").DataTable();
@@ -288,7 +288,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     Table#Table_Modernizations td.hide_column { display:none; }
     </style>
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}

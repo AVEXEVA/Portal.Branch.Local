@@ -7,7 +7,7 @@ function gd(year, month, day) {
         $data = array();
         $data2 = array();
         $data3 = array();
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT Job.Custom1 AS Supervisor, TicketD.Total as Total, TicketD.EDate AS Dated
             FROM 
                 (((TicketD 

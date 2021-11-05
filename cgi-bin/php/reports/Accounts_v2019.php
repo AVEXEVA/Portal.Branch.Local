@@ -4,12 +4,12 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,7 +25,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Start = isset($_GET['Start']) && strlen($_GET['Start']) > 0 ? date('Y-m-d H:i:s', strtotime($_GET['Start'])) : '2017-03-30 00:00:00.000';
     $End = isset($_GET['End']) && strlen($_GET['End']) > 0 ? date('Y-m-d H:i:s', strtotime($_GET['End'])) : '2065-12-01 00:00:00.000';
     $Active_SQL = isset($_GET['Active']) && $_GET['Active'] == 1 ? "AND Loc.Maint = 1" : NULL;
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
     "SELECT  Locations.*,
             CASE WHEN Locations.Profit = 0 OR (Locations.Labor_Sum + Locations.Materials_Sum + ABS(Locations.Overhead)) = 0 THEN 0
             ELSE

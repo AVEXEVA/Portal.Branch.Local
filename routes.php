@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
 	    " SELECT  *
 			  FROM    Connection
 			  WHERE   Connection.Connector = ?
@@ -16,8 +16,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
     $Connection = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
 	    	" SELECT  *,
 			          Emp.fFirst AS First_Name,
 				        Emp.Last   AS Last_Name
@@ -28,8 +28,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
   	$User = sqlsrv_fetch_array( $result );
-	$result = sqlsrv_query(
-		$NEI,
+	$result = $database->query(
+		null,
   		" 	SELECT *
 			FROM   Privilege
 			WHERE  Privilege.User_ID = ?;",
@@ -46,8 +46,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  	    || 	$Privileges[ 'Route' ][ 'Other_Privilege' ] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query(
-			$NEI,
+		$database->query(
+			null,
       		" 	INSERT INTO Activity( [User], [Date], [Page] )
   				VALUES( ?, ?, ? );"
     		, array(
@@ -67,7 +67,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload='finishLoadingPage();'>
     <div id='wrapper' class='<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>'>
       <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-      <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
       <div id='page-wrapper' class='content'>
         <div class='panel panel-primary'>
             <div class='panel-heading'><h3>Routes</h3></div>

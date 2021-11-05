@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
@@ -22,8 +22,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   if(!$Privileged || count($_POST) == 0 || !isset($_POST['Report'], $_POST['Anonymous'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
     $Name = $_POST['Anonymous'] == 'true' ? 'Anonymous' : $My_User['fFirst'] . ' ' . $My_User['Last'];
-    sqlsrv_query($NEI,"INSERT INTO Portal.dbo.Safety_Report(Name, Report) VALUES(?, ?);",array($Name, $_POST['Report']));
-    $ID = sqlsrv_fetch_array(sqlsrv_query($NEI,"SELECT Max(ID) AS ID FROM Portal.dbo.Safety_Report;"))['ID'];
+    $database->query(null,"INSERT INTO Portal.dbo.Safety_Report(Name, Report) VALUES(?, ?);",array($Name, $_POST['Report']));
+    $ID = sqlsrv_fetch_array($database->query(null,"SELECT Max(ID) AS ID FROM Portal.dbo.Safety_Report;"))['ID'];
     /*Email*/
     $_SERVER['SERVER_NAME'] = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : "Nouveau_Elevator_Portal";
     function generateMessageID()

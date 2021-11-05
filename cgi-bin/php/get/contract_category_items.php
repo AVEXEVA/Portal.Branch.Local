@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table,
                Privilege.User_Privilege,
                Privilege.Group_Privilege,
@@ -34,13 +34,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
     if(!isset($Connection['ID'])  || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-        /*$resource = sqlsrv_query($NEI,"SELECT Elev.ID AS ID FROM nei.dbo.Contract LEFT JOIN nei.dbo.Loc ON Contract.Loc = Loc.Loc LEFT JOIN nei.dbo.Elev ON Loc.Loc = Elev.Loc WHERE Contract.BFinish >= ? AND Elev.[Status] = 0;",array(date("Y-m-d H:i:s",strtotime('now'))));
+        /*$resource = $database->query(null,"SELECT Elev.ID AS ID FROM nei.dbo.Contract LEFT JOIN nei.dbo.Loc ON Contract.Loc = Loc.Loc LEFT JOIN nei.dbo.Elev ON Loc.Loc = Elev.Loc WHERE Contract.BFinish >= ? AND Elev.[Status] = 0;",array(date("Y-m-d H:i:s",strtotime('now'))));
         if($resource){while($row = sqlsrv_fetch_array($resource)){
-          $r = sqlsrv_query($NEI,"SELECT * FROM Portal.dbo.Contract_Category_Item AS Contract_Item WHERE Contract_Item.[Unit] = ?;",array($row['ID']));
+          $r = $database->query(null,"SELECT * FROM Portal.dbo.Contract_Category_Item AS Contract_Item WHERE Contract_Item.[Unit] = ?;",array($row['ID']));
           if($r && is_array(sqlsrv_fetch_array($r))){}
           else {}
         }}*/
-        $resource = sqlsrv_query($NEI,
+        $resource = $database->query(null,
           " SELECT  Job.fDesc                           AS  Contract,
                     OwnerWithRol.Name                   AS  Customer,
                     Loc.Tag                             AS  Location,

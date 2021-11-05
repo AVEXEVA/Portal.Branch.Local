@@ -2,12 +2,12 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -44,7 +44,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Order_By = isset($columns[$_GET['order'][0]['column']]) ? $columns[$_GET['order'][0]['column']] : null;
         $Order_By = $Order_By != Null ? "ORDER BY " . $Order_By : null;
         $Order_By = $Order_By != Null && ($_GET['order'][0]['dir'] == 'asc' || $_GET['order'][0]['dir'] == 'desc') ? $Order_By . ' ' . $_GET['order'][0]['dir'] : null;
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
         "SELECT   OwnerWithRol.Name               AS  Customer_Name,
                   Loc.Tag                         AS  Location_Name,
                   Contract.BAmt                   AS  Contract_Amount,

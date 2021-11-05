@@ -2,12 +2,12 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Privilege.*
         FROM   Privilege
         WHERE 
@@ -22,7 +22,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         $Dispatchers = array(673,925,223,767,1137,465,371,569,418,772,254,763,273,19,232,17,1011,987,773,472,480,133,881,183,225,906);
         while($Dispatcher = array_pop($Dispatchers)){
-            $r1 = sqlsrv_query($NEI,"
+            $r1 = $database->query(null,"
                 SELECT Privilege.*
                 FROM   Privilege
                 WHERE
@@ -42,13 +42,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }
             }
             foreach($My_Privileges as $Privilege){
-                sqlsrv_query($NEI,"
+                $database->query(null,"
                     INSERT INTO Privilege(User_ID,Access_Table,User_Privilege,Group_Privilege,Other_Privilege)
                     VALUES({$Dispatcher},'{$Privilege}',6,6,4)
                 ;");
             }
             foreach($Update_Privileges as $Privilege){
-                sqlsrv_query($NEI,"
+                $database->query(null,"
                     UPDATE Privilege
                     SET 
                         User_Privilege='6',

@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
 		        FROM        Connection
             WHERE       Connection.Connector = ?
@@ -17,8 +17,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *,
                     Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-	$result = sqlsrv_query(
-        $NEI,
+	$result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -48,8 +48,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         || $Privileges[ 'Admin' ][ 'Other_Privilege' ] < 4){
 				?><?php require( '../404.html' );?><?php }
     else {
-      sqlsrv_query(
-          $NEI,
+      $database->query(
+          null,
           "   INSERT INTO Activity([User], [Date], [Page])
               VALUES( ?, ?, ? );",
           array(
@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload='finishLoadingPage();'>
 <div id='container'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-      <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-      <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+      <?php require( bin_php . 'element/navigation/index.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
       <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
         <div class='panel-panel-primary'>
           <div class='panel-heading'>Accounting Department</div>
@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         else {
                           TIMELINE[i] = jsonData[i];
                           $("#Timeline").prepend("<div class='row'>"
-                            + '<div class="col-xs-1"><?php $Icons->Invoice(1);?></div>'
+                            + '<div class="col-xs-1"><?php \singleton\fontawesome::getInstance( )->Invoice(1);?></div>'
                             + "<div class='col-xs-1'>Invoice</div>"
                             + "<div class='col-xs-1'>#" + jsonData[i].Ref + "</div>"
                             + "<div class='col-xs-1'>$" + numberWithCommas(jsonData[i].Amount) + "</div>"

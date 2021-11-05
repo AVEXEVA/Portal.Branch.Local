@@ -18,7 +18,7 @@ function gd(year, month, day) {
             if(FALSE){while($array = sqlsrv_fetch_array($job_result)){$Jobs[] = "[JOBLABOR].[JOB #]='{$array['ID']}'";}}
             $Jobs = implode(" OR ",$Jobs);
 
-            $invoice_result = sqlsrv_query($NEI,"
+            $invoice_result = $database->query(null,"
                 SELECT
                     Invoice.Amount AS Amount,
                     Invoice.fDate as fDate
@@ -48,7 +48,7 @@ function gd(year, month, day) {
                 }
             }
 
-            $job_item_result = sqlsrv_query($Paradox,"
+            $job_item_result = $database->query($Paradox,"
                 SELECT
                     [JOBLABOR].[WEEK ENDING]    AS fDate,
                     [JOBLABOR].[TOTAL COST]     AS Amount
@@ -68,7 +68,7 @@ function gd(year, month, day) {
             }
             ksort($dates);
 
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT
                     JobI.Amount AS Amount,
                     JobI.fDate as fDate
@@ -89,7 +89,7 @@ function gd(year, month, day) {
             }
             ksort($dates);
 
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT
                     JobI.Amount AS Amount,
                     JobI.fDate as fDate
@@ -113,7 +113,7 @@ function gd(year, month, day) {
             }
             ksort($dates);
 
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT
                     JobI.Amount AS Amount,
                     JobI.fDate as fDate

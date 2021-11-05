@@ -23,14 +23,14 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
   }
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Connecticut'){
-        sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
-        $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
+        $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -42,11 +42,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     if(!isset($array['ID'], $_POST['ID'])  || !$Privileged || !is_numeric($_POST['ID'])){?><html><head></head></html><?php }
     else {
-      $r = sqlsrv_query($NEI,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
       if($r && is_array(sqlsrv_fetch_array($r))){
         function roundToQuarterHour($minutes) {$round = 15;return round($minutes / $round) * $round;}
         if(!$r || ($r && !is_array(sqlsrv_fetch_array($r)))){
-          $r = sqlsrv_query($NEI,
+          $r = $database->query(null,
             " SELECT  Tickets.*
               FROM    ((
                           SELECT  TicketO.TimeComp
@@ -81,7 +81,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               $En_Route = $Ticket['TimeComp'];
             }
           }
-          $r = sqlsrv_query($NEI,
+          $r = $database->query(null,
             " SELECT  Attendance.*
               FROM    Attendance
               WHERE   Attendance.[Start] IS NOT NULL
@@ -108,7 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           $En_Route2 = date("Y-m-d {$hours}:{$minutes}:00.000");
 
           if(isset($En_Route)){
-            sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.TimeRoute = ?, TicketO.Assigned = 2, TicketO.EDate = ? WHERE TicketO.ID = ?;",array($En_Route,$En_Route2,$_POST['ID']));
+            $database->query(null,"UPDATE TicketO SET TicketO.TimeRoute = ?, TicketO.Assigned = 2, TicketO.EDate = ? WHERE TicketO.ID = ?;",array($En_Route,$En_Route2,$_POST['ID']));
           }
         }
         $Time_Site = isset($Time_Site) ? $Time_Site : date('1899-12-30 H:i:s');
@@ -120,12 +120,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
         if($hours == "00" && $minutes == "00"){ $minutes = "01"; }
         $Time_Site = "1899-12-30 {$hours}:{$minutes}:00.000";
-        sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.TimeSite = ?, TicketO.Assigned = 3 WHERE TicketO.ID = ?;",array($Time_Site, $_POST['ID']));
-        $r = sqlsrv_query($NEI,"SELECT Loc.Latt AS Latitude, Loc.fLong AS Longitude FROM Loc LEFT JOIN TicketO ON Loc.Loc = TicketO.LID WHERE TicketO.ID = ?;",array($_POST['ID']));
+        $database->query(null,"UPDATE TicketO SET TicketO.TimeSite = ?, TicketO.Assigned = 3 WHERE TicketO.ID = ?;",array($Time_Site, $_POST['ID']));
+        $r = $database->query(null,"SELECT Loc.Latt AS Latitude, Loc.fLong AS Longitude FROM Loc LEFT JOIN TicketO ON Loc.Loc = TicketO.LID WHERE TicketO.ID = ?;",array($_POST['ID']));
         $Location_GPS = Null;
         if($r){$Location_GPS = sqlsrv_fetch_array($r);}
         if(is_array($Location_GPS) && is_numeric($Location_GPS['Latitude']) && is_numeric($Location_GPS['Longitude']) && $Location_GPS['Latitude'] != 0 && $Location_GPS['Longitude'] != 0){
-          $r = sqlsrv_query($NEI,
+          $r = $database->query(null,
             " SELECT  GPS.Latitude, GPS.Longitude, GPS.Time_Stamp
               FROM    GPS
               WHERE   GPS.Employee_ID = ?

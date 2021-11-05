@@ -2,12 +2,12 @@
 session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(isset($array['ID'],$My_Privileges['Route']) && $My_Privileges['Route']['User_Privilege'] >= 4 && $My_Privileges['Route']['Group_Privilege'] >= 4 && $My_Privileges['Route']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     else {
         if(is_numeric($_GET['ID'])){
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                 "SELECT 
                     Route.ID        AS  ID,
                     Route.Name      AS  Route, 
@@ -35,10 +35,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             if($My_Privileges['Route']['User_Privilege'] >= 4 && $_SESSION['User'] == $Route['Employee_ID']){$Privileged = TRUE;}
         }
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=route<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-    	$r = sqlsrv_query($NEI,
+    	$r = $database->query(null,
             "SELECT 
                 Route.ID             AS ID,
                 Route.Name           AS Route, 
@@ -70,18 +70,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
         $Route = sqlsrv_fetch_array($r);
 ?><div class="panel panel-primary">
-	<!--<div class="panel-heading"><h4><?php $Icons->Maintenance();?> Maintenance</h4></div>-->
+	<!--<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance</h4></div>-->
 	<div class='panel-body white-background'>
 		<div class='row shadower ' style='font-size:16px;padding:5px;'>
-			<div class='col-xs-4'><?php $Icons->Route();?> Route:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
             <div class='col-xs-8'><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Route['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Route['Route_ID'];?>"><?php }?><?php echo proper($Route["Route_Mechanic_First_Name"] . " " . $Route["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Route['Route_Mechanic_ID']){?></a><?php }?>
 			</div>
             <?php if(isset($Route['Route_Mechanic_Phone_Number']) && strlen($Route['Route_Mechanic_Phone_Number']) > 0){?>
-			<div class='col-xs-4'><?php $Icons->Phone();?> Phone:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Phone();?> Phone:</div>
 				
 			<div class='col-xs-8'><a href="tel:<?php echo $Route['Route_Mechanic_Phone_Number'];?>"><?php echo $Route['Route_Mechanic_Phone_Number'];?></a></div><?php }?>
 			<?php /*if(strlen($Route['Route_Mechanic_Email']) > 0){?>
-			<div class='col-xs-4'><?php $Icons->Email();?> Email:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email();?> Email:</div>
             <div class='col-xs-8'><a href="mailto:<?php echo $Route['Route_Mechanic_Email'];?>"><?php echo $Route['Route_Mechanic_Email'];?></a></div><?php }*/?>
 		</div>
 	</div>

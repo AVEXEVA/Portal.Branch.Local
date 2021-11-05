@@ -4,14 +4,14 @@ require('index.php');
 set_time_limit ( 120 );
 ini_set('memory_limit','1024M');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
     if(!isset($array['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Job.ID            AS ID,
 				   Job.fDesc         AS Name,
 				   OwnerWithRol.Name AS Customer,
@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;");
         $data = array();
 		$Job = 0;
-		$stmt = sqlsrv_prepare($NEI,"
+		$stmt = sqlsrv_prepare(null,"
 			SELECT Sum(Invoice.Total) AS Invoice_Price,
 				   Count(Invoice.Ref)  AS Invoices
 			FROM   nei.dbo.Invoice

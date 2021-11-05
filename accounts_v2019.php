@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
 		    FROM    Connection
 		    WHERE       Connection.Connector = ?
@@ -17,8 +17,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *,
                     Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-	$result = sqlsrv_query(
-        $NEI,
+	$result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -48,8 +48,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         || $Privileges[ 'Sales_Admin' ][ 'Other_Privilege' ] < 4){
 				?><?php require( '../404.html' );?><?php }
     else {
-      sqlsrv_query(
-          $NEI,
+      $database->query(
+          null,
           "   INSERT INTO Activity([User], [Date], [Page])
               VALUES( ?, ?, ? );",
           array(
@@ -81,7 +81,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload="finishLoadingPage();"
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div>
               Start <input type='text' name='Start' value='<?php echo $_GET['Start'];?>' style='color:black;' />
@@ -116,8 +116,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     </div>
   </div>
 	<!-- Bootstrap Core JavaScript -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+	
+    
     <?php require('cgi-bin/js/datatables.php');?>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
     <script src='https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js'></script>
@@ -128,7 +128,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
     </style>
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     .Totals.dtrg-group.dtrg-end.dtrg-level-0>td {
         color :black !important;

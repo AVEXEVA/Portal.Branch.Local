@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 if(isset(
   $_SESSION['User'],
   $_SESSION['Hash'] ) ) {
-        $result = sqlsrv_query(
-          $NEI,
+        $result = $database->query(
+          null,
             "   SELECT  *
                 FROM    Connection
                 WHERE   Connector = ?
@@ -18,8 +18,8 @@ if(isset(
       )
   );
         $array = sqlsrv_fetch_array($result);
-        $result= sqlsrv_query(
-          $NEI,
+        $result= $database->query(
+          null,
           "   SELECT    *, fFirst
               AS        First_Name, Last as Last_Name
               FROM Emp
@@ -30,7 +30,7 @@ if(isset(
   );
         $User = sqlsrv_fetch_array($result);
         $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != "OFFICE") ? True : False;
-        $result = sqlsrv_query(
+        $result = $database->query(
           $Portal,
           "   SELECT Access_Table,
                      User_Privilege,
@@ -49,7 +49,7 @@ if(isset(
     else {
         //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
     }
-    sqlsrv_query(
+    $database->query(
       $Portal,
       "   INSERT INTO Activity([User], [Date], [Page])
           VALUES(?,?,?);",
@@ -60,8 +60,8 @@ if(isset(
     if(!isset($array[ 'ID' ]) || !is_numeric($_GET[ 'ID' ])  || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
         $ID = $_GET['ID'];
-        $result = sqlsrv_query(
-            $NEI,
+        $result = $database->query(
+            null,
             "   SELECT  TOP 1
                         Estimate.ID             AS  ID,
                         Estimate.Name           AS  Contact,

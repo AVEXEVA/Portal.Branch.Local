@@ -14,12 +14,12 @@ $connectionOptions['Database'] = 'Portal';
 $conn2 = sqlsrv_connect($serverName, $connectionOptions);
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
-    $r = sqlsrv_query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $r = sqlsrv_query($conn2,"
+    $r = $database->query($conn2,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -28,7 +28,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = FALSE;
     if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Ticket']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    sqlsrv_query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "activity.php"));
+    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "activity.php"));
     if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=dispatch.php';</script></head></html><?php }
     else {
 ?>
@@ -42,7 +42,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -110,19 +110,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
     <style>
     </style>
     <script>  
@@ -193,7 +193,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         });
     </script>
     <!-- Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
 </body>
 </html>
 <?php

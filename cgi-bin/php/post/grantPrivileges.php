@@ -2,12 +2,12 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Privilege.*
         FROM   Privilege
         WHERE 
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Admin = sqlsrv_fetch_array($r);
     if(!isset($array['ID'])  || !is_array($Admin)){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Privilege.*
             FROM   Privilege
             WHERE  User_ID='{$_POST['User_ID']}'
@@ -28,7 +28,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;");
         $array = sqlsrv_fetch_array($r);
         if(isset($array['ID']) && $array['ID'] > 0){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 UPDATE Privilege
                 SET 
                     User_Privilege='{$_POST['User_Privilege']}',
@@ -39,7 +39,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     AND Access_Table='{$_POST['Access_Table']}'
             ;");
         } else {
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 INSERT INTO Privilege(User_ID,Access_Table,User_Privilege,Group_Privilege,Other_Privilege)
                 VALUES({$_POST['User_ID']},'{$_POST['Access_Table']}',{$_POST['User_Privilege']},{$_POST['Group_Privilege']},{$_POST['Other_Privilege']})
             ;");

@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -30,7 +30,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Unit']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
@@ -48,7 +48,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$_POST['Backup_Beeper'] = isset($_POST['Backup_Beeper']) ? $_POST['Backup_Beeper'] : 0;
 			$_POST['Cleaned'] = isset($_POST['Cleaned']) ? $_POST['Cleaned'] : 0;
 			$_POST['Floor_Empty'] = isset($_POST['Floor_Empty']) ? $_POST['Floor_Empty'] : 0;
-			sqlsrv_query($NEI,"
+			$database->query(null,"
 				INSERT INTO Portal.dbo.Vehicle_Inspection([User], Registration, Safety_Equipment, Tire_Pressure, Oil, All_Fluids, Liftgate_and_Handheld, Inspection_Sticker, Lights_and_Blinkers, Leaf_Springs, Mirrors, Backup_Beeper, Cleaned, Floor_Empty)
 				VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 			;", array($_SESSION['User'], $_POST['Registration'], $_POST['Safety_Equipment'], $_POST['Tire_Pressure'], $_POST['Oil'], $_POST['All_Fluids'], $_POST['Liftgate_and_Handheld'], $_POST['Inspection_Sticker'], $_POST['Lights_and_Blinkers'], $_POST['Leaf_Springs'], $_POST['Mirrors'], $_POST['Backup_Beeper'], $_POST['Cleaned'], $_POST['Floor_Empty']));
@@ -65,11 +65,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h4><?php $Icons->Back();?>  Vehicle Inspection</h4></div>
+				<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Back();?>  Vehicle Inspection</h4></div>
 				<div class="panel-body" style='background-color:rgba(255,255,255,.5);'>
 					<form action='#' method='POST'>
 						<div class='row' style='padding:25px;'>
@@ -142,10 +142,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+        
+    
+    
 </body>
 </html>
 <?php
@@ -163,11 +163,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h4 onClick="document.location.href='index.php';"><?php $Icons->Back();?>  Vehicle Inspection</h4></div>
+				<div class="panel-heading"><h4 onClick="document.location.href='index.php';"><?php \singleton\fontawesome::getInstance( )->Back();?>  Vehicle Inspection</h4></div>
 				<div class="panel-body" style='background-color:rgba(255,255,255,.5);'>
 					<form action='#' method='POST'>
 						<div class='row'>
@@ -277,10 +277,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+        
+    
+    
 </body>
 </html>
 <?php

@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Job']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "modernization.php"));
@@ -41,7 +41,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 sqlsrv_fetch($queryID);
                 return sqlsrv_get_field($queryID, 0);
             }
-            $r = sqlsrv_query($Portal,"
+            $r = $database->query($Portal,"
                 SELECT *
                 FROM   Modernization 
                 WHERE  Modernization.Job      = ?
@@ -54,7 +54,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             else {$_POST['Returned'] = "1900-01-01";}
             if(!is_null($Modernization)){
                 $Modernization = $Modernization['ID'];
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     UPDATE Modernization 
                     SET    Modernization.Supervisor    = ?,
                            Modernization.Date_Removed  = ?,
@@ -68,14 +68,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     $_POST[$key] = trim($value);
                     if($value = ' '){$value = '';}
                 }
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     INSERT INTO Modernization(Supervisor, Date_Removed, Actual_Return, EBN, Budget_Hours, Job, Unit)
                     VALUES('{$_POST['Supervisor']}','{$_POST['Removed']}','{$_POST['Returned']}','{$_POST['EBN']}','{$_POST['Budget_Hours']}','{$_POST['Job']}','{$_POST['Unit']}');
                      SELECT SCOPE_IDENTITY();
                 ");
                 $Modernization = lastId($r);
-				$r = sqlsrv_query($NEI,"SELECT * FROM Portal.dbo.Tasks;");
-				if($r){while($Task = sqlsrv_fetch_array($r)){sqlsrv_query($NEI,"INSERT INTO Portal.dbo.Mod_Tasks(Modernization, Task, Status) VALUES(?,?,?);",array($Modernization,$Task['ID'],"0%"));if( ($errors = sqlsrv_errors() ) != null) {
+				$r = $database->query(null,"SELECT * FROM Portal.dbo.Tasks;");
+				if($r){while($Task = sqlsrv_fetch_array($r)){$database->query(null,"INSERT INTO Portal.dbo.Mod_Tasks(Modernization, Task, Status) VALUES(?,?,?);",array($Modernization,$Task['ID'],"0%"));if( ($errors = sqlsrv_errors() ) != null) {
         foreach( $errors as $error ) {
             echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
             echo "code: ".$error[ 'code']."<br />";
@@ -85,7 +85,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
             //echo 'here';
             $Timestamp = date("Y-m-d H:i:s");
-            $r = sqlsrv_query($Portal,"
+            $r = $database->query($Portal,"
                     INSERT INTO Mod_Tracker(Modernization,Status,Author,Time_Stamp) 
                     VALUES('{$Modernization}','{$_POST['Status']}','{$_SESSION['User']}','{$Timestamp}')
                 ;");
@@ -98,13 +98,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta name="description" content="">
     <meta name="author" content="Peter D. Speranza">    
 	<title>Nouveau Texas | Portal</title>    
-    <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
+    <?php require( bin_php . 'element/navigation/index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -369,13 +369,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         </style>
                         <div class='panel-heading'><h4>
                             <div style='display:inline-block;'>
-                                <span onClick="modernizationTracker('tracked_modernizations');" style='cursor:pointer;'><?php $Icons->Unit();?>Modernization List</span>
+                                <span onClick="modernizationTracker('tracked_modernizations');" style='cursor:pointer;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Modernization List</span>
                                 <span class='hidden' onClick="modernizationTracker('tracked_modernization');" style='cursor:pointer;'><span id='tracked_modernization'> > Modernization Entity</span></span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
                             <?php if(isset($My_Privileges['Admin']['User_Privilege']) && $My_Privileges['Admin']['User_Privilege'] > 4){?>
-                            <div class='delete' style='cursor:pointer;float:right;margin-left:25px;' onClick="deleteRow();"><?php $Icons->Edit();?> Delete</div><?php }?>
-                            <div class='add' style='float:right;margin-left:25px;cursor:pointer;' onClick="popupAdd();"><?php $Icons->Add();?> Add</div>
+                            <div class='delete' style='cursor:pointer;float:right;margin-left:25px;' onClick="deleteRow();"><?php \singleton\fontawesome::getInstance( )->Edit();?> Delete</div><?php }?>
+                            <div class='add' style='float:right;margin-left:25px;cursor:pointer;' onClick="popupAdd();"><?php \singleton\fontawesome::getInstance( )->Add();?> Add</div>
                             <div style='clear:both;'></div>
                         </h4></div>
                         <div class="panel-body" id='content'>
@@ -383,7 +383,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <tr><td style='text-align:right;'>Ongoing Mods:</td>
                                     <td>&nbsp;</td>
                                     <td><?php
-                                    $r = sqlsrv_query($NEI,"
+                                    $r = $database->query(null,"
                                         SELECT Count(Job.ID) AS Counter
                                         FROM Job
                                         WHERE 
@@ -398,7 +398,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <tr><td style='text-align:right;'>Mods Started This Year:</td>
                                     <td>&nbsp;</td>
                                     <td><?php
-                                    $r = sqlsrv_query($NEI,"
+                                    $r = $database->query(null,"
                                         SELECT Count(Job.ID) AS Counter
                                         FROM Job
                                         WHERE 
@@ -413,7 +413,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <tr><td style='text-align:right;'>Mods Returned To Service This Year:</td>
                                     <td>&nbsp;</td>
                                     <td><?php
-                                    /*$r = sqlsrv_query($Portal,"
+                                    /*$r = $database->query($Portal,"
                                         SELECT Count(Modernization.ID) AS Counter
                                         FROM Job
                                         WHERE 
@@ -422,7 +422,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                     ;");
                                     $Counter = sqlsrv_fetch_array($r)['Counter'];*/
                                     $Counter = 0;
-                                    $r = sqlsrv_query($Portal,"
+                                    $r = $database->query($Portal,"
                                         SELECT
                                            MAX(Mod_Tracker.Time_Stamp) AS Time_Stamp
                                         FROM
@@ -432,7 +432,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                     ;");
                                     if($r){
                                         while($array = sqlsrv_fetch_array($r)){
-                                            $r2 = sqlsrv_query($Portal,"
+                                            $r2 = $database->query($Portal,"
                                                 SELECT Mod_Tracker.Status AS Status
                                                 FROM Mod_Tracker 
                                                 WHERE Mod_Tracker.Time_Stamp = '{$array['Time_Stamp']}'
@@ -498,21 +498,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <!-- Metis Menu Plugin JavaScript -->
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
 	
-	<script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+	
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <style>
     Table#Table_Modernizations td.hide_column { display:none; }
     </style>
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}

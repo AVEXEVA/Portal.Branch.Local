@@ -5,7 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
     //Connection
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
         "   SELECT  *
 		    FROM    Connection
             WHERE   Connection.Connector = ?
@@ -17,7 +17,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
     //Employee
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
         "   SELECT  *,
 		            Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -29,8 +29,8 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-	$result = sqlsrv_query(
-        $NEI,
+	$result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -47,8 +47,8 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
 	  	    || $Privileges[ 'Time' ][ 'Other_Privilege' ] < 4){
 				?><?php require( '../404.html' );?><?php }
     else {
-		sqlsrv_query(
-            $NEI,
+		$database->query(
+            null,
             "   INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
                 VALUES( ?, ?, ? );",
             array(
@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
             foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
             $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
         }
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
         	SELECT Emp.*,
         	       tblWork.Super
         	FROM   Emp
@@ -110,7 +110,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
         }
     </style>
     <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/js/index.php' );?>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/js/datatables.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
@@ -119,7 +119,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
         <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/element/loading.php' );?>
         <div id='page-wrapper' class='content'>
             <div class='panel panel-primary'>
-                <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php $Icons->Ticket( 1 );?> Review Timesheets</div>
+                <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Review Timesheets</div>
                 <div class='panel-body'>
                     <div class='row'><div class='col-sm-12'>&nbsp;</div></div>
                     <div class='form-group row'>
@@ -250,84 +250,84 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                 <td class='First_Name'><?php echo $Mechanic['fFirst'];?></td>
                                 <?php $Thursday = date('Y-m-d',strtotime($_GET['Date'] . ' -6 days'));?>
                                 <td class='day Thursday' style='font-weight:bold;' rel='<?php echo $Thursday;?>'><?php
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Thursday' rel='<?php echo $Thursday;?>'><?php
                                     //$Thursday = date('Y-m-d',strtotime($_GET['Date'] . ' -6 days'));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));?>
                                 <td class='day Friday' style='font-weight:bold;' rel='<?php echo $Friday;?>'><?php
                                     
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));?>
                                 <td class='day Friday' rel='<?php echo $Friday;?>'><?php
                                     //$Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Saturday' style='font-weight:bold;' rel='<?php echo $Saturday;?>'><?php
                                     
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Saturday' rel='<?php echo $Saturday;?>'><?php
                                     //$Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));?>
                                 <td class='day Sunday' style='font-weight:bold;' rel='<?php echo $Sunday;?>'><?php
                                     
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Sunday' rel='<?php echo $Sunday;?>'><?php
                                     //$Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));?>
                                 <td class='day Monday' style='font-weight:bold;' rel='<?php echo $Monday;?>'><?php
                                     
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Monday' rel='<?php echo $Monday;?>'><?php
                                     //$Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));?>
                                 <td class='day Tuesday' style='font-weight:bold;' rel='<?php echo $Tuesday;?>'><?php
                                     
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Tuesday' rel='<?php echo $Tuesday;?>'><?php
                                     //$Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Wednesday = date('Y-m-d',strtotime($_GET['Date']));?>
                                 <td class='day Wednesday' style='font-weight:bold;' rel='<?php echo $Wednesday;?>'><?php
                                     
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Wednesday' rel='<?php echo $Wednesday;?>'><?php
                                     //$Wednesday = date('Y-m-d',strtotime($_GET['Date']));
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='week Total' style='font-weight:bold;' rel='<?php echo $Thursday;?>'><?php
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];
                                 ?></td>
                                 <td class='week Total' rel='<?php echo $Thursday;?>'><?php
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];
                                 ?></td>
                                 <td class='Expenses' style='font-weight:bold;'><?php
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(Zone)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(Zone)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];
                                 ?></td>
                                 <td class='Expenses'><?php
-                                    $r = sqlsrv_query($NEI,"SELECT Sum(OtherE) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                    $r = $database->query(null,"SELECT Sum(OtherE) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];
                                 ?></td>
                                 <td class='Expenses' colspan='3'><?php
-                                $r = sqlsrv_query($NEI,"SELECT TicketPic.PicData FROM TicketD LEFT JOIN TicketPic ON TicketD.ID = TicketPic.TicketID WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                $r = $database->query(null,"SELECT TicketPic.PicData FROM TicketD LEFT JOIN TicketPic ON TicketD.ID = TicketPic.TicketID WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                 if($r){while($row = sqlsrv_fetch_array($r)){
                                   if(isset($row['PicData']) && !is_null($row['PicData']) && strlen($row['PicData']) > 0){
                                     $row['Type'] = 'image/jpeg';

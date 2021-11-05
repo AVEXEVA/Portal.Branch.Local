@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = sqlsrv_fetch_array($User);
 
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         && $Privileges['Unit']['Group_Privilege'] >= 4 
         && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Count( Ticket.Count ) AS Count 
                 FROM    (
                             SELECT  Ticket.Unit,
@@ -102,7 +102,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             foreach($_POST as $key=>$value){
 				//if($key == 'Price'){continue;}
 				//if($key == 'Type'){continue;}
-                sqlsrv_query($NEI,"
+                $database->query(null,"
                     UPDATE ElevTItem
                     SET    ElevTItem.Value     = ?
                     WHERE  ElevTItem.Elev      = ?
@@ -118,21 +118,21 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 }
             }
 			/*if(isset($_POST['Price'])){
-				sqlsrv_query($NEI,"
+				$database->query(null,"
 					UPDATE Elev
 					SET    Elev.Price = ?
 					WHERE  Elev.ID    = ?
 				;",array($_POST['Price'],$_GET['ID']));
 			}
 			if(isset($_POST['Type'])){
-				sqlsrv_query($NEI,"
+				$database->query(null,"
 					UPDATE Elev
 					SET    Elev.Type = ?
 					WHERE  Elev.ID    = ?
 				;",array($_POST['Type'],$_GET['ID']));
 			}*/
         }
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
           " SELECT  TOP 1
                     Elev.ID,
                     Elev.Unit           AS Building_ID,
@@ -179,8 +179,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         $Unit = sqlsrv_fetch_array($r);
         $unit = $Unit;
         $data = $Unit;
-        $r2 = sqlsrv_query(
-            $NEI,
+        $r2 = $database->query(
+            null,
             "   SELECT  *
                 FROM    ElevTItem
                 WHERE       ElevTItem.ElevT = 1

@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Ticket']['User_Privilege']  < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
@@ -66,14 +66,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h3 style='margin:0px;'><?php $Icons->Requisition();?> Requisition</h3></div>
+				<div class="panel-heading"><h3 style='margin:0px;'><?php \singleton\fontawesome::getInstance( )->Requisition();?> Requisition</h3></div>
         <div class='panel-body'>
           <!--<div class='row'>
             <div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-            <div class='col-xs-4'><?php $Icons->Blank(1);?> Type:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Type:</div>
             <div class='colx-s-8'><select name='Type' onChange='changeType(this);' style='color:black;'>
               <option value='Regular'>Regular</option>
               <option value='Gear'>Gear</option>
@@ -95,20 +95,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class="panel-body" style=''>
 					<div class='row'><div class='col-xs-12'>&nbsp;</div></div>
 					<div class="row">
-						<div class='col-xs-4'><?php $Icons->Calendar(1);?> Date:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</div>
 						<div class='col-xs-8'><input disabled type='text' name='Date' size='15' value='<?php echo date("m/d/Y");?>'/></div>
 					</div>
 					<div class="row">
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Required</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Required</div>
 						<div class='col-xs-8'><input type='text' name='Required' size='15' value='<?php echo isset($_GET['Required']) ? $_GET['Required'] : Null;?>' /></div>
 					</div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
           <div class='row'>
-  					<div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
   					<div class='col-xs-8'><button type='button' onClick='selectLocations(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -131,11 +131,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
           </div>
           <div class='row'>
-  					<div class='col-xs-4'><?php $Icons->Location(1);?> Drop Off:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Drop Off:</div>
   					<div class='col-xs-8'><button type='button' onClick='selectDropOffs(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['DropOff']) && is_numeric($_GET['DropOff'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['DropOff']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['DropOff']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -158,11 +158,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
           </div>
           <div class='row'>
-            <div class='col-xs-4'><?php $Icons->Unit(1);?> Unit:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
             <div class='col-xs-8'><button type='button' onClick='selectUnits(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Unit']) && is_numeric($_GET['Unit'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Elev WHERE Elev.ID = ?;",array($_GET['Unit']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Elev WHERE Elev.ID = ?;",array($_GET['Unit']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -185,11 +185,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
           </div>
           <div class='row'>
-            <div class='col-xs-4'><?php $Icons->Job(1);?> Job:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
             <div class='col-xs-8'><button type='button' onClick='selectJobs(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Job']) && is_numeric($_GET['Job'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Job WHERE Job.ID = ?;",array($_GET['Unit']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Job WHERE Job.ID = ?;",array($_GET['Unit']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -213,36 +213,36 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           </div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
         </div>
-        <div class='panel-heading Requisition-Regular active'><h3><?php $Icons->Description(1);?> Details</h3></div>
+        <div class='panel-heading Requisition-Regular active'><h3><?php \singleton\fontawesome::getInstance( )->Description(1);?> Details</h3></div>
         <div class='panel-body Requisition-Regular active'>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
 					<div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Shutdown:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Shutdown:</div>
 						<div class='col-xs-8'><input type='checkbox' name='Shutdown'  /></div>
 					</div>
 					<div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> A.S.A.P.:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> A.S.A.P.:</div>
 						<div class='col-xs-8'><input type='checkbox' name='ASAP'  /></div>
 					</div>
           <div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Rush:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Rush:</div>
 						<div class='col-xs-8'><input type='checkbox' name='Rush'  /></div>
 					</div>
           <div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> L/S/D.:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> L/S/D.:</div>
 						<div class='col-xs-8'><input type='checkbox' name='LSD'  /></div>
 					</div>
           <div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> F.R.M.:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> F.R.M.:</div>
 						<div class='col-xs-8'><input type='checkbox' name='FRM'  /></div>
 					</div>
           <div class='row Labels' >
-            <div class='col-xs-12'><?php $Icons->Paragraph(1);?> Notes:</div>
+            <div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Paragraph(1);?> Notes:</div>
             <div class='col-xs-12'><textarea name='Notes' style='width:100%;' rows='9'></textarea></div>
           </div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
         </div>
-        <div class='panel-heading '><h3><?php $Icons->Purchase();?> Items</h3></div>
+        <div class='panel-heading '><h3><?php \singleton\fontawesome::getInstance( )->Purchase();?> Items</h3></div>
         <div class='panel-body Requisition-Electrical'>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
           <div class='row'>
@@ -1012,24 +1012,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
 
 	<!--  if you want iE6 not to poke select boxes thru your dropdowns, you need ... -->
 	<script type="text/javascript" src="js/jquery.bgiframe.min.js"></script>

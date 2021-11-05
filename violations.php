@@ -5,8 +5,8 @@ if(session_id() == '' || !isset($_SESSION) ){
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  * 
             FROM    Connection 
             WHERE   Connector = ? 
@@ -19,12 +19,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?;",
@@ -38,8 +38,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     if(!isset($Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=violations.php';</script></head></html><?php }
     else {
-      sqlsrv_query(
-        $NEI,
+      $database->query(
+        null,
         "   INSERT INTO Activity([User], [Date], [Page])
             VALUES(?,?,?);",
         array(
@@ -71,12 +71,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Violation( 1 );?> Violations</div>
+                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
                     </div>
                 </div>
@@ -123,11 +123,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
     <?php require('cgi-bin/js/datatables.php');?>
     <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <script>
         var grouping_id = 5;
         var grouping_name = 'Status';

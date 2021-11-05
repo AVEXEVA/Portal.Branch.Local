@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -30,7 +30,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "tickets.php"));
@@ -48,13 +48,13 @@ if(isMobile()){?><!DOCTYPE html>
 <body style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary" style='margin-bottom:0px;'>
 				<div class="panel-heading"><?php
 				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
-				if(is_numeric($_GET['Mechanic'])){$r = sqlsrv_query($NEI,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
-						else {$Mechanic = $User;}?><?php $Icons->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div>
+				if(is_numeric($_GET['Mechanic'])){$r = $database->query(null,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
+						else {$Mechanic = $User;}?><?php \singleton\fontawesome::getInstance( )->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div>
 
 				<div class="panel-body no-print">
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
@@ -119,7 +119,7 @@ if(isMobile()){?><!DOCTYPE html>
 
 						if(isset($_GET['End_Date'])){$End_Date = DateTime::createFromFormat('m/d/Y', $_GET['End_Date'])->format("Y-m-d 23:59:59.999");}
 						else{$End_Date = DateTime::createFromFormat('m/d/Y',"12/30/2050")->format("Y-m-d 23:59:59.999");}
-						$r = sqlsrv_query($NEI,"
+						$r = $database->query(null,"
 							SELECT
 								TechLocation.*
 							FROM
@@ -173,10 +173,10 @@ if(isMobile()){?><!DOCTYPE html>
     }
     </style>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Morris Charts JavaScript -->
     <!--<script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
@@ -184,19 +184,19 @@ if(isMobile()){?><!DOCTYPE html>
     <script src="../data/morris-data.php"></script>-->
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
@@ -247,7 +247,7 @@ if(isMobile()){?><!DOCTYPE html>
                     '<td style="background-color:#1d1d1d;">'+resolution+'</td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td colspan="2"><button style="width:100%;height:42px;" onClick="document.location.href=\'ticket2.php?ID='+d.ID+'\';"><?php $Icons->Ticket();?>View Ticket</a></td>'+
+                    '<td colspan="2"><button style="width:100%;height:42px;" onClick="document.location.href=\'ticket2.php?ID='+d.ID+'\';"><?php \singleton\fontawesome::getInstance( )->Ticket();?>View Ticket</a></td>'+
                 '</tr>'+
             '</tbody></table>';
         }

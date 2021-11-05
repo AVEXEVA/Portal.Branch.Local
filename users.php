@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	//Connection
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	"	SELECT 	* 
     		FROM 	Connection 
     		WHERE 		Connector = ? 
@@ -17,10 +17,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     	)
     );
     $Connection = sqlsrv_fetch_array( $result );
-    $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User         = sqlsrv_fetch_array($User);
     $Field        = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $r            = sqlsrv_query($NEI,"
+    $r            = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE User_ID = '{$_SESSION['User']}'
@@ -29,7 +29,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged   = FALSE;
     if(isset($Privileges['Ticket']) && $Privileges['Ticket']['User_Privilege'] >= 4 && $Privileges['Ticket']['Group_Privilege'] >= 4 && $Privileges['Ticket']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "users.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "users.php"));
     if(!isset($Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=users.php';</script></head></html><?php }
     else {
 ?><!DOCTYPE html>
@@ -45,27 +45,27 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload='finishLoadingPage();' style='background-color:#3d3d3d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="panel panel-primary" style='margin-bottom:0px;'>
                 <div class="panel-heading">
                     <div class='row'>
-                        <div class='col-xs-10'><?php $Icons->Users( 1 );?> Users</div>
+                        <div class='col-xs-10'><?php \singleton\fontawesome::getInstance( )->Users( 1 );?> Users</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
                     </div>
                 </div>
                 <div class="panel-body no-print" id='Filters' style='border-bottom:1px solid #1d1d1d;'>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Search( 1 );?> Search:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?> Search:</div>
                         <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
                     </div>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class="row"> 
-                        <div class='col-xs-4'><?php $Icons->Supervisor( 1 );?> Supervisor:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Supervisor( 1 );?> Supervisor:</div>
                         <div class='col-xs-8'><select name='Supervisor' onChange='redraw( );'><option value=''>Select</option><?php 
-                            $result = sqlsrv_query(
-                                $Databases[ 'Default' ],
+                            $result = $database->query(
+                                null,
                                 "   SELECT      tblWork.Super AS Supervisor
                                     FROM        tblWork 
                                     GROUP BY    tblWork.Super
@@ -107,7 +107,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     </div>
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <script>
 
     var Table_Users = $('#Table_Users').DataTable( {

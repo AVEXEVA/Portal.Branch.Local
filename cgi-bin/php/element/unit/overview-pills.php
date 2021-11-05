@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4 && $My_Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
 				SELECT * 
 				FROM   TicketO 
 					   LEFT JOIN nei.dbo.Loc  ON TicketO.LID   = Loc.Loc
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				WHERE  Emp.ID      = ?
 					   AND Elev.ID = ?
             ;",array($_SESSION['User'],$_GET['ID']));
-            $r2 = sqlsrv_query($NEI,"
+            $r2 = $database->query(null,"
 				SELECT * 
 				FROM   TicketD 
 					   LEFT JOIN nei.dbo.Loc  ON TicketD.Loc   = Loc.Loc
@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				WHERE  Emp.ID      = ?
 					   AND Elev.ID = ?
             ;",array($_SESSION['User'],$_GET['ID']));
-            $r3 = sqlsrv_query($NEI,"
+            $r3 = $database->query(null,"
 				SELECT * 
 				FROM   TicketDArchive
 					   LEFT JOIN nei.dbo.Loc  ON TicketDArchive.Loc   = Loc.Loc
@@ -53,7 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = (is_array($r) || is_array($r2) || is_array($r3)) ? TRUE : FALSE;
         }
     } elseif($_SESSION['Branch'] == 'Customer' && is_numeric($_GET['ID'])){
-        $SQL_Result = sqlsrv_query($NEI,"
+        $SQL_Result = $database->query(null,"
             SELECT Elev.Owner 
             FROM   nei.dbo.Elev 
             WHERE  Elev.ID        = ? 
@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     if(!isset($array['ID'])  || !$Privileged || !(is_numeric($_GET['ID']) || is_numeric($_POST['ID']))){?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Elev.ID              AS ID,
                     Elev.Unit            AS Unit,
@@ -112,7 +112,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		;",array($_GET['ID']));
         $Unit = sqlsrv_fetch_array($r);
         $data = $Unit;
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT *
             FROM   nei.dbo.ElevTItem
             WHERE  ElevTItem.ElevT    = 1
@@ -122,14 +122,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?>
 <div class="tab-pane fade in active" id="overview-pills">
 	<div class="panel panel-primary" style='margin-bottom:0px;'>
-		<!--<div class="panel-heading"><h3><?php $Icons->Dashboard();?> <?php echo $Location['Tag'];  ?> Dashboard</h3></div>-->
+		<!--<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Dashboard();?> <?php echo $Location['Tag'];  ?> Dashboard</h3></div>-->
 		<div class="panel-body">
 			<div class="row">
 				<div class='col-md-6'>
 					<div class='row'>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Unit();?> Unit</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Unit();?> Unit</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -152,7 +152,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Customer();?> Customer</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer();?> Customer</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -179,7 +179,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Location();?> Location</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location();?> Location</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -207,9 +207,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										<div class="panel-heading"><h4>Maintenance Information</h4></div>
 										<div class='panel-body white-background'>
 											<div class='row' style='font-size:20px;padding:5px;'>
-												<div class='col-xs-12'><?php $Icons->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Unit['Route_ID'];?>"><?php }?><?php echo proper($Unit["Route_Mechanic_First_Name"] . " " . $Unit["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?></a><?php }?>
+												<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Unit['Route_ID'];?>"><?php }?><?php echo proper($Unit["Route_Mechanic_First_Name"] . " " . $Unit["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?></a><?php }?>
 												</div>
-												<div class='col-xs-12'><?php $Icons->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Unit["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
+												<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Unit["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
 											</div>
 										</div>
 									</div>
@@ -242,7 +242,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-8 text-right">
 												<div class="col-xs-8 text-right">
 												<div class="medium"><?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Count(ID) AS Count_of_Jobs 
 														FROM   nei.dbo.Job 
 														WHERE  Elev= ?
@@ -265,7 +265,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-8 text-right">
 												<div class="col-xs-8 text-right">
 												<div class="medium"><?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Count(ID) AS Count_of_Jobs 
 														FROM   nei.dbo.Violation 
 														WHERE  Violation.Elev ='{$_GET['ID']}'
@@ -288,7 +288,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-8 text-right">
 												<div class="col-xs-8 text-right">
 												<div class="medium"><?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Count(Tickets.ID) AS Count_of_Tickets 
 														FROM   (
 																	(SELECT ID FROM TicketO WHERE TicketO.LElev = ?)
@@ -316,7 +316,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-8 text-right">
 												<div class="col-xs-8 text-right">
 												<div class="medium"><?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Count(Estimate.ID) AS Count_of_Tickets 
 														FROM   nei.dbo.Estimate
 															   LEFT JOIN nei.dbo.Job ON Estimate.Job = Job.ID
@@ -340,7 +340,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-8 text-right">
 												<div class="col-xs-8 text-right">
 												<div class="medium"><?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Count(Ref) AS Count_of_Invoices 
 														FROM   nei.dbo.Invoice 
 															   LEFT JOIN nei.dbo.Job ON Invoice.Job = Job.ID
@@ -364,7 +364,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-8 text-right">
 												<div class="col-xs-8 text-right">
 												<div class="medium"><?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Count(TransID) AS Count_of_Outstanding_Invoices 
 														FROM   nei.dbo.OpenAR
 															   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref = Invoice.Ref
@@ -386,7 +386,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Calendar();?> Timeline</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Calendar();?> Timeline</h3></div>
 								<div class='panel-body white-background BankGothic shadow' style='height:400px;overflow:auto;'>
 									<div id='overview-timeline'><?php require('../../../php/element/loading-active.php');?></div>
 									<script>

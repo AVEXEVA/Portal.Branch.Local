@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT * 
         FROM   Connection 
         WHERE  Connection.Connector = ? 
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*, 
                Emp.fFirst AS First_Name, 
                Emp.Last   AS Last_Name 
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table, 
                Privilege.User_Privilege, 
                Privilege.Group_Privilege, 
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
 		    $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 		}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Emp.*, 
 				   tblWork.Super 
 			FROM   Emp 
@@ -84,7 +84,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		if($End_Date < date('Y-m-d 00:00:00.000')){$Closeout = " AND TickOStatus.Type='Completed'";}
 		else {$Clouseout = '';}
 
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT TicketO.*, 
 				   Loc.Tag 			 AS Tag, 
 				   Loc.Address 		 AS Address, 
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketD.fWork = '" . $Selected_Mechanic . "'";}
 		    $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 		}
-	    $r = sqlsrv_query($NEI,"
+	    $r = $database->query(null,"
 	    	SELECT 
 	    		TicketD.CDate 	  AS CDate, 
 	    		TicketD.ID 		  AS ID, 
@@ -184,7 +184,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		        $Tickets[$array['ID']]['Status'] = "Completed";
 		    }
 		}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 	    	SELECT 
 	    		TicketDArchive.CDate 	AS CDate, 
 	    		TicketDArchive.ID 		AS ID, 

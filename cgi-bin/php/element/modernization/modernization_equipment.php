@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -22,7 +22,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!$Privileged || !isset($_GET['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
 
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
                 SELECT * 
                 FROM Mod_Equipment
                 WHERE 
@@ -34,7 +34,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         if($Modernization_Equipment['Drawings_Received'] == "1900-01-01 00:00:00.000"){$Modernization_Equipment['Drawings_Received'] = '';}
         if($Modernization_Equipment['Drawings_Reviewed'] == "1900-01-01 00:00:00.000"){$Modernization_Equipment['Drawings_Reviewed'] = '';}
         if($Modernization_Equipment['Warehoused'] == "1900-01-01 00:00:00.000"){$Modernization_Equipment['Warehoused'] = '';}
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
                 SELECT 
                     Modernization.*,
                     Modernization.ID                                                                    AS  ID,
@@ -59,7 +59,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     Modernization.ID = '{$Modernization_Equipment['Modernization']}'
             ;");
         $Modernization = sqlsrv_fetch_array($r);
-        $r2 = sqlsrv_query($Portal,"
+        $r2 = $database->query($Portal,"
             SELECT Mod_Tracker.Time_Stamp, Mod_Status.Title
             FROM 
                 Mod_Tracker
@@ -69,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         if($r2){
             $Modernization['Status'] = sqlsrv_fetch_array($r2)['Title'];
         }
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                 Elev.ID,
                 Elev.Unit           AS Unit,
@@ -108,7 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Unit = sqlsrv_fetch_array($r);
         $data = $Unit;
 
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT 
                 *
             FROM ElevTItem

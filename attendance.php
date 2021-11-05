@@ -3,7 +3,7 @@
     require('cgi-bin/php/index.php');
     setlocale(LC_MONETARY, 'en_US');
     if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ])){
-          $result = sqlsrv_query($NEI,
+          $result = $database->query(null,
           "SELECT *
            FROM Connection
            WHERE Connector = ? AND Hash = ?;",
@@ -11,7 +11,7 @@
          );
     $array = sqlsrv_fetch_array($result);
     if(!isset($_SESSION[ 'Branch' ]) || $_SESSION[ 'Branch' ] == 'Nouveau Elevator'){
-        $result= sqlsrv_query($NEI,
+        $result= $database->query(null,
           "SELECT *, First
            AS First_Name, Last as Last_Name
            FROM Emp
@@ -19,7 +19,7 @@
          );
         $User = sqlsrv_fetch_array($result);
         $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != 'OFFICE') ? True : False;
-        $result = sqlsrv_query($Portal,
+        $result = $database->query($Portal,
         "   SELECT Access_Table,
                    User_Privilege,
                    Group_Privilege,
@@ -40,7 +40,7 @@
         if(!isset(
           $array[ 'ID' ]) || !$Privileged){require( '401.html' );}
         else {
-    		sqlsrv_query(
+    		$database->query(
           $Portal,
           "INSERT INTO Activity([User],
            [Date], [Page])
@@ -76,8 +76,8 @@
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class='panel'>
             <div class='panel-heading'>
@@ -90,7 +90,7 @@
                 <div class='col-xs-12'>End: <input name='End'  value='<?php echo isset($_GET[ 'End' ]) ? $_GET[ 'End' ] : '';?>'   /></div>
                 <div class='col-xs-12'><input type='submit' value='Search' /></div>-->
                 <div class='col-xs-12'>Supervisor: <select name='Supervisor'><?php
-                  $result = sqlsrv_query($NEI,
+                  $result = $database->query(null,
                   "SELECT tblWork.Super
                    FROM nei.dbo.tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
                   if($result){while($resultow = sqlsrv_fetch_array($result)){
@@ -142,21 +142,21 @@
     </div>
 	</div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
 	<script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>

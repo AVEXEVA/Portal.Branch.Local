@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Financials']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "financials.php"));
@@ -40,14 +40,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if(strlen($_POST['Start_Date']) > 0){$_POST['Start_Date'] = date_format(date_create_from_format('m/d/Y',$_POST['Start_Date']),'Y-m-d 00:00:00.000');}
                 if(strlen($_POST['End_Date']) > 0){$_POST['End_Date'] = date_format(date_create_from_format('m/d/Y',$_POST['End_Date']),'Y-m-d 00:00:00.000');}
                 $_POST['Company'] = intval($_POST['Company']);
-                $r = sqlsrv_query($Portal,"SELECT * FROM Insurance WHERE Company=? AND Type = ?",array($_POST['Company'],$_POST['Type']));
+                $r = $database->query($Portal,"SELECT * FROM Insurance WHERE Company=? AND Type = ?",array($_POST['Company'],$_POST['Type']));
                 if($r && sqlsrv_fetch_array($r)){
-                    sqlsrv_query($Portal,"UPDATE Insurance SET Start_Date = ?, End_Date = ? WHERE Company = ? AND Type = ?",array($_POST['Start_Date'],$_POST['End_Date'],$_POST['Company'],$_POST['Type']));
+                    $database->query($Portal,"UPDATE Insurance SET Start_Date = ?, End_Date = ? WHERE Company = ? AND Type = ?",array($_POST['Start_Date'],$_POST['End_Date'],$_POST['Company'],$_POST['Type']));
                 } else {
-                    sqlsrv_query($Portal,"INSERT INTO Insurance(Company, Start_Date, End_Date, Type) VALUES(?,?,?,?);",array($_POST['Company'],$_POST['Start_Date'],$_POST['End_Date'],$_POST['Type']));
+                    $database->query($Portal,"INSERT INTO Insurance(Company, Start_Date, End_Date, Type) VALUES(?,?,?,?);",array($_POST['Company'],$_POST['Start_Date'],$_POST['End_Date'],$_POST['Type']));
                 }
             } elseif(isset($_POST['Company_Name'])){
-                sqlsrv_query($Portal,"INSERT INTO Insured_Company(Company) VALUES(?)",array($_POST['Company_Name']));
+                $database->query($Portal,"INSERT INTO Insured_Company(Company) VALUES(?)",array($_POST['Company_Name']));
             }
         }?><!DOCTYPE html>
 <html lang="en">
@@ -62,15 +62,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class='panel-heading'><h4>
                             <div style='display:inline-block;'>
-                                <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php $Icons->Unit();?>Customized Finances</span>
+                                <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Customized Finances</span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
                             <div style='clear:both;'></div>
@@ -209,7 +209,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    							<th><select name='Customer' style='width:300px;' onchange='selectCustomer(this);'>
                    								<option value=''>Select</option>
                    								<?php 
-                   									$r = sqlsrv_query($NEI,"SELECT * FROM OwnerWithRol ORDER BY Name");
+                   									$r = $database->query(null,"SELECT * FROM OwnerWithRol ORDER BY Name");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
                    											?><option value='<?php echo $array['ID'];?>'><?php echo $array['Name'];?></option><?php
@@ -223,7 +223,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    							<th><select name='JobType' style='width:150px;' onchange='selectJobType(this);'>
                    								<option value='' selected='selceted'>Select</option>
                    								<?php 
-                   									$r = sqlsrv_query($NEI,"SELECT * FROM JobType ORDER BY Type");
+                   									$r = $database->query(null,"SELECT * FROM JobType ORDER BY Type");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
                    											?><option class='option' value='<?php echo $array['ID'];?>'><?php echo $array['Type'];?></option><?php
@@ -233,7 +233,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    							<th id='Jobs'><select name='Job' style='width:300px;' onchange='selectJob(this);'>
                    								<option value=''>Select</option>
                    								<?php 
-                   									$r = sqlsrv_query($NEI,"SELECT * FROM Job ORDER BY Job.fDesc");
+                   									$r = $database->query(null,"SELECT * FROM Job ORDER BY Job.fDesc");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
                    											?><option class='option' location='<?php echo $array['Loc'];?>' type='<?php echo $array['Type'];?> value='<?php echo $array['ID'];?>'><?php echo $array['fDesc'];?></option><?php
@@ -243,7 +243,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    							<th id='Units'><select name='Unit' style='width:150px;' onchange='selectCustomer(this);'>
                    								<option value=''>Select</option>
                    								<?php 
-                   									$r = sqlsrv_query($NEI,"SELECT * FROM Elev ORDER BY Elev.State");
+                   									$r = $database->query(null,"SELECT * FROM Elev ORDER BY Elev.State");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
                    											?><option class='option' location='<?php echo $array['Loc'];?>' value='<?php echo $array['ID'];?>'><?php echo strlen($array['State'] > 0) ? $array['State'] : $array['Unit'];?></option><?php
@@ -272,21 +272,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>    
+        
 
     <?php require('cgi-bin/js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
@@ -304,7 +304,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </script>
     <script>
       var availableLocations = [<?php 
-        $r = sqlsrv_query($NEI,"SELECT Loc.Loc AS ID, Loc.Tag as Name FROM Loc ORDER BY Loc.Tag ASC");
+        $r = $database->query(null,"SELECT Loc.Loc AS ID, Loc.Tag as Name FROM Loc ORDER BY Loc.Tag ASC");
         $Locations = array();
         if($r){while($Location = sqlsrv_fetch_array($r)){$Locations[$Location['ID']] = $Location['Name'];}}
         $data = array();

@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table,
                Privilege.User_Privilege,
                Privilege.Group_Privilege,
@@ -40,7 +40,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
       if(isset($_GET['ID'])){
-        $r = sqlsrv_query($database_Device,
+        $r = $database->query($database_Device,
           " SELECT  CM_Fault.ID AS ID,
                     CM_Fault.Location AS Location,
                     CM_Fault.Unit AS Unit,
@@ -53,7 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ORDER BY CM_Fault.Date DESC
           ;",array($_GET['ID']));
       } else {
-        $r = sqlsrv_query($database_Device,
+        $r = $database->query($database_Device,
           " SELECT  CM_Fault.ID AS ID,
                     CM_Fault.Location AS Location,
                     CM_Fault.Unit AS Unit,

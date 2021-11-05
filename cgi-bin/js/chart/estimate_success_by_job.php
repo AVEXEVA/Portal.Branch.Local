@@ -12,7 +12,7 @@ function gd(year, month, day) {
             $totals = array();
             //if(FALSE){while($array = sqlsrv_fetch_array($job_result)){$Jobs[] = "[JOBLABOR].[JOB #]='{$array['ID']}'";}}
             //$Jobs = implode(" OR ",$Jobs);
-            $Estimates = sqlsrv_query($NEI,"
+            $Estimates = $database->query(null,"
                 SELECT Estimate.ID     AS ID,
 					   Estimate.fDate  AS Date,
 				       Estimate.Status AS Status

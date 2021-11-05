@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/portal.live.local/html/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Connection.*
 		    FROM    Connection
 		    WHERE         Connection.Connector = ?
@@ -16,8 +16,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  *,
 		            Emp.fFirst AS First_Name,
 			        Emp.Last   AS Last_Name
@@ -28,8 +28,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query(
-        $NEI,  
+	$r = $database->query(
+        null,  
         "   SELECT *
 		    FROM   Privilege
 		    WHERE  Privilege.User_ID = ?;",
@@ -45,8 +45,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query(
-            $NEI,
+		$database->query(
+            null,
             "   INSERT INTO Activity([User], [Date], [Page])
                 VALUES(?,?,?);",
             array(
@@ -69,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style='background-color:#3d3d3d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary" style='margin-bottom:0px;'>
 				<div class="panel-heading">
@@ -134,9 +134,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
 		</div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <script>
 
     var Table_Tickets = $('#Table_Tickets').DataTable( {

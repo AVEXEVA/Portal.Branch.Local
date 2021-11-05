@@ -6,7 +6,7 @@ function gd(year, month, day) {
     var repair_jobs_data = [
         <?php 
         $data = array();
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT fDate
             FROM Job
             WHERE (Job.Type='3' OR Job.Type='6') AND Job.fDate <= '2020-01-01 00:00:00.000' AND Job.fDate >= '2000-01-01 00:00:00.000';

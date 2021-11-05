@@ -4,8 +4,8 @@ require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/
 setlocale(LC_MONETARY, 'en_US');
   if(isset($_SESSION[ 'User' ],
            $_SESSION[ 'Hash' ] ) ) {
-        $result = sqlsrv_query(
-            $NEI,
+        $result = $database->query(
+            null,
           '     SELECT  *
           FROM      Connection
           WHERE         Connector = ?
@@ -18,8 +18,8 @@ setlocale(LC_MONETARY, 'en_US');
           $array = sqlsrv_fetch_array( $result );
           if(!isset(
               $_SESSION[ 'Branch' ]) || $_SESSION[ 'Branch' ] == 'Nouveau Elevator'){
-            $result= sqlsrv_query(
-              $NEI,
+            $result= $database->query(
+              null,
             '      SELECT   *,
                           Emp.fFirst AS First_Name,
                           Emp.Last   AS Last_Name
@@ -32,8 +32,8 @@ setlocale(LC_MONETARY, 'en_US');
           $User = sqlsrv_fetch_array( $result );
           $Field = ($User[ 'Field' ] == 1
               && $User[ 'Title' ] != 'OFFICE') ? True : False;
-          $result = sqlsrv_query(
-            $NEI,
+          $result = $database->query(
+            null,
           '       SELECT Access_Table,
                          User_Privilege,
                          Group_Privilege,
@@ -56,14 +56,14 @@ setlocale(LC_MONETARY, 'en_US');
     }
     } elseif(
       $_SESSION[ 'Branch' ] == 'Customer' && is_numeric($_GET[ 'ID' ] ) ) {
-            $result =  sqlsrv_query(
-               $NEI,
+            $result =  $database->query(
+               null,
                '    SELECT Ref
                     FROM  Invoice LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
                     WHERE Invoice.Ref='{$_GET[ 'ID' ] }' AND Loc.Owner = '{$_SESSION[ 'Branch_ID' ]}';');
                $Privileged = $result ? TRUE : FALSE;
     }
-  sqlsrv_query($Portal,'INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);',
+  $database->query($Portal,'INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);',
   array(
     $_SESSION[ 'User' ],
       date('Y-m-d H:i:s'),
@@ -71,7 +71,7 @@ setlocale(LC_MONETARY, 'en_US');
     );
     if(!isset($array['ID']) || !is_numeric($_GET['ID'])  || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
-        $result = sqlsrv_query($NEI,
+        $result = $database->query(null,
             'SELECT
                 TOP 1
                 Invoice.Ref 			AS ID,
@@ -126,11 +126,11 @@ setlocale(LC_MONETARY, 'en_US');
 <body onload='finishLoadingPage();'>
     <div id='wrapper' style='overflow:auto !important;' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION['Toggle_Menu'] : null;?>'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content' style='overflow:auto !important;'>
             <div class='' style='display:none;'>
                 <div class='panel panel-primary'>
-                    <div class='panel-heading'><h3><?php $Icons->Invoice();?> Invoice</h3></div>
+                    <div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Invoice();?> Invoice</h3></div>
                     <div class='panel-body'>
                         <div class='col-md-4'>
                             <div class='panel panel-red'>

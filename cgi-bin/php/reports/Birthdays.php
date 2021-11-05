@@ -3,8 +3,8 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  * 
             FROM    Connection 
             WHERE       Connector = ? 
@@ -15,8 +15,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $Connection = sqlsrv_fetch_array( $result );
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  * 
             FROM    Emp 
             WHERE   ID = ?;",
@@ -26,8 +26,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $User = sqlsrv_fetch_array($User);
     //Privileges
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  Access_Table, 
                     User_Privilege, 
                     Group_Privilege, 
@@ -48,7 +48,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         || !$Privileged
     ){ print json_encode( array( 'data' => array( ) ) ); }
     else {
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
              SELECT Emp.fFirst + ' ' + Emp.Last   AS Name,
 			 		Emp.DBirth                    AS Birthday
 			 FROM   Emp

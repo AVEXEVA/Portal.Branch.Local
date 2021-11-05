@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
 		        FROM        Connection
             WHERE       Connection.Connector = ?
@@ -17,8 +17,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *,
                     Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-	$result = sqlsrv_query(
-        $NEI,
+	$result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -63,7 +63,7 @@ if(     count( $_POST ) > 0
     $Description,
     $Suggestion
   );
-  $result = sqlsrv_query(
+  $result = $database->query(
     $Portal,
     " INSERT INTO Bug(Name, Severity, Description, Suggestion)
       VALUES(?,?,?,?);",
@@ -105,10 +105,10 @@ if(     count( $_POST ) > 0
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class="panel panel-primary">
-            <div class='panel-heading'><h4><?php $Icons->Contract( );?> Contracts</h4></div>
+            <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
                 <div class='panel-body no-print' id='Filters' style='border-bottom:1px solid #1d1d1d;'>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class='form-group row'>
@@ -133,7 +133,7 @@ if(     count( $_POST ) > 0
                         <div class='col-auto'><select name='Severity' onChange='redraw( );'>
                             <option value=''>Select</option>
                             <?php 
-                                $result = sqlsrv_query( 
+                                $result = $database->query( 
                                     $Portal,
                                     "   SELECT  *
                                         FROM    Portal.dbo.Severity;",
@@ -161,9 +161,9 @@ if(     count( $_POST ) > 0
             </div>
         </div>
     </div>
-  <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+  
   <?php require(PROJECT_ROOT.'js/datatables.php');?>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  
   <script>
     var Table_Bugs = $('#Table_Bugs').DataTable( {
         dom        : 'tp',

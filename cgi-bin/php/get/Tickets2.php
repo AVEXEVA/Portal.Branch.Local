@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $Connection = sqlsrv_query(
-    	$NEI,
+    $Connection = $database->query(
+    	null,
     	"	SELECT 	Top 1 
     				*
 			FROM   	Connection
@@ -19,8 +19,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
     $Connection = sqlsrv_fetch_array($Connection);
-	$User    = sqlsrv_query(
-		$NEI,
+	$User    = $database->query(
+		null,
 		"	SELECT 	Top 1 
 					Emp.*,
 				   	Emp.fFirst AS First_Name,
@@ -32,8 +32,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
 	$User = sqlsrv_fetch_array( $User );
-	$r = sqlsrv_query(
-		$NEI,
+	$r = $database->query(
+		null,
 		"	SELECT 	Privilege.Access_Table,
 				   	Privilege.User_Privilege,
 			   		Privilege.Group_Privilege,
@@ -57,7 +57,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if( !isset( $Connection[ 'ID' ] ) || !$Privileged ){ print json_encode( array( 'data' => array( ) ) );}
 	else {
 		$output = array(
-	        'sEcho'         =>  intval($_GET['sEcho']),
+	        'sEcho'         => isset( $_GET[ 'draw' ] ) ? intval( $_GET[ 'draw' ] ) : 1,
 	        'iTotalRecords'     =>  0,
 	        'iTotalDisplayRecords'  =>  0,
 	        'aaData'        =>  array(),
@@ -308,8 +308,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			) AS Tbl 
 			WHERE 		Tbl.ROW_COUNT >= ?
 					AND Tbl.ROW_COUNT <= ?;";
-		$rResult = sqlsrv_query(
-			$NEI,
+		$rResult = $database->query(
+			null,
 			$Query,
 			$parameters
 		) or die(print_r(sqlsrv_errors()));
@@ -375,8 +375,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
 			WHERE 		({$conditions}) AND ({$search});";
 
-	    $stmt = sqlsrv_query( 
-	    	$NEI, 
+	    $stmt = $database->query( 
+	    	null, 
 	    	$sQueryRow, 
 	    	$parameters
 	    ) or die(print_r(sqlsrv_errors()));
@@ -394,8 +394,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	                		FROM 	TicketD
 	                	)
 	            	) AS Ticket;";
-	    $rResultTotal = sqlsrv_query(
-	    	$NEI,  
+	    $rResultTotal = $database->query(
+	    	null,  
 	    	$sQuery, 
 	    	array( $User[ 'ID' ] )
 	    ) or die(print_r(sqlsrv_errors()));
@@ -403,8 +403,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    $iTotal = $aResultTotal[0];
 
 	    $Types = array( );
-	    $result = sqlsrv_query(
-	    	$NEI,
+	    $result = $database->query(
+	    	null,
 	    	"	SELECT 	JobType.ID,
 	    				JobType.Type
 	    		FROM 	JobType;",

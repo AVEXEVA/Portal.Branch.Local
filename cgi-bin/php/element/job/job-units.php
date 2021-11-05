@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	//Connection
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	"	SELECT 	*
 			FROM   	Connection
 			WHERE  		Connection.Connector = ?
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	);
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result    = sqlsrv_query(
-		$NEI,
+	$result    = $database->query(
+		null,
 		"	SELECT 	Emp.*,
 			   		Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
 	$User = sqlsrv_fetch_array( $result );
-	$result = sqlsrv_query(
-		$NEI,
+	$result = $database->query(
+		null,
 		"	SELECT 	Privilege.Access_Table,
 			   		Privilege.User_Privilege,
 			   		Privilege.Group_Privilege,
@@ -56,8 +56,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		&& 	$Privileges[ 'Job' ][ 'User_Privilege' ] >= 4
 		&& 	$Privileges[ 'Job' ][ 'Group_Privilege' ] >= 4 
 		&& 	is_numeric( $_GET[ 'ID' ] )
-	){		$r = sqlsrv_query(
-				$NEI,
+	){		$r = $database->query(
+				null,
 				"	SELECT Job.Loc AS Location_ID
 					FROM   Job
 					WHERE  Job.ID = ?;", 
@@ -66,8 +66,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 				)
 			);
 			$Location_ID = sqlsrv_fetch_array($r)['Location_ID'];
-			$result = sqlsrv_query(
-				$NEI,
+			$result = $database->query(
+				null,
 				"	SELECT 	Tickets.ID
 					FROM 	(
 								(
@@ -95,8 +95,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			isset( $Privileges[ 'Job' ] )
 		&& 	$Privileges[ 'Job' ][ 'User_Privilege' ] >= 4
 		&& 	is_numeric( $_GET[ 'ID' ] )
-	){		$result = sqlsrv_query(
-				$NEI,
+	){		$result = $database->query(
+				null,
 				"	SELECT 	Tickets.ID
 					FROM  	(
 								(
@@ -126,8 +126,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     	|| 	!$Privileged){
     		require('401.html');
    	} else {
-    	sqlsrv_query(
-    		$NEI,
+    	$database->query(
+    		null,
     		"	INSERT INTO Activity([User], [Date], [Page])
     			VALUES(?,?,?);",
     		array(
@@ -136,8 +136,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     			'job.php?ID=' . $_GET['ID']
     		)
     	);
-       	$r = sqlsrv_query(
-       		$NEI,
+       	$r = $database->query(
+       		null,
        		"	SELECT 	TOP 1
                 		Job.ID                AS Job_ID,
                 		Job.fDesc             AS Job_Name,
@@ -201,7 +201,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		<div class='row'>
 			<div class='col-md-12' >
 				<div class='panel panel-primary'>
-					<div class='panel-heading'><?php $Icons->Unit( 1 );?> Units</div>
+					<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?> Units</div>
 					<div class='panel-body'>
 						<table id='Table_Units' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 							<thead>

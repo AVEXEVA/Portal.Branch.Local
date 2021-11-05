@@ -7,14 +7,14 @@ function Check_Date_Time($date_time){
  else {return false;}
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
@@ -26,7 +26,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
-    /*$r = sqlsrv_query($NEI,
+    /*$r = $database->query(null,
       " SELECT *
         FROM (
           (SELECT  TicketO.ID AS ID,
@@ -74,7 +74,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       sqlsrv_execute($pSQL);
       if(!$pSQL || !is_array(sqlsrv_fetch_array($pSQL))){
         if(isset($Ticket_Data['CDate']) && Check_Date_Time($Ticket_Data['CDate'])){
-          sqlsrv_query($Portal_44,
+          $database->query($Portal_44,
             " INSERT INTO Portal.dbo.Timeline(Entity, [Entity_ID], [Action], Time_Stamp, Description)
               VALUES(?, ?, ?, ?, ?)
             ;",array('Ticket', $Ticket_ID, 'Created', $Ticket_Data['CDate'], '<i class="fa fa-building fa-fw fa-1x"></i>' . " " . $Ticket_Data['Location_Tag']));
@@ -95,7 +95,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       sqlsrv_execute($pSQL);
       if(!$pSQL || !is_array(sqlsrv_fetch_array($pSQL))){
         if(isset($Ticket_Data['TimeRoute']) && Check_Date_Time($Ticket_Data['TimeRoute']) && $Ticket_Data['TimeRoute'] != '1899-12-30 00:00:00.000'){
-          sqlsrv_query($Portal_44,
+          $database->query($Portal_44,
             " INSERT INTO Portal.dbo.Timeline(Entity, [Entity_ID], [Action], Time_Stamp, Description)
               VALUES(?, ?, ?, ?, ?)
             ;",array('Ticket', $Ticket_ID, 'Accepted Work', date("Y-m-d",strtotime($Ticket_Data['EDate'])) . ' ' . date("H:i:s",strtotime($Ticket_Data['TimeRoute'])), '<i class="fa fa-building fa-fw fa-1x"></i>' . " " . $Ticket_Data['Location_Tag']));
@@ -116,7 +116,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       sqlsrv_execute($pSQL);
       if(!$pSQL || !is_array(sqlsrv_fetch_array($pSQL))){
         if(isset($Ticket_Data['TimeSite']) && Check_Date_Time($Ticket_Data['TimeSite']) && $Ticket_Data['TimeSite'] != '1899-12-30 00:00:00.000'){
-          sqlsrv_query($Portal_44,
+          $database->query($Portal_44,
             " INSERT INTO Portal.dbo.Timeline(Entity, [Entity_ID], [Action], Time_Stamp, Description)
               VALUES(?, ?, ?, ?, ?)
             ;",array('Ticket', $Ticket_ID, 'At Work', date("Y-m-d",strtotime($Ticket_Data['EDate'])) . ' ' . date("H:i:s",strtotime($Ticket_Data['TimeSite'])), '<i class="fa fa-building fa-fw fa-1x"></i>' . " " . $Ticket_Data['Location_Tag']));
@@ -136,7 +136,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       sqlsrv_execute($pSQL);
       if(!$pSQL || !is_array(sqlsrv_fetch_array($pSQL))){
         if(isset($Ticket_Data['TimeComp']) && Check_Date_Time($Ticket_Data['TimeComp']) && $Ticket_Data['TimeComp'] != '1899-12-30 00:00:00.000'){
-          sqlsrv_query($Portal_44,
+          $database->query($Portal_44,
             " INSERT INTO Portal.dbo.Timeline(Entity, [Entity_ID], [Action], Time_Stamp, Description)
               VALUES(?, ?, ?, ?, ?)
             ;",array('Ticket', $Ticket_ID, 'Completed Work', date("Y-m-d",strtotime($Ticket_Data['EDate'])) . ' ' . date("H:i:s",strtotime($Ticket_Data['TimeComp'])), '<i class="fa fa-building fa-fw fa-1x"></i>' . " " . $Ticket_Data['Location_Tag']));
@@ -149,14 +149,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Ticket_ID = 0;
 
     if(isset($_GET['REFRESH_DATETIME'])){
-      $r = sqlsrv_query($Portal_44,
+      $r = $database->query($Portal_44,
         " SELECT  *
           FROM    Portal.dbo.Timeline
           WHERE   Timeline.Time_Stamp > ?
                   AND Timeline.Time_stamp <= ?
           ORDER BY Timeline.Time_Stamp ASC
         ;",array(date("Y-m-d H:i:s",strtotime("-15 minutes",strtotime($_GET['REFRESH_DATETIME']))),date("Y-m-d H:i:s",strtotime('+15 minutes'))));
-      $pSQL = sqlsrv_prepare($NEI,
+      $pSQL = sqlsrv_prepare(null,
         " SELECT  Emp.fFirst + ' ' + Emp.Last AS Employee_Name,
                   Ticket.ID,
                   Loc.Tag AS Location_Tag

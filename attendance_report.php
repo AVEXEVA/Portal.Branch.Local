@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -54,8 +54,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:#1d1d1d;height:100%;">
 <div id='container' style='min-height:100%;height:100%;'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-    <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <?php require( bin_php . 'element/navigation/index.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
     <div id="page-wrapper" class='content'>
       <div class='panel panel-primary'>
         <div class='panel-heading'>Attendance Report</div>
@@ -64,7 +64,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-1'>Supervisor:</div>
             <div class='col-xs-11'><select name='Supervisor' style='color:black !important;' onChange='refresh();'><option value='' style='color:black;'>Select</option>
               <?php
-                $r = sqlsrv_query($NEI,"SELECT tblWork.Super FROM nei.dbo.tblWork WHERE tblWork.Super <> '' GROUP BY tblWork.Super ORDER BY tblWork.Super ASC ;");
+                $r = $database->query(null,"SELECT tblWork.Super FROM nei.dbo.tblWork WHERE tblWork.Super <> '' GROUP BY tblWork.Super ORDER BY tblWork.Super ASC ;");
                 if($r){while($row = sqlsrv_fetch_array($r)){?><option style='color:black !important;' value='<?php echo $row['Super'];?>' <?php echo isset($_GET['Supervisor']) && $row['Super'] == $_GET['Supervisor']  && $_GET['Supervisor'] != '' ? 'selected' : '';?>><?php echo $row['Super'];?></option><?php }}?>
             </select></div>
           </div>
@@ -85,18 +85,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   </div>
 </div>
 <!-- Bootstrap Core JavaScript -->
-<script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+
 
 <!-- Metis Menu Plugin JavaScript -->
-<script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+
 
 <?php require(PROJECT_ROOT.'js/datatables.php');?>
-<script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+
 <!-- Custom Theme JavaScript -->
-<script src="../dist/js/sb-admin-2.js"></script>
+
 
 <!-- JQUERY UI Javascript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
 <script>
 var Attendance_Report = null;
 $(document).ready(function(){

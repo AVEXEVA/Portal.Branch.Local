@@ -1,14 +1,14 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?;",array($_SESSION['User']));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege FROM Privilege WHERE User_ID = ?;",array($_SESSION['User']));
+    $r = $database->query($Portal,"SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege FROM Privilege WHERE User_ID = ?;",array($_SESSION['User']));
     $My_Privileges = array();
     while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = FALSE;
@@ -38,20 +38,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload="finishLoadingPage();" style='background-color:#1d1d1d;'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
     <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-    <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
     <div id="page-wrapper" class='content' style='<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
       <div class='panel-primary'>
-        <div class='panel-heading' onClick='document.location.href="work.php";'><h4 style=''><?php $Icons->Location();?> Location: New</h4></div>
+        <div class='panel-heading' onClick='document.location.href="work.php";'><h4 style=''><?php \singleton\fontawesome::getInstance( )->Location();?> Location: New</h4></div>
         <div class='panel-body'>
   				<div class='row'>
   					<div class='col-xs-12'>&nbsp;</div>
           </div>
           <div class='row'>
-  					<div class='col-xs-4'><?php $Icons->Location(1);?> Customer:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Customer:</div>
   					<div class='col-xs-8'><button type='button' onClick='selectCustomers(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Customer']) && is_numeric($_GET['Customer'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.OwnerWithRol WHERE OwnerWithRol.ID = ?;",array($_GET['Customer']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.OwnerWithRol WHERE OwnerWithRol.ID = ?;",array($_GET['Customer']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -211,15 +211,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  }
 	  </style>
 	  <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
 	<script>
 	$(document).ready(function(){$("input[name='Date']").datepicker();});

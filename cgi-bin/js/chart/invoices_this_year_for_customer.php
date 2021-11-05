@@ -2,7 +2,7 @@
 function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 var data1 = [<?php 
 	$Vars = array();
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT Loc.Loc
 		FROM   nei.dbo.Loc
 		WHERE  Loc.Owner = ?
@@ -13,7 +13,7 @@ var data1 = [<?php
 		$SQL_Locations = implode(" OR ",$Locations);
 		$SQL_Start_Date = date('Y-01-01 00:00:00.000');
 		$SQL_End_Date = date('Y-m-t 23:59:59.999');
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Invoice.Ref,
 				   Invoice.fDate,
 				   Invoice.Total 

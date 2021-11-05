@@ -29,7 +29,7 @@ class datatable extends \sql\index {
   private function __columns_sqlsrv( ){
     $columns = array( );
     $query = "select * from information_schema.columns where columns.table_name = ?";
-    $result = sqlsrv_query(
+    $result = $database->query(
       parent::__get( 'resource' )->__get( 'link' ),
       $query,
       array( 
@@ -80,7 +80,7 @@ class datatable extends \sql\index {
     $rows = array();
     $table = parent::__get( 'name' );
     $query = "select * from {$table};";
-    $result = sqlsrv_query(
+    $result = $database->query(
       parent::__get( 'resource' )->__get( 'link' ),
       $query,
       array(

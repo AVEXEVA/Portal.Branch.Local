@@ -63,7 +63,7 @@ function attendance_clock(link){
 }
 function complete_clockout(){
   if('<?php
-    $r = sqlsrv_query($NEI,"SELECT * FROM TicketO LEFT JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID WHERE ((TicketO.Assigned >= 2 AND TicketO.Assigned <= 3)  OR (TicketDPDA.Comments = '' OR TicketDPDA.Comments IS NULL ) AND 0 = 1 ) AND TicketO.fWork = ? ;",array($User['fWork']));
+    $r = $database->query(null,"SELECT * FROM TicketO LEFT JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID WHERE ((TicketO.Assigned >= 2 AND TicketO.Assigned <= 3)  OR (TicketDPDA.Comments = '' OR TicketDPDA.Comments IS NULL ) AND 0 = 1 ) AND TicketO.fWork = ? ;",array($User['fWork']));
     if($r && is_array(sqlsrv_fetch_array($r))){echo 'True';}
     else{echo 'False';}
   ?>' == 'True'){alert('You must finish your tickets before you clock out.');}
@@ -168,7 +168,7 @@ $( document ).ready( function(){
         className: 'indent',
         data : 'Tag',
         render : function(data, type, row, meta){
-          if(type === 'display'){return '<?php $Icons->Ticket(1);?>';}
+          if(type === 'display'){return '<?php \singleton\fontawesome::getInstance( )->Ticket(1);?>';}
           return data;
         },
         sortable : true,

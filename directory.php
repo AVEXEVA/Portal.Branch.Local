@@ -13,12 +13,12 @@ $conn = sqlsrv_connect($serverName, $connectionOptions);
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = addslashes($_SESSION['User']);
     $Hash = addslashes($_SESSION['Hash']);
-    $r = sqlsrv_query($conn,"SELECT * FROM Connection WHERE Connector='{$User}' AND Hash='{$Hash}'");
+    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector='{$User}' AND Hash='{$Hash}'");
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID='{$User}'");
+    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID='{$User}'");
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    sqlsrv_query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "directory.php"));
+    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "directory.php"));
     if(!isset($array['ID']) || $Field ){?><html><head><script>document.location.href='../login.php?Forward=directory.php';</script></head></html><?php }
     else {
 ?><!DOCTYPE html>
@@ -34,7 +34,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'html/navigation.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -76,26 +76,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="https://www.nouveauelevator.com/vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- DataTables JavaScript -->
     <script src="https://www.nouveauelevator.com/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/datatables-responsive/dataTables.responsive.js"></script>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!--Moment JS Date Formatter-->
-    <script src="../dist/js/moment.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <!-- Custom Date Filters-->
-    <script src="../dist/js/filters.js"></script>
+    
     <script>
         function hrefEmployees(){
             $("#Employees_Table tbody tr").each(function(){

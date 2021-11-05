@@ -1,7 +1,7 @@
 <script>
   var here;
 <?php
-$result = sqlsrv_query($NEI,"SELECT TicketO.ID AS Ticket_ID FROM TicketD WHERE TicketO.Invoice = ?",array($_GET['ID']));
+$result = $database->query(null,"SELECT TicketO.ID AS Ticket_ID FROM TicketD WHERE TicketO.Invoice = ?",array($_GET['ID']));
 if($result){while($Ticket = sqlsrv_fetch_array($result)){?>
   $(document).ready(function(){
     var TicketID = <?php echo $Ticket['Ticket_ID'];?>;
@@ -15,7 +15,7 @@ if($result){while($Ticket = sqlsrv_fetch_array($result)){?>
   });
 <?php }}?>
 <?php
-$result = sqlsrv_query($NEI,"SELECT TicketD.ID AS Ticket_ID FROM TicketD WHERE TicketD.Invoice = ?",array($_GET['ID']));
+$result = $database->query(null,"SELECT TicketD.ID AS Ticket_ID FROM TicketD WHERE TicketD.Invoice = ?",array($_GET['ID']));
 if($result){while($Ticket = sqlsrv_fetch_array($result)){?>
   $(document).ready(function(){
     var TicketID = <?php echo $Ticket['Ticket_ID'];?>;
@@ -29,7 +29,7 @@ if($result){while($Ticket = sqlsrv_fetch_array($result)){?>
   });
 <?php }}?>
 <?php
-$result = sqlsrv_query($NEI,"SELECT TicketDArchive.ID AS Ticket_ID FROM TicketDArchive WHERE TicketDArchive.Invoice = ?",array($_GET['ID']));
+$result = $database->query(null,"SELECT TicketDArchive.ID AS Ticket_ID FROM TicketDArchive WHERE TicketDArchive.Invoice = ?",array($_GET['ID']));
 if($result){while($Ticket = sqlsrv_fetch_array($result)){?>
   $(document).ready(function(){
     var TicketID = <?php echo $Ticket['Ticket_ID'];?>;

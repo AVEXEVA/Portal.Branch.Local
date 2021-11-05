@@ -7,7 +7,7 @@ function gd(year, month, day) {
         $data = array();
         $data2 = array();
         $data3 = array();
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT Loc.Zone AS Division, 
 				   ((TicketD.Reg * PRWage.Reg) + (TicketD.OT * PRWage.OT1) + (TicketD.DT * PRWage.OT2) + (TicketD.TT * PRWage.Reg)) AS Total, 
 				   TicketD.EDate AS Dated

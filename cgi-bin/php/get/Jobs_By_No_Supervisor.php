@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT * 
         FROM   Connection 
         WHERE  Connection.Connector = ? 
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*, 
                Emp.fFirst AS First_Name, 
                Emp.Last   AS Last_Name 
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table, 
                Privilege.User_Privilege, 
                Privilege.Group_Privilege, 
@@ -42,7 +42,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         $data = array();
         if($My_Privileges['User_Privilege'] >= 4 && $My_Privileges['Group_Privilege'] >= 4 && $My_Privileges['Other_Privilege'] >= 4){
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Job.ID                  AS  ID,
                        Job.fDesc               AS  Name,
                        JobType.Type            AS  Type,
@@ -71,14 +71,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         } else {
             $SQL_Jobs = array();
             if($My_Privileges['Group_Privilege'] >= 4){
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Job AS Job
                     FROM   TicketO
                            LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
                     WHERE  Emp.ID = ?
                 ;",array($_SESSION['User']));
                 while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Jobs[] = "Job.ID='{$array['Job']}'";}
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Job AS Job
                     FROM   TicketD
                            LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -87,7 +87,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($r){
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Jobs[] = "Job.ID='{$array['Job']}'";}
                 }
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
                     SELECT Job AS Job
                     FROM   TicketDArchive
                            LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
@@ -99,7 +99,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
             }
             if($My_Privileges['User_Privilege'] >= 4){
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Job.ID AS Job
                     FROM Job
                          LEFT JOIN nei.dbo.Loc   ON Elev.Loc = Loc.Loc
@@ -114,7 +114,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $SQL_Jobs = array_unique($SQL_Jobs);
             if(count($SQL_Jobs) > 0){
                 $SQL_Jobs = implode(' OR ',$SQL_Jobs);
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Job.ID            AS  ID,
                            Job.fDesc         AS  Name,
                            JobType.Type      AS  Type,

@@ -542,7 +542,7 @@ function save_internal_comments(link){
     success:function(code){
       <?php
       if($Ticket['Level'] == 10){
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
           " SELECT  TicketO.ID
             FROM    nei.dbo.TicketO
             WHERE   TicketO.LElev = ?

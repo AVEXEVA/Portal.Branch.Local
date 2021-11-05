@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 $_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -32,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Admin']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "accounting.php"));
@@ -47,8 +47,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
 <div id='container'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-      <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-      <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+      <?php require( bin_php . 'element/navigation/index.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
       <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
         <div class='panel-panel-primary'>
           <div class='panel-heading'>Accounting Department</div>
@@ -81,7 +81,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         else {
                           TIMELINE[i] = jsonData[i];
                           $("#Timeline").prepend("<div class='row'>"
-                            + '<div class="col-xs-1"><?php $Icons->Violation(1);?></div>'
+                            + '<div class="col-xs-1"><?php \singleton\fontawesome::getInstance( )->Violation(1);?></div>'
                             + "<div class='col-xs-3'>" + jsonData[i].Location_Tag + "</div>"
                             + "<div class='col-xs-1'>Violation #" + jsonData[i].ID + "</div>"
                             + "<div class='col-xs-1'>" + jsonData[i].Action + "</div>"

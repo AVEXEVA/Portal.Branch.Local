@@ -5,7 +5,7 @@ function gd(year, month, day) {
     var data5 = [
         <?php 
         $Vars = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 Loc.Loc
             FROM 
@@ -20,7 +20,7 @@ function gd(year, month, day) {
             $SQL_Start_Date = date('Y-01-01 00:00:00.000');
             $SQL_End_Date = date('Y-m-t 23:59:59.999');
             $Tickets = array();
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT 
                     TicketD.ID,
                     TicketD.EDate 
@@ -35,7 +35,7 @@ function gd(year, month, day) {
             while($array = sqlsrv_fetch_array($r)){
                 $Tickets[substr($array['EDate'],0,10)] = isset($Tickets[substr($array['EDate'],0,10)]) ? $Tickets[substr($array['EDate'],0,10)] + 1 : 1;
             }
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT
                     Loc.Loc
                 FROM 
@@ -45,7 +45,7 @@ function gd(year, month, day) {
             ;");
             $Locations = array();
             while($array = sqlsrv_fetch_array($r)){$Locations[] = "TicketO.LID='{$array['Loc']}'";}
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT 
                     TicketO.ID,
                     TicketO.EDate

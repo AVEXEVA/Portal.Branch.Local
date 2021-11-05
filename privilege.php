@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash  = ?
     ;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         WHERE  Emp.ID = ?
     ;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
@@ -32,14 +32,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             || $My_Privileges['Admin']['Other_Privilege'] < 4){
                 ?><?php require('../404.html');?><?php }
     else {
-        sqlsrv_query($NEI,"
+        $database->query(null,"
             INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
             VALUES(?,?,?)
         ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "privilege.php?User_ID=" . $_GET['User_ID']));
 $Selected_User_ID = isset($_GET['User_ID']) ? $_GET['User_ID'] : $_POST['User_ID'];
 if(isset($_POST['User_ID'])){
     if(isset($_POST['Type']) && $_POST['Type'] == 'Update'){
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             UPDATE Portal
             SET
                 Email = ?,
@@ -48,14 +48,14 @@ if(isset($_POST['User_ID'])){
                   AND Branch='Nouveau Texas';
         ",array($_POST['Email'],$_POST['Password'],$_POST['User_ID']));
     } elseif(isset($_POST['Type']) && $_POST['Type'] == 'Insert'){
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             INSERT INTO Portal(Email, Password, Verified, Branch, Branch_ID)
             VALUES(?,?,1,'Nouveau Texas',?);
         ",array($_POST['Email'],$_POST['Password'],$_POST['User_ID']));
     }
     $_GET['User_ID'] = $_POST['User_ID'];
 }
-$r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID='{$Selected_User_ID}'");
+$r = $database->query(null,"SELECT * FROM Emp WHERE ID='{$Selected_User_ID}'");
 $Selected_User = sqlsrv_fetch_array($r);
 ?><!DOCTYPE html>
 <html lang="en">
@@ -68,7 +68,7 @@ $Selected_User = sqlsrv_fetch_array($r);
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row" onClick='document.location.href="privileges.php";'>
                 <div class="col-lg-12">
@@ -102,7 +102,7 @@ $Selected_User = sqlsrv_fetch_array($r);
                         </div>
                         <div class='panel-body'>
                             <?php
-                                $r = sqlsrv_query($Portal,"
+                                $r = $database->query($Portal,"
                                     SELECT *
                                     FROM Portal
                                     WHERE
@@ -147,7 +147,7 @@ $Selected_User = sqlsrv_fetch_array($r);
                 <div class='col-lg-12'><form id="grantPrivileges" action="cgi-bin/php/post/grantPrivileges.php">
                     GRANT <?php echo proper($Selected_User['fFirst'] . " " . $Selected_User['Last']);?> TABLE
                     <select name='Access_Table'>
-                    <?php $r = sqlsrv_query($Portal,"SELECT Privileges.Access_Table FROM   Privilege;");
+                    <?php $r = $database->query($Portal,"SELECT Privileges.Access_Table FROM   Privilege;");
                     $Access_Tables = array();
                     while($array = sqlsrv_fetch_array($r)){$Access_Tables[] = $array['Access_Table'];}
                     $Access_Tables = array_unique($Access_Tables);
@@ -244,11 +244,11 @@ $Selected_User = sqlsrv_fetch_array($r);
             </div>
         </div>
     </div>
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
+    
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="../dist/js/sb-admin-2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+    
     <script>
         $(document).ready(function() {
             var table = $('#Privileges_Table').DataTable( {

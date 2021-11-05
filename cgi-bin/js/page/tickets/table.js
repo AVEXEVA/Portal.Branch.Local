@@ -83,7 +83,9 @@ $(document).ready(function( ){
         ajax: {
                 url     : 'cgi-bin/php/get/Tickets2.php',
                 data    : function(d){
+                    console.log( d );
                     d = {
+                        draw : d.draw,
                         start : d.start, 
                         length : d.length,
                         order : {

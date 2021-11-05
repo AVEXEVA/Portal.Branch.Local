@@ -1,6 +1,6 @@
 <?php
 $data = array();
-$r = sqlsrv_query($NEI,"
+$r = $database->query(null,"
 	SELECT 
         TicketD.ID,
         TicketD.EDate,

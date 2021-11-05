@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = sqlsrv_query(
-    	$NEI,
+    $r = $database->query(
+    	null,
     	"	SELECT *
 			FROM   Connection
 			WHERE  Connection.Connector = ?
@@ -16,8 +16,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
     $Connection = sqlsrv_fetch_array( $r, SQLSRV_FETCH_ASSOC );
-    $r = sqlsrv_query(
-    	$NEI,
+    $r = $database->query(
+    	null,
     	"	SELECT 	*,
 		       		Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
@@ -28,8 +28,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		) 
 	);
     $User = sqlsrv_fetch_array( $r );
-	$r = sqlsrv_query(
-		$NEI,
+	$r = $database->query(
+		null,
 		"	SELECT *
 			FROM   Privilege
 			WHERE  Privilege.User_ID = ?;",
@@ -45,8 +45,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  		|| $Privileges[ 'Unit' ][ 'Group_Privilege' ] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query(
-			$NEI,
+		$database->query(
+			null,
 			"	INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 				VALUES(?,?,?);",
 			array(
@@ -76,7 +76,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			<div class="panel panel-primary">
 				<div class="panel-heading">
                     <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Unit( 1 );?> Units</div>
+                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?> Units</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
                     </div>
                 </div>
@@ -102,8 +102,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     <div class='row'>
                     	<div class='col-xs-4'>Type:</div>
                     	<div class='col-xs-8'><select name='Type' onChange='redraw( );'><?php
-			                	$rResult = sqlsrv_query(
-			                		$NEI,
+			                	$rResult = $database->query(
+			                		null,
 			                		"	SELECT 	 Elev.Type
 			                			FROM 	 Elev
 			                			GROUP BY Elev.Type;"
@@ -141,9 +141,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
     <?php require('cgi-bin/js/datatables.php');?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
     <script>
 		var isChromium = window.chrome,
 			winNav = window.navigator,

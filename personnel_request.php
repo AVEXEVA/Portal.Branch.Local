@@ -2,28 +2,28 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 $serverName = "172.16.12.45";
-$NEIectionOptions = array(
+nullectionOptions = array(
     "Database" => "nei",
     "Uid" => "sa",
     "PWD" => "SQLABC!23456",
     'ReturnDatesAsStrings'=>true
 );
 //Establishes the connection
-$NEI = sqlsrv_connect($serverName, $NEIectionOptions);
+null = sqlsrv_connect($serverName, nullectionOptions);
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "personnel_request.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "personnel_request.php"));
     if(!isset($array['ID']) ){?><html><head><script>document.location.href='../login.php?Forward=personnel_request.php';</script></head></html><?php }
     else {
 $Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;
 
 if($Mechanic > 0){
     $Call_Sign = "";
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT 
             Emp.*, 
             Emp.Last as Last_Name, 
@@ -51,8 +51,8 @@ if($Mechanic > 0){
 
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-       <?php require(PROJECT_ROOT.'php/element/navigation/index2.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+       <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
@@ -128,16 +128,16 @@ if($Mechanic > 0){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <script>
         var reset_loc = 0;
@@ -148,7 +148,7 @@ if($Mechanic > 0){
     <script>
     $(document).ready(function(){
         var Tickets = [<?php 
-                $r = sqlsrv_query($NEI,"SELECT Job.ID, Job.fDesc as Description, JobType.Type as Type, Loc.Tag FROM Job LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID LEFT JOIN TicketD ON Job.ID = TicketD.Job LEFT JOIN nei.dbo.Loc ON Job.Loc = Loc.Loc LEFT JOIN Emp ON TicketD.fWork = Emp.fWork where Emp.ID='{$_SESSION['User']}'");
+                $r = $database->query(null,"SELECT Job.ID, Job.fDesc as Description, JobType.Type as Type, Loc.Tag FROM Job LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID LEFT JOIN TicketD ON Job.ID = TicketD.Job LEFT JOIN nei.dbo.Loc ON Job.Loc = Loc.Loc LEFT JOIN Emp ON TicketD.fWork = Emp.fWork where Emp.ID='{$_SESSION['User']}'");
                 $Jobs = array();
                 while($Job = sqlsrv_fetch_array($r)){
                     $Job['fDesc'] = preg_replace( "/\r|\n/", "; ", $Job['fDesc'] );

@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	//Connection
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	'	SELECT 	*
 			FROM   	Connection
 			WHERE  		Connection.Connector = ?
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	);
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result    = sqlsrv_query(
-		$NEI,
+	$result    = $database->query(
+		null,
 		'	SELECT 	Emp.*,
 			   		  Emp.fFirst AS First_Name,
 			   		  Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
 	$User = sqlsrv_fetch_array( $result );
-	$result = sqlsrv_query(
-		$NEI,
+	$result = $database->query(
+		null,
 		'	SELECT 	Privilege.Access_Table,
 			   		  Privilege.User_Privilege,
 			   		  Privilege.Group_Privilege,
@@ -56,8 +56,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		  && 	$Privileges[ 'Job' ][ 'User_Privilege' ] >= 4
 		  && 	$Privileges[ 'Job' ][ 'Group_Privilege' ] >= 4
 		  && 	is_numeric( $_GET[ 'ID' ] )
-	){		$result = sqlsrv_query(
-				$NEI,
+	){		$result = $database->query(
+				null,
 				'	SELECT Job.Loc AS Location_ID
 					FROM   Job
 					WHERE  Job.ID = ?;',
@@ -66,8 +66,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 				)
 			);
 			$Location_ID = sqlsrv_fetch_array($result)['Location_ID'];
-			$result = sqlsrv_query(
-				$NEI,
+			$result = $database->query(
+				null,
 				'	SELECT 	Tickets.ID
 					FROM 	(
 								(
@@ -95,8 +95,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			isset( $Privileges[ 'Job' ] )
 		&& 	$Privileges[ 'Job' ][ 'User_Privilege' ] >= 4
 		&& 	is_numeric( $_GET[ 'ID' ] )
-	){		$result = sqlsrv_query(
-				$NEI,
+	){		$result = $database->query(
+				null,
 				'	SELECT 	Tickets.ID
 					FROM  	(
 								(
@@ -126,8 +126,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     	|| 	!$Privileged){
     		require('401.html');
    	} else {
-    	sqlsrv_query(
-    		$NEI,
+    	$database->query(
+    		null,
     		'	INSERT INTO Activity([User], [Date], [Page])
     			VALUES(?,?,?);',
     		array(
@@ -136,8 +136,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     			'job.php?ID=' . $_GET[ 'ID' ]
     		)
     	);
-       	$result = sqlsrv_query(
-       		$NEI,
+       	$result = $database->query(
+       		null,
        		'	SELECT 	TOP 1
                 		Job.ID                AS Job_ID,
                 		Job.fDesc             AS Job_Name,
@@ -212,122 +212,122 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <div id='container' style='min-height:100%;height:100%;'>
     <div id='wrapper' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>' style='height:100%;'>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc'></script>
       <div id='page-wrapper' class='content'>
-		<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='job.php?ID=<?php echo $_GET[ 'ID' ];?>'><?php $Icons->Job();?> Job: <?php echo $Job[ 'Job_Name' ];?></a></h4>
+		<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='job.php?ID=<?php echo $_GET[ 'ID' ];?>'><?php \singleton\fontawesome::getInstance( )->Job();?> Job: <?php echo $Job[ 'Job_Name' ];?></a></h4>
 			<div class ='Screen-Tabs shadower' style='margin: 0;border-bottom:3px solid black !important;'>
 				<div class='row'>
 					<div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-information.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Information(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
 							<div class ='nav-text'>Information</div>
 					</div>
 					<?php if(isset($Privileges[ 'Customer' ]) && $Privileges[ 'Customer' ][ 'User_Privilege' ] >= 4){
 						?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='document.location.href='customer.php?ID=<?php echo $Job[ 'Customer_ID' ];?>''>
-								<div class='nav-icon'><?php $Icons->Customer(3);?></div>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 								<div class ='nav-text'>Customer</div>
 						</div><?php }?>
 					<?php if(isset($Privileges[ 'Job' ]) && $Privileges[ 'Job' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-code.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Job(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 							<div class ='nav-text'>Code</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Collection' ]) && $Privileges[ 'Collection' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-collections.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Collection(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
 							<div class ='nav-text'>Collections</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Contract' ]) && $Privileges[ 'Contract' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-contracts.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Contract(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract(3);?></div>
 							<div class ='nav-text'>Contracts</div>
 					</div><?php }?>
 					<div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-feed.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Activities(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Activities(3);?></div>
 							<div class ='nav-text'>Feed</div>
 					</div>
 					<?php if(isset($Privileges[ 'Time' ]) && $Privileges[ 'Time' ][ 'Group_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-hours.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Payroll(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Payroll(3);?></div>
 							<div class ='nav-text'>Hours</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Invoice' ]) && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-invoices.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Invoice(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
 							<div class ='nav-text'>Invoices</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Legal' ]) && $Privileges[ 'Legal' ][ 'User_Privilege' ] >= 4 && false){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-legal.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Legal(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Legal(3);?></div>
 							<div class ='nav-text'>Legal</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Location' ]) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='document.location.href ='location.php?ID=<?php echo $Job[ 'Location_ID' ];?>';'>
-							<div class='nav-icon'><?php $Icons->Location(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
 							<div class ='nav-text'>Location</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Log' ]) && $Privileges[ 'Log' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-log.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Job(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 							<div class ='nav-text'>Log</div>
 					</div><?php }?>
 					<?php /*if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-maintenance.php?ID=<?php echo $_GET['ID'];?>');'>
-							<div class='nav-icon'><?php $Icons->Maintenance(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Maintenance(3);?></div>
 							<div class ='nav-text'>Maintenance</div>
 					</div><?php }*/?>
 					<?php /*if(isset($Privileges['Map']) && $Privileges['Map']['User_Privilege'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-map.php?ID=<?php echo $_GET['ID'];?>');'>
-							<div class='nav-icon'><?php $Icons->Map(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
 							<div class ='nav-text'>Map</div>
 					</div><?php }*/?>
 					<?php /*if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-modernization.php?ID=<?php echo $_GET['ID'];?>');'>
-							<div class='nav-icon'><?php $Icons->Modernization(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Modernization(3);?></div>
 							<div class ='nav-text'>Modernization</div>
 					</div><?php }*/?>
 					<?php if(isset($Privileges[ 'Finances' ]) && $Privileges[ 'Finances' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-pnl.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Customer(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 							<div class ='nav-text'>P&L</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Proposal' ]) && $Privileges[ 'Proposal' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-proposals.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Proposal(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
 							<div class ='nav-text'>Proposals</div>
 					</div><?php }?>
 					<?php /*if(isset($Privileges['Repair']) && $Privileges['Repair']['User_Privilege'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-repair.php?ID=<?php echo $_GET['ID'];?>');'>
-							<div class='nav-icon'><?php $Icons->Repair(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Repair(3);?></div>
 							<div class ='nav-text'>Repair</div>
 					</div><?php }*/?>
 					<?php /*if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-testing.php?ID=<?php echo $_GET['ID'];?>');'>
-							<div class='nav-icon'><?php $Icons->Testing(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Testing(3);?></div>
 							<div class ='nav-text'>Testing</div>
 					</div><?php }*/?>
 					<?php if(isset($Privileges[ 'Ticket' ]) && $Privileges[ 'Ticket' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-tickets.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Ticket(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
 							<div class ='nav-text'>Tickets</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Time' ]) && $Privileges[ 'Time' ][ 'Group_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-timeline.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->History(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->History(3);?></div>
 							<div class ='nav-text'>Timeline</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Unit' ]) && $Privileges[ 'Unit' ][ 'Group_Privilege' ] >= 4 && is_numeric($Job[ 'Unit_ID' ]) && $Job[ 'Unit_ID' ] > 0){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='document.location.href='unit.php?ID=<?php echo $Job['Unit_ID'];?>';'>
-							<div class='nav-icon'><?php $Icons->Unit(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 							<div class ='nav-text'>Unit</div>
 					</div><?php } elseif(isset($Privileges[ 'Unit' ]) && $Privileges[ 'Unit' ][ 'Group_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-units.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Unit(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 							<div class ='nav-text'>Units</div>
 					</div><?php }?>
 					<?php
-					$result = sqlsrv_query(
-            $NEI,
+					$result = $database->query(
+            null,
             '   SELECT Violation.ID
                 FROM   Violation
                 WHERE  Violation.Job = ?',
@@ -340,7 +340,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							if(isset($Privileges[ 'Violation' ])
                 && $Privileges[ 'Violation' ][ 'User_Privilege' ] >= 4){
 						?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='document.location.href='violation.php?ID=<?php echo $Violation;?>';'>
-								<div class='nav-icon'><?php $Icons->Violation(3);?></div>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 								<div class ='nav-text'>Violation</div>
 						</div><?php
 							}
@@ -349,7 +349,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 					<?php if(isset($Privileges[ 'User' ])
                   && $Privileges[ 'User' ][ 'User_Privilege' ] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick='someFunction(this,'job-workers.php?ID=<?php echo $_GET[ 'ID' ];?>');'>
-							<div class='nav-icon'><?php $Icons->Users(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
 							<div class ='nav-text'>Workers</div>
 					   </div><?php }?>
 				  </div>

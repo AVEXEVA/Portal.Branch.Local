@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -30,7 +30,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Unit']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
@@ -49,10 +49,10 @@ if(isMobile() || true){?><!DOCTYPE html>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
       <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-      <?php require(PROJECT_ROOT.'php/element/loading.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
       <div id="page-wrapper" class='content'>
   			<div class="panel panel-primary">
-  				<div class="panel-heading"><h4><div style='float:left;' onClick="document.location.href='home.php';"><?php $Icons->Unit();?> Units</div><div style='float:right;' onClick="document.location.href='unit.php'"><?php $Icons->Add(1);?></div><div style='clear:both;'></div></h4></div>
+  				<div class="panel-heading"><h4><div style='float:left;' onClick="document.location.href='home.php';"><?php \singleton\fontawesome::getInstance( )->Unit();?> Units</div><div style='float:right;' onClick="document.location.href='unit.php'"><?php \singleton\fontawesome::getInstance( )->Add(1);?></div><div style='clear:both;'></div></h4></div>
   				<div class="panel-body">
   					<table id='Table_Units' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
   						<thead>
@@ -71,18 +71,18 @@ if(isMobile() || true){?><!DOCTYPE html>
       </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
+    
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="https://www.nouveauelevator.com/vendor/metisMenu/metisMenu.js"></script>
+    
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    <script src="cgi-bin/js/jquery.dataTables.yadcf.js"></script>
+    
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
+    
 
     <!-- JQUERY UI Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 
     <script>
 	var Table_Units = $('#Table_Units').DataTable( {

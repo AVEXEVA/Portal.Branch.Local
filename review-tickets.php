@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -57,11 +57,11 @@ div.popup div.panel-heading {
           $reg_total = 0;
           $other_total = 0;
           $total = 0;
-          $resource = sqlsrv_query($NEI,"SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL;", array($_SESSION['User']));
+          $resource = $database->query(null,"SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL;", array($_SESSION['User']));
           if($resource){
             $attendance = sqlsrv_fetch_array($resource);
             if(is_array($attendance)){
-              $resource = sqlsrv_query($NEI,
+              $resource = $database->query(null,
                 " SELECT  *
                   FROM    TicketO
                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -82,7 +82,7 @@ div.popup div.panel-heading {
                 $other_total += $row['OT'] + $row['DT'] + $row['NT'];
                 $total += $row['Total'];
               }}
-              $resource = sqlsrv_query($NEI,
+              $resource = $database->query(null,
                 " SELECT  *
                   FROM    TicketD
                           LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -101,7 +101,7 @@ div.popup div.panel-heading {
                 $other_total += $row['OT'] + $row['DT'] + $row['NT'];
                 $total += $row['Total'];
               }}
-              $resource = sqlsrv_query($NEI,
+              $resource = $database->query(null,
                 " SELECT  TicketO.ID AS ID
                   FROM    TicketO
                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork

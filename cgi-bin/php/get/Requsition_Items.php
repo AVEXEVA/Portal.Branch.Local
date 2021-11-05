@@ -2,15 +2,15 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $My_User = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+    $My_User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $Field = ($User['Field'] == 1 && "OFFICE" != $My_User['Title']) ? True : False;
     if(!isset($array['ID']) ){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
 		$data = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Item.ID              AS ID,
 			       Item.Product         AS Product_ID,
 				   Item.Quantity        AS Item_Quantity,
