@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start( [ 'read_and_close' => true ] );
 $_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -39,10 +39,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Texas | Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
 <div id='container'>

@@ -1,10 +1,15 @@
 <?php
-session_start();
-require('index.php');
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( [
+		'read_and_close' => true
+	] ); 
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_query(
     	$NEI,
-    	"	SELECT 	*
+    	"	SELECT 	Top 1 
+    				*
 			FROM   	Connection
 			WHERE  		Connection.Connector 	= ?
 				   	AND Connection.Hash 		= ?;", 
@@ -16,7 +21,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 	$User    = sqlsrv_query(
 		$NEI,
-		"	SELECT 	Emp.*,
+		"	SELECT 	Top 1 
+					Emp.*,
 				   	Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
 			FROM   	Emp
@@ -50,6 +56,41 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     if( !isset( $Connection[ 'ID' ] ) || !$Privileged ){ print json_encode( array( 'data' => array( ) ) );}
 	else {
+		$output = array(
+	        'sEcho'         =>  intval($_GET['sEcho']),
+	        'iTotalRecords'     =>  0,
+	        'iTotalDisplayRecords'  =>  0,
+	        'aaData'        =>  array(),
+	        'options' => array( )
+	    );
+
+	    $Statuses = array(
+			0 => 'Unassigned',
+			1 => 'Assigned',
+			2 => 'En Route',
+			3 => 'On Site',
+			4 => 'Completed',
+			5 => 'On Hold',
+			6 => 'Reviewing'
+		);
+	    $Levels = array(
+			0  => '',
+			1  => 'Service Call',
+			2  => 'Trucking',
+			3  => 'Modernization',
+			4  => 'Violations',
+			5  => 'Level 5',
+			6  => 'Repair',
+			7  => 'Annual',
+			8  => 'Escalator',
+			9  => 'Email',
+			10 => 'Maintenance',
+			11 => 'Survey',
+			12 => 'Engineering',
+			13 => 'Support',
+			14 => "M/R"
+		);
+
 		/*Parse GET*/
 		$_GET[ 'Start_Date' ]	 	= isset( $_GET[ 'Start_Date' ] )  		&& !in_array( $_GET[ 'Start_Date' ], array( '', ' ', null ) ) 		? DateTime::createFromFormat( 'm/d/Y', $_GET['Start_Date'] )->format( 'Y-m-d 00:00:00.000' ) 		: null;
 		$_GET[ 'End_Date' ] 		= isset( $_GET[ 'End_Date' ] )   		&& !in_array( $_GET[ 'End_Date' ], array( '', ' ', null ) ) 		? DateTime::createFromFormat( 'm/d/Y', $_GET['End_Date'] )->format( 'Y-m-d 00:00:00.000' ) 			: null;
@@ -77,6 +118,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Ticket.ID LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Person' ] ) && !in_array( $_GET[ 'Person' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Person'];
+	      $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Customer'];
@@ -138,19 +183,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $parameters[] = $_GET['Time_Completed_End'];
 	      $conditions[] = "Ticket.Time_Completed <= ?";
 	    }
-	    //var_dump( $_GET[ 'Time_Route_Start' ] );
+	    if( isset( $_GET[ 'LSD' ] ) && !in_array( $_GET[ 'LSD' ], array( '', ' ', null ) ) ){
+	      switch( $_GET[ 'LSD'] ){
+	      	case 0:	$conditions[ ] = "Ticket.Resolution NOT LIKE '%LSD%'";break;
+	      	case 1:	$conditions[ ] = "Ticket.Resolution LIKE '%LSD%'";break;
+	      	default : break;
+	      }
+	    }
+	    
 		/*Search Filters*/
-		if( isset( $_GET[ 'search' ] ) ){
-			/*Ticket ID*/
-			$search[] = " Ticket.ID LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-			/*Ticket ID*/
-			$search[] = " Location.Tag LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-
-			$search[] = " Unit.State + ' - ' + Unit.Unit LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-		}
+		//if( isset( $_GET[ 'search' ] ) ){ }
 		
 
 		/*Concatenate Filters*/
@@ -162,6 +204,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
 
 		/*Order && Direction*/
+		//update columns from bin/js/tickets/table.js
 		$Columns = array(
 			0 =>  'Ticket.ID',
 			1 =>  'Location.Tag',
@@ -209,7 +252,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						END AS Time_Route,
 						CASE 	WHEN Ticket.Time_Completed = '1899-12-30 00:00:00.000' THEN null 
 								ELSE Ticket.Time_Completed 
-						END AS Time_Completed
+						END AS Time_Completed,
+						CASE 	WHEN Ticket.Resolution LIKE '%LSD%' THEN 1
+								ELSE 0 
+						END AS LSD
 				FROM 	(
 							(
 								SELECT 	TicketO.ID       	AS ID,
@@ -224,7 +270,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				           	     		0                   AS Payroll,
 				           	     		TicketO.TimeRoute 	AS Time_Route,
 				           	     		TicketO.TimeSite    AS Time_Site,
-				           	     		TicketO.TimeComp    AS Time_Completed
+				           	     		TicketO.TimeComp    AS Time_Completed,
+				           	     		'' 					AS Resolution
 						 		FROM   	TicketO
 						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
 	                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
@@ -241,7 +288,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										TicketD.ClearPR 	AS Payroll,
 										TicketD.TimeRoute 	AS Time_Route,
 				           	     		TicketD.TimeSite    AS Time_Site,
-				           	     		TicketD.TimeComp    AS Time_Completed
+				           	     		TicketD.TimeComp    AS Time_Completed,
+				           	     		TicketD.DescRes 	AS Resolution
 							 	FROM   	TicketD
 							)
 						) AS Ticket
@@ -263,125 +311,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$rResult = sqlsrv_query(
 			$NEI,
 			$Query,
-			$parameters,
-			array( 'Scrollable' => SQLSRV_CURSOR_KEYSET )
+			$parameters
 		) or die(print_r(sqlsrv_errors()));
 
-		$sQueryRow = "
-	        SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT
-			FROM 	(
-						(
-							SELECT 	TicketO.ID       	AS ID,
-									TicketO.EDate       AS Date,
-									TicketO.fWork 		AS Field,
-									TicketO.LID         AS Location,
-									TicketO.Job         AS Job,
-									TicketO.LElev       AS Unit,
-									TicketDPDA.Total    AS Hours,
-									TicketO.Level       AS Level,
-									TicketO.Assigned    AS Status,
-			           	     		0                   AS Payroll,
-			           	     		TicketO.TimeRoute 	AS Time_Route,
-			           	     		TicketO.TimeSite    AS Time_Site,
-			           	     		TicketO.TimeComp    AS Time_Completed
-					 		FROM   	TicketO
-					        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
-                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
-						) UNION ALL (
-							SELECT 	TicketD.ID      AS ID,
-									TicketD.EDate   AS Date,
-									TicketD.fWork 	AS Field,
-									TicketD.Loc 	AS Location,
-									TicketD.Job 	AS Job,
-									TicketD.Elev	AS Unit,
-									TicketD.Total 	AS Hours,
-									TicketD.Level 	AS Level,
-									4				AS Status,
-									TicketD.ClearPR AS Payroll,
-									TicketD.TimeRoute 	AS Time_Route,
-			           	     		TicketD.TimeSite    AS Time_Site,
-			           	     		TicketD.TimeComp    AS Time_Completed
-						 	FROM   	TicketD
-						)
-					) AS Ticket
-					LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
-					LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
-					LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
-					LEFT JOIN (
-                        SELECT  Owner.ID,
-                                Rol.Name 
-                        FROM    Owner 
-                                LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                    ) AS Customer ON Job.Owner = Customer.ID
-					LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
-			WHERE 	({$conditions}) AND ({$search});";
-
-	    $Options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-	    $stmt = sqlsrv_query( 
-	    	$NEI, 
-	    	$sQueryRow, 
-	    	$parameters, 
-	    	$Options 
-	    ) or die(print_r(sqlsrv_errors()));
-
-	    $iFilteredTotal = sqlsrv_num_rows( $stmt );
-
-	    $sQuery = " SELECT  COUNT(Ticket.ID)
-	                FROM    (
-	                	(
-	                		SELECT 	TicketO.ID,
-	                				TicketO.fWork
-	                		FROM 	TicketO
-	                	) UNION ALL (
-	                		SELECT 	TicketD.ID,
-	                				TicketD.fWork 
-	                		FROM 	TicketD
-	                	)
-	            	) AS Ticket
-	            	WHERE 	Ticket.fWork = ?;";
-	    $rResultTotal = sqlsrv_query(
-	    	$NEI,  
-	    	$sQuery, 
-	    	array( $User[ 'ID' ] )
-	    ) or die(print_r(sqlsrv_errors()));
-	    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
-	    $iTotal = $aResultTotal[0];
-
-	    $output = array(
-	        'sEcho'         =>  intval($_GET['sEcho']),
-	        'iTotalRecords'     =>  $iTotal,
-	        'iTotalDisplayRecords'  =>  $iFilteredTotal,
-	        'aaData'        =>  array(),
-	        'options' => array( )
-	    );
-	 
-	    $Statuses = array(
-			0 => 'Unassigned',
-			1 => 'Assigned',
-			2 => 'En Route',
-			3 => 'On Site',
-			4 => 'Completed',
-			5 => 'On Hold',
-			6 => 'Reviewing'
-		);
-	    $Levels = array(
-			0  => '',
-			1  => 'Service Call',
-			2  => 'Trucking',
-			3  => 'Modernization',
-			4  => 'Violations',
-			5  => 'Level 5',
-			6  => 'Repair',
-			7  => 'Annual',
-			8  => 'Escalator',
-			9  => 'Email',
-			10 => 'Maintenance',
-			11 => 'Survey',
-			12 => 'Engineering',
-			13 => 'Support',
-			14 => "M/R"
-		);
-	    while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
+		while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
 	      $Ticket[ 'Status' ]    		= $Statuses[ $Ticket[ 'Status' ] ];
 	      $Ticket[ 'Level' ]      		= $Levels[ $Ticket[ 'Level' ] ];
           $Ticket[ 'Date' ]       		= date( 'm/d/Y', strtotime( $Ticket[ 'Date' ] ) );
@@ -390,6 +323,85 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           $Ticket[ 'Time_Completed' ]  	= date( 'h:i A', strtotime( $Ticket['Time_Completed' ] ) );
 	      $output[ 'aaData' ][]   		= $Ticket;
 	    }
+
+		$sQueryRow = "
+	        SELECT 		Count( Ticket.ID ) AS Count
+			FROM 		(
+							(
+								SELECT 	TicketO.ID       	AS ID,
+										TicketO.EDate       AS Date,
+										TicketO.fWork 		AS Field,
+										TicketO.LID         AS Location,
+										TicketO.Job         AS Job,
+										TicketO.LElev       AS Unit,
+										TicketDPDA.Total    AS Hours,
+										TicketO.Level       AS Level,
+										TicketO.Assigned    AS Status,
+			        	   	     		0                   AS Payroll,
+			        	   	     		TicketO.TimeRoute 	AS Time_Route,
+			        	   	     		TicketO.TimeSite    AS Time_Site,
+			        	   	     		TicketO.TimeComp    AS Time_Completed,
+				    	       	     		'' 					AS Resolution
+						 		FROM   	TicketO
+						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
+                						LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
+							) UNION ALL (
+								SELECT 	TicketD.ID      AS ID,
+										TicketD.EDate   AS Date,
+										TicketD.fWork 	AS Field,
+										TicketD.Loc 	AS Location,
+										TicketD.Job 	AS Job,
+										TicketD.Elev	AS Unit,
+										TicketD.Total 	AS Hours,
+										TicketD.Level 	AS Level,
+										4				AS Status,
+										TicketD.ClearPR AS Payroll,
+										TicketD.TimeRoute 	AS Time_Route,
+			        	   	     		TicketD.TimeSite    AS Time_Site,
+			        	   	     		TicketD.TimeComp    AS Time_Completed,
+				    	       	     	TicketD.DescRes 	AS Resolution
+							 	FROM   	TicketD
+							)
+						) AS Ticket
+						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
+						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
+						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
+						LEFT JOIN (
+                    	    SELECT  Owner.ID,
+                    	            Rol.Name 
+                    	    FROM    Owner 
+                    	            LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                    	) AS Customer ON Job.Owner = Customer.ID
+						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
+			WHERE 		({$conditions}) AND ({$search});";
+
+	    $stmt = sqlsrv_query( 
+	    	$NEI, 
+	    	$sQueryRow, 
+	    	$parameters
+	    ) or die(print_r(sqlsrv_errors()));
+
+	    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+	    sqlsrv_cancel( $stmt );
+
+	    $sQuery = " SELECT  COUNT(Ticket.ID)
+	                FROM    (
+	                	(
+	                		SELECT 	TicketO.ID
+	                		FROM 	TicketO
+	                	) UNION ALL (
+	                		SELECT 	TicketD.ID
+	                		FROM 	TicketD
+	                	)
+	            	) AS Ticket;";
+	    $rResultTotal = sqlsrv_query(
+	    	$NEI,  
+	    	$sQuery, 
+	    	array( $User[ 'ID' ] )
+	    ) or die(print_r(sqlsrv_errors()));
+	    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+	    $iTotal = $aResultTotal[0];
+
 	    $Types = array( );
 	    $result = sqlsrv_query(
 	    	$NEI,
@@ -400,6 +412,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    if( $result ) { while( $row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 	    	$Types[ $row[ 'ID' ] ] = $row[ 'Type' ];
 	    }}
+	    $output[ 'iTotalRecords' ] = $iTotal;
+	    $output[ 'iTotalDisplayRecords' ] = $iFilteredTotal;
 	    $output[ 'options' ][ 'Status' ] = $Statuses;
 	    $output[ 'options' ][ 'Level' ] = $Levels ;
 	    $output[ 'options' ][ 'Type' ] = $Types ;

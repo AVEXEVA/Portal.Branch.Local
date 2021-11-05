@@ -35,6 +35,7 @@ if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="s
 <link href="cgi-bin/css/popup.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <!--<link href="cgi-bin/css/datepicker.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">-->
 <link href="cgi-bin/css/color.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<link href="cgi-bin/css/scrollbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <style>
 /*Fonts*/
 @font-face {

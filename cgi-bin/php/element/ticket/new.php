@@ -202,9 +202,9 @@ if(is_numeric($_GET['ID'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>    <title>Nouveau Elevator Portal</title>    
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_meta . 'index.php');?>    <title>Nouveau Elevator Portal</title>    
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
     <style type="text/css" media="print">
         .no-print {
             display:none !important;

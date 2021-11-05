@@ -1,5 +1,5 @@
 <?php 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 $serverName = "172.16.12.45";
 $connectionOptions = array(
@@ -24,12 +24,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Texas | Portal</title>
     <!-- CSS -->
-    <?php require(PROJECT_ROOT."css/index.php");?>
+    <?php require( bin_css . 'index.php');?>
     <!-- Portal Javascript-->
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_js . 'index.php');?>
 </head>
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">

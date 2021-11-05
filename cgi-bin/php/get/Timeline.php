@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start( [ 'read_and_close' => true ] );
 set_time_limit (60);
 require('../index.php');
 function Check_Date_Time($date_time){

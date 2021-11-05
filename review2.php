@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = sqlsrv_query($NEI,"
@@ -76,10 +76,10 @@ if($r){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(PROJECT_ROOT.'php/meta.php');?>
+    <?php require( bin_meta . 'index.php');?>
 	<title>Nouveau Texas | Portal</title>
-    <?php require(PROJECT_ROOT."css/index.php");?>
-    <?php require(PROJECT_ROOT.'js/index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js . 'index.php');?>
     <!-- Bootstrap Core JavaScript -->
     <script src="https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js"></script>
 

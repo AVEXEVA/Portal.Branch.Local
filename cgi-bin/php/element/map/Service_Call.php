@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start( [ 'read_and_close' => true ] );
 set_time_limit (30);
 require('../../index.php');
 function distance($lat1, $lon1, $lat2, $lon2, $unit) {

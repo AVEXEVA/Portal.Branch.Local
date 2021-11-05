@@ -55,6 +55,11 @@
 
 <link rel='stylesheet' href='https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css'>
 <script src='https://cdn.datatables.net/datetime/1.1.1/js/dataTables.dateTime.min.js'></script>
+
+<link rel='stylesheet' href='cgi-bin/library/timepicker/jquery.timepicker.min.css'>
+<script src='cgi-bin/library/timepicker/jquery.timepicker.min.js'></script>
+
+<script src='cgi-bin/library/bootstrap/typeahead.js'></script>
 <!--
 <link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.bootstrap.min.css">
 <link rel="stylesheet" href=https://www.nouveauelevator.com/portal/cgi-bin//Editor-1.7.0/css/editor.bootstrap4.min.css">

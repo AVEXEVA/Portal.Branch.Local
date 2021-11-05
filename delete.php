@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 require(PROJECT_ROOT.'php/element/navigation/index.php');
  require('cgi-bin/css/index.php');

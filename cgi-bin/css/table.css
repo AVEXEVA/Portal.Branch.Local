@@ -54,3 +54,8 @@ table.dataTable tbody tr.child td span.dtr-data {
 div.dataTables_scrollBody {
 	z-index: 1;
 }
+
+.dataTable tbody tr td .row .col-12 {
+    max-width : 175px;
+    overflow  : hidden;
+}

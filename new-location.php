@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start( [ 'read_and_close' => true ] );
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
   $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
@@ -19,8 +19,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <html lang="en">
 <head>
   <title>Nouveau Texas | Portal</title>
-  <?php require(PROJECT_ROOT.'php/meta.php');?>
-  <?php require(PROJECT_ROOT."css/index.php");?>
+  <?php require( bin_meta . 'index.php');?>
+  <?php require( bin_css . 'index.php');?>
   <style>
   .popup {
     z-index:999999999;
@@ -33,7 +33,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     width:100%;
   }
   </style>
-  <?php require(PROJECT_ROOT.'js/index.php');?>
+  <?php require( bin_js . 'index.php');?>
 </head>
 <body onload="finishLoadingPage();" style='background-color:#1d1d1d;'>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
