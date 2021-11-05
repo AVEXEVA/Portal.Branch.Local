@@ -91,7 +91,7 @@ $Options = array(
     "Uid" => "sa",
     "PWD" => "SQLABC!23456",
     'ReturnDatesAsStrings'=>true,
-    "CharacterSet" => "UTF-8",
+    "CharacterSet" => SQLSRV_ENC_CHAR,
     "TraceOn" => false
 );
 $NEI = sqlsrv_connect($IP, $Options);

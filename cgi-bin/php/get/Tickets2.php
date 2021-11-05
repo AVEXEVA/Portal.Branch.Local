@@ -1,6 +1,8 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+    session_start( [
+		'read_and_close' => true
+	] ); 
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -61,6 +63,33 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	        'aaData'        =>  array(),
 	        'options' => array( )
 	    );
+
+	    $Statuses = array(
+			0 => 'Unassigned',
+			1 => 'Assigned',
+			2 => 'En Route',
+			3 => 'On Site',
+			4 => 'Completed',
+			5 => 'On Hold',
+			6 => 'Reviewing'
+		);
+	    $Levels = array(
+			0  => '',
+			1  => 'Service Call',
+			2  => 'Trucking',
+			3  => 'Modernization',
+			4  => 'Violations',
+			5  => 'Level 5',
+			6  => 'Repair',
+			7  => 'Annual',
+			8  => 'Escalator',
+			9  => 'Email',
+			10 => 'Maintenance',
+			11 => 'Survey',
+			12 => 'Engineering',
+			13 => 'Support',
+			14 => "M/R"
+		);
 
 		/*Parse GET*/
 		$_GET[ 'Start_Date' ]	 	= isset( $_GET[ 'Start_Date' ] )  		&& !in_array( $_GET[ 'Start_Date' ], array( '', ' ', null ) ) 		? DateTime::createFromFormat( 'm/d/Y', $_GET['Start_Date'] )->format( 'Y-m-d 00:00:00.000' ) 		: null;
@@ -394,34 +423,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
 	    $iTotal = $aResultTotal[0];
 
-	    
-	 
-	    $Statuses = array(
-			0 => 'Unassigned',
-			1 => 'Assigned',
-			2 => 'En Route',
-			3 => 'On Site',
-			4 => 'Completed',
-			5 => 'On Hold',
-			6 => 'Reviewing'
-		);
-	    $Levels = array(
-			0  => '',
-			1  => 'Service Call',
-			2  => 'Trucking',
-			3  => 'Modernization',
-			4  => 'Violations',
-			5  => 'Level 5',
-			6  => 'Repair',
-			7  => 'Annual',
-			8  => 'Escalator',
-			9  => 'Email',
-			10 => 'Maintenance',
-			11 => 'Survey',
-			12 => 'Engineering',
-			13 => 'Support',
-			14 => "M/R"
-		);
 	    $Types = array( );
 	    $result = sqlsrv_query(
 	    	$NEI,

@@ -62,7 +62,7 @@ $(document).ready(function( ){
         paging         : true,
         orderCellsTop  : true,
         autoWidth      : true,
-        stateSave      : true,
+        //stateSave      : true,
         responsive     : true,
         select         : {
           style : 'multi',

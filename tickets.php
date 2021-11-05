@@ -13,12 +13,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         require('tickets5.php');
         break;
       case 'Live':
-        require('tickets4.php');
+        require('tickets5.php');
         break;
     }
   } else {
-    require('tickets4.php');
+    require('tickets5.php');
   }
 } else {
-  ?><script>document.location.href="../login.php?Forward=tickets.php";</script><?php
+  ?><script>document.location.href="../login.php?Forward=tickets.php?<?php echo http_build_query( $_GET );?>";</script><?php
 }?>
