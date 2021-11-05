@@ -1,36 +1,69 @@
- <?php 
-session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
-$serverName = "172.16.12.45";
-$connectionOptions = array(
-    "Database" => "nei",
-    "Uid" => "sa",
-    "PWD" => "SQLABC!23456",
-    'ReturnDatesAsStrings'=>true
-);
-//Establishes the connection
-$conn = sqlsrv_connect($serverName, $connectionOptions);
-$connectionOptions['Database'] = 'Portal';
-$conn2 = sqlsrv_connect($serverName, $connectionOptions);
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-
-    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $r = $database->query($conn2,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = FALSE;
-    if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Ticket']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "activity.php"));
-    if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=dispatch.php';</script></head></html><?php }
-    else {
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Activity' ])
+      ||  $Privileges[ 'Activity' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Activity' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Activity' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    sqlsrv_query(
+      $NEI,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'activity.php'
+      )
+   );
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,13 +85,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <div class='row'>
                                 <div class='col-xs-4'>
                                     <div class='row'>
-                                        <div class='col-xs-4' style='text-align:right;'> 
+                                        <div class='col-xs-4' style='text-align:right;'>
                                             <label for='Supers' style='text-align:right;'>Departments(s):</label>
                                         </div>
                                         <div class='col-xs-8'>
                                             <?php $Supervisors = (isset($_GET['Supervisors'])) ? (strpos($_GET['Supervisors'], ',') !== false) ? split(',',$_GET['Supervisors']) : array($_GET['Supervisors']) : array();?>
                                             <select id='Departments' name='Departments' multiple='multiple' size='7' style='max-width:100%;'>
-                                                <?php 
+                                                <?php
                                                 if(!is_array($Supervisors)){$Supervisors = array($Supervisors);}?>
                                                 <option value='Division 1' <?php if(in_array('Division 1',$Supervisors) || !isset($_GET['Supervisors']) || $_GET['Supervisors'] == 'undefined'){?>selected='selected'<?php }?>>Division 1</option>
                                                 <option value='Division 2' <?php if(in_array('Division 2',$Supervisors)){?>selected='selected'<?php }?>>Division 2</option>
@@ -110,29 +143,29 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
 
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-    
+
 
     <!-- Custom Theme JavaScript -->
-    
+
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
     <style>
     </style>
-    <script>  
+    <script>
         function hrefTickets(){
             $("#Table_Tickets tbody tr").each(function(){
                 $(this).on('click',function(){
                     document.location.href="ticket.php?ID=" + $(this).children(":first-child").html();
                 });
              });
-        } 
+        }
         $(document).ready(function() {
             var Table_Tickets = $('#Table_Tickets').DataTable({
                 "responsive": true,
@@ -151,28 +184,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 "initComplete":function(){
                     $("tr[role='row']>th:nth-child(5)").click().click();
                     hrefTickets();
-                    $("input[type='search'][aria-controls='Table_Tickets']").on('keyup',function(){hrefTickets();});       
+                    $("input[type='search'][aria-controls='Table_Tickets']").on('keyup',function(){hrefTickets();});
                     $('#Table_Tickets').on( 'page.dt', function () {setTimeout(function(){hrefTickets();},100);});
                     $("#Table_Tickets th").on("click",function(){setTimeout(function(){hrefTickets();},100);});
                     finishLoadingPage();
                 }
             });
-            <?php if(!$Mobile){?>
-            yadcf.init(Table_Tickets,[
-                {   column_number:0,
-                    filter_type:"auto_complete"},
-                {   column_number:1},
-                {   column_number:2},
-                {   column_number:3},
-                {   column_number:4,
-                    filter_type: "auto_complete"},
-                {   column_number:5},
-                {   column_number:6,
-                    filter_type: "range_date",
-                    date_format: "mm/dd/yyyy",
-                    filter_delay: 500}
-            ]);
-            stylizeYADCF();<?php }?>
         });
     </script>
     <script>
@@ -184,7 +201,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             document.location.href='dispatch.php?Supervisors=' + Supervisors + '&Mechanics=' + Mechanics + "&Start_Date=" + Start_Date + "&End_Date=" + End_Date;
         }
     </script>
-    <script>       
+    <script>
         $(document).ready(function(){
             $("input.start_date").datepicker({onSelect:function(dateText, inst){refresh_get();}});
             $("input.end_date").datepicker({onSelect:function(dateText, inst){refresh_get();}});
@@ -193,7 +210,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         });
     </script>
     <!-- Filters-->
-    
+
 </body>
 </html>
 <?php

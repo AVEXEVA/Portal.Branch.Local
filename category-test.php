@@ -42,10 +42,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
     if( !isset( $Connection[ 'ID' ] )
-        || !isset($Privileges[ 'Violation' ])
+     || !isset($Privileges[ 'Violation' ])
             || $Privileges[ 'Violation' ][ 'User_Privilege' ]  < 4
             || $Privileges[ 'Violation' ][ 'Group_Privilege' ] < 4
-        || $Privileges[ 'Violation' ][ 'Other_Privilege' ] < 4){
+            || $Privileges[ 'Violation' ][ 'Other_Privilege' ] < 4){
                 ?><?php require( '../404.html' );?><?php }
     else {
         $database->query(
@@ -53,7 +53,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           "   INSERT INTO Activity([User], [Date], [Page])
               VALUES( ?, ?, ? );",
           array(
-              $_SESSION['User'],
+              $_SESSION[ 'User' ],
               date( 'Y-m-d H:i:s' ),
               'catagory-test.php'
           )
@@ -103,57 +103,9 @@ if(isset($_POST) && Count($_POST) > 0 ){
      <title>Nouveau Texas | Portal</title>
      <?php require( bin_css . 'index.php');?>
      <?php require( bin_js . 'index.php');?>
-	<style>
-	input[type="text"] {border:none; border-bottom:1px solid black; }
- input[type='text1']{border:none;border-bottom:none;}
- .boxed {border: 3px solid black ;}
-	.boxed1{border: 3px solid black;background-color: black;text-align: center;color: white;}
-	.boxed2{border: 3px solid black;background-color: grey;text-align:center;color:black;width: 250px;height: 10px;padding: 15px;}
-	table { table-layout:fixed;width: 100%;overflow: hidden;}
-	textarea{width:100%;overflow:hidden;}
-	@media only screen and (max-width: 600px) {.tg .tg-us36{font-size:6px;}}
-	html,body{
- width: 100%;
- margin: 0px;
- padding: 0px;
- overflow: scroll;
-	}
-	@page{size:a4;}
-	@media print {
-	.space-print {
-		height: :600px !important;
-	}
-  	html, body {
-	 margin: 0 !important;
-	 padding: 0 !important;
-	 page-break-before: always;
-	 page-break-after:always;
- 		}
-	}
-	.tg {border-collapse:collapse;border-spacing:0;}
-	.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-	.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-	.tg .tg-us36{border-color:inherit;vertical-align:top;}
-</style>
-<script>
-
-	$(document).ready(function(){
-		$('.preference').each(function(e){
-	 if($(this).val() == 0){
-	  $(this).attr("checked", "checked");
-		 }
-		});
-		$(".col-xs-12").each(function(){
-			var html = $(this).html();
-			var label = html.substring(0, html.indexOf('<input'));
-			var input = html.substring(html.indexOf('<input'));
-			$(this).replaceWith("<div class='col-xs-4 col-lg-2 col-md-2'>" + label + "</div><div class='col-xs-8 col-lg-4 col-md-4'>" + input + "</div>");
-		});
-	});
-</script>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#white !important;color:black !important;'>
- <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+ <?php require(bin_php.'element/navigation/index.php');?>
     <div id="page-wrapper" class='content'>
    <?php if(FALSE){?><div class='col-xs-12'><form style='height:100%;float:left;width:100%;' action='search.php' method='GET'><input name='Keyword' type='text' placeholder='Search' style='height:50px;color:black;width:100%;'/></form></div><?php }?>
 	<div class='panel-white'>
@@ -173,13 +125,6 @@ if(isset($_POST) && Count($_POST) > 0 ){
 							</div>
 						</div>
 						<div class='row'>
-								<script>
-									$(document).ready(function(){
-										$( function() {
-										    $( ".datepicker" ).datepicker();
-										  } );
-									});
-								</script>
 								<div class='col-xs-12'>Start:<input type='text' class="datepicker" name='Start_Time' size='20' value='<?php echo $data['Start_Time'];?>'/></div>
 								<div class='col-xs-12'>End:<input type='text' class="datepicker" name='End_Time'  size='20' value='<?php echo $data['End_Time'];?>'/></div>
 						</div>
@@ -210,7 +155,6 @@ if(isset($_POST) && Count($_POST) > 0 ){
 							<table class="tg" cellspacing='0' cellpadding = '0' >
 							 <tr>
 							 <th class="tg-us36">Elevator Part</th>
-
 							 <th class="tg-us36"><input type='text1' name='Violation_Elevator_Part1' size='1' value='<?php echo $data['Violation_Elevator_Part1'];?>'/></th>
 							 <th class="tg-us36"><input type='text1' name='Violation_Elevator_Part2' size='1' value='<?php echo $data['Violation_Elevator_Part2'];?>'/></th>
 							 <th class="tg-us36"><input type='text1' name='Violation_Elevator_Part3' size='1' value='<?php echo $data['Violation_Elevator_Part3'];?>'/></th>
@@ -266,7 +210,6 @@ if(isset($_POST) && Count($_POST) > 0 ){
 								<div class='col-xs-4'>Yes <input type='radio' name='Pictures' value='1' <?php if(isset($data['Pictures']) && $data['Signed'] == '1') echo "checked='checked'"; ?> /></div>
 								<div class='col-xs-4'>No <input type='radio' name='Pictures' value='0' <?php if(isset($data['Pictures']) && $data['Pictures'] == '0') echo "checked='checked'"; ?> /></div>
 							</div>
-
 					<div class='row' align = ''>
 						<div class='col-lg-12'>
 							<strong>Inspection:</strong>
@@ -319,7 +262,6 @@ if(isset($_POST) && Count($_POST) > 0 ){
 					<div class='row' style='padding:1px;'>
 						<div class='col-lg-6 '> <strong>Comments: (Part# info. and Floor # if shaft item)</strong> <textarea rows="5" cols="200" name='Comments'><?php echo $data['Comments'];?></textarea></div>
 					</div>
-
 					<div class='row'>
 						<div class='col-xs-12 col-lg-4'>Runby: <input type='text' name='Runby' size = '20' value='<?php echo $data['Runby'];?>'/> in. </div>
 					</div>
@@ -354,19 +296,8 @@ if(isset($_POST) && Count($_POST) > 0 ){
 						<div class='col-xs-2'><input type='checkbox' name='Slack_Rope_Switch' <?php if(isset($data['Slack_Rope_Switch'])) echo "checked='checked'"; ?>/></div>
 					</div>
 					<div class='row'>
-
 						<div class='col-xs-12'>Governor Cal:<input type='text' name='Governor_Cal' size = '20' value='<?php echo $data['Governor_Cal'];?>' /> FPM </div>
 					</div>
-					<style>
-					@media print {
-						.space-print {
-							display:block !important;
-						}
-					}
-					.space-print {
-						display: none;
-					}
-				</style>
 				   <div class='space-print'><br></br><br></br><br></br><br></br></div>
 					<div class='row' style='padding:15px;'>
 						<div class='col-lg-12'>	<strong> MAINTENANCE ITEMS - For Customer / Contractor </strong>
@@ -518,4 +449,5 @@ if(isset($_POST) && Count($_POST) > 0 ){
 	</div>
 </body>
 </html><?php
-}}?>
+}
+}?>

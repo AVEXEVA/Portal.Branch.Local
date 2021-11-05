@@ -1,29 +1,69 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-        $My_User = sqlsrv_fetch_array($r);
-        $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-        $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-        $Privileged = FALSE;
-        if(isset($My_Privileges['Time']) && $My_Privileges['Time']['User_Privilege'] >= 4 && $My_Privileges['Time']['Group_Privilege'] >= 4 && $My_Privileges['Time']['Other_Privilege'] >= 4){
-        	$Privileged = TRUE;
-		    }
-    }
-    //
-    if(!isset($array['ID']) || !$Privileged){require('401.html');}
-    else {?>
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = \singleton\database::getInstance()->query((
+    null,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = sqlsrv_query(
+    null,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = \singleton\database::getInstance()->query((
+    null,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Attendance' ])
+      ||  $Privileges[ 'Attendance' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Attendance' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Attendance' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    \singleton\database::getInstance()->query((
+      $NEI,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'Attendance_Report.php'
+      )
+    ); ?>
 <!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -33,23 +73,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_js . 'index.php');?>
     <link rel='stylesheet' href='cgi-bin/libraries/timepicker/jquery.timepicker.min.css' />
     <script src='cgi-bin/libraries/timepicker/jquery.timepicker.min.js'></script>
-	<style>
-		.panel {background-color:transparent !important;}
-		.panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
-		.nav-tabs > li:not(.active) {background-color:rgba(255,255,255,.6) !important;}
-		.panel-heading {font-family: 'BankGothic' !important;}
-		.shadow {box-shadow:0px 5px 5px 0px;}
-		<?php if(isMobile()){?>
-		.panel-body {padding:0px !important;}
-		<?php }?>
-
-			div#wrapper {
-				overflow:scroll;
-			}
-		@media print {
-			div#wrapper {overflow:visible;}
-		}
-	</style>
 </head>
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:#1d1d1d;height:100%;">
 <div id='container' style='min-height:100%;height:100%;'>
@@ -84,82 +107,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
   </div>
 </div>
-<!-- Bootstrap Core JavaScript -->
-
-
-<!-- Metis Menu Plugin JavaScript -->
-
-
-<?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-<!-- Custom Theme JavaScript -->
-
-
-<!-- JQUERY UI Javascript -->
-
-<script>
-var Attendance_Report = null;
-$(document).ready(function(){
-  Attendance_Report = $('#Table_Attendance_Report').DataTable( {
-    "ajax": {
-     "url": "cgi-bin/php/reports/Attendance_Report.php",
-     "data": function ( d ) {
-        return $.extend( {}, d, {
-          "Supervisor": $("select[name='Supervisor']").val()
-        } );
-       }
-     },
-    "processing":true,
-    "serverSide":true,
-    "columns": [
-      {
-        data:"First_Name",
-        width:"200px"
-      },
-      {
-        data:"Last_Name",
-        width:"200px"
-      },
-      {
-        data:"Clock_In",
-        width:"200px"
-      },
-      {
-        data:"Clock_Out",
-        width:"200px"
-      },
-      {
-        data:"Start_Notes"
-      }
-    ],
-    "buttons":[
-      {
-        extend: 'collection',
-        text: 'Export',
-        buttons: [
-          'copy',
-          'excel',
-          'csv',
-          'pdf',
-          'print'
-        ]
-      }
-    ],
-    "language":{
-      "loadingRecords":"<div style='text-align:center;'><div class='sk-cube-grid' style='display:inline-block;position:relative;';><div class='sk-cube sk-cube1' style='background-color:#cc0000'></div><div class='sk-cube sk-cube2' style='background-color:#cc0000'></div><div class='sk-cube sk-cube3' style='background-color:#cc0000'></div><div class='sk-cube sk-cube4' style='background-color:#cc0000'></div><div class='sk-cube sk-cube5' style='background-color:#cc0000'></div><div class='sk-cube sk-cube6' style='background-color:#cc0000'></div><div class='sk-cube sk-cube7' style='background-color:#cc0000'></div><div class='sk-cube sk-cube8' style='background-color:#cc0000'></div><div class='sk-cube sk-cube9' style='background-color:#cc0000'></div></div><div class='sk-cube-grid' style='display:inline-block;position:relative;top:-45px;'><div class='sk-cube sk-cube1' style='background-color:#00007f'></div><div class='sk-cube sk-cube2' style='background-color:#00007f'></div><div class='sk-cube sk-cube3' style='background-color:#00007f'></div><div class='sk-cube sk-cube4' style='background-color:#00007f'></div><div class='sk-cube sk-cube5' style='background-color:#00007f'></div><div class='sk-cube sk-cube6' style='background-color:#00007f'></div><div class='sk-cube sk-cube7' style='background-color:#00007f'></div><div class='sk-cube sk-cube8' style='background-color:#00007f'></div><div class='sk-cube sk-cube9' style='background-color:#00007f'></div></div><div class='sk-cube-grid' style='display:inline-block;position:relative;top:-84px;'><div class='sk-cube sk-cube1' style='background-color:gold'></div><div class='sk-cube sk-cube2' style='background-color:gold'></div><div class='sk-cube sk-cube3' style='background-color:gold'></div><div class='sk-cube sk-cube4' style='background-color:gold'></div><div class='sk-cube sk-cube5' style='background-color:gold'></div><div class='sk-cube sk-cube6' style='background-color:gold'></div><div class='sk-cube sk-cube7' style='background-color:gold'></div><div class='sk-cube sk-cube8' style='background-color:gold'></div><div class='sk-cube sk-cube9' style='background-color:gold'></div></div></div><div style='font-size:72px;text-align:center;' class='BankGothic'>Nouveau Texas</div><div style='font-size:42px;text-align:center;'><i>Raising Your Life</i></div>"
-    },
-    "paging":true,
-    "initComplete":function(){},
-    "scrollY" : "600px",
-    "scrollCollapse":true,
-    //"lengthChange": false,
-    "order": [[ 1, "ASC" ]]
-  } );
-});
-function refresh(){
-  Attendance_Report.draw();
-}
-</script>
 </body>
 </html>
 <?php }

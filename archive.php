@@ -1,33 +1,69 @@
-<?php 
-session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $User  = addslashes($_SESSION['User']);
-    $Hash  = addslashes($_SESSION['Hash']);
-    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-    $User  = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $r = $database->query($conn2,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-    $My_Privileges   = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged   = FALSE;
-    if( isset($My_Privileges['Ticket']) 
-        && $My_Privileges['Ticket']['User_Privilege'] >= 4 
-        && $My_Privileges['Ticket']['Group_Privilege'] >= 4 
-        && $My_Privileges['Ticket']['Other_Privilege'] >= 4){
-            $Privileged = TRUE;}
-    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "archive.php"));
-    if( !isset($array['ID']) 
-        
-         
-        || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=archive.php';</script></head></html><?php }
-    else {
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Archive' ])
+      ||  $Privileges[ 'Archive' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Archive' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Archive' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    sqlsrv_query(
+      $NEI,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'archive.php'
+      )
+    );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,11 +71,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <title>Nouveau Illinois Portal</title>    <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
-<?php 
+<?php
 if(is_numeric($_GET['Mechanic'])){
     $r = $database->query($conn,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");
     $r = sqlsrv_fetch_array($r);
-    $Mechanic = $r;} 
+    $Mechanic = $r;}
 else {  $Mechanic = $User;  }?>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -47,7 +83,7 @@ else {  $Mechanic = $User;  }?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
-            </div> 
+            </div>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
@@ -71,24 +107,14 @@ else {  $Mechanic = $User;  }?>
                                     function addCustomer(link){$("div#Customers").append("<div class='row Customer' rel='" + $(link).val() + "'><div class='col-xs-2'>&nbsp;</div><div class='col-xs-8'>" + $(link).children(":selected").text() + "</div><div class='col-xs-2 RemoveCustomer' onClick='removeCustomer(this);'>X</div></div>");}
                                     function removeCustomer(link){$(link).parent().remove();}
                                     </script>
-                                    <style>
-                                    .RemoveCustomer : hover {
-                                        color           : red;
-                                        cursor          : pointer;
-                                    }
-                                    .Customer {
-                                        padding         : 5px;
-                                        border          : 1px solid black;
-                                    }
-                                    </style>
                                     <div class='row'>
                                         <div class='col-xs-4' style='text-align:right;'>Customer:</div>
                                         <div class='col-xs-8'><select name="Customer" onChange='addCustomer(this);' class='form-control'>
-                                        <?php 
-                                        $r = $database->query($conn,"
+                                        <?php
+                                        $r = $database->query(null,"
                                             SELECT
                                                 OwnerWithRol.ID,
-                                                OwnerWithRol.Name 
+                                                OwnerWithRol.Name
                                             FROM OwnerWithRol
                                             ORDER BY OwnerWithRol.Name");
                                         while($array = sqlsrv_fetch_array($r)){?><option value='<?php echo $array['ID'];?>'><?php echo proper($array['Name']);?></option><?php }?>
@@ -126,18 +152,18 @@ else {  $Mechanic = $User;  }?>
                                     <div class='row'>
                                         <div class='col-xs-4' style='text-align:right;'>Location:</div>
                                         <div class='col-xs-8'><select class='form-control' name="Location" onChange='addLocation(this);'>
-                                        <?php 
-                                        $r = $database->query($conn,"
+                                        <?php
+                                        $r = $database->query(null,"
                                             SELECT
                                                 Loc.Loc,
-                                                Loc.Tag 
+                                                Loc.Tag
                                             FROM Loc
                                             WHERE Loc.Maint=1
                                             ORDER BY Loc.Tag");
                                         while($array = sqlsrv_fetch_array($r)){?><option value='<?php echo $array['Loc'];?>'><?php echo proper($array['Tag']);?></option><?php }?>
                                         </select></div>
                                     </div>
-                                    <div class='row' id='Locations'><?php 
+                                    <div class='row' id='Locations'><?php
                                         if(!isset($_GET['Location_ID']) || $_GET['Location_ID'] == "All" || $_GET['Location_ID'] == "" || $_GET['Location_ID'] == ","){}
                                         else {
                                             $Location_ID = (isset($_GET['Location_ID'])) ? (strpos($_GET['Location_ID'], ',') !== false) ? explode(',',addslashes($_GET['Location_ID'])) : array(addslashes($_GET['Location_ID'])) : array();
@@ -149,7 +175,7 @@ else {  $Mechanic = $User;  }?>
                                                 $Location_ID = "Loc = '" . $Location_ID . "'";
                                             }
                                             $r = FALSE;
-                                            $r = $database->query($conn,"
+                                            $r = $database->query(null,"
                                                 SELECT *
                                                 FROM Loc
                                                 WHERE {$Location_ID}
@@ -158,7 +184,6 @@ else {  $Mechanic = $User;  }?>
                                                 while($array = sqlsrv_fetch_array($r)){?><div class='row Location' rel='<?php echo $array['Loc'];?>'><div class='col-xs-2'>&nbsp;</div><div class='col-xs-8'><?php echo $array['Tag'];?></div><div class='col-xs-2 RemoveLocation' onClick='removeLocation(this);'>X</div></div><?php }
                                             }
                                         }
-
                                     ?></div>
                                 </div>
                             </div>
@@ -184,15 +209,15 @@ else {  $Mechanic = $User;  }?>
             </div>
         </div>
     </div>
-    
-    
+
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    
-    
+
+
+
 
     <!-- Custom Date Filters-->
-    
+
     <script>
         var reset_loc = 0;
         $(document).ready(function(){
@@ -264,7 +289,7 @@ else {  $Mechanic = $User;  }?>
                         setTimeout(function(){
                             //$("tr[role='row']>th:nth-child(5)").click().click();
                             hrefTickets();
-                            $("input[type='search'][aria-controls='Table_Archive_Tickets']").on('keyup',function(){hrefTickets();});       
+                            $("input[type='search'][aria-controls='Table_Archive_Tickets']").on('keyup',function(){hrefTickets();});
                             $('#Table_Archive_Tickets').on( 'page.dt', function () {setTimeout(function(){hrefTickets();},100);});
                             $("#Table_Archive_Tickets th").on("click",function(){setTimeout(function(){hrefTickets();},100);});
                         },100);
@@ -281,7 +306,7 @@ else {  $Mechanic = $User;  }?>
                     {   "data"         : "fDesc"},
                     {   "data"         : "DescRes"},
                     {   "data"         : "EDate"},
-                    { 
+                    {
                         "data"           : "Total",
                         "defaultContent" : "0"
                     },
@@ -290,12 +315,12 @@ else {  $Mechanic = $User;  }?>
                         "visible"        : false,
                         "searchable"     : true
                     },
-                    { 
+                    {
                         "data"           : "Unit_Label",
                         "visible"        : false,
                         "searchable"     : true
                     },
-                    { 
+                    {
                         "data"           : "Unit_Description",
                         "visible"        : false,
                         "searchable"     : true
@@ -307,7 +332,7 @@ else {  $Mechanic = $User;  }?>
                 "initComplete":function(){
                     //$("tr[role='row']>th:nth-child(5)").click().click();
                     hrefTickets();
-                    $("input[type='search'][aria-controls='Table_Archive_Tickets']").on('keyup',function(){hrefTickets();});       
+                    $("input[type='search'][aria-controls='Table_Archive_Tickets']").on('keyup',function(){hrefTickets();});
                     $('#Table_Archive_Tickets').on( 'page.dt', function () {setTimeout(function(){hrefTickets();},100);});
                     $("#Table_Archive_Tickets th").on("click",function(){setTimeout(function(){hrefTickets();},100);});
                     $("select[name='Table_Archive_Tickets_length']").on("click",function(){setTimeout(function(){hrefTickets();},100);});

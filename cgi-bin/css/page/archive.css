@@ -1,0 +1,8 @@
+.RemoveCustomer : hover {
+    color           : red;
+    cursor          : pointer;
+}
+.Customer {
+    padding         : 5px;
+    border          : 1px solid black;
+}

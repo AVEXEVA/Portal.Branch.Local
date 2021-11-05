@@ -1,41 +1,69 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-$_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
-require('cgi-bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT *
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-	   	|| !isset($My_Privileges['Violation'])
-	  		|| $My_Privileges['Violation']['User_Privilege']  < 4
-	  		|| $My_Privileges['Violation']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Violation']['Other_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
-    else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "compliance.php"));
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = sqlsrv_query(
+    $NEI,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Violation' ])
+      ||  $Privileges[ 'Violation' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Violation' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Violation' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    sqlsrv_query(
+      $NEI,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'compliance.php'
+      )
+    );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,9 +91,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-3' style='background-color:black;color:white;border:1px solid white;'>Total: <?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = 'DIVISION #1'
                             AND Violation.Status <> 'Dismissed'
                             AND Violation.Status <> 'Preliminary Report'
@@ -75,9 +103,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-3' style='border:1px solid black;'>Total: <?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = 'DIVISION #2'
                             AND Violation.Status <> 'Dismissed'
                             AND Violation.Status <> 'Preliminary Report'
@@ -88,9 +116,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-3' style='background-color:black;color:white;border:1px solid white;'>Total: <?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = 'DIVISION #3'
                             AND Violation.Status <> 'Dismissed'
                             AND Violation.Status <> 'Preliminary Report'
@@ -100,9 +128,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-3' style='border:1px solid black;'>Total: <?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = 'DIVISION #4'
                             AND Violation.Status <> 'Dismissed'
                             AND Violation.Status <> 'Preliminary Report'
@@ -115,9 +143,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Code:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Code'
                   ;",array($Division_Name));
@@ -126,9 +154,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Sales:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'To Sales'
                   ;",array($Division_Name));
@@ -137,9 +165,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Job Created:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Job Created'
                   ;",array($Division_Name));
@@ -149,9 +177,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Code:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Code'
                   ;",array($Division_Name));
@@ -160,9 +188,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Sales:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'To Sales'
                   ;",array($Division_Name));
@@ -171,9 +199,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Job Created:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Job Created'
                   ;",array($Division_Name));
@@ -183,9 +211,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Code:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Code'
                   ;",array($Division_Name));
@@ -194,9 +222,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Sales:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'To Sales'
                   ;",array($Division_Name));
@@ -205,9 +233,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Job Created:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Job Created'
                   ;",array($Division_Name));
@@ -217,9 +245,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Code:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Code'
                   ;",array($Division_Name));
@@ -228,9 +256,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Sales:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'To Sales'
                   ;",array($Division_Name));
@@ -239,9 +267,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Job Created:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'Job Created'
                   ;",array($Division_Name));
@@ -253,9 +281,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>DOB:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND (
                               Violation.Status = 'Forms to DOB'
@@ -267,9 +295,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>E-Filed:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'AOC E-filed'
                   ;",array($Divsion_Name));
@@ -278,9 +306,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Contract Canceled:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'CONTRACT CANCELLED'
                   ;",array($Division_Name));
@@ -290,9 +318,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>DOB:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND (
                               Violation.Status = 'Forms to DOB'
@@ -304,9 +332,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>E-Filed:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'AOC E-filed'
                   ;",array($Divsion_Name));
@@ -315,9 +343,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Contract Canceled:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'CONTRACT CANCELLED'
                   ;",array($Division_Name));
@@ -327,9 +355,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>DOB:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND (
                               Violation.Status = 'Forms to DOB'
@@ -341,9 +369,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>E-Filed:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'AOC E-filed'
                   ;",array($Divsion_Name));
@@ -352,9 +380,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='background-color:black;color:white;border:1px solid white;'>Contract Canceled:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'CONTRACT CANCELLED'
                   ;",array($Division_Name));
@@ -364,9 +392,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>DOB:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND (
                               Violation.Status = 'Forms to DOB'
@@ -378,9 +406,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>E-Filed:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'AOC E-filed'
                   ;",array($Divsion_Name));
@@ -389,9 +417,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               <div class='col-xs-1' style='border:1px solid black;'>Contract Canceled:<?
                 $r = $database->query(null,
                   " SELECT  Count(Violation.ID) AS Count
-                    FROM    nei.dbo.Violation
-                            LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                            LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM    Violation
+                            LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                            LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE   Zone.Name = ?
                             AND Violation.Status = 'CONTRACT CANCELLED'
                   ;",array($Division_Name));
@@ -411,9 +439,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                   " SELECT    Loc.Tag AS Location_Tag,
                               Zone.Name AS Division_Name,
                               Count(Violation.ID) AS Count
-                    FROM      nei.dbo.Violation
-                              LEFT JOIN nei.dbo.Loc ON Loc.Loc = Violation.Loc
-                              LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                    FROM      Violation
+                              LEFT JOIN Loc ON Loc.Loc = Violation.Loc
+                              LEFT JOIN Zone ON Loc.Zone = Zone.ID
                     WHERE     Violation.Status <> 'Dismissed'
                               AND Zone.Name <> 'Repair'
                     GROUP BY  Loc.Tag, Zone.Name
@@ -425,80 +453,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <div class='col-xs-6'><?php echo $row['Location_Tag'];?></div>
                     <div class='col-xs-3'><?php echo $row['Count'];?></div>
                   </div><?php
-                }}
-              ?></div>
-              <script>
-              var TIMELINE = new Array();
-              var GETTING_TIMELINE = 0;
-              var Last_ID = 0;
-              var REFRESH_DATETIME = "<?php echo date("Y-m-d H:i:s",strtotime('-7 days'));?>";
-              function numberWithCommas(x) {
-                  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-              }
-              function NOW() {
-
-                  var date = new Date();
-                  var aaaa = date.getFullYear();
-                  var gg = date.getDate();
-                  var mm = (date.getMonth() + 1);
-
-                  if (gg < 10)
-                      gg = "0" + gg;
-
-                  if (mm < 10)
-                      mm = "0" + mm;
-
-                  var cur_day = aaaa + "-" + mm + "-" + gg;
-
-                  var hours = date.getHours()
-                  var minutes = date.getMinutes()
-                  var seconds = date.getSeconds();
-
-                  if (hours < 10)
-                      hours = "0" + hours;
-
-                  if (minutes < 10)
-                      minutes = "0" + minutes;
-
-                  if (seconds < 10)
-                      seconds = "0" + seconds;
-
-                  return cur_day + " " + hours + ":" + minutes + ":" + seconds;
-
-              }
-              function getTimeline(){
-                var TEMP_REFRESH_DATETIME = REFRESH_DATETIME;
-                REFRESH_DATETIME = NOW();
-                if(GETTING_TIMELINE == 0){
-                  GETTING_TIMELINE = 1;
-                  $.ajax({
-                    url:"cgi-bin/php/get/Compliance.php",
-                    data:{
-                      REFRESH:TEMP_REFRESH_DATETIME
-                    },
-                    method:"GET",
-                    success:function(code){
-                      var jsonData = JSON.parse(code);
-                      for(i in jsonData){
-                        $("#Timeline").prepend("<div class='row'  ondblclick='popupViolation(" + jsonData[i].ID + ");'>"
-                          + '<div class="col-xs-2">' + jsonData[i].CreatedStamp + '</div>'
-                          + '<div class="col-xs-1">' + jsonData[i].fUser + '</div>'
-                          + "<div class='col-xs-3'>" + jsonData[i].Location_Tag + "</div>"
-                          + "<div class='col-xs-2'>Violation #" + jsonData[i].ID + "</div>"
-                          + "<div class='col-xs-4'>" + jsonData[i].Action + "</div>"
-                          //+ "<div class='col-xs-1'>$" + numberWithCommas(jsonData[i].Amount) + "</div>"
-                        + "</div>");
-                      }
-                      GETTING_TIMELINE = 0;
-                    }
-                  });
                 }
               }
-              $(document).ready(function(){
-                getTimeline();
-                setInterval(getTimeline, 5000);
-              });
-              </script>
+              ?></div>
             </div>
             <div class='row'>
               <?php $rows = array();
@@ -506,9 +463,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               "   SELECT  *
                   FROM
                   (
-
                         (
-                          SELECT Violation.ID               AS ID,
+                          SELECT Violation.ID            AS ID,
                              Violation.Name              AS Name,
                              Violation.fdate             AS fDate,
                              Violation.Status            AS Status,
@@ -521,14 +477,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                              Violation.Custom7 AS Due_Date,
                              '' 						   AS Remarks,
                                          Terr.Name                   AS Territory
-                          FROM   nei.dbo.Violation
-                             LEFT JOIN nei.dbo.Elev  ON Violation.Elev = Elev.ID
-                             LEFT JOIN nei.dbo.Loc   ON Violation.Loc  = Loc.Loc
-                             LEFT JOIN nei.dbo.Zone  ON Loc.Zone       = Zone.ID
-                             LEFT JOIN nei.dbo.Route ON Loc.Route      = Route.ID
+                             FROM   Violation
+                             LEFT JOIN Elev  ON Violation.Elev = Elev.ID
+                             LEFT JOIN Loc   ON Violation.Loc  = Loc.Loc
+                             LEFT JOIN Zone  ON Loc.Zone       = Zone.ID
+                             LEFT JOIN Route ON Loc.Route      = Route.ID
                              LEFT JOIN Emp   ON Route.Mech     = Emp.fWork
-                             LEFT JOIN nei.dbo.Job   ON Violation.Job  = Job.ID
-                                         LEFT JOIN nei.dbo.Terr  ON Loc.Terr       = Terr.ID
+                             LEFT JOIN Job   ON Violation.Job  = Job.ID
+                                         LEFT JOIN Terr  ON Loc.Terr       = Terr.ID
                           WHERE
                               Violation.Status <> 'Dismissed'
                               AND Violation.ID     <> 0
@@ -553,7 +509,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               }?>
               <div class='col-xs-6' style='border:3px solid black;'><h3><?php echo $count;?> Due Violations</h3></div>
               <?php
-              $r = $database->query(null,"SELECT Count(Violation.ID) AS Count FROM nei.dbo.Violation WHERE Violation.Status = 'Code';");
+              $r = $database->query(null,"SELECT Count(Violation.ID) AS Count FROM Violation WHERE Violation.Status = 'Code';");
               $count = sqlsrv_fetch_array($r)['Count'];
               ?>
               <div class='col-xs-6' style='border:3px solid black;'><h3><?php echo $count;?> Violations in Code Department</h3></div>
@@ -573,7 +529,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               }}
               ?></div>
               <?php
-              $r = $database->query(null,"SELECT Violation.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Elev.State AS Unit_State FROM nei.dbo.Violation LEFT JOIN nei.dbo.Loc ON Violation.Loc = Loc.Loc LEFT JOIN nei.dbo.Zone ON Zone.ID = Loc.Zone LEFT JOIN nei.dbo.Elev ON Violation.Elev = Elev.ID WHERE Violation.Status = 'Code' ORDER BY Zone.NAme ASC, Loc.Tag ASC;");
+              $r = $database->query(null,"SELECT Violation.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Elev.State AS Unit_State FROM Violation LEFT JOIN Loc ON Violation.Loc = Loc.Loc LEFT JOIN Zone ON Zone.ID = Loc.Zone LEFT JOIN Elev ON Violation.Elev = Elev.ID WHERE Violation.Status = 'Code' ORDER BY Zone.NAme ASC, Loc.Tag ASC;");
               $rows = array();
               if($r){while($row = sqlsrv_fetch_array($r)){
                 $rows[] = $row;
@@ -605,13 +561,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             tblWork.Super AS Supervisor,
                             TicketO.Level AS Level,
                             TicketO.ID AS ID
-                    FROM    nei.dbo.TicketO
-                            LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc
+                    FROM    TicketO
+                            LEFT JOIN Loc ON TicketO.LID = Loc.Loc
                             LEFT JOIN Emp ON Emp.fWork = TicketO.fWork
-                            LEFT JOIN nei.dbo.Violation ON Violation.Loc = Loc.Loc
-                            LEFT JOIN nei.dbo.Job ON Violation.Job = Job.ID
-                            LEFT JOIN nei.dbo.Zone ON Zone.ID = Loc.Zone
-                            LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                            LEFT JOIN Violation ON Violation.Loc = Loc.Loc
+                            LEFT JOIN Job ON Violation.Job = Job.ID
+                            LEFT JOIN Zone ON Zone.ID = Loc.Zone
+                            LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                     WHERE   Violation.Status = 'Job Created'
                             AND Job.Status = 0
                             AND TicketO.Assigned = 3
@@ -634,7 +590,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }}
               ?></div>
               <div class='col-xs-6' style='height:600px;overflow-y:scroll;border:3px solid black;'><?php
-                $r = $database->query(null,"SELECT TicketO.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Emp.fFirst + ' ' + Emp.Last AS Employee_Name, TickOStatus.Type AS Status FROM nei.dbo.TicketO LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE TicketO.Level = 4 ORDER BY TicketO.CDate ASC;");
+                $r = $database->query(null,"SELECT TicketO.*, Loc.Tag AS Location_Tag, Zone.Name AS Division_Name, Emp.fFirst + ' ' + Emp.Last AS Employee_Name, TickOStatus.Type AS Status FROM TicketO LEFT JOIN TickOStatus ON TicketO.Assigned = TickOStatus.Ref LEFT JOIN Loc ON TicketO.LID = Loc.Loc LEFT JOIN Zone ON Loc.Zone = Zone.ID LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE TicketO.Level = 4 ORDER BY TicketO.CDate ASC;");
                 if($r){while($row = sqlsrv_fetch_array($r)){
                   ?><div class='row' ondblclick="popupTicket(<?php echo $row['ID'];?>);">
                     <div class='col-xs-2'><?php echo date("m/d/Y",strtotime($row['CDate']));?></div>
@@ -651,53 +607,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       </div>
   </div>
 </div>
-<script>
-function popupViolation(violationID){
-  $(".Ticket").remove();
-  $.ajax({
-    url:"violation.php",
-    method:"GET",
-    data:{
-      container:0,
-      ID:violationID
-    },
-    success:function(code){
-      $("body").append(code);
-    }
-  })
-}
-function popupTicket(ticketID){
-  $(".Ticket").remove();
-  $.ajax({
-    url:"cgi-bin/php/tooltip/Ticket.php",
-    method:"GET",
-    data:{
-      ID:ticketID
-    },
-    success:function(code){
-      $("body").append(code);
-    }
-  })
-}
-$(document).on('click',function(e){
-  $(".Ticket").remove();
-	if($(e.target).closest('.popup').length === 0){
-		$('.popup').fadeOut(300);
-		$('.popup').remove();
-	}
-});
-</script>
-<style>
-.popup {
-  position:fixed;
-  top:5%;
-  left:10%;
-  width:80%;
-  height:80%;
-  background-color:#3d3d3d;
-  border:3px solid black;
-}
-</style>
 </body>
 </html>
 <?php

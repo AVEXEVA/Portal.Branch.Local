@@ -1,0 +1,6 @@
+<style>
+  div.column {display:inline-block;vertical-align:top;}
+  div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
+  div.data {display:inline-block;width:300px;vertical-align:top;}
+  div#map * {overflow:visible;}
+  </style>

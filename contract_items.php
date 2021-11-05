@@ -1,37 +1,69 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT *
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-	   	|| !isset($My_Privileges['Contract'])
-	  		|| $My_Privileges['Contract']['User_Privilege']  < 4
-	  		|| $My_Privileges['Contract']['Group_Privilege'] < 4){require('../404.html');}
-    else {
-		$database->query(null,
-      "INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
-			VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "contracts.php"));
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  $result = \singleton\database::getInstance()->query(
+    null,
+    " SELECT  *
+      FROM    Connection
+      WHERE       Connection.Connector = ?
+              AND Connection.Hash  = ?;",
+    array(
+      $_SESSION[ 'User' ],
+      $_SESSION[ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array( $result );
+  //User
+  $result = \singleton\database::getInstance()->query(
+    null,
+    " SELECT  *,
+              Emp.fFirst AS First_Name,
+              Emp.Last   AS Last_Name
+      FROM    Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = \singleton\database::getInstance()->query(
+    null,
+    " SELECT  Privilege.Access_Table,
+              Privilege.User_Privilege,
+              Privilege.Group_Privilege,
+              Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset($Privileges[ 'Contract' ])
+      ||  $Privileges[ 'Contract' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Contract' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Contract' ][ 'Other_Privilege' ] < 4
+  ){
+      ?><?php require( '../404.html' );?><?php
+  } else {
+    \singleton\database::getInstance()->query(
+      null,
+      " INSERT INTO Activity( [User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'User' ],
+        date( 'Y-m-d H:i:s' ),
+        'contract_items.php'
+      )
+    );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,8 +78,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
+        <?php require(bin_php.'element/navigation/index.php');?>
+        <?php require(bin_php.'php/element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
 				<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Contract();?> Contracts</h4></div>
@@ -99,26 +131,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-6'><button type='button' onClick='contract_item_covered();'>Cover Contract Item for Criteria</button></div>
           </div>
         </form></div>
-        <script>
-          function contract_item_covered(){
-            var contractData = new FormData($('form#Manage_Contract_Item')[0]);
-            $.ajax({
-              url:"cgi-bin/php/post/cover_contract_item.php",
-              cache: false,
-              processData: false,
-              contentType: false,
-              data: contractData,
-              timeout:15000,
-              error:function(XMLHttpRequest, textStatus, errorThrown){
-                alert('Your ticket did not save. Please check your internet.')
-              },
-              method:"POST",
-              success:function(code){
-                //document.location.href='contract_items.php';
-              }
-            });
-          }
-        </script>
 				<div class="panel-body">
 					<table id='Table_Contract_Items' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 						<thead>
@@ -130,58 +142,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<th>Condition</th>
 							<th>Remedy</th>
 							<th>Covered</th>
-						</thead>
-					</table>
-				</div>
-            </div>
+						      </thead>
+					     </table>
+				    </div>
+          </div>
         </div>
     </div>
-    <!-- Bootstrap Core JavaScript -->
-    
-    <!-- JQUERY UI Javascript -->
-    
-    <?php require('cgi-bin/js/datatables.php');?>
-    <script>
-    var Table_Contract_Items = null;
-      $(document).ready(function(){
-          Table_Contract_Items = $('#Table_Contract_Items').DataTable( {
-              "ajax": {
-                  "url":"cgi-bin/php/get/contract_category_items.php",
-                  "data": function ( d ) {
-                     return $.extend( {}, d, {
-                       "Territory": $("input[name='Start']").val(),
-                       "Customer": $("input[name='Customer']").val(),
-                       "Location": $("input[name='Location']").val(),
-                       "Unit": $("input[name='Unit']").val()
-                     } );
-                   },
-                  "dataSrc":function(json){
-                    if(!json.data){json.data = [];}
-                    return json.data;
-                  }
-              },
-              /*"processing":true,
-              "serverSide":true,*/
-              "columns": [
-                  { "data": "Contract"},
-                  { "data": "Customer"},
-                  { "data": "Location"},
-                  { "data": "Unit"},
-                  { "data": "Unit_Part"},
-                  { "data": "Unit_Part_Condition"},
-                  { "data": "Unit_Part_Remedy"},
-                  { "data": "Unit_Part_Covered"}
-              ],
-              "order": [[1, 'desc']],
-              "lengthMenu":[[10,25,50,100,500,-1],[10,25,50,100,500,"All"]],
-              "language":{"loadingRecords":""},
-              "initComplete":function(){},
-          } );
-      });
-      function refresh(){
-        Table_Escalations.draw();
-      }
-    </script>
 </body>
 </html>
 <?php
