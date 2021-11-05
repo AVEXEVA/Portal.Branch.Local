@@ -3,7 +3,7 @@
 $(function() {
     <?php 
     $Vars = array();
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT 
             Elev.State AS Unit_State,
             Elev.Type AS Unit_Type

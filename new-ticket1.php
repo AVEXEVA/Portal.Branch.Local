@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Connection
-  $result = sqlsrv_query(
-    $NEI,
+  $result = $database->query(
+    null,
     " SELECT  Connection.* 
       FROM    Connection 
       WHERE       Connection.Connector = ? 
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
   $Connection = sqlsrv_fetch_array( $result );
   //User
-  $result = sqlsrv_query(
-    $NEI,
+  $result = $database->query(
+    null,
     " SELECT  Emp.*, 
               Emp.fFirst AS First_Name, 
               Emp.Last as Last_Name 
@@ -33,8 +33,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Privileges
   $Privileges = array( );
   $Privileged = false;
-  $result = sqlsrv_query(
-    $NEI,
+  $result = $database->query(
+    null,
     " SELECT  Privilege.Access_Table, 
               Privilege.User_Privilege, 
               Privilege.Group_Privilege, 
@@ -50,7 +50,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   if( isset( $Privileges[ 'Ticket' ] ) && $Privileges[ 'Ticket' ][ 'User_Privilege' ] >= 6){ $Privileged = TRUE; }
   if( !isset($Connection['ID'])  || !$Privileged ){require("401.html");}
   else {
-    sqlsrv_query($NEI,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
+    $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,7 +107,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   					<div class='col-auto'><button type='button' onClick='selectLocations(this);' '><?php
             $pass = false;
             if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
+              $r = $database->query(null,"SELECT * FROM Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -134,7 +134,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             <div class='col-auto'><button type='button' onClick='selectUnits(this);' '><?php
             $pass = false;
             if(isset($_GET['Unit']) && is_numeric($_GET['Unit'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM Elev WHERE Elev.ID = ?;",array($_GET['Unit']));
+              $r = $database->query(null,"SELECT * FROM Elev WHERE Elev.ID = ?;",array($_GET['Unit']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -161,7 +161,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             <div class='col-auto'><button type='button' onClick='selectJobs(this);' '><?php
             $pass = false;
             if(isset($_GET['Job']) && is_numeric($_GET['Job'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM Job WHERE Job.ID = ?;",array($_GET['Job']));
+              $r = $database->query(null,"SELECT * FROM Job WHERE Job.ID = ?;",array($_GET['Job']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){

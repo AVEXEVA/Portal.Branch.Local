@@ -4,13 +4,13 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+        $My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($My_User); 
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -20,10 +20,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Territory']) && $My_Privileges['Territory']['User_Privilege'] >= 4 && $My_Privileges['Territory']['Group_Privilege'] >= 4 && $My_Privileges['Territory']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     }
-	if(is_numeric($_GET['ID'])){sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "territory.php?ID=" . $_GET['ID']));}
+	if(is_numeric($_GET['ID'])){$database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "territory.php?ID=" . $_GET['ID']));}
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Terr.ID   AS Territory_ID,
 					Terr.Name AS Territory_Name
@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <div class='row' style='font-size:20px;'><?php 
 $_GET['Date'] = date('Y-m-d',strtotime($_GET['Date']));
 $Timeline = array();
-$SQL_Completed_Tickets = sqlsrv_query($NEI,"
+$SQL_Completed_Tickets = $database->query(null,"
 	SELECT Tickets.ID,
 		   Tickets.EDate  AS Date,
 		   Tickets.Object AS Object,
@@ -79,7 +79,7 @@ if($SQL_Completed_Tickets){while($Ticket = sqlsrv_fetch_array($SQL_Completed_Tic
 	if(!isset($Timeline[date('Y-m-d',strtotime($Ticket['Date']))])){$Timeline[date('Y-m-d',strtotime($Ticket['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Ticket['Date']))][] = $Ticket; 
 }}
-$SQL_Created_Tickets = sqlsrv_query($NEI,"
+$SQL_Created_Tickets = $database->query(null,"
 	SELECT Tickets.ID,
 		   Tickets.CDate  AS Date,
 		   Tickets.Object AS Object,
@@ -119,7 +119,7 @@ if($SQL_Created_Tickets){while($Ticket = sqlsrv_fetch_array($SQL_Created_Tickets
 	if(!isset($Timeline[date('Y-m-d',strtotime($Ticket['Date']))])){$Timeline[date('Y-m-d',strtotime($Ticket['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Ticket['Date']))][] = $Ticket; 
 }}
-$SQL_Completed_Jobs = sqlsrv_query($NEI,"
+$SQL_Completed_Jobs = $database->query(null,"
 	SELECT Job.ID,
 		   Job.CloseDate AS Date,
 		   'Job'         AS Object,
@@ -136,7 +136,7 @@ if($SQL_Completed_Jobs){while($Job = sqlsrv_fetch_array($SQL_Completed_Jobs)){
 	if(!isset($Timeline[date('Y-m-d',strtotime($Job['Date']))])){$Timeline[date('Y-m-d',strtotime($Job['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Job['Date']))][] = $Job; 
 }}
-$SQL_Created_Jobs = sqlsrv_query($NEI,"
+$SQL_Created_Jobs = $database->query(null,"
 	SELECT Job.ID,
 		   Job.fDate  AS Date,
 		   'Job'      AS Object,
@@ -152,7 +152,7 @@ if($SQL_Created_Jobs){while($Job = sqlsrv_fetch_array($SQL_Created_Jobs)){
 	$Timeline[date('Y-m-d',strtotime($Job['Date']))][] = $Job; 
 }}
 
-$SQL_Created_Estimates = sqlsrv_query($NEI,"
+$SQL_Created_Estimates = $database->query(null,"
 	SELECT Estimate.ID,
 		   Estimate.fDate  AS Date,
 		   'Proposal'      AS Object,
@@ -168,7 +168,7 @@ if($SQL_Created_Estimates){while($Estimate = sqlsrv_fetch_array($SQL_Created_Est
 	$Timeline[date('Y-m-d',strtotime($Estimate['Date']))][] = $Estimate; 
 }}
 if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privilege'] >= 4){
-	$SQL_Paid_Invoices = sqlsrv_query($NEI,"
+	$SQL_Paid_Invoices = $database->query(null,"
 		SELECT Trans.ID      AS ID,
 			   Trans.fDate   AS Date,
 			   'Transaction' AS Object,
@@ -188,7 +188,7 @@ if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privil
 		if(!isset($Timeline[date('Y-m-d',strtotime($Payment['Date']))])){$Timeline[date('Y-m-d',strtotime($Payment['Date']))] = array();}
 		$Timeline[date('Y-m-d',strtotime($Payment['Date']))][] = $Payment; 
 	}}
-	$SQL_Created_Invoices = sqlsrv_query($NEI,"
+	$SQL_Created_Invoices = $database->query(null,"
 		SELECT Invoice.Ref   AS ID,
 			   Invoice.fDate AS Date,
 			   'Invoice'     AS Object,
@@ -207,7 +207,7 @@ if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privil
 
 }
 
-$SQL_Created_Violation = sqlsrv_query($NEI,"
+$SQL_Created_Violation = $database->query(null,"
 	SELECT Violation.ID    AS ID,
 		   Violation.fdate AS Date,
 		   'Violation'     AS Object,
@@ -222,7 +222,7 @@ if($SQL_Created_Violation){while($Violation = sqlsrv_fetch_array($SQL_Created_Vi
 	if(!isset($Timeline[date('Y-m-d',strtotime($Violation['Date']))])){$Timeline[date('Y-m-d',strtotime($Violation['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Violation['Date']))][] = $Violation; 
 }}
-$SQL_Overdue_Violations = sqlsrv_query($NEI,"
+$SQL_Overdue_Violations = $database->query(null,"
 	SELECT *,
 		   Violations.Due_Date  AS Date,
 		   'Overdue'            AS Field
@@ -285,7 +285,7 @@ if($SQL_Overdue_Violations){while($Violation = sqlsrv_fetch_array($SQL_Overdue_V
 	$Timeline['20'. substr($Violation['Date'],6,2) . '-' .substr($Violation['Date'],0,2) . '-' . substr($Violation['Date'],3,2)][] = $Violation; 
 
 }}
-$SQL_Contract_Starts = sqlsrv_query($NEI,"
+$SQL_Contract_Starts = $database->query(null,"
 	SELECT Contract.Job    AS ID,
 		   Contract.BStart AS Date,
 		   'Contract'      AS Object,
@@ -313,7 +313,7 @@ if($SQL_Contract_Starts){while($Contract = sqlsrv_fetch_array($SQL_Contract_Star
 	}
 }}
 if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privilege'] >= 4){
-	$SQL_Overdue_Invoices = sqlsrv_query($NEI,"
+	$SQL_Overdue_Invoices = $database->query(null,"
 		SELECT OpenAR.Ref AS ID,
 			   OpenAR.Due AS Date,
 			   'OpenAR'   AS Object,

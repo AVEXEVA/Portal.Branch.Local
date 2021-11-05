@@ -5,8 +5,8 @@ if(session_id() == '' || !isset($_SESSION) ){
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  * 
             FROM    Connection 
             WHERE   Connector = ? 
@@ -19,12 +19,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?;",
@@ -38,8 +38,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     if(!isset($Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=violations.php';</script></head></html><?php }
     else {
-      sqlsrv_query(
-        $NEI,
+      $database->query(
+        null,
         "   INSERT INTO Activity([User], [Date], [Page])
             VALUES(?,?,?);",
         array(

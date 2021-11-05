@@ -4,7 +4,7 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 var lawsuit_cost_data = [
 	<?php 
 	$data = array();
-	$job_result = sqlsrv_query($NEI,"
+	$job_result = $database->query(null,"
 		SELECT Job.ID AS ID
 		FROM   Job
 		WHERE  Job.Type = 2
@@ -15,7 +15,7 @@ var lawsuit_cost_data = [
 		$totals = array();
 		while($array = sqlsrv_fetch_array($job_result)){$Jobs[] = "[JOBLABOR].[JOB #]='{$array['ID']}'";}
 		$Jobs = implode(" OR ",$Jobs);
-		$invoice_result = sqlsrv_query($NEI,"
+		$invoice_result = $database->query(null,"
 			SELECT Invoice.Amount AS Amount,
 				   Invoice.fDate as fDate
 			FROM   Invoice
@@ -39,7 +39,7 @@ var lawsuit_cost_data = [
 				$dates[$date] = (isset($dates[$date])) ? $dates[$date] + ($array['Amount'] * (1 - $Overhead)): $array['Amount'] * (1 - $Overhead);
 			}
 		}
-		$job_item_result = sqlsrv_query($Paradox,"
+		$job_item_result = $database->query($Paradox,"
 			SELECT [JOBLABOR].[WEEK ENDING]    AS fDate,
 				   [JOBLABOR].[TOTAL COST]     AS Amount
 			FROM   Paradox.dbo.JOBLABOR
@@ -55,7 +55,7 @@ var lawsuit_cost_data = [
 		}
 		ksort($dates);
 
-		$job_item_result = sqlsrv_query($NEI,"
+		$job_item_result = $database->query(null,"
 			SELECT JobI.Amount AS Amount, 
 				   JobI.fDate as fDate
 			FROM   nei.dbo.Loc 
@@ -72,7 +72,7 @@ var lawsuit_cost_data = [
 			}
 		}
 		ksort($dates);
-		$job_item_result = sqlsrv_query($NEI,"
+		$job_item_result = $database->query(null,"
 			SELECT   JobI.Amount AS Amount,
 					 JobI.fDate as fDate
 			FROM     nei.dbo.Loc 
@@ -92,7 +92,7 @@ var lawsuit_cost_data = [
 			}
 		}
 		ksort($dates);
-		$job_item_result = sqlsrv_query($NEI,"
+		$job_item_result = $database->query(null,"
 			SELECT   JobI.Amount AS Amount,
 				     JobI.fDate as fDate
 			FROM     nei.dbo.Loc 

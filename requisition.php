@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -31,11 +31,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         || !is_numeric($_GET['ID'])){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "requisition.phpID={$_GET['ID']}"));
-    $r = sqlsrv_query($Portal,
+    $r = $database->query($Portal,
       " SELECT  Requisition.*,
                 Loc.Tag AS Location_Tag,
                 DropOff.Tag AS DropOff_Tag,
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         WHERE Requisition.ID = ?
       ;",array($_GET['ID']));
     $Requisition = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.Requisition_Item WHERE Requisition_Item.Requisition = ?;",array($_GET['ID']));
+    $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Requisition_Item WHERE Requisition_Item.Requisition = ?;",array($_GET['ID']));
     $Requisition_Items = array();
     if($r){while($row = sqlsrv_fetch_array($r)){$Requisition_Items[] = $row;}}
 ?><!DOCTYPE html>

@@ -3,12 +3,12 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 set_time_limit(120);
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID='{$_SESSION['User']}'
@@ -18,9 +18,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	$Privileged = FALSE;
 	if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
 	elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-		$r  = sqlsrv_query( $NEI,"SELECT * FROM TicketO        WHERE TicketO.LID        = ? AND fWork=?;",array($_GET['ID'],$My_User['fWork']));
-		$r2 = sqlsrv_query( $NEI,"SELECT * FROM TicketD        WHERE TicketD.Loc        = ? AND fWork=?;",array($_GET['ID'],$My_User['fWork']));
-		$r3 = sqlsrv_query( $NEI,"SELECT * FROM TicketDArchive WHERE TicketDArchive.Loc = ? AND fWork=?;",array($_GET['ID'],$My_User['fWork']));
+		$r  = $database->query( null,"SELECT * FROM TicketO        WHERE TicketO.LID        = ? AND fWork=?;",array($_GET['ID'],$My_User['fWork']));
+		$r2 = $database->query( null,"SELECT * FROM TicketD        WHERE TicketD.Loc        = ? AND fWork=?;",array($_GET['ID'],$My_User['fWork']));
+		$r3 = $database->query( null,"SELECT * FROM TicketDArchive WHERE TicketDArchive.Loc = ? AND fWork=?;",array($_GET['ID'],$My_User['fWork']));
 		$r  = sqlsrv_fetch_array($r);
 		$r2 = sqlsrv_fetch_array($r2);
 		$r3 = sqlsrv_fetch_array($r3);
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($array['ID']) || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
         $data = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
 			SELECT TicketO.ID                  AS ID,
 				   TicketO.ID                  AS Ticket_ID,
 				   TicketO.fDesc               AS Description,

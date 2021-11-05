@@ -3,12 +3,12 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../../cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    $My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ?
@@ -18,17 +18,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Privileged = FALSE;
     if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     /*elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  $NEI,"
+        $r = $database->query(  null,"
 		SELECT 	*
 		FROM 	TicketO
 		WHERE 	TicketO.LID='{$_GET['ID']}'
 				AND fWork='{$My_User['fWork']}'");
-        $r2 = sqlsrv_query( $NEI,"
+        $r2 = $database->query( null,"
 		SELECT 	*
 		FROM 	TicketD
 		WHERE 	TicketD.Loc='{$_GET['ID']}'
 				AND fWork='{$My_User['fWork']}'");
-        $r3 = sqlsrv_query( $NEI,"
+        $r3 = $database->query( null,"
 		SELECT 	*
 		FROM 	TicketDArchive
 		WHERE 	TicketDArchive.Loc='{$_GET['ID']}'
@@ -38,11 +38,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$r3 = sqlsrv_fetch_array($r3);
         $Privileged = (is_array($r) || is_array($r2) || is_array($r3)) ? TRUE : FALSE;
     }*/
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
         $ID = $_GET['ID'];
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Name,
@@ -81,7 +81,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="col-xs-9 text-right">
 														<div class="col-xs-9 text-right">
 														<div class="medium"><?php
-															$r = sqlsrv_query($NEI,"
+															$r = $database->query(null,"
 																SELECT Sum(OpenAR.Balance) AS Count_of_Outstanding_Invoices
 																FROM   OpenAR
 																	   LEFT JOIN Loc ON OpenAR.Loc = Loc.Loc

@@ -4,14 +4,14 @@ if(session_id() == '' || !isset($_SESSION)) {
 	require('cgi-bin/php/index.php');
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -28,11 +28,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
     if(	!isset($My_Connection['ID']) ){?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "dashboard.php"));
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT 
 				Emp.*, 
 				Emp.Last as Last_Name, 
@@ -67,7 +67,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class="panel panel-primary" style='margin-bottom:0px;'>
 				<div class="panel-heading"><?php 
 				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
-				if(is_numeric($_GET['Mechanic'])){$r = sqlsrv_query($NEI,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;} 
+				if(is_numeric($_GET['Mechanic'])){$r = $database->query(null,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;} 
 						else {$Mechanic = $User;}?><h3><?php \singleton\fontawesome::getInstance( )->Dashboard();?>My Dashboard</h3></div>
                 <div class="row">
 					<div class='col-md-6'>
@@ -105,7 +105,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 													
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT 
 															(SELECT Count(*) AS Counts
 															 FROM   TicketD
@@ -139,7 +139,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Sum(Total) AS Summed
 															FROM   (SELECT Total, fWork, EDate FROM TicketD
 																	UNION ALL 
@@ -178,15 +178,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								</div>
 								<?php 
 								$serverName = "172.16.12.45";
-								$NEIectionOptions = array(
+								nullectionOptions = array(
 									"Database" => "ATTENDANCE",
 									"Uid" => "sa",
 									"PWD" => "SQLABC!23456",
 									'ReturnDatesAsStrings'=>true
 								);
 								//Establishes the connection
-								$c2 = sqlsrv_connect($serverName, $NEIectionOptions);
-								$r = sqlsrv_query($c2,"select * from Employee where EmpID='" .$User['Ref'] . "'");
+								$c2 = sqlsrv_connect($serverName, nullectionOptions);
+								$r = $database->query($c2,"select * from Employee where EmpID='" .$User['Ref'] . "'");
 								$Attendance = sqlsrv_fetch_array($r);
 								while($temp = sqlsrv_fetch_array($r));
 								?>
@@ -266,7 +266,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<?php if(!$Mobile){?><div class="panel-heading">Main</div><?php }?>
 							<div class='panel-body' style='<?php if(isMobile()){?>margin-top:6px;<?php }?>'><?php }?>
 								<?php 
-								$r = sqlsrv_query($NEI,"
+								$r = $database->query(null,"
 									SELECT Top 1 
 										   TicketO.ID AS ID
 									FROM   nei.dbo.TicketO
@@ -297,7 +297,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								</div>
 								<?php }?>
 								<?php 
-								$r = sqlsrv_query($NEI,"
+								$r = $database->query(null,"
 									SELECT Top 1 
 										   Tickets.Date AS Date,
 										   Tickets.Unit AS Unit
@@ -341,7 +341,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>small<?php } else {?>medium<?php }?>">
 													<?php 
-													$r = sqlsrv_query($NEI,"SELECT * FROM Elev WHERE Elev.ID = ?;",array($Unit));
+													$r = $database->query(null,"SELECT * FROM Elev WHERE Elev.ID = ?;",array($Unit));
 													$Unit = sqlsrv_fetch_array($r);
 													echo strlen($Unit['State']) > 0 ? $Unit['State'] : $Unit['Unit'];;
 													j?>
@@ -352,7 +352,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									</div></div>
 								</div>
 								<?php 
-								$r = sqlsrv_query($NEI,"
+								$r = $database->query(null,"
 									SELECT Top 1 
 										   Tickets.Date 	AS Date,
 										   Tickets.Location AS Location
@@ -399,7 +399,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>small<?php } else {?>medium<?php }?>">
 													<?php
-													$r = sqlsrv_query($NEI,"SELECT * FROM Loc WHERE Loc.Loc = ?;",array($Location));
+													$r = $database->query(null,"SELECT * FROM Loc WHERE Loc.Loc = ?;",array($Location));
 													$Location = sqlsrv_fetch_array($r);
 													echo proper($Location['Tag']);
 													j?>
@@ -410,7 +410,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									</div></div>
 								</div>
 								<?php 
-								$r = sqlsrv_query($NEI,"
+								$r = $database->query(null,"
 									SELECT Top 1
 										   Tickets.Date AS Date,
 										   Tickets.Job AS Job
@@ -457,7 +457,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>small<?php } else {?>medium<?php }?>">
 													<?php 
-													$r = sqlsrv_query($NEI,"SELECT * FROM Job WHERE Job.ID = ?;",array($Job));
+													$r = $database->query(null,"SELECT * FROM Job WHERE Job.ID = ?;",array($Job));
 													$Job = sqlsrv_fetch_array($r);
 													echo strlen($Job['fDesc']) > 0 ? $Job['fDesc'] : $Job['fDesc'];;
 													j?>
@@ -492,7 +492,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>">
 													<?php 
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT 
 															(SELECT Count(*) AS Counts
 															 FROM   TicketD
@@ -526,7 +526,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div><?php }?>
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Sum(Total) AS Summed
 															FROM   (SELECT Total, fWork, EDate FROM TicketD
 																	UNION ALL 
@@ -572,7 +572,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT 
 																(SELECT Count(*) AS Counts
 																 FROM   TicketD
@@ -603,7 +603,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Sum(Total) AS Summed
 															FROM   (SELECT Total, fWork FROM TicketD
 																	UNION ALL 
@@ -654,7 +654,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Counter
 															FROM   
 																(
@@ -702,7 +702,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Violation.ID) AS Counter
 															FROM   nei.dbo.Violation
 																   LEFT JOIN nei.dbo.Loc   ON Violation.Loc = Loc.Loc
@@ -729,7 +729,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Violation.ID) AS Counter
 															FROM   nei.dbo.Violation
 																   LEFT JOIN nei.dbo.Loc   ON Violation.Loc = Loc.Loc
@@ -756,7 +756,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.Loc) AS Counter
 															FROM   
 																(
@@ -804,7 +804,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.Unit) AS Counter
 															FROM   
 																(
@@ -852,7 +852,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Maintenances
 															FROM   
 																(
@@ -905,7 +905,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Modernizations
 															FROM   
 																(
@@ -958,7 +958,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Maintenances
 															FROM   
 																(
@@ -1011,7 +1011,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div><?php }?>
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-													$r = sqlsrv_query($NEI,"
+													$r = $database->query(null,"
 														SELECT Tickets.Date
 														FROM   
 															(
@@ -1107,7 +1107,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						<i class='fa fa-2x fa-flag'></i>
 					</div>
 					<?php 
-					$r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
+					$r = $database->query(null,"SELECT * FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
 					if($r){if(is_array(sqlsrv_fetch_array($r))){?>
 					<div class='dashboard-option' onClick="activateContent('my-maintenance');">
 						<i class='fa fa-2x fa-cogs'></i>
@@ -1117,7 +1117,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					</div>
 					<?php }}?>
 					<?php
-					$r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Vehicle LEFT JOIN Emp ON Emp.fWork = Vehicle.fWork WHERE Emp.ID = ?;", array($_SESSION['User']));
+					$r = $database->query(null,"SELECT * FROM nei.dbo.Vehicle LEFT JOIN Emp ON Emp.fWork = Vehicle.fWork WHERE Emp.ID = ?;", array($_SESSION['User']));
 					if($r){if(is_array(sqlsrv_fetch_array($r))){?>
 					<div class='dashboard-option' onClick="document.location.href='inspection.php'">
 						<i class='fa fa-2x fa-truck'></i>
@@ -1177,7 +1177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Monday'){$Thursday = date('Y-m-d', strtotime($Date . ' -4 days'));}
                                         elseif($Today == 'Tuesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -5 days'));}
                                         elseif($Today == 'Wednesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -6 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) as Summed 
                                             FROM nei.dbo.TicketD 
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
@@ -1192,7 +1192,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Tuesday'){$Friday = date('Y-m-d', strtotime($Date . ' -4 days'));}
                                         elseif($Today == 'Wednesday'){$Friday = date('Y-m-d', strtotime($Date . ' -5 days'));}
                                         elseif($Today == 'Thursday'){$Friday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed 
                                             FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
@@ -1207,7 +1207,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Wednesday'){$Saturday = date('Y-m-d', strtotime($Date . ' -4 days'));}
                                         elseif($Today == 'Thursday'){$Saturday = date('Y-m-d', strtotime($Date . ' +2 days'));}
                                         elseif($Today == 'Friday'){$Saturday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed
                                             FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
@@ -1222,7 +1222,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Thursday'){$Sunday = date('Y-m-d', strtotime($Date . ' +3 days'));}
                                         elseif($Today == 'Friday'){$Sunday = date('Y-m-d', strtotime($Date . ' +2 days'));}
                                         elseif($Today == 'Saturday'){$Sunday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed 
                                             FROM nei.dbo.TicketD 
 
@@ -1238,7 +1238,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Friday'){$Monday = date('Y-m-d', strtotime($Date . ' +3 days'));}
                                         elseif($Today == 'Saturday'){$Monday = date('Y-m-d', strtotime($Date . ' +2 days'));}
                                         elseif($Today == 'Sunday'){$Monday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed
                                             FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
@@ -1253,7 +1253,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Saturday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +3 days'));}
                                         elseif($Today == 'Sunday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +2 days'));}
                                         elseif($Today == 'Monday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed
                                             FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
@@ -1268,7 +1268,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Sunday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +3 days'));}
                                         elseif($Today == 'Monday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +2 days'));}
                                         elseif($Today == 'Tuesday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-                                        $r = sqlsrv_query($NEI,"
+                                        $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed
                                             FROM nei.dbo.TicketD 
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
@@ -1276,11 +1276,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <td><?php
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
 										<td>$<?php
-											$r = sqlsrv_query($NEI,"SELECT Sum(Zone) + Sum(Toll) + Sum(OtherE) AS Expenses FROM nei.dbo.TicketD WHERE fWork = ? AND EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'",array($Employee_ID));
+											$r = $database->query(null,"SELECT Sum(Zone) + Sum(Toll) + Sum(OtherE) AS Expenses FROM nei.dbo.TicketD WHERE fWork = ? AND EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'",array($Employee_ID));
 											echo sqlsrv_fetch_array($r)['Expenses'];
 										?></td>
                                     </tr>
@@ -1291,46 +1291,46 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         ?></td>
                                         <?php 
                                         $Thursday = date('Y-m-d',strtotime($Thursday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
                                         <td class='Thursday' rel='<?php echo $Thursday;?>' onClick="refresh_this(this);"><?php 
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Friday = date('Y-m-d',strtotime($Friday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
                                         <td class='Friday' rel='<?php echo $Friday;?>' onClick="refresh_this(this);"><?php 
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Saturday = date('Y-m-d',strtotime($Saturday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
                                         <td class='Saturday' rel='<?php echo $Saturday;?>' onClick="refresh_this(this);"><?php 
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Sunday = date('Y-m-d',strtotime($Sunday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
                                         <td class='Sunday' rel='<?php echo $Sunday;?>' onClick="refresh_this(this);"><?php 
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Monday = date('Y-m-d',strtotime($Monday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
                                         <td class='Monday' rel='<?php echo $Monday;?>' onClick="refresh_this(this);"><?php 
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Tuesday = date('Y-m-d',strtotime($Tuesday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
                                         <td class='Tuesday' rel='<?php echo $Tuesday;?>' onClick="refresh_this(this);"><?php 
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Wednesday = date('Y-m-d',strtotime($Wednesday . '-7 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
                                         <td class='Wednesday' rel='<?php echo $Wednesday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <td><?php
-                                            $r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+                                            $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
 										<td>$<?php
-											$r = sqlsrv_query($NEI,"SELECT Sum(Zone) + Sum(Toll) + Sum(OtherE) AS Expenses FROM nei.dbo.TicketD WHERE fWork = ? AND EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'",array($Employee_ID));
+											$r = $database->query(null,"SELECT Sum(Zone) + Sum(Toll) + Sum(OtherE) AS Expenses FROM nei.dbo.TicketD WHERE fWork = ? AND EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'",array($Employee_ID));
 											echo sqlsrv_fetch_array($r)['Expenses'];
 										?></td>
                                     </tr><?php }?>
@@ -1340,7 +1340,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div id='my-ticket' class='subcontent col-xs-12' style='margin:0px !important;padding:0px !important;display:none;'>
 						<h4 style='text-align:center;background-color:whitesmoke;color:black;margin:0px;padding:10px;'>My Ticket</h4>
 						<?php 
-							$r = sqlsrv_query($NEI,"
+							$r = $database->query(null,"
 								SELECT Top 1
 									   Tickets.*,
 									   Loc.ID                      AS Customer,
@@ -1477,7 +1477,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 					</div>
 					<?php 
-					$r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
+					$r = $database->query(null,"SELECT * FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
 					if($r){if(is_array(sqlsrv_fetch_array($r))){?>
 					<div id='my-maintenance' class='subcontent col-xs-12' style='margin:0px !important;padding:0px !important;display:none;'>
 						<h4 style='text-align:center;background-color:whitesmoke;color:black;margin:0px;padding:10px;'>Required Route Maintenance</h4>
@@ -1493,7 +1493,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</table>
 						<script>
 						<?php
-							$r = sqlsrv_query($NEI,"SELECT Route.ID AS ID FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
+							$r = $database->query(null,"SELECT Route.ID AS ID FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
 							$Route = sqlsrv_fetch_array($r)['ID'];
 						?>
 						$(document).ready(function(){

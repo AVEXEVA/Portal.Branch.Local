@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM nei.dbo.Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
     if(!isset($array['ID'],$_GET['State']) || strlen($_GET['State']) == 0){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Elev.ID     AS ID,
 				   Elev.State  AS State, 
 				   Elev.Unit   AS Label,
@@ -24,14 +24,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$data = array();
 		if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
 			$Unit = $array;
-			$r2 = sqlsrv_query($NEI,"
+			$r2 = $database->query(null,"
 				SELECT *
 				FROM   nei.dbo.ElevTItem
 				WHERE  ElevTItem.ElevT    = 1
 					   AND ElevTItem.Elev = ?
 			;",array($Unit['ID']));
 			if($r2){while($array2 = sqlsrv_fetch_array($r2,SQLSRV_FETCH_ASSOC)){$Unit[$array2['fDesc']] = $array2['Value'];}}
-			$r3 = sqlsrv_query($NEI,"
+			$r3 = $database->query(null,"
 				SELECT *
 				FROM   nei.dbo.ElevTItem
 				WHERE  ElevTItem.ElevT    = 1

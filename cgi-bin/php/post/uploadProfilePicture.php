@@ -3,8 +3,8 @@ if(session_id() == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] ); 
     require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
 }
-if(     !isset( $Databases[ 'Default' ], $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
-    ||  !connection_privileged( $Databases[ 'Default' ], $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] ) ){
+if(     !isset( null, $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
+    ||  !connection_privileged( null, $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] ) ){
         header( 'Location: https://beta.nouveauelevator.com/login.php' );
         exit; } 
 if(     isset($_FILES[ 'Profile' ] ) 
@@ -16,7 +16,7 @@ if(     isset($_FILES[ 'Profile' ] )
   imagejpeg( $image, null, 50 );
   $image = ob_get_clean( );
   $image = base64_encode( $image );
-  sqlsrv_query( 
+  $database->query( 
     $Portal,
     "UPDATE Portal.dbo.Portal SET [Picture] = ?, Picture_Type = ? WHERE Branch = ? AND Branch_ID = ?;",
     array( 

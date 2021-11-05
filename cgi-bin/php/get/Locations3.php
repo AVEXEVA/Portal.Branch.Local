@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-  $result = sqlsrv_query(
-      $NEI,
+  $result = $database->query(
+      null,
       " SELECT  *
         FROM    Connection
         WHERE   Connection.Connector = ?
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
     );
   $Connection = sqlsrv_fetch_array( $result );
-  $result = sqlsrv_query(
-      $NEI,
+  $result = $database->query(
+      null,
       "   SELECT  Emp.*,
                   Emp.fFirst AS First_Name,
                   Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
   );
   $User = sqlsrv_fetch_array( $result );
-  $result = sqlsrv_query(
-      $NEI,
+  $result = $database->query(
+      null,
       "   SELECT  Privilege.Access_Table,
                   Privilege.User_Privilege,
                   Privilege.Group_Privilege,
@@ -60,7 +60,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
 
 
-    $conn = $NEI;
+    $conn = null;
 
     $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
     $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
@@ -198,7 +198,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     
-    $rResult = sqlsrv_query(
+    $rResult = $database->query(
       $conn,  
       $sQuery, 
       $parameters 
@@ -252,12 +252,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl";
 
-    $stmt = sqlsrv_query( $conn, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+    $stmt = $database->query( $conn, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
     $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
     $sQuery = " SELECT  COUNT(Elev.ID)
                 FROM    Elev;";
-    $rResultTotal = sqlsrv_query($conn,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = $database->query($conn,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
     

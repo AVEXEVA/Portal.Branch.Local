@@ -7,5 +7,5 @@ $ConnectionOptions = array(
     "PWD" => "SQLABC!23456",
     'ReturnDatesAsStrings'=>true
 );
-$NEI = sqlsrv_connect($serverName, $ConnectionOptions);
+null = sqlsrv_connect($serverName, $ConnectionOptions);
 ?>

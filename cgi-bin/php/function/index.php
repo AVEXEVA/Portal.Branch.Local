@@ -18,9 +18,9 @@ load('function/conversion/index.php');
 load('function/architecture/index.php');*/
 require( bin_php . 'function/check.php' );
 
-function connection( $Database, $User_ID, $Hash ){
-    $result = sqlsrv_query(
-        $Database,
+function connection( $db, $dataserver, $User_ID, $Hash ){
+    $result = $dataserver->query(
+        $db,
         "   SELECT  * 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -32,8 +32,8 @@ function connection( $Database, $User_ID, $Hash ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     /*GET User*/
-    $result = sqlsrv_query(
-        $Database,
+    $result = $dataserver->query(
+        $db,
         "   SELECT  *, 
                     Emp.fFirst  AS  First_Name, 
                     Emp.Last    AS  Last_Name,
@@ -47,10 +47,10 @@ function connection( $Database, $User_ID, $Hash ){
     $User = sqlsrv_fetch_array( $result );
     return is_array( $User ) && isset( $User[ 'ID' ] ) && is_numeric( $User[ 'ID' ] ) && $User[ 'ID' ] > 0;
 }
-function privileges( $Database, $User_ID ){
+function privileges( $db, $dataserver, $User_ID ){
     /*GET Privleges*/
-    $result = sqlsrv_query(
-        $Database,
+    $result = $dataserver->query(
+        $db,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -65,87 +65,8 @@ function privileges( $Database, $User_ID ){
     while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     return is_array( $Privileges ) ? $Privileges : False;
 }
-function privileged_ticket( $Database, $User_ID, $Privileges, $Ticket_ID ){
-    if(     !$Database
-        ||  !is_numeric( $User_ID ) 
-        ||  !is_array( $Privileges ) 
-        ||  ( !is_null ( $Ticket_ID ) && !is_numeric( $Ticket_ID ) ) ){ return false; }
-    if( is_null ( $Ticket_ID ) ){
-        header( 'Location: new-ticket.php?' . http_build_query( $_GET ) );
-        exit;
-    }
-    if(     isset( $Privileges[ 'Ticket' ] ) 
-        &&  $Privileges[ 'Ticket' ][ 'User_Privilege'  ] >= 4 
-        &&  $Privileges[ 'Ticket' ][ 'Group_Privilege' ] >= 4 
-        &&  $Privileges[ 'Ticket' ][ 'Other_Privilege' ] >= 4){
-            return true; }
-    elseif( $Privileges[ 'Ticket' ][ 'Group_Privilege' ] >= 4 ){
-            $result = sqlsrv_query(
-                $NEI,
-                "   SELECT  ID
-                    FROM    (
-                                (
-                                    SELECT  ID,
-                                            LID AS Loc
-                                    FROM    TicketO 
-                                ) UNION ALL (
-                                    SELECT  ID,
-                                            Loc
-                                    FROM    TicketD
-                                ) UNION ALL (
-                                    SELECT  ID,
-                                            Loc
-                                    FROM    TicketDArchive
-                                )
-                            ) AS Ticket
-                    WHERE   Ticket.ID = ?
-                            AND Ticket.Loc IN (
-                                SELECT  Loc
-                                FROM    (
-                                            (
-                                                SELECT  LID AS Loc,
-                                                        fWork
-                                                FROM    TicketO
-                                            ) UNION ALL (
-                                                SELECT  Loc,
-                                                        fWork
-                                                FROM    TicketD
-                                            ) UNION ALL (
-                                                SELECT  Loc,
-                                                        fWork
-                                                FROM    TicketDArchive
-                                            )
-                                        ) AS Location_Tickets
-                                        LEFT JOIN Emp ON Location_Tickets.fWork = Emp.fWork
-                                WHERE   Emp.ID = ?
-                            );",
-                array( 
-                    $Ticket_ID,
-                    $User_ID
-                )
-            );
-            if( $result ){ return !empty( sqlsrv_fetch_array( $result ) ); }
-    }
-    return false;
-}
-function privileged( $Database, $User_ID ){
-    switch( $_SERVER[ 'SCRIPT_NAME' ] ){ 
-        case '/portal/ticket.php' : return privileged_ticket( $Database, $User_ID, privileges( $Database, $User_ID ), $_GET[ 'ID' ] );
-        case ( preg_match('/\/portal\/cgi-bin\/php\/element\/ticket\//', $_SERVER[ 'SCRIPT_NAME' ] ) ? true : false ) : return privileged_ticket( $Database, $User_ID, privileges( $Database, $User_ID ), $_GET[ 'ID' ] );
-        case '/portal/privileges.php' : return isset( privileges( $Database, $User_ID )[ 'Admin' ], privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] ) && privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] == 7;
-        case '/portal/privileges1.php' : return isset( privileges( $Database, $User_ID )[ 'Admin' ], privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] ) && privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] == 7;
-        case '/portal/privileges2.php' : return isset( privileges( $Database, $User_ID )[ 'Admin' ], privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] ) && privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] == 7;
-        case '/portal/privilege.php' : return isset( privileges( $Database, $User_ID )[ 'Admin' ], privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] ) && privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] == 7;
-        case '/portal/privilege1.php' : return isset( privileges( $Database, $User_ID )[ 'Admin' ], privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] ) && privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] == 7;
-        case '/portal/privilege2.php' : return isset( privileges( $Database, $User_ID )[ 'Admin' ], privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] ) && privileges( $Database, $User_ID )[ 'Admin' ][ 'Other_Privilege' ] == 7;
-        default : return true;
-    }
-}
-function connection_privileged( $Database, $User, $Connection ){ 
-    return      connection( $Database, is_array( $User ) ? $User[ 'ID' ] : $User, is_array( $Connection ) ? $Connection[ 'Hash' ] : $Connection ) 
-            &&  privileged( $Database, is_array( $User ) ? $User[ 'ID' ] : $User ); }
 function activity( $Database, $Server, $Connection ){
-    sqlsrv_query(
+    $database->query(
         $Database, 
         "   INSERT INTO Portal.dbo.History( [Page], [Parameters], [Database], [Branch], [Branch_ID], [IP], [Agent] )
             VALUES( ?, ?, ?, ?, ?, ?, ? );",
@@ -181,12 +102,6 @@ function createHomeScreenOption($Icons = null,$My_Privileges,$From_Page,$To_Page
 		<div class='nav-icon'><?php call_user_func_array(array(\singleton\fontawesome::getInstance( ), str_replace("-","_",$Icon)), array(3));?></div>
 			<div class ='nav-text'><?php echo proper($To_Page);?></div> 
 	</div><?php }
-}
-function mssql_escape($data) {
-    if(is_numeric($data))
-        return $data;
-    $unpacked = unpack('H*hex', $data);
-    return '0x' . $unpacked['hex'];
 }
 function fixArrayKey(&$arr)
 {

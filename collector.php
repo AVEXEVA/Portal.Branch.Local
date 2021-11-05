@@ -4,13 +4,13 @@ require('cgi-bin/php/index.php');
 require('php/class/Customer.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,7 +25,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //
     if(!isset($array['ID']) || !$Privileged){?><html><head><script>document.location.href="../login.php?Forward=customer<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-		sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "collector.php"));
+		$database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "collector.php"));
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;background-image:url('http://www.nouveauelevator.com/Images/Backgrounds/New_York_City_Skyline.jpg');webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>

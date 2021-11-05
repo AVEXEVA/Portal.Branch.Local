@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT * 
         FROM   Connection 
         WHERE  Connection.Connector = ? 
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*, 
                Emp.fFirst AS First_Name, 
                Emp.Last   AS Last_Name 
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Privilege.Access_Table, 
                Privilege.User_Privilege, 
                Privilege.Group_Privilege, 
@@ -37,7 +37,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $My_Privileges['Route']['Group_Privilege'] >= 4
         && $My_Privileges['Violation']['Group_Privilege'] >= 4
         && is_numeric($_GET['ID'])){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Locations.*
                 FROM 
                 (
@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $My_Privileges['Route']['User_Privilege'] >= 4
         && $My_Privileges['Violation']['User_Privilege'] >= 4
         && is_numeric($_GET['ID'])){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Route.ID AS Route_ID
                 FROM   Route
                        LEFT JOIN Emp ON Route.Mech = Emp.fWork
@@ -79,7 +79,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {   
         $data = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
 			SELECT *
 			FROM
 				((SELECT 0					 	   AS ID,
@@ -156,13 +156,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		}
         $SQL_Units = array();
         if($My_Privileges['Group_Privilege'] >= 4){
-            $r = sqlsrv_query($NEI,"SELECT LElev AS Unit FROM TicketO LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
+            $r = $database->query(null,"SELECT LElev AS Unit FROM TicketO LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
             if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Violation.Elev='{$array['Unit']}'";}}
-            $r = sqlsrv_query($NEI,"SELECT Elev AS Unit FROM TicketD LEFT JOIN Emp ON TicketD.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
+            $r = $database->query(null,"SELECT Elev AS Unit FROM TicketD LEFT JOIN Emp ON TicketD.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
             if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Violation.Elev='{$array['Unit']}'";}}
         }
         if($My_Privileges['User_Privilege'] >= 4){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Elev.ID AS Unit
                 FROM   Elev
                        LEFT JOIN Loc   ON Elev.Loc   = Loc.Loc
@@ -175,7 +175,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $SQL_Units = array_unique($SQL_Units);
         if(count($SQL_Units) > 0){
             $SQL_Units = implode(' OR ',$SQL_Units);
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Violation.ID     AS ID,
                        Violation.Name   AS Name,
                        Violation.fdate  AS fDate,

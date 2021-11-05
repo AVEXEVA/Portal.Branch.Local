@@ -5,14 +5,14 @@ session_start( [ 'read_and_close' => true ] );
 set_time_limit (120);
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Illinois'){
-      $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($NEI,"
+      $r = $database->query(null,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
@@ -25,8 +25,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   if(!$Privileged || count($_POST) == 0 || !isset($_POST['ID']) || !is_numeric($_POST['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
     /*Create TicketDPDA*/
-    $r = sqlsrv_query($NEI,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'], $_SESSION['User']));
-    $r2 = sqlsrv_query($NEI,"SELECT * FROM TicketDPDA WHERE TicketDPDA.ID = ?",array($_POST['ID']));
+    $r = $database->query(null,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'], $_SESSION['User']));
+    $r2 = $database->query(null,"SELECT * FROM TicketDPDA WHERE TicketDPDA.ID = ?",array($_POST['ID']));
     $ticket2 = $r2 ? sqlsrv_fetch_array($r2) : null;
     if($r && !is_array($ticket2)){
       $row = sqlsrv_fetch_array($r);
@@ -41,9 +41,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $values = implode(',',$values);
         $sQuery = "INSERT INTO TicketDPDA(ID, CDate, DDate, EDate, fWork, Job, Loc, Elev, Type, fDesc, Who, fBy, TimeRoute, TimeSite, TimeComp, DescRes, ClearCheck, ClearPR, Status, Invoice, WorkComplete, ResolveSource, Charge, downtime, Source, Total, Reg, OT, DT, TT, OtherE, SMile, EMile, StartBreak, EndBreak, TFMCustom1, TFMCustom2, TFMCustom3, TFMCustom4, TFMCustom5, idRolCustomContact, Custom6, Custom7, Custom8, Custom9, Custom10, WorkOrder, PriceL, Phase, WageC, Cat, Est, Level) VALUES(" . $values . ");";
         //echo $sQuery;
-        sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
-        sqlsrv_query($NEI, $sQuery, array($_POST['ID'],$row['CDate'], $row['DDate'], $row['EDate'], $row['fWork'], $row['Job'],$row['LID'], $row['LElev'], $row['Type'], $row['fDesc'],  $row['Who'], $row['fBy'], $row['TimeRoute'], $row['TimeSite'], $row['TimeComp'], 'Sync Failure due to Halted Script',0 ,0, 0, 0, 1, 'TFM-A3.60', 0, 0, '', $total, 0, 0, 0, 0, 0, 0, 0,  date('Y-m-d 00:00:00.000'),  date('Y-m-d 00:00:00.000'), '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 1, 0, 'None', 0, $row['Level']));
-        //sqlsrv_query($NEI,"UPDATE Portal.dbo.Ticket SET Ticket.TimeComp = ? WHERE Ticket.ID = ?;",array(date('Y-m-d H:i:s'), $_POST['ID']));
+        $database->query(null,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
+        $database->query(null, $sQuery, array($_POST['ID'],$row['CDate'], $row['DDate'], $row['EDate'], $row['fWork'], $row['Job'],$row['LID'], $row['LElev'], $row['Type'], $row['fDesc'],  $row['Who'], $row['fBy'], $row['TimeRoute'], $row['TimeSite'], $row['TimeComp'], 'Sync Failure due to Halted Script',0 ,0, 0, 0, 1, 'TFM-A3.60', 0, 0, '', $total, 0, 0, 0, 0, 0, 0, 0,  date('Y-m-d 00:00:00.000'),  date('Y-m-d 00:00:00.000'), '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 1, 0, 'None', 0, $row['Level']));
+        //$database->query(null,"UPDATE Portal.dbo.Ticket SET Ticket.TimeComp = ? WHERE Ticket.ID = ?;",array(date('Y-m-d H:i:s'), $_POST['ID']));
       }
     } elseif($r && is_array($ticket2)){
       $row = sqlsrv_fetch_array($r);
@@ -53,22 +53,22 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $hours = substr($end,11,2) - substr($start,11,2);
         $minutes = substr($end,14,2) - substr($start,14,2);
         $total = ($hours * 1) + ($minutes / 60);
-        sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.Total = ?, TicketDPDA.TimeComp = ? WHERE TicketDPDA.ID = ?",array($total, $row['TimeComp'],$_POST['ID']));
+        $database->query(null,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.Total = ?, TicketDPDA.TimeComp = ? WHERE TicketDPDA.ID = ?",array($total, $row['TimeComp'],$_POST['ID']));
       }
     }
-    $r = sqlsrv_query($NEI,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
-    $r2 = sqlsrv_query($NEI,"SELECT * FROM TicketDPDA WHERE TicketDPDA.ID = ?;",array($_POST['ID']));
+    $r = $database->query(null,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
+    $r2 = $database->query(null,"SELECT * FROM TicketDPDA WHERE TicketDPDA.ID = ?;",array($_POST['ID']));
     if($r && is_array(sqlsrv_fetch_array($r)) && $r2 && is_array(sqlsrv_fetch_array($r2))){
       /*Complete Ticket to Review*/ 
-      sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
+      $database->query(null,"UPDATE TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
       /*Receipt*/
-      /*$r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.[File] WHERE [File].Ticket = ?",array($_POST['ID']));
+      /*$r = $database->query($Portal,"SELECT * FROM Portal.dbo.[File] WHERE [File].Ticket = ?",array($_POST['ID']));
       if(is_array(sqlsrv_fetch_array($r)) && FALSE) {
-        $r = sqlsrv_query($Portal,"UPDATE Portal.dbo.[File] SET [File].Name = ?, [File].[Type] = ?, [File].[Data] = ?, [File].[User] = ? WHERE [File].[Ticket] = ?",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
+        $r = $database->query($Portal,"UPDATE Portal.dbo.[File] SET [File].Name = ?, [File].[Type] = ?, [File].[Data] = ?, [File].[User] = ? WHERE [File].[Ticket] = ?",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
       } else {
-        $r = sqlsrv_query($Portal,"INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
-        $r = sqlsrv_query($NEI,"INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), date("Y-m-d H:i:s"), NULL, NULL, 0));
+        $r = $database->query($Portal,"INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'], $_FILES['Receipt']['type'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), $_SESSION['User'], $_POST['ID']));
+        $r = $database->query(null,"INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], base64_encode(file_get_contents($_FILES['Receipt']['tmp_name'])), date("Y-m-d H:i:s"), NULL, NULL, 0));
       }*/
       if(isset($_FILES['Receipt']) && count($_FILES['Receipt']) > 0){
         $Count = count($_FILES['Receipt']['tmp_name']);
@@ -81,10 +81,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $image = ob_get_clean();
             $image = base64_encode($image);
             $File_Name = 'nei_TCK'. $_POST['ID'] . '_' . rand(0,9999999) . '_' . $index;
-            /*$r = sqlsrv_query($Portal,"SET TEXTSIZE 2147483647;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'][ $index ], $_FILES['Receipt']['type'][ $index ], array($image, SQLSRV_PARAM_IN,
+            /*$r = $database->query($Portal,"SET TEXTSIZE 2147483647;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Receipt']['name'][ $index ], $_FILES['Receipt']['type'][ $index ], array($image, SQLSRV_PARAM_IN,
           SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), $_SESSION['User'], $_POST['ID']));*/
-            $r = sqlsrv_query(
-              $NEI,
+            $r = $database->query(
+              null,
               " SET TEXTSIZE 2147483647;
                 INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) 
                 VALUES(?, ?, ?, ?, ?, ?);", 
@@ -113,16 +113,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $image = ob_get_clean();
         $image = base64_encode($image);
         $File_Name = 'nei_TIK'. $_POST['ID'] . '_' . rand(0,9999999);
-        /*$r = sqlsrv_query($Portal,"SET TEXTSIZE 10000000;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Chargeable_Image']['name'], $_FILES['Chargeable_Image']['type'], array($image, SQLSRV_PARAM_IN,
+        /*$r = $database->query($Portal,"SET TEXTSIZE 10000000;INSERT INTO Portal.dbo.[File](Name, [Type], [Data], [User], [Ticket]) VALUES(?, ?,  ?, ?, ?);",array($_FILES['Chargeable_Image']['name'], $_FILES['Chargeable_Image']['type'], array($image, SQLSRV_PARAM_IN,
       SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), $_SESSION['User'], $_POST['ID']));*/
-        $r = sqlsrv_query($NEI,"SET TEXTSIZE 10000000;INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], array($image, SQLSRV_PARAM_IN,
+        $r = $database->query(null,"SET TEXTSIZE 10000000;INSERT INTO TicketPic(TicketID, PicData, ModifiedOn, PictureName, PictureComments, EmailPicture) VALUES(?, ?, ?, ?, ?, ?)", array($_POST['ID'], array($image, SQLSRV_PARAM_IN,
       SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')), date("Y-m-d H:i:s"), $File_Name, NULL, 0));
       }
       /*Time*/
       //var_dump($_FILES['Receipt']);
       if(is_numeric($_POST['Regular']) && is_numeric($_POST['Overtime']) && is_numeric($_POST['Doubletime']) && is_numeric($_POST['NightDiff']) && is_array($array) && count($array) > 0){
         $total = $_POST['Regular'] + $_POST['Overtime'] + $_POST['Doubletime'] + $_POST['NightDiff'];
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.Total = ?, TicketDPDA.Reg = ?, TicketDPDA.OT = ?, TicketDPDA.DT = ?, TicketDPDA.NT = ? WHERE TicketDPDA.ID = ?",array($total, $_POST['Regular'],$_POST['Overtime'],$_POST['Doubletime'],$_POST['NightDiff'],$_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.Total = ?, TicketDPDA.Reg = ?, TicketDPDA.OT = ?, TicketDPDA.DT = ?, TicketDPDA.NT = ? WHERE TicketDPDA.ID = ?",array($total, $_POST['Regular'],$_POST['Overtime'],$_POST['Doubletime'],$_POST['NightDiff'],$_POST['ID']));
       }
       /*Expenses*/
       function toInt($str)
@@ -131,26 +131,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       }
       if(isset($_POST['CarExpenses'])){
         $_POST['CarExpenses'] = toInt($_POST['CarExpenses']);
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.Zone = ? WHERE TicketDPDA.ID = ?;",array($_POST['CarExpenses'],$_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.Zone = ? WHERE TicketDPDA.ID = ?;",array($_POST['CarExpenses'],$_POST['ID']));
       }
       if(isset($_POST['OtherExpenses'])){
         $_POST['OtherExpenses'] = toInt($_POST['OtherExpenses']);
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.OtherE = ? WHERE TicketDPDA.ID = ?;",array($_POST['OtherExpenses'],$_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.OtherE = ? WHERE TicketDPDA.ID = ?;",array($_POST['OtherExpenses'],$_POST['ID']));
       }
       if(isset($_POST['Chargeable']) && $_POST['Chargeable'] == 'true'){
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.Charge = ? WHERE TicketDPDA.ID = ?;",array(1,$_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.Charge = ? WHERE TicketDPDA.ID = ?;",array(1,$_POST['ID']));
       }
       if(isset($_POST['Follow_Up']) && $_POST['Follow_Up'] == 'true'){
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.WorkComplete = ? WHERE TicketDPDA.ID = ?;",array(0,$_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.WorkComplete = ? WHERE TicketDPDA.ID = ?;",array(0,$_POST['ID']));
       } elseif(isset($_POST['Follow_Up'])) {
-        sqlsrv_query($NEI,"UPDATE TicketDPDA SET TicketDPDA.WorkComplete = ? WHERE TicketDPDA.ID = ?;",array(1,$_POST['ID']));
+        $database->query(null,"UPDATE TicketDPDA SET TicketDPDA.WorkComplete = ? WHERE TicketDPDA.ID = ?;",array(1,$_POST['ID']));
       }
       /*GPS*/
       /*if(isset($_POST['Latitude'],$_POST['Longitude'])){
-        sqlsrv_query($NEI,"INSERT INTO TechLocation(TicketID, TechID, ActionGroup, Action, Latitude, Longitude, Altitude, Accuracy, DateTimeRecorded) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
+        $database->query(null,"INSERT INTO TechLocation(TicketID, TechID, ActionGroup, Action, Latitude, Longitude, Altitude, Accuracy, DateTimeRecorded) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);",
         array($_POST['ID'],  $My_User['fWork'], "Completed time", "Updated completed time to " . date("h:i A"), $_POST['Latitude'], $_POST['Longitude'], 0, 0, date("Y-m-d H:i:s")));
       } */
-      $r = sqlsrv_query($NEI,
+      $r = $database->query(null,
           " SELECT  Top 1
                     GPS.*
             FROM    GPS
@@ -160,8 +160,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       if($r){
         $row = sqlsrv_fetch_array($r);
         if(is_array($row)){
-          sqlsrv_query(
-            $NEI,
+          $database->query(
+            null,
             " INSERT INTO TechLocation( TicketID, TechID, ActionGroup, Action, Latitude, Longitude, Altitude, Accuracy, DateTimeRecorded ) 
               VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ? );",
             array(
@@ -184,27 +184,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $data = base64_decode($img);
         file_put_contents("../../../media/images/signatures/{$_POST['ID']}.jpg",$data);
         $data = file_get_contents("../../../media/images/signatures/{$_POST['ID']}.jpg");
-        $r = sqlsrv_query($NEI,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($_POST['ID']));
+        $r = $database->query(null,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($_POST['ID']));
         if($r && is_array(sqlsrv_fetch_array($r))){
-          sqlsrv_query($NEI, "SET TEXTSIZE 10000000;UPDATE PDATicketSignature SET PDATicketSignature.Signature = ? WHERE PDATicketSignature.PDATicketID = ?;",array(array($data, SQLSRV_PARAM_IN,
+          $database->query(null, "SET TEXTSIZE 10000000;UPDATE PDATicketSignature SET PDATicketSignature.Signature = ? WHERE PDATicketSignature.PDATicketID = ?;",array(array($data, SQLSRV_PARAM_IN,
         SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')),$_POST['ID']));
         } else {
-          sqlsrv_query($NEI, "SET TEXTSIZE 10000000;INSERT INTO PDATicketSignature(PDATicketID, Signature, SignatureType) VALUES(?,?,'C');",array($_POST['ID'],array($data, SQLSRV_PARAM_IN,
+          $database->query(null, "SET TEXTSIZE 10000000;INSERT INTO PDATicketSignature(PDATicketID, Signature, SignatureType) VALUES(?,?,'C');",array($_POST['ID'],array($data, SQLSRV_PARAM_IN,
         SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max'))));
         }
-        $r = sqlsrv_query($NEI,"SELECT * FROM TicketO WHERE TicketO.ID = ? AND TicketO.WorkOrder IS NOT NULL AND TicketO.WorkOrder <> '';",array($_POST['ID']));
+        $r = $database->query(null,"SELECT * FROM TicketO WHERE TicketO.ID = ? AND TicketO.WorkOrder IS NOT NULL AND TicketO.WorkOrder <> '';",array($_POST['ID']));
         $ticket = sqlsrv_fetch_array($r);
         if(is_array($ticket) && isset($_POST['Signature_Work_Order']) && strtolower($_POST['Signature_Work_Order']) != 'false'){
-          $r = sqlsrv_query($NEI,"SELECT * FROM TicketO WHERE TicketO.WorkOrder = ?;",array($ticket['WorkOrder']));
+          $r = $database->query(null,"SELECT * FROM TicketO WHERE TicketO.WorkOrder = ?;",array($ticket['WorkOrder']));
           if($r){while($row = sqlsrv_fetch_array($r)){
             $data = file_get_contents("../../../media/images/signatures/{$_POST['ID']}.jpg");
             file_put_contents("../../../media/images/signatures/{$row['ID']}.jpg",$data);
-            $r5 = sqlsrv_query($NEI,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($row['ID']));
+            $r5 = $database->query(null,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($row['ID']));
             if($r5 && is_array(sqlsrv_fetch_array($r5))){
-              sqlsrv_query($NEI, "SET TEXTSIZE 10000000;UPDATE PDATicketSignature SET PDATicketSignature.Signature = ? WHERE PDATicketSignature.PDATicketID = ?;",array(array($data, SQLSRV_PARAM_IN,
+              $database->query(null, "SET TEXTSIZE 10000000;UPDATE PDATicketSignature SET PDATicketSignature.Signature = ? WHERE PDATicketSignature.PDATicketID = ?;",array(array($data, SQLSRV_PARAM_IN,
             SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max')),$row['ID']));
             } else {
-              sqlsrv_query($NEI, "SET TEXTSIZE 10000000;INSERT INTO PDATicketSignature(PDATicketID, Signature, SignatureType) VALUES(?,?,'C');",array($row['ID'],array($data, SQLSRV_PARAM_IN,
+              $database->query(null, "SET TEXTSIZE 10000000;INSERT INTO PDATicketSignature(PDATicketID, Signature, SignatureType) VALUES(?,?,'C');",array($row['ID'],array($data, SQLSRV_PARAM_IN,
             SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),SQLSRV_SQLTYPE_VARBINARY('max'))));
             }
           }}
@@ -214,18 +214,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       if(isset($_POST['Signature_Text'])){
         $sQuery = "UPDATE TicketDPDA SET TicketDPDA.SignatureText = ? WHERE TicketDPDA.ID = ?;";
         $params = array($_POST['Signature_Text'], $_POST['ID']);
-        sqlsrv_query($NEI, $sQuery, $params);
+        $database->query(null, $sQuery, $params);
       }
       /*Resolution and SignatureText*/
       if(isset($_POST['Resolution'])){
         $sQuery = "UPDATE TicketDPDA SET TicketDPDA.DescRes = ? WHERE TicketDPDA.ID = ?;";
         $params = array($_POST['Resolution'], $_POST['ID']);
-        sqlsrv_query($NEI, $sQuery, $params);
+        $database->query(null, $sQuery, $params);
       }
       if(isset($_POST['Deficiency']) && is_array($_POST['Deficiency']) && count($_POST['Deficiency']) > 0){
           foreach($_POST['Deficiency'] AS $DEF_ID=>$DEF_VALUE){
             $FLOAT_VAL = $DEF_VALUE == 'true' ? 1 : 0;
-            sqlsrv_query($NEI,"UPDATE Portal.dbo.Deficiency SET Deficiency.[Percentage] = ? WHERE Deficiency.ID = ?",array($FLOAT_VAL,$DEF_ID));
+            $database->query(null,"UPDATE Portal.dbo.Deficiency SET Deficiency.[Percentage] = ? WHERE Deficiency.ID = ?",array($FLOAT_VAL,$DEF_ID));
           }
       }
       /*Email*/
@@ -240,7 +240,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $_SERVER['SERVER_NAME']
           );
         }
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
           SELECT  TicketDPDA.*,
                   OwnerWithRol.Name AS Customer,
                   Loc.Tag AS Location,
@@ -258,7 +258,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
         $Ticket = $r ? sqlsrv_fetch_array($r) : Null;
 
-        $r = sqlsrv_query($NEI,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($_POST['ID']));
+        $r = $database->query(null,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($_POST['ID']));
         $signature = $r ? sqlsrv_fetch_array($r)['Signature'] : Null;
         $to = $_POST['Email'];
         $from = "WebServices@NouveauElevator.com";
@@ -366,14 +366,14 @@ tr {border-bottom:#555555;}
 
 
 
-        $r = sqlsrv_query($Portal,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ? AND Ticket_Email.Email = ?;",array($_POST['ID'],$_POST['Email']));
+        $r = $database->query($Portal,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ? AND Ticket_Email.Email = ?;",array($_POST['ID'],$_POST['Email']));
         if($r && is_array(sqlsrv_fetch_array($r))){
-          sqlsrv_query($Portal,"INSERT INTO Ticket_Email(Ticket, Email) VALUES(?, ?);",array($_POST['ID'],$_POST['Email']));
+          $database->query($Portal,"INSERT INTO Ticket_Email(Ticket, Email) VALUES(?, ?);",array($_POST['ID'],$_POST['Email']));
         } else {
-          sqlsrv_query($Portal,"INSERT INTO Ticket_Email(Ticket, Email) VALUES(?, ?);",array($_POST['ID'],$_POST['Email']));
+          $database->query($Portal,"INSERT INTO Ticket_Email(Ticket, Email) VALUES(?, ?);",array($_POST['ID'],$_POST['Email']));
         }
       }
-      /*$r = sqlsrv_query($Portal_44,
+      /*$r = $database->query($Portal_44,
         " SELECT  *
           FROM    Portal.dbo.Timeline
           WHERE   Timeline.[Entity] = 'Ticket'
@@ -381,7 +381,7 @@ tr {border-bottom:#555555;}
                   AND Timeline.[Action] = 'Completed Work'
         ;",array($_POST['ID']));
       if(!$r || !is_array(sqlsrv_fetch_array($r))){
-        sqlsrv_query($Portal_44,
+        $database->query($Portal_44,
           " INSERT INTO Portal.dbo.Timeline(Entity, [Entity_ID], [Action], Time_Stamp)
             VALUES(?, ?, ?, ?)
           ;",array('Ticket', $_POST['ID'], 'Completed Work', date("Y-m-d H:i:s")));

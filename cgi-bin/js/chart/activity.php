@@ -5,7 +5,7 @@ var activity_data = [
 	$data = array();
 	$dates = array();
 	$totals = array();
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT ID,
 			   Connector,
 			   Timestamped

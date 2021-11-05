@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = sqlsrv_fetch_array($User);
 
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $Privileges['Unit']['Group_Privilege'] >= 4 
         && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Sum( Ticket.Count ) AS Count 
                 FROM    (
                             SELECT  Ticket.Unit,
@@ -98,8 +98,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             print json_encode( array( 'data' => array( ) ) ); 
     } else {
         $data = array();
-        $r = sqlsrv_query(
-            $NEI,
+        $r = $database->query(
+            null,
             "   SELECT      Job.ID,
                             Job.Name,
                             Job.Type,

@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -26,7 +26,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
     if(	!isset($My_Connection['ID']) ){?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "profile.php"));
@@ -34,7 +34,7 @@ $Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;
 
 if($Mechanic > 0){
     $Call_Sign = "";
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT
             Emp.*,
             Emp.Last as Last_Name,
@@ -140,15 +140,15 @@ if($Mechanic > 0){
 				</div>
 				<?php
 					$serverName = "172.16.12.45";
-					$NEIectionOptions = array(
+					nullectionOptions = array(
 						"Database" => "ATTENDANCE",
 						"Uid" => "sa",
 						"PWD" => "SQLABC!23456",
 						'ReturnDatesAsStrings'=>true
 					);
 					//Establishes the connection
-					$c2 = sqlsrv_connect($serverName, $NEIectionOptions);
-					$r = sqlsrv_query($c2,"select * from Employee where EmpID= ?;",array($User['Ref']));
+					$c2 = sqlsrv_connect($serverName, nullectionOptions);
+					$r = $database->query($c2,"select * from Employee where EmpID= ?;",array($User['Ref']));
 					$Attendance = sqlsrv_fetch_array($r);
 					while($temp = sqlsrv_fetch_array($r));
 				?>

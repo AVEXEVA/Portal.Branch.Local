@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
@@ -22,8 +22,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   if(!$Privileged || count($_POST) == 0){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
     $_POST['Required'] = date("Y-m-d 00:00:00.000",strtotime($_POST['Required']));
-    sqlsrv_query($Portal, "INSERT INTO Portal.dbo.Requisition([User], [Date], [Required], [Location], [DropOff], [Unit], [Job], [Shutdown], [ASAP], [Rush], [LSD], [FRM], [Notes]) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",array($_SESSION['User'], date("Y-m-d H:i:s"),  $_POST['Required'], $_POST['Location'], $_POST['DropOff'], $_POST['Unit'], $_POST['Job'], $_POST['Shutdown'], $_POST['ASAP'], $_POST['Rush'], $_POST['LSD'], $_POST['FRM'], $_POST['Notes']));
-    $r = sqlsrv_query($Portal,"SELECT Max(ID) AS ID FROM Portal.dbo.Requisition;");
+    $database->query($Portal, "INSERT INTO Portal.dbo.Requisition([User], [Date], [Required], [Location], [DropOff], [Unit], [Job], [Shutdown], [ASAP], [Rush], [LSD], [FRM], [Notes]) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",array($_SESSION['User'], date("Y-m-d H:i:s"),  $_POST['Required'], $_POST['Location'], $_POST['DropOff'], $_POST['Unit'], $_POST['Job'], $_POST['Shutdown'], $_POST['ASAP'], $_POST['Rush'], $_POST['LSD'], $_POST['FRM'], $_POST['Notes']));
+    $r = $database->query($Portal,"SELECT Max(ID) AS ID FROM Portal.dbo.Requisition;");
     $Requisition_ID = sqlsrv_fetch_array($r)['ID'];
     if(isset($_POST['Item']) && is_array($_POST['Item']) && isset($Requisition_ID) && is_numeric($Requisition_ID)){
       $i = 0;
@@ -31,14 +31,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         //var_dump($_FILES);
         if(isset($_FILES['Item']['tmp_name'][$i])){
           $data = base64_encode(file_get_contents($_FILES['Item']['tmp_name'][$i]));
-          sqlsrv_query($Portal, "INSERT INTO Portal.dbo.Requisition_Item(Requisition, Item_Description, Quantity, Image, Image_Type) VALUES(?, ?, ?, ?, ?);", array($Requisition_ID, $array['Comments'], $array['Quantity'], $data, $_FILES['Item']['type'][$i]));
+          $database->query($Portal, "INSERT INTO Portal.dbo.Requisition_Item(Requisition, Item_Description, Quantity, Image, Image_Type) VALUES(?, ?, ?, ?, ?);", array($Requisition_ID, $array['Comments'], $array['Quantity'], $data, $_FILES['Item']['type'][$i]));
         } else {
-          sqlsrv_query($Portal, "INSERT INTO Portal.dbo.Requisition_Item(Requisition, Item_Description, Quantity) VALUES(?, ?, ?);", array($Requisition_ID, $array['Comments'], $array['Quantity']));
+          $database->query($Portal, "INSERT INTO Portal.dbo.Requisition_Item(Requisition, Item_Description, Quantity) VALUES(?, ?, ?);", array($Requisition_ID, $array['Comments'], $array['Quantity']));
         }
         $i++;
       }
     }
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
       SELECT tblWork.Super AS Supervisor
       FROM   Emp
              LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
@@ -60,19 +60,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         );
       }
       //Get Location
-      $r = sqlsrv_query($NEI,"SELECT Loc.Tag AS Location FROM nei.dbo.Loc WHERE Loc.Loc = ?",array($_POST['Location']));
+      $r = $database->query(null,"SELECT Loc.Tag AS Location FROM nei.dbo.Loc WHERE Loc.Loc = ?",array($_POST['Location']));
       $Location = sqlsrv_fetch_array($r)['Location'];
 
       //Get Drop Off
-      $r = sqlsrv_query($NEI,"SELECT Loc.Tag AS DropOff FROM nei.dbo.Loc WHERE Loc.Loc = ?",array($_POST['DropOff']));
+      $r = $database->query(null,"SELECT Loc.Tag AS DropOff FROM nei.dbo.Loc WHERE Loc.Loc = ?",array($_POST['DropOff']));
       $DropOff = sqlsrv_fetch_array($r)['DropOff'];
 
       //Get Job
-      $r = sqlsrv_query($NEI,"SELECT Job.fDesc AS DropOff FROM nei.dbo.Job WHERE Job.ID = ?",array($_POST['Job']));
+      $r = $database->query(null,"SELECT Job.fDesc AS DropOff FROM nei.dbo.Job WHERE Job.ID = ?",array($_POST['Job']));
       $Job = sqlsrv_fetch_array($r)['DropOff'];
 
       //Get Unit
-      $r = sqlsrv_query($NEI,"SELECT Elev.State AS State, Elev.Unit AS Building_NO FROM nei.dbo.Elev WHERE Elev.ID = ?",array($_POST['Unit']));
+      $r = $database->query(null,"SELECT Elev.State AS State, Elev.Unit AS Building_NO FROM nei.dbo.Elev WHERE Elev.ID = ?",array($_POST['Unit']));
       $array = sqlsrv_fetch_array($r);
       $State = $array['State'];
       $Building_NO = $array['Building_NO'];

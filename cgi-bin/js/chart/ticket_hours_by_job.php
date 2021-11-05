@@ -5,7 +5,7 @@ function gd(year, month, day) {
     var data = [
         <?php 
         $Vars = array();
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT 
                     TicketD.ID,
                     TicketD.EDate,

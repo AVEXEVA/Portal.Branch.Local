@@ -7,7 +7,7 @@ function gd(year, month, day) {
         $Vars = array();
         $SQL_Start_Date = date('Y-01-01 00:00:00.000');
             $SQL_End_Date = date('Y-m-t 23:59:59.999');
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT 
                     TicketD.ID,
                     TicketD.EDate,

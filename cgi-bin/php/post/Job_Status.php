@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,14 +25,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				$data = array();
 				foreach($_POST['data'] as $ID=>$Job){
-					$resource = sqlsrv_query($NEI,"
+					$resource = $database->query(null,"
 						SELECT Job_Status.ID
 						FROM   nei.dbo.Job_Status
 						WHERE  Job_Status.Status = ?
 					;",array($Job['Status']));
 					if($r){$Job_Status_ID = sqlsrv_fetch_array($resource)['ID'];}
 					$Job_Status_ID--;
-					sqlsrv_query($NEI,"
+					$database->query(null,"
 						UPDATE nei.dbo.Job
 						SET    Job.Status = ?
 						WHERE  Job.ID     = ?
@@ -45,16 +45,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		} elseif(isset($_POST['action']) && $_POST['action'] == 'create' && FALSE){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID=>$Job){
-					$resource = sqlsrv_query($NEI,"
+					$resource = $database->query(null,"
 						SELECT Loc.Loc AS Location_ID
 						FROM   nei.dbo.Loc
 						WHERE  Loc.Tag = ?
 					;",array($Job['Location']));
 					if($r){$Location_ID = sqlsrv_fetch_array($resource)['Location_ID'];}
-					$resource = sqlsrv_query($NEI,"SELECT Max(Elev.ID) AS ID FROM nei.dbo.Elev;");
+					$resource = $database->query(null,"SELECT Max(Elev.ID) AS ID FROM nei.dbo.Elev;");
 					$Job_Primary_Key = sqlsrv_fetch_array($resource)['ID'];
 					$Job_Primary_Key++;
-					$resource = sqlsrv_query($NEI,"
+					$resource = $database->query(null,"
 						INSERT INTO Elev(ID, Job, State, Loc, Owner, Cat, Type, Building, Manuf, Remarks, Install, InstallBy, Since, Last, Price, fGroup, fDesc, Serial, Template, Status, Week, AID)
 						VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 					;",array($Job_Primary_Key, $Job['Job'], $Job['State'], $Location_ID, $_GET['ID'], 'Public', $Job['Type'], $Job['Building'], $Job['Manufacturer'], $Job['Remarks'], $Job['Install'], $Job['InstallBy'], $Job['Since'], $Job['Last'], $Job['Price'], $Job['fGroup'], $Job['fDesc'], $Job['Serial'], $Job['Template'], $Job['Status'], $Job['Week'], ""));

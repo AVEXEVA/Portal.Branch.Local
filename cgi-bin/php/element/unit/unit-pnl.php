@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Texas'){
-        sqlsrv_query($NEI,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -19,13 +19,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4 && $My_Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4){
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Elev.Loc AS Location_ID
 				FROM   Elev
 				WHERE  Elev.ID = ?
 			;",array($_GET['ID'] ));
 			$Location_ID = sqlsrv_fetch_array($r)['Location_ID'];
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
 			SELECT Tickets.*
 			FROM
 			(
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             foreach($_POST as $key=>$value){
 				if($key == 'Price'){continue;}
 				if($key == 'Type'){continue;}
-                sqlsrv_query($NEI,"
+                $database->query(null,"
                     UPDATE ElevTItem
                     SET    ElevTItem.Value     = ?
                     WHERE  ElevTItem.Elev      = ?
@@ -72,21 +72,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;",array($value,$_GET['ID'],$key));
             }
 			if(isset($_POST['Price'])){
-				sqlsrv_query($NEI,"
+				$database->query(null,"
 					UPDATE Elev
 					SET    Elev.Price = ?
 					WHERE  Elev.ID    = ?
 				;",array($_POST['Price'],$_GET['ID']));
 			}
 			if(isset($_POST['Type'])){
-				sqlsrv_query($NEI,"
+				$database->query(null,"
 					UPDATE Elev
 					SET    Elev.Type = ?
 					WHERE  Elev.ID    = ?
 				;",array($_POST['Type'],$_GET['ID']));
 			}
         }
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                 Elev.ID,
                 Elev.Unit           AS Unit,
@@ -126,7 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Unit = sqlsrv_fetch_array($r);
         $unit = $Unit;
         $data = $Unit;
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT *
             FROM   ElevTItem
             WHERE  ElevTItem.ElevT    = 1
@@ -152,7 +152,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						<div class='panel-body white-background shadow'>
 							<table id="Table_Profit" class="display" cellspacing='0' width='100%'>
 								<?php
-								$resource = sqlsrv_query($NEI,"
+								$resource = $database->query(null,"
 									SELECT   Overhead_Cost.*
 									FROM     Overhead_Cost
 									ORDER BY Overhead_Cost.Type ASC
@@ -178,7 +178,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										<td style='border:1px solid black;padding:3px;'>Revenue</td>
 										<?php
 										foreach($Overhead_Costs as $key=>$Overhead_Cost){?><td style='border:1px solid black;padding:3px;'><?php
-											$resource = sqlsrv_query($NEI,"
+											$resource = $database->query(null,"
 												SELECT Sum(Invoice.Amount) AS Revenue
 												FROM   Invoice
 													   LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
@@ -195,7 +195,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										<?php
 										foreach($Overhead_Costs as $key=>$Overhead_Cost){?><td style='border:1px solid black;padding:3px;'><?php
 											//var_dump($Overhead_Cost);
-											$resource = sqlsrv_query($NEI,"
+											$resource = $database->query(null,"
 												SELECT Sum(JobI.Amount) AS Labor
 												FROM   Loc
 													   LEFT JOIN Job  ON Loc.Loc = Job.Loc
@@ -208,7 +208,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													   AND JobI.fDate >= '2017-03-30 00:00:00.000'
 											;",array($_GET['ID'],$Overhead_Cost['Start'],$Overhead_Cost['End']));
 											$Overhead_Costs[$key]['Labor'] = sqlsrv_fetch_array($resource)['Labor'];
-											$resource = sqlsrv_query($NEI,"
+											$resource = $database->query(null,"
 												SELECT SUM([JOBLABOR].[TOTAL COST]) AS Labor
 												FROM   Job as Job
 													   LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
@@ -236,7 +236,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										<?php
 										foreach($Overhead_Costs as $key=>$Overhead_Cost){?><td style='border:1px solid black;padding:3px;'><?php
 											//var_dump($Overhead_Cost);
-											$resource = sqlsrv_query($NEI,"
+											$resource = $database->query(null,"
 												SELECT Sum(JobI.Amount) AS Materials
 												FROM   Loc
 													   LEFT JOIN Job  ON Loc.Loc = Job.Loc

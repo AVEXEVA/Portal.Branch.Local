@@ -1,14 +1,14 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?;",array($_SESSION['User']));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege FROM Privilege WHERE User_ID = ?;",array($_SESSION['User']));
+    $r = $database->query($Portal,"SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege FROM Privilege WHERE User_ID = ?;",array($_SESSION['User']));
     $My_Privileges = array();
     while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = FALSE;
@@ -51,7 +51,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   					<div class='col-xs-8'><button type='button' onClick='selectCustomers(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Customer']) && is_numeric($_GET['Customer'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.OwnerWithRol WHERE OwnerWithRol.ID = ?;",array($_GET['Customer']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.OwnerWithRol WHERE OwnerWithRol.ID = ?;",array($_GET['Customer']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){

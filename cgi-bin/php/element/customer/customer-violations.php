@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  * 
             FROM    Connection 
             WHERE       Connector = ? 
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *, 
                     fFirst AS First_Name, 
                     Last as Last_Name 
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $User   = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
         "   SELECT  Privilege.*
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -52,8 +52,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         || 	!$Privileged 
     ){ ?><html><head><script>document.location.href="../login.php?Forward=customer<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        sqlsrv_query(
-            $NEI,
+        $database->query(
+            null,
             "   INSERT INTO Activity( [User], [Date], [Page] ) VALUES( ?, ?, ? );",
             array(
                 $_SESSION['User'],
@@ -61,8 +61,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 "customer/tickets.php"
             )
         );
-        $result = sqlsrv_query(
-            $NEI,
+        $result = $database->query(
+            null,
             "   SELECT  Customer.*                    
                 FROM    (
                             SELECT  Owner.ID    AS ID,

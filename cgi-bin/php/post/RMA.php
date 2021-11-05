@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,9 +25,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				$data = array();
 				foreach($_POST['data'] as $ID=>$RMA){
-					$r = sqlsrv_query($NEI,"SELECT Loc.Loc AS ID FROM nei.dbo.Loc WHERE Loc.Tag = ?;",array($RMA['Location']));
+					$r = $database->query(null,"SELECT Loc.Loc AS ID FROM nei.dbo.Loc WHERE Loc.Tag = ?;",array($RMA['Location']));
 					if($r){$Location_ID = sqlsrv_fetch_Array($r)['ID'];}
-					sqlsrv_query($NEI,"
+					$database->query(null,"
 						UPDATE Portal.dbo.RMA
 						SET    RMA.Name        = ?,
 							   RMA.Date        = ?,
@@ -49,9 +49,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		} elseif(isset($_POST['action']) && $_POST['action'] == 'create'){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID=>$RMA){
-					$r = sqlsrv_query($NEI,"SELECT Loc.Loc AS ID FROM nei.dbo.Loc WHERE Loc.Tag = ?;",array($RMA['Location']));
+					$r = $database->query(null,"SELECT Loc.Loc AS ID FROM nei.dbo.Loc WHERE Loc.Tag = ?;",array($RMA['Location']));
 					if($r){$Location_ID = sqlsrv_fetch_Array($r)['ID'];}
-					sqlsrv_query($NEI,"
+					$database->query(null,"
 						INSERT INTO Portal.dbo.RMA(Name, Date, RMA, Received, Returned, Tracking, PO, Link, Status, Description, Location,Address)
 						VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
 					;",array($RMA['Name'], $RMA['Date'], $RMA['RMA'], $RMA['Received'], $RMA['Returned'], $RMA['Tracking'], $RMA['PO'], $RMA['Link'], $RMA['Status'], $RMA['Description'], $Location_ID,' '));
@@ -62,7 +62,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		} elseif(isset($_POST['action']) && $_POST['action'] == 'remove'){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID=>$RMA){
-					sqlsrv_query($NEI,"DELETE FROM Portal.dbo.RMA WHERE RMA.ID = ?;",array($ID));
+					$database->query(null,"DELETE FROM Portal.dbo.RMA WHERE RMA.ID = ?;",array($ID));
 				}
 				print json_encode(array('data'=>array()));
 			}

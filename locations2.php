@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = sqlsrv_query(
-    	$NEI,
+    $r = $database->query(
+    	null,
     	"	SELECT *
 			FROM   Connection
 			WHERE  Connection.Connector = ?
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
     $Connection = sqlsrv_fetch_array( $r, SQLSRV_FETCH_ASSOC );
-    $r = sqlsrv_query(
-    	$NEI,
+    $r = $database->query(
+    	null,
     	"	SELECT 	*,
 		       		Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
     $User = sqlsrv_fetch_array( $r );
-	$r = sqlsrv_query(
-		$NEI,
+	$r = $database->query(
+		null,
 		"	SELECT *
 			FROM   Privilege
 			WHERE  Privilege.User_ID = ?;",
@@ -47,8 +47,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  		|| $Privileges[ 'Location' ][ 'Group_Privilege' ] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query(
-			$NEI,
+		$database->query(
+			null,
 			"	INSERT INTO Activity([User], [Date], [Page])
 				VALUES(?,?,?);",
 			array(
@@ -96,8 +96,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							<th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
 								<option value=''>Select</option>
 								<?php 
-									$result = sqlsrv_query(
-										$NEI,
+									$result = $database->query(
+										null,
 										" 	SELECT 		Elev.Building 
 											FROM 		Elev 
 											WHERE 		Elev.Building NOT IN ( '', ' ' )
@@ -110,8 +110,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							<th class='text-white border border-white' title='Division'><select class='redraw form-control' name='Division'>
 								<option value=''>Select</option>
 								<?php 
-									$result = sqlsrv_query(
-										$NEI,
+									$result = $database->query(
+										null,
 										" 	SELECT 		Zone.ID,
 														Zone.Name 
 											FROM 		Zone ;"
@@ -122,8 +122,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							<th class='text-white border border-white' title='Route'><select class='redraw form-control' name='Route'>
 								<option value=''>Select</option>
 								<?php 
-									$result = sqlsrv_query(
-										$NEI,
+									$result = $database->query(
+										null,
 										" 	SELECT 		Route.ID,
 														Route.Name,
 														Employee.fFirst + ' ' + Employee.Last AS Mechanic 

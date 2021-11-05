@@ -2,12 +2,12 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
 		$data = array();
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Elev.State AS State
 			FROM   nei.dbo.Elev
 			WHERE  Elev.Loc = ?

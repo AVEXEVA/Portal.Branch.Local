@@ -7,14 +7,14 @@ function Check_Date_Time($date_time){
  else {return false;}
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Get Timeline//
     $rows = array();
 
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
       " SELECT    Top 1000
                   Invoice.*,
                   Loc.Tag AS Location_Tag

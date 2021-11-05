@@ -26,7 +26,7 @@
     name: 'City',
     type: 'select',
     options: [<?php
-      $result = sqlsrv_query($NEI,
+      $result = $database->query(null,
       "    SELECT   OwnerWithRol.City
            FROM     OwnerWithRol
            WHERE    OwnerWithRol.City <> ''
@@ -42,8 +42,8 @@
     name: 'State',
     type: 'select',
     options: [<?php
-      $result = sqlsrv_query(
-        $NEI,
+      $result = $database->query(
+        null,
         " SELECT   OwnerWithRol.State
           FROM     OwnerWithRol
           WHERE    OwnerWithRol.State <> ''
@@ -62,8 +62,8 @@
     name:'Customer',
     type:'select',
     options:[<?php
-      $result = sqlsrv_query(
-        $NEI,
+      $result = $database->query(
+        null,
         " SELECT   OwnerWithRol.Name
           FROM     OwnerWithRol
           WHERE    OwnerWithRol.Name <> ''

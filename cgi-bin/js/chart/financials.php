@@ -11,7 +11,7 @@ function gd(year, month, day) {
                 $dates[$date] = 0;
                 $totals[$date] = 0;
             }
-             $job_item_result = sqlsrv_query($Paradox,"
+             $job_item_result = $database->query($Paradox,"
                 SELECT 
                     [JOBLABOR].[WEEK ENDING]    AS fDate,
                     [JOBLABOR].[TOTAL COST]     AS Amount
@@ -29,7 +29,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-             $job_item_result = sqlsrv_query($Paradox,"
+             $job_item_result = $database->query($Paradox,"
                 SELECT 
                     [JOBLABOR].[WEEK ENDING]    AS fDate,
                     [JOBLABOR].[TOTAL COST]     AS Amount
@@ -47,7 +47,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT 
                     JobI.fDate as fDate,
                     JobI.Amount as Amount
@@ -66,7 +66,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT 
                     JobI.fDate as fDate,
                     JobI.Amount as Amount
@@ -85,7 +85,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT 
                     JobI.fDate as fDate,
                     JobI.Amount as Amount
@@ -104,7 +104,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT 
                     JobI.fDate as fDate,
                     JobI.Amount as Amount
@@ -123,7 +123,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT 
                     JobI.fDate as fDate,
                     JobI.Amount as Amount
@@ -141,7 +141,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $job_item_result = sqlsrv_query($NEI,"
+            $job_item_result = $database->query(null,"
                 SELECT 
                     JobI.fDate as fDate,
                     JobI.Amount as Amount
@@ -159,7 +159,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $invoice_result = sqlsrv_query($NEI,"
+            $invoice_result = $database->query(null,"
                 SELECT 
                     Invoice.fDate as fDate,
                     Invoice.Amount as Amount
@@ -185,7 +185,7 @@ function gd(year, month, day) {
                 }
             }
             ksort($dates);
-            $invoice_result = sqlsrv_query($NEI,"
+            $invoice_result = $database->query(null,"
                 SELECT 
                     Invoice.fDate as fDate,
                     Invoice.Amount as Amount

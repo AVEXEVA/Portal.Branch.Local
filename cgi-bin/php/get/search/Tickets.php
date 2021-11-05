@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $Connection = sqlsrv_query(
-    	$NEI,
+    $Connection = $database->query(
+    	null,
     	"	SELECT 	*
 			FROM   	Connection
 			WHERE  		Connection.Connector 	= ?
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
     $Connection = sqlsrv_fetch_array($Connection);
-	$User    = sqlsrv_query(
-		$NEI,
+	$User    = $database->query(
+		null,
 		"	SELECT 	Emp.*,
 				   	Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
 	$User = sqlsrv_fetch_array( $User );
-	$r = sqlsrv_query(
-		$NEI,
+	$r = $database->query(
+		null,
 		"	SELECT 	Privilege.Access_Table,
 				   	Privilege.User_Privilege,
 			   		Privilege.Group_Privilege,
@@ -258,8 +258,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						) AS tbl
 			WHERE 		tbl.FieldValue LIKE '%' + ? + '%'
 			GROUP BY 	tbl.FieldName, tbl.FieldValue;";
-		$rResult = sqlsrv_query(
-			$NEI,
+		$rResult = $database->query(
+			null,
 			$Query,
 			$parameters
 		) or die(print_r(sqlsrv_errors()));

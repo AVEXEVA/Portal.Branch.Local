@@ -4,7 +4,7 @@ $(function() {
     var data43 = [<?php 
         $data = array();
         $data2 = array();
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT Loc.Zone AS Division, Sum(TicketD.Total) as Total
             FROM (TicketD LEFT JOIN nei.dbo.Job ON Job.ID = TicketD.Job) LEFT JOIN nei.dbo.Loc ON Job.Loc = Loc.Loc
             WHERE Job.Type='0' AND TicketD.EDate >= '2017-03-30 00:00:00.000' AND TicketD.Total <= 24

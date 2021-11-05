@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array( $result );
 
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = sqlsrv_fetch_array( $result );
 
     //Privileges
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $Privileges['Location']['Group_Privilege'] >= 4 
         && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Count( Ticket.ID ) AS Count 
                 FROM    (
                             SELECT  Ticket.ID,
@@ -103,8 +103,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ||  !is_numeric( $_GET[ 'ID' ] ) ){
             ?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        sqlsrv_query(
-            $NEI,
+        $database->query(
+            null,
             "   INSERT INTO Activity([User], [Date], [Page]) 
                 VALUES(?,?,?);",
             array(
@@ -113,8 +113,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 'location-information.php?ID=' . $_GET[ 'ID' ]
             )
         );
-        $r = sqlsrv_query(
-            $NEI,
+        $r = $database->query(
+            null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Location_Name,

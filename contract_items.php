@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Contract']['User_Privilege']  < 4
 	  		|| $My_Privileges['Contract']['Group_Privilege'] < 4){require('../404.html');}
     else {
-		sqlsrv_query($NEI,
+		$database->query(null,
       "INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "contracts.php"));
 ?><!DOCTYPE html>
@@ -57,7 +57,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-11'><select name='Territory'>
               <option value=''>Select</option>
               <?php
-                $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Terr;");
+                $r = $database->query(null,"SELECT * FROM nei.dbo.Terr;");
                 if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
               ?>
             </select></div>
@@ -78,21 +78,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-2'><select name='Elevator_Part'>
               <option value=''>Select</option>
               <?php
-                $r = sqlsrv_query($NEI,"SELECT * FROM Portal.dbo.Category_Elevator_Part;");
+                $r = $database->query(null,"SELECT * FROM Portal.dbo.Category_Elevator_Part;");
                 if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
               ?>
             </select></div>
             <div class='col-xs-2'><select name='Condition'>
               <option value=''>Select</option>
               <?php
-                $r = sqlsrv_query($NEI,"SELECT * FROM Portal.dbo.Category_Violation_Condition;");
+                $r = $database->query(null,"SELECT * FROM Portal.dbo.Category_Violation_Condition;");
                 if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
               ?>
             </select></div>
             <div class='col-xs-2'><select name='Remedy'>
               <option value=''>Select</option>
               <?php
-                $r = sqlsrv_query($NEI,"SELECT * FROM Portal.dbo.Category_Remedy;");
+                $r = $database->query(null,"SELECT * FROM Portal.dbo.Category_Remedy;");
                 if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
               ?>
             </select></div>

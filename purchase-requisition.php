@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Ticket']['User_Privilege']  < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
@@ -108,7 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   					<div class='col-xs-8'><button type='button' onClick='selectLocations(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   					<div class='col-xs-8'><button type='button' onClick='selectDropOffs(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['DropOff']) && is_numeric($_GET['DropOff'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['DropOff']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Loc WHERE Loc.Loc = ?;",array($_GET['DropOff']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -162,7 +162,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-8'><button type='button' onClick='selectUnits(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Unit']) && is_numeric($_GET['Unit'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Elev WHERE Elev.ID = ?;",array($_GET['Unit']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Elev WHERE Elev.ID = ?;",array($_GET['Unit']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){
@@ -189,7 +189,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-8'><button type='button' onClick='selectJobs(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Job']) && is_numeric($_GET['Job'])){
-              $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Job WHERE Job.ID = ?;",array($_GET['Unit']));
+              $r = $database->query(null,"SELECT * FROM nei.dbo.Job WHERE Job.ID = ?;",array($_GET['Unit']));
               if($r){
                 $row = sqlsrv_fetch_array($r);
                 if(is_array($row)){

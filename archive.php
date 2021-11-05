@@ -4,12 +4,12 @@ require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User  = addslashes($_SESSION['User']);
     $Hash  = addslashes($_SESSION['Hash']);
-    $r = sqlsrv_query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector = ? AND Hash= ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User  = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    $r = sqlsrv_query($conn2,"
+    $r = $database->query($conn2,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -22,7 +22,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $My_Privileges['Ticket']['Group_Privilege'] >= 4 
         && $My_Privileges['Ticket']['Other_Privilege'] >= 4){
             $Privileged = TRUE;}
-    sqlsrv_query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "archive.php"));
+    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "archive.php"));
     if( !isset($array['ID']) 
         
          
@@ -37,7 +37,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <?php 
 if(is_numeric($_GET['Mechanic'])){
-    $r = sqlsrv_query($conn,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");
+    $r = $database->query($conn,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");
     $r = sqlsrv_fetch_array($r);
     $Mechanic = $r;} 
 else {  $Mechanic = $User;  }?>
@@ -85,7 +85,7 @@ else {  $Mechanic = $User;  }?>
                                         <div class='col-xs-4' style='text-align:right;'>Customer:</div>
                                         <div class='col-xs-8'><select name="Customer" onChange='addCustomer(this);' class='form-control'>
                                         <?php 
-                                        $r = sqlsrv_query($conn,"
+                                        $r = $database->query($conn,"
                                             SELECT
                                                 OwnerWithRol.ID,
                                                 OwnerWithRol.Name 
@@ -106,7 +106,7 @@ else {  $Mechanic = $User;  }?>
                                                 $Customer_ID = "OwnerWithRol.ID = '" . $Customer_ID . "'";
                                             }
                                             $r = FALSE;
-                                            $r = sqlsrv_query($conn,"
+                                            $r = $database->query($conn,"
                                                 SELECT *
                                                 FROM OwnerWithRol
                                                 WHERE {$Customer_ID}
@@ -127,7 +127,7 @@ else {  $Mechanic = $User;  }?>
                                         <div class='col-xs-4' style='text-align:right;'>Location:</div>
                                         <div class='col-xs-8'><select class='form-control' name="Location" onChange='addLocation(this);'>
                                         <?php 
-                                        $r = sqlsrv_query($conn,"
+                                        $r = $database->query($conn,"
                                             SELECT
                                                 Loc.Loc,
                                                 Loc.Tag 
@@ -149,7 +149,7 @@ else {  $Mechanic = $User;  }?>
                                                 $Location_ID = "Loc = '" . $Location_ID . "'";
                                             }
                                             $r = FALSE;
-                                            $r = sqlsrv_query($conn,"
+                                            $r = $database->query($conn,"
                                                 SELECT *
                                                 FROM Loc
                                                 WHERE {$Location_ID}

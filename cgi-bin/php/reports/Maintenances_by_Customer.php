@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI, 
+    $result = $database->query(
+        null, 
         "   SELECT  * 
             FROM    Connection 
             WHERE       Connector = ? 
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *, 
                     fFirst AS First_Name, 
                     Last as Last_Name 
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $User   = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
         "   SELECT  Privilege.*
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -54,7 +54,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         $data = array();
         $Tickets = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
                 SELECT   Elev.ID AS ID
                 FROM     TicketO 
                          LEFT JOIN Elev ON  TicketO.LElev = Elev.ID
@@ -70,7 +70,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $sql = array();
         foreach($data2 as $key=>$variable){$sql[] = "Elev.ID = '{$variable['ID']}'";}
         $sql = implode(" OR ",$sql);
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
                 SELECT   Max(TicketD.EDate) AS Last_Date,
                          Elev.ID          	AS ID
                 FROM     TicketD 
@@ -91,7 +91,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }
             }
         }
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Elev.ID         			   AS ID,
                    Elev.State      			   AS State, 
                    Elev.Unit       			   AS Unit,

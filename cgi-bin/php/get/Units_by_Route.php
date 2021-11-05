@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT * 
         FROM   Connection 
         WHERE  Connection.Connector = ? 
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*, 
                Emp.fFirst AS First_Name, 
                Emp.Last   AS Last_Name 
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Privilege.Access_Table, 
                Privilege.User_Privilege, 
                Privilege.Group_Privilege, 
@@ -37,7 +37,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $My_Privileges['Route']['Group_Privilege'] >= 4
         && $My_Privileges['Location']['Group_Privilege'] >= 4
         && is_numeric($_GET['ID'])){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Locations.*
                 FROM 
                 (
@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $My_Privileges['Route']['User_Privilege'] >= 4
         && $My_Privileges['Location']['User_Privilege'] >= 4
         && is_numeric($_GET['ID'])){
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Route.ID AS Route_ID
                 FROM   Route
                        LEFT JOIN Emp ON Route.Mech = Emp.fWork
@@ -78,7 +78,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     $Privileged = True;}}}
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {                
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Elev.ID    AS ID,
                    Elev.State AS State, 
                    Elev.Unit  AS Unit,

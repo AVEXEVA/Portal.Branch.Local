@@ -10,12 +10,12 @@ if( session_id( ) == '' || !isset( $_SESSION ) ) {
     
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
     
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ?
@@ -25,9 +25,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Privileged = FALSE;
     if(isset($Privileges['Ticket']) && $Privileges['Ticket']['User_Privilege'] >= 4 && $Privileges['Ticket']['Group_Privilege'] >= 4 && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Ticket']['Group_Privilege'] >= 4){
-        $r = sqlsrv_query(  $NEI,"SELECT LID FROM TicketO WHERE TicketO.ID='{$ID}'");
-        $r2 = sqlsrv_query( $NEI,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$ID}'");
-        $r3 = sqlsrv_query( $NEI,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$ID}'");
+        $r = $database->query(  null,"SELECT LID FROM TicketO WHERE TicketO.ID='{$ID}'");
+        $r2 = $database->query( null,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$ID}'");
+        $r3 = $database->query( null,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$ID}'");
         $r = sqlsrv_fetch_array($r);
         $r2 = sqlsrv_fetch_array($r2);
         $r3 = sqlsrv_fetch_array($r3);
@@ -36,9 +36,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         elseif(is_array($r2)){$Location = $r2['Loc'];}
         elseif(is_array($r3)){$Location = $r3['Loc'];}
         if(!is_null($Location)){
-            $r = sqlsrv_query(  $NEI,"SELECT ID FROM TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$User['fWork']}'");
-            $r2 = sqlsrv_query( $NEI,"SELECT ID FROM TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$User['fWork']}'");
-            $r3 = sqlsrv_query( $NEI,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$User['fWork']}'");
+            $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$User['fWork']}'");
+            $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$User['fWork']}'");
+            $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$User['fWork']}'");
             if($r || $r2 || $r3){
                 if($r){$a = sqlsrv_fetch_array($r);}
                 if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -50,9 +50,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         }
         if(!$Privileged){
             if($Privileges['Ticket']['User_Privilege'] >= 4 && is_numeric($ID)){
-                $r = sqlsrv_query(  $NEI,"SELECT ID FROM TicketO WHERE TicketO.ID='{$ID}' AND fWork='{$User['fWork']}'");
-                $r2 = sqlsrv_query( $NEI,"SELECT ID FROM TicketD WHERE TicketD.ID='{$ID}' AND fWork='{$User['fWork']}'");
-                $r3 = sqlsrv_query( $NEI,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$ID}' AND fWork='{$User['fWork']}'");
+                $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.ID='{$ID}' AND fWork='{$User['fWork']}'");
+                $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.ID='{$ID}' AND fWork='{$User['fWork']}'");
+                $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$ID}' AND fWork='{$User['fWork']}'");
                 if($r || $r2 || $r3){
                     if($r){$a = sqlsrv_fetch_array($r);}
                     if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     if( !isset( $Connection['ID'] ) || !$Privileged){ echo 'Blocked'; }
     else {
-        sqlsrv_query($NEI,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "post/emailTicket.php"));
+        $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "post/emailTicket.php"));
         $_SERVER['SERVER_NAME'] = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : "Nouveau_Elevator_Portal";
         function generateMessageID()
         {
@@ -79,8 +79,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         }
         //$_POST[ 'Data '] = explode( ',', $_POST[ 'data' ] );
         if( is_array( $_POST[ 'data' ] ) && count( $_POST[ 'data' ] ) > 0 ){ foreach( $_POST[ 'data' ] AS $ID ){
-            $r = sqlsrv_query(
-                $NEI,
+            $r = $database->query(
+                null,
                 "   SELECT  TicketD.*,
                             Customer.Name AS Customer,
                             Loc.Tag AS Location,

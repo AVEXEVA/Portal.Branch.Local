@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   nei.dbo.Connection
 		WHERE  Connection.Connector = ?
 			   AND Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = sqlsrv_query($NEI,"
+	$My_User    = $database->query(null,"
 		SELECT Emp.*,
 			   Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	;", array($_SESSION['User']));
 	$My_User = sqlsrv_fetch_array($My_User);
 	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = sqlsrv_query($Portal,"
+	$r = $database->query($Portal,"
 		SELECT Privilege.Access_Table,
 			   Privilege.User_Privilege,
 			   Privilege.Group_Privilege,
@@ -37,14 +37,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
 	else {
-    sqlsrv_query($NEI,"
+    $database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "pto.php"));
     $Vacation_Start = date("Y-m-d H:i:s") >= date("Y-06-01 00:00:00.000") ? date("Y-06-01 00:00:00.000") : date("Y-06-01 00:00:00.000",strtotime("-1 year"));
     $Medical_Start = date("Y-m-d H:i:s") >= date("Y-03-01 00:00:00.000") ? date("Y-03-01 00:00:00.000") : date("Y-03-01 00:00:00.000",strtotime("-1 year"));
     $Lieu_Start = date("Y-m-d H:i:s") >= date("Y-01-01 00:00:00.000") ? date("Y-01-01 00:00:00.000") : date("Y-01-01 00:00:00.000",strtotime("-1 year"));
-    $resource = sqlsrv_query($NEI,
+    $resource = $database->query(null,
       " SELECT  TicketD.*
         FROM    nei.dbo.TicketD
                 LEFT JOIN nei.dbo.Emp ON TicketD.fWork = Emp.fWork

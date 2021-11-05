@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -22,17 +22,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
         }
     } elseif($_SESSION['Branch'] == 'Customer' && is_numeric($_GET['ID'])){
-            $r =  sqlsrv_query( $NEI,"SELECT Ref FROM nei.dbo.Invoice LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc WHERE Invoice.Ref='{$_GET['ID']}' AND Loc.Owner = '{$_SESSION['Branch_ID']}';");
+            $r =  $database->query( null,"SELECT Ref FROM nei.dbo.Invoice LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc WHERE Invoice.Ref='{$_GET['ID']}' AND Loc.Owner = '{$_SESSION['Branch_ID']}';");
             $Privileged = $r ? TRUE : FALSE;
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "invoice.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "invoice.php"));
     if(!isset($array['ID']) || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
 ?>
     <script>
 		$(document).ready(function(){
 			<?php
-		  	$r = sqlsrv_query($NEI,"
+		  	$r = $database->query(null,"
 				SELECT OpenAR.Ref
 				FROM   nei.dbo.OpenAR
 				       LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref           = Invoice.Ref

@@ -3,12 +3,12 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] ); 
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
-if(     !isset( $Databases[ 'Default' ], $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
-    ||  !connection_privileged( $Databases[ 'Default' ], $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] ) ){
+if(     !isset( $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
+    ||  !connection( 'Demo', \singleton\database::getInstance( ), $_SESSION[ 'Connection' ][ 'Branch_ID' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
         header( 'Location: https://beta.nouveauelevator.com/login.php' );
         exit; }
-$result = sqlsrv_query(
-  $Databases[ 'Default' ],
+$result = $database->query(
+  null,
   " SELECT *,
           Emp.fFirst AS First_Name,
           Emp.Last   AS Last_Name,
@@ -21,10 +21,10 @@ $result = sqlsrv_query(
 );
 $User = sqlsrv_fetch_array( $result );
 
-$Privileges = privileges( $Databases[ 'Default' ], $_SESSION[ 'Connection' ][ 'Branch_ID' ] );
+$Privileges = privileges( null, \singleton\database::getInstance( ), $_SESSION[ 'Connection' ][ 'Branch_ID' ] );
 
-$image_result = sqlsrv_query( 
-  $Portal,
+$image_result = $database->query( 
+  'Portal',
   " SELECT  Picture,
             Picture_Type AS Type 
     FROM    Portal.dbo.Portal 
@@ -75,7 +75,7 @@ $image_result = sqlsrv_query(
       </div>
     </section>
     <?php if( $User[ 'Field' ] == 1 ){
-        $r = sqlsrv_query($NEI, "SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL",array($_SESSION['User']));
+        $r = $database->query(null, "SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL",array($_SESSION['User']));
         if($r){$Attendance_Activity = sqlsrv_fetch_array($r);}
     ?><div class='card bg-darker text-light'>
       <div class='card-header bg-white text-black text-center'>Field Work</div>
@@ -313,8 +313,8 @@ $image_result = sqlsrv_query(
         </div>
       </div><?php } ?>
       <?php
-      $result = sqlsrv_query(
-        $NEI,
+      $result = $database->query(
+        null,
         " SELECT Route.ID
           FROM   Route
                  LEFT JOIN Emp ON Route.Mech = Emp.fWork

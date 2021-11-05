@@ -2,8 +2,8 @@
 if(session_id() == '' || !isset($_SESSION) ){ session_start( [ 'read_and_close' => true ] ); }
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query(
-    $NEI,
+  $r = $database->query(
+    null,
     " SELECT *
 		  FROM   Connection
 		  WHERE  Connection.Connector = ?
@@ -14,8 +14,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     )
   );
   $Connection = sqlsrv_fetch_array( $r, SQLSRV_FETCH_ASSOC );
-  $r = sqlsrv_query(
-    $NEI,
+  $r = $database->query(
+    null,
     " SELECT  *,
   		        Emp.fFirst AS First_Name,
   			      Emp.Last   AS Last_Name
@@ -26,8 +26,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     )
   );
   $User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query(
-    $NEI,
+	$r = $database->query(
+    null,
     " SELECT *
 		  FROM   Privilege
 		  WHERE  Privilege.User_ID = ?;",
@@ -41,8 +41,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-  		sqlsrv_query(
-        $NEI,
+  		$database->query(
+        null,
         " INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",
         array(
           $_SESSION['User'],

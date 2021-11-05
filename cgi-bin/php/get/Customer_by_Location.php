@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM Connection 
 		WHERE Connector = ? 
 		AND Hash = ?
 		;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"
+    $User = $database->query(null,"
 		SELECT * 
 		FROM Emp 
 		WHERE ID = ?
@@ -24,7 +24,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($array['ID'])  || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
 		$data = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Loc.Owner         AS Customer_ID,
 				   OwnerWithRol.Name AS Customer_Name
 			FROM   nei.dbo.Loc

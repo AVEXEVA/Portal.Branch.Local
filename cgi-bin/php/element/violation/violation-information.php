@@ -2,13 +2,13 @@
 session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -21,7 +21,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
         }
     } elseif($_SESSION['Branch'] == 'Customer' && is_numeric($_GET['ID'])){
-        $SQL_Result = sqlsrv_query($NEI,"
+        $SQL_Result = $database->query(null,"
             SELECT Loc.Owner
             FROM Violation LEFT JOIN nei.dbo.Loc ON Violation.Loc = Loc.Loc
             WHERE Violation.ID='{$_GET['ID']}' AND Loc.Owner='{$_SESSION['Branch_ID']}'
@@ -31,11 +31,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             if($sql){$Privileged = true;}
         }
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "violation.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "violation.php"));
     if(!isset($array['ID']) && is_numeric($_GET['ID'])  || !$Privileged){?><html><head><script>document.location.href="../login.php?Forward=violation<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
         $ID = addslashes($_GET['ID']);
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                 Violation.*,
 				Violation.Remarks       AS Remarks,
@@ -129,7 +129,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			<div class='col-xs-4' style='text-align:right;'>Tickets:</div>
 			<div class='col-xs-8'><?php
 				if($data['Job_ID'] > 0){
-					$r = sqlsrv_query($NEI,"
+					$r = $database->query(null,"
 						SELECT Count(Tickets.ID) AS Count_of_Tickets
 						FROM   ((SELECT TicketO.ID AS ID
 								 FROM   nei.dbo.TicketO

@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table,
                Privilege.User_Privilege,
                Privilege.Group_Privilege,
@@ -229,7 +229,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
 		";
 	}
 
-    $rResult = sqlsrv_query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    $rResult = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
 
 
     /* Data set length after filtering */
@@ -274,7 +274,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
 	}
 
     $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = sqlsrv_query( $conn, $sQueryRow , $params, $options );
+    $stmt = $database->query( $conn, $sQueryRow , $params, $options );
 
     $iFilteredTotal = sqlsrv_num_rows( $stmt );
 
@@ -285,7 +285,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
         SELECT COUNT(".$sIndexColumn.")
         FROM   $sTable
     ";
-    $rResultTotal = sqlsrv_query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
@@ -316,12 +316,12 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+    $User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ? AND Access_Table='Location'
@@ -332,7 +332,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $data = array();
         if($My_Privileges['User_Privilege'] >= 4 && $My_Privileges['Group_Privilege'] >= 4 && $My_Privileges['Other_Privilege'] >= 4){
             $data = array();
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Loc.Loc           AS ID,
 					   Loc.ID            AS Name,
 					   Loc.Tag           AS Tag,
@@ -366,7 +366,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         } else {
             $SQL_Locations = array();
             if($My_Privileges['Group_Privilege'] >= 4){
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT LID AS Location
                     FROM   nei.dbo.TicketO
                            LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -374,7 +374,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;",array($_SESSION['User']));
 
                 while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Loc AS Location
                     FROM   nei.dbo.TicketD
                            LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -383,7 +383,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
                 while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
 
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
                     SELECT Loc AS Location
                     FROM   nei.dbo.TicketDArchive
                            LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
@@ -393,7 +393,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
             }
             if($My_Privileges['User_Privilege'] >= 4){
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Loc.Loc AS Location
                     FROM   nei.dbo.Loc
                            LEFT JOIN nei.dbo.Route ON Loc.Route = Route.ID
@@ -405,7 +405,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $SQL_Locations = array_unique($SQL_Locations);
             if(count($SQL_Locations) > 0){
                 $SQL_Locations = implode(' OR ',$SQL_Locations);
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Loc.Loc           AS ID,
 					       Loc.ID            AS Name,
 					       Loc.Tag           AS Tag,

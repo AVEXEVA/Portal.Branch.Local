@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
-        $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
+        $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -19,9 +19,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif($My_Privileges['Ticket']['Group_Privilege'] >= 4){
-            $r = sqlsrv_query(  $NEI,"SELECT LID FROM nei.dbo.TicketO WHERE TicketO.ID='{$_GET['ID']}'");
-            $r2 = sqlsrv_query( $NEI,"SELECT Loc FROM nei.dbo.TicketD WHERE TicketD.ID='{$_GET['ID']}'");
-            $r3 = sqlsrv_query( $NEI,"SELECT Loc FROM nei.dbo.TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
+            $r = $database->query(  null,"SELECT LID FROM nei.dbo.TicketO WHERE TicketO.ID='{$_GET['ID']}'");
+            $r2 = $database->query( null,"SELECT Loc FROM nei.dbo.TicketD WHERE TicketD.ID='{$_GET['ID']}'");
+            $r3 = $database->query( null,"SELECT Loc FROM nei.dbo.TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
             $r = sqlsrv_fetch_array($r);
             $r2 = sqlsrv_fetch_array($r2);
             $r3 = sqlsrv_fetch_array($r3);
@@ -30,9 +30,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             elseif(is_array($r2)){$Location = $r2['Loc'];}
             elseif(is_array($r3)){$Location = $r3['Loc'];}
             if(!is_null($Location)){
-                $r = sqlsrv_query(  $NEI,"SELECT ID FROM nei.dbo.TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
-                $r2 = sqlsrv_query( $NEI,"SELECT ID FROM nei.dbo.TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
-                $r3 = sqlsrv_query( $NEI,"SELECT ID FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
+                $r = $database->query(  null,"SELECT ID FROM nei.dbo.TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
+                $r2 = $database->query( null,"SELECT ID FROM nei.dbo.TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
+                $r3 = $database->query( null,"SELECT ID FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
                 if($r || $r2 || $r3){
                     if($r){$a = sqlsrv_fetch_array($r);}
                     if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -44,9 +44,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
             if(!$Privileged){
                 if($My_Privileges['Ticket']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-                    $r = sqlsrv_query(  $NEI,"SELECT ID FROM nei.dbo.TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
-                    $r2 = sqlsrv_query( $NEI,"SELECT ID FROM nei.dbo.TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
-                    $r3 = sqlsrv_query( $NEI,"SELECT ID FROM nei.dbo.TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                    $r = $database->query(  null,"SELECT ID FROM nei.dbo.TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                    $r2 = $database->query( null,"SELECT ID FROM nei.dbo.TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                    $r3 = $database->query( null,"SELECT ID FROM nei.dbo.TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
                     if($r || $r2 || $r3){
                         if($r){$a = sqlsrv_fetch_array($r);}
                         if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -59,9 +59,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
         }
     } elseif($_SESSION['Branch'] == 'Customer' && is_numeric($_GET['ID'])){
-            $r  = sqlsrv_query( $NEI,"SELECT Loc.Loc FROM nei.dbo.TicketO        LEFT JOIN nei.dbo.Loc ON TicketO.LID        = Loc.Loc WHERE TicketO.ID=?        AND Loc.Owner = ?;",array($_GET['ID'],$_SESSION['Branch_ID']));
-            $r2 = sqlsrv_query( $NEI,"SELECT Loc.Loc FROM nei.dbo.TicketD        LEFT JOIN nei.dbo.Loc ON TicketD.Loc        = Loc.Loc WHERE TicketD.ID=?        AND Loc.Owner = ?;",array($_GET['ID'],$_SESSION['Branch_ID']));
-            $r3 = sqlsrv_query( $NEI,"SELECT Loc.Loc FROM nei.dbo.TicketDArchive LEFT JOIN nei.dbo.Loc ON TicketDArchive.Loc = Loc.Loc WHERE TicketDArchive.ID=? AND Loc.Owner = ?;",array($_GET['ID'],$_SESSION['Branch_ID']));
+            $r  = $database->query( null,"SELECT Loc.Loc FROM nei.dbo.TicketO        LEFT JOIN nei.dbo.Loc ON TicketO.LID        = Loc.Loc WHERE TicketO.ID=?        AND Loc.Owner = ?;",array($_GET['ID'],$_SESSION['Branch_ID']));
+            $r2 = $database->query( null,"SELECT Loc.Loc FROM nei.dbo.TicketD        LEFT JOIN nei.dbo.Loc ON TicketD.Loc        = Loc.Loc WHERE TicketD.ID=?        AND Loc.Owner = ?;",array($_GET['ID'],$_SESSION['Branch_ID']));
+            $r3 = $database->query( null,"SELECT Loc.Loc FROM nei.dbo.TicketDArchive LEFT JOIN nei.dbo.Loc ON TicketDArchive.Loc = Loc.Loc WHERE TicketDArchive.ID=? AND Loc.Owner = ?;",array($_GET['ID'],$_SESSION['Branch_ID']));
             if($r || $r2 || $r3){
                 if($r){$a = sqlsrv_fetch_array($r);}else{$a = false;}
                 if($r2){$a2 = sqlsrv_fetch_array($r2);}else{$a2 = false;}
@@ -76,7 +76,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
 $Ticket = null;
 if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT
                 TicketO.*,
                 Loc.Tag             AS Tag,
@@ -121,7 +121,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
     $Ticket['Loc'] = $Ticket['LID'];
     $Ticket['Status'] = (strlen($Ticket['Status']) == 0) ? 'Reviewing' : $Ticket['Status'];
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketD.*,
                 Loc.Tag             AS Tag,
@@ -163,7 +163,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
         $Ticket = sqlsrv_fetch_array($r);
     }
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketDArchive.*,
                 Loc.Tag             AS Tag,
@@ -207,13 +207,13 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
         $Ticket = sqlsrv_fetch_array($r);
     }
 if($Ticket['Table2'] == 'TicketO'){
-  $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.TicketDPDA WHERE ID = ?;",array($_GET['ID']));
+  $r = $database->query(null,"SELECT * FROM nei.dbo.TicketDPDA WHERE ID = ?;",array($_GET['ID']));
   $Ticket2 = sqlsrv_fetch_array($r);
 } elseif($Ticket['Table2'] == 'TicketD'){
-  $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.TicketD WHERE ID = ?;",array($_GET['ID']));
+  $r = $database->query(null,"SELECT * FROM nei.dbo.TicketD WHERE ID = ?;",array($_GET['ID']));
   $Ticket2 = sqlsrv_fetch_array($r);
 } elseif($Ticket['Table2'] == 'TicketDArchive'){
-  $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.TicketDArchive WHERE ID = ?;",array($_GET['ID']));
+  $r = $database->query(null,"SELECT * FROM nei.dbo.TicketDArchive WHERE ID = ?;",array($_GET['ID']));
   $Ticket2 = sqlsrv_fetch_array($r);
 }?>
 <div class="panel panel-primary">
@@ -278,7 +278,7 @@ if($Ticket['Table2'] == 'TicketO'){
       }
       function getUnits(link){
         $("body").append("<div class='popup' style='background-color:#1d1d1d;'><div class='panel-primary''><div class='panel-heading' style='padding-top:50px;'><h3><?php echo $Ticket['Tag'];?>'s Units</h3></div><div class='panel-body' style='padding:25px;><div class='row'><?php
-          $r = sqlsrv_query($NEI,"SELECT * FROM Elev WHERE Elev.Loc = ?",array($Ticket['Location_ID']));
+          $r = $database->query(null,"SELECT * FROM Elev WHERE Elev.Loc = ?",array($Ticket['Location_ID']));
           if($r){while($row = sqlsrv_fetch_array($r)){
             echo "<div class='col-xs-12'><button style='width:100%;height:50px;' onClick='changeUnit(this);' rel='{$row['ID']}'>{$row['State']} - {$row['Unit']}";
           }}
@@ -320,7 +320,7 @@ if($Ticket['Table2'] == 'TicketO'){
     }
     function getWorkOrders(link){
       $("body").append("<div class='popup' style='background-color:#1d1d1d;'><div class='panel-primary''><div class='panel-heading' style='padding-top:50px;'><h3><?php echo $Ticket['Tag'];?>'s Work Orders</h3></div><div class='panel-body' style='padding:25px;><div class='row'><?php
-        $r = sqlsrv_query($NEI,"SELECT TicketO.WorkOrder FROM nei.dbo.TicketO WHERE TicketO.LID = ? AND TicketO.Assigned = 6 AND TicketO.fWork = ? AND TicketO.WorkOrder IS NOT NULL AND TicketO.WorkOrder <> 0 AND TicketO.WorkOrder <> '' AND TicketO.WorkOrder <> ? AND TicketO.Assigned >= 5 GROUP BY TicketO.WorkOrder;",array($Ticket['Location_ID'],$My_User['fWork'],$_GET['ID']));
+        $r = $database->query(null,"SELECT TicketO.WorkOrder FROM nei.dbo.TicketO WHERE TicketO.LID = ? AND TicketO.Assigned = 6 AND TicketO.fWork = ? AND TicketO.WorkOrder IS NOT NULL AND TicketO.WorkOrder <> 0 AND TicketO.WorkOrder <> '' AND TicketO.WorkOrder <> ? AND TicketO.Assigned >= 5 GROUP BY TicketO.WorkOrder;",array($Ticket['Location_ID'],$My_User['fWork'],$_GET['ID']));
         if($r){while($row = sqlsrv_fetch_array($r)){
           echo "<div class='col-xs-12'><button style='width:100%;height:50px;' onClick='changeWorkOrder(this);' rel='{$row['WorkOrder']}'>{$row['WorkOrder']}";
         }}
@@ -345,7 +345,7 @@ if($Ticket['Table2'] == 'TicketO'){
       <?php }?>
     </div>
     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-    <?php $r = sqlsrv_query($NEI,"SELECT * FROM (
+    <?php $r = $database->query(null,"SELECT * FROM (
       (SELECT TicketO.ID, TicketO.WorkOrder FROM nei.dbo.TicketO WHERE TicketO.WorkOrder = ? AND TicketO.WorkOrder <> 0)
       UNION ALL
       (SELECT TicketD.ID, TicketD.WorkOrder  FROM nei.dbo.TicketD WHERE TicketD.WorkOrder = ? AND TicketD.WorkOrder <> 0)
@@ -444,7 +444,7 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='row resolution'>
       <div class='col-xs-4'><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution:</div>
       <div class='col-xs-8'><select onChange='toggle_Resolution_Items(this);' name='Resolutions' style='color:black !important;width:100%;' ><?php
-        $r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.Resolution ORDER BY Resolution.[Name] ASC;");
+        $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Resolution ORDER BY Resolution.[Name] ASC;");
         if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['Name'];?>'><?php echo $row['Name'];?></option><?php }}
       ?></select></div>
       <div class='col-xs-12'>&nbsp;</div>
@@ -452,7 +452,7 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='row Resolution-Items'>
       <div class='col-xs-4'>&nbsp;</div>
       <div class='col-xs-8'><select name='Item_Type' multiple style='color:black !important;width:100%;' ><?php
-        $r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.Item_Type ORDER BY Item_Type.[Name] ASC;");
+        $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Item_Type ORDER BY Item_Type.[Name] ASC;");
         if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['Name'];?>'><?php echo $row['Name'];?></option><?php }}
       ?></select></div>
       <div class='col-xs-12'>&nbsp;</div>
@@ -670,7 +670,7 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='row expenses'>
       <div class='col-xs-4'><i class="fa fa-paperclip fa-1x fa-fw" aria-hidden="true"></i> Photo:</div>
       <?php
-        $r = sqlsrv_query($Portal,'SELECT [File].Type AS Type, [File].[Data] AS Data, TicketPic.PicData AS PicData FROM Portal.dbo.[File] LEFT JOIN nei.dbo.TicketPic ON [File].Ticket = TicketPic.TicketID WHERE [TicketPic].TicketID = ?',array($_GET['ID']));
+        $r = $database->query($Portal,'SELECT [File].Type AS Type, [File].[Data] AS Data, TicketPic.PicData AS PicData FROM Portal.dbo.[File] LEFT JOIN nei.dbo.TicketPic ON [File].Ticket = TicketPic.TicketID WHERE [TicketPic].TicketID = ?',array($_GET['ID']));
         $i = 0;
         if($r){while($row = sqlsrv_fetch_array($r)){
           if($i > 0){?><div class='col-xs-4'>&nbsp;</div><?php }
@@ -700,7 +700,7 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='email row'>
       <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
       <div class='col-xs-8'><?php
-      $r = sqlsrv_query($Portal,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ?;",array($_GET['ID']));
+      $r = $database->query($Portal,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ?;",array($_GET['ID']));
       $i = 0;
       if($r){while($row = sqlsrv_fetch_array($r)){
         if($i == 0){echo $row['Email'];}
@@ -714,7 +714,7 @@ if($Ticket['Table2'] == 'TicketO'){
       <div class='col-xs-8'><?php echo isset($Ticket2['SignatureText']) ? $Ticket2['SignatureText'] : '';?></div>
       <div class='col-xs-12'><img style='width:100%;' src="data:image/jpeg;base64,<?php
         //echo file_get_contents("media/images/signatures/index.php?ID={$_GET['ID']}");
-        $r = sqlsrv_query($NEI,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?",array($_GET['ID']));
+        $r = $database->query(null,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?",array($_GET['ID']));
         if($r){
           echo base64_encode(sqlsrv_fetch_array($r)['Signature']);
         }
@@ -832,7 +832,7 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='row resolution'>
       <div class='col-xs-4'><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution:</div>
       <div class='col-xs-8'><select onChange='toggle_Resolution_Items(this);' name='Resolutions' style='color:black !important;width:100%;' ><?php
-        $r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.Resolution ORDER BY Resolution.[Name] ASC;");
+        $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Resolution ORDER BY Resolution.[Name] ASC;");
         if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['Name'];?>'><?php echo $row['Name'];?></option><?php }}
       ?></select></div>
       <div class='col-xs-12'>&nbsp;</div>
@@ -840,7 +840,7 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='row Resolution-Items'>
       <div class='col-xs-4'>&nbsp;</div>
       <div class='col-xs-8'><select name='Item_Type' multiple style='color:black !important;width:100%;' ><?php
-        $r = sqlsrv_query($Portal,"SELECT * FROM Portal.dbo.Item_Type ORDER BY Item_Type.[Name] ASC;");
+        $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Item_Type ORDER BY Item_Type.[Name] ASC;");
         if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['Name'];?>'><?php echo $row['Name'];?></option><?php }}
       ?></select></div>
       <div class='col-xs-12'>&nbsp;</div>
@@ -866,7 +866,7 @@ if($Ticket['Table2'] == 'TicketO'){
       <script>
       var availableEmails = [
         <?php
-          $r = sqlsrv_query($Portal,
+          $r = $database->query($Portal,
           " SELECT Ticket_Email.Email
             FROM (
                     ( SELECT TicketD.Loc AS Location_ID,
@@ -1034,10 +1034,10 @@ if($Ticket['Table2'] == 'TicketO'){
 		<?php }} else {
       if((isset($Ticket['TimeRoute']) && $Ticket['TimeRoute'] == '1899-12-30 00:00:00.000') || !isset($Ticket['TimeRoute']) || $Ticket['TimeRoute'] == NULL){?>
         <?php
-        $r = sqlsrv_query($NEI,"SELECT * FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? AND Attendance.[Start] >= ? AND Attendance.[Start] < ? AND Attendance.[End] IS NULL ORDER BY Attendance.[Start] DESC;",array($_SESSION['User'], date("Y-m-d 00:00:00.000"),date("Y-m-d H:i:s")));
+        $r = $database->query(null,"SELECT * FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? AND Attendance.[Start] >= ? AND Attendance.[Start] < ? AND Attendance.[End] IS NULL ORDER BY Attendance.[Start] DESC;",array($_SESSION['User'], date("Y-m-d 00:00:00.000"),date("Y-m-d H:i:s")));
         if(!$r || !is_array(sqlsrv_fetch_array($r))){$disabled = true;}
         else {$disabled = false;}
-        $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.TicketO LEFT JOIN nei.dbo.Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.Assigned >= 2 AND TicketO.Assigned <= 3 AND Emp.ID = ?;",array($_SESSION['User']));
+        $r = $database->query(null,"SELECT * FROM nei.dbo.TicketO LEFT JOIN nei.dbo.Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.Assigned >= 2 AND TicketO.Assigned <= 3 AND Emp.ID = ?;",array($_SESSION['User']));
         if($r && is_array(sqlsrv_fetch_array($r))){$disabled2 = true;}
         else{$disabled2 = false;}
         ?>

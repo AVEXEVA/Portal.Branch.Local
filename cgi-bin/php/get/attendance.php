@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table,
                Privilege.User_Privilege,
                Privilege.Group_Privilege,
@@ -39,7 +39,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	if(!isset($Connection['ID'])  ||  !$Privileged){print json_encode(array('data'=>array()));}
   else {
     if((isset($_GET['User']) && $My_Privileges['Time']['Other_Privilege'] >= 4) || (isset($_GET['User']) && $_GET['User'] == $_SESSION['User'])){
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
         SELECT Attendance.*
         FROM   Portal.dbo.Attendance
         WHERE  Attendance.[User] = ?
@@ -56,7 +56,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     } elseif(isset($_GET['Supervisor'])  && strlen($_GET['Supervisor']) > 0 && $My_Privileges['Time']['Other_Privilege'] >= 4) {
       //$_GET['Start'] = date('Y-m-d H:i:s',strtotime($_GET['Start']));
       //$_GET['End'] = date('Y-m-d H:i:s',strtotime($_GET['End']));
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
         SELECT Emp.ID AS ID,
                Emp.fFirst,
                Emp.Last
@@ -69,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $data = array();
       $sQuery = "SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? ORDER BY Attendance.[ID] DESC;";
       if($r){while($row = sqlsrv_fetch_array($r)){
-        $r2 = sqlsrv_query($Portal, $sQuery, array($row['ID']));
+        $r2 = $database->query($Portal, $sQuery, array($row['ID']));
         if($r2){
           $row2 = sqlsrv_fetch_array($r2);
           $row2 = is_array($row2) ? $row2 : array('Start'=>'1899-12-30 00:00:00.000', 'End'=>'1899-12-30 00:00:00.000');
@@ -81,7 +81,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     } elseif($My_Privileges['Time']['Other_Privilege'] >= 4) {
       $_GET['Start'] = date('Y-m-d H:i:s',strtotime($_GET['Start']));
       $_GET['End'] = date('Y-m-d H:i:s',strtotime($_GET['End']));
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
         SELECT Emp.ID AS ID,
                Emp.fFirst,
                Emp.Last
@@ -92,7 +92,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $data = array();
       $sQuery = "SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? ORDER BY Attendance.[ID] DESC;";
       if($r){while($row = sqlsrv_fetch_array($r)){
-        $r2 = sqlsrv_query($Portal, $sQuery, array($row['ID']));
+        $r2 = $database->query($Portal, $sQuery, array($row['ID']));
         if($r2){
           $row2 = sqlsrv_fetch_array($r2);
           $row2 = is_array($row2) ? $row2 : array('Start'=>'1899-12-30 00:00:00.000', 'End'=>'1899-12-30 00:00:00.000');

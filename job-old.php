@@ -4,14 +4,14 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 			   AND Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = sqlsrv_query($NEI,"
+	$My_User    = $database->query(null,"
 		SELECT Emp.*,
 			   Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	;", array($_SESSION['User']));
 	$My_User = sqlsrv_fetch_array($My_User);
 	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT Privilege.Access_Table,
 			   Privilege.User_Privilege,
 			   Privilege.Group_Privilege,
@@ -36,13 +36,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
 	if(isset($My_Privileges['Job'])
 		&& $My_Privileges['Job']['Group_Privilege'] >= 4){
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Job.Loc AS Location_ID
 				FROM   Job
 				WHERE  Job.ID = ?
 			;", array($_GET['ID']));
 			$Location_ID = sqlsrv_fetch_array($r)['Location_ID'];
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Tickets.ID
 				FROM
 				(
@@ -65,7 +65,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	if(isset($My_Privileges['Job'])
 		&& $My_Privileges['Job']['User_Privilege'] >= 4
 		&& is_numeric($_GET['ID'])){
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Tickets.ID
 				FROM
 				(
@@ -87,11 +87,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if(is_array(sqlsrv_fetch_array($r))){$Privileged = True;}}
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){?>Privileged Denied<?php }
 	else {
-    sqlsrv_query($NEI,"
+    $database->query(null,"
       INSERT INTO Activity([User], [Date], [Page])
       VALUES(?,?,?)
     ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "job.php?ID=" . $_GET['ID']));
-       $r = sqlsrv_query($NEI,"
+       $r = $database->query(null,"
 			SELECT TOP 1
                 Job.ID                AS Job_ID,
                 Job.fDesc             AS Job_Name,
@@ -372,7 +372,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 						<div class ='nav-text'>Units</div>
 				</div><?php }?>
 				<?php
-				$r = sqlsrv_query($NEI,"SELECT Violation.ID FROM Violation WHERE Violation.Job = ?",array($_GET['ID']));
+				$r = $database->query(null,"SELECT Violation.ID FROM Violation WHERE Violation.Job = ?",array($_GET['ID']));
 				if($r){
 					$Violation = sqlsrv_fetch_array($r)['ID'];
 					if($Violation && $Violation > 0){

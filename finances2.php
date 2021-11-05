@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 set_time_limit(1200);
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -18,7 +18,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -32,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Executive']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "finances.php"));
@@ -59,7 +59,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         <div class='panel-body'>
                           <table id="Table_Profit" class="display" cellspacing='0' width='100%' style='font-size:8px !important;'>
                             <?php
-                            $resource = sqlsrv_query($NEI,"
+                            $resource = $database->query(null,"
                               SELECT   Overhead_Cost.*
                               FROM     Portal.dbo.Overhead_Cost
                               ORDER BY Overhead_Cost.Type ASC
@@ -85,7 +85,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <td style='border:1px solid black;padding:3px;'>Revenue</td>
                                 <?php
                                 foreach($Overhead_Costs as $key=>$Overhead_Cost){?><td style='border:1px solid black;padding:3px;'><?php
-                                  $resource = sqlsrv_query($NEI,"
+                                  $resource = $database->query(null,"
                                     SELECT Sum(Invoice.Amount) AS Revenue
                                     FROM   nei.dbo.Invoice
                                          LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
@@ -101,7 +101,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <?php
                                 foreach($Overhead_Costs as $key=>$Overhead_Cost){?><td style='border:1px solid black;padding:3px;'><?php
                                   //var_dump($Overhead_Cost);
-                                  $resource = sqlsrv_query($NEI,"
+                                  $resource = $database->query(null,"
                                     SELECT Sum(JobI.Amount) AS Labor
                                     FROM   nei.dbo.Loc
                                          LEFT JOIN nei.dbo.Job  ON Loc.Loc = Job.Loc
@@ -113,7 +113,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                          AND JobI.fDate >= '2017-03-30 00:00:00.000'
                                   ;",array($Overhead_Cost['Start'],$Overhead_Cost['End']));
                                   $Overhead_Costs[$key]['Labor'] = sqlsrv_fetch_array($resource)['Labor'];
-                                  $resource = sqlsrv_query($NEI,"
+                                  $resource = $database->query(null,"
                                     SELECT SUM([JOBLABOR].[TOTAL COST]) AS Labor
                                     FROM   nei.dbo.Job as Job
                                          LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
@@ -140,7 +140,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <?php
                                 foreach($Overhead_Costs as $key=>$Overhead_Cost){?><td style='border:1px solid black;padding:3px;'><?php
                                   //var_dump($Overhead_Cost);
-                                  $resource = sqlsrv_query($NEI,"
+                                  $resource = $database->query(null,"
                                     SELECT Sum(JobI.Amount) AS Materials
                                     FROM   nei.dbo.Loc
                                          LEFT JOIN nei.dbo.Job  ON Loc.Loc = Job.Loc

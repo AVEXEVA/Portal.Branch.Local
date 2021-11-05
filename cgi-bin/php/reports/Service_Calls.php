@@ -3,11 +3,11 @@ session_start( [ 'read_and_close' => true ] );
 ini_set('memory_limit','512M');
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
     if(!isset($array['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
 				SELECT Tickets.ID        AS ID,
 					   Tickets.*,
 					   Loc.ID            AS Account,
@@ -79,5 +79,5 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         print json_encode(array('data'=>$data));
     }
 }
-sqlsrv_close($NEI);
+sqlsrv_close(null);
 ?>

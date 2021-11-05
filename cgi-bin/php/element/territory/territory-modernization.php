@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   nei.dbo.Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Portal.dbo.Privilege  
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  ){$Privilegd = True;}
     if(	!isset($My_Connection['ID']) || !$Privileged || !is_numeric($_GET['ID'])){?><?php require('../404.html');?><?php }
     else {
-		$r = sqlsrv_query($NEI,
+		$r = $database->query(null,
             "SELECT TOP 1
                     Terr.ID   AS Territory_ID,
 					Terr.Name AS Territory_Name

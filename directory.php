@@ -13,12 +13,12 @@ $conn = sqlsrv_connect($serverName, $connectionOptions);
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = addslashes($_SESSION['User']);
     $Hash = addslashes($_SESSION['Hash']);
-    $r = sqlsrv_query($conn,"SELECT * FROM Connection WHERE Connector='{$User}' AND Hash='{$Hash}'");
+    $r = $database->query($conn,"SELECT * FROM Connection WHERE Connector='{$User}' AND Hash='{$Hash}'");
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID='{$User}'");
+    $User = $database->query($conn,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID='{$User}'");
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
-    sqlsrv_query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "directory.php"));
+    $database->query($conn2,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "directory.php"));
     if(!isset($array['ID']) || $Field ){?><html><head><script>document.location.href='../login.php?Forward=directory.php';</script></head></html><?php }
     else {
 ?><!DOCTYPE html>

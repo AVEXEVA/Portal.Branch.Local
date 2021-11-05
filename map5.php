@@ -28,14 +28,14 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
   }
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,
+  $r = $database->query(null,
     "  SELECT *
        FROM   Connection
 	     WHERE  Connection.Connector = ?
 	            AND Connection.Hash  = ?
     ;",array($_SESSION['User'],$_SESSION['Hash']));
   $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-  $r = sqlsrv_query($NEI,
+  $r = $database->query(null,
     "SELECT *,
 	          Emp.fFirst AS First_Name,
 		        Emp.Last   AS Last_Name
@@ -43,7 +43,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
      WHERE  Emp.ID = ?
     ;",array($_SESSION['User']));
   $My_User = sqlsrv_fetch_array($r);
-  $r = sqlsrv_query($NEI,
+  $r = $database->query(null,
     " SELECT *
 	    FROM   Privilege
 	      WHERE  Privilege.User_ID = ?
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
   if(!isset($My_Connection['ID']) || !isset($My_Privileges['Map']) || $My_Privileges['Map']['User_Privilege']  < 4 || $My_Privileges['Map']['Group_Privilege'] < 4 || $My_Privileges['Map']['Other_Privilege'] < 4){require('../404.html');}
   else {
-  	sqlsrv_query($NEI,
+  	$database->query(null,
       "   INSERT INTO Activity([User], [Date], [Page])
   		     VALUES(?,?,?)
   	   ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "map.php"));?><!DOCTYPE html>
@@ -102,14 +102,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                       <div class='col-xs-1'><button onClick="codeAddress(prompt('What address would you like to center on?'));" style='width:100%;color:black;'>Center Address</button></div>
                       <div class='col-xs-2'><select name='Employee' style='color:black !important;' onChange='zoomUser(this);'>
                         <option value=''>Select User to Center</option>
-                        <?php $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
+                        <?php $r = $database->query(null,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
                         if($r){while($row = sqlsrv_fetch_array($r)){
                           ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Last'] . ', ' . $row['fFirst'];?></option><?php
                         }}?>
                       </select></div>
                       <div class='col-xs-2'><select name='Employee' style='color:black !important;' onChange='breadcrumbUser(this);'>
                         <option value=''>Select User to Breadcrumb</option>
-                        <?php $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
+                        <?php $r = $database->query(null,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
                         if($r){while($row = sqlsrv_fetch_array($r)){
                           ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Last'] . ', ' . $row['fFirst'];?></option><?php
                         }}?>
@@ -137,7 +137,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <div class='row'>
                       <div class='col-xs-1' style='background-color:white;color:black;' onClick='clearMarkers();'>&nbsp;</div>
                       <div class='col-xs-1' onClick='showDivision1();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -149,7 +149,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showDivision2();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -161,7 +161,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showDivision3();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -173,7 +173,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showDivision4();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -185,7 +185,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showModernization();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -197,7 +197,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showEscalator();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -209,7 +209,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showFiremen();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -221,7 +221,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showRepair();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -233,7 +233,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                       <div class='col-xs-1' onClick='showTesting();' style='background-color:white;color:black;border:1px solid black;'><?php
-                        $r = sqlsrv_query($NEI,
+                        $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
                                     LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -285,7 +285,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 
 <?php
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
       " SELECT  Top 1 *
         FROM    GPS
         WHERE   GPS.Employee_ID = ?

@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = sqlsrv_fetch_array($User);
 
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         && $Privileges['Location']['Group_Privilege'] >= 4 
         && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Count( Ticket.ID ) AS Count 
                 FROM    (
                             SELECT  Ticket.ID,
@@ -103,8 +103,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ||  !is_numeric( $_GET[ 'ID' ] ) ){
             /*?><html><head><script>document.location.href="https://beta.nouveauelevator.com/login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php*/ }
     else {
-        sqlsrv_query(
-            $NEI,
+        $database->query(
+            null,
             "   INSERT INTO Activity([User], [Date], [Page]) 
                 VALUES(?,?,?);",
             array(
@@ -113,8 +113,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 'location/information.php?ID=' . $_GET[ 'ID' ]
             )
         );
-        $r = sqlsrv_query(
-            $NEI,
+        $r = $database->query(
+            null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Location_Name,
@@ -248,8 +248,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-9'><?php
-                $r = sqlsrv_query(
-                    $NEI,
+                $r = $database->query(
+                    null,
                     "   SELECT  Count(Unit.ID) AS Count 
                         FROM    Elev AS Unit
                         WHERE   Unit.Loc = ?;", 
@@ -265,8 +265,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-9'><?php
-                $r = sqlsrv_query(
-                    $NEI,
+                $r = $database->query(
+                    null,
                     "   SELECT  Count(Job.ID) AS Count 
                         FROM    Job 
                         WHERE   Job.Loc = ?;",
@@ -282,8 +282,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-9'><?php
-                $r = sqlsrv_query(
-                    $NEI,
+                $r = $database->query(
+                    null,
                     "   SELECT  Count(ID) AS Count 
                         FROM    Violation 
                         WHERE   Violation.Loc = ?;",
@@ -299,8 +299,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-9'><?php
-                $r = sqlsrv_query(
-                    $NEI,
+                $r = $database->query(
+                    null,
                     "   SELECT  Count(Ticket.ID) AS Count
                         FROM    TicketO AS Ticket
                         WHERE   Ticket.LID = ?;",
@@ -333,7 +333,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-9'><?php 
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Estimate.ID) AS Count 
                     FROM   Estimate
                     WHERE  Estimate.LocID = ?
@@ -350,8 +350,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Collection</div>
             <div class='col-xs-9'><?php 
-                $r = sqlsrv_query(
-                    $NEI,
+                $r = $database->query(
+                    null,
                     "   SELECT  Count( OpenAR.Ref ) AS Count
                         FROM    OpenAR
                                 LEFT JOIN Invoice ON  OpenAR.Ref = Invoice.Ref

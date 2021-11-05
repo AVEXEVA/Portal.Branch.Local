@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT * 
         FROM   Connection 
         WHERE  Connection.Connector = ? 
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = sqlsrv_query($NEI,"
+    $My_User    = $database->query(null,"
         SELECT Emp.*, 
                Emp.fFirst AS First_Name, 
                Emp.Last   AS Last_Name 
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT Privilege.Access_Table, 
                Privilege.User_Privilege, 
                Privilege.Group_Privilege, 
@@ -36,7 +36,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT Terr.Name AS Territory,
 				   Sum(OpenAR.Balance) AS Total_Past_Due
             FROM   nei.dbo.OpenAR
@@ -50,7 +50,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $data = array();
         if($r){while($array = sqlsrv_fetch_array($r2,SQLSRV_FETCH_ASSOC)){
 			$Territory = $array;
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Maintenance_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -62,7 +62,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				       AND JobType.Type = 'Maintenance'
 			;",array($Territory['Territory']));
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Modernization_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -75,7 +75,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					   AND Job.Custom18 NOT LIKE '%loan%'
 			;",array($Territory['Territory']));
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Repair_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -87,7 +87,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				       AND JobType.Type = 'NEW REPAIR'
 			;",array($Territory['Territory']));
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Testing_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -99,7 +99,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				       AND JobType.Type = 'Annual'
 			;",array($Territory['Territory']));
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Violations_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -113,7 +113,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			
 			//XCalls
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS XCALL_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			elseif($Territory['Territory'] == 'Michael Hannan'){$Terr = 'MH';}
 			elseif($Territory['Territory'] == 'George Ziugzda'){$Terr = 'GWZ';}
 			else{$Terr = 'ASDF';}
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Lawsuits_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -149,7 +149,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
 			
 			//Other
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Other_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -163,7 +163,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			
 			//Billing Only
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Billing_Only_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
 			
 			//Loans
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Loans_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -192,7 +192,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			
 			
 			$date = date("Y-m-d",strtotime('-90 days'));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Ninety_Days_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -206,7 +206,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
 			
 			$date = date("Y-m-d",strtotime('-180 days'));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS One_Eighty_Days_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -220,7 +220,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
 			
 			$date = date("Y-m-d",strtotime('-365 days'));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Three_Sixty_Five_Days_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -234,7 +234,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
 			
 			$date = date("Y-m-d",strtotime('-730 days'));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Two_Years_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref
@@ -248,7 +248,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Territory = array_merge($Territory,sqlsrv_fetch_array($r));
 			
 			$date = date("Y-m-d",strtotime('-1095 days'));
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Sum(OpenAR.Balance) AS Three_Years_Past_Due 
 				FROM   nei.dbo.OpenAR
 					   LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref  = Invoice.Ref

@@ -1,9 +1,9 @@
 <?php
-$r = sqlsrv_query($NEI,"SELECT TicketO.* FROM nei.dbo.TicketO LEFT JOIN nei.dbo.Emp ON TicketO.fWork = Emp.fWork WHERE Emp.ID = ? AND TicketO.High = 1 AND TicketO.Assigned < 5 AND TicketO.ID NOT IN (SELECT Alert.Ticket FROM Portal.dbo.Alert);",array($_SESSION['User']));
+$r = $database->query(null,"SELECT TicketO.* FROM nei.dbo.TicketO LEFT JOIN nei.dbo.Emp ON TicketO.fWork = Emp.fWork WHERE Emp.ID = ? AND TicketO.High = 1 AND TicketO.Assigned < 5 AND TicketO.ID NOT IN (SELECT Alert.Ticket FROM Portal.dbo.Alert);",array($_SESSION['User']));
 if($r){
   $Tickets = array();
   while($row = sqlsrv_fetch_array($r)){
-    sqlsrv_query($NEI,"INSERT INTO Portal.dbo.Alert(Ticket) VALUES(?);",array($row['ID']));
+    $database->query(null,"INSERT INTO Portal.dbo.Alert(Ticket) VALUES(?);",array($row['ID']));
     $Tickets[] = $row;
   }
   if(count($Tickets) > 0){
@@ -44,7 +44,7 @@ $Dispatch_Users = array(673,925,223,767,1137,465,371,569,418,772,254,763,273,19,
 //$Dispatch_Users = array(673,925,250,895,223,767,1137,465,371,569,418,772,254,763,273,19,232,17,1011,987,773,472,480,133,881,183,225,906);
 //$Admin_Users = array(250,895);
 //if(!isset($Field)){$Field = True;}
-$Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
+$Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
 $Today = date('l');
 if($Today == 'Wednesday'){$Wednesday = date('m/d/Y');}
 elseif($Today == 'Thursday'){$Wednesday = date('m/d/Y', strtotime($Today . ' +6 days'));}
@@ -86,7 +86,7 @@ else {?>
             <?php if(isMobile()){?><span style='font-size:22px;'><?php }?>Nouveau Texas<?php if(isMobile()){?></span><?php }?>
         </a>
     </div>
-	<?php if(!isMobile() && !($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') && is_array($My_User)){?><div class='menu-container' style='background-color:#151515;color:white;'>
+	<?php if(!isMobile() && !($User['Field'] == 1 && $User['Title'] != 'OFFICE') && is_array($User)){?><div class='menu-container' style='background-color:#151515;color:white;'>
 		<div class='menu'>
 			<ul <?php if(!isMobile()){?>style='float:left;width:60%;'<?php }?>>
 				<li><a href="dashboard.php">Home</a></li>
@@ -94,60 +94,60 @@ else {?>
                     <ul>
                         <li><a href="main.php">Office</a>
                             <ul>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege'] >= 4){?><li><a href="customers.php"><?php Icons::getInstance( )->Customer();?> Customers</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privilege'] >= 4){?><li><a href="locations.php"><?php Icons::getInstance( )->Location();?> Locations</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Other_Privilege'] >= 4){?><li><a href="jobs.php"><?php Icons::getInstance( )->Job();?> Jobs</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Other_Privilege'] >= 4){?><li><a href="units.php"><?php Icons::getInstance( )->Unit();?> Units</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege'] >= 4){?><li><a href="customers.php"><?php Icons::getInstance( )->Customer();?> Customers</a></li><?php }?>
+                                <?php if(isset($Privileges['Location']) && $Privileges['Location']['Other_Privilege'] >= 4){?><li><a href="locations.php"><?php Icons::getInstance( )->Location();?> Locations</a></li><?php }?>
+                                <?php if(isset($Privileges['Job']) && $Privileges['Job']['Other_Privilege'] >= 4){?><li><a href="jobs.php"><?php Icons::getInstance( )->Job();?> Jobs</a></li><?php }?>
+                                <?php if(isset($Privileges['Unit']) && $Privileges['Unit']['Other_Privilege'] >= 4){?><li><a href="units.php"><?php Icons::getInstance( )->Unit();?> Units</a></li><?php }?>
                             </ul>
                         </li>
                         <li><a href="#">Accounting</a>
                             <ul>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="collections.php"><?php Icons::getInstance( )->Collection();?> Collections</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="invoices.php"><?php Icons::getInstance( )->Invoice();?> Invoices</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="collections.php"><?php Icons::getInstance( )->Collection();?> Collections</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="invoices.php"><?php Icons::getInstance( )->Invoice();?> Invoices</a></li><?php }?>
                             </ul>
                         </li>
                         <li><a href="#">Sales</a>
                             <ul>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="leads.php"><?php Icons::getInstance( )->Customer();?> Leads</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="proposals.php"><?php Icons::getInstance( )->Proposal();?> Proposals</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="contracts.php"><?php Icons::getInstance( )->Contract();?> Contracts</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="leads.php"><?php Icons::getInstance( )->Customer();?> Leads</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="proposals.php"><?php Icons::getInstance( )->Proposal();?> Proposals</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="contracts.php"><?php Icons::getInstance( )->Contract();?> Contracts</a></li><?php }?>
                             </ul>
                         </li>
                         <li><a href="#">Operations</a>
                             <ul>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="dispatch.php"><?php Icons::getInstance( )->Phone();?> Dispatch</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="tickets.php"><?php Icons::getInstance( )->Ticket();?> Tickets</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="violations.php"><?php Icons::getInstance( )->Violation();?> Violations</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href='routes.php'><?php Icons::getInstance( )->Route();?> <span class=''>Routes</span></a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="dispatch.php"><?php Icons::getInstance( )->Phone();?> Dispatch</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="tickets.php"><?php Icons::getInstance( )->Ticket();?> Tickets</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="violations.php"><?php Icons::getInstance( )->Violation();?> Violations</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href='routes.php'><?php Icons::getInstance( )->Route();?> <span class=''>Routes</span></a></li><?php }?>
                             </ul>
                         </li>
 						<li><a href="#">Warehouse</a>
                             <ul>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="rmas.php"><?php Icons::getInstance( )->Customer();?> RMAs</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="products.php"><?php Icons::getInstance( )->Customer();?> Products</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="product_types.php"><?php Icons::getInstance( )->Customer();?> Product Types</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="#"><?php Icons::getInstance( )->Customer();?> Items</a></li><?php }?>
-                                <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="requisitions.php"><?php Icons::getInstance( )->Customer();?> Requisitions</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="rmas.php"><?php Icons::getInstance( )->Customer();?> RMAs</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="products.php"><?php Icons::getInstance( )->Customer();?> Products</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="product_types.php"><?php Icons::getInstance( )->Customer();?> Product Types</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="#"><?php Icons::getInstance( )->Customer();?> Items</a></li><?php }?>
+                                <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="requisitions.php"><?php Icons::getInstance( )->Customer();?> Requisitions</a></li><?php }?>
                             </ul>
                         </li>
 						<li><a href="#">Purchasing</a>
                             <ul>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href='#'><?php Icons::getInstance( )->Customer();?> Purchase Orders</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href='#'><?php Icons::getInstance( )->Customer();?> Purchase Order Items</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href='#'><?php Icons::getInstance( )->Customer();?> Purchase Orders</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href='#'><?php Icons::getInstance( )->Customer();?> Purchase Order Items</a></li><?php }?>
                             </ul>
                         </li>
 						<li><a href="#">Other</a>
                             <ul>
-								<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['Other_Privilege']){?><li><a href='legal.php'><?php Icons::getInstance( )->Legal();?> <span class=''>Legal</span></a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="permits.php"><?php Icons::getInstance( )->Customer();?> Permits</a></li><?php }?>
-								<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege']){?><li><a href="insured_companies.php"><?php Icons::getInstance( )->Customer();?> Insurance</a></li><?php }?>
+								<?php if(isset($Privileges['Legal']) && $Privileges['Legal']['Other_Privilege']){?><li><a href='legal.php'><?php Icons::getInstance( )->Legal();?> <span class=''>Legal</span></a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="permits.php"><?php Icons::getInstance( )->Customer();?> Permits</a></li><?php }?>
+								<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Other_Privilege']){?><li><a href="insured_companies.php"><?php Icons::getInstance( )->Customer();?> Insurance</a></li><?php }?>
                             </ul>
                         </li>
-						<?php if(isset($My_Privileges['Admin'])){?><li><a href="#">Admin</a>
+						<?php if(isset($Privileges['Admin'])){?><li><a href="#">Admin</a>
                             <ul>
-								<?php if(isset($My_Privileges['Connection']) && $My_Privileges['Connection']['Other_Privilege']){?><li><a href='connections.php'><?php Icons::getInstance( )->Connection();?> <span class=''>Connections</span></a></li><?php }?>
-								<?php if(isset($My_Privileges['Privilege']) && $My_Privileges['Privilege']['Other_Privilege']){?><li><a href='privileges.php'><?php Icons::getInstance( )->Customer();?> <span class=''>Privileges</span></a></li><?php }?>
-								<?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Other_Privilege']){?><li><a href='users.php'><?php Icons::getInstance( )->Users();?> <span class=''>Users</span></a></li><?php }?>
+								<?php if(isset($Privileges['Connection']) && $Privileges['Connection']['Other_Privilege']){?><li><a href='connections.php'><?php Icons::getInstance( )->Connection();?> <span class=''>Connections</span></a></li><?php }?>
+								<?php if(isset($Privileges['Privilege']) && $Privileges['Privilege']['Other_Privilege']){?><li><a href='privileges.php'><?php Icons::getInstance( )->Customer();?> <span class=''>Privileges</span></a></li><?php }?>
+								<?php if(isset($Privileges['User']) && $Privileges['User']['Other_Privilege']){?><li><a href='users.php'><?php Icons::getInstance( )->Users();?> <span class=''>Users</span></a></li><?php }?>
                             </ul>
                         </li><?php }?>
                     </ul>
@@ -189,7 +189,7 @@ else {?>
 								<li><a href='time_sheet.php'><?php Icons::getInstance( )->Customer();?> <span class=''>Time Sheet</span></a></li>
                             </ul>
                         </li>
-						<?php if(isset($My_Privileges['Admin'])){?><li><a href="#">Admin</a>
+						<?php if(isset($Privileges['Admin'])){?><li><a href="#">Admin</a>
                             <ul>
 								<li><a href='birthdays.php'><?php Icons::getInstance( )->Birthday();?> <span class=''>Birthdays</span></a></li>
                             </ul>
@@ -198,13 +198,13 @@ else {?>
                 </li>
 				<li><a href="#">Other</a>
 					<ul>
-						<?php if(isset($My_Privileges['Admin'])){?><li><a href="#">Roles</a>
+						<?php if(isset($Privileges['Admin'])){?><li><a href="#">Roles</a>
 							<ul>
 								<li><a href="admin.php">Admin</a></li>
 								<li><a href="collector.php">Collector</a></li>
 							</ul>
 						</li><?php }?>
-						<?php if(isset($My_Privileges['Admin'])){?><li><a href="#">Company Overview</a>
+						<?php if(isset($Privileges['Admin'])){?><li><a href="#">Company Overview</a>
 							<ul>
 								<li><a href="overview.php">Company</a></li>
 								<li><a href="maintenance.php">Maintenance</a></li>
@@ -214,7 +214,7 @@ else {?>
 							</ul>
 						</li><?php }?>
 						<li><a href="map.php?Type=Live">Map</a></li>
-						<li><a href="user.php?ID=<?php echo $My_User['ID'];?>">Profile</a></li>
+						<li><a href="user.php?ID=<?php echo $User['ID'];?>">Profile</a></li>
 					</ul>
 				</li>
 				<li><a href="#">Options</a>

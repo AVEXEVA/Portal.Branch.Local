@@ -2,11 +2,11 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
     if(!isset($array['ID'],$_GET['ID']) || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT TicketO.ID        AS ID,
                    TicketO.fDesc     AS fDesc,
                    TicketO.CDate     AS CDate,
@@ -53,7 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;",array(&$_GET['ID']));
         $data = array();
         if($r){while($Ticket = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $Ticket;}}
-        $r1 = sqlsrv_query($NEI,"
+        $r1 = $database->query(null,"
             SELECT TicketD.ID        AS ID,
                    TicketD.fDesc     AS fDesc,
                    TicketD.CDate     AS CDate,
@@ -101,7 +101,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    AND TicketD.Level     = 1
         ;",array(&$_GET['ID']));
         if($r1){while($Ticket = sqlsrv_fetch_array($r1,SQLSRV_FETCH_ASSOC)){$data[] = $Ticket;}}
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT TicketDArchive.ID       AS ID,
                    TicketDArchive.fDesc    AS fDesc,
                    TicketDArchive.CDate    AS CDate,
@@ -150,5 +150,5 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         print json_encode(array('data'=>$data));   
     }
 }
-sqlsrv_close($NEI);
+sqlsrv_close(null);
 ?>

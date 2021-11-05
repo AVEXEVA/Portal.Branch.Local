@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	//Connection
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	"	SELECT 	* 
     		FROM 	Connection 
     		WHERE 		Connector = ? 
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result = sqlsrv_query(
-		$NEI,
+	$result = $database->query(
+		null,
 		"	SELECT 	*, 
 					fFirst AS First_Name, 
 					Last as Last_Name 
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	);
 	$User   = sqlsrv_fetch_array( $result );
 	//Privileges
-	$result = sqlsrv_query($NEI,
+	$result = $database->query(null,
 		" 	SELECT 	Privilege.*
 			FROM   	Privilege
 			WHERE  	Privilege.User_ID = ?;",
@@ -52,8 +52,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     	|| !$Privileged 
     ){ ?><html><head><script>document.location.href="../login.php?Forward=customer<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-    	sqlsrv_query(
-    		$NEI,
+    	$database->query(
+    		null,
     		"	INSERT INTO Activity( [User], [Date], [Page] ) VALUES( ?, ?, ? );",
     		array(
     			$_SESSION['User'],
@@ -61,8 +61,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     			"customer.php"
     		)
     	);
-        $result = sqlsrv_query(
-        	$NEI,
+        $result = $database->query(
+        	null,
             "	SELECT 	Customer.*                    
             	FROM    (
             				SELECT 	Owner.ID    AS ID,
@@ -105,7 +105,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-8'><?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Elev.ID) AS Count_of_Elevators
 					FROM   Elev
 						   LEFT JOIN Loc ON Elev.Loc = Loc.Loc
@@ -116,7 +116,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-8'>&nbsp;
 				<?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Job.ID) AS Count_of_Jobs
 					FROM   Job
 						   LEFT JOIN Loc ON Job.Loc = Loc.Loc
@@ -127,7 +127,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-8'>&nbsp;
 			<?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Violation.ID) AS Count_of_Violations
 					FROM   Violation
 						   LEFT JOIN Loc ON Violation.Loc = Loc.Loc
@@ -138,7 +138,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-8'>
 			<?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Tickets.ID) AS Count_of_Tickets
 					FROM   (
 								(
@@ -168,7 +168,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-8'>
 				<?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Estimate.ID) AS Count_of_Estimates
 					FROM   Estimate
 						   LEFT JOIN Loc ON Estimate.LocID = Loc.Loc
@@ -179,7 +179,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Invoices</div>
             <div class='col-xs-8'>
 				<?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Invoice.Ref) AS Count_of_Invoices
 					FROM   Invoice
 						   LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
@@ -190,7 +190,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Legal(1);?> Lawsuits</div>
             <div class='col-xs-8'>
 				<?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Count(Job.ID) AS Count_of_Lawsuits
 					FROM   Job
 						   LEFT JOIN Loc ON Job.Loc = Loc.Loc
@@ -205,7 +205,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Balance</div>
             <div class='col-xs-8'><?php
-				$r = sqlsrv_query($NEI,"
+				$r = $database->query(null,"
 					SELECT Sum(OpenAR.Balance) AS Balance
 					FROM   OpenAR
 						   LEFT JOIN Loc ON OpenAR.Loc = Loc.Loc

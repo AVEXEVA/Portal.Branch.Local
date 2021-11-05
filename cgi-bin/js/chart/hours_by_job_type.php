@@ -6,7 +6,7 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 	$data = array();
 	$data2 = array();
 	$data3 = array();
-	$job_result = sqlsrv_query($NEI,"
+	$job_result = $database->query(null,"
 		SELECT JobType.Type AS Job_Type, 
 			   TicketD.Total AS Total, 
 			   TicketD.EDate AS Dated

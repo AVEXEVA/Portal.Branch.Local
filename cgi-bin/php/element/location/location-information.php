@@ -3,12 +3,12 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../../cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    $My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($My_User);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ?
@@ -18,17 +18,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Privileged = FALSE;
     if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  $NEI,"
+        $r = $database->query(  null,"
         SELECT  *
         FROM    TicketO
         WHERE   TicketO.LID='{$_GET['ID']}'
                 AND fWork='{$My_User['fWork']}'");
-        $r2 = sqlsrv_query( $NEI,"
+        $r2 = $database->query( null,"
         SELECT  *
         FROM    TicketD
         WHERE   TicketD.Loc='{$_GET['ID']}'
                 AND fWork='{$My_User['fWork']}'");
-        $r3 = sqlsrv_query( $NEI,"
+        $r3 = $database->query( null,"
         SELECT  *
         FROM    TicketDArchive
         WHERE   TicketDArchive.Loc='{$_GET['ID']}'
@@ -38,10 +38,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $r3 = sqlsrv_fetch_array($r3);
         $Privileged = (is_array($r) || is_array($r2) || is_array($r3)) ? TRUE : FALSE;
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Location_Name,
@@ -91,7 +91,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			}
 			else { $end = 30;}
 			$End_Date = date('Y-m') . "-" . $end . " 23:59:59.999";
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 			SELECT Tickets.*,
 				   Loc.ID                      AS Customer,
 				   Loc.Tag                     AS Location,
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			}
 
 		}
-		$row_count = sqlsrv_query($NEI,"
+		$row_count = $database->query(null,"
 					SELECT Count(Tickets.ID) AS Open_Tickets
 					FROM (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '0' ) AS Tickets
 
@@ -185,7 +185,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		",array($_GET['ID']));
 		//echo $r ? number_format(sqlsrv_fetch_array($row_count)['Open_Tickets']) : 0;
 
-		$row_count2 =  sqlsrv_query($NEI,"
+		$row_count2 =  $database->query(null,"
                     SELECT Count(Tickets.ID) AS Open_Tickets
                     FROM   (
                                 (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '0' )
@@ -195,7 +195,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		//echo $r ? number_format(sqlsrv_fetch_array($row_count2)['Open_Tickets']) : 0;
 			   $open_tickets = number_format(sqlsrv_fetch_array($row_count2)['Open_Tickets']);
 
-		$row_count3 =  sqlsrv_query($NEI,"
+		$row_count3 =  $database->query(null,"
                     SELECT Count(Tickets.ID) AS Assigned_Tickets
                     FROM   (
                                 (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '1')
@@ -204,7 +204,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		//echo $r ? number_format(sqlsrv_fetch_array($row_count3)['Assigned_Tickets']) : 0;
 				$assigned_tickets =  number_format(sqlsrv_fetch_array($row_count3)['Assigned_Tickets']);
 
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
                     SELECT Tickets, Count(*) AS Count_of_Tickets
                     FROM   TicketO
                      GROUP BY TicketO.fWork
@@ -254,22 +254,22 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Elevators FROM Elev WHERE Loc='{$_GET['ID']}';");
+                $r = $database->query(null,"SELECT Count(ID) AS Count_of_Elevators FROM Elev WHERE Loc='{$_GET['ID']}';");
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Elevators']) : 0;
             ?></div>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Jobs FROM Job WHERE Loc='{$_GET['ID']}' ;");
+                $r = $database->query(null,"SELECT Count(ID) AS Count_of_Jobs FROM Job WHERE Loc='{$_GET['ID']}' ;");
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
             ?></div>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Jobs FROM Violation WHERE Loc='{$_GET['ID']}';");
+                $r = $database->query(null,"SELECT Count(ID) AS Count_of_Jobs FROM Violation WHERE Loc='{$_GET['ID']}';");
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
             ?></div>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Tickets.ID) AS Count_of_Tickets
                     FROM   (
                                 (SELECT ID FROM TicketO WHERE TicketO.LID = ?)
@@ -283,7 +283,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Estimate.ID) AS Count_of_Tickets
                     FROM   Estimate
                     WHERE  Estimate.LocID = ?
@@ -293,7 +293,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other'] >= 4){?>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?>Collections</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(Ref) AS Count_of_Invoices
                     FROM   OpenAR
                     WHERE  Loc='{$_GET['ID']}' AND Invoice.Status = 1;
@@ -303,7 +303,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal'] >=4 ) {?>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Legal(1);?> Lawsuits</div>
             <div class='col-xs-8'><?php
-                $r = sqlsrv_query($NEI,"
+                $r = $database->query(null,"
                     SELECT Count(ID) AS Count_of_Legal_Jobs
                     FROM   Job
                     WHERE  Job.Loc = ?

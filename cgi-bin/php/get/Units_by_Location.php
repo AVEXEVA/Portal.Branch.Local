@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $Connection = sqlsrv_query(
-    	$NEI,
+    $Connection = $database->query(
+    	null,
     	"	SELECT *
 			FROM   Connection
 			WHERE  Connection.Connector = ?
@@ -16,8 +16,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
     $Connection = sqlsrv_fetch_array($Connection);
-	$User    = sqlsrv_query(
-		$NEI,
+	$User    = $database->query(
+		null,
 		"	SELECT 	Emp.*,
 			   		Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
@@ -25,8 +25,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			WHERE  	Emp.ID = ?
 	;", array($_SESSION['User']));
 	$User = sqlsrv_fetch_array( $User );
-	$r = sqlsrv_query(
-		$NEI,
+	$r = $database->query(
+		null,
 		"	SELECT Privilege.Access_Table,
 				   Privilege.User_Privilege,
 				   Privilege.Group_Privilege,
@@ -49,8 +49,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		&& $Privileges[ 'Location' ][ 'Group_Privilege' ] >= 4
 		&& is_numeric( $_GET[ 'Location' ] ) ){
 			$Location_ID = $_GET[ 'Location' ];
-			$r = sqlsrv_query(
-				$NEI,
+			$r = $database->query(
+				null,
 				"	SELECT Tickets.ID
 					FROM
 					(
@@ -83,7 +83,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		&& $Privileges['Location']['User_Privilege'] >= 4
 		&& is_numeric($_GET['ID'])){
 			$Location_ID = $_GET['ID'];
-			$r = sqlsrv_query($NEI,"
+			$r = $database->query(null,"
 				SELECT Tickets.ID
 				FROM
 				(
@@ -117,7 +117,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     	?><html><head><script>document.location.href="../login.php?Forward=forbidden.php";?>";</script></head></html><?php }
   	else {
 		$data = array();
-		$r = sqlsrv_query($NEI,
+		$r = $database->query(null,
 			"	SELECT 	Elev.ID     AS ID,
 					   	Elev.State  AS State,
 					   	Elev.Unit   AS Unit,
@@ -136,8 +136,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		$data = array();
 		if( $r ){ while( $array = sqlsrv_fetch_array( $r, SQLSRV_FETCH_ASSOC ) ){
 			$Unit = $array;
-			$r2 = sqlsrv_query(
-				$NEI,
+			$r2 = $database->query(
+				null,
 				"	SELECT 	*
 					FROM   	ElevTItem
 					WHERE  	ElevTItem.ElevT    = 1
@@ -147,8 +147,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 				)
 			);
 			if( $r2 ){ while( $array2 = sqlsrv_fetch_array( $r2, SQLSRV_FETCH_ASSOC ) ){ $Unit[ $array2[ 'fDesc' ] ] = $array2[ 'Value' ]; } }
-			$r3 = sqlsrv_query(
-				$NEI,
+			$r3 = $database->query(
+				null,
 				"	SELECT *
 					FROM   ElevTItem
 					WHERE  ElevTItem.ElevT    = 1

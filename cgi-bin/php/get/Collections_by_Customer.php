@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  * 
             FROM    Connection 
             WHERE       Connector = ? 
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *, 
                     fFirst AS First_Name, 
                     Last as Last_Name 
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $User   = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
         "   SELECT  Privilege.*
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -52,8 +52,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         || !$Privileged 
     ){ print json_encode( array( 'data' => array( ) ) ); }
     else {
-        $result = sqlsrv_query(
-            $NEI,
+        $result = $database->query(
+            null,
             "   SELECT OpenAR.Ref      AS  Invoice,
                        OpenAR.fDate    AS  Dated,
                        OpenAR.Due      AS  Due,

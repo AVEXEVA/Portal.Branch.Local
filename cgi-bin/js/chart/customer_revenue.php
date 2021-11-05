@@ -3,7 +3,7 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 var customer_revenue_data = [
 	<?php 
 	$data = array();
-	$job_result = sqlsrv_query($NEI,"
+	$job_result = $database->query(null,"
 		SELECT Job.ID AS ID
 		FROM   Job 
 		WHERE  Job.Owner = ?
@@ -14,7 +14,7 @@ var customer_revenue_data = [
 		$totals = array();
 		while($array = sqlsrv_fetch_array($job_result)){$Jobs[] = "[JOBLABOR].[JOB #]='{$array['ID']}'";}
 		$Jobs = implode(" OR ",$Jobs);
-		$invoice_result = sqlsrv_query($NEI,"
+		$invoice_result = $database->query(null,"
 			SELECT Invoice.Amount AS Amount,
 				   Invoice.fDate  AS fDate
 			FROM   nei.dbo.Invoice

@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Time']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "review.php"));
@@ -53,7 +53,7 @@ else {
     foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
     $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 }
-$r = sqlsrv_query($NEI,"
+$r = $database->query(null,"
 	SELECT Emp.*,
 	       tblWork.Super
 	FROM   Emp
@@ -264,41 +264,41 @@ if($r){
                                         <td class='First_Name'><?php echo $Mechanic['fFirst'];?></td>
                                         <td class='Thursday'><?php
                                             $Thursday = date('Y-m-d',strtotime($_GET['Date'] . ' -6 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Thursday . " 00:00:00.000' AND [Start] <= '" . $Thursday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Thursday . " 00:00:00.000' AND [Start] <= '" . $Thursday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Friday'><?php
                                             $Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Friday . " 00:00:00.000' AND [Start] <= '" . $Friday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Friday . " 00:00:00.000' AND [Start] <= '" . $Friday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Saturday'><?php
                                             $Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Saturday . " 00:00:00.000' AND [Start] <= '" . $Saturday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Saturday . " 00:00:00.000' AND [Start] <= '" . $Saturday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Sunday'><?php
                                             $Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Sunday . " 00:00:00.000' AND [Start] <= '" . $Sunday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Sunday . " 00:00:00.000' AND [Start] <= '" . $Sunday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Monday'><?php
                                             $Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Monday . " 00:00:00.000' AND [Start] <= '" . $Monday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Monday . " 00:00:00.000' AND [Start] <= '" . $Monday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Tuesday'><?php
                                             $Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Tuesday . " 00:00:00.000' AND [Start] <= '" . $Tuesday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Tuesday . " 00:00:00.000' AND [Start] <= '" . $Tuesday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Wednesday'><?php
                                             $Wednesday = date('Y-m-d',strtotime($_GET['Date']));
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Wednesday . " 00:00:00.000' AND [Start] <= '" . $Wednesday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Wednesday . " 00:00:00.000' AND [Start] <= '" . $Wednesday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $array = sqlsrv_fetch_array($r);
                                             echo (strtotime($array['End']) - strtotime($array['Start'])) / (60 * 60);?></td>
                                         <td class='Total'><?php
-                                            $r = sqlsrv_query($NEI,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Thursday . " 00:00:00.000' AND [Start] <= '" . $Wednesday . " 23:59:59.999' AND [End] IS NOT NULL;");
+                                            $r = $database->query(null,"SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE [User]='" . $Mechanic['ID'] . "' and [Start] >= '" . $Thursday . " 00:00:00.000' AND [Start] <= '" . $Wednesday . " 23:59:59.999' AND [End] IS NOT NULL;");
                                             $total = 0;
                                             if($r){while($row = sqlsrv_fetch_array($r)){
                                                 $total += (strtotime($row['End']) - strtotime($row['Start'])) / (60 * 60);

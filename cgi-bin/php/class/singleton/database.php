@@ -1,6 +1,7 @@
 <?php
 namespace singleton;
 class database extends \singleton\index {
+	private $default = 'Demo';
 	private $resources = array( );
 	private $databases = array(
 		'Portal',
@@ -26,7 +27,7 @@ class database extends \singleton\index {
 	    'TraceOn' 				=> 	false
 	);
 	protected function __construct( ){
-		if( is_array( $this->databases ) && count( $this->databases > 0 ) ){
+		if( is_array( $this->databases ) && count( $this->databases ) > 0 ){
 			foreach( $this->databases as $database ){
 				if( is_string( $database ) && strlen( $database ) > 0 ){
 					$options = $this->options;
@@ -36,13 +37,17 @@ class database extends \singleton\index {
 			}	
 		}
 	}
-	public function query( $database, $query, $parameters ){
-		return in_array( $database, array_keys( $this->resources ) ) 
-			? 	sqlsrv_query(
-					$this->resources[ $database ],
+	public function query( $database, $query, $parameters = array( ) ){
+		return is_null ( $database ) || in_array( $database, array_keys( $this->resources ) )
+			?	sqlsrv_query(
+					$this->resources[ $this->default ],
 					$query,
 					$parameters
 				)
-			: 	false;
+			: 	sqlsrv_query(
+					$this->resources[ $database ],
+					$query,
+					$parameters
+				);
 	}
 }?>

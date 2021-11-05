@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = sqlsrv_fetch_array($User);
 
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         && $Privileges['Unit']['Group_Privilege'] >= 4 
         && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Count( Ticket.Count ) AS Count 
                 FROM    (
                             SELECT  Ticket.Unit,
@@ -97,7 +97,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         ||  !is_numeric( $_GET[ 'ID' ] ) ){
             ?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
           " SELECT  TOP 1
                     Elev.ID,
                     Elev.Unit           AS Building_ID,
@@ -144,7 +144,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         $Unit = sqlsrv_fetch_array($r);
         $unit = $Unit;
         $data = $Unit;
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT *
             FROM   ElevTItem
             WHERE  ElevTItem.ElevT    = 1
@@ -154,8 +154,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         ?><div class="panel panel-primary">
 			<div class='row' style='border-bottom:3px;padding-top:10px;padding-bottom:10px;color:white !important;'>
 				<?php
-					$result = sqlsrv_query(
-						$NEI,
+					$result = $database->query(
+						null,
 						"	SELECT 	Sum(Tickets.Regular)	AS Regular,
 							   		Sum(Tickets.Overtime) 	AS Overtime,
 									Sum(Tickets.Doubletime) AS Doubletime,

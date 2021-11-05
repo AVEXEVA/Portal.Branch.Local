@@ -2,12 +2,12 @@
 session_start( [ 'read_and_close' => true ] );
 require('../../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -26,7 +26,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 sqlsrv_fetch($queryID);
                 return sqlsrv_get_field($queryID, 0);
             }
-            $r = sqlsrv_query($Portal,"
+            $r = $database->query($Portal,"
                 SELECT *
                 FROM Modernization 
                 WHERE 
@@ -40,7 +40,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             else {$_POST['Returned'] = "1900-01-01";}
             if(!is_null($Modernization)){
                 $Modernization = $Modernization['ID'];
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     UPDATE Modernization 
                     SET 
                         Modernization.Supervisor = ?,
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         Modernization.ID = ?
                 ",array($_POST['Supervisor'],$_POST['Removed'],$_POST['Returned'],$_POST['EBN'],$_POST['Budget_Hours'],$Modernization));
             } else {
-                $r = sqlsrv_query($Portal,"
+                $r = $database->query($Portal,"
                     INSERT INTO Modernization(Supervisor, Date_Removed, Actual_Return, EBN, Budget_Hours, Job, Unit)
                     VALUES('{$_POST['Supervisor']}','{$_POST['Removed']}','{$_POST['Returned']}','{$_POST['EBN']}','{$_POST['Budget_Hours']}','{$_POST['Job']}','{$_POST['Unit']}');
                      SELECT SCOPE_IDENTITY();
@@ -61,7 +61,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
             //echo 'here';
             $Timestamp = date("Y-m-d H:i:s");
-            $r = sqlsrv_query($Portal,"
+            $r = $database->query($Portal,"
                     INSERT INTO Mod_Tracker(Modernization,Status,Author,Time_Stamp) 
                     VALUES('{$Modernization}','{$_POST['Status']}','{$_SESSION['User']}','{$Timestamp}')
                 ;");
@@ -70,7 +70,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <tr><td style='text-align:right;'>Ongoing Mods:</td>
         <td>&nbsp;</td>
         <td><?php
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Count(Job.ID) AS Counter
             FROM Job
             WHERE 
@@ -85,7 +85,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <tr><td style='text-align:right;'>Mods Started This Year:</td>
         <td>&nbsp;</td>
         <td><?php
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Count(Job.ID) AS Counter
             FROM Job
             WHERE 
@@ -100,7 +100,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <tr><td style='text-align:right;'>Mods Returned To Service This Year:</td>
         <td>&nbsp;</td>
         <td><?php
-        /*$r = sqlsrv_query($Portal,"
+        /*$r = $database->query($Portal,"
             SELECT Count(Modernization.ID) AS Counter
             FROM Job
             WHERE 
@@ -109,7 +109,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;");
         $Counter = sqlsrv_fetch_array($r)['Counter'];*/
         $Counter = 0;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT
                MAX(Mod_Tracker.Time_Stamp) AS Time_Stamp
             FROM
@@ -119,7 +119,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;");
         if($r){
             while($array = sqlsrv_fetch_array($r)){
-                $r2 = sqlsrv_query($Portal,"
+                $r2 = $database->query($Portal,"
                     SELECT Mod_Tracker.Status AS Status
                     FROM Mod_Tracker 
                     WHERE Mod_Tracker.Time_Stamp = '{$array['Time_Stamp']}'

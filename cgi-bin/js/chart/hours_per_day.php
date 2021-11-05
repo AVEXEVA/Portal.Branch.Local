@@ -1,7 +1,7 @@
 <script>
 function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 var data1 = [
-	<?php $r = sqlsrv_query($NEI,"
+	<?php $r = $database->query(null,"
 		SELECT TicketD.ID,
 			   TicketD.EDate,
 			   TicketD.Total 

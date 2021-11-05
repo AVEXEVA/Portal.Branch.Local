@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",
     	array(
     		$_SESSION[ 'User' ],
@@ -14,16 +14,16 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     	)
     );
     $Connection = sqlsrv_fetch_array($result);
-    $User = sqlsrv_query(
-    	$NEI,
+    $User = $database->query(
+    	null,
     	"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",
     	array(
     		$_SESSION[ 'User' ]
     	)
     );
     $User = sqlsrv_fetch_array($User);
-    $result = sqlsrv_query(
-    	$NEI,
+    $result = $database->query(
+    	null,
     	"	SELECT 	  Access_Table,
         			    User_Privilege,
         			    Group_Privilege,
@@ -43,8 +43,8 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         && $Privileges[ 'Location' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
     elseif($Privileges[ 'Location' ][ 'User_Privilege' ] >= 4
         && is_numeric($_GET[ 'ID' ])){
-        $result = sqlsrv_query(
-        	$NEI,
+        $result = $database->query(
+        	null,
         	"	SELECT Tickets.*
 				FROM
 				(
@@ -74,8 +74,8 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         $result = sqlsrv_fetch_array($result);
         $Privileged = is_array($result) ? TRUE : FALSE;
     }
-    sqlsrv_query(
-      $NEI,
+    $database->query(
+      null,
       "   INSERT INTO Activity([User], [Date], [Page])
           VALUES(?,?,?);",
     array(
@@ -86,7 +86,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     if(!isset($Connection[ 'ID' ])  || !$Privileged){
       /*?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php */ }
     else {
-        $result = sqlsrv_query($NEI,"SELECT TOP 1
+        $result = $database->query(null,"SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Name,
                     Loc.Tag              AS Tag,
@@ -207,8 +207,8 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							<div class ='nav-text'>Proposals</div>
 					</div><?php }?>
 					<?php
-						$result = sqlsrv_query(
-						    $NEI,
+						$result = $database->query(
+						    null,
 						    " 	SELECT 	Count(Route.ID) AS Counter
 								FROM	Route
 										LEFT JOIN Emp ON Route.Mech = Emp.fWork

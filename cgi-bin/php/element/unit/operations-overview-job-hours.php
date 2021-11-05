@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Connection
-    $Connection = sqlsrv_query(
-        $NEI,
+    $Connection = $database->query(
+        null,
         "   SELECT  Connection.* 
             FROM    Connection 
             WHERE   Connection.Connector = ? 
@@ -19,8 +19,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst  AS First_Name, 
                     Emp.Last    AS Last_Name 
@@ -33,8 +33,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = sqlsrv_fetch_array($User);
 
     //Privileges
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -53,8 +53,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         && $Privileges['Unit']['Group_Privilege'] >= 4 
         && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = sqlsrv_query(  
-            $NEI,
+        $r = $database->query(  
+            null,
             "   SELECT  Count( Ticket.Count ) AS Count 
                 FROM    (
                             SELECT  Ticket.Unit,
@@ -97,7 +97,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         ||  !is_numeric( $_GET[ 'ID' ] ) ){
             ?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
           " SELECT  TOP 1
                     Elev.ID,
                     Elev.Unit           AS Building_ID,
@@ -144,7 +144,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         $Unit = sqlsrv_fetch_array($r);
         $unit = $Unit;
         $data = $Unit;
-        $r2 = sqlsrv_query($NEI,"
+        $r2 = $database->query(null,"
             SELECT *
             FROM   ElevTItem
             WHERE  ElevTItem.ElevT    = 1
@@ -200,7 +200,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Monday'){$Thursday = date('Y-m-d', strtotime($Date . ' -4 days'));}
 		elseif($Today == 'Tuesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -5 days'));}
 		elseif($Today == 'Wednesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -6 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) as Summed 
 			FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID 
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
@@ -215,7 +215,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Tuesday'){$Friday = date('Y-m-d', strtotime($Date . ' -4 days'));}
 		elseif($Today == 'Wednesday'){$Friday = date('Y-m-d', strtotime($Date . ' -5 days'));}
 		elseif($Today == 'Thursday'){$Friday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) AS Summed 
 			FROM TicketD
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
@@ -230,7 +230,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Wednesday'){$Saturday = date('Y-m-d', strtotime($Date . ' -4 days'));}
 		elseif($Today == 'Thursday'){$Saturday = date('Y-m-d', strtotime($Date . ' +2 days'));}
 		elseif($Today == 'Friday'){$Saturday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) AS Summed
 			FROM TicketD
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
@@ -245,7 +245,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Thursday'){$Sunday = date('Y-m-d', strtotime($Date . ' +3 days'));}
 		elseif($Today == 'Friday'){$Sunday = date('Y-m-d', strtotime($Date . ' +2 days'));}
 		elseif($Today == 'Saturday'){$Sunday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) AS Summed 
 			FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID 
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
@@ -260,7 +260,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Friday'){$Monday = date('Y-m-d', strtotime($Date . ' +3 days'));}
 		elseif($Today == 'Saturday'){$Monday = date('Y-m-d', strtotime($Date . ' +2 days'));}
 		elseif($Today == 'Sunday'){$Monday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) AS Summed
 			FROM TicketD
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
@@ -275,7 +275,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Saturday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +3 days'));}
 		elseif($Today == 'Sunday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +2 days'));}
 		elseif($Today == 'Monday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) AS Summed
 			FROM TicketD
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
@@ -290,7 +290,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		elseif($Today == 'Sunday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +3 days'));}
 		elseif($Today == 'Monday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +2 days'));}
 		elseif($Today == 'Tuesday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +1 days'));}
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Sum(Total) AS Summed
 			FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID
 			WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
@@ -298,7 +298,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<td><?php
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 	</tr>
@@ -309,42 +309,42 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		?></td>
 		<?php 
 		$Thursday = date('Y-m-d',strtotime($Thursday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
 		<td class='Thursday' rel='<?php echo $Thursday;?>' onClick="refresh_this(this);"><?php 
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<?php $Friday = date('Y-m-d',strtotime($Friday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
 		<td class='Friday' rel='<?php echo $Friday;?>' onClick="refresh_this(this);"><?php 
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<?php $Saturday = date('Y-m-d',strtotime($Saturday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
 		<td class='Saturday' rel='<?php echo $Saturday;?>' onClick="refresh_this(this);"><?php 
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<?php $Sunday = date('Y-m-d',strtotime($Sunday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
 		<td class='Sunday' rel='<?php echo $Sunday;?>' onClick="refresh_this(this);"><?php 
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<?php $Monday = date('Y-m-d',strtotime($Monday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
 		<td class='Monday' rel='<?php echo $Monday;?>' onClick="refresh_this(this);"><?php 
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<?php $Tuesday = date('Y-m-d',strtotime($Tuesday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
 		<td class='Tuesday' rel='<?php echo $Tuesday;?>' onClick="refresh_this(this);"><?php 
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<?php $Wednesday = date('Y-m-d',strtotime($Wednesday . '-7 days'));
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
 		<td class='Wednesday' rel='<?php echo $Wednesday;?>' onClick="refresh_this(this);"><?php
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 		<td><?php
-			$r = sqlsrv_query($NEI,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
+			$r = $database->query(null,"SELECT Sum(Total) AS Summed FROM TicketD LEFT JOIN Job ON TicketD.Job = Job.ID WHERE TicketD.Elev='" . $_GET['ID'] . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
 			echo sqlsrv_fetch_array($r)['Summed'];
 		?></td>
 	</tr><?php }?>

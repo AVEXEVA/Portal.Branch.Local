@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
             FROM        Connection
             WHERE       Connection.Connector = ?
@@ -17,8 +17,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *,
                     Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -30,8 +30,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -48,8 +48,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         || $Privileges[ 'Violation' ][ 'Other_Privilege' ] < 4){
                 ?><?php require( '../404.html' );?><?php }
     else {
-        sqlsrv_query(
-          $NEI,
+        $database->query(
+          null,
           "   INSERT INTO Activity([User], [Date], [Page])
               VALUES( ?, ?, ? );",
           array(
@@ -72,7 +72,7 @@ if(isset($_POST) && Count($_POST) > 0 ){
 	$val = implode(',',$values);
 	$parameters = array_values($_POST);
 	//var_dump($_POST);
-	sqlsrv_query($connection,
+	$database->query($connection,
   "INSERT INTO Portal.dbo.Inspection(Company, [Date], Mechanic, License_Number, Start_Time, End_Time, Building_Address, Inspected_By, Elevator_Number, Device_Number, Category1, Category5, Signed, Violation_Elevator_Part1, Violation_Elevator_Part2, Violation_Elevator_Part3, Violation_Elevator_Part4, Violation_Elevator_Part5, Violation_Elevator_Part6, Violation_Elevator_Part7, Violation_Elevator_Part8, Violation_Elevator_Part9, Violation_Elevator_Part10, Violation_Condition1, Violation_Condition2, Violation_Condition3, Violation_Condition4, Violation_Condition5, Violation_Condition6, Violation_Condition7, Violation_Condition8, Violation_Condition9, Violation_Condition10, Violation_Suggested_Remedy1, Violation_Suggested_Remedy2, Violation_Suggested_Remedy3, Violation_Suggested_Remedy4, Violation_Suggested_Remedy5, Violation_Suggested_Remedy6, Violation_Suggested_Remedy7, Violation_Suggested_Remedy8, Violation_Suggested_Remedy9, Violation_Suggested_Remedy10, Pass, Fail, Retest, Pictures, Inspection_d, Code_Data_Plate, Controller, Machine, Speed, Last_Category1_Tag, Last_Category5_Tag, Comments, Runby, Normal_Up, Normal_down, Final_Up, Final_down, Car_Oil_Buffers, Cwt_Oil_Buffers, Governor_Switch, Plank_Switch, Slack_Rope_Switch, Governor_Cal, Maintenance_Elevator_Part1, Maintenance_Elevator_Part2, Maintenance_Elevator_Part3, Maintenance_Elevator_Part4, Maintenance_Elevator_Part5, Maintenance_Elevator_Part6, Maintenance_Elevator_Part7, Maintenance_Elevator_Part8, Maintenance_Elevator_Part9, Maintenance_Elevator_Part10, Maintenance_Condition1, Maintenance_Condition2, Maintenance_Condition3, Maintenance_Condition4, Maintenance_Condition5, Maintenance_Condition6, Maintenance_Condition7, Maintenance_Condition8, Maintenance_Condition9, Maintenance_Condition10, Maintenance_Suggested_Remedy1, Maintenance_Suggested_Remedy2, Maintenance_Suggested_Remedy3, Maintenance_Suggested_Remedy4, Maintenance_Suggested_Remedy5, Maintenance_Suggested_Remedy6, Maintenance_Suggested_Remedy7, Maintenance_Suggested_Remedy8, Maintenance_Suggested_Remedy9, Maintenance_Suggested_Remedy10, Run_Pressure, Work_Pressure, Relief_Pressure, Notes, Car_Safety_Set, Car_Slip_Traction, Car_Stall, Cwt_Safety_Test, Cwt_Slip_Traction, Cwt_Stall, Date_Form_Received, Directors_Initals, Directors_Changes, Date_ELV3_Created, Invoice_Number, Date_Invoice_Created, Retest_Notes, Retest_Billed, Retest_Dates) VALUES(?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
   array($_POST[ 'Company' ], $_POST['Date'], $_POST['Mechanic'], $_POST['License_Number'], $_POST['Start_Time'], $_POST['End_Time'], $_POST['Building_Address'], $_POST['Inspected_By'], $_POST['Elevator_Number'], $_POST['Device_Number'], $_POST['Category1'], $_POST['Category5'], $_POST['Signed'], $_POST['Violation_Elevator_Part1'], $_POST['Violation_Elevator_Part2'], $_POST['Violation_Elevator_Part3'], $_POST['Violation_Elevator_Part4'], $_POST['Violation_Elevator_Part5'], $_POST['Violation_Elevator_Part6'], $_POST['Violation_Elevator_Part7'], $_POST['Violation_Elevator_Part8'], $_POST['Violation_Elevator_Part9'], $_POST['Violation_Elevator_Part10'], $_POST['Violation_Condition1'], $_POST['Violation_Condition2'], $_POST['Violation_Condition3'], $_POST['Violation_Condition4'], $_POST['Violation_Condition5'], $_POST['Violation_Condition6'], $_POST['Violation_Condition7'], $_POST['Violation_Condition8'], $_POST['Violation_Condition9'], $_POST['Violation_Condition10'], $_POST['Violation_Suggested_Remedy1'], $_POST['Violation_Suggested_Remedy2'], $_POST['Violation_Suggested_Remedy3'], $_POST['Violation_Suggested_Remedy4'], $_POST['Violation_Suggested_Remedy5'], $_POST['Violation_Suggested_Remedy6'], $_POST['Violation_Suggested_Remedy7'], $_POST['Violation_Suggested_Remedy8'], $_POST['Violation_Suggested_Remedy9'], $_POST['Violation_Suggested_Remedy10'], $_POST['Pass'], $_POST['Fail'], $_POST['Retest'], $_POST['Pictures'], $_POST['Inspection'], $_POST['Code_Data_Plate'], $_POST['Controller'], $_POST['Machine'], $_POST['Speed'], $_POST['Last_Category1_Tag'], $_POST['Last_Category5_Tag'], $_POST['Comments'], $_POST['Runby'], $_POST['Normal_Up'], $_POST['Normal_down'], $_POST['Final_Up'], $_POST['Final_down'], $_POST['Car_Oil_Buffers'], $_POST['Cwt_Oil_Buffers'], $_POST['Governor_Switch'], $_POST['Plank_Switch'], $_POST['Slack_Rope_Switch'], $_POST['Governor_Cal'], $_POST['Maintenance_Elevator_Part1'], $_POST['Maintenance_Elevator_Part2'], $_POST['Maintenance_Elevator_Part3'], $_POST['Maintenance_Elevator_Part4'], $_POST['Maintenance_Elevator_Part5'], $_POST['Maintenance_Elevator_Part6'], $_POST['Maintenance_Elevator_Part7'], $_POST['Maintenance_Elevator_Part8'], $_POST['Maintenance_Elevator_Part9'], $_POST['Maintenance_Elevator_Part10'], $_POST['Maintenance_Condition1'], $_POST['Maintenance_Condition2'], $_POST['Maintenance_Condition3'], $_POST['Maintenance_Condition4'], $_POST['Maintenance_Condition5'], $_POST['Maintenance_Condition6'], $_POST['Maintenance_Condition7'], $_POST['Maintenance_Condition8'], $_POST['Maintenance_Condition9'], $_POST['Maintenance_Condition10'], $_POST['Maintenance_Suggested_Remedy1'], $_POST['Maintenance_Suggested_Remedy2'], $_POST['Maintenance_Suggested_Remedy3'], $_POST['Maintenance_Suggested_Remedy4'], $_POST['Maintenance_Suggested_Remedy5'], $_POST['Maintenance_Suggested_Remedy6'], $_POST['Maintenance_Suggested_Remedy7'], $_POST['Maintenance_Suggested_Remedy8'], $_POST['Maintenance_Suggested_Remedy9'], $_POST['Maintenance_Suggested_Remedy10'], $_POST['Run_Pressure'], $_POST['Work_Pressure'], $_POST['Relief_Pressure'], $_POST['Notes'], $_POST['Car_Safety_Set'], $_POST['Car_Slip_Traction'], $_POST['Car_Stall'], $_POST['Cwt_Safety_Test'], $_POST['Cwt_Slip_Traction'], $_POST['Cwt_Stall'], $_POST['Date_Form_Received'], $_POST['Directors_Initals'], $_POST['Directors_Changes'], $_POST['Date_ELV3_Created'], $_POST['Invoice_Number'], $_POST['Date_Invoice_Created'], $_POST['Retest_Notes'], $_POST['Retest_Billed'], $_POST['Retest_Dates']));
 }
@@ -84,7 +84,7 @@ if(isset($_POST) && Count($_POST) > 0 ){
   }
  }*/
  /***************************************************Commands***********************************************************/
- $result = sqlsrv_query($connection, "
+ $result = $database->query($connection, "
  	Select Inspection.*
  	From Portal.dbo.Inspection
  	Where Inspection.ID=?;",array($_GET['ID']));

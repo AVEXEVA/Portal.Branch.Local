@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Executive']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "maintenance.php"));
@@ -82,7 +82,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <?php
                                         $data = array();
                                         $data2 = array();
-                                        $job_result = sqlsrv_query($NEI,"
+                                        $job_result = $database->query(null,"
                                             SELECT 
                                                 Loc.Zone            AS Division, 
                                                 Sum(TicketD.Reg)    AS Regular_Time, 
@@ -176,7 +176,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <?php
                                         $data = array();
                                         $data2 = array();
-                                        $job_result = sqlsrv_query($NEI,"
+                                        $job_result = $database->query(null,"
                                             SELECT 
                                                 Loc.Zone            AS Division, 
                                                 Sum(TicketD.Reg)    AS Regular_Time, 
@@ -274,7 +274,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <?php
                                         $data = array();
                                         $data2 = array();
-                                        $job_result = sqlsrv_query($NEI,"
+                                        $job_result = $database->query(null,"
                                             SELECT 
                                                 Loc.Zone            AS Division, 
                                                 Sum(TicketD.Reg * PRWage.Reg)    AS Regular_Time, 
@@ -373,7 +373,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <?php
                                         $data = array();
                                         $data2 = array();
-                                        $job_result = sqlsrv_query($NEI,"
+                                        $job_result = $database->query(null,"
                                             SELECT 
                                                 Loc.Zone            AS Division, 
                                                 Sum(TicketD.Reg * PRWage.Reg)    AS Regular_Time, 
@@ -487,7 +487,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             <tr>
                                                 <td><b>Revenue</b></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_2012
                                                         FROM 
                                                             (Invoice
@@ -499,7 +499,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_2012);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_2013
                                                         FROM 
                                                             (Invoice
@@ -511,7 +511,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_2013);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_2014
                                                         FROM 
                                                             (Invoice
@@ -523,7 +523,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_2014);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_2015
                                                         FROM 
                                                             (Invoice
@@ -535,7 +535,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_2015);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_2016
                                                         FROM 
                                                             (Invoice
@@ -547,7 +547,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_2016);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_2017
                                                         FROM 
                                                             (Invoice
@@ -559,7 +559,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_2017);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_3_Year
                                                         FROM 
                                                             (Invoice
@@ -571,7 +571,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Revenue_3_Year);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT Sum(Invoice.Amount) AS Total_Revenue_5_Year
                                                         FROM 
                                                             (Invoice
@@ -586,7 +586,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             <tr>
                                                 <td><b>Labor</b></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2012
                                                         FROM 
@@ -599,7 +599,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_2012 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2012'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2012
                                                         FROM 
@@ -614,7 +614,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_2012);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2013
                                                         FROM 
@@ -627,7 +627,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_2013 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2013'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2013
                                                         FROM 
@@ -642,7 +642,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_2013);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2014
                                                         FROM 
@@ -655,7 +655,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_2014 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2014'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2014
                                                         FROM 
@@ -670,7 +670,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_2014);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2015
                                                         FROM 
@@ -683,7 +683,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_2015 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2015'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2015
                                                         FROM 
@@ -698,7 +698,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_2015);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2016
                                                         FROM 
@@ -711,7 +711,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_2016 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2016'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2016
                                                         FROM 
@@ -726,7 +726,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_2016);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2017
                                                         FROM 
@@ -740,7 +740,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     ;");
                                                     
                                                     $Temp_Labor_2017 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2017'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2017
                                                         FROM 
@@ -752,7 +752,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Total_Labor_2017 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2017'] : 0;
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_2017
                                                         FROM 
@@ -768,7 +768,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_2017);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_3_Year
                                                         FROM 
@@ -781,7 +781,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_3_Year
                                                         FROM 
@@ -793,7 +793,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Total_Labor_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : 0;
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_3_Year
                                                         FROM 
@@ -809,7 +809,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Labor_3_Year);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_5_Year
                                                         FROM 
@@ -822,7 +822,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Temp_Labor_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_5_Year'] : 0;
-                                                    $r = sqlsrv_query($Paradox,"
+                                                    $r = $database->query($Paradox,"
                                                         SELECT 
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_5_Year
                                                         FROM 
@@ -834,7 +834,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                             AND Job.Type = '0'
                                                     ;");
                                                     $Total_Labor_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_5_Year'] : 0;
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Labor_5_Year
                                                         FROM 
@@ -853,7 +853,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             <tr style='border-bottom:1px solid black;'>
                                                 <td><b>Materials</b></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_2012
                                                         FROM 
@@ -869,7 +869,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_2012);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_2013
                                                         FROM 
@@ -885,7 +885,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_2013);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_2014
                                                         FROM 
@@ -901,7 +901,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_2014);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_2015
                                                         FROM 
@@ -917,7 +917,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_2015);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_2016
                                                         FROM 
@@ -933,7 +933,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_2016);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_2017
                                                         FROM 
@@ -949,7 +949,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_2017);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_3_Year
                                                         FROM 
@@ -965,7 +965,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     echo money_format('%(n',$Total_Materials_3_Year);
                                                 ?></td>
                                                 <td><?php 
-                                                    $r = sqlsrv_query($NEI,"
+                                                    $r = $database->query(null,"
                                                         SELECT 
                                                             Sum(JobI.Amount) AS Total_Materials_5_Year
                                                         FROM 

@@ -1,6 +1,6 @@
 <script type="text/javascript">
     <?php 
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT OpenAR.*
             FROM 
                 OpenAR

@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	//Connection
-    $result = sqlsrv_query(
-    	$NEI, 
+    $result = $database->query(
+    	null, 
     	"	SELECT 	* 
     		FROM 	Connection 
     		WHERE 		Connector = ? 
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result = sqlsrv_query(
-		$NEI,
+	$result = $database->query(
+		null,
 		"	SELECT 	*, 
 					fFirst AS First_Name, 
 					Last as Last_Name 
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	);
 	$User   = sqlsrv_fetch_array( $result );
 	//Privileges
-	$result = sqlsrv_query($NEI,
+	$result = $database->query(null,
 		" 	SELECT 	Privilege.*
 			FROM   	Privilege
 			WHERE  	Privilege.User_ID = ?;",
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     	|| !$Privileged 
     ){ print json_encode( array( 'data' => array( ) ) ); }
     else {
-		$r = sqlsrv_query($NEI,"
+		$r = $database->query(null,"
 			SELECT Elev.ID     AS ID,
 				   Elev.State  AS State, 
 				   Elev.Unit   AS Unit,
@@ -67,14 +67,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$data = array();
 		if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
 			$Unit = $array;
-			$r2 = sqlsrv_query($NEI,"
+			$r2 = $database->query(null,"
 				SELECT *
 				FROM   ElevTItem
 				WHERE  ElevTItem.ElevT    = 1
 					   AND ElevTItem.Elev = ?
 			;",array($Unit['ID']));
 			if($r2){while($array2 = sqlsrv_fetch_array($r2,SQLSRV_FETCH_ASSOC)){$Unit[$array2['fDesc']] = $array2['Value'];}}
-			$r3 = sqlsrv_query($NEI,"
+			$r3 = $database->query(null,"
 				SELECT *
 				FROM   ElevTItem
 				WHERE  ElevTItem.ElevT    = 1

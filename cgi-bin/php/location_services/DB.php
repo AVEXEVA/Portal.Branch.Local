@@ -16,13 +16,13 @@ class DB{
 		$sql="select mobile,imei from imei_mobile_numbers where isActive = 1 and isDeleted = 0 and imei = ?";
 		$params = array($imei);
 	  $conn=$this->connect_db();
-		$query = sqlsrv_query($conn,$sql,$params);
+		$query = $database->query($conn,$sql,$params);
 
 		if($query){
 			$results = sqlsrv_fetch_array($query);
 			if($results){
 				$sql1="select gps_update_interval,gps_fastest_interval,app_version_code,app_update_url from  configuration where isActive = 1 and isDeleted = 0";
-        $query1 = sqlsrv_query($conn, $sql1);
+        $query1 = $database->query($conn, $sql1);
 			  $results1 = sqlsrv_fetch_array($query1);
 				if($results1){
 					$results1['imei']=$results['imei'];

@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,7 +25,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         else {$_POST['Submitted'] = "1900-01-01";}
         if(strlen($_POST['Returned']) > 0){$_POST['Returned'] = substr($_POST['Returned'],6,4) . '-' . substr($_POST['Returned'],0,2) . '-' . substr($_POST['Returned'],3,2);}
         else {$_POST['Returned'] = "1900-01-01";}
-        sqlsrv_query($Portal,"
+        $database->query($Portal,"
             UPDATE Mod_Correspondence
             SET 
                 Mod_Correspondence.Recipient = ?,

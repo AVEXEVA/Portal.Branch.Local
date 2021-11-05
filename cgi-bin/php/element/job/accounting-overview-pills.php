@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-    	$My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    	$My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($My_User);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -19,9 +19,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && $My_Privileges['Job']['Group_Privilege'] >= 4 && $My_Privileges['Job']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif($My_Privileges['Job']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-            $r = sqlsrv_query(  $NEI,"SELECT * FROM nei.dbo.TicketO WHERE TicketO.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
-            $r2 = sqlsrv_query( $NEI,"SELECT * FROM nei.dbo.TicketD WHERE TicketD.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
-            $r3 = sqlsrv_query( $NEI,"SELECT * FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
+            $r = $database->query(  null,"SELECT * FROM nei.dbo.TicketO WHERE TicketO.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
+            $r2 = $database->query( null,"SELECT * FROM nei.dbo.TicketD WHERE TicketD.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
+            $r3 = $database->query( null,"SELECT * FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
             $r = sqlsrv_fetch_array($r);
             $r2 = sqlsrv_fetch_array($r2);
 			$r3 = sqlsrv_fetch_array($r3);
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //
     if(!isset($array['ID'])  || !is_numeric($_GET['ID']) || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=job<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                 Job.ID                AS Job_ID,
                 Job.fDesc             AS Job_Name,
@@ -107,7 +107,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														<div class="col-xs-9 text-right">
 															<div class="col-xs-9 text-right">
 															<div class="medium"><?php
-																$r = sqlsrv_query($NEI,"
+																$r = $database->query(null,"
 																	SELECT Sum(Balance) AS Count_of_Outstanding_Invoices
 																	FROM   nei.dbo.OpenAR
 																	       LEFT JOIN nei.dbo.Invoice ON OpenAR.Ref = Invoice.Ref
@@ -131,7 +131,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														<div class="col-xs-9 text-right">
 															<div class="col-xs-9 text-right">
 															<div class="medium"><?php
-																$r = sqlsrv_query($NEI,"
+																$r = $database->query(null,"
 																	SELECT Sum(Amount) AS Count_of_Outstanding_Invoices
 																	FROM   Invoice
 																	WHERE  Invoice.Job = ?
@@ -155,14 +155,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														<div class="col-xs-9 text-right">
 															<div class="col-xs-9 text-right">
 															<div class="medium"><?php
-																$r = sqlsrv_query($NEI,"
+																$r = $database->query(null,"
 																	SELECT Sum([JOBLABOR].[TOTAL COST]) AS Labor
 																	FROM   Paradox.dbo.JOBLABOR
 																		   LEFT JOIN nei.dbo.Job ON cast(Job.ID as varchar(15)) = JOBLABOR.[JOB #]
 																	WHERE  Job.ID = ?
 																;",array($_GET['ID']));
 																$Labor = $r ? sqlsrv_fetch_array($r)['Labor'] : 0;
-																$r = sqlsrv_query($NEI,"
+																$r = $database->query(null,"
 																	SELECT   Sum(JobI.Amount) AS Amount
 																	FROM     nei.dbo.JobI
 																			 LEFT JOIN nei.dbo.Job ON JobI.Job = Job.ID
@@ -189,7 +189,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														<div class="col-xs-9 text-right">
 															<div class="col-xs-9 text-right">
 															<div class="medium"><?php
-																$r = sqlsrv_query($NEI,"
+																$r = $database->query(null,"
 																	SELECT   Sum(JobI.Amount) AS Amount
 																	FROM     nei.dbo.JobI
 																			 LEFT JOIN nei.dbo.Job ON JobI.Job = Job.ID

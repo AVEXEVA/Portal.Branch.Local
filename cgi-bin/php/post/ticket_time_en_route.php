@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Illinois'){
-        sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
-        $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
+        $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -21,10 +21,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     if(!isset($array['ID'], $_POST['ID'])  || !$Privileged || !is_numeric($_POST['ID'])){?><html><head></head></html><?php }
     else {
-      $r = sqlsrv_query($NEI,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM TicketO LEFT JOIN Emp ON Emp.fWork = TicketO.fWork WHERE TicketO.ID = ? AND Emp.ID = ?;",array($_POST['ID'],$_SESSION['User']));
       if($r && is_array(sqlsrv_fetch_array($r))){
         function roundToQuarterHour($minutes) {$round = 15;return round($minutes / $round) * $round;}
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
           " SELECT  Tickets.*
             FROM    ((
                         SELECT  TicketO.TimeComp
@@ -58,7 +58,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $En_Route = $Ticket['TimeComp'];
           }
         }
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
           " SELECT  Attendance.*
             FROM    Attendance
             WHERE   Attendance.[Start] IS NOT NULL
@@ -91,9 +91,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $En_Route2 = date("Y-m-d {$hours}:{$minutes}:00.000");
 
         if(isset($En_Route)){
-          sqlsrv_query($NEI,"UPDATE TicketO SET TicketO.TimeRoute = ?, TicketO.Assigned = 2, TicketO.EDate = ? WHERE TicketO.ID = ?;",array($En_Route,$En_Route2,$_POST['ID']));
-          //sqlsrv_query($NEI,"INSERT INTO Portal.dbo.Ticket(ID, TimeRoute) VALUES(?, ?);",array($_POST['ID'],$En_Route2));
-          /*sqlsrv_query($Portal_44,
+          $database->query(null,"UPDATE TicketO SET TicketO.TimeRoute = ?, TicketO.Assigned = 2, TicketO.EDate = ? WHERE TicketO.ID = ?;",array($En_Route,$En_Route2,$_POST['ID']));
+          //$database->query(null,"INSERT INTO Portal.dbo.Ticket(ID, TimeRoute) VALUES(?, ?);",array($_POST['ID'],$En_Route2));
+          /*$database->query($Portal_44,
             " INSERT INTO Portal.dbo.Timeline(Entity, [Entity_ID], [Action], Time_Stamp)
               VALUES(?, ?, ?, ?)
             ;",array('Ticket', $_POST['ID'], 'Accepted Work', date("Y-m-d H:i:s")));*/

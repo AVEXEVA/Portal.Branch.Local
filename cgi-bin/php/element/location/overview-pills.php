@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('../../../../cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-    	$My_User = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
+    	$My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($My_User); 
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -19,9 +19,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Privileged = FALSE;
         if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
         elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-            $r = sqlsrv_query(  $NEI,"SELECT * FROM nei.dbo.TicketO WHERE TicketO.LID='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
-            $r2 = sqlsrv_query( $NEI,"SELECT * FROM nei.dbo.TicketD WHERE TicketD.Loc='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
-            $r3 = sqlsrv_query( $NEI,"SELECT * FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Loc='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
+            $r = $database->query(  null,"SELECT * FROM nei.dbo.TicketO WHERE TicketO.LID='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
+            $r2 = $database->query( null,"SELECT * FROM nei.dbo.TicketD WHERE TicketD.Loc='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
+            $r3 = $database->query( null,"SELECT * FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Loc='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
             $r = sqlsrv_fetch_array($r);
             $r2 = sqlsrv_fetch_array($r2);
 			$r3 = sqlsrv_fetch_array($r3);
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //
     if(!isset($array['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){?><?php require('../../../401.html');?><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT TOP 1
                     Loc.Loc              AS Location_ID,
                     Loc.ID               AS Name,
@@ -147,7 +147,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Elevators FROM Elev WHERE Loc='{$_GET['ID']}';");
+														$r = $database->query(null,"SELECT Count(ID) AS Count_of_Elevators FROM Elev WHERE Loc='{$_GET['ID']}';");
 														echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Elevators']) : 0;
 													?></div>
 													<div>Units</div></div>
@@ -166,7 +166,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Jobs FROM Job WHERE Loc='{$_GET['ID']}';");
+														$r = $database->query(null,"SELECT Count(ID) AS Count_of_Jobs FROM Job WHERE Loc='{$_GET['ID']}';");
 														echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;?>
 													</div>
 													<div>Jobs</div></div>
@@ -185,7 +185,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"SELECT Count(ID) AS Count_of_Jobs FROM Violation WHERE Loc='{$_GET['ID']}';");
+														$r = $database->query(null,"SELECT Count(ID) AS Count_of_Jobs FROM Violation WHERE Loc='{$_GET['ID']}';");
 														echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;?>
 													</div>
 													<div>Violations</div></div>
@@ -204,7 +204,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Tickets.ID) AS Count_of_Tickets 
 															FROM   (
 																		(SELECT ID FROM TicketO WHERE TicketO.LID = ?)
@@ -232,7 +232,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Estimate.ID) AS Count_of_Tickets 
 															FROM   nei.dbo.Estimate
 															WHERE  Estimate.LocID = ?
@@ -255,7 +255,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(Ref) AS Count_of_Invoices 
 															FROM   nei.dbo.Invoice 
 															WHERE  Loc='{$_GET['ID']}';
@@ -278,7 +278,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(ID) AS Count_of_Outstanding_Invoices 
 															FROM   Job
 															WHERE  Job.Loc = ?
@@ -303,7 +303,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-9 text-right">
 													<div class="col-xs-9 text-right">
 													<div class="medium"><?php 
-														$r = sqlsrv_query($NEI,"
+														$r = $database->query(null,"
 															SELECT Count(TransID) AS Count_of_Outstanding_Invoices 
 															FROM   OpenAR
 															WHERE  Loc = ?

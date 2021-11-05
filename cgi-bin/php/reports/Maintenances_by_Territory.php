@@ -2,9 +2,9 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($Portal,"
+    $r = $database->query($Portal,"
         SELECT User_Privilege, Group_Privilege, Other_Privilege
         FROM   Portal.dbo.Privilege
         WHERE User_ID = ? AND Access_Table='Job'
@@ -15,7 +15,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $data = array();
         if($My_Privileges['User_Privilege'] >= 4 && $My_Privileges['Group_Privilege'] >= 4 && $My_Privileges['Other_Privilege'] >= 4){
             $Tickets = array();
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                     SELECT   Elev.ID AS ID
                     FROM     nei.dbo.TicketO 
                              LEFT JOIN nei.dbo.Elev ON  TicketO.LElev = Elev.ID
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $sql = array();
             foreach($data2 as $key=>$variable){$sql[] = "Elev.ID = '{$variable['ID']}'";}
             $sql = implode(" OR ",$sql);
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                     SELECT   Max(TicketD.EDate) AS Last_Date,
                              Elev.ID          	AS ID
                     FROM     nei.dbo.TicketD 
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     }
                 }
             }
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT Elev.ID         			   AS ID,
                        Elev.State      			   AS State, 
                        Elev.Unit       			   AS Unit,

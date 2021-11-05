@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 			   AND Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = sqlsrv_query($NEI,"
+	$My_User    = $database->query(null,"
 		SELECT Emp.*, 
 			   Emp.fFirst AS First_Name, 
 			   Emp.Last   AS Last_Name 
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	;", array($_SESSION['User']));
 	$My_User = sqlsrv_fetch_array($My_User); 
 	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = sqlsrv_query($Portal,"
+	$r = $database->query($Portal,"
 		SELECT Privilege.Access_Table, 
 			   Privilege.User_Privilege, 
 			   Privilege.Group_Privilege, 
@@ -37,7 +37,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){?><html><head><script>document.location.href="../login.php?Forward=job<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
 		$data = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT 
                 TicketO.ID        AS ID,
                 TicketO.fDesc     AS fDesc,
@@ -86,7 +86,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 Master_Account.Master = '{$_GET['ID']}'
         ;");
         if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketD.ID        AS ID,
                 TicketD.fDesc     AS fDesc,
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 AND TicketD.Total > 0
         ;");
         if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketDArchive.ID       AS ID,
                 TicketDArchive.fDesc    AS fDesc,

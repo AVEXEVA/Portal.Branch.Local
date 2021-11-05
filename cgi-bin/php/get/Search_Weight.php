@@ -2,9 +2,9 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $SQL_Result_Privileges = sqlsrv_query($Portal,"
+    $SQL_Result_Privileges = $database->query($Portal,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE User_ID='{$_SESSION['User']}'
@@ -25,7 +25,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Location_State = "Loc.State LIKE '%" . str_replace(" ","%' OR Loc.State LIKE '%",$Keyword) . "%'";
             $Location_Zip = "Loc.Zip LIKE '%" . str_replace(" ","%' OR Loc.Zip LIKE '%",$Keyword) . "%'";
             if($My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){
-                /*$SQL_Result_Locations = sqlsrv_query($NEI,"
+                /*$SQL_Result_Locations = $database->query(null,"
                     SELECT DISTINCT
                         Loc     AS ID,
                         'Location'  AS Object,
@@ -55,7 +55,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         ) AS t
                     GROUP BY [Loc]
                 ;");*/
-                $SQL_Result_Locations = sqlsrv_query($NEI,"
+                $SQL_Result_Locations = $database->query(null,"
                     SELECT 
                         ftt.RANK as Description,
                         Loc.Loc     as ID,
@@ -73,7 +73,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             } else {
                 $SQL_Locations = array();
                 if($My_Privileges['Location']['Group_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT 
                             LID                 AS Location
                         FROM 
@@ -84,7 +84,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     ;");
                     
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT 
                             Loc                 AS Location
                         FROM 
@@ -97,7 +97,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
                 }
                 if($My_Privileges['Location']['User_Privilege'] >= 4){
-                    $r = sqlsrv_query($NEI,"
+                    $r = $database->query(null,"
                         SELECT Loc.Loc          AS Location
                         FROM 
                             (Loc
@@ -111,7 +111,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 $SQL_Locations = array_unique($SQL_Locations);
                 if(count($SQL_Locations) > 0){
                     $SQL_Locations = implode(' OR ',$SQL_Locations);
-                    $SQL_Result_Locations = sqlsrv_query($NEI,"
+                    $SQL_Result_Locations = $database->query(null,"
                         SELECT DISTINCT
                             Loc.Loc     AS ID,
                             'Location'  AS Object,

@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,9 +25,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($array['ID']) || !$Privileged){require('401.html');}
     else {
       if(isset($_POST) && count($_POST) > 0){
-        $r = sqlsrv_query($NEI,"SELECT Max(ID) AS ID FROM nei.dbo.Unavailable;");
+        $r = $database->query(null,"SELECT Max(ID) AS ID FROM nei.dbo.Unavailable;");
         $ID = sqlsrv_fetch_array($r)['ID'] + 1;
-        $r = sqlsrv_query($NEI,"INSERT INTO nei.dbo.Unavailable(ID, fDate, Worker, fDesc, AllDay, StartTime, EndTime, Remarks) VALUES(?, ?, ?, ?, ?, ?, ?, ?);",array($ID, $_POST['fDate'], $_POST['fWork'], $_POST['fDesc'], $_POST['AllDay'], date("H:i",strtotime($_POST['StartTime'])), date("H:i",strtotime($_POST['EndTime'])), $_POST['Remarks']));
+        $r = $database->query(null,"INSERT INTO nei.dbo.Unavailable(ID, fDate, Worker, fDesc, AllDay, StartTime, EndTime, Remarks) VALUES(?, ?, ?, ?, ?, ?, ?, ?);",array($ID, $_POST['fDate'], $_POST['fWork'], $_POST['fDesc'], $_POST['AllDay'], date("H:i",strtotime($_POST['StartTime'])), date("H:i",strtotime($_POST['EndTime'])), $_POST['Remarks']));
         if( ($errors = sqlsrv_errors() ) != null) {
         foreach( $errors as $error ) {
             echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
@@ -36,7 +36,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         }
     }
       }
-		sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "attendance2.php"));
+		$database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "attendance2.php"));
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -82,7 +82,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 <div class='col-xs-12'>End: <input name='End'  value='<?php echo isset($_GET['End']) ? $_GET['End'] : '';?>'   /></div>
                 <div class='col-xs-12'><input type='submit' value='Search' /></div>-->
                 <div class='col-xs-12'>Supervisor: <select name='Supervisor'><?php
-                  $r = sqlsrv_query($NEI,"SELECT tblWork.Super FROM nei.dbo.tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
+                  $r = $database->query(null,"SELECT tblWork.Super FROM nei.dbo.tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
                   if($r){while($row = sqlsrv_fetch_array($r)){
                     ?><option value='<?php echo $row['Super'];?>' <?php if(isset($_GET['Supervisor']) && $_GET['Supervisor'] == $row['Super']){?>selected<?php }?>><?php echo $row['Super'];?></option><?php
                   }}
@@ -120,7 +120,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                   if(isset($_GET['Supervisor'])  && strlen($_GET['Supervisor']) > 0) {
                     //$_GET['Start'] = date('Y-m-d H:i:s',strtotime($_GET['Start']));
                     //$_GET['End'] = date('Y-m-d H:i:s',strtotime($_GET['End']));
-                    $r = sqlsrv_query($Portal,"
+                    $r = $database->query($Portal,"
                       SELECT Emp.ID AS ID,
                              Emp.fWork AS fWork,
                              Emp.fFirst,
@@ -134,7 +134,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                   } else {
                     $_GET['Start'] = date('Y-m-d H:i:s',strtotime($_GET['Start']));
                     $_GET['End'] = date('Y-m-d H:i:s',strtotime($_GET['End']));
-                    $r = sqlsrv_query($Portal,"
+                    $r = $database->query($Portal,"
                       SELECT Top 25 Emp.ID AS ID,
                              Emp.fWork AS fWork,
                              Emp.fFirst,
@@ -146,7 +146,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                   $data = array();
                   $sQuery = "SELECT Attendance.[Start], Attendance.[End] FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? ORDER BY Attendance.[ID] DESC;";
                   if($r){while($row = sqlsrv_fetch_array($r)){
-                    $r2 = sqlsrv_query($Portal, $sQuery, array($row['ID']));
+                    $r2 = $database->query($Portal, $sQuery, array($row['ID']));
                     if($r2){
                       $row2 = sqlsrv_fetch_array($r2);
                       $row2 = is_array($row2) ? $row2 : array('Start'=>'1899-12-30 00:00:00.000', 'End'=>'1899-12-30 00:00:00.000');
@@ -170,7 +170,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $i2 = $i + 1;
                         $tomorrow = date("Y-m-{$i2} 00:00:00.000");
                       }
-                      $r = sqlsrv_query($NEI,"SELECT Top 1 * FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? AND Attendance.[Start] >= ? AND Attendance.[Start] < ? AND (Attendance.[End] < ? OR Attendance.[End] IS NULL) ORDER BY Attendance.ID DESC;",array($user['ID'],$today, $tomorrow, $tomorrow, $tomorrow));
+                      $r = $database->query(null,"SELECT Top 1 * FROM Portal.dbo.Attendance WHERE Attendance.[User] = ? AND Attendance.[Start] >= ? AND Attendance.[Start] < ? AND (Attendance.[End] < ? OR Attendance.[End] IS NULL) ORDER BY Attendance.ID DESC;",array($user['ID'],$today, $tomorrow, $tomorrow, $tomorrow));
                       if($r){$row = sqlsrv_fetch_array($r);}
                       if(is_array($row)){
                         if(isset($row['End']) && !is_null($row['End']) && date("N",strtotime($today)) >= 6){
@@ -181,7 +181,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                           $color = 'yellow';
                         }
                       } else {
-                        $r = sqlsrv_query($NEI,"SELECT Top 1 * FROM nei.dbo.Unavailable WHERE Unavailable.Worker = ? AND Unavailable.fDate >= ? AND Unavailable.fDate < ?",array($user['fWork'], $today, $tomorrow));
+                        $r = $database->query(null,"SELECT Top 1 * FROM nei.dbo.Unavailable WHERE Unavailable.Worker = ? AND Unavailable.fDate >= ? AND Unavailable.fDate < ?",array($user['fWork'], $today, $tomorrow));
                         if($r){$row = sqlsrv_fetch_array($r);}
                         if(is_array($row)){
                           $color = 'red';

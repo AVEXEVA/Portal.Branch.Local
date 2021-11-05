@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT * 
 		FROM   Connection 
 		WHERE  Connection.Connector = ? 
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT * 
 		FROM   Privilege 
 		WHERE  Privilege.User_ID = ?
@@ -31,13 +31,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Job']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "rma.php"));
         if(count($_POST) > 0){
         	if(isset($_POST['Name']) && !isset($_POST['Address'])){
-            	sqlsrv_query($Portal,"INSERT INTO RMA(Name, Date, Address, RMA, Recieved, Returned, Tracking, PO, Link, Description, Status) VALUES(?,?,?,?,?,?,?)",array($_POST['Name'],$_POST['Date'],$_POST['Address'],$_POST['RMA'],$_POST['Recieved'],$_POST['Returned'],$_POST['Tracking'],$_POST['PO'],$_POST['Link'],$_POST['Description'],$_POST['Status']));
+            	$database->query($Portal,"INSERT INTO RMA(Name, Date, Address, RMA, Recieved, Returned, Tracking, PO, Link, Description, Status) VALUES(?,?,?,?,?,?,?)",array($_POST['Name'],$_POST['Date'],$_POST['Address'],$_POST['RMA'],$_POST['Recieved'],$_POST['Returned'],$_POST['Tracking'],$_POST['PO'],$_POST['Link'],$_POST['Description'],$_POST['Status']));
             }
         }?><!DOCTYPE html>
 <html lang="en">
@@ -189,7 +189,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 </script>
                                 <tbody>
                                     <?php
-                                    	$r = sqlsrv_query($Portal,"SELECT * FROM RMA");
+                                    	$r = $database->query($Portal,"SELECT * FROM RMA");
                                     	if($r){while($RMA = sqlsrv_fetch_array($r)){
                                     		?><tr class='RMA'>
                                     		<td class='ID hidden' rel='ID'><?php echo $RMA['ID'];?></td>

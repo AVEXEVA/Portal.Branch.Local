@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
@@ -32,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     if(!is_null($Elevator_Part) && !is_null($Condition) && !is_null($Remedy)){
       if(!is_null($Territory)){
-        $resource = sqlsrv_query($NEI,
+        $resource = $database->query(null,
           " SELECT
                     Contract.Job AS Contract,
                     Elev.ID      AS Unit
@@ -51,7 +51,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
         }
         if($resource){while($row = sqlsrv_fetch_array($resource)){
-          $r = sqlsrv_query($NEI,
+          $r = $database->query(null,
             " SELECT  *
               FROM    Portal.dbo.Contract_Category_Item AS Contract_Item
               WHERE   Contract_Item.[Unit] = ?
@@ -68,7 +68,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           }
           if($r && is_array(sqlsrv_fetch_array($r))){}
           else {
-            sqlsrv_query($NEI,
+            $database->query(null,
               " INSERT INTO Portal.dbo.Contract_Category_Item(Contract, Unit, Elevator_Part, Condition, Remedy, Covered)
                 VALUES(?, ?, ?, ?, ?, ?)
               ;", array($row['Contract'], $row['Unit'], $Elevator_Part, $Condition, $Remedy, 1));

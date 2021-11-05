@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('../../index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
-      $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+      $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "unit.php"));
+      $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-      $r = sqlsrv_query($Portal,"
+      $r = $database->query($Portal,"
           SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Portal.dbo.Privilege
           WHERE  User_ID = ?
@@ -33,13 +33,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $_POST['Product'],
         $_POST['Manufacturer']
       );
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
 
       //Select ID from Product
       $sQuery =
         " SELECT  Max(Product.ID) AS ID
           FROM    Device.dbo.Product;";
-      $r = sqlsrv_query($database_Device, $sQuery);
+      $r = $database->query($database_Device, $sQuery);
       if($r){$Product_ID = sqlsrv_fetch_array($r)['ID'];}
       else {return;}
 
@@ -77,13 +77,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           $_POST['Blueprint']
         );
       }
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
 
       //SELECT ID from Item
       $sQuery =
         " SELECT  Max(Item.ID) AS ID
           FROM    Device.dbo.Item;";
-      $r = sqlsrv_query($database_Device, $sQuery);
+      $r = $database->query($database_Device, $sQuery);
       if($r){$Item_ID = sqlsrv_fetch_array($r)['ID'];}
       else {return;}
 
@@ -100,7 +100,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $_POST['Nudging'],
         $_POST['Infared_Pulse_Ratio']
       );
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
 
       //Insert into Image
       if(isset($_FILES['Image']) && file_exists($_FILES['Image']['tmp_name'])){
@@ -110,7 +110,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           base64_encode(file_get_contents($_FILES['Image']['tmp_name'])),
           $_FILES['Image']['type']
         );
-        $r = sqlsrv_query($database_Device, $sQuery, $params);
+        $r = $database->query($database_Device, $sQuery, $params);
       }
     } elseif(isset($_POST['ID'],$_POST['Item'])){
       //SELECT Product BY Item ID
@@ -121,7 +121,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $params = array(
         $_POST['Item']
       );
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
       if($r){$Item = sqlsrv_fetch_array($r);}
       else{return;}
 
@@ -137,7 +137,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $_POST['Manufacturer'],
         $Item['Product_ID']
       );
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
 
       //Update Item
       if(isset($_FILES['Image']) && file_exists($_FILES['Image']['tmp_name'])){
@@ -195,7 +195,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           $_POST['Item']
         );
       }
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
 
       //Update Edge
       $sQuery =
@@ -216,7 +216,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $_POST['Infared_Pulse_Ratio'],
         $_POST['Item']
       );
-      $r = sqlsrv_query($database_Device, $sQuery, $params);
+      $r = $database->query($database_Device, $sQuery, $params);
 
       //Insert into Image
       if(isset($_FILES['Image']) && file_exists($_FILES['Image']['tmp_name'])){
@@ -226,7 +226,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           base64_encode(file_get_contents($_FILES['Image']['tmp_name'])),
           $_FILES['Image']['type']
         );
-        $r = sqlsrv_query($database_Device, $sQuery, $params);
+        $r = $database->query($database_Device, $sQuery, $params);
       }
     }
   }

@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
                 FROM    Connection
                 WHERE       Connection.Connector = ?
@@ -19,8 +19,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array( $result );
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *,
                     Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
@@ -32,8 +32,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -51,8 +51,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     ){      
         ?><?php require( '../404.html' );?><?php 
     } else {
-        sqlsrv_query(
-          $NEI,
+        $database->query(
+          null,
           "   INSERT INTO Activity([User], [Date], [Page])
               VALUES( ?, ?, ? );",
           array(
@@ -107,8 +107,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                     <div class='col-12'><select class='redraw' name='Type'>
                                         <option value=''>Select</option><?php
                                         $Types = array( );
-                                        $result = sqlsrv_query(
-                                            $NEI,
+                                        $result = $database->query(
+                                            null,
                                             "   SELECT  JobType.ID,
                                                         JobType.Type
                                                 FROM    JobType;",

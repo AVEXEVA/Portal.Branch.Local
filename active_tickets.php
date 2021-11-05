@@ -2,8 +2,8 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT *
             FROM      Connection
             WHERE     Connection.Connector = ?
@@ -14,8 +14,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
     );
     $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-    $result = sqlsrv_query(
-      $NEI,
+    $result = $database->query(
+      null,
       "   SELECT *,
 		                  Emp.fFirst AS First_Name,
                       Emp.Last   AS Last_Name
@@ -27,8 +27,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
 
     $User = sqlsrv_fetch_array( $result );
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
       "    SELECT *
            FROM       Privilege
            WHERE      Privilege.User_ID = ?;",
@@ -44,8 +44,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-  		sqlsrv_query(
-        $NEI,
+  		$database->query(
+        null,
         " INSERT INTO Activity( [User], [Date], [Page] )
           VALUES ( ?, ?, ? );",
         array(
@@ -167,7 +167,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
               		type:"select",
               		options:
                   [<?php
-        $result = sqlsrv_query($NEI,
+        $result = $database->query(null,
 
               "  SELECT   Loc.Tag AS Location
 					       FROM     nei.dbo.Loc
@@ -188,7 +188,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           			name:  "Mechanic",
           			type:  "select",
           			options: [<?php
-				$result = sqlsrv_query($NEI,
+				$result = $database->query(null,
               "SELECT   Emp.fFirst + ' ' + Emp.Last AS Mechanic
                FROM     Emp
                WHERE    Emp.Field = 1
@@ -208,7 +208,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			name: "Status",
 			type: "select",
 			options: [<?php
-				$result = sqlsrv_query($NEI,"
+				$result = $database->query(null,"
 					SELECT   TickOStatus.Type AS Status
 					FROM     nei.dbo.TickOStatus
 					GROUP BY TickOStatus.Type
@@ -260,7 +260,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			name:"Unit_State",
 			type:"select",
 			options: [<?php
-				$result = sqlsrv_query($NEI,"
+				$result = $database->query(null,"
 					SELECT Elev.State AS State
 					FROM   nei.dbo.Elev
 						   LEFT JOIN nei.dbo.Loc ON Elev.Loc = Loc.Loc

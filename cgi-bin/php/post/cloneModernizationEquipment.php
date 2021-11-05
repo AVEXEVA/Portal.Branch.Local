@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -23,7 +23,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         if(!isset($_POST['Version'])){$_POST['Version'] = 0;}
         if(is_numeric($_POST['Version'])){$_POST['Version']++;}
-        sqlsrv_query($Portal,"
+        $database->query($Portal,"
             INSERT INTO Mod_Equipment(Modernization, Parent, Version, Equipment, Description, In_Care_Of, Subcontractor, Quantity, Submitted, Purchased, PO, Status, Drawings_Received, Drawings_Reviewed, Notes, Warehoused)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		;",array($_GET['ID'],0,$_POST['Version'],$_POST['Equipment'],$_POST['Description'],$_POST['In_Care_Of'],$_POST['Subcontractor'],$_POST['Quantity'],$_POST['Submitted'],$_POST['Purchased'],$_POST['PO'],$_POST['Status'],$_POST['Drawings_Received'],$_POST['Drawings_Reviewed'],$_POST['Notes'],$_POST['Warehoused']));

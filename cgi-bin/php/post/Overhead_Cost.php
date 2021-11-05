@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('../get/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     $Privileged = FALSE;
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
+        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -25,7 +25,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				$data = array();
 				foreach($_POST['data'] as $ID=>$Overhead_Cost){
-					sqlsrv_query($NEI,"
+					$database->query(null,"
 						UPDATE Portal.dbo.Overhead_Cost
 						SET    Ovearhead_Cost.Type  = ?,
 							   Ovearhead_Cost.Start = ?,
@@ -41,7 +41,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				$data = array();
 				foreach($_POST['data'] as $ID=>$Overhead_Cost){
-					sqlsrv_query($NEI,"
+					$database->query(null,"
 						INSERT INTO Portal.dbo.Overhead_Cost([Type], [Start], [End], [Rate])
 						VALUES(?,?,?,?);
 					;",array($Overhead_Cost['Type'],$Overhead_Cost['Start'],$Overhead_Cost['End'],$Overhead_Cost['Rate']));
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							echo "message: ".$error[ 'message']."<br />";
 						}
 					}
-					$resource = sqlsrv_query($NEI,"
+					$resource = $database->query(null,"
 						SELECT Max(Overhead_Cost.ID) AS Overhead_Cost_ID
 						FROM   Portal.dbo.Overhead_Cost
 					;");
@@ -65,7 +65,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		} elseif(isset($_POST['action']) && $_POST['action'] == 'remove'){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID=>$Location){
-					sqlsrv_query($NEI,"DELETE FROM Portal.dbo.Overhead_Cost WHERE Overhead_Cost.ID = ?",array($ID));
+					$database->query(null,"DELETE FROM Portal.dbo.Overhead_Cost WHERE Overhead_Cost.ID = ?",array($ID));
 				}
 				print json_encode(array('data'=>array()));
 			}

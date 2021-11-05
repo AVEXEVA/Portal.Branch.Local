@@ -5,7 +5,7 @@ function gd(year, month, day) {
     var data123 = [
         <?php 
         $Vars = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT Invoice.Ref,
                    Invoice.fDate,
                    Invoice.Total 

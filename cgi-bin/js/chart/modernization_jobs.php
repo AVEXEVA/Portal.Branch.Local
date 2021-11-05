@@ -6,7 +6,7 @@ function gd(year, month, day) {
     var modernization_jobs_data = [
         <?php 
         $data = array();
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT fDate
             FROM Job
             WHERE Job.Type='2';

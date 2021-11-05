@@ -5,14 +5,14 @@ if(session_id() == '' || !isset($_SESSION)) {
 }
 
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
   		SELECT *
   		FROM   Connection
   		WHERE  Connection.Connector = ?
   		       AND Connection.Hash  = ?
   	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
   		SELECT *,
   		       Emp.fFirst AS First_Name,
   			     Emp.Last   AS Last_Name,
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   		WHERE  Emp.ID = ?
   	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
   		SELECT *
   		FROM   Privilege
   		WHERE  Privilege.User_ID = ?
@@ -46,8 +46,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$end = date('m') == 2 ? 28 : 30;//if(date('m')==2) {$end = 28;}  else { $end = 30;}
 		$End_Date = date('Y-m-t 23:59:59.999');
 		if(isset($_SESSION['User'])) { $fWork = $_SESSION['User'];}
-		$query = sqlsrv_query(
-			$NEI,
+		$query = $database->query(
+			null,
 			" SELECT Count(*) AS Count
 			  FROM TicketO LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 			  WHERE (
@@ -62,8 +62,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		);
 		$open_tickets_count = sqlsrv_fetch_array($query)['Count'];
 		$data = array();
-		$query = sqlsrv_query(
-            $NEI,
+		$query = $database->query(
+            null,
             " SELECT Count(Tickets.ID) AS Count
               FROM  (
                     ( 
@@ -112,7 +112,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				   AND Tickets.EDate >= ?
 				   AND Tickets.EDate < ?
 				   AND Emp.ID = ?";
-		$query = sqlsrv_query($NEI,$service_count,array($Year_Start, $Next_Year_Start, $_SESSION['User']));
+		$query = $database->query(null,$service_count,array($Year_Start, $Next_Year_Start, $_SESSION['User']));
 		$service_tickets_count = sqlsrv_fetch_array($query)['Count'];
 		$total_service_count = "
 			SELECT Count(*) AS Count
@@ -126,7 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				   AND Tickets.EDate >= ?
 				   AND Tickets.EDate < ?
 				   AND Emp.ID = ?)";
-		$query = sqlsrv_query($NEI,$total_service_count,array($Year_Start, $Next_Year_Start, $_SESSION['User']));
+		$query = $database->query(null,$total_service_count,array($Year_Start, $Next_Year_Start, $_SESSION['User']));
 		$total_service_tickets_count = sqlsrv_fetch_array($query)['Count'];
     if($total_service_tickets_count != 0){
   		$service_ticket_percentage = round(100 - (($service_tickets_count / ($total_service_tickets_count)) * 100));
@@ -151,7 +151,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			       AND Tickets.EDate >= ?
 			       AND Tickets.EDate < ?
 			       AND Emp.ID = ?";
-		$query = sqlsrv_query($NEI,$violation_count,array($Year_Start, $Next_Year_Start, $_SESSION['User']));
+		$query = $database->query(null,$violation_count,array($Year_Start, $Next_Year_Start, $_SESSION['User']));
 		$violation_tickets_count = sqlsrv_fetch_array($query)['Count'];
     if($total_service_tickets_count != 0){
 		    $violation_ticket_percentage = round(100 - (($violation_tickets_count / ($total_service_tickets_count)) * 100));
@@ -203,7 +203,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       }
       function complete_clockout(){
         if('<?php
-          $r = sqlsrv_query($NEI,"SELECT * FROM TicketO WHERE TicketO.Assigned >= 2 AND TicketO.Assigned <= 3 AND TicketO.fWork = ?;",array($My_User['fWork']));
+          $r = $database->query(null,"SELECT * FROM TicketO WHERE TicketO.Assigned >= 2 AND TicketO.Assigned <= 3 AND TicketO.fWork = ?;",array($My_User['fWork']));
           if($r && is_array(sqlsrv_fetch_array($r))){echo 'True';}
           else{echo 'False';}
         ?>' == 'True'){alert('You must finish your tickets before you clock out.');}
@@ -273,7 +273,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       </script>
       <div class='panel-body' style='padding-top:15px;padding-bottom:15px;'>
         <?php
-        $r = sqlsrv_query($NEI, "SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL",array($_SESSION['User']));
+        $r = $database->query(null, "SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL",array($_SESSION['User']));
         if($r){$row = sqlsrv_fetch_array($r);}
         ?>
         <div class='row'>
@@ -385,7 +385,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class ='nav-text'>Routes</div>
 			</div><?php } ?>
 			<?php
-			$result = sqlsrv_query($NEI,"
+			$result = $database->query(null,"
 				SELECT Route.ID
 				FROM   Route
 					   LEFT JOIN Emp ON Route.Mech = Emp.fWork

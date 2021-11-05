@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -26,7 +26,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
     if(	!isset($My_Connection['ID']) ){?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "user.php"));
@@ -35,7 +35,7 @@ if(!isset($_GET['ID'])){$_GET['ID'] = $_SESSION['User'];$ASDF=FALSE;				}
 else {$ASDF=TRUE;}
 if($Mechanic > 0){
     $Call_Sign = "";
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT
             Emp.*,
             Emp.Last as Last_Name,
@@ -49,7 +49,7 @@ if($Mechanic > 0){
             LEFT JOIN Rol ON Emp.Rol = Rol.ID
         WHERE Emp.ID = ?;",array($_GET['ID']));
     $User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"SELECT Email FROM Portal.dbo.Portal WHERE Portal.Branch_ID = ? AND Portal.Branch = 'Nouveau Texas';",array($_GET['ID']));
+	$r = $database->query(null,"SELECT Email FROM Portal.dbo.Portal WHERE Portal.Branch_ID = ? AND Portal.Branch = 'Nouveau Texas';",array($_GET['ID']));
 	$Email = sqlsrv_fetch_array($r)['Email'];
     while($a= sqlsrv_fetch_array($r)){}
 }?><!DOCTYPE html>
@@ -266,15 +266,15 @@ if($Mechanic > 0){
 				</div>
 				<?php
 					$serverName = "172.16.12.45";
-					$NEIectionOptions = array(
+					nullectionOptions = array(
 						"Database" => "ATTENDANCE",
 						"Uid" => "sa",
 						"PWD" => "SQLABC!23456",
 						'ReturnDatesAsStrings'=>true
 					);
 					//Establishes the connection
-					$c2 = sqlsrv_connect($serverName, $NEIectionOptions);
-					$r = sqlsrv_query($c2,"select * from Employee where EmpID='" .$User['Ref'] . "'");
+					$c2 = sqlsrv_connect($serverName, nullectionOptions);
+					$r = $database->query($c2,"select * from Employee where EmpID='" .$User['Ref'] . "'");
 					$Attendance = sqlsrv_fetch_array($r);
 					while($temp = sqlsrv_fetch_array($r));
 				?>
@@ -286,7 +286,7 @@ if($Mechanic > 0){
             <div class='col-xs-5'><select name='Skill'>
               <option value=''>Select</option>
               <?php
-                $r = sqlsrv_query($Portal,
+                $r = $database->query($Portal,
                   " SELECT    *
                     FROM      Portal.dbo.Skill
                     ORDER BY  Skill.Name ASC;");
@@ -298,7 +298,7 @@ if($Mechanic > 0){
             <div class='col-xs-4'><select name='Skill'>
               <option value=''>Select</option>
               <?php
-                $r = sqlsrv_query($Portal,
+                $r = $database->query($Portal,
                   " SELECT    *
                     FROM      Portal.dbo.Proficiency
                     ORDER BY  Proficiency.ID ASC;");
@@ -311,7 +311,7 @@ if($Mechanic > 0){
           </div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
           <?php
-            $r = sqlsrv_query($Portal,
+            $r = $database->query($Portal,
               " SELECT  Skill.Name AS Skill,
                         Proficiency.Name AS Proficiency
                 FROM    Portal.dbo.Skillset
@@ -398,8 +398,8 @@ if($Mechanic > 0){
                         $day = $i < 10 ? '0' . $i : $i;
                         $tomorrow = $i + 1 < 10 ? '0' . ($i + 1) : $i + 1;
                         ?>$("#li-<?php echo $_GET['year'];?>-<?php echo $_GET['month'];?>-<?php echo $day;?>").css('background-color','<?php
-                          $attendance = sqlsrv_query($Portal,"SELECT * FROM Attendance WHERE Attendance.[Start] >= ? AND Attendance.[Start] < ? AND Attendance.[User] = ?;",array("{$prefix}-{$day} 00:00:00.000",date("Y-m-d 00:00:00.000",strtotime('tomorrow',strtotime("{$prefix}-{$day} 00:00:00.000"))),$user));
-                          $unavailable = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Unavailable LEFT JOIN Emp ON Unavailable.Worker = Emp.fWork WHERE Unavailable.fDate = ? AND Emp.ID = ?;",array($prefix . "-" . $day, $user));
+                          $attendance = $database->query($Portal,"SELECT * FROM Attendance WHERE Attendance.[Start] >= ? AND Attendance.[Start] < ? AND Attendance.[User] = ?;",array("{$prefix}-{$day} 00:00:00.000",date("Y-m-d 00:00:00.000",strtotime('tomorrow',strtotime("{$prefix}-{$day} 00:00:00.000"))),$user));
+                          $unavailable = $database->query(null,"SELECT * FROM nei.dbo.Unavailable LEFT JOIN Emp ON Unavailable.Worker = Emp.fWork WHERE Unavailable.fDate = ? AND Emp.ID = ?;",array($prefix . "-" . $day, $user));
                           if($attendance && is_array(sqlsrv_fetch_array($attendance))){echo "green";}
                           elseif($unavailable && is_array(sqlsrv_fetch_array($unavailable))) {echo "red";}
                           else {echo "white";}

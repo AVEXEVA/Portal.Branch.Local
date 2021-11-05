@@ -4,7 +4,7 @@ $(function() {
     var data42 = [<?php 
         $data = array();
         $data2 = array();
-        $job_result = sqlsrv_query($NEI,"
+        $job_result = $database->query(null,"
             SELECT Custom1 AS Supervisor
             FROM Job
             WHERE Job.Type = '8';

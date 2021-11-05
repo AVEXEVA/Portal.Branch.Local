@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *
             FROM    Connection
             WHERE       Connection.Connector = ?
@@ -18,7 +18,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     );
     $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
     //User
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
        "   SELECT *,
                   Emp.fFirst AS First_Name,
                   Emp.Last   AS Last_Name
@@ -29,7 +29,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     );
     $User = sqlsrv_fetch_array($result);
     //Privileges
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
      "   SELECT *
          FROM   Privilege
          WHERE  Privilege.User_ID = ?
@@ -46,8 +46,8 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
             || $Privileges[ 'Customer' ][ 'Other_Privilege' ] < 4){
                 ?><?php require('../404.html');?><?php }
     else {
-        sqlsrv_query(
-          $NEI,
+        $database->query(
+          null,
           " INSERT INTO Activity([User], [Date], [Page] ) VALUES( ?, ?, ? );",
           array(
             $_SESSION['User'],

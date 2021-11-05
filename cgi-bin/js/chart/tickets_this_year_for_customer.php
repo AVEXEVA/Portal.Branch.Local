@@ -5,7 +5,7 @@ function gd(year, month, day) {
     var data2 = [
         <?php 
         $Vars = array();
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 Loc.Loc
             FROM 
@@ -19,7 +19,7 @@ function gd(year, month, day) {
             $SQL_Locations = implode(" OR ",$Locations);
             $SQL_Start_Date = date('Y-01-01 00:00:00.000');
             $SQL_End_Date = date('Y-m-t 23:59:59.999');
-            $r = sqlsrv_query($NEI,"
+            $r = $database->query(null,"
                 SELECT 
                     TicketD.ID,
                     TicketD.EDate,

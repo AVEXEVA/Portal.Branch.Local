@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI, 
+    $result = $database->query(
+        null, 
         "   SELECT  * 
             FROM    Connection 
             WHERE       Connector = ? 
@@ -18,8 +18,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  *, 
                     fFirst AS First_Name, 
                     Last as Last_Name 
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $User   = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = sqlsrv_query($NEI,
+    $result = $database->query(null,
         "   SELECT  Privilege.*
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         || !$Privileged 
     ){ print json_encode( array( 'data' => array( ) ) ); }
     else {
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
 			SELECT Tickets.*,
 				   Loc.ID                      AS Customer,
 				   Loc.Tag                     AS Location,
@@ -169,7 +169,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		print json_encode(array('data'=>$data));
 	}
 } elseif(isset($_SESSION['Customer'],$_SESSION['Hash'])){
-  $r = sqlsrv_query($NEI,"
+  $r = $database->query(null,"
     SELECT *
     FROM   Connection
     WHERE  Connection.Connector = ?
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   ;", array($_SESSION['Customer'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
   if(isset($Connection['ID'])){
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
     " SELECT Top 100
            Tickets.*,
            Loc.ID                      AS Customer,

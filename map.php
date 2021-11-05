@@ -9,14 +9,14 @@ if(TRUE){
 $_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -24,7 +24,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Map']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "map.php"));
@@ -76,7 +76,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                           <div class='row'>
                             <div class='col-xs-1' style='background-color:white;color:black;' onClick='clearMarkers();'>&nbsp;</div>
                             <div class='col-xs-1' onClick='showDivision1();' style='background-color:magenta;color:black;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -88,7 +88,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showDivision2();' style='background-color:green;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -100,7 +100,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showDivision3();' style='background-color:blue;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -112,7 +112,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showDivision4();' style='background-color:teal;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -124,7 +124,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showModernization();' style='background-color:black;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -136,7 +136,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showEscalator();' style='background-color:brown;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -148,7 +148,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showFiremen();' style='background-color:red;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -160,7 +160,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showRepair();' style='background-color:purple;color:white;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -172,7 +172,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                               echo is_array($row) ? $row['Count'] : null;
                             ?> personnel</div>
                             <div class='col-xs-1' onClick='showTesting();' style='background-color:orange;color:black;'><?php
-                              $r = sqlsrv_query($NEI,
+                              $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
                                   FROM    nei.dbo.TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -190,7 +190,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <div class='col-xs-3'><button onClick="codeAddress(prompt('What address would you like to center on?'));" style='width:100%;color:black;'>Center on Address</button></div>
                             <div class='col-xs-3'><select name='Employee' style='color:black !important;' onChange='zoomUser(this);'>
                               <option value=''>Select</option>
-                              <?php $r = sqlsrv_query($NEI,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
+                              <?php $r = $database->query(null,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
                               if($r){while($row = sqlsrv_fetch_array($r)){
                                 ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Last'] . ', ' . $row['fFirst'];?></option><?php
                               }}?>
@@ -284,7 +284,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $End_Date              = new DateTime('now');
             $End_Date              = $End_Date->format("Y-m-d 23:59:59.999");
         }
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
         "   SELECT
                 TechLocation.*,
                 Emp.fFirst AS First_Name,
@@ -344,7 +344,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             );
             if(isset($array['On site time'])){
                 $GPS_Location = $array['On site time'];
-                $r = sqlsrv_query($Portal,
+                $r = $database->query($Portal,
                   "SELECT Max(Phone_GPS.[Timestamp]) AS TimeStamp,
                           Phone_GPS.ID AS ID,
                           Phone_GPS.Latitude AS Latitude,
@@ -444,7 +444,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                   if($key == "General"){continue;}
                   if(isset($array['On site time'])){
                       $GPS_Location = $array['On site time'];
-                      $r = sqlsrv_query($Portal,
+                      $r = $database->query($Portal,
                         "SELECT Max(Phone_GPS.[Timestamp]) AS TimeStamp,
                                 Phone_GPS.ID AS ID,
                                 Phone_GPS.Latitude AS Latitude,
@@ -527,7 +527,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         if($key == "General"){continue;}
                         if(isset($array['On site time'])){
                             $GPS_Location = $array['On site time'];
-                            $r = sqlsrv_query($Portal,
+                            $r = $database->query($Portal,
                               "SELECT Max(Phone_GPS.[Timestamp]) AS TimeStamp,
                                       Phone_GPS.ID AS ID,
                                       Phone_GPS.Latitude AS Latitude,
@@ -577,7 +577,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
         }
         <?php /*
-        $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Loc WHERE Loc.Maint = 1;");
+        $r = $database->query(null,"SELECT * FROM nei.dbo.Loc WHERE Loc.Maint = 1;");
         if($r){while($row = sqlsrv_fetch_array($r)){
           ?>marker[<?php echo $key;?>] = new mapIcons.Marker({
             map: map,

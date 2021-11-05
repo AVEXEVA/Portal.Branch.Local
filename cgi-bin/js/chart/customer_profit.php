@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  *
             FROM    Connection
             WHERE       Connection.Connector = ?
@@ -16,8 +16,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name, 
                     Emp.Last   AS Last_Name
@@ -28,8 +28,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
                     Privilege.Group_Privilege,
@@ -62,17 +62,17 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 	$Jobs = array();
 	$dates = array();
 	$totals = array();
-	$r = sqlsrv_query($NEI,"SELECT Loc.Custom3 FROM Loc WHERE Loc.Owner = ? AND Loc.Custom3 IS NOT NULL AND Loc.Custom3 <> ' ' AND Loc.Custom3 <> '';", array($_GET['ID']));
+	$r = $database->query(null,"SELECT Loc.Custom3 FROM Loc WHERE Loc.Owner = ? AND Loc.Custom3 IS NOT NULL AND Loc.Custom3 <> ' ' AND Loc.Custom3 <> '';", array($_GET['ID']));
 	$groups = array();
 	$groups2 = array();
 	if($r){while($array = sqlsrv_fetch_array($r)){
-		$r2 = sqlsrv_query($NEI,"SELECT Loc.Owner FROM Loc WHERE Loc.Custom3 = ?;", array($array['Custom3']));
+		$r2 = $database->query(null,"SELECT Loc.Owner FROM Loc WHERE Loc.Custom3 = ?;", array($array['Custom3']));
 		if($r2){while($row2 = sqlsrv_fetch_array($r2)){
 			$groups2[] = "Job.Owner = {$row2['Owner']}";
 		}}
 	}}
 	$groups2 = count($groups2) > 0 ? implode(" OR ", $groups2) : "'1' = '2'";
-	$r = sqlsrv_query($NEI,
+	$r = $database->query(null,
 	" SELECT   Job.Loc,
 							Invoice.Amount AS Amount,
 				 		Invoice.fDate  AS fDate
@@ -107,7 +107,7 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 			$i++;
 		}
 	}
-	$r = sqlsrv_query($NEI,
+	$r = $database->query(null,
 	" SELECT Job.Loc, JobI.Amount AS Amount,
 			   JobI.fDate as fDate
 		FROM   Loc
@@ -136,7 +136,7 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 			$i++;
 		}
 	}
-	$r = sqlsrv_query($NEI,
+	$r = $database->query(null,
 	"	SELECT   Job.Loc, JobI.Amount AS Amount,
 				 JobI.fDate as fDate
 		FROM     Loc
@@ -202,7 +202,7 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 		?><?php }?>
 		var location_dataset = [<?php $i = 0;?>
 				<?php foreach($Locs as $Loc){?><?php echo $i == 0 ? NULL : ',';$i=1;?>{
-						label: "<?php $r = sqlsrv_query($NEI,"SELECT Loc.Tag FROM Loc WHERE Loc.Loc = ?;", array($Loc));echo sqlsrv_fetch_array($r)['Tag'];?>",
+						label: "<?php $r = $database->query(null,"SELECT Loc.Tag FROM Loc WHERE Loc.Loc = ?;", array($Loc));echo sqlsrv_fetch_array($r)['Tag'];?>",
 						data: location_data_<?php echo $Loc;?>,
 						color: "#<?php $color =  random_color(); echo $color;?>",
 						points: { fillColor: "#<?php echo $color;?>", show: true },

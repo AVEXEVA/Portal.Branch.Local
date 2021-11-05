@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
   //Establish Connection
-  $r = sqlsrv_query(
-    $NEI,
+  $r = $database->query(
+    null,
     " SELECT  *
       FROM    Connection
       WHERE   Connection.Connector = ?
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   $Connection = sqlsrv_fetch_array($r);
 
   //Estasblish User
-  $User    = sqlsrv_query($NEI,"
+  $User    = $database->query(null,"
     SELECT  Emp.*,
             Emp.fFirst AS First_Name,
             Emp.Last   AS Last_Name
@@ -29,8 +29,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   $User = sqlsrv_fetch_array($My_User);
 
   //Establish Privileges
-  $r = sqlsrv_query(
-    $NEI,
+  $r = $database->query(
+    null,
     " SELECT  Privilege.Access_Table,
               Privilege.User_Privilege,
               Privilege.Group_Privilege,
@@ -51,8 +51,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       ||  $Privileges['Ticket']['Other_Privilege'] >= 4)){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){ print json_encode( array( 'data' => array( ) ) ); }
   else {
-      $r = sqlsrv_query(
-        $NEI,
+      $r = $database->query(
+        null,
         " SELECT  Tickets.*,
                   Loc.ID            AS Account,
                   Loc.Tag           AS Tag,
@@ -172,7 +172,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $i++;
       }
     }
-    $r = sqlsrv_query($NEI,"SELECT Tickets.*,
+    $r = $database->query(null,"SELECT Tickets.*,
          Loc.ID            AS Account,
          Loc.Tag           AS Tag,
          Loc.Tag           AS Location,

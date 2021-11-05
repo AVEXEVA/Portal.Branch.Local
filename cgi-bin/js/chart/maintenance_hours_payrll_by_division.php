@@ -7,7 +7,7 @@ function gd(year, month, day) {
         $data = array();
         $data2 = array();
         $data3 = array();
-        $job_result = sqlsrv_query($conn,"
+        $job_result = $database->query($conn,"
             SELECT Loc.Zone AS Division, TicketD.Total as Total, TicketD.EDate AS Dated
             FROM (TicketD LEFT JOIN Job ON Job.ID = TicketD.Job) LEFT JOIN Loc ON Job.Loc = Loc.Loc
             WHERE Job.Type='0' AND TicketD.EDate >= '2017-03-30 00:00:00.000' AND TicketD.Total <= 24 AND TicketD.Total > 0

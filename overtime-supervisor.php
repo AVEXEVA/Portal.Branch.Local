@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -31,7 +31,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  	    || $My_Privileges['Job']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "overtime.php"));
@@ -69,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <div class='col-xs-1' style='text-align:right;'>Job Type:</div>
                                 <div class='col-xs-11'><select name='Job_Type' style='color:black !important;'><option value=''>Select</option>
                                   <?php
-                                    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.JobType WHERE ID <> 9 AND ID <> 12;");
+                                    $r = $database->query(null,"SELECT * FROM nei.dbo.JobType WHERE ID <> 9 AND ID <> 12;");
                                     if($r){while($row = sqlsrv_fetch_array($r)){
                                       ?><option value='<?php echo $row['ID'];?>' <?php echo isset($_GET['Job_Type']) && $row['ID'] == $_GET['Job_Type'] && $_GET['Job_Type'] != '' ? 'selected' : '';?>><?php echo $row['Type'];?></option><?php
                                     }}?>
@@ -79,7 +79,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <div class='col-xs-1' style='text-align:right;'>Supervisor:</div>
                                 <div class='col-xs-11'><select name='Supervisor' style='color:black !important;'><option value='' style='color:black;'>Select</option>
                                   <?php
-                                    $r = sqlsrv_query($NEI,"SELECT tblWork.Super FROM nei.dbo.tblWork WHERE tblWork.Super <> '' GROUP BY tblWork.Super ORDER BY tblWork.Super ASC ;");
+                                    $r = $database->query(null,"SELECT tblWork.Super FROM nei.dbo.tblWork WHERE tblWork.Super <> '' GROUP BY tblWork.Super ORDER BY tblWork.Super ASC ;");
                                     if($r){while($row = sqlsrv_fetch_array($r)){?><option style='color:black !important;' value='<?php echo $row['Super'];?>' <?php echo isset($_GET['Supervisor']) && $row['Super'] == $_GET['Supervisor']  && $_GET['Supervisor'] != '' ? 'selected' : '';?>><?php echo $row['Super'];?></option><?php }}?>
                                 </select></div>
                               </div>
@@ -218,7 +218,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                 HAVING  (Tickets.Type=? {$job_type}) AND (Tickets.Employee_Supervisor = ? {$supervisor}) AND Tickets.Type <> 9 AND Tickets.Type <> 12 AND Tickets.fDesc LIKE '%' + ? + '%' {$showRegular};
                                             ;";
                                             //echo $sQuery;
-                                            $r = sqlsrv_query($NEI, $sQuery, array($_GET['Start'], $_GET['End'],$_GET['Job_Type'],$_GET['Supervisor'],$_GET['Start'], $_GET['End'],$_GET['fDesc'],$_GET['Job_Type'],$_GET['Supervisor'],$_GET['fDesc']));
+                                            $r = $database->query(null, $sQuery, array($_GET['Start'], $_GET['End'],$_GET['Job_Type'],$_GET['Supervisor'],$_GET['Start'], $_GET['End'],$_GET['fDesc'],$_GET['Job_Type'],$_GET['Supervisor'],$_GET['fDesc']));
                                             if( ($errors = sqlsrv_errors() ) != null) {
                                                 foreach( $errors as $error ) {
                                                     echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
@@ -231,7 +231,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             $statuses = array();
                                             $job_totals = array();
                                             if($r){while($array = sqlsrv_fetch_array($r)){
-                                              $r2 = sqlsrv_query($NEI,"SELECT Sum(TicketD.OT) + Sum(TicketD.DT) AS Total_Overtime FROM TicketD WHERE TicketD.Job = ?",array($array['Job']));
+                                              $r2 = $database->query(null,"SELECT Sum(TicketD.OT) + Sum(TicketD.DT) AS Total_Overtime FROM TicketD WHERE TicketD.Job = ?",array($array['Job']));
                                               if($r2){$job_totals[$array['Job'] . ' - ' . $array['fDesc']] = sqlsrv_fetch_array($r2)['Total_Overtime'];}
                                             	if($array['Status'] == NULL){ $statuses[$array['Job'] . ' - ' . $array['fDesc']] = 'Unknown';}
                                             	elseif(strtolower($array['Status']) == 'open'){$statuses[$array['Job'] . ' - ' . $array['fDesc']] = 'Active';}
@@ -258,7 +258,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                           $nt_total += $array['SumOfNT'];
                                                           $total_total += $array['SumOfTotal'];
                                                           ?><tr><td></td><td><?php echo $array['Title'];?></td><td><?php echo $array['fFirst'] . ' ' . $array['Last'];?></td><td><?php echo $array['Supervisor'];?></td></tr><?php
-                                                          $resource = sqlsrv_query($NEI,
+                                                          $resource = $database->query(null,
                                                             "SELECT *
                                                              FROM   nei.dbo.TicketD
                                                              WHERE  TicketD.EDate >= ?

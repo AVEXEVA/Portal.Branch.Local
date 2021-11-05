@@ -3,13 +3,13 @@ session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r= sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $r= $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != 'OFFICE') ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -64,7 +64,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='col-xs-1'>Supervisor:</div>
             <div class='col-xs-11'><select name='Supervisor' style='color:black !important;' onChange='refresh();'><option value='' style='color:black;'>Select</option>
               <?php
-                $r = sqlsrv_query($NEI,"SELECT tblWork.Super FROM nei.dbo.tblWork WHERE tblWork.Super <> '' GROUP BY tblWork.Super ORDER BY tblWork.Super ASC ;");
+                $r = $database->query(null,"SELECT tblWork.Super FROM nei.dbo.tblWork WHERE tblWork.Super <> '' GROUP BY tblWork.Super ORDER BY tblWork.Super ASC ;");
                 if($r){while($row = sqlsrv_fetch_array($r)){?><option style='color:black !important;' value='<?php echo $row['Super'];?>' <?php echo isset($_GET['Supervisor']) && $row['Super'] == $_GET['Supervisor']  && $_GET['Supervisor'] != '' ? 'selected' : '';?>><?php echo $row['Super'];?></option><?php }}?>
             </select></div>
           </div>

@@ -4,13 +4,13 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID={$_GET['ID']}"));
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID={$_GET['ID']}"));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
         SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
         FROM   Privilege
         WHERE  User_ID = ?
@@ -21,9 +21,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     elseif($My_Privileges['Ticket']['User_Privilege'] >= 6 && !isset($_GET['ID'])){$Privileged = TRUE;}
     elseif($My_Privileges['Ticket']['Group_Privilege'] >= 4){
-        $r = sqlsrv_query(  $NEI,"SELECT LID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}'");
-        $r2 = sqlsrv_query( $NEI,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$_GET['ID']}'");
-        $r3 = sqlsrv_query( $NEI,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
+        $r = $database->query(  null,"SELECT LID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}'");
+        $r2 = $database->query( null,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$_GET['ID']}'");
+        $r3 = $database->query( null,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
         $r = sqlsrv_fetch_array($r);
         $r2 = sqlsrv_fetch_array($r2);
         $r3 = sqlsrv_fetch_array($r3);
@@ -32,9 +32,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         elseif(is_array($r2)){$Location = $r2['Loc'];}
         elseif(is_array($r3)){$Location = $r3['Loc'];}
         if(!is_null($Location)){
-            $r = sqlsrv_query(  $NEI,"SELECT ID FROM TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
-            $r2 = sqlsrv_query( $NEI,"SELECT ID FROM TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
-            $r3 = sqlsrv_query( $NEI,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
+            $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
+            $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
+            $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
             if($r || $r2 || $r3){
                 if($r){$a = sqlsrv_fetch_array($r);}
                 if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -46,9 +46,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         }
         if(!$Privileged){
             if($My_Privileges['Ticket']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-                $r = sqlsrv_query(  $NEI,"SELECT ID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
-                $r2 = sqlsrv_query( $NEI,"SELECT ID FROM TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
-                $r3 = sqlsrv_query( $NEI,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
+                $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
                 if($r || $r2 || $r3){
                     if($r){$a = sqlsrv_fetch_array($r);}
                     if($r2){$a2 = sqlsrv_fetch_array($r2);}
@@ -65,7 +65,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
 $Ticket = null;
 if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT
                 TicketO.*,
                 Loc.Tag             AS Tag,
@@ -110,7 +110,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
     $Ticket['Loc'] = $Ticket['LID'];
     $Ticket['Status'] = ($Ticket['Status'] == 'Completed') ? "Reviewing" : $Ticket['Status'];
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketD.*,
                 Loc.Tag             AS Tag,
@@ -153,7 +153,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
         $Ticket = sqlsrv_fetch_array($r);
     }
     if($Ticket['ID'] == "" || $Ticket['ID'] == 0 || !isset($Ticket['ID'])){
-        $r = sqlsrv_query($NEI,"
+        $r = $database->query(null,"
             SELECT
                 TicketDArchive.*,
                 Loc.Tag             AS Tag,
@@ -197,7 +197,7 @@ if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
                 TicketDArchive.ID = ?;",array($_GET['ID']));
         $Ticket = sqlsrv_fetch_array($r);
     }
-$r = sqlsrv_query($NEI,"SELECT PDATicketSignature.Signature AS Signature FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?",array($_GET['ID']));
+$r = $database->query(null,"SELECT PDATicketSignature.Signature AS Signature FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?",array($_GET['ID']));
 if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Signature'];}}?>
 <!DOCTYPE html>
 <html lang="en">
@@ -457,7 +457,7 @@ white-space: normal !important;
 									</div>
 									<div class='panel-body' style='height:200px;overflow-y:scroll;'>
 										<?php
-											$r = sqlsrv_query($NEI,"
+											$r = $database->query(null,"
 												SELECT TOP 100 TechLocation.*
 												FROM TechLocation
 												WHERE TicketID = '" . $Ticket['ID'] . "'
@@ -691,7 +691,7 @@ white-space: normal !important;
         myOptions);
     var marker = new Array();
 <?php
-$r = sqlsrv_query($NEI,"
+$r = $database->query(null,"
     SELECT TOP 100 TechLocation.*
     FROM TechLocation
     WHERE TicketID = '" . $Ticket['ID'] . "';");

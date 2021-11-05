@@ -5,8 +5,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Establish Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  * 
             FROM    Connection 
             WHERE       Connection.Connector = ? 
@@ -18,8 +18,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Connection = sqlsrv_fetch_array($result);
     //Establish User
-    $result    = sqlsrv_query(
-        $NEI,
+    $result    = $database->query(
+        null,
         "   SELECT  Emp.*, 
                     Emp.fFirst AS First_Name, 
                     Emp.Last   AS Last_Name 
@@ -31,8 +31,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result ); 
     //Establish Priivleges
-    $result = sqlsrv_query(
-        $NEI,
+    $result = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table, 
                     Privilege.User_Privilege, 
                     Privilege.Group_Privilege, 
@@ -59,8 +59,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     ) 
                 );
     } else {
-        $result = sqlsrv_query(
-            $NEI,
+        $result = $database->query(
+            null,
             "   SELECT  Invoice.Ref         AS  ID,
                         Invoice.fDesc       AS  Description,
                         Invoice.Total       AS  Total,

@@ -18,7 +18,7 @@
         </li>
         <?php $RouteNav = False;
         if($Field){
-            $r = sqlsrv_query($NEI,"SELECT * FROM Route WHERE Mech='{$User['fWork']}';");
+            $r = $database->query(null,"SELECT * FROM Route WHERE Mech='{$User['fWork']}';");
             $RouteNav = sqlsrv_fetch_array($r);
         }
         if(is_array($RouteNav) && isset($RouteNav['ID']) && $RouteNav['ID'] > 0){?><li>

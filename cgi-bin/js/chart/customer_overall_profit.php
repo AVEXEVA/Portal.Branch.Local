@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  *
             FROM    Connection
             WHERE       Connection.Connector = ?
@@ -16,8 +16,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = sqlsrv_query(
-        $NEI,
+    $User = $database->query(
+        null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name, 
                     Emp.Last   AS Last_Name
@@ -28,8 +28,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = sqlsrv_query(
-        $NEI,
+    $r = $database->query(
+        null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
                     Privilege.Group_Privilege,
@@ -76,7 +76,7 @@ var job_profit_data = [
     $Jobs = array();
     $dates = array('2017-03-30 00:00:00.000' => 0.00);
     $totals = array();
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
     " SELECT   Invoice.Amount AS Amount,
                         Invoice.fDate  AS fDate
         FROM     Invoice
@@ -108,7 +108,7 @@ var job_profit_data = [
         }
     }
     ksort($dates);
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
     " SELECT JobI.Amount AS Amount,
                JobI.fDate as fDate
         FROM   Loc
@@ -136,7 +136,7 @@ var job_profit_data = [
         }
     }
     ksort($dates);
-    $r = sqlsrv_query($NEI,
+    $r = $database->query(null,
     "   SELECT   JobI.Amount AS Amount,
                  JobI.fDate as fDate
         FROM     Loc

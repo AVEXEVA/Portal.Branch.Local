@@ -9,14 +9,14 @@ require('../../../cgi-bin/libraries/PHPMailer-master/src/Exception.php');
 require('../../../cgi-bin/libraries/PHPMailer-master/src/PHPMailer.php');
 require('../../../cgi-bin/libraries/PHPMailer-master/src/SMTP.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM nei.dbo.Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
     if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
-        $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
+        $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = sqlsrv_query($Portal,"
+        $r = $database->query($Portal,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
@@ -26,7 +26,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     if(!isset($array['ID'])){?><html><head></head></html><?php }
     else {
-      sqlsrv_query($Portal, "INSERT INTO COVID_19_Questionaire([User], Time_Stamp, Question_1, Question_2, Question_3, Release, Question_4) VALUES(?, ?, ?, ?, ?, ?, ?);", array($_SESSION['User'], date("Y-m-d H:i:s", strtotime('now')), $_POST['1'], $_POST['2'], $_POST['3'], substr(hash('sha256',rand(0,99999999)), 0, 16), $_POST['4']));
+      $database->query($Portal, "INSERT INTO COVID_19_Questionaire([User], Time_Stamp, Question_1, Question_2, Question_3, Release, Question_4) VALUES(?, ?, ?, ?, ?, ?, ?);", array($_SESSION['User'], date("Y-m-d H:i:s", strtotime('now')), $_POST['1'], $_POST['2'], $_POST['3'], substr(hash('sha256',rand(0,99999999)), 0, 16), $_POST['4']));
 
       if($_POST['1'] == 'Yes' || $_POST['2'] == 'Yes' || $_POST['3'] == 'Yes' || $_POST['4'] == 'Yes'){
 	      try {

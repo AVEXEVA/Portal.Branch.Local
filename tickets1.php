@@ -2,14 +2,14 @@
 session_start( [ 'read_and_close' => true ] );
 require('cgi-bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
@@ -17,7 +17,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = sqlsrv_query($NEI,"
+	$r = $database->query(null,"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
@@ -30,7 +30,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	  		|| $My_Privileges['Ticket']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		sqlsrv_query($NEI,"
+		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "tickets.php"));
@@ -53,7 +53,7 @@ if(isMobile()){?><!DOCTYPE html>
 			<div class="panel panel-primary" style='margin-bottom:0px;'>
 				<div class="panel-heading"><?php
 				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
-				if(is_numeric($_GET['Mechanic'])){$r = sqlsrv_query($NEI,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
+				if(is_numeric($_GET['Mechanic'])){$r = $database->query(null,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
 						else {$Mechanic = $User;}?><?php \singleton\fontawesome::getInstance( )->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div>
 
 				<div class="panel-body no-print">
@@ -119,7 +119,7 @@ if(isMobile()){?><!DOCTYPE html>
 
 						if(isset($_GET['End_Date'])){$End_Date = DateTime::createFromFormat('m/d/Y', $_GET['End_Date'])->format("Y-m-d 23:59:59.999");}
 						else{$End_Date = DateTime::createFromFormat('m/d/Y',"12/30/2050")->format("Y-m-d 23:59:59.999");}
-						$r = sqlsrv_query($NEI,"
+						$r = $database->query(null,"
 							SELECT
 								TechLocation.*
 							FROM

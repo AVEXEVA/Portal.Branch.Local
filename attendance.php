@@ -3,7 +3,7 @@
     require('cgi-bin/php/index.php');
     setlocale(LC_MONETARY, 'en_US');
     if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ])){
-          $result = sqlsrv_query($NEI,
+          $result = $database->query(null,
           "SELECT *
            FROM Connection
            WHERE Connector = ? AND Hash = ?;",
@@ -11,7 +11,7 @@
          );
     $array = sqlsrv_fetch_array($result);
     if(!isset($_SESSION[ 'Branch' ]) || $_SESSION[ 'Branch' ] == 'Nouveau Elevator'){
-        $result= sqlsrv_query($NEI,
+        $result= $database->query(null,
           "SELECT *, First
            AS First_Name, Last as Last_Name
            FROM Emp
@@ -19,7 +19,7 @@
          );
         $User = sqlsrv_fetch_array($result);
         $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != 'OFFICE') ? True : False;
-        $result = sqlsrv_query($Portal,
+        $result = $database->query($Portal,
         "   SELECT Access_Table,
                    User_Privilege,
                    Group_Privilege,
@@ -40,7 +40,7 @@
         if(!isset(
           $array[ 'ID' ]) || !$Privileged){require( '401.html' );}
         else {
-    		sqlsrv_query(
+    		$database->query(
           $Portal,
           "INSERT INTO Activity([User],
            [Date], [Page])
@@ -90,7 +90,7 @@
                 <div class='col-xs-12'>End: <input name='End'  value='<?php echo isset($_GET[ 'End' ]) ? $_GET[ 'End' ] : '';?>'   /></div>
                 <div class='col-xs-12'><input type='submit' value='Search' /></div>-->
                 <div class='col-xs-12'>Supervisor: <select name='Supervisor'><?php
-                  $result = sqlsrv_query($NEI,
+                  $result = $database->query(null,
                   "SELECT tblWork.Super
                    FROM nei.dbo.tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
                   if($result){while($resultow = sqlsrv_fetch_array($result)){

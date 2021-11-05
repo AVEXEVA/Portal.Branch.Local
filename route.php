@@ -4,12 +4,12 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = sqlsrv_query($NEI,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
-    $r = sqlsrv_query($NEI,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = sqlsrv_query($NEI,"
+    $r = $database->query(null,"
             SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
             WHERE  User_ID = ?
@@ -20,7 +20,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(isset($My_Privileges['Route']) && $My_Privileges['Route']['User_Privilege'] >= 4 && $My_Privileges['Route']['Group_Privilege'] >= 4 && $My_Privileges['Route']['Other_Privilege'] >= 4){$Privileged = TRUE;}
     else {
         if(is_numeric($_GET['ID'])){
-                $r = sqlsrv_query($NEI,
+                $r = $database->query(null,
                 "SELECT
                     Route.ID        AS  ID,
                     Route.Name      AS  Route,
@@ -37,10 +37,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             if($My_Privileges['Route']['User_Privilege'] >= 4 && $_SESSION['User'] == $Route['Employee_ID']){$Privileged = TRUE;}
         }
     }
-    sqlsrv_query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
+    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=route<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
-        $r = sqlsrv_query($NEI,
+        $r = $database->query(null,
             "SELECT
                 Route.ID             AS ID,
                 Route.Name           AS Route,
@@ -128,13 +128,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <div class ='nav-text'>Information</div>
                     </div>
                     <?php
-                    $r = sqlsrv_query($NEI,"SELECT Elev.ID FROM Elev LEFT JOIN Loc ON Elev.Loc = Loc.Loc WHERE Loc.Route = ?;",array($_GET['ID']));
+                    $r = $database->query(null,"SELECT Elev.ID FROM Elev LEFT JOIN Loc ON Elev.Loc = Loc.Loc WHERE Loc.Route = ?;",array($_GET['ID']));
                     if($r){
                       $Units = array();
                       while($row = sqlsrv_fetch_array($r)){$Units[] = $row['ID'];}
                       if(count($Units) > 0){
                         $Units = "WHERE (CM_Unit.Elev_ID = " . implode(" OR CM_Unit.Elev_ID = ",$Units) . ")";
-                        $r = sqlsrv_query($database_Device,"SELECT CM_Unit.* FROM Device.dbo.CM_Unit {$Units}");
+                        $r = $database->query($database_Device,"SELECT CM_Unit.* FROM Device.dbo.CM_Unit {$Units}");
                         if($r && is_array(sqlsrv_fetch_array($r))){
                         ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-faults.php?ID=<?php echo $_GET['ID'];?>');">
                                 <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
