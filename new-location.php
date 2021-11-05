@@ -41,13 +41,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_php . 'element/loading.php');?>
     <div id="page-wrapper" class='content' style='<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
       <div class='panel-primary'>
-        <div class='panel-heading' onClick='document.location.href="work.php";'><h4 style=''><?php $Icons->Location();?> Location: New</h4></div>
+        <div class='panel-heading' onClick='document.location.href="work.php";'><h4 style=''><?php \singleton\fontawesome::getInstance( )->Location();?> Location: New</h4></div>
         <div class='panel-body'>
   				<div class='row'>
   					<div class='col-xs-12'>&nbsp;</div>
           </div>
           <div class='row'>
-  					<div class='col-xs-4'><?php $Icons->Location(1);?> Customer:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Customer:</div>
   					<div class='col-xs-8'><button type='button' onClick='selectCustomers(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Customer']) && is_numeric($_GET['Customer'])){

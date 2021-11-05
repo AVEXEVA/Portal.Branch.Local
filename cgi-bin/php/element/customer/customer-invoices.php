@@ -84,7 +84,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Customer = sqlsrv_fetch_array($result);
 ?>
 <div class="panel panel-primary" style='margin-bottom:0px;'>
-	<div class='panel-heading'><?php $Icons->Invoice( 1 );?> Invoices</div>
+	<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
 	<div class="panel-body">
 		<div class="row">
 			<div class='col-md-12' >

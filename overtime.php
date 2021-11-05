@@ -59,7 +59,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
-                        <div class="panel-heading"><h3><div style='float:left;'><?php $Icons->Timesheet();?>PIVOT: Job Supervisor - <?php echo $_GET['Start'];?> to <?php echo $_GET['End'];?></div><div style='float:right;'><button onClick="document.location.href='overtime-supervisor.php';" style='color:black;'>Employee Supervisor</button></div><div style='float:right;'><button onClick="document.location.href='overtime-employee.php';" style='color:black;'>Employee</button></div><div style='clear:both;'></div></h3></div>
+                        <div class="panel-heading"><h3><div style='float:left;'><?php \singleton\fontawesome::getInstance( )->Timesheet();?>PIVOT: Job Supervisor - <?php echo $_GET['Start'];?> to <?php echo $_GET['End'];?></div><div style='float:right;'><button onClick="document.location.href='overtime-supervisor.php';" style='color:black;'>Employee Supervisor</button></div><div style='float:right;'><button onClick="document.location.href='overtime-employee.php';" style='color:black;'>Employee</button></div><div style='clear:both;'></div></h3></div>
                         <div class='panel-heading'>
                           <form>
                               <div class='row'>

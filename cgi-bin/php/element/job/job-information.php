@@ -113,84 +113,84 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		);
         $Job = sqlsrv_fetch_array($r);?>
 <div class="panel panel-primary">
-    <div class="panel-heading"><?php $Icons->Job( 1 );?> Job</div>
+    <div class="panel-heading"><?php \singleton\fontawesome::getInstance( )->Job( 1 );?> Job</div>
     <div class='panel-body' style='padding:10px;'>			
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Job(1);?> ID</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> ID</div>
 			<div class='col-xs-8'><?php echo $Job['Job_ID'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Name</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Name</div>
 			<div class='col-xs-8'><?php echo $Job['Job_Name'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Start Date</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Start Date</div>
 			<div class='col-xs-8'><?php echo date("m/d/Y",strtotime($Job['Job_Start_Date']));?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Timetable</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Timetable</div>
 			<div class='col-xs-8'><?php echo strlen($Job['Job_Budgeted_Hours']) > 0 ? $Job['Job_Budgeted_Hours'] : "Null";?> hrs</div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Type</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Type</div>
 			<div class='col-xs-8'><?php echo $Job['Job_Type'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Notes</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Notes</div>
 			<div class='col-xs-8'><pre><?php echo $Job['Job_Remarks'];?></pre></div>
 		</div>
 	</div>
-	<div class='panel-heading'><?php $Icons->Location( 1 );?> Location</div>
+	<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Location</div>
 	<div class='panel-body' style='padding:10px;'>
 		<div class='row' style='border-bottom:3px ;padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Location(1);?> Name:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Name:</div>
 			<div class='col-xs-8'><?php echo $Job['Location_Name'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Street:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
 			<div class='col-xs-8'><?php echo $Job['Location_Street'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
 			<div class='col-xs-8'><?php echo $Job['Location_City'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
 			<div class='col-xs-8'><?php echo $Job['Location_State'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Zip:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
 			<div class='col-xs-8'><?php echo $Job['Location_Zip'];?></div>
 		</div>
 	</div>
-	<div class='panel-heading'><?php $Icons->Customer( 1 );?> Customer</div>
+	<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customer</div>
 	<div class='panel-body' style='padding:10px;'>
 		<div class='row' style='border-bottom:3px ;padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Customer(1);?> Customer </div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer </div>
 			<div class='col-xs-8'><?php echo $Job['Customer_Street'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Address</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Address</div>
 			<div class='col-xs-8'><?php echo $Job['Customer_Name'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> City</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City</div>
 			<div class='col-xs-8'><?php echo $Job['Customer_City'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> State</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State</div>
 			<div class='col-xs-8'><?php echo $Job['Customer_State'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Zip</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip</div>
 			<div class='col-xs-8'><?php echo $Job['Customer_Zip'];?></div>
 		</div>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Status</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status</div>
 			<div class='col-xs-8'><?php echo $Job['Customer_Status'] == 0 ? "Active" : "Unactive";?></div>
 		</div>
 		<div class='row'>
-			<?php if(isset($Job['Customer_Website']) && strlen($Job['Customer_Website']) > 0){?><div class='col-xs-4'><?php $Icons->Customer(1);?> Website</div>
+			<?php if(isset($Job['Customer_Website']) && strlen($Job['Customer_Website']) > 0){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Website</div>
 			<div class='col-xs-8'><?php echo $Job['Customer_Website'];?></div><?php }?>
 		</div>
     </div>

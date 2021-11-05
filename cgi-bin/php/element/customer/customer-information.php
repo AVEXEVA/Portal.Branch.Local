@@ -85,25 +85,25 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><div class="panel panel-primary">
 	<div class='panel-body' style='font-size:16px;padding:5px;'>
 		<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Customer(1);?> Name:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Name:</div>
 			<div class='col-xs-8'><?php echo $Customer['Name'];?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Status:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
 			<div class='col-xs-8'><?php echo isset($Customer['Status']) && $Customer['Status'] == 0? "Active" : "Inactive";?></div>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Address(1);?> Street:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Street:</div>
 			<div class='col-xs-8'><?php echo $Customer['Street'];?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
 			<div class='col-xs-8'><?php echo $Customer['City'];?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
 			<div class='col-xs-8'><?php echo $Customer['State'];?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Zip:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
 			<div class='col-xs-8'><?php echo $Customer['Zip'];?></div>
-			<div class='col-xs-4'><?php $Icons->Web(1);?> Website:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
 			<div class='col-xs-8'><?php echo strlen($Customer['Website']) > 0 ?  $Customer['Website'] : "&nbsp;";?></div>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-            <div class='col-xs-4'><?php $Icons->Unit(1);?> Units</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-8'><?php
 				$r = sqlsrv_query($NEI,"
 					SELECT Count(Elev.ID) AS Count_of_Elevators
@@ -113,7 +113,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
 				echo $r ? sqlsrv_fetch_array($r)['Count_of_Elevators'] : 0;
 			?></div>
-            <div class='col-xs-4'><?php $Icons->Job(1);?> Jobs</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-8'>&nbsp;
 				<?php
 				$r = sqlsrv_query($NEI,"
@@ -124,7 +124,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
 			echo $r ? sqlsrv_fetch_array($r)['Count_of_Jobs'] : 0;?>
 			</div>
-            <div class='col-xs-4'><?php $Icons->Violation(1);?> Violations</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-8'>&nbsp;
 			<?php
 				$r = sqlsrv_query($NEI,"
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
 				echo $r ? sqlsrv_fetch_array($r)['Count_of_Violations'] : 0;?>
 			</div>
-            <div class='col-xs-4'><?php $Icons->Ticket(1);?> Tickets</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-8'>
 			<?php
 				$r = sqlsrv_query($NEI,"
@@ -165,7 +165,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID'],$_GET['ID'],$_GET['ID']));
 				echo $r ? sqlsrv_fetch_array($r)['Count_of_Tickets'] : 0;?>
 			</div>
-            <div class='col-xs-4'><?php $Icons->Proposal(1);?> Proposals</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-8'>
 				<?php
 				$r = sqlsrv_query($NEI,"
@@ -176,7 +176,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
 				echo $r ? sqlsrv_fetch_array($r)['Count_of_Estimates'] : 0;?>
 			</div>
-            <div class='col-xs-4'><?php $Icons->Invoice(1);?> Invoices</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Invoices</div>
             <div class='col-xs-8'>
 				<?php
 				$r = sqlsrv_query($NEI,"
@@ -187,7 +187,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
 				echo $r ? sqlsrv_fetch_array($r)['Count_of_Invoices'] : 0;?>
 			</div>
-            <div class='col-xs-4'><?php $Icons->Legal(1);?> Lawsuits</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Legal(1);?> Lawsuits</div>
             <div class='col-xs-8'>
 				<?php
 				$r = sqlsrv_query($NEI,"
@@ -203,7 +203,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		</div>
 		<?php if(isset($My_Privileges['Finances']) && $My_Privileges['Finances']['User_Privilege'] >= 4) {?>
 		<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-            <div class='col-xs-4'><?php $Icons->Payroll(1);?> Balance</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Balance</div>
             <div class='col-xs-8'><?php
 				$r = sqlsrv_query($NEI,"
 					SELECT Sum(OpenAR.Balance) AS Balance

@@ -51,7 +51,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
-                        <div class="panel-heading"><h3><?php $Icons->Chart();?> Overhead Cost</h3></div>
+                        <div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Chart();?> Overhead Cost</h3></div>
                         <div class="panel-body">
 							<div id='Form_Overhead_Cost'>
 								<div class="panel panel-primary">

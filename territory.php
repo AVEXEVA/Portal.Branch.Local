@@ -56,7 +56,7 @@ if(isMobile()){?><!DOCTYPE html>
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
-				<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='location.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Territory();?> Territory: <?php echo $Territory['Territory_Name'];?></a></h4>
+				<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='location.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Territory();?> Territory: <?php echo $Territory['Territory_Name'];?></a></h4>
 			<style>
 				* { margin: 0 }
 				.Home-Screen-Option,.row,.nav-icon,.nav-text {
@@ -100,107 +100,107 @@ if(isMobile()){?><!DOCTYPE html>
 				<div class='row' style="margin: 0">
 					<?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
 					?><div tab='information' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' style="margin: 0" onClick="someFunction(this,'territory-information.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon' style="margin: 0"><?php $Icons->Information(3);?></div>
+							<div class='nav-icon' style="margin: 0"><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
 							<div class ='nav-text' style="margin: 0">Information</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 || $My_Privileges['Job']['Group_Privilege'] >= 4 && false){
 					?><div tab='code' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-code.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Job(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 							<div class ='nav-text'>Code</div>
 					</div><?php }?>
 					<?php/* if(isset($My_Privileges['Contract']) && $My_Privileges['Contract']['User_Privilege'] >= 4 || $My_Privileges['Contract']['Group_Privilege'] >= 4 && false){
 					?><div tab='contracts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-contracts.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Contract(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract(3);?></div>
 							<div class ='nav-text'>Contracts</div>
 					</div><?php }*/?>
 					<?php if(isset($My_Privileges['Collection']) && $My_Privileges['Collection']['User_Privilege'] >= 4 ){
 					?><div tab='collections' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-collections.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Collection(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
 							<div class ='nav-text'>Collections</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Contact']) && $My_Privileges['Contact']['User_Privilege'] >= 4 && false ) {
 					?><div tab='contacts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-contacts.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Info(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Info(3);?></div>
 							<div class ='nav-text'>Contacts</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4){
 					?><div tab='customer' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-customers.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Customer(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 							<div class ='nav-text'>Customers</div>
 					</div><?php }?>
 					<?php if(false) {?>
 					<div tab='feed' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-feed.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Activities(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Activities(3);?></div>
 							<div class ='nav-text'>Feed</div>
 					</div><?php } ?>
 					<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['User_Privilege'] >= 4 && false ){
 					?><div tab='invoices' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-invoices.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Invoice(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
 							<div class ='nav-text'>Invoices</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && false ){
 					?><div tab='jobs' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-jobs.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Job(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 							<div class ='nav-text'>Jobs</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
 					?><div tab='locations' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-locations.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Location(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
 							<div class ='nav-text'>Locations</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && false){
 					?><div tab='legal' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-legal.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Legal(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Legal(3);?></div>
 							<div class ='nav-text'>Legal</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && false){
 					?><div tab='maintenance' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-maintenance.php?ID=<?php echo $_GET['ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Maintenance(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Maintenance(3);?></div>
 							<div class ='nav-text'>Maintenance</div>
 					</div><?php }?>
 					<?php if(false) {?>
 					<div tab='map' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-map.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Map(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
 							<div class ='nav-text'>Map</div>
 					</div><?php } ?>
 					<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && false ){
 					?><div tab='modernization' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-modernization.php?ID=<?php echo $_GET['ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Modernization(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Modernization(3);?></div>
 							<div class ='nav-text'>Modernization</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Finances']) && $My_Privileges['Finances']['User_Privilege'] >= 4 && false){
 					?><div tab='PNL' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-pnl.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Customer(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 							<div class ='nav-text'>P&L</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Proposal']) && $My_Privileges['Proposal']['User_Privilege'] >= 4 && false ){
 					?><div tab='proposals' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-proposals.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Proposal(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
 							<div class ='nav-text'>Proposals</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Service']) && $My_Privileges['Service']['User_Privilege'] >= 4 && false){
 					?><div tab='service' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-service.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Phone(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Phone(3);?></div>
 							<div class ='nav-text'>Service</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && false){
 					?><div tab='testing' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-testing.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Testing(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Testing(3);?></div>
 							<div class ='nav-text'>Testing</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Group_Privilege'] >= 4 && false){
 					?><div tab='timeline' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-timeline.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->History(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->History(3);?></div>
 							<div class ='nav-text'>Timeline</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && false){
 					?><div tab='units' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-units.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Unit(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 							<div class ='nav-text'>Units</div>
 					</div><?php }?>
 					<?php if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['User_Privilege'] >= 4 && false){
 					?><div tab='violations' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'territory-violations.php?ID=<?php echo $Territory['Territory_ID'];?>');">
-							<div class='nav-icon'><?php $Icons->Violation(3);?></div>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 							<div class ='nav-text'>Violations</div>
 					</div><?php }?>
 				</div>

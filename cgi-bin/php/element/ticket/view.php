@@ -251,18 +251,18 @@ white-space: normal !important;
 				<div class="panel panel-primary" style='margin-bottom:0px;'>
 					<div class="panel-heading">
 						<div style='float:left;'>
-							<h3><?php $Icons->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
+							<h3><?php \singleton\fontawesome::getInstance( )->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
 						</div>
 						<?php if(isset($My_Privileges['Admin'])){?>
 						<div style='float:right;'>
 							<div style='float:left;font-size:22px;border:1px solid white;background-color:#f5f5f5;color:#252525;padding:5px;box-shadow:0px 5px 5px 0px #555555;border-radius:5px;cursor:pointer;margin-left:10px;'>
-								<?php $Icons->Edit();?> Edit
+								<?php \singleton\fontawesome::getInstance( )->Edit();?> Edit
 							</div>
 							<div onClick="document.location.href='ticket.php';" style='float:left;font-size:22px;border:1px solid white;background-color:#f5f5f5;color:#252525;padding:5px;box-shadow:0px 5px 5px 0px #555555;border-radius:5px;cursor:pointer;margin-left:10px;'>
-								<?php $Icons->Add();?> Add
+								<?php \singleton\fontawesome::getInstance( )->Add();?> Add
 							</div>
 							<div style='float:left;font-size:22px;border:1px solid white;background-color:#f5f5f5;color:#252525;padding:5px;box-shadow:0px 5px 5px 0px #555555;border-radius:5px;cursor:pointer;margin-left:10px;'>
-								<?php $Icons->Delete();?> Delete
+								<?php \singleton\fontawesome::getInstance( )->Delete();?> Delete
 							</div>
 						</div><?php }?>
 						<div style='clear:both;'></div>
@@ -274,10 +274,10 @@ white-space: normal !important;
 									<div class="panel-heading">Basic Information</div>
 									<div class='panel-body'>
 										<div style='font-size:24px;text-decoration:underline;'><b>
-											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php $Icons->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='location.php?ID=<?php echo $Ticket['Location_ID'];?>'><?php $Icons->Location();?> <?php echo $Ticket['Tag'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='job.php?ID=<?php echo $Ticket['Job_ID'];?>'><?php $Icons->Job();?> <?php echo $Ticket['Job_Description'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='user.php?ID=<?php echo $Ticket['User_ID'];?>'><?php $Icons->User();?> <?php echo proper($Ticket['First_Name'] . " " . $Ticket['Last_Name']);?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='location.php?ID=<?php echo $Ticket['Location_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> <?php echo $Ticket['Tag'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='job.php?ID=<?php echo $Ticket['Job_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Job();?> <?php echo $Ticket['Job_Description'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='user.php?ID=<?php echo $Ticket['User_ID'];?>'><?php \singleton\fontawesome::getInstance( )->User();?> <?php echo proper($Ticket['First_Name'] . " " . $Ticket['Last_Name']);?></a></div></div>
 										</b></div>
 									</div>
 								</div>

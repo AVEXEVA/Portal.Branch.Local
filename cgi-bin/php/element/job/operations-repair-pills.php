@@ -95,7 +95,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Territory();?>Total Repair Hours</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Territory();?>Total Repair Hours</h3></div>
 								<div class='panel-body white-background BankGothic shadow'>
 									<div class="flot-chart"><div class="flot-chart-content" id="flot-placeholder-repair-hours-by-customer"></div></div>	
 								</div>
@@ -108,7 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12' style=''>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Modernization();?>Active Repair</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Modernization();?>Active Repair</h3></div>
 								<div class='panel-body white-background BankGothic shadow'>
 									<table id='Table_Active_Repair' class='display' cellspacing='0' width='100%'>
 										<thead>

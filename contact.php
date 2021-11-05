@@ -50,7 +50,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
-			<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='contact.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Info();?> Contact: <?php echo $Contact['Contact'];?></a></h4>
+			<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='contact.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Info();?> Contact: <?php echo $Contact['Contact'];?></a></h4>
 			<div class='col-xs-4'>Name:</div>
 			<div class='col-xs-8'><?php echo $Contact['Contact'];?></div>
 			<div class='col-xs-4'>Phone:</div>

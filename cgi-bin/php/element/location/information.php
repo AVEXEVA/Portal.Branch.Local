@@ -165,10 +165,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         );
         $Location = sqlsrv_fetch_array($r);
 ?><div class='panel panel-primary' id='location/information'>
-    <div class='panel-heading'><?php $Icons->Customer( 1 );?> Customer</h4></div>
+    <div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customer</h4></div>
     <div class='panel-body'>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Blank( 1 );?> Name:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Name:</div>
             <div class='col-xs-9'><?php
                 echo $Privileges['Customer']['Other_Privilege'] >= 4
                     ?   "<div class='row'><div class='col-xs-9'><input disabled type='text' value='" . proper( $Location['Customer_Name'] ) . "' /></div><div class='col-xs-3'><button onClick=\"document.location.href='division.php?ID=" . $Location['Customer_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <?php if( !in_array( Location[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Location['Longitude' ], array( null, 0 ) ) ){
-        ?><div class='panel-heading'><?php $Icons->Map( 1 );?> Map</div>
+        ?><div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Map( 1 );?> Map</div>
         <div class='panel-body'>
             <div class='row'><div id='map'>&nbsp;</div></div>
             <script type="text/javascript">
@@ -205,29 +205,29 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
         </div>
     <?php }?>
-    <div class='panel-heading'><?php $Icons->Location( 1 );?> Location</div>
+    <div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Location</div>
     <div class='panel-body'>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Address(1);?> Street:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Street:</div>
             <div class='col-xs-9'><input disabled type='text' name='Street' value='<?php echo strlen($Location['Location_Street']) ? $Location['Location_Street'] : "&nbsp;";?>' /></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Blank(1);?> City:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
             <div class='col-xs-9'><input disabled type='text' name='City' value='<?php echo strlen($Location['Location_City']) ? $Location['Location_City'] : "&nbsp;";?>' /></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Blank(1);?> State:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
             <div class='col-xs-9'><input disabled type='text' name='State' value='<?php echo strlen($Location['Location_State']) ? $Location['Location_State'] : "&nbsp;";?>' /></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Blank(1);?> Zip:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
             <div class='col-xs-9'><input disabled type='text' name='Zip' value='<?php echo strlen($Location['Location_Zip']) ? $Location['Location_Zip'] : "&nbsp;";?>' /></div>
         </div>
     </div>
-    <div class='panel-heading'><?php $Icons->Maintenance( 1 );?> Operations</div>
+    <div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Maintenance( 1 );?> Operations</div>
     <div class='panel-body'>
         <div class='row'> 
-            <div class='col-xs-3'><?php $Icons->Route();?> Route:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
             <div class='col-xs-9'><?php  
                 echo $Privileges['Route']['Other_Privilege'] >= 4 || $User[ 'ID' ] == $Location['Route_Mechanic_ID'] 
                     ?   "<div class='row'><div class='col-xs-9'><input disabled type='text' value='" . proper( $Location['Route_Mechanic_First_Name'] . ' ' . $Location['Route_Mechanic_Last_Name'] ) . "' /></div><div class='col-xs-3'><button onClick=\"document.location.href='route.php?ID=" . $Location['Route_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
@@ -235,18 +235,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Resident(1);?> Resident:</div> 
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Resident(1);?> Resident:</div> 
             <div class='col-xs-9'><input disabled type='text' name='Resident' value='<?php echo isset($Location['Resident_Mechanic']) && $Location['Resident_Mechanic'] != '' ? proper($Location['Resident_Mechanic']) : "No";?>' /></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Division(1);?> Division:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
             <div class='col-xs-9'><?php 
                 echo $Privileges['Division']['Other_Privilege'] >= 4
                     ?   "<div class='row'><div class='col-xs-9'><input disabled type='text' value='" . proper( $Location['Division'] ) . "' /></div><div class='col-xs-3'><button onClick=\"document.location.href='division.php?ID=" . $Location['Division_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
                     :   "<input disabled type='text' name='Division' value='" . proper( $Location['Division'] ) . "' />";?></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Unit(1);?> Units</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-9'><?php
                 $r = sqlsrv_query(
                     $NEI,
@@ -263,7 +263,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Job(1);?> Jobs</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-9'><?php
                 $r = sqlsrv_query(
                     $NEI,
@@ -280,7 +280,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Violation(1);?> Violations</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-9'><?php
                 $r = sqlsrv_query(
                     $NEI,
@@ -297,7 +297,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Ticket(1);?> Tickets</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-9'><?php
                 $r = sqlsrv_query(
                     $NEI,
@@ -315,10 +315,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <?php if(isset($Privileges['Finances']) && $Privileges['Finances']['Other_Privilege'] >= 4){?>
-    <div class='panel-heading'><h4><?php $Icons->Blank( 1 );?> Sales</h4></div>
+    <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Sales</h4></div>
     <div class='panel-body'>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Territory(1);?> Territory:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Territory(1);?> Territory:</div>
             <div class='col-xs-9'>
                 <div class='row'>
                     <div class='col-xs-9'><input disabled type='text' value='<?php echo $Location[ 'Territory_Name'];?>' /></div>
@@ -331,7 +331,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Proposal(1);?> Proposals</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-9'><?php 
                 $r = sqlsrv_query($NEI,"
                     SELECT Count(Estimate.ID) AS Count 
@@ -344,11 +344,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Collection(1);?> Balance:</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Balance:</div>
             <div class='col-xs-9'><input disabled type='text' name='Balance' value='<?php echo isset($Location['Location_Balance']) && $Location['Location_Balance'] != '' ? money_format('%.2n',$Location['Location_Balance']) : "&nbsp;";?>' /></div>
         </div>
         <div class='row'>
-            <div class='col-xs-3'><?php $Icons->Invoice(1);?> Collection</div>
+            <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Collection</div>
             <div class='col-xs-9'><?php 
                 $r = sqlsrv_query(
                     $NEI,

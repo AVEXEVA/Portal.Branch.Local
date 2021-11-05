@@ -155,35 +155,35 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         if( $r ){while( $array = sqlsrv_fetch_array( $r ) ){ $Unit[ $array[ 'fDesc' ] ] = $array[ 'Value' ]; } }
 ?><!DOCTYPE html>
             <div class="panel panel-primary">
-                <div class="panel-heading"><h4><?php $Icons->Info( 1 );?> Information</h4></div>
+                <div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Info( 1 );?> Information</h4></div>
                 <div class='panel-body'>
                     <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Description( 1 );?> City ID:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Description( 1 );?> City ID:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'City_ID' ] ) > 0 ? $Unit[ 'City_ID' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Blank( 1 );?> Building ID:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Building ID:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'Building_ID' ] ) > 0 ? $Unit[ 'Building_ID' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Unit( 1 );?> Type:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?> Type:</div>
                         <div class='col-xs-8'><?php echo strlen($Unit[ 'Type' ])>0 ? $Unit[ 'Type' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
                         <?php if( isset( $Privileges[ 'Invoice' ] ) && $Privileges[ 'Invoice' ][ 'Other_Privilege' ] >= 4){
-              ?><div class='col-xs-4'><?php $Icons->Collection(1);?> Price:</div>
+              ?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Price:</div>
                           <div class='col-xs-8'><?php echo strlen($Unit[ 'Price' ])>0 ? money_format( '%.2n', $Unit[ 'Price' ] ): "&nbsp;";?></div><?php 
             }?>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Note( 1 );?> Notes:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Note( 1 );?> Notes:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'Description'] )>0 ? $Unit[ 'Description' ] : "&nbsp;";?></div>
                     </div>
         </div>
-        <div class="panel-heading"><h4><?php $Icons->Location( 1 );?> Location</h4></div>
+        <div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Location</h4></div>
         <div class='panel-body'>
                     <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Location(1);?> Name:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Name:</div>
                         <div class='col-xs-8'><?php 
               echo $Privileges['Location']['Other_Privilege'] >= 4 
                     ?   "<div class='row'><div class='col-xs-8'><input disabled type='text' value='" . proper( $Unit['Location_Tag'] ) . "' /></div><div class='col-xs-4'><button onClick=\"document.location.href='location.php?ID=" . $Unit['Location_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
@@ -191,26 +191,26 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             ?></div>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Blank(1);?> Street:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'Street' ]) > 0 ? $Unit[ 'Street' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'City' ] ) > 0 ? $Unit[ 'City' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'Location_State' ] ) > 0 ? $Unit[ 'Location_State' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Blank(1);?> Zip:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
                         <div class='col-xs-8'><?php echo strlen( $Unit[ 'Zip' ] ) > 0 ? $Unit[ 'Zip' ] : "&nbsp;";?></div>
           </div>
                 </div>
-        <div class="panel-heading"><h4><?php $Icons->Customer( 1 );?> Customer</h4></div>
+        <div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customer</h4></div>
         <div class='panel-body'>
                 <div class='row'>
-                    <div class='col-xs-4'><?php $Icons->Customer(1);?> Name: </div>
+                    <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Name: </div>
                     <div class='col-xs-8'><?php 
               echo $Privileges['Customer']['Other_Privilege'] >= 4 
                     ?   "<div class='row'><div class='col-xs-8'><input disabled type='text' value='" . proper( $Unit['Customer_Name'] ) . "' /></div><div class='col-xs-4'><button onClick=\"document.location.href='customer.php?ID=" . $Unit['Customer_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
@@ -218,19 +218,19 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             ?></div>
           </div>
           <div class='row'>
-                    <div class='col-xs-4'><?php $Icons->Blank(1);?> Contact:</div>
+                    <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Contact:</div>
                     <div class='col-xs-8'><?php echo $Unit['Customer_Contact'];?></div>
           </div>
           <div class='row'>
-                    <div class='col-xs-4'><?php $Icons->Blank(1);?> Street:</div>
+                    <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
                     <div class='col-xs-8'><?php echo $Unit['Customer_Street'];?></div>
                 </div>
           <div class='row'>
-                    <div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+                    <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
                     <div class='col-xs-8'><?php echo $Unit['Customer_City'];?></div>
                 </div>
           <div class='row'>
-                    <div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+                    <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
                     <div class='col-xs-8'><?php echo $Unit['Customer_State'];?></div>
                 </div>
             </div>

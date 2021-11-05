@@ -27,5 +27,5 @@ class Icons {
 	public function User(){?><i class="fa fa-user-o fa-fw"></i><? }
 	public function Dashboard(){?><i class="fa fa-dashboard fa-fw"></i><? }
 }
-$Icons = new Icons();
+singletonontawesome( ) = new Icons();
 ?>

@@ -61,7 +61,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3><?php $Icons->Admin();?>Admin: <?php echo $My_User['fFirst'] . ' ' . $My_User['Last'];?></h3>
+                            <h3><?php \singleton\fontawesome::getInstance( )->Admin();?>Admin: <?php echo $My_User['fFirst'] . ' ' . $My_User['Last'];?></h3>
                         </div>
                         <script>
                         var asyncArray = new Array();
@@ -98,8 +98,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         </script>
                         <div class="panel-body">
                             <ul class="nav nav-tabs BankGothic">
-                                <li class=''><a href="#" tab="overview-pills" onClick="asyncPage(this);"><?php $Icons->Info();?>Overview</a></li>
-								<li class=''><a href='#' tab='tables-pills'   onClick='asyncPage(this);'><?php $Icons->Table();?>Tables</a></li>
+                                <li class=''><a href="#" tab="overview-pills" onClick="asyncPage(this);"><?php \singleton\fontawesome::getInstance( )->Info();?>Overview</a></li>
+								<li class=''><a href='#' tab='tables-pills'   onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Table();?>Tables</a></li>
                             </ul>
                             <br />
                             <div class="tab-content" id="main-tab-content">

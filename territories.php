@@ -49,7 +49,7 @@ if(isMobile()){
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h4><?php $Icons->Territory();?> Territories</h4></div>
+				<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Territory();?> Territories</h4></div>
 				<div class="panel-body">
 					<table id='Table_Territories' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 						<thead>

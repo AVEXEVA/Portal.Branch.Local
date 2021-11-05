@@ -125,7 +125,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Job();?> Job Description</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Job();?> Job Description</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:18px;text-decoration:underline;'><b>
 										<div class='row'>
@@ -174,7 +174,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Location();?> Location</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location();?> Location</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;cursor:pointer;' onClick="document.location.href='location.php?ID=<?php echo $Location['Location_ID'];?>';"><b>
 										<div class='row'><div class='col-xs-12'><?php echo $Location["Tag"];?></div></div>
@@ -186,7 +186,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Customer();?> Customer</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer();?> Customer</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row'><div class='col-xs-12'><?php if($My_Privileges['Customer']['Other_Privilege'] >= 4){?><a href="customer.php?ID=<?php echo $Location['Customer_ID'];?>"><?php }?><?php echo $Location['Customer_Name'];?><?php if($My_Privileges['Customer']['Other_Privilege'] >= 4){?></a><?php }?></div></div>
@@ -200,16 +200,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<div class='row'>
 								<div class='col-md-6'>
 									<div class="panel panel-primary">
-										<div class="panel-heading"><h4><?php $Icons->Maintenance();?> Maintenance Information</h4></div>
+										<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance Information</h4></div>
 										<div class='panel-body white-background' style='font-size:20px;padding:5px;'>
-											<div class='row'><div class='col-xs-12'><?php $Icons->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?></div></div>
-											<div class='row'><div class='col-xs-12'><?php $Icons->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div></div>
+											<div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?></div></div>
+											<div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div></div>
 										</div>
 									</div>
 								</div>
 								<div class='col-md-6'>
 									<div class="panel panel-primary">
-										<div class="panel-heading"><h4><?php $Icons->Contract();?> Sales Information</h4></div>
+										<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Contract();?> Sales Information</h4></div>
 										<div class='panel-body white-background' style='font-size:20px;padding:5px;'>
 											<div class='row'><div class='col-xs-12'><?php echo $Location['Territory_Domain'];?>'s Territory</div></div>
 										</div>
@@ -217,7 +217,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								</div>
 								<?php if(isset($My_Privileges['Admin'])){?><div class='col-md-12'>
 									<div class="panel panel-primary">
-										<div class="panel-heading"><?php $Icons->Chart();?> Finances</div>
+										<div class="panel-heading"><?php \singleton\fontawesome::getInstance( )->Chart();?> Finances</div>
 										<div class='panel-body'>
 											<?php if(isset($My_Privileges['Admin'])){?><div class="col-lg-6 col-md-6">
 												<div class="panel panel-primary">
@@ -522,7 +522,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Calendar();?> Timeline</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Calendar();?> Timeline</h3></div>
 								<div class='panel-body white-background BankGothic shadow' style='height:600px;overflow:auto;'>
 									<div class='row' style='font-size:20px;'><?php 
 										$Timeline = array();
@@ -810,31 +810,31 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											foreach($DayTimeline as $Instance){
 												//$Instance['Date'] = date('m/d/Y',strtotime($Instance['Date']));
 												if(substr($Instance['Object'],0,6) == 'Ticket' && $Instance['Field'] == 'Completed'){
-													?><div class='col-md-12'><a href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Ticket();?> Completed <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Ticket();?> Completed <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,6) == 'Ticket' && $Instance['Field'] == 'Created'){
-													?><div class='col-md-12'><a href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Ticket();?> Created <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='ticket.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Ticket();?> Created <?php if($Instance['Level'] == 1){?>Service Call <?php }elseif($Instance['Level'] == 10){?>Preventative Maintenance <?php }?>Ticket #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,3) == 'Job' && $Instance['Field'] == 'Created'){
-													?><div class='col-md-12'><a href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Job();?> Created Job #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Job();?> Created Job #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,3) == 'Job' && $Instance['Field'] == 'Completed'){
-													?><div class='col-md-12'><a href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Job();?> Completed Job #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='job.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Job();?> Completed Job #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,8) == 'Proposal' && $Instance['Field'] == 'Created'){
-													?><div class='col-md-12'><a href='proposal.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Proposal();?> Created Proposal #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='proposal.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Proposal();?> Created Proposal #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,7) == 'Invoice' && $Instance['Field'] == 'Created'){
-													?><div class='col-md-12'><a href='invoice.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Invoice();?> Created Invoice #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='invoice.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Invoice();?> Created Invoice #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,10) == 'Violation' && $Instance['Field'] == 'Created'){
-													?><div class='col-md-12'><a href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Created Violation #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Created Violation #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif($Instance['Object'] == 'Transaction' && $Instance['Field'] == 'Paid'){
-													?><div class='col-md-12'><a href='transaction.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Invoice();?> Paid Invoice #<?php echo $Instance['Ref'];?></a></div><?php
+													?><div class='col-md-12'><a href='transaction.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Invoice();?> Paid Invoice #<?php echo $Instance['Ref'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,10) == 'Violation' && $Instance['Field'] == 'Overdue'){
-													?><div class='col-md-12'><a href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Overdue Violation #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Overdue Violation #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,10) == 'Job' && $Instance['Field'] == 'Overdue'){
-													?><div class='col-md-12'><a href='job.php?ID=<?php echo $Instance['Job'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Overdue Violation Job #<?php echo $Instance['Job'];?></a></div><?php
+													?><div class='col-md-12'><a href='job.php?ID=<?php echo $Instance['Job'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Overdue Violation Job #<?php echo $Instance['Job'];?></a></div><?php
 												} elseif($Instance['Object'] == 'Contract' && $Instance['Field'] == 'Starts'){
-													?><div class='col-md-12'><a href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Contract();?> Contract Starts Job #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Contract();?> Contract Starts Job #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif($Instance['Object'] == 'Contract' && $Instance['Field'] == 'Billed'){
-													?><div class='col-md-12'><a href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Contract();?> Contract Billed Job #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='contract.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Contract();?> Contract Billed Job #<?php echo $Instance['ID'];?></a></div><?php
 												} elseif(substr($Instance['Object'],0,10) == 'OpenAR' && $Instance['Field'] == 'Overdue'){
-													?><div class='col-md-12'><a href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php $Icons->Violation();?> Overdue Invoice #<?php echo $Instance['ID'];?></a></div><?php
+													?><div class='col-md-12'><a href='violation.php?ID=<?php echo $Instance['ID'];?>'><?php $Instance['Date'];?> <?php \singleton\fontawesome::getInstance( )->Violation();?> Overdue Invoice #<?php echo $Instance['ID'];?></a></div><?php
 												}
 											}
 										}}

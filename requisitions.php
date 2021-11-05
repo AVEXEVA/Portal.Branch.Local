@@ -52,8 +52,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-          <div style='float:left;' onClick="document.location.href='home.php';"><?php $Icons->Requisition();?> Requisitions</div>
-          <div style='float:right;' onClick="document.location.href='purchase-requisition.php';"><?php $Icons->Add(1);?></div>
+          <div style='float:left;' onClick="document.location.href='home.php';"><?php \singleton\fontawesome::getInstance( )->Requisition();?> Requisitions</div>
+          <div style='float:right;' onClick="document.location.href='purchase-requisition.php';"><?php \singleton\fontawesome::getInstance( )->Add(1);?></div>
           <div style='clear:both;'></div>
         </div>
 				<div class="panel-body">
@@ -118,7 +118,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 '<td style="background-color:#1d1d1d;">'+d.Job+'</td>'+
             '</tr>'+
             '<tr>'+
-                '<td colspan="2"><button style="width:100%;height:42px;" onClick="document.location.href=\'requisition.php?ID='+d.ID+'\';"><?php $Icons->Requisition();?>View Requisition</a></td>'+
+                '<td colspan="2"><button style="width:100%;height:42px;" onClick="document.location.href=\'requisition.php?ID='+d.ID+'\';"><?php \singleton\fontawesome::getInstance( )->Requisition();?>View Requisition</a></td>'+
             '</tr>'+
         '</tbody></table>';
     }

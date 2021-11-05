@@ -195,29 +195,29 @@ if($Ticket['Table2'] == 'TicketO'){
 }
 ?>
 <div class="panel panel-primary">
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Info(1);?> Description</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Info(1);?> Description</h4></div>
 	<div class='panel-body white-background' style='font-size:14px;padding:10px;'>
 		<div class='row'>
-			<div class='col-xs-4'><?php $Icons->User(1);?> Worker:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->User(1);?> Worker:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['First_Name'] . " " . $Ticket["Last_Name"]);?></div>
     </div>
     <div class='row'>
-			<div class='col-xs-4'><?php $Icons->User(1);?> Date:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->User(1);?> Date:</div>
 			<div class='col-xs-8'><?php echo date("m/d/Y",strtotime($Ticket['EDate']));?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Description(1);?> Description:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Description(1);?> Description:</div>
       <div class='colx-s-8'>&nbsp;</div>
     </div>
     <div class='row'>
 			<div class='col-xs-12'><pre><?php echo proper($Ticket['fDesc']);?></pre></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
 			<div class='col-xs-8'><?php echo strlen($Ticket['Tag']) > 0 ? $Ticket['Tag'] : 'N/A';?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Unit(1);?> Unit:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
       <style>
       .popup {
         position:absolute;
@@ -268,11 +268,11 @@ if($Ticket['Table2'] == 'TicketO'){
       </script>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Job(1);?> Job:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
 			<div class='col-xs-8'><?php echo strlen($Ticket['Job_Description']) > 0 ? $Ticket['Job_Description'] : 'N/A';?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Ticket(1);?> Status:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Status:</div>
       <div class='col-xs-8'><?php echo strlen($Ticket['Status']) > 0 ? $Ticket['Status'] : 'Reviewing';?></div>
     </div>
     <?php if($Ticket['Status'] == 'Reviewing' && !isset($_GET['Edit']) && $My_User['fWork'] == $Ticket['fWork']){?>
@@ -281,7 +281,7 @@ if($Ticket['Table2'] == 'TicketO'){
     </div>
     <?php }?>
   </div>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Ticket(1);?> Work Orders</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Work Orders</h4></div>
   <div class='panel-body'>
     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     <script>
@@ -309,7 +309,7 @@ if($Ticket['Table2'] == 'TicketO'){
     }
     </script>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Info(1);?> Change W.O.:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Info(1);?> Change W.O.:</div>
       <?php
       if(isset($_GET['Edit']) || ($Ticket['Assigned'] >= 1 && $Ticket['Assigned'] <= 3)){?>
       <div class='col-xs-8'><button style='width:100%;' onClick='getWorkOrders(this);'><?php
@@ -338,48 +338,48 @@ if($Ticket['Table2'] == 'TicketO'){
     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
   </div>
 	<?php if(isset($_GET['Edit']) && $Ticket['Table2'] == 'TicketO' && $Ticket['Employee_ID'] = $_SESSION['User']){?>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Time</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Time</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Delivery(1);?> En Route:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Delivery(1);?> En Route:</div>
 			<div class='col-xs-8' id='en-route'><?php echo $Ticket['TimeRoute'] != '' ? date("h:i A",strtotime($Ticket['TimeRoute'])) : date("h:i A",strtotime($Ticket['TimeSite']));?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Resident(1);?> At Work:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Resident(1);?> At Work:</div>
 			<div class='col-xs-8' id='on-site'><?php echo date("h:i A",strtotime($Ticket['TimeSite']));?></div>
     </div>
     <div class='row'>
       <div class='col-xs-12'>&nbsp;</div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Check(1);?> Completed:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Check(1);?> Completed:</div>
       <div class='col-xs-8' id='completed'><?php echo date("h:i A",strtotime($Ticket['TimeComp']));?></div>
     </div>
     <div class='row'>
       <div class='col-xs-12'>&nbsp;</div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Regular:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Regular:</div>
       <div class='col-xs-2'><input type='text' id='time-regular' name='time-regular' size='3' value='<?php echo $Ticket2['Reg'];?>' /></div>
       <div class='col-xs-6' ><div id='slider-regular' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Overtime:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Overtime:</div>
       <div class='col-xs-2'><input type='text' id='time-overtime' name='time-overtime' size='3' /></div>
       <div class='col-xs-6'><div id='slider-overtime' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> 1.7x:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> 1.7x:</div>
       <div class='col-xs-2'><input type='text' id='time-nightdiff' name='time-nightdiff' size='3' /></div>
       <div class='col-xs-6'><div id='slider-nightdiff' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Doubletime:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Doubletime:</div>
       <div class='col-xs-2'><input type='text' id='time-doubletime' name='time-doubletime' size='3' /></div>
       <div class='col-xs-6' ><div id='slider-doubletime' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Total:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Total:</div>
       <div class='col-xs-2'><input type='text' id='timeTotal' name='Total' size='3' value='<?php echo $total;?>' disabled /></div>
       <div class='col-xs-6' id='permaTotal'>&nbsp;</div>
       <script>
@@ -389,14 +389,14 @@ if($Ticket['Table2'] == 'TicketO'){
       </script>
     </div>
   </div>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Expenses</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Expenses</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='row expenses'>
-      <div class='col-xs-4'><?php $Icons->Payroll(1);?> Car:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Car:</div>
       <div class='col-xs-8'><input type='text' name='CarExpenses' placeholder='$0.00' style='width:100%;' value='<?php echo $Ticket2['Zone'];?>' /></div>
     </div>
     <div class='row expenses'>
-      <div class='col-xs-4'><?php $Icons->Payroll(1);?> Other:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Other:</div>
       <div class='col-xs-8'><input type='text' name='OtherExpenses' placeholder='$0.00' style='width:100%;' value='<?php echo $Ticket2['OtherE'];?>'  /></div>
     </div>
     <div class='row expenses'>
@@ -411,11 +411,11 @@ if($Ticket['Table2'] == 'TicketO'){
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='row resolution'>
-      <div class='col-xs-4'><?php $Icons->Blank();?> Chargeable</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank();?> Chargeable</div>
       <div class='col-xs-8'><input type='checkbox' value='1' name='Chargeable' style='height:15px;width:15px;' /></div>
     </div>
     <div class='row resolution' style='display:none;'>
-      <div class='col-xs-4'><?php $Icons->Blank(1);?> Follow Up:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Follow Up:</div>
       <div class='col-xs-8'><input  type='checkbox' value='1' name='Follow_Up' style='height:15px;width:15px;' /></div>
       <div class='col-xs-12'>&nbsp;</div>
     </div>
@@ -495,17 +495,17 @@ if($Ticket['Table2'] == 'TicketO'){
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-pencil fa-1x fa-fw" aria-hidden="true"></i> Signature</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='email row'>
-      <div class='col-xs-4'><?php $Icons->Email(1);?> Email:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
       <div class='col-xs-8'><input type='checkbox' value='0' onchange='toggle_email_person();' /></div>
     </div>
 
     <div class='email-person row'>
-      <div class='col-xs-4'><?php $Icons->Blank(1);?> Address:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Address:</div>
       <div class='col-xs-8'><input type='text' name='Email' style='width:100%;' /></div>
     </div>
     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     <div class='signature row'>
-      <div class='col-xs-4'><?php $Icons->Contract(1);?> Signee:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Contract(1);?> Signee:</div>
       <div class='col-xs-8'><input type='text' name='Signature_Name' style='width:100%;' value='<?php echo $Ticket2['SignatureText'];?>' /></div>
       <div class='col-xs-12'><button onClick='clearCanvas();' style='width:100%;'>Clear Signature</button></div>
       <div class='col-xs-12'><canvas id='signature' style='width:100%;touch-action: none;' height='200px'></canvas></div>
@@ -641,38 +641,38 @@ if($Ticket['Table2'] == 'TicketO'){
       </div>
     <?php } elseif((isset($Ticket['TimeSite']) && strlen($Ticket['TimeSite']) > 0 && date("h:i A",strtotime($Ticket['TimeSite'])) != '12:00 AM') || $Ticket['Status'] == 'Completed' || $Ticket['Employee_ID'] != $_SESSION['User']){?>
       <?php if((date("h:i A",strtotime($Ticket['TimeComp'])) != '12:00 AM' && ($Ticket['Table2'] == 'TicketD' || $Ticket['Table2'] == 'TicketDArchive' || ($Ticket['Status'] == 'Reviewing' && $Ticket['Table2'] == 'TicketO'))) || $Ticket['Employee_ID'] != $_SESSION['User'] || $Ticket['Table2'] == 'TicketD' || $Ticket['Table2'] == 'TicketDArchive'){?>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Time</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Time</h4></div>
   <div class='panel-body' style='padding:10px;font-size:14px;'>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Delivery(1);?> En Route:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Delivery(1);?> En Route:</div>
 			<div class='col-xs-8' id='en-route'><?php echo is_null($Ticket['TimeRoute']) ? 'N/A' : date("h:i A",strtotime($Ticket['TimeRoute']));?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> On Site:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> On Site:</div>
 			<div class='col-xs-8' id='on-site'><?php echo is_null($Ticket['TimeSite']) ? 'N/A' : date("h:i A",strtotime($Ticket['TimeSite']));?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Done:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Done:</div>
       <div class='col-xs-8' id='completed'><?php echo is_null($Ticket['TimeComp']) ? 'N/A' : date("h:i A",strtotime($Ticket['TimeComp']));?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Regular:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Regular:</div>
       <div class='col-xs-8'><?php echo $Ticket2['Reg'];?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Overtime:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Overtime:</div>
       <div class='col-xs-8'><?php echo $Ticket2['OT'];?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> 1.7x:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> 1.7x:</div>
       <div class='col-xs-8'><?php echo $Ticket2['NT'];?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Doubletime:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Doubletime:</div>
       <div class='col-xs-8'><?php echo $Ticket2['DT'];?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Total:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Total:</div>
       <div class='col-xs-2'><input type='text' id='timeTotal' name='Total' size='3' value='<?php echo $Ticket2['Total'];?>' disabled /></div>
       <div class='col-xs-6' id='permaTotal'>&nbsp;</div>
       <script>
@@ -682,14 +682,14 @@ if($Ticket['Table2'] == 'TicketO'){
       </script>
     </div>
   </div>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Payroll(1);?> Expenses</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Expenses</h4></div>
   <div class='panel-body' style='padding:10px;font-size:14px;'>
     <div class='row expenses'>
-      <div class='col-xs-4'><?php $Icons->Payroll(1);?> Car:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Car:</div>
       <div class='col-xs-8'><?php echo $Ticket2['Zone'];?></div>
     </div>
     <div class='row expenses'>
-      <div class='col-xs-4'><?php $Icons->Payroll(1);?> Other:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Other:</div>
       <div class='col-xs-8'><?php echo $Ticket2['OtherE'];?></div>
     </div>
     <div class='row expenses'>
@@ -724,7 +724,7 @@ if($Ticket['Table2'] == 'TicketO'){
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-pencil fa-1x fa-fw" aria-hidden="true"></i> Signature</h4></div>
   <div class='panel-body' style='padding:10px;font-size:14px;'>
     <div class='email row'>
-      <div class='col-xs-4'><?php $Icons->Email(1);?> Email:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
       <div class='col-xs-8'><?php
       $r = sqlsrv_query($Portal,"SELECT * FROM Ticket_Email WHERE Ticket_Email.Ticket = ?;",array($_GET['ID']));
       $i = 0;
@@ -736,7 +736,7 @@ if($Ticket['Table2'] == 'TicketO'){
       ?></div>
     </div>
     <div class='signature row'>
-      <div class='col-xs-4'><?php $Icons->Contract(1);?> Signee:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Contract(1);?> Signee:</div>
       <div class='col-xs-8'><?php echo isset($Ticket2['SignatureText']) ? $Ticket2['SignatureText'] : '';?></div>
       <div class='col-xs-12'><img style='width:100%;' src="data:image/jpeg;base64,<?php
         //echo file_get_contents("media/images/signatures/index.php?ID={$_GET['ID']}");
@@ -762,7 +762,7 @@ if($Ticket['Table2'] == 'TicketO'){
     </div>
   </div>
   <?php } else {?>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Time</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Time</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='row'>
       <div class='col-xs-12'><button style='width:100%;height:35px;' id='reset_time' onclick='reset_time(this);'>Reset Ticket</button></div>
@@ -771,18 +771,18 @@ if($Ticket['Table2'] == 'TicketO'){
       <div class='col-xs-12'>&nbsp;</div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Delivery(1);?> En Route:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Delivery(1);?> En Route:</div>
 			<div class='col-xs-8' id='en-route'><?php echo $Ticket['TimeRoute'] != '' ? date("h:i A",strtotime($Ticket['TimeRoute'])) : date("h:i A",strtotime($Ticket['TimeSite']));?></div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Resident(1);?> At Work:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Resident(1);?> At Work:</div>
 			<div class='col-xs-8' id='on-site'><?php echo date("h:i A",strtotime($Ticket['TimeSite']));?></div>
     </div>
     <div class='row'>
       <div class='col-xs-12'>&nbsp;</div>
     </div>
     <div class='row'>
-      <div class='col-xs-4'><?php $Icons->Check(1);?> Completed:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Check(1);?> Completed:</div>
       <div class='col-xs-8' id='completed'><button style='width:100%;' onclick='post_time_completed(this);'>Completed Work</button></div>
     </div>
     <div class='row'>
@@ -792,27 +792,27 @@ if($Ticket['Table2'] == 'TicketO'){
       <div class='col-xs-12'>&nbsp;</div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Regular:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Regular:</div>
       <div class='col-xs-2'><input type='text' id='time-regular' name='time-regular' size='3' /></div>
       <div class='col-xs-6' ><div id='slider-regular' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Overtime:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Overtime:</div>
       <div class='col-xs-2'><input type='text' id='time-overtime'name='time-overtime' size='3' /></div>
       <div class='col-xs-6'><div id='slider-overtime' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> 1.7x:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> 1.7x:</div>
       <div class='col-xs-2'><input type='text' id='time-nightdiff'name='time-nightdiff' size='3' /></div>
       <div class='col-xs-6'><div id='slider-nightdiff' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Doubletime:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Doubletime:</div>
       <div class='col-xs-2'><input type='text' id='time-doubletime'name='time-doubletime' size='3' /></div>
       <div class='col-xs-6' ><div id='slider-doubletime' class='slider'></div></div>
     </div>
     <div class='row timesheet'>
-      <div class='col-xs-4'><?php $Icons->Timesheet(1);?> Total:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Total:</div>
       <div class='col-xs-2'><input type='text' id='timeTotal' name='Total' size='3' value='<?php echo $total;?>' disabled /></div>
       <div class='col-xs-6' id='permaTotal'>&nbsp;</div>
     </div>
@@ -824,14 +824,14 @@ if($Ticket['Table2'] == 'TicketO'){
       <div class='col-xs-2'><input class='lunch' type='checkbox' onChange='time_lunch(this, 1);' /></div>
     </div>
   </div>
-  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Expenses</h4></div>
+  <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Expenses</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='row expenses'>
-      <div class='col-xs-4'><?php $Icons->Payroll(1);?> Car:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Car:</div>
       <div class='col-xs-8'><input type='text' name='CarExpenses' placeholder='$0.00' style='width:100%;' /></div>
     </div>
     <div class='row expenses'>
-      <div class='col-xs-4'><?php $Icons->Payroll(1);?> Other:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Other:</div>
       <div class='col-xs-8'><input type='text' name='OtherExpenses' placeholder='$0.00' style='width:100%;' /></div>
     </div>
 
@@ -847,11 +847,11 @@ if($Ticket['Table2'] == 'TicketO'){
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-paragraph fa-1x fa-fw" aria-hidden="true"></i> Resolution</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='row resolution'>
-      <div class='col-xs-4'><?php $Icons->Blank();?> Chargeable</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank();?> Chargeable</div>
       <div class='col-xs-8'><input type='checkbox' value='1' name='Chargeable' style='height:15px;width:15px;' /></div>
     </div>
     <div class='row resolution' style='display:none;'>
-      <div class='col-xs-4'><?php $Icons->Blank(1);?> Follow Up:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Follow Up:</div>
       <div class='col-xs-8'><input  type='checkbox' value='1' name='Follow_Up' style='height:15px;width:15px;' /></div>
       <div class='col-xs-12'>&nbsp;</div>
     </div>
@@ -931,12 +931,12 @@ if($Ticket['Table2'] == 'TicketO'){
   <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><i class="fa fa-pencil fa-1x fa-fw" aria-hidden="true"></i> Signature</h4></div>
   <div class='panel-body' style='padding:10px;'>
     <div class='email row'>
-      <div class='col-xs-4'><?php $Icons->Email(1);?> Email:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
       <div class='col-xs-8'><input type='checkbox' value='0' onchange='toggle_email_person();' /></div>
     </div>
 
     <div class='email-person row'>
-      <div class='col-xs-4'><?php $Icons->Blank(1);?> Address:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Address:</div>
       <div class='col-xs-8'><input type='text' name='Email' style='width:100%;' /></div>
       <script>
       var availableEmails = [
@@ -970,7 +970,7 @@ if($Ticket['Table2'] == 'TicketO'){
     </div>
     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     <div class='signature row'>
-      <div class='col-xs-4'><?php $Icons->Contract(1);?> Signee:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Contract(1);?> Signee:</div>
       <div class='col-xs-8'>
         <input type='text' id='Signature_Name' name='Signature_Name' style='width:100%;'  />
       </div>
@@ -1116,7 +1116,7 @@ if($Ticket['Table2'] == 'TicketO'){
         if($r && is_array(sqlsrv_fetch_array($r))){$disabled2 = true;}
         else{$disabled2 = false;}
         ?>
-      <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Time</h4></div>
+      <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Time</h4></div>
       <div class='panel-body' style='padding-top:10px;'>
         <div class='row'>
     			<div class='col-xs-12'><button style='width:100%;height:65px;'
@@ -1144,19 +1144,19 @@ if($Ticket['Table2'] == 'TicketO'){
         <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
       </div>
       <?php } else {?>
-      <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php $Icons->Timesheet(1);?> Time</h4></div>
+      <div class='panel-heading' style='padding:1px;padding-left:10px !important;margin:0px;margin-bottom:5px;'><h4><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> Time</h4></div>
       <div class='panel-body' style='padding-top:10px;'>
         <div class='row'>
           <div class='col-xs-12'><button style='width:100%;height:35px;' id='reset_time' onclick='reset_time(this);'>Reset Ticket</button></div>
           <div class='col-xs-12'>&nbsp;</div>
         </div>
         <div class='row'>
-          <div class='col-xs-4'><?php $Icons->Delivery(1);?> En Route:</div>
+          <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Delivery(1);?> En Route:</div>
     			<div class='col-xs-8'><?php echo date("h:i A",strtotime($Ticket['TimeRoute']));?></div>
         </div>
         <div class='row'>
           <div class='col-xs-12'>&nbsp;</div>
-          <div class='col-xs-4'><?php $Icons->Timesheet(1);?> On Site:</div>
+          <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Timesheet(1);?> On Site:</div>
     			<div class='col-xs-8'><button style='width:100%;height:50px;' id='on_site' onclick='post_time_on_site(this);'>At Work</button></div>
         </div>
         <div class='row'><div class='col-xs-12'>&nbsp;</div></div>

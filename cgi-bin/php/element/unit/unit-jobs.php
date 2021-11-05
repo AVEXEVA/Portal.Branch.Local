@@ -152,7 +152,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         );
         if( $r ){while( $array = sqlsrv_fetch_array( $r ) ){ $Unit[ $array[ 'fDesc' ] ] = $array[ 'Value' ]; } }
 ?><div class='panel panel-primary'>
-	<div class='panel-heading'><?php $Icons->Job( 1 );?> Jobs</div>
+	<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?> Jobs</div>
 	<div class='panel-body'>
 		<table id='Table_Jobs' class='display' cellspacing='0' width='100%'>
 			<thead>

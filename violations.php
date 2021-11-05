@@ -76,7 +76,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Violation( 1 );?> Violations</div>
+                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
                     </div>
                 </div>

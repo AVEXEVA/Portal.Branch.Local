@@ -178,7 +178,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $SQL_Jobs = implode(" OR ",$Jobs);
         }?>
 <div class='panel panel-primary'>
-	<div class='panel-heading'><?php $Icons->Violation( 1 );?> Violations</div>
+	<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</div>
 	<div class='panel-body  BankGothic shadow'>
 		<table id='Table_Violations' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 			<thead>

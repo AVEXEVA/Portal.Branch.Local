@@ -72,7 +72,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         <?php require( bin_php . 'element/loading.php'); ?>
         <div id='page-wrapper' class='content'>
 			<div class='panel panel-primary'>
-				<div class='panel-heading'><h4><?php $Icons->Birthday( 1 ) ;?> Birthdays</h4></div>
+				<div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Birthday( 1 ) ;?> Birthdays</h4></div>
 				<div class='panel-body'>
 					<table id='Table_Birthdays' class='display' cellspacing='0' width='100%'>
 						<thead>

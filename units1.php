@@ -52,7 +52,7 @@ if(isMobile() || true){?><!DOCTYPE html>
       <?php require( bin_php . 'element/loading.php');?>
       <div id="page-wrapper" class='content'>
   			<div class="panel panel-primary">
-  				<div class="panel-heading"><h4><div style='float:left;' onClick="document.location.href='home.php';"><?php $Icons->Unit();?> Units</div><div style='float:right;' onClick="document.location.href='unit.php'"><?php $Icons->Add(1);?></div><div style='clear:both;'></div></h4></div>
+  				<div class="panel-heading"><h4><div style='float:left;' onClick="document.location.href='home.php';"><?php \singleton\fontawesome::getInstance( )->Unit();?> Units</div><div style='float:right;' onClick="document.location.href='unit.php'"><?php \singleton\fontawesome::getInstance( )->Add(1);?></div><div style='clear:both;'></div></h4></div>
   				<div class="panel-body">
   					<table id='Table_Units' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
   						<thead>

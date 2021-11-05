@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;",array($_GET['ID']));
         $Customer = sqlsrv_fetch_array($r);?>
 <div class="panel panel-primary">
-	<div class="panel-heading"><h4><?php $Icons->Modernization();?>Active Modernizations</h4></div>
+	<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Modernization();?>Active Modernizations</h4></div>
 	<div class='panel-body white-background BankGothic shadow'>
 		<table id='Table_Active_Modernizations' class='display' cellspacing='0' width='100%'>
 			<thead>
@@ -67,7 +67,7 @@ var Table_Active_Modernizations = $('#Table_Active_Modernizations').DataTable( {
 </script>
 <div class="panel panel-primary">
 	<br><br>
-	<div class="panel-heading"><h4><?php $Icons->Modernization();?>Modernization Job Items</h4></div>
+	<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Modernization();?>Modernization Job Items</h4></div>
 	<div class='panel-body white-background BankGothic shadow'>
 		<table id='Table_Modernization_Job_Items' class='display' cellspacing='0' width='100%'>
 			<thead>

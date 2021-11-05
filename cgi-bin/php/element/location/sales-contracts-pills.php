@@ -69,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Territory();?>Active Contracts</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Territory();?>Active Contracts</h3></div>
 								<div class='panel-body white-background BankGothic shadow'>
 									<table id='Table_Sales_Contracts_2' class='display' cellspacing='0' width='100%'>
 										<thead><tr>

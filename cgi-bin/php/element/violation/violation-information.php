@@ -95,15 +95,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$Violation = $data;
 ?>
 <div class="panel panel-primary">
-	<div class="panel-heading"> <i class="nav-icon"><?php $Icons -> Info(1)?></i>Basic Information</div>
+	<div class="panel-heading"> <i class="nav-icon"><?php \singleton\fontawesome::getInstance( ) -> Info(1)?></i>Basic Information</div>
 	<div class='panel-body' style='padding:15px;'>
 		<div style='font-size:24px;text-decoration:underline;'>
-			<div class='col-xs-12'><?php $Icons->Violation();?> Violation #<?php echo $data['ID'];?></div>
-			<div class='col-xs-12'><a href='location.php?ID=<?php echo $data['Location_ID'];?>'><?php $Icons->Location();?> <?php echo $data['Location_Tag'];?></a></div>
-			<?php if(isset($Violation['Job_ID']) && is_int($Violation['Job_ID']) && $Violation['Job_ID'] >= 0){?><div class='col-xs-12'><a href='job.php?ID=<?php echo $data['Job_ID'];?>'><?php $Icons->Job();?> <?php echo $data['Job_Description'];?></a></div><?php }?>
-			<div class='col-xs-12'><?php $Icons->Calendar_Plus();?> Created: <?php echo date("m/d/Y",strtotime($Violation['fdate']));?></div>
+			<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Violation();?> Violation #<?php echo $data['ID'];?></div>
+			<div class='col-xs-12'><a href='location.php?ID=<?php echo $data['Location_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> <?php echo $data['Location_Tag'];?></a></div>
+			<?php if(isset($Violation['Job_ID']) && is_int($Violation['Job_ID']) && $Violation['Job_ID'] >= 0){?><div class='col-xs-12'><a href='job.php?ID=<?php echo $data['Job_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Job();?> <?php echo $data['Job_Description'];?></a></div><?php }?>
+			<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Calendar_Plus();?> Created: <?php echo date("m/d/Y",strtotime($Violation['fdate']));?></div>
 			<div class='col-xs-12'>
-			<?php $Icons->Calendar();?> Due Date: <?php
+			<?php \singleton\fontawesome::getInstance( )->Calendar();?> Due Date: <?php
 				preg_match_all("/DUE: ((0?[13578]|10|12)(-|\/)(([1-9])|(0[1-9])|([12])([0-9]?)|(3[01]?))(-|\/)((19)([2-9])(\d{1})|(20)([01])(\d{1})|([8901])(\d{1}))|(0?[2469]|11)(-|\/)(([1-9])|(0[1-9])|([12])([0-9]?)|(3[0]?))(-|\/)((19)([2-9])(\d{1})|(20)([01])(\d{1})|([8901])(\d{1})))/",$data['Remarks'],$matches);
 				$string = $matches[1][0];
 				$string = str_replace("/","/",$string);
@@ -111,11 +111,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				echo strlen($data['Due_Date']) > 0 ? $data['Due_Date'] : 'Unknown';
 			?>
 			</div>
-			<div class='col-xs-12'><span style='float:left;'><?php $Icons->Note();?></span><pre style='float:left;'><?php echo strlen($data["Remarks"]) ? proper($data['Remarks']) : "Unlisted";?></pre></div>
+			<div class='col-xs-12'><span style='float:left;'><?php \singleton\fontawesome::getInstance( )->Note();?></span><pre style='float:left;'><?php echo strlen($data["Remarks"]) ? proper($data['Remarks']) : "Unlisted";?></pre></div>
 		</div>
 	</div>
 		<?php if(isset($Violation['Job_ID']) && is_int($Violation['Job_ID']) && $Violation['Job_ID'] >= 0){?>
-	<div class="panel-heading"><i class="nav-icon"><?php $Icons -> Job(1)?></i>Job Information</div>
+	<div class="panel-heading"><i class="nav-icon"><?php \singleton\fontawesome::getInstance( ) -> Job(1)?></i>Job Information</div>
 	<div class='panel-body' style='padding:15px;'>
     <div class='row'>
 			<div class='col-xs-4' style='text-align:right;'>Job:</div>
@@ -152,7 +152,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   </div>
 		<?php }?>
   <div class="panel-heading">
-  	<i class="nav-icon"><?php $Icons -> Unit(1)?></i>
+  	<i class="nav-icon"><?php \singleton\fontawesome::getInstance( ) -> Unit(1)?></i>
   	<a href="<?php echo (strlen($data['Unit_ID']) > 0) ? 'unit.php?ID=' . $Violation['Unit_ID'] : '#';?>" style="color: white">Unit Information</div>
   <div class='panel-body' style='padding:15px;'>
   		<div class='row'>

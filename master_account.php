@@ -86,26 +86,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3><?php $Icons->Customer();?>Account: <?php echo $Customer['Name'];?>
+                            <h3><?php \singleton\fontawesome::getInstance( )->Customer();?>Account: <?php echo $Customer['Name'];?>
                                 <?php if($Customer['Status'] == 0 && FALSE){?><img src='../Images/Icons/Inactive.png' style='height:35px;' /><?php }?>
                             </h3>
                         </div>
                         <div class="panel-body">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#basic-pills" data-toggle="tab"><?php $Icons->Info();?>Basic</a></li>
-                                <li class=''><a href="#locations-pills"  data-toggle="tab"><?php $Icons->Location();?>Locations</a></li>
-                                <li class=''><a href="#units-pills"      data-toggle="tab"><?php $Icons->Unit();?>Units</a></li>
-                                <li class=''><a href="#jobs-pills"       data-toggle="tab"><?php $Icons->Job();?>Jobs</a></li>
-                                <li class='' onClick="setTimeout(function(){initialize()},1000);"><a href="#tickets-pills"    data-toggle="tab"><?php $Icons->Ticket();?>Tickets</a></li>
-                                <li><a href="#maintenance-pills" data-toggle="tab"><?php $Icons->Maintenance();?> Maintenance</a></li>
-                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?><li class=''><a href="#financials-pills" data-toggle="tab"><?php $Icons->Financial();?>Financials</a></li><?php }?>
-                                <li class=''><a href="#violations-pills" data-toggle="tab"><?php $Icons->Violation();?>Violations</a></li>
-                                <li class=''><a href="#workers-pills" data-toggle="tab"><?php $Icons->User();?>Workers</a></li>
-                                <li class=''><a href="#contracts-pills"  data-toggle="tab"><?php $Icons->Contract();?>Contracts</a></li>
-                                <li class=''><a href="#proposals-pills"  data-toggle="tab"><?php $Icons->Proposal();?>Proposals</a></li>
-                                <li class=''><a href="#invoices-pills"   data-toggle="tab"><?php $Icons->Invoice();?>Invoices</a></li>
-                                <li class=''><a href="#collections-pills"  data-toggle="tab"><?php $Icons->Collection();?>Collections</a></li>
-                                <!--<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && $My_Privileges['Legal']['Group_Privilege'] >= 4 && $My_Privileges['Legal']['Other_Privilege'] >= 4){?><li class=''><a href="#legal-pills"  data-toggle="tab"><?php $Icons->Legal();?>Legal</a></li><?php }?>-->
+                                <li class="active"><a href="#basic-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Info();?>Basic</a></li>
+                                <li class=''><a href="#locations-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Location();?>Locations</a></li>
+                                <li class=''><a href="#units-pills"      data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</a></li>
+                                <li class=''><a href="#jobs-pills"       data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Job();?>Jobs</a></li>
+                                <li class='' onClick="setTimeout(function(){initialize()},1000);"><a href="#tickets-pills"    data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</a></li>
+                                <li><a href="#maintenance-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance</a></li>
+                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?><li class=''><a href="#financials-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Financial();?>Financials</a></li><?php }?>
+                                <li class=''><a href="#violations-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Violation();?>Violations</a></li>
+                                <li class=''><a href="#workers-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->User();?>Workers</a></li>
+                                <li class=''><a href="#contracts-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Contract();?>Contracts</a></li>
+                                <li class=''><a href="#proposals-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Proposal();?>Proposals</a></li>
+                                <li class=''><a href="#invoices-pills"   data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</a></li>
+                                <li class=''><a href="#collections-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Collection();?>Collections</a></li>
+                                <!--<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && $My_Privileges['Legal']['Group_Privilege'] >= 4 && $My_Privileges['Legal']['Other_Privilege'] >= 4){?><li class=''><a href="#legal-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Legal();?>Legal</a></li><?php }?>-->
                             </ul>
                             <br />
                             <div class="tab-content">
@@ -121,7 +121,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             <br />
                                             <div class='row' style='padding-left:25px;'>
                                                 <div class='row'><div class='col-xs-12'><b><u>Customer Information</u></b></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Location();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Location();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT Count(Loc.Loc) as Count_of_Locations
                                                         FROM nei.dbo.Loc LEFT JOIN Portal.dbo.Master_Account ON Loc.Owner = Master_Account.Customer
@@ -129,19 +129,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                     ;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Locations'] : 0;
                                                 ?> <i>Locations</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Unit();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Unit();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT DISTINCT Count(Elev.ID) AS Count_of_Elevators 
                                                         FROM nei.dbo.Elev LEFT JOIN nei.dbo.Loc ON Elev.Loc = Loc.Loc LEFT JOIN Portal.dbo.Master_Account ON Loc.Owner = Master_Account.Customer
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Elevators'] : 0;?> <i>Units</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Job();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Job();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT DISTINCT Count(Job.ID) AS Count_of_Jobs 
                                                         FROM nei.dbo.Job LEFT JOIN nei.dbo.Loc ON Loc.Loc = Job.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Jobs'] : 0;?> <i>Jobs</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Ticket();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Ticket();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT Count(TicketD.ID) AS Count_of_Tickets 
                                                         FROM 
@@ -172,19 +172,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                                         WHERE 
                                                             Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? $Count_of_Tickets + sqlsrv_fetch_array($r)['Count_of_Tickets'] : $Count_of_Tickets;?> <i>Tickets</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Invoice();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Invoice();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT DISTINCT Count(Invoice.Ref) AS Count_of_Invoices 
                                                         FROM nei.dbo.Invoice LEFT JOIN nei.dbo.Loc ON Loc.Loc = Invoice.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Invoices'] : 0;?> <i>Invoices</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Proposal();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Proposal();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT Count(Estimate.ID) AS Count_of_Proposals 
                                                         FROM (nei.dbo.Estimate LEFT JOIN nei.dbo.Job ON Estimate.Job = Job.ID) LEFT JOIN nei.dbo.Loc ON Job.Loc = Loc.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
                                                         WHERE Master_Account.Master = ?;",array($_GET['ID']));
                                                     echo $r ? sqlsrv_fetch_array($r)['Count_of_Proposals'] : 0;?> <i>Proposals</i></div></div>
-                                                <div class='row'><div class='col-xs-12'><?php $Icons->Collection();
+                                                <div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Collection();
                                                     $r = sqlsrv_query($NEI,"
                                                         SELECT DISTINCT Count(OpenAR.TransID) AS Count_of_Outstanding_Invoices 
                                                         FROM nei.dbo.OpenAR LEFT JOIN nei.dbo.Loc ON Loc.Loc = OpenAR.Loc LEFT JOIN Portal.dbo.Master_Account ON Master_Account.Customer = Loc.Owner
@@ -1813,7 +1813,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     '<td>'+d.Description+'</td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td><a href="invoice.php?ID='+d.Invoice+'"  target="_blank"><?php $Icons->Collection();?>View Invoice</a></td>'+
+                    '<td><a href="invoice.php?ID='+d.Invoice+'"  target="_blank"><?php \singleton\fontawesome::getInstance( )->Collection();?>View Invoice</a></td>'+
                 '</tr>'+
             '</table>';
         }

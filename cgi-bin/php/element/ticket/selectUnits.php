@@ -5,7 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 ?><div class='popup'>
   <div class='panel-primary'>
-    <div class='panel-heading'><h4><?php $Icons->Unit( 1 );?> Unit</h4></div>
+    <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?> Unit</h4></div>
     <div class='panel-body'>
       <div class='row form-group'>
         <label class='col-auto border-bottom v1'>Search:</label>

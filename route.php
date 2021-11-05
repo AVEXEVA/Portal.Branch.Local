@@ -81,7 +81,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-            <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
+            <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
             <style>
             .nav-text{
                 font-weight: bold;
@@ -124,7 +124,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class='Screen-Tabs shadower'>
                 <div class='row'>
                     <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-information.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Information(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                             <div class ='nav-text'>Information</div>
                     </div>
                     <?php
@@ -137,29 +137,29 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $r = sqlsrv_query($database_Device,"SELECT CM_Unit.* FROM Device.dbo.CM_Unit {$Units}");
                         if($r && is_array(sqlsrv_fetch_array($r))){
                         ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-faults.php?ID=<?php echo $_GET['ID'];?>');">
-                                <div class='nav-icon'><?php $Icons->Information(3);?></div>
+                                <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                                 <div class ='nav-text'>Faults</div>
                         </div><?php }
                       }
                     }?>
                     <?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-locations.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Location(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
                             <div class ='nav-text'>Locations</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-units.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Unit(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
                             <div class ='nav-text'>Units</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-violations.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Violation(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
                             <div class ='nav-text'>Violations</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Other_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='user.php?ID=<?php echo $_GET['ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->User(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
                             <div class ='nav-text'>User</div>
                     </div><?php }?>
                 </div>

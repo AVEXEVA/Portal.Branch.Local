@@ -251,14 +251,14 @@ white-space: normal !important;
 				<div class="panel panel-primary" style='margin-bottom:0px;'>
 					<div class="panel-heading">
 						<div style='float:left;'>
-							<h3><?php $Icons->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
+							<h3><?php \singleton\fontawesome::getInstance( )->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
 						</div>
 						<div style='float:right;'>
 							<div style='float:left;font-size:22px;border:1px solid white;background-color:#f5f5f5;color:#252525;padding:5px;box-shadow:0px 5px 5px 0px #555555;border-radius:5px;cursor:pointer;margin-left:10px;'>
-								<?php $Icons->Save();?> Save
+								<?php \singleton\fontawesome::getInstance( )->Save();?> Save
 							</div>
 							<div style='float:left;font-size:22px;border:1px solid white;background-color:#f5f5f5;color:#252525;padding:5px;box-shadow:0px 5px 5px 0px #555555;border-radius:5px;cursor:pointer;margin-left:10px;'>
-								<?php $Icons->Delete();?> Delete
+								<?php \singleton\fontawesome::getInstance( )->Delete();?> Delete
 							</div>
 						</div>
 						<div style='clear:both;'></div>
@@ -273,7 +273,7 @@ white-space: normal !important;
 											<div class='col-md-12'>
 												<div class='row'>
 													<div class='col-md-3' style='text-align:right;'>
-														<?php $Icons->Customer();?> Customer
+														<?php \singleton\fontawesome::getInstance( )->Customer();?> Customer
 													</div>
 													<div class='col-md-9'>
 														<input type='text' size='30' name='Customer_Name'  placeholder='Customer' onchange='selectCustomer(this);' />
@@ -326,7 +326,7 @@ white-space: normal !important;
 											<div class='col-md-12'>
 												<div class='row'>
 													<div class='col-md-3' style='text-align:right;'>
-														<?php $Icons->Location();?> Location
+														<?php \singleton\fontawesome::getInstance( )->Location();?> Location
 													</div>
 													<div class='col-md-9' id='input_Location'>
 														<input type='text' size='30' name='Location_Name' placeholder='Location' onchange="selectLocation(this);" />
@@ -398,7 +398,7 @@ white-space: normal !important;
 											<div class='col-md-12'>
 												<div class='row'>
 													<div class='col-md-3' style='text-align:right;'>
-														<?php $Icons->Job();?> Job
+														<?php \singleton\fontawesome::getInstance( )->Job();?> Job
 													</div>
 													<div class='col-md-9' id='input_Job'>
 														<input type='text' size='30' name='Job_Name' placeholder='Job' onchange="selectJob(this);" />
@@ -473,7 +473,7 @@ white-space: normal !important;
 											<div class='col-md-12'>
 												<div class='row'>
 													<div class='col-md-3' style='text-align:right;'>
-														<?php $Icons->Unit();?> Unit
+														<?php \singleton\fontawesome::getInstance( )->Unit();?> Unit
 													</div>
 													<div class='col-md-9' id='input_Unit'>
 														<input type='text' size='30' name='Unit_Name' placeholder='Unit' />

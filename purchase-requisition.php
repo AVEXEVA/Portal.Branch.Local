@@ -69,11 +69,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h3 style='margin:0px;'><?php $Icons->Requisition();?> Requisition</h3></div>
+				<div class="panel-heading"><h3 style='margin:0px;'><?php \singleton\fontawesome::getInstance( )->Requisition();?> Requisition</h3></div>
         <div class='panel-body'>
           <!--<div class='row'>
             <div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-            <div class='col-xs-4'><?php $Icons->Blank(1);?> Type:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Type:</div>
             <div class='colx-s-8'><select name='Type' onChange='changeType(this);' style='color:black;'>
               <option value='Regular'>Regular</option>
               <option value='Gear'>Gear</option>
@@ -95,16 +95,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class="panel-body" style=''>
 					<div class='row'><div class='col-xs-12'>&nbsp;</div></div>
 					<div class="row">
-						<div class='col-xs-4'><?php $Icons->Calendar(1);?> Date:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</div>
 						<div class='col-xs-8'><input disabled type='text' name='Date' size='15' value='<?php echo date("m/d/Y");?>'/></div>
 					</div>
 					<div class="row">
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Required</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Required</div>
 						<div class='col-xs-8'><input type='text' name='Required' size='15' value='<?php echo isset($_GET['Required']) ? $_GET['Required'] : Null;?>' /></div>
 					</div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
           <div class='row'>
-  					<div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
   					<div class='col-xs-8'><button type='button' onClick='selectLocations(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
@@ -131,7 +131,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
           </div>
           <div class='row'>
-  					<div class='col-xs-4'><?php $Icons->Location(1);?> Drop Off:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Drop Off:</div>
   					<div class='col-xs-8'><button type='button' onClick='selectDropOffs(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['DropOff']) && is_numeric($_GET['DropOff'])){
@@ -158,7 +158,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
           </div>
           <div class='row'>
-            <div class='col-xs-4'><?php $Icons->Unit(1);?> Unit:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
             <div class='col-xs-8'><button type='button' onClick='selectUnits(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Unit']) && is_numeric($_GET['Unit'])){
@@ -185,7 +185,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </script>
           </div>
           <div class='row'>
-            <div class='col-xs-4'><?php $Icons->Job(1);?> Job:</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
             <div class='col-xs-8'><button type='button' onClick='selectJobs(this);' style='width:100%;height:50px;'><?php
             $pass = false;
             if(isset($_GET['Job']) && is_numeric($_GET['Job'])){
@@ -213,36 +213,36 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           </div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
         </div>
-        <div class='panel-heading Requisition-Regular active'><h3><?php $Icons->Description(1);?> Details</h3></div>
+        <div class='panel-heading Requisition-Regular active'><h3><?php \singleton\fontawesome::getInstance( )->Description(1);?> Details</h3></div>
         <div class='panel-body Requisition-Regular active'>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
 					<div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Shutdown:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Shutdown:</div>
 						<div class='col-xs-8'><input type='checkbox' name='Shutdown'  /></div>
 					</div>
 					<div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> A.S.A.P.:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> A.S.A.P.:</div>
 						<div class='col-xs-8'><input type='checkbox' name='ASAP'  /></div>
 					</div>
           <div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Rush:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Rush:</div>
 						<div class='col-xs-8'><input type='checkbox' name='Rush'  /></div>
 					</div>
           <div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> L/S/D.:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> L/S/D.:</div>
 						<div class='col-xs-8'><input type='checkbox' name='LSD'  /></div>
 					</div>
           <div class='row Labels' >
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> F.R.M.:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> F.R.M.:</div>
 						<div class='col-xs-8'><input type='checkbox' name='FRM'  /></div>
 					</div>
           <div class='row Labels' >
-            <div class='col-xs-12'><?php $Icons->Paragraph(1);?> Notes:</div>
+            <div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Paragraph(1);?> Notes:</div>
             <div class='col-xs-12'><textarea name='Notes' style='width:100%;' rows='9'></textarea></div>
           </div>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
         </div>
-        <div class='panel-heading '><h3><?php $Icons->Purchase();?> Items</h3></div>
+        <div class='panel-heading '><h3><?php \singleton\fontawesome::getInstance( )->Purchase();?> Items</h3></div>
         <div class='panel-body Requisition-Electrical'>
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
           <div class='row'>

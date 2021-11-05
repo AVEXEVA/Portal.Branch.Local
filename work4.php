@@ -129,7 +129,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           className: 'indent',
           data : 'Tag',
           render : function(data, type, row, meta){
-            if(type === 'display'){return '<?php $Icons->Ticket(1);?>';}
+            if(type === 'display'){return '<?php \singleton\fontawesome::getInstance( )->Ticket(1);?>';}
             return data;
           },
           sortable : true,

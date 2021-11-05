@@ -50,19 +50,19 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             <div class="panel panel-primary" style='margin-bottom:0px;'>
                 <div class="panel-heading">
                     <div class='row'>
-                        <div class='col-xs-10'><?php $Icons->Users( 1 );?> Users</div>
+                        <div class='col-xs-10'><?php \singleton\fontawesome::getInstance( )->Users( 1 );?> Users</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
                     </div>
                 </div>
                 <div class="panel-body no-print" id='Filters' style='border-bottom:1px solid #1d1d1d;'>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class='row'>
-                        <div class='col-xs-4'><?php $Icons->Search( 1 );?> Search:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?> Search:</div>
                         <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
                     </div>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class="row"> 
-                        <div class='col-xs-4'><?php $Icons->Supervisor( 1 );?> Supervisor:</div>
+                        <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Supervisor( 1 );?> Supervisor:</div>
                         <div class='col-xs-8'><select name='Supervisor' onChange='redraw( );'><option value=''>Select</option><?php 
                             $result = sqlsrv_query(
                                 $Databases[ 'Default' ],

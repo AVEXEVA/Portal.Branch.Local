@@ -118,7 +118,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			<div class='row'>
 				<div class='col-md-6'>
 					<div class="panel panel-primary">
-						<div class="panel-heading"><h3><?php $Icons->Collection();?>Revenue</h3></div>
+						<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Collection();?>Revenue</h3></div>
 						<div class='panel-body white-background BankGothic shadow'>
 							<div id="flot-placeholder-customer-revenue" style="width:100%;height:500px;display:inline-block;"></div>
 							<?php require('../../../js/chart/location_revenue.php');?>
@@ -127,7 +127,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				</div>
 				<div class='col-md-6' style=''>
 					<div class="panel panel-primary">
-						<div class="panel-heading"><h3><?php $Icons->Invoice();?>Invoices</h3></div>
+						<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</h3></div>
 						<div class='panel-body white-background BankGothic shadow'>
 							<table id='Table_Revenue_Invoices' class='display' cellspacing='0' width='100%'>
 								<thead>

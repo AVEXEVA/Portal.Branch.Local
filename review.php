@@ -119,7 +119,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
         <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/element/loading.php' );?>
         <div id='page-wrapper' class='content'>
             <div class='panel panel-primary'>
-                <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php $Icons->Ticket( 1 );?> Review Timesheets</div>
+                <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Review Timesheets</div>
                 <div class='panel-body'>
                     <div class='row'><div class='col-sm-12'>&nbsp;</div></div>
                     <div class='form-group row'>

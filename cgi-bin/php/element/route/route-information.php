@@ -70,18 +70,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
         $Route = sqlsrv_fetch_array($r);
 ?><div class="panel panel-primary">
-	<!--<div class="panel-heading"><h4><?php $Icons->Maintenance();?> Maintenance</h4></div>-->
+	<!--<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance</h4></div>-->
 	<div class='panel-body white-background'>
 		<div class='row shadower ' style='font-size:16px;padding:5px;'>
-			<div class='col-xs-4'><?php $Icons->Route();?> Route:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
             <div class='col-xs-8'><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Route['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Route['Route_ID'];?>"><?php }?><?php echo proper($Route["Route_Mechanic_First_Name"] . " " . $Route["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Route['Route_Mechanic_ID']){?></a><?php }?>
 			</div>
             <?php if(isset($Route['Route_Mechanic_Phone_Number']) && strlen($Route['Route_Mechanic_Phone_Number']) > 0){?>
-			<div class='col-xs-4'><?php $Icons->Phone();?> Phone:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Phone();?> Phone:</div>
 				
 			<div class='col-xs-8'><a href="tel:<?php echo $Route['Route_Mechanic_Phone_Number'];?>"><?php echo $Route['Route_Mechanic_Phone_Number'];?></a></div><?php }?>
 			<?php /*if(strlen($Route['Route_Mechanic_Email']) > 0){?>
-			<div class='col-xs-4'><?php $Icons->Email();?> Email:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email();?> Email:</div>
             <div class='col-xs-8'><a href="mailto:<?php echo $Route['Route_Mechanic_Email'];?>"><?php echo $Route['Route_Mechanic_Email'];?></a></div><?php }*/?>
 		</div>
 	</div>

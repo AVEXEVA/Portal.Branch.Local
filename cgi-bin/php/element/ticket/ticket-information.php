@@ -192,39 +192,39 @@ if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Sig
 <div class="panel panel-primary">
 	<div class='panel-body white-background' style='font-size:16px;padding:5px;'>
 		<div class='row' style='border-bottom:3px dashed black;padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->User(1);?> Worker:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->User(1);?> Worker:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['First_Name'] . " " . $Ticket["Last_Name"]);?></div>
-			<!--<div class='col-xs-4'><?php $Icons->Calendar(1);?> Created:</div>
+			<!--<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Created:</div>
 			<div class='col-xs-8'><?php echo date("m/d/Y h:i A",strtotime($Ticket['CDate']));?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Dispatched:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Dispatched:</div>
 			<div class='col-xs-8'><?php echo date("m/d/Y h:i A",strtotime($Ticket['DDate']));?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Scheduled:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Scheduled:</div>
 			<div class='col-xs-8'><?php echo date("m/d/Y h:i A",strtotime($Ticket['EDate']));?></div>-->
-      <div class='col-xs-4'><?php $Icons->Description(1);?> Description:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Description(1);?> Description:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['fDesc']);?></div>
-      <div class='col-xs-4'><?php $Icons->Blank(1);?> Status:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
       <div class='col-xs-8'><?php echo strlen($Ticket['Status']) > 0 ? $Ticket['Status'] : 'Completed';?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> On Site:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> On Site:</div>
 			<div class='col-xs-8'><?php echo date("h:i A",strtotime($Ticket['TimeSite']));?></div>
-      <div class='col-xs-4'><?php $Icons->Blank(1);?> Done:</div>
+      <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Done:</div>
       <div class='col-xs-8'><?php echo date("h:i A",strtotime($Ticket['TimeComp']));?></div>
 		</div>
 		<div class='row' style='border-bottom:3px dashed black;padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Customer(1);?> Customer:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['Customer']);?></div>
-			<div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['Tag']);?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Street:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['Address']);?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['City']);?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
 			<div class='col-xs-8'><?php echo $Ticket['State'];?></div>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Zip:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
 			<div class='col-xs-8'><?php echo $Ticket['Zip'];?></div>
 		</div>
 		<div class='row' style='border-bottom:3px dashed black;padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Blank(1);?> Resolution:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Resolution:</div>
 			<div class='col-xs-8'><?php echo proper($Ticket['DescRes']);?></div>
 		</div>
 	</div>

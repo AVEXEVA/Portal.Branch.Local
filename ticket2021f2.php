@@ -255,7 +255,7 @@ white-space: normal !important;
 				<div class="panel panel-primary" style='margin-bottom:0px;'>
 					<div class="panel-heading">
 						<div style='float:left;'>
-							<h3><?php $Icons->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
+							<h3><?php \singleton\fontawesome::getInstance( )->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
 						</div>
 						<div style='clear:both;'></div>
 					</div>
@@ -267,10 +267,10 @@ white-space: normal !important;
 									<div class='panel-body'>
 										<div style='font-size:24px;text-decoration:underline;'><b>
 											<?php /*Need to make one big row and multiple cols*/?>
-											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php $Icons->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='location.php?ID=<?php echo $Ticket['Location_ID'];?>'><?php $Icons->Location();?> <?php echo $Ticket['Tag'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><a href='job.php?ID=<?php echo $Ticket['Job_ID'];?>'><?php $Icons->Job();?> <?php echo $Ticket['Job_Description'];?></a></div></div>
-											<div class='row'><div class='col-xs-12'><?php $Icons->User();?> <?php echo proper($Ticket['First_Name'] . " " . $Ticket['Last_Name']);?></div></div>
+											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='location.php?ID=<?php echo $Ticket['Location_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> <?php echo $Ticket['Tag'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><a href='job.php?ID=<?php echo $Ticket['Job_ID'];?>'><?php \singleton\fontawesome::getInstance( )->Job();?> <?php echo $Ticket['Job_Description'];?></a></div></div>
+											<div class='row'><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->User();?> <?php echo proper($Ticket['First_Name'] . " " . $Ticket['Last_Name']);?></div></div>
 										</b></div>
 									</div>
 								</div>
@@ -574,7 +574,7 @@ white-space: normal !important;
                 </div>
             </div>
 			<?php } else {?>
-                    <h4 style='margin:0px;padding:10px;<?php if($Ticket['Assigned'] >= 2 && $Ticket['Assigned'] <= 3){?>background-color:gold;<?php } else {?>background-color:whitesmoke;<?php }?>border-bottom:1px solid darkgray;'><a href='work.php?ID=<?php echo $_GET['ID'];?>'><?php $Icons->Ticket();?> Ticket: <?php echo $_GET['ID'];?> - <?php echo $Ticket['Tag'];?> - <?php echo $Ticket['Unit_State'];?></a></h4>
+                    <h4 style='margin:0px;padding:10px;<?php if($Ticket['Assigned'] >= 2 && $Ticket['Assigned'] <= 3){?>background-color:gold;<?php } else {?>background-color:whitesmoke;<?php }?>border-bottom:1px solid darkgray;'><a href='work.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Ticket();?> Ticket: <?php echo $_GET['ID'];?> - <?php echo $Ticket['Tag'];?> - <?php echo $Ticket['Unit_State'];?></a></h4>
                     <style>
                     .nav-text{
                         font-weight: bold;
@@ -624,36 +624,36 @@ white-space: normal !important;
             <div class='Screen-Tabs shadower'>
                 <div class='row'>
                     <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'ticket-information2021f2.php?ID=<?php echo $_GET['ID'];?><?php if(isset($_GET['Edit'])){?>&Edit=True<?php }?><?php if(isset($_GET['Ticket_Update'])){?>&Ticket_Update=1<?php }?>');">
-                            <div class='nav-icon'><?php $Icons->Information(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                             <div class ='nav-text'>Information</div>
                     </div>
                     <?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='customer.php?ID=<?php echo $Ticket['Customer_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Customer(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
                             <div class ='nav-text'>Customer</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='location.php?ID=<?php echo $Ticket['Location_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Location(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
                             <div class ='nav-text'>Location</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='job.php?ID=<?php echo $Ticket['Job_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Job(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
                             <div class ='nav-text'>Job</div>
                     </div><?php }?>
                     <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'ticket-map.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php $Icons->Map(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
                             <div class ='nav-text'>Map</div>
                     </div>
                     <?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='unit.php?ID=<?php echo $Ticket['Unit_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->Unit(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
                             <div class ='nav-text'>Unit</div>
                     </div><?php }?>
                     <?php if(isset($My_Privileges['User']) && $My_Privileges['User']['User_Privilege'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='user.php?ID=<?php echo $Ticket['Employee_ID'];?>';">
-                            <div class='nav-icon'><?php $Icons->User(3);?></div>
+                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
                             <div class ='nav-text'>User</div>
                     </div><?php }?>
 

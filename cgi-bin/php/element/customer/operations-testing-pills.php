@@ -71,7 +71,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Territory();?>Total Testing Hours</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Territory();?>Total Testing Hours</h3></div>
 								<div class='panel-body white-background BankGothic shadow'>
 									<div class="flot-chart"><div class="flot-chart-content" id="flot-placeholder-testing-hours-by-customer"></div></div>	
 								</div>

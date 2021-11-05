@@ -74,7 +74,7 @@ if(isset($_SESSION[ 'User' ],
             <div class='panel panel-primary'>
                 <div class='panel-heading'>
                     <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Invoice( 1 );?> Invoices</div>
+                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick='$('#Filters').toggle();'>+/-</button></div>
                     </div>
                 </div>

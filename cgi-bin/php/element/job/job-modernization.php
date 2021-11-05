@@ -119,7 +119,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12' style=''>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Modernization();?>Active Modernizations</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Modernization();?>Active Modernizations</h3></div>
 								<div class='panel-body'>
 									<table id='Table_Active_Modernizations' class='display' cellspacing='0' width='100%'>
 										<thead>
@@ -149,7 +149,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-12' style=''>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Modernization();?>Modernization Job Items</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Modernization();?>Modernization Job Items</h3></div>
 								<div class='panel-body'>
 									<table id='Table_Modernization_Job_Items' class='display' cellspacing='0' width='100%'>
 										<thead>

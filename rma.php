@@ -60,7 +60,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class='panel-heading'><h4>
-                            <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;float:left;'><?php $Icons->Unit();?>Tracking RMAs</span>
+                            <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;float:left;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Tracking RMAs</span>
                             <div style='float:right;margin-left:25px;margin-right:25px;' onClick="saveRMA();"><button style='color:black;'>Save</button></div>
                             <div style='float:right;margin-left:25px;margin-right:25px;' onClick="newRMA();"><button style='color:black;'>New</button></div>
                             <div style='clear:both;'></div>

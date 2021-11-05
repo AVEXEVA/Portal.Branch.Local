@@ -52,7 +52,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   				<div class="panel-heading"><?php
   				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
   				if(is_numeric($_GET['Mechanic'])){$r = sqlsrv_query($NEI,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
-  						else {$Mechanic = $User;}?><h4><div style='float:left;' onclick="document.location.href='home.php';"><?php $Icons->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div><div style='float:right;' onClick='document.location.href="ticket.php";'><i class='fa fa-plus fa-fw fa-1x'></i></div><div style='clear:both;'></div></h4></div>
+  						else {$Mechanic = $User;}?><h4><div style='float:left;' onclick="document.location.href='home.php';"><?php \singleton\fontawesome::getInstance( )->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div><div style='float:right;' onClick='document.location.href="ticket.php";'><i class='fa fa-plus fa-fw fa-1x'></i></div><div style='clear:both;'></div></h4></div>
     			<div class="panel-body">
             <style>
             table#Table_Tickets tbody tr {
@@ -126,7 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         "className":"indent",
                         "data":"Tag",
                         "render":function(data, type, row, meta){
-                          if(type === 'display'){return '<?php $Icons->Ticket(1);?>';}
+                          if(type === 'display'){return '<?php \singleton\fontawesome::getInstance( )->Ticket(1);?>';}
                           return data;
                         },
                         sortable:true

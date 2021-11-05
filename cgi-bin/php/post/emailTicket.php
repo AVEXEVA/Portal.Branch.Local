@@ -4,9 +4,9 @@ use PHPMailer\PHPMailer\Exception;
 if( session_id( ) == '' || !isset( $_SESSION ) ) {    
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/library/PHPMailer-master/src/Exception.php');
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/library/PHPMailer-master/src/PHPMailer.php');
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/library/PHPMailer-master/src/SMTP.php');
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/library/phpmailer/src/Exception.php');
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/library/phpmailer/src/PHPMailer.php');
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/library/phpmailer/src/SMTP.php');
     
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){

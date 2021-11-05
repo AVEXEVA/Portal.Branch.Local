@@ -877,10 +877,10 @@ function getTimeline(){
           if(TIMELINE[i]){}
           else {
             $("#Feed").prepend("<div rel='" + ticketData[i].Entity_ID + "' class='row toolesttipster' id='timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID + "'><div class='col-xs-12'>"
-              + "<div class='row'><div class='col-xs-12'>" + '<?php $Icons->Ticket(1);?> ' + ticketData[i].Entity + ' #' + ticketData[i].Entity_ID + "</div></div>"
-              + "<div class='row'><div class='col-xs-12'>" + '<?php $Icons->Calendar(1);?> ' + ticketData[i].Action + " @ " + ticketData[i].Time_Stamp + '</div></div>'
-              + "<div class='row'><div class='col-xs-12'>" + '<?php $Icons->Calendar(1);?> ' + ticketData[i].Location_Tag + '</div></div>'
-              + "<div class='row'><div class='col-xs-12'>"  + '<?php $Icons->User(1);?> ' + ticketData[i].Employee_Name + '</div></div>'
+              + "<div class='row'><div class='col-xs-12'>" + '<?php \singleton\fontawesome::getInstance( )->Ticket(1);?> ' + ticketData[i].Entity + ' #' + ticketData[i].Entity_ID + "</div></div>"
+              + "<div class='row'><div class='col-xs-12'>" + '<?php \singleton\fontawesome::getInstance( )->Calendar(1);?> ' + ticketData[i].Action + " @ " + ticketData[i].Time_Stamp + '</div></div>'
+              + "<div class='row'><div class='col-xs-12'>" + '<?php \singleton\fontawesome::getInstance( )->Calendar(1);?> ' + ticketData[i].Location_Tag + '</div></div>'
+              + "<div class='row'><div class='col-xs-12'>"  + '<?php \singleton\fontawesome::getInstance( )->User(1);?> ' + ticketData[i].Employee_Name + '</div></div>'
             +  "</div></div>"
             + "<div class='row'><div class='col-xs-12'>&nbsp;</div></div>");
             $("#timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID).on('click',function(){

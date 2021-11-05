@@ -142,30 +142,30 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class="panel-heading">Unit</div>
 				<div class='panel-body'>
 					<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-						<div class='col-xs-4'><?php $Icons->Unit(1);?> ID:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> ID:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['State'])>0 ? $Unit['State'] : "&nbsp;";?></div>
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Name:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Name:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Unit'])>0 ? $Unit['Unit'] : "&nbsp;";?></div>
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Type:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Type:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Type'])>0 ? $Unit['Type'] : "&nbsp;";?></div>
-						<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other_Privilege'] >= 4){?><div class='col-xs-4'><?php $Icons->Collection(1);?> Price:</div>
+						<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other_Privilege'] >= 4){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Price:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Price'])>0 ? money_format('%.2n',$Unit['Price']): "&nbsp;";?></div><?php }?>
-						<div class='col-xs-4'><?php $Icons->Note(1);?> Notes:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Note(1);?> Notes:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Description'])>0 ? $Unit['Description'] : "&nbsp;";?></div>
 					</div>
         </div>
         <div class="panel-heading">Location</div>
         <div class='panel-body'>
 					<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-						<div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Location_Tag'])>0 ? $Unit['Location_Tag'] : "&nbsp;";?></div>
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Street:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Street'])>0 ? $Unit['Street'] : "&nbsp;";?></div>
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['City'])>0 ? $Unit['City'] : "&nbsp;";?></div>
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Location_State'])>0 ? $Unit['Location_State'] : "&nbsp;";?></div>
-						<div class='col-xs-4'><?php $Icons->Blank(1);?> Zip:</div>
+						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Zip'])>0 ? $Unit['Zip'] : "&nbsp;";?></div>
 					</div>
 				</div>
@@ -173,23 +173,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='panel-body'>
   				<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
   					<?php if(isset($Unit['Customer_Name']) && strlen($Unit['Customer_Name'])>0){ ?>
-  					<div class='col-xs-4'><?php $Icons->Customer(1);?> Customer: </div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer: </div>
   					<div class='col-xs-8'><?php echo $Unit['Customer_Name'];?></div>
   					<?php }
   					if(strlen(isset($Unit['Customer_Contact']) && $Unit['Customer_Contact'])>0){ ?>
-  					<div class='col-xs-4'><?php $Icons->Blank(1);?> Contact:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Contact:</div>
   					<div class='col-xs-8'><?php echo $Unit['Customer_Contact'];?></div>
   					<?php }
   					if(strlen(isset($Unit['Customer_Street']) && $Unit['Customer_Street'])>0){ ?>
-  					<div class='col-xs-4'><?php $Icons->Blank(1);?> Street:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
   					<div class='col-xs-8'><?php echo $Unit['Customer_Street'];?></div>
   					<?php }
   					if(strlen(isset($Unit['Customer_City']) && $Unit['Customer_City'])>0){ ?>
-  					<div class='col-xs-4'><?php $Icons->Blank(1);?> City:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
   					<div class='col-xs-8'><?php echo $Unit['Customer_City'];?></div>
   					<?php }
   					if(strlen(isset($Unit['Customer_State']) && $Unit['Customer_State'])>0){ ?>
-  					<div class='col-xs-4'><?php $Icons->Blank(1);?> State:</div>
+  					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
   					<div class='col-xs-8'><?php echo $Unit['Customer_State'];?></div>
   					 <?php } ?>
   				</div>

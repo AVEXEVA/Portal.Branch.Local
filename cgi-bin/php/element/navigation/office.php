@@ -40,13 +40,13 @@
             <a href="customers.php"><i class="fa fa-link fa-fw"></i> Customers</a>
         </li>
         <li>
-            <a href="invoices.php"><?php $Icons->Invoice();?> Invoices</a>
+            <a href="invoices.php"><?php \singleton\fontawesome::getInstance( )->Invoice();?> Invoices</a>
         </li>
         <li>
-            <a href="collections.php"><?php $Icons->Collection();?> <span class=''>Collections</span></a>
+            <a href="collections.php"><?php \singleton\fontawesome::getInstance( )->Collection();?> <span class=''>Collections</span></a>
         </li>
 		<li>
-            <a href="contracts.php"><?php $Icons->Customer();?> <span class=''>Contracts</span></a>
+            <a href="contracts.php"><?php \singleton\fontawesome::getInstance( )->Customer();?> <span class=''>Contracts</span></a>
         </li>
 		<li>
 			<a href="financials.php"><i class='fa fa-dollar fa-fw'></i> Financials</a>

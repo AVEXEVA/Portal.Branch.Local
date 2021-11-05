@@ -98,7 +98,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <div class="row">
                 <div class="col-lg-12" style='padding:0px;'>
                     <div class="panel panel-primary">
-                        <div class="panel-heading" style='background-color:whitesmoke;color:black;'><h3><?php $Icons->Connection();?>Connections</h3></div>
+                        <div class="panel-heading" style='background-color:whitesmoke;color:black;'><h3><?php \singleton\fontawesome::getInstance( )->Connection();?>Connections</h3></div>
                         <div class="panel-body">
                             <table id='Table_Connections' class='display' cellspacing='0' width='100%'>
                                 <thead>

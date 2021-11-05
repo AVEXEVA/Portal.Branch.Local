@@ -67,21 +67,21 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <div id='page-wrapper' class='content' >
       <div class='row'>
         <div class='offset-md-3 col-md-6 panel panel-primary panel-sync'><form id='Ticket' action='new-ticket.php' method='POST'>
-          <div class='panel-heading' onClick='document.location.href="work.php";'><h4><?php $Icons->Ticket( );?> Ticket Creation</h4></div>
+          <div class='panel-heading' onClick='document.location.href="work.php";'><h4><?php \singleton\fontawesome::getInstance( )->Ticket( );?> Ticket Creation</h4></div>
           <div class='panel-body'>
             <div class='row g-0'>
               <div class='col-lg-12 col-xl-6'>
                 <div class='row form-group g-0'><div class='col-sm-12'>&nbsp;</div></div>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->User(1);?> Worker:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->User(1);?> Worker:</label>
                   <div class='col-auto padding v1'><input type='text' disabled value='<?php echo $User['First_Name'] . " " . $User['Last_Name'];?>' /></div>
                 </div>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->Calendar(1);?> Date:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</label>
                   <div class='col-auto padding v1'><input name='Date' value='<?php echo isset($_GET['Date']) ? $_GET['Date'] : date('m/d/Y');?>'/></div>
                 </div>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->Location(1);?> Location:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</label>
                   <div class='col-auto padding v1'><button type='button' onClick='selectLocations(this);'><?php
                   $pass = false; 
                   if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
@@ -98,7 +98,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                  
                 </div>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->Unit(1);?> Unit:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</label>
                   <div class='col-auto padding v1'><button type='button' onClick='selectUnits(this);'><?php
                   $pass = false;
                   if(isset($_GET['Unit']) && is_numeric($_GET['Unit'])){
@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                  
                 </div>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->Job(1);?> Job:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</label>
                   <div class='col-auto padding v1'><button type='button' onClick='selectJobs(this);'><?php
                   $pass = false;
                   if(isset($_GET['Job']) && is_numeric($_GET['Job'])){
@@ -131,7 +131,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                   if(!$pass){?>Select Job<?php }?></button></div>
                 </div>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->Blank(1);?> Level:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Level:</label>
                   <div class='col-auto padding v1'><select style='width:100%;' name='Level'>
                     <option value=''>Select</option>
                     <option value='1'>Service Call</option>
@@ -151,7 +151,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
               </div>
               <div class='col-md-12'>
                 <div class='row form-group g-0'>
-                  <label class='col-auto border-bottom v1'><?php $Icons->Description(1);?> Description:</label>
+                  <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Description(1);?> Description:</label>
                   <textarea class='col-sm-12' rows='8' name='Description'></textarea>
                 </div>
               </div>

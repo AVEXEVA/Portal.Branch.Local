@@ -81,7 +81,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         else {
                           TIMELINE[i] = jsonData[i];
                           $("#Timeline").prepend("<div class='row'>"
-                            + '<div class="col-xs-1"><?php $Icons->Violation(1);?></div>'
+                            + '<div class="col-xs-1"><?php \singleton\fontawesome::getInstance( )->Violation(1);?></div>'
                             + "<div class='col-xs-3'>" + jsonData[i].Location_Tag + "</div>"
                             + "<div class='col-xs-1'>Violation #" + jsonData[i].ID + "</div>"
                             + "<div class='col-xs-1'>" + jsonData[i].Action + "</div>"

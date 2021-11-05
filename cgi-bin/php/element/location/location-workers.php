@@ -166,7 +166,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Location = sqlsrv_fetch_array($r);
         $data = $Location;
 ?><div class='panel panel-primary'>
-	<div class='panel-heading'><?php $Icons->Users();?> Workers</div>
+	<div class='panel-heading'><?php \singleton\fontawesome::getInstance( )->Users();?> Workers</div>
 	<div class='panel-body  BankGothic shadow'>
 		<table id='Table_Workers' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 			<thead>

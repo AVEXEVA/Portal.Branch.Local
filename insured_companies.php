@@ -70,7 +70,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <div class="panel panel-primary">
                         <div class='panel-heading'><h4>
                             <div style='display:inline-block;'>
-                                <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php $Icons->Unit();?>Tracked Permits / Insurances</span>
+                                <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Tracked Permits / Insurances</span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
                             <div style='clear:both;'></div>

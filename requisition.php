@@ -270,66 +270,66 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
           </div>
     			<div class="panel panel-primary no-print">
-    				<div class="panel-heading" onClick="document.location.href='requisitions.php'"><h3 style='margin:0px;'><?php $Icons->Requisition();?> Requisition #<?php echo $Requisition['ID'];?></h3></div>
+    				<div class="panel-heading" onClick="document.location.href='requisitions.php'"><h3 style='margin:0px;'><?php \singleton\fontawesome::getInstance( )->Requisition();?> Requisition #<?php echo $Requisition['ID'];?></h3></div>
     				<div class="panel-body" style=''>
     					<div class='row'><div class='col-xs-12'>&nbsp;</div></div>
               <div class="row">
-    						<div class='col-xs-4'><?php $Icons->User(1);?> User:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->User(1);?> User:</div>
     						<div class='col-xs-8'><input disabled type='text' name='User_Name' size='15' value='<?php echo $Requisition['User_Name'];?>' /></div>
     					</div>
     					<div class="row">
-    						<div class='col-xs-4'><?php $Icons->Calendar(1);?> Date:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</div>
     						<div class='col-xs-8'><input disabled type='text' name='Date' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Date']));?>' /></div>
     					</div>
     					<div class="row">
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> Required</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Required</div>
     						<div class='col-xs-8'><input disabled type='text' name='Required' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Required']));?>' /></div>
     					</div>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
               <div class='row'>
-      					<div class='col-xs-4'><?php $Icons->Location(1);?> Location:</div>
+      					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
       					<div class='col-xs-8'><?php echo $Requisition['Location_Tag'];?></div>
               </div>
               <div class='row'>
-      					<div class='col-xs-4'><?php $Icons->Location(1);?> Drop Off:</div>
+      					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Drop Off:</div>
       					<div class='col-xs-8'><?php echo $Requisition['DropOff_Tag'];?></div>
               </div>
               <div class='row'>
-                <div class='col-xs-4'><?php $Icons->Unit(1);?> Unit:</div>
+                <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
                 <div class='col-xs-8'><?php echo $Requisition['Unit_State'];?></div>
               </div>
               <div class='row'>
-                <div class='col-xs-4'><?php $Icons->Job(1);?> Job:</div>
+                <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
                 <div class='col-xs-8'><?php echo $Requisition['Job_Name'];?></div>
               </div>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     					<div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> Shutdown:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Shutdown:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='Shutdown' <?php echo isset($Requisition['Shutdown']) && $Requisition['Shutdown'] == 1 ? 'checked' : '';?> /></div>
     					</div>
     					<div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> A.S.A.P.:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> A.S.A.P.:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='ASAP' <?php echo isset($Requisition['ASAP']) && $Requisition['ASAP'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> Rush:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Rush:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='Rush' <?php echo isset($Requisition['Rush']) && $Requisition['Rush'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> L/S/D.:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> L/S/D.:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='LSD' <?php echo isset($Requisition['LSD']) && $Requisition['LSD'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-    						<div class='col-xs-4'><?php $Icons->Blank(1);?> F.R.M.:</div>
+    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> F.R.M.:</div>
     						<div class='col-xs-8'><input type='checkbox' disabled name='FRM' <?php echo isset($Requisition['FRM']) && $Requisition['FRM'] == 1 ? 'checked' : '';?>  /></div>
     					</div>
               <div class='row Labels' >
-                <div class='col-xs-12'><?php $Icons->Paragraph(1);?> Notes:</div>
+                <div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Paragraph(1);?> Notes:</div>
                 <div class='col-xs-12'><textarea name='Notes' style='width:100%;' rows='9' disabled><?php echo isset($Requisition['Notes']) ? $Requisition['Notes'] : NULL;?></textarea></div>
               </div>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
             </div>
-            <div class='panel-heading'><h3><?php $Icons->Purchase();?> Items</h3></div>
+            <div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Purchase();?> Items</h3></div>
             <div class='panel-body'>
               <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
     					<div class='row'>

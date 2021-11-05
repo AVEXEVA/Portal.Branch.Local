@@ -181,7 +181,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								'<td>'+d.Description+'</td>'+
 							'</tr>'+
 							'<tr>'+
-								'<td><a href="invoice.php?ID='+d.Invoice+'"  target="_blank"><?php $Icons->Collection();?>View Invoice</a></td>'+
+								'<td><a href="invoice.php?ID='+d.Invoice+'"  target="_blank"><?php \singleton\fontawesome::getInstance( )->Collection();?>View Invoice</a></td>'+
 							'</tr>'+
 						'</table>';
 					}

@@ -111,7 +111,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;",array($_GET['ID']));
         $Job = sqlsrv_fetch_array($r);?>
 		<div class="panel panel-primary">
-			<!--<div class="panel-heading"><h4><?php $Icons->Users();?> Workers Table</h4></div>-->
+			<!--<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Users();?> Workers Table</h4></div>-->
 			<div class="panel-body">
 				<table id='Table_Workers' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 					<thead>

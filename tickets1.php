@@ -54,7 +54,7 @@ if(isMobile()){?><!DOCTYPE html>
 				<div class="panel-heading"><?php
 				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
 				if(is_numeric($_GET['Mechanic'])){$r = sqlsrv_query($NEI,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
-						else {$Mechanic = $User;}?><?php $Icons->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div>
+						else {$Mechanic = $User;}?><?php \singleton\fontawesome::getInstance( )->Ticket();?><?php echo proper($Mechanic['fFirst'] . " " . $Mechanic['Last']);?>'s Tickets</div>
 
 				<div class="panel-body no-print">
           <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
@@ -247,7 +247,7 @@ if(isMobile()){?><!DOCTYPE html>
                     '<td style="background-color:#1d1d1d;">'+resolution+'</td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td colspan="2"><button style="width:100%;height:42px;" onClick="document.location.href=\'ticket2.php?ID='+d.ID+'\';"><?php $Icons->Ticket();?>View Ticket</a></td>'+
+                    '<td colspan="2"><button style="width:100%;height:42px;" onClick="document.location.href=\'ticket2.php?ID='+d.ID+'\';"><?php \singleton\fontawesome::getInstance( )->Ticket();?>View Ticket</a></td>'+
                 '</tr>'+
             '</tbody></table>';
         }

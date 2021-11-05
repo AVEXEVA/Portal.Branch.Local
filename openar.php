@@ -68,7 +68,7 @@ if(isMobile()){?>
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
-							<div class="panel-heading"><h4><?php $Icons->Customer();?> Customers</h4></div>
+							<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer();?> Customers</h4></div>
 							<div class="panel-body">
 								<div id='Form_Customer'>
 									<div class="panel panel-primary">

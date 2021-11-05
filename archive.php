@@ -51,7 +51,7 @@ else {  $Mechanic = $User;  }?>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
-                        <div class="panel-heading"><h3><?php $Icons->Archive();?>Archive<div style='float:right'><button onClick='refreshGet();' style='color:black;'>Refresh</button></div></h3></div>
+                        <div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Archive();?>Archive<div style='float:right'><button onClick='refreshGet();' style='color:black;'>Refresh</button></div></h3></div>
                         </div>
                         <div class='panel-heading' style='background-color:white;color:black;'>
                             <div class='row'>

@@ -73,7 +73,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	    <?php require( 'cgi-bin/php/element/loading.php' );?>
 	    <div id='page-wrapper' class='content'>
 			<div class='card card-full card-primary border-0'>
-				<div class='card-heading bg-white text-black'><h4><?php $Icons->Contract( );?> Contracts</h4></div>
+				<div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
 				<div class='card-body bg-dark'>
 					<div id='Form_Lead'>
 						<div class='card'>

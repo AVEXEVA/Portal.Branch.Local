@@ -55,13 +55,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3><?php $Icons->Modernization();?>Repair Department
+                            <h3><?php \singleton\fontawesome::getInstance( )->Modernization();?>Repair Department
                             </h3>
                         </div>
                         <div class="panel-body">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#basic-pills" data-toggle="tab"><?php $Icons->Info();?> Summary</a></li>
-                                <li class=""><a href="#financials-pills" data-toggle="tab"><?php $Icons->Financial();?> Financials</a></li>
+                                <li class="active"><a href="#basic-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Info();?> Summary</a></li>
+                                <li class=""><a href="#financials-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Financial();?> Financials</a></li>
                             </ul>
                             <br />
                             <div class="tab-content">

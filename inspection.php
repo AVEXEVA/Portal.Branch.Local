@@ -69,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h4><?php $Icons->Back();?>  Vehicle Inspection</h4></div>
+				<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Back();?>  Vehicle Inspection</h4></div>
 				<div class="panel-body" style='background-color:rgba(255,255,255,.5);'>
 					<form action='#' method='POST'>
 						<div class='row' style='padding:25px;'>
@@ -167,7 +167,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h4 onClick="document.location.href='index.php';"><?php $Icons->Back();?>  Vehicle Inspection</h4></div>
+				<div class="panel-heading"><h4 onClick="document.location.href='index.php';"><?php \singleton\fontawesome::getInstance( )->Back();?>  Vehicle Inspection</h4></div>
 				<div class="panel-body" style='background-color:rgba(255,255,255,.5);'>
 					<form action='#' method='POST'>
 						<div class='row'>

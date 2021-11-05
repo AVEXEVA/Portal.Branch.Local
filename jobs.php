@@ -74,7 +74,7 @@ if(isMobile() || true){
 			<div class='panel panel-primary'>
 				<div class='panel-heading'>
                     <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Job( 1 );?> Jobs</div>
+                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Job( 1 );?> Jobs</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick='$('#Filters').toggle();'>+/-</button></div>
                     </div>
                 </div>

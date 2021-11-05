@@ -25,4 +25,12 @@ define(
 	'bin_library',
 	bin . 'library/'
 );
+
+define( 'privilege_read', 4 );
+define( 'privilege_write', 4 );
+define( 'privilege_exec', 4 );
+define( 'level_world', 0 );
+define( 'level_world', 3 );
+define( 'level_world', 6 );
+
 ?>

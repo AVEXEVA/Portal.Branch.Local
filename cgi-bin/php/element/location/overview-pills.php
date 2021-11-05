@@ -72,14 +72,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Location = sqlsrv_fetch_array($r);?>
 <div class="tab-pane fade in active" id="overview-pills">
 	<div class="panel panel-primary" style='margin-bottom:0px;'>
-		<!--<div class="panel-heading"><h4><?php $Icons->Dashboard();?> <?php echo $Location['Tag'];  ?> Dashboard</h4></div>-->
+		<!--<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Dashboard();?> <?php echo $Location['Tag'];  ?> Dashboard</h4></div>-->
 		<div class="panel-body">
 			<div class="row">
 				<div class='col-md-6'>
 					<div class='row'>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Customer();?> Customer</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer();?> Customer</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -94,7 +94,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Customer();?> Billing</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer();?> Billing</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -109,21 +109,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 							<div class='col-md-6'>
 								<div class="panel panel-primary">
-									<div class="panel-heading"><h4><?php $Icons->Maintenance();?> Maintenance</h4></div>
+									<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance</h4></div>
 									<div class='panel-body white-background'>
 										<div class='row' style='font-size:20px;padding:5px;'>
-											<div class='col-xs-12'><?php $Icons->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
+											<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
 											</div>
-											<div class='col-xs-12'><?php $Icons->Phone();?> <?php echo $Location['Route_Mechanic_Phone_Number'];?></div>
-											<?php if(strlen($Location['Route_Mechanic_Email']) > 0){?><div class='col-xs-12'><?php $Icons->Email();?> <?php echo $Location['Route_Mechanic_Email'];?></div><?php }?>
-											<div class='col-xs-12'><?php $Icons->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
+											<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Phone();?> <?php echo $Location['Route_Mechanic_Phone_Number'];?></div>
+											<?php if(strlen($Location['Route_Mechanic_Email']) > 0){?><div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Email();?> <?php echo $Location['Route_Mechanic_Email'];?></div><?php }?>
+											<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
 										</div>
 									</div>
 								</div>
 							</div>
 							<div class='col-md-6'>
 								<div class="panel panel-primary">
-									<div class="panel-heading"><h4><?php $Icons->Territory();?> Sales Information</h4></div>
+									<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Territory();?> Sales Information</h4></div>
 									<div class='panel-body white-background'>
 										<div class='row' style='font-size:20px;padding:5px;'>
 											<div class='col-xs-12'><?php echo $Location['Territory_Domain'];?>'s Territory</div>
@@ -135,7 +135,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					</div>
 					<div class='col-md-6'>
 						<div class="panel panel-primary">
-							<div class="panel-heading"><h4><?php $Icons->Info();?> Records</h4></div>
+							<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Info();?> Records</h4></div>
 							<div class='panel-body'>
 								<div class="col-lg-4 col-md-4" onClick='clickTab("tables-pills","tables-units-pills");'>
 									<div class="panel panel-primary">
@@ -323,7 +323,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						<div class='row'>
 							<div class='col-md-12'>
 								<div class="panel panel-primary">
-									<div class="panel-heading"><h4><?php $Icons->Calendar();?> Timeline</h4></div>
+									<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Calendar();?> Timeline</h4></div>
 									<div class='panel-body white-background BankGothic shadow' style='height:600px;overflow:auto;'>
 										<div id='overview-timeline'><?php require('../../../php/element/loading-active.php');?></div>
 										<script>

@@ -68,7 +68,7 @@ if(isset($_SESSION[ 'User' ],
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
 			<div class='panel panel-primary'>
-				<div class='panel-heading'><h3><?php $Icons->Customer();?> Leads</h3></div>
+				<div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
 				<div class='panel-body'>
 					<div id='Form_Lead'>
 						<div class='panel panel-primary'>

@@ -130,7 +130,7 @@ setlocale(LC_MONETARY, 'en_US');
         <div id='page-wrapper' class='content' style='overflow:auto !important;'>
             <div class='' style='display:none;'>
                 <div class='panel panel-primary'>
-                    <div class='panel-heading'><h3><?php $Icons->Invoice();?> Invoice</h3></div>
+                    <div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Invoice();?> Invoice</h3></div>
                     <div class='panel-body'>
                         <div class='col-md-4'>
                             <div class='panel panel-red'>

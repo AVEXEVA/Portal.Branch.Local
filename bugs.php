@@ -108,7 +108,7 @@ if(     count( $_POST ) > 0
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class="panel panel-primary">
-            <div class='panel-heading'><h4><?php $Icons->Contract( );?> Contracts</h4></div>
+            <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
                 <div class='panel-body no-print' id='Filters' style='border-bottom:1px solid #1d1d1d;'>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class='form-group row'>

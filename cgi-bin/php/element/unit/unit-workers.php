@@ -134,7 +134,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         if($r2){while($array = sqlsrv_fetch_array($r2)){$Unit[$array['fDesc']] = $array['Value'];}}
 ?>
 		<div class="panel panel-primary">
-			<!--<div class="panel-heading"><h4><?php $Icons->Users();?> Workers Table</h4></div>-->
+			<!--<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Users();?> Workers Table</h4></div>-->
 			<div class="panel-body white-background BankGothic shadow">
 				<table id='Table_People' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 					<thead>

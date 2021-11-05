@@ -139,7 +139,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			<div class='row'>
 				<div class='col-md-12'>
 					<div class="panel panel-primary">
-						<div class="panel-heading"><h3><?php $Icons->Territory();?>Total Profit</h3></div>
+						<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Territory();?>Total Profit</h3></div>
 						<div class='panel-body white-background BankGothic shadow' style='height:300px;'>
 							<div class="flot-chart" style='height:300px;'><div class="flot-chart-content" id="flot-placeholder-profit" style='height:300px;'></div></div>
 						</div>

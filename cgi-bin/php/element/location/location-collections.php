@@ -95,7 +95,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div>
 										</div>
 										<div class="panel panel-primary">
-											<!--<div class="panel-heading"><h3><?php $Icons->Territory();?>Collectable Invoices</h3></div>-->
+											<!--<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Territory();?>Collectable Invoices</h3></div>-->
 											<div class='panel-body  BankGothic shadow'>
 												<table id='Table_Collectable_Invoices' class='display' cellspacing='0' width='100%'>
 													<thead><tr>

@@ -33,11 +33,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><div class="panel panel-primary" id='location-information'>
 	<div class='panel-body white-background' style='font-size:16px;padding:5px;'>
 		<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-			<div class='col-xs-4'><?php $Icons->Territory(1);?> Name:</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Territory(1);?> Name:</div>
 			<div class='col-xs-8'><?php echo $Territory['Territory_Name'];?></div>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-            <div class='col-xs-4'><?php $Icons->Unit(1);?> Units</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
 					SELECT Count(Elev.ID) AS Count_of_Elevators
@@ -49,7 +49,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Elevators']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Job(1);?> Jobs</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
 					SELECT Count(Job.ID) AS Count_of_Jobs
@@ -60,7 +60,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Violation(1);?> Violations</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
 					SELECT Count(Violation.ID) AS Count_of_Jobs
@@ -70,7 +70,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				;",array($_GET['ID']));
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Ticket(1);?> Tickets</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
                     SELECT Count(Tickets.ID) AS Count_of_Tickets
@@ -98,7 +98,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;",array($_GET['ID'],$_GET['ID'],$_GET['ID']));
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Proposal(1);?> Proposals</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
                     SELECT Count(Estimate.ID) AS Count_of_Tickets
@@ -108,7 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 ;",array($_GET['ID']));
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
             ?></div>
-            <div class='col-xs-4'><?php $Icons->Invoice(1);?> Invoices</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Invoices</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
                     SELECT Count(Invoice.Ref) AS Count_of_Invoices
@@ -119,7 +119,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Invoices']) : 0;
             ?></div>
 			<?php if(isset($My_Privileges[Legal]) && $My_Privileges[Legal]>=4 ) {?>
-            <div class='col-xs-4'><?php $Icons->Legal(1);?> Lawsuits</div>
+            <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Legal(1);?> Lawsuits</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
                     SELECT Count(Job.ID) AS Count_of_Legal_Jobs
@@ -132,7 +132,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Legal_Jobs']) : 0;
             ?></div><?php }?>
 			<?php if(isset($My_Privileges[Legal]) && $My_Privileges[Legal]>=4 ) {?>
-			<div class='col-xs-4'><?php $Icons->Collection(1);?> Total Balance</div>
+			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Total Balance</div>
             <div class='col-xs-8'><?php
                 $r = sqlsrv_query($NEI,"
                     SELECT Sum(Loc.Balance) AS Terr_Sum

@@ -369,13 +369,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         </style>
                         <div class='panel-heading'><h4>
                             <div style='display:inline-block;'>
-                                <span onClick="modernizationTracker('tracked_modernizations');" style='cursor:pointer;'><?php $Icons->Unit();?>Modernization List</span>
+                                <span onClick="modernizationTracker('tracked_modernizations');" style='cursor:pointer;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Modernization List</span>
                                 <span class='hidden' onClick="modernizationTracker('tracked_modernization');" style='cursor:pointer;'><span id='tracked_modernization'> > Modernization Entity</span></span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
                             <?php if(isset($My_Privileges['Admin']['User_Privilege']) && $My_Privileges['Admin']['User_Privilege'] > 4){?>
-                            <div class='delete' style='cursor:pointer;float:right;margin-left:25px;' onClick="deleteRow();"><?php $Icons->Edit();?> Delete</div><?php }?>
-                            <div class='add' style='float:right;margin-left:25px;cursor:pointer;' onClick="popupAdd();"><?php $Icons->Add();?> Add</div>
+                            <div class='delete' style='cursor:pointer;float:right;margin-left:25px;' onClick="deleteRow();"><?php \singleton\fontawesome::getInstance( )->Edit();?> Delete</div><?php }?>
+                            <div class='add' style='float:right;margin-left:25px;cursor:pointer;' onClick="popupAdd();"><?php \singleton\fontawesome::getInstance( )->Add();?> Add</div>
                             <div style='clear:both;'></div>
                         </h4></div>
                         <div class="panel-body" id='content'>

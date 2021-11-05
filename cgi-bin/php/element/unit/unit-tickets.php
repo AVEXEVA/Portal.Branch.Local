@@ -154,7 +154,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         );
         if( $r ){while( $array = sqlsrv_fetch_array( $r ) ){ $Unit[ $array[ 'fDesc' ] ] = $array[ 'Value' ]; } }
 ?><div class="panel panel-primary">
-	<div class="panel-heading"><?php $Icons->Ticket( 1 );?> Tickets</div>
+	<div class="panel-heading"><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Tickets</div>
 	<div class="panel-body">
 		<table id='Table_Tickets' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
 			<thead>

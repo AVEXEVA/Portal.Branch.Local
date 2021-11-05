@@ -92,7 +92,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			<div class="row">
 				<div class='col-md-12' >
 					<div class="panel panel-primary">
-			<!--<div class="panel-heading"><h4><?php $Icons->Users();?> Workers Table</h4></div>-->
+			<!--<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Users();?> Workers Table</h4></div>-->
 			<div class="panel-body white-background BankGothic shadow">
 				<table id='Table_Workers' class='display' cellspacing='0' width='100%' style='font-size:14px;'>
 					<thead>

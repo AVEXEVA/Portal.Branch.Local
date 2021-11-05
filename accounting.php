@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         else {
                           TIMELINE[i] = jsonData[i];
                           $("#Timeline").prepend("<div class='row'>"
-                            + '<div class="col-xs-1"><?php $Icons->Invoice(1);?></div>'
+                            + '<div class="col-xs-1"><?php \singleton\fontawesome::getInstance( )->Invoice(1);?></div>'
                             + "<div class='col-xs-1'>Invoice</div>"
                             + "<div class='col-xs-1'>#" + jsonData[i].Ref + "</div>"
                             + "<div class='col-xs-1'>$" + numberWithCommas(jsonData[i].Amount) + "</div>"

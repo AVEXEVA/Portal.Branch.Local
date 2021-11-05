@@ -8,11 +8,11 @@
   }
 ?>
 <?php if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><script data-pagespeed-no-defer src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script><?php }?>
-<script src="https://www.nouveauelevator.com/portal/cgi-bin/js/functions.js"></script>
-<script src="https://www.nouveauelevator.com/portal/cgi-bin/js/onload.js"></script>
+<script src="cgi-bin/js/functions.js"></script>
+<script src="cgi-bin/js/onload.js"></script>
 <script src="https://kit.fontawesome.com/46bc044748.js" crossorigin="anonymous"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56288874-1"></script>
-<script src="https://www.nouveauelevator.com/portal/cgi-bin/js/index.js"></script>
+<script src="cgi-bin/js/index.js"></script>
 <script src="cgi-bin/js/index.js?<?php echo rand( 1000, 9999999 );?>"></script>
 <script>
   function linkTab( Tab ){ 

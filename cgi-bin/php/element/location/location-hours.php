@@ -117,15 +117,15 @@ table#Location_Hours tbody tr td, table#Location_Hours thead tr th {
 		;",array($_GET['ID'],$_GET['ID']));
 		$Sums = sqlsrv_fetch_array($r);
 	?>
-	<div class='col-xs-4'><?php $Icons->Hours(1);?> Regular:</div>
+	<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Hours(1);?> Regular:</div>
 	<div class='col-xs-8'><?php echo strlen($Sums['Regular']) ? $Sums['Regular'] : "&nbsp;";;?></div>
-	<div class='col-xs-4'><?php $Icons->Blank(1);?> Overtime:</div>
+	<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Overtime:</div>
 	<div class='col-xs-8'><?php echo strlen($Sums['Overtime']) ? $Sums['Overtime'] : "&nbsp;";;?></div>
-	<div class='col-xs-4'><?php $Icons->Blank(1);?> Doubletime:</div>
+	<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Doubletime:</div>
 	<div class='col-xs-8'><?php echo strlen($Sums['Doubletime']) ? $Sums['Doubletime'] : "&nbsp;";;?></div>
-	<div class='col-xs-4'><?php $Icons->Blank(1);?> Total:</div>
+	<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Total:</div>
 	<div class='col-xs-8'><?php echo strlen($Sums['Total']) ? $Sums['Total'] : "&nbsp;";;?></div>
-	<div class='col-xs-4'><?php $Icons->Blank(1);?> Budgeted:</div>
+	<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Budgeted:</div>
 	<div class='col-xs-8'><?php echo strlen($Job['Job_Budgeted_Hours']) ? $Job['Job_Budgeted_Hours'] : "&nbsp;";;?></div>
 </div>
 <table width="100%" class="" id="Location_Hours">

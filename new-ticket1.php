@@ -89,21 +89,21 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <?php require( bin_php . 'element/loading.php'); ?>
     <div id='page-wrapper' class='content' >
       <div class='panel-primary'>
-        <div class='panel-heading' onClick='document.location.href="work.php";'><h4><?php $Icons->Ticket( );?> Ticket Creation</h4></div>
+        <div class='panel-heading' onClick='document.location.href="work.php";'><h4><?php \singleton\fontawesome::getInstance( )->Ticket( );?> Ticket Creation</h4></div>
         <div class='panel-body'>
   				<div class='row form-group'>
   					<div class='col-sm-12'>&nbsp;</div>
           </div>
           <div class='row form-group'>
-  					<label class='col-auto'><?php $Icons->User(1);?> Worker:</label>
+  					<label class='col-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Worker:</label>
   					<div class='col-auto'><?php echo $User['First_Name'] . " " . $User['Last_Name'];?></div>
           </div>
           <div class='row form-group'>
-  					<label class='col-auto'><?php $Icons->Calendar(1);?> Date:</label>
+  					<label class='col-auto'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</label>
   					<div class='col-auto'><input name='Date' value='<?php echo isset($_GET['Date']) ? $_GET['Date'] : date('m/d/Y');?>'/></label>
           </div>
           <div class='row form-group'>
-  					<label class='col-auto'><?php $Icons->Location(1);?> Location:</label>
+  					<label class='col-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</label>
   					<div class='col-auto'><button type='button' onClick='selectLocations(this);' '><?php
             $pass = false;
             if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
@@ -130,7 +130,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             </script>
           </div>
           <div class='row form-group'>
-            <label class='col-auto'><?php $Icons->Unit(1);?> Unit:</label>
+            <label class='col-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</label>
             <div class='col-auto'><button type='button' onClick='selectUnits(this);' '><?php
             $pass = false;
             if(isset($_GET['Unit']) && is_numeric($_GET['Unit'])){
@@ -157,7 +157,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             </script>
           </div>
           <div class='row form-group'>
-            <label class='col-auto'><?php $Icons->Job(1);?> Job:</label>
+            <label class='col-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</label>
             <div class='col-auto'><button type='button' onClick='selectJobs(this);' '><?php
             $pass = false;
             if(isset($_GET['Job']) && is_numeric($_GET['Job'])){
@@ -184,7 +184,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             </script>
           </div>
           <div class='row form-group'>
-            <label class='col-auto'><?php $Icons->Blank(1);?> Level:</label>
+            <label class='col-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Level:</label>
             <div class='col-auto'><select style='width:100%;' name='Level'>
               <option value=''>Select</option>
               <option value='1'>Service Call</option>
@@ -203,7 +203,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           </div>
           <hr />
           <div class='row form-group'>
-            <label class='col-auto'><?php $Icons->Description(1);?> Description:</label>
+            <label class='col-auto'><?php \singleton\fontawesome::getInstance( )->Description(1);?> Description:</label>
           </div>
           <div class='row form-group'>
             <div class='col-sm-12'><textarea style='width:100%;' rows='8' name='Description'></textarea></div>

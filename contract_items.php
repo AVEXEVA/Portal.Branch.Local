@@ -50,7 +50,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><h4><?php $Icons->Contract();?> Contracts</h4></div>
+				<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Contract();?> Contracts</h4></div>
         <div class='panel-body'><form id='Manage_Contract_Item'>
           <div class='row'>
             <div class='col-xs-1'>Territory</div>

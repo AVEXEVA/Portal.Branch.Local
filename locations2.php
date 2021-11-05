@@ -72,7 +72,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="card card-full card-primary border-0">
-                <div class="card-heading"><h4><?php $Icons->Location( 1 );?> Locations</h4></div>
+                <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Locations</h4></div>
                 <div class="card-body bg-dark">
 					<table id='Table_Locations' class='display' cellspacing='0' width='100%'>
 						<thead><tr>

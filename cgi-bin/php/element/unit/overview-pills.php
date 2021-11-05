@@ -122,14 +122,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?>
 <div class="tab-pane fade in active" id="overview-pills">
 	<div class="panel panel-primary" style='margin-bottom:0px;'>
-		<!--<div class="panel-heading"><h3><?php $Icons->Dashboard();?> <?php echo $Location['Tag'];  ?> Dashboard</h3></div>-->
+		<!--<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Dashboard();?> <?php echo $Location['Tag'];  ?> Dashboard</h3></div>-->
 		<div class="panel-body">
 			<div class="row">
 				<div class='col-md-6'>
 					<div class='row'>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Unit();?> Unit</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Unit();?> Unit</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -152,7 +152,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Customer();?> Customer</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Customer();?> Customer</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -179,7 +179,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						</div>
 						<div class='col-md-6'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h4><?php $Icons->Location();?> Location</h4></div>
+								<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location();?> Location</h4></div>
 								<div class='panel-body white-background'>
 									<div style='font-size:20px;text-decoration:underline;'><b>
 										<div class='row' style='padding:5px;'>
@@ -207,9 +207,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										<div class="panel-heading"><h4>Maintenance Information</h4></div>
 										<div class='panel-body white-background'>
 											<div class='row' style='font-size:20px;padding:5px;'>
-												<div class='col-xs-12'><?php $Icons->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Unit['Route_ID'];?>"><?php }?><?php echo proper($Unit["Route_Mechanic_First_Name"] . " " . $Unit["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?></a><?php }?>
+												<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Route();?> <?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Unit['Route_ID'];?>"><?php }?><?php echo proper($Unit["Route_Mechanic_First_Name"] . " " . $Unit["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Unit['Route_Mechanic_ID']){?></a><?php }?>
 												</div>
-												<div class='col-xs-12'><?php $Icons->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Unit["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
+												<div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Division();?> <?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Unit["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
 											</div>
 										</div>
 									</div>
@@ -386,7 +386,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12'>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Calendar();?> Timeline</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Calendar();?> Timeline</h3></div>
 								<div class='panel-body white-background BankGothic shadow' style='height:400px;overflow:auto;'>
 									<div id='overview-timeline'><?php require('../../../php/element/loading-active.php');?></div>
 									<script>

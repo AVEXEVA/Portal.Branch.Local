@@ -71,7 +71,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='row'>
 						<div class='col-md-12' style=''>
 							<div class="panel panel-primary">
-								<div class="panel-heading"><h3><?php $Icons->Chart();?>Financial Information</h3></div>
+								<div class="panel-heading"><h3><?php \singleton\fontawesome::getInstance( )->Chart();?>Financial Information</h3></div>
 								<div class='panel-body BankGothic'>
 									<?php if(isset($My_Privileges['Admin'])){?><div class="col-lg-6 col-md-6">
 										<div class="panel panel-primary">

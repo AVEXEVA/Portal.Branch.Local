@@ -68,7 +68,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class="panel-heading"><?php 
 				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
 				if(is_numeric($_GET['Mechanic'])){$r = sqlsrv_query($NEI,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;} 
-						else {$Mechanic = $User;}?><h3><?php $Icons->Dashboard();?>My Dashboard</h3></div>
+						else {$Mechanic = $User;}?><h3><?php \singleton\fontawesome::getInstance( )->Dashboard();?>My Dashboard</h3></div>
                 <div class="row">
 					<div class='col-md-6'>
 						<div class="panel panel-primary">

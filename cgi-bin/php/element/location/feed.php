@@ -154,7 +154,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $Location = sqlsrv_fetch_array($r);
 ?><style>#Table_Activities { font-size:12px; }</style>
 <div class='panel panel-primary'>
-    <div class='panel-heading'><h4><?php $Icons->Activities( 1 );?> Activities</h4></div>
+    <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Activities( 1 );?> Activities</h4></div>
     <div class='panel-body'>
         <table id='Table_Activities' class='display' cellspacing='0' width='100%'>
             <thead><tr>

@@ -3,7 +3,7 @@
     <ul class="nav nav-third-level collapse">
     	<?php if(isset($My_Privileges['Executive']) && $My_Privileges['Executive']['Other_Privilege'] >= 4){?>
         <li>
-            <a href="repair.php"><?php $Icons->Job();?> <span class=''>Summary</span></a>
+            <a href="repair.php"><?php \singleton\fontawesome::getInstance( )->Job();?> <span class=''>Summary</span></a>
         </li>
         <?php }?>
     	
