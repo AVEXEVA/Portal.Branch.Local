@@ -58,79 +58,96 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">
-    <title><?php echo $_SESSION[ 'Branch' ] == '' ? 'Nouveau' : $_SESSION[ 'Branch' ]; ?> | Portal</title>
-    <?php require('cgi-bin/css/index.php');?>
-    <style>#Table_Locations { font-size:12px; }</style>
-    <?php require('cgi-bin/js/index.php');?>
+    <title>Nouveau Elevator Portal</title>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php require( bin_meta . 'index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js  . 'index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require('cgi-bin/php/element/navigation/index.php');?>
-        <?php require('cgi-bin/php/element/loading.php');?>
+    <div id="wrapper">
+        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-                    <div class='row'>
-                        <div class='col-xs-10'><h4><?php $Icons->Location( 1 );?> Locations</div>
-                        <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
-                    </div>
-                </div>
-				<div class="panel-body no-print" id='Filters' style='border-bottom:1px solid #1d1d1d;'>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Search:</div>
-                        <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Name:</div>
-                    	<div class='col-xs-8'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Customer:</div>
-                    	<div class='col-xs-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>City:</div>
-                    	<div class='col-xs-8'><input type='text' name='City' placeholder='City' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Street:</div>
-                    	<div class='col-xs-8'><input type='text' name='Street' placeholder='Street' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Maintained:</div>
-                    	<div class='col-xs-8'><select name='Maintained' onChange='redraw( );'>
-		                	<option value=''>Select</option>
-		                	<option value='1'>Active</option>
-		                	<option value='0'>Inactive</option>
-		                </select></div>
-		            </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Status:</div>
-                    	<div class='col-xs-8'><select name='Status' onChange='redraw( );'>
-		                	<option value=''>Select</option>
-		                	<option value='0'>Active</option>
-		                	<option value='1'>Inactive</option>
-		                </select></div>
-		            </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                </div>
-				<div class='panel-body'>
+            <div class="card card-full card-primary border-0">
+                <div class="card-heading"><h4><?php $Icons->Location( 1 );?> Locations</h4></div>
+                <div class="card-body bg-dark">
 					<table id='Table_Locations' class='display' cellspacing='0' width='100%'>
 						<thead><tr>
-							<th title='ID'>ID</th>
-							<th title='Name'>Name</th>
-							<th title='Customer'>Customer</th>
-							<th title='City'>City</th>
-							<th title='Street'>Street</th>
-							<th title='Maintained'>Maintained</th>
-							<th title='Status'>Status</th>
+							<th class='text-white border border-white' title='ID'>ID</th>
+							<th class='text-white border border-white' title='Name'>Name</th>
+							<th class='text-white border border-white' title='Customer'>Customer</th>
+							<th class='text-white border border-white' title='Type'>Type</th>
+							<th class='text-white border border-white' title='Division'>Division</th>
+							<th class='text-white border border-white' title='Route'>Route</th>
+							<th class='text-white border border-white' title='Street'>Street</th>
+							<th class='text-white border border-white' title='City'>City</th>
+							<th class='text-white border border-white' title='State'>State</th>
+							<th class='text-white border border-white' title='Zip'>Zip</th>
+							<th class='text-white border border-white' title='Units'>Units</th>
+							<th class='text-white border border-white' title='Maintained'>Maintained</th>
+							<th class='text-white border border-white' title='Status'>Status</th>
+						</tr><tr>
+							<th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' /></th>
+							<th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' /></th>
+							<th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' /></th>
+							<th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
+								<option value=''>Select</option>
+								<?php 
+									$result = sqlsrv_query(
+										$NEI,
+										" 	SELECT 		Elev.Building 
+											FROM 		Elev 
+											WHERE 		Elev.Building NOT IN ( '', ' ' )
+											GROUP BY 	Elev.Building
+											ORDER BY 	Elev.Building ASC;"
+									);
+									if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['Building'];?>'><?php echo $row['Building'];?></option><?php } }
+								?>
+							</select></th>
+							<th class='text-white border border-white' title='Division'><select class='redraw form-control' name='Division'>
+								<option value=''>Select</option>
+								<?php 
+									$result = sqlsrv_query(
+										$NEI,
+										" 	SELECT 		Zone.ID,
+														Zone.Name 
+											FROM 		Zone ;"
+									);
+									if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php } }
+								?>
+							</select></th>
+							<th class='text-white border border-white' title='Route'><select class='redraw form-control' name='Route'>
+								<option value=''>Select</option>
+								<?php 
+									$result = sqlsrv_query(
+										$NEI,
+										" 	SELECT 		Route.ID,
+														Route.Name,
+														Employee.fFirst + ' ' + Employee.Last AS Mechanic 
+											FROM 		Route
+														LEFT JOIN Emp AS Employee ON Route.Mech = Employee.fWork
+											WHERE 		Employee.fFirst + ' ' + Employee.Last <> 'D D'
+											ORDER BY 	Route.Name + ' - ' + Employee.fFirst + ' ' + Employee.Last ASC;"
+									);
+									if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['ID'];?>'><?php echo $row[ 'Name' ];?> - <?php echo $row['Mechanic'];?></option><?php } }
+								?>
+							</select></th>
+							<th class='text-white border border-white' title='Street'><input class='redraw form-control' type='text' name='Street' /></th>
+							<th class='text-white border border-white' title='City'><input class='redraw form-control' type='text' name='City' /></th>
+							<th class='text-white border border-white' title='State'><input class='redraw form-control' type='text' name='State' /></th>
+							<th class='text-white border border-white' title='Zip'><input class='redraw form-control' type='text' name='Zip' /></th>
+							<th class='text-white border border-white' title='Units'><input disabled class='redraw form-control' type='text' name='Units' /></th>
+							<th class='text-white border border-white' title='Maintained'><select class='redraw form-control' name='Status'>
+			                	<option value=''>Select</option>
+			                	<option value='0'>Active</option>
+			                	<option value='1'>Inactive</option>
+			                </select></th>
+							<th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Maintained'>
+			                	<option value=''>Select</option>
+			                	<option value='1'>Active</option>
+			                	<option value='0'>Inactive</option>
+			                </select></th>
 						</tr></thead>
 					</table>
 				</div>

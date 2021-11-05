@@ -1,4 +1,5 @@
 <?php
+/*'MultipleActiveResultSets' => false,*/
 $Databases = array(
     'Demo' => sqlsrv_connect( 
         '172.16.12.45',
@@ -90,7 +91,8 @@ $Options = array(
     "Uid" => "sa",
     "PWD" => "SQLABC!23456",
     'ReturnDatesAsStrings'=>true,
-    "CharacterSet" => "UTF-8"
+    "CharacterSet" => "UTF-8",
+    "TraceOn" => false
 );
 $NEI = sqlsrv_connect($IP, $Options);
 $Options['Database'] = 'Portal';

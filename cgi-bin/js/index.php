@@ -13,6 +13,7 @@
 <script src="https://kit.fontawesome.com/46bc044748.js" crossorigin="anonymous"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56288874-1"></script>
 <script src="https://www.nouveauelevator.com/portal/cgi-bin/js/index.js"></script>
+<script src="cgi-bin/js/index.js?<?php echo rand( 1000, 9999999 );?>"></script>
 <script>
   function linkTab( Tab ){ 
     $("div[tab='" + Tab + "']")[0].scrollIntoView( );
