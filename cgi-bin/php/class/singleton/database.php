@@ -1,12 +1,7 @@
 <?php
 namespace singleton;
 class database extends \singleton\index {
-	use \magic\method\index;
-	private $resource = null;
-	private $host = null;
-	private $user = null;
-	private $password = null;
-	private $database = null;
+	private $resources = array( );
 	private $databases = array(
 		'Portal',
 		'Demo',
@@ -19,6 +14,9 @@ class database extends \singleton\index {
 		'Paradox',
 		'Attendance'
 	);
+	private $host = '172.16.12.45';
+	private $user = 'sa';
+	private $password = 'SQLABC!23456';
 	private $options = array(
 		'Database' 				=> 	null,
 	    'Uid' 					=> 	'sa',
@@ -26,22 +24,25 @@ class database extends \singleton\index {
 	    'ReturnDatesAsStrings'	=>	true,
 	    'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 	    'TraceOn' 				=> 	false
-	)
-	public function __construct( $database = null ){
-		if( in_array( $Database, $this->databases ) ){
-			$options = $this->options;
-			$options[ 'Database' ] = $database;
-			$this->resource = sqlsrv_connect(
-				$this->host,
-				$options
-			);
+	);
+	protected function __construct( ){
+		if( is_array( $this->databases ) && count( $this->databases > 0 ) ){
+			foreach( $this->databases as $database ){
+				if( is_string( $database ) && strlen( $database ) > 0 ){
+					$options = $this->options;
+					$options[ 'Database' ] = $database;
+					$this->resources[ $database ] = sqlsrv_connect( $this->host, $options );	
+				}
+			}	
 		}
 	}
-	public function __query( $query, $parameters ){
-		return sqlsrv_query(
-			$this->resource,
-			$query,
-			$parameters
-		);
+	public function query( $database, $query, $parameters ){
+		return in_array( $database, array_keys( $this->resources ) ) 
+			? 	sqlsrv_query(
+					$this->resources[ $database ],
+					$query,
+					$parameters
+				)
+			: 	false;
 	}
 }?>

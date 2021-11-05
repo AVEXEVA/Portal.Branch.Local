@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $Connection = sqlsrv_query(
-    	$NEI,
+    $Connection = $database->query(
+    	'Demo',
     	"	SELECT 	Top 1 
     				*
 			FROM   	Connection
