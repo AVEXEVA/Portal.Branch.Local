@@ -37,6 +37,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
+        if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+			$parameters[] = $_GET['ID'];
+			$conditions[] = "Product.ID LIKE '%' + ? + '%'";
+		}
+		 
+        if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+			$parameters[] = $_GET['Name'];
+			$conditions[] = "Product.Name LIKE '%' + ? + '%'";
+		}
+		
+
         $data = array();
 		$r = $database->query(null,"
         	SELECT Product.*

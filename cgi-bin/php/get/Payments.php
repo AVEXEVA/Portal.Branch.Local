@@ -30,9 +30,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_Privileges = array();
     while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
-    if( isset($My_Privileges['Invoice']) 
+    if( isset($My_Privileges['Accounts_Payable']) 
         && (
-			$My_Privileges['Invoice']['Other_Privilege'] >= 4
+			$My_Privileges['Accounts_Payable']['Other_Privilege'] >= 4
 		)
 	 ){
             $Privileged = True;}
@@ -49,8 +49,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				   Paid.Disc     AS Discount,
 				   Paid.Paid     AS Paid,
 				   Paid.TRID     AS TRID
-            FROM   nei.dbo.Paid
-                   LEFT JOIN nei.dbo.Trans ON Paid.TRID = Trans.ID
+            FROM   Paid
+                   LEFT JOIN Trans ON Paid.TRID = Trans.ID
         ;");
         $data = array();
         if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}

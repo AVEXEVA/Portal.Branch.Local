@@ -63,7 +63,30 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
     $conditions = array();
     $conditions = $conditions == array() ? "NULL IS NULL" : implode( ' AND ', $conditions );
-    $params[] = $User[ 'fWork' ];
+    if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['ID'];
+      $conditions[] = "Violation.ID LIKE '%' + ? + '%'";
+    }
+
+    if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Name'];
+      $conditions[] = "Violation.Name LIKE '%' + ? + '%'";
+    }
+
+    if( isset($_GET[ 'Date' ] ) && !in_array( $_GET[ 'Date' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Date'];
+      $conditions[] = "Violation.fDate LIKE '%' + ? + '%'";
+    }
+
+    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Status'];
+      $conditions[] = "Violation.Status LIKE '%' + ? + '%'";
+    }
+
+    if( isset($_GET[ 'Location_Name' ] ) && !in_array( $_GET[ 'Location_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_Name'];
+      $conditions[] = "Location.TAg LIKE '%' + ? + '%'";
+    }
     $params[] = $Start;
     $params[] = $End;
     $Columns = array(
@@ -111,7 +134,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                   WHERE   {$conditions}
                           AND Violation.Status = 'Job Created'
                           AND Violation.fDate >= '2017-03-08 00:00:00.000'
-                          AND Ticket.Field = ?
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN {$Start} AND {$End};";
     $rResult = $database->query(
