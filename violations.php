@@ -1,7 +1,7 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
     session_start( [ 'read_and_close' => true ] );
-    require('cgi-bin/php/index.php');
+    require('bin/php/index.php');
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
@@ -125,7 +125,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
     
     <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
     
     <script>
@@ -179,7 +179,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     d.Status = $('input[name="Status"]').val( );
                     return d; 
                 },
-                url : 'cgi-bin/php/get/Violations2.php'
+                url : 'bin/php/get/Violations2.php'
             },
             drawCallback : function ( settings ) { hrefViolations( ); },
             rowGroup: { 

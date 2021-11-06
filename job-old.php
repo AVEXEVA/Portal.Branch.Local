@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
@@ -182,7 +182,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 			$("#loading-pills").addClass('active');
 			$("#loading-pills .loading").css("display","block");
 			$.ajax({
-				url:"cgi-bin/php/element/job/" + tab + ".php",
+				url:"bin/php/element/job/" + tab + ".php",
 				method:"GET",
 				data:"ID=<?php echo $_GET['ID'];?>",
 				success:function(code){$("div#main-tab-content").append(code);}
@@ -198,7 +198,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 			$("#loading-sub-pills").addClass('active');
 			$("#loading-sub-pills .loading").css("display","block");
 			$.ajax({
-				url:"cgi-bin/php/element/job/" + tab + ".php",
+				url:"bin/php/element/job/" + tab + ".php",
 				method:"GET",
 				data:"ID=<?php echo $_GET['ID'];?>",
 				success:function(code){$("div#sub-tab-content." + maintab).append(code);}
@@ -401,7 +401,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
     <!-- Metis Menu Plugin JavaScript -->
     
 
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     
     <!-- Custom Theme JavaScript -->
     
@@ -439,7 +439,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 			$(link).siblings().removeClass('active');
 			$(link).addClass('active');
 			$.ajax({
-				url:"cgi-bin/php/element/job/" + URL,
+				url:"bin/php/element/job/" + URL,
 				success:function(code){
 					$("div.container-content").html(code);
 				}
@@ -449,7 +449,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 			$("div.Screen-Tabs>div>div:first-child").click();
 		});
 	</script>
-    <?php require('cgi-bin/js/flotcharts.php');?>
+    <?php require('bin/js/flotcharts.php');?>
 </body>
 </html>
 <?php

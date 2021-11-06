@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
         SELECT *
@@ -144,7 +144,7 @@ $Selected_User = sqlsrv_fetch_array($r);
             </div>
             <div class='row'>
                 <div class='col-lg-12'>&nbsp;</div>
-                <div class='col-lg-12'><form id="grantPrivileges" action="cgi-bin/php/post/grantPrivileges.php">
+                <div class='col-lg-12'><form id="grantPrivileges" action="bin/php/post/grantPrivileges.php">
                     GRANT <?php echo proper($Selected_User['fFirst'] . " " . $Selected_User['Last']);?> TABLE
                     <select name='Access_Table'>
                     <?php $r = $database->query($Portal,"SELECT Privileges.Access_Table FROM   Privilege;");
@@ -202,21 +202,21 @@ $Selected_User = sqlsrv_fetch_array($r);
                         success:function(code){document.location.href='privilege.php?User_ID=<?php echo $Selected_User['ID'];?>';}
                     });
                 }
-                function grantBeta(){alterUserPrivileges("cgi-bin/php/post/grantBeta.php");}
-                function grantSalesAdmin(){alterUserPrivileges("cgi-bin/php/post/grantSalesAdmin.php");}
-                function grantModernization(){alterUserPrivileges("cgi-bin/php/post/grantModernization.php",);}
-                function grantMaintenance(){alterUserPrivileges("cgi-bin/php/post/grantMaintenance.php",);}
-                function grantRepair(){alterUserPrivileges("cgi-bin/php/post/grantRepair.php",);}
-                function grantTesting(){alterUserPrivileges("cgi-bin/php/post/grantTesting.php",);}
-                function grantAdmin(){alterUserPrivileges("cgi-bin/php/post/grantAdmin.php",);}
-                function grantSurveySheet(){alterUserPrivileges("cgi-bin/php/post/grantSurveySheet.php",);}
-                function grantField(){alterUserPrivileges("cgi-bin/php/post/grantField.php");}
-                function grantDispatch(){alterUserPrivileges("cgi-bin/php/post/grantDispatch.php");}
-                function grantOffice(){alterUserPrivileges("cgi-bin/php/post/grantOffice.php");}
-                function removePrivileges(){alterUserPrivileges("cgi-bin/php/post/removePrivileges.php");}
-                function grantFinances(){alterUserPrivileges("cgi-bin/php/post/grantFinances.php");}
-                function grantPurchasing(){alterUserPrivileges("cgi-bin/php/post/grantPurchasing.php");}
-                function grantRequisition(){alterUserPrivileges("cgi-bin/php/post/grantRequisition.php");}
+                function grantBeta(){alterUserPrivileges("bin/php/post/grantBeta.php");}
+                function grantSalesAdmin(){alterUserPrivileges("bin/php/post/grantSalesAdmin.php");}
+                function grantModernization(){alterUserPrivileges("bin/php/post/grantModernization.php",);}
+                function grantMaintenance(){alterUserPrivileges("bin/php/post/grantMaintenance.php",);}
+                function grantRepair(){alterUserPrivileges("bin/php/post/grantRepair.php",);}
+                function grantTesting(){alterUserPrivileges("bin/php/post/grantTesting.php",);}
+                function grantAdmin(){alterUserPrivileges("bin/php/post/grantAdmin.php",);}
+                function grantSurveySheet(){alterUserPrivileges("bin/php/post/grantSurveySheet.php",);}
+                function grantField(){alterUserPrivileges("bin/php/post/grantField.php");}
+                function grantDispatch(){alterUserPrivileges("bin/php/post/grantDispatch.php");}
+                function grantOffice(){alterUserPrivileges("bin/php/post/grantOffice.php");}
+                function removePrivileges(){alterUserPrivileges("bin/php/post/removePrivileges.php");}
+                function grantFinances(){alterUserPrivileges("bin/php/post/grantFinances.php");}
+                function grantPurchasing(){alterUserPrivileges("bin/php/post/grantPurchasing.php");}
+                function grantRequisition(){alterUserPrivileges("bin/php/post/grantRequisition.php");}
                 </script>
             </div>
             <div class="row">
@@ -253,7 +253,7 @@ $Selected_User = sqlsrv_fetch_array($r);
         $(document).ready(function() {
             var table = $('#Privileges_Table').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Privilege.php?ID=<?php echo $Selected_User_ID;?>",
+                    "url":"bin/php/get/Privilege.php?ID=<?php echo $Selected_User_ID;?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "columns": [

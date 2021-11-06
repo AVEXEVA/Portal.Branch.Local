@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Connection
@@ -120,7 +120,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             <script>
               function selectLocations(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/ticket/selectLocations.php",
+                  url:"bin/php/element/ticket/selectLocations.php",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -147,7 +147,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             <script>
               function selectUnits(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/ticket/selectUnits.php?Location=<?php echo $_GET['Location'];?>",
+                  url:"bin/php/element/ticket/selectUnits.php?Location=<?php echo $_GET['Location'];?>",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -174,7 +174,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             <script>
               function selectJobs(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/ticket/selectJobs.php?Location=<?php echo $_GET['Location'];?>&Unit=<?php echo $_GET['Unit'];?>",
+                  url:"bin/php/element/ticket/selectJobs.php?Location=<?php echo $_GET['Location'];?>&Unit=<?php echo $_GET['Unit'];?>",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -229,7 +229,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 alert('Please fill out the necessasry information in order to continue.');
               } else {
                 $.ajax({
-                  url:"cgi-bin/php/post/save_new_ticket.php",
+                  url:"bin/php/post/save_new_ticket.php",
                   cache: false,
                   processData: false,
                   contentType: false,

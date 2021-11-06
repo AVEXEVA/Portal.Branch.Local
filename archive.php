@@ -3,7 +3,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
         'read_and_close' => true
     ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   $result = sqlsrv_query(
@@ -277,7 +277,7 @@ else {  $Mechanic = $User;  }?>
             <?php /*if(isset($_GET['deferLoading'])){?>finishLoadingPage();<?php }*/?>
             <?php if(count($_GET) > 0){?>var Table_Archive_Tickets = $('#Table_Archive_Tickets').DataTable( {
                 "ajax": {
-                    url:"cgi-bin/php/get/archive.php",
+                    url:"bin/php/get/archive.php",
                     type: "GET",
                     data:function(d){
                         d.Start_Date = $("input.start_date").val();

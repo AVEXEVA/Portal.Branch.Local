@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -134,7 +134,7 @@ if(isMobile()){?>
 	</div>
     
     
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     
     
     
@@ -218,7 +218,7 @@ if(isMobile()){?>
 		});
 		var Table_Customers = $('#Table_Customers').DataTable( {
 			"ajax": {
-				"url":"cgi-bin/php/get/Customers.php"
+				"url":"bin/php/get/Customers.php"
 			},
 			"processing":true,
 			"serverSide":true,

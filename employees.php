@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array        = sqlsrv_fetch_array($r);
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $(document).ready(function() {
             var table = $('#Table_Employees').DataTable( {
                 ajax : {
-                    url     : 'cgi-bin/php/get/Employees.php'
+                    url     : 'bin/php/get/Employees.php'
                 },
                 columns : [
                     { 

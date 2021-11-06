@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -96,7 +96,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     
     <script>
         var Editor_Overhead_Cost = new $.fn.dataTable.Editor({
-			ajax: "cgi-bin/php/post/Overhead_Cost.php",
+			ajax: "bin/php/post/Overhead_Cost.php",
 			table: "#Table_Overhead_Cost",
 			template: '#Form_Overhead_Cost',
 			formOptions: {
@@ -127,7 +127,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		Editor_Overhead_Cost.field('ID').disable();
 		var Table_Overhead_Cost = $('#Table_Overhead_Cost').DataTable( {
 			"ajax": {
-				"url":"cgi-bin/php/get/Overhead_Cost.php",
+				"url":"bin/php/get/Overhead_Cost.php",
 				"dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
 			},
 			"columns": [
@@ -166,7 +166,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					]
 				}
 			],
-			<?php require('cgi-bin/js/datatableOptions.php');?>
+			<?php require('bin/js/datatableOptions.php');?>
 		} );
     </script>
 </body>

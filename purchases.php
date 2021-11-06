@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -115,7 +115,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script>
         function popupAddEquipment(link){
             $.ajax({
-                url:"cgi-bin/php/element/purchasing/Add_Modernization_Equipment.php?ID=" + $("input[name='ID']").val(),
+                url:"bin/php/element/purchasing/Add_Modernization_Equipment.php?ID=" + $("input[name='ID']").val(),
                 method:"GET",
                 success:function(code){
                     $("body").append(code);
@@ -140,7 +140,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     document.location.href='purchasing.php';
                 } else if(protocol == 'modernization_equipment'){
                     $.ajax({
-                        url:"cgi-bin/php/element/modernization/modernization_equipment.php?ID=" + $("form#modernization_equipment input[name='ID']").val(),
+                        url:"bin/php/element/modernization/modernization_equipment.php?ID=" + $("form#modernization_equipment input[name='ID']").val(),
                         method:"GET",
                         success:function(code){
                             modernizationTracker(null,code);
@@ -154,12 +154,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         function lookupJobs(link){
             $.ajax({
                 method:"GET",
-                url:"cgi-bin/php/element/select_Job_by_Location.php?ID=" + $(link).val(),
+                url:"bin/php/element/select_Job_by_Location.php?ID=" + $(link).val(),
                 success:function(code){$("td#tdJob").html(code);}
             });
             $.ajax({
                 method:"GET",
-                url:"cgi-bin/php/element/select_Unit_by_Location.php?ID=" + $(link).val(),
+                url:"bin/php/element/select_Unit_by_Location.php?ID=" + $(link).val(),
                 success:function(code){$("td#tdUnit").html(code);}
             });
         }
@@ -168,7 +168,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($("form#modernization_equipment").length == 0) {
                     var string = "ID=" + $(".selected td:nth-child(2)").html();
                     $.ajax({
-                        url:"cgi-bin/php/post/deleteModernizationEquipment.php",
+                        url:"bin/php/post/deleteModernizationEquipment.php",
                         method:"POST",
                         data:string,
                         success:function(){
@@ -178,7 +178,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 } else {
                     var string = "ID=" + $(".selected td:nth-child(1)").html();
                     $.ajax({
-                        url:"cgi-bin/php/post/deleteModernizationCorrespondence.php",
+                        url:"bin/php/post/deleteModernizationCorrespondence.php",
                         method:"POST",
                         data:string,
                         success:function(){
@@ -191,7 +191,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $(document).ready(function() {
             var Table_Modernization_Equipment = $('#Table_Modernization_Equipment').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Purchasing.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Purchasing.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;
@@ -253,7 +253,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $("Table#Table_Modernization_Equipment").on("draw.dt",function(){
                 $("Table#Table_Modernization_Equipment tr[role='row']").on("dblclick",function(){
                     $.ajax({
-                        url:"cgi-bin/php/element/modernization/modernization_equipment.php?ID=" + $(this).children("td:nth-child(2)").html(),
+                        url:"bin/php/element/modernization/modernization_equipment.php?ID=" + $(this).children("td:nth-child(2)").html(),
                         method:"GET",
                         success:function(code){modernizationTracker(null,code);}
                     });

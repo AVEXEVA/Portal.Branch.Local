@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	//Connection
@@ -116,7 +116,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         responsive : true,
         dom : 'tp',
         ajax: {
-                url     : 'cgi-bin/php/get/Users2.php',
+                url     : 'bin/php/get/Users2.php',
                 data:function(d){
                     d = {
                         start : d.start, 

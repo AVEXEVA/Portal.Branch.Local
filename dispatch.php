@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -181,7 +181,7 @@ else {$Clouseout = '';}?>
     
     
     
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     
 	
     <script>  
@@ -195,7 +195,7 @@ else {$Clouseout = '';}?>
         $(document).ready(function() {
             var Table_Tickets = $('#Table_Tickets').DataTable({
                 "responsive": true,
-                "ajax":"cgi-bin/php/get/Dispatch.php?Supervisors=" + $("select[name='Departments']").val() + '&Mechanics=' + $("select[name='Mechanics']").val() + "&Start_Date=" + $("input[name='filter_start_date']").val() + "&End_Date=" + $("input[name='filter_end_date']").val(),
+                "ajax":"bin/php/get/Dispatch.php?Supervisors=" + $("select[name='Departments']").val() + '&Mechanics=' + $("select[name='Mechanics']").val() + "&Start_Date=" + $("input[name='filter_start_date']").val() + "&End_Date=" + $("input[name='filter_end_date']").val(),
                 "columns": [
                     {"data" : "ID"},
                     {"data" : "fFirst"},

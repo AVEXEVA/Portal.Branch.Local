@@ -1,7 +1,7 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
 setlocale(LC_MONETARY, 'en_US');
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
@@ -1819,7 +1819,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         }
         $(document).ready(function(){
             var Table_Locations = $('#Table_Locations').DataTable( {
-                "ajax": "cgi-bin/php/get/Locations_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Locations_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { "data": "ID" },
                     { "data": "Name"},
@@ -1866,7 +1866,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ]);
             var Table_Tickets_Maintenance = $('#Table_Tickets_Maintenance').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Tickets_by_Master_Maintenance.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Tickets_by_Master_Maintenance.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "lengthMenu":[[10,25,50,100,500,-1,0],[10,25,50,100,500,"All","None"]],
@@ -1943,7 +1943,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             });
             var Table_Tickets_Service_Calls = $('#Table_Tickets_Service_Calls').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Tickets_by_Master_Service_Calls.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Tickets_by_Master_Service_Calls.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "lengthMenu":[[10,25,50,100,500,-1,0],[10,25,50,100,500,"All","None"]],
@@ -2020,7 +2020,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             });
             var Table_Jobs = $('#Table_Jobs').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Jobs_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Jobs_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}
@@ -2056,7 +2056,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             stylizeYADCF();<?php }?>
             $("Table#Table_Jobs").on("draw.dt",function(){hrefJobs();});
             var Table_Contracts = $('#Table_Contracts').DataTable( {
-                "ajax": "cgi-bin/php/get/Contracts_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Contracts_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { "data": "Location"},
                     { "data": "Amount"},
@@ -2091,7 +2091,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 {   column_number:3}
             ]);
             var Table_Invoices = $('#Table_Invoices').DataTable( {
-                "ajax": "cgi-bin/php/get/Invoices_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Invoices_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { "data" : "ID" },
                     { "data" : "Job"},
@@ -2131,7 +2131,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 {   column_number:6}
             ]);
             var Table_Proposals = $('#Table_Proposals').DataTable( {
-                "ajax": "cgi-bin/php/get/Proposals_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Proposals_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { 
                         "data": "fDate",
@@ -2180,7 +2180,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <?php }?>
             var Table_Jobs_for_Anaylsis = $('#Table_Jobs_for_Anaylsis').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Jobs_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Jobs_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}
@@ -2219,7 +2219,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             } );
             var Table_Locations_for_Anaylsis = $('#Table_Locations_for_Anaylsis').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Locations_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Locations_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}
@@ -2259,7 +2259,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 $(this).toggleClass('selected');
             } );
             var Table_Units = $('#Table_Units').DataTable( {
-                "ajax": "cgi-bin/php/get/Units_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Units_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { "data": "ID" },
                     { "data": "State"},
@@ -2286,7 +2286,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ]);
             var Table_Violations = $('#Table_Violations').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Violations_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Violations_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "columns": [
@@ -2315,7 +2315,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             stylizeYADCF();<?php }?>
             var Table_Tickets = $('#Table_Tickets').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Tickets_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Tickets_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "columns": [
@@ -2394,7 +2394,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             });
             var Table_Collections = $('#Table_Collections').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Collections_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Collections_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "scrollX": true,
@@ -2469,7 +2469,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             });
             var Table_Workers = $('#Table_Workers').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Workers_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Workers_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "columns": [
@@ -2536,7 +2536,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <?php if($My_Privileges['Legal']['Group_Privilege'] >= 4){?>
             var Table_Legal = $('#Table_Legal').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Legal_by_Master.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/get/Legal_by_Master.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}
@@ -2575,7 +2575,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <?php }?>
         });
     </script>
-    <?php require('cgi-bin/js/flotcharts.php');?>
+    <?php require('bin/js/flotcharts.php');?>
     <?php /*require(PROJECT_ROOT."js/chart/invoices_this_year_for_customer.php");*/?>
     <?php /*require(PROJECT_ROOT."js/chart/tickets_this_year_for_customer.php");?>
     <?php require(PROJECT_ROOT."js/chart/service_calls_this_year_for_customer.php");?>

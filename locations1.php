@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -88,7 +88,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         var Table_Locations = $('#Table_Locations').DataTable( {
 			"processing":true,
 			"serverSide":true,
-			"ajax": "cgi-bin/php/get/Locations.php",
+			"ajax": "bin/php/get/Locations.php",
 			"order": [[ 1, "asc" ]],
 			"columns": [
 				{

@@ -2,7 +2,7 @@
 if(session_id() == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
 }
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
     $array = sqlsrv_fetch_array($r);
@@ -220,8 +220,8 @@ if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Sig
     <?php require( bin_meta . 'index.php');?>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
-    <script src="cgi-bin/js/slider-noui.js"></script>
-    <link href='cgi-bin/css/slider-noui.css' rel='stylesheet' />
+    <script src="bin/js/slider-noui.js"></script>
+    <link href='bin/css/slider-noui.css' rel='stylesheet' />
     <style type="text/css" media="print">
         .no-print {
             display:block !important;
@@ -740,7 +740,7 @@ foreach($GPS_Locations as $key=>$GPS_Location){?>
             $(link).siblings().removeClass('active');
             $(link).addClass('active');
             $.ajax({
-                url:"cgi-bin/php/element/ticket/" + URL,
+                url:"bin/php/element/ticket/" + URL,
                 success:function(code){
                     $("div.container-content").html(code);
                 }

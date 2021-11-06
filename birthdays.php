@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $result = $database->query(
@@ -91,7 +91,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         var Table_Birthdays = $('#Table_Birthdays').DataTable( {
             dom : 'tp',
             ajax : {
-                url : 'cgi-bin/php/reports/Birthdays.php',
+                url : 'bin/php/reports/Birthdays.php',
                 dataSrc : function( json ){
                     if( !json.data ){ json.data = [ ]; }
                     return json.data;

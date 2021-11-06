@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $result = $database->query(
@@ -65,8 +65,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta name="author" content="Peter D. Speranza">
 	<title>Nouveau Texas | Portal</title>
 	<?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/css/index.php' );?>
-    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/js/index.php' );?>
+    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/css/index.php' );?>
+    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/js/index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>">

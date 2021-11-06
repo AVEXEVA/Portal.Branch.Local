@@ -1,7 +1,7 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
   session_start( [ 'read_and_close' => true ] );
-  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
+  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php');
 }
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
     <!--ToolTipster-->
-    <!--<link rel="stylesheet" type="text/css" href="cgi-bin/libraries/tooltipster/tooltipster.bundle.min.css" />
+    <!--<link rel="stylesheet" type="text/css" href="bin/libraries/tooltipster/tooltipster.bundle.min.css" />
     <style>
       .tooltipster-base {background-color:white;position:absolute;}
       .row.shadower {
@@ -71,7 +71,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         padding-bottom:5px;
       }
       </style>
-    <script type="text/javascript" src="cgi-bin/libraries/tooltipster/tooltipster.bundle.min.js"></script>-->
+    <script type="text/javascript" src="bin/libraries/tooltipster/tooltipster.bundle.min.js"></script>-->
     <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.css' />
     <style>
     .tooltipTicket {
@@ -293,8 +293,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       ;", array($_GET['Mechanic']));
     $asdf = sqlsrv_fetch_array($r);?>
 <!-- Map Icons -->
-<link rel="stylesheet" type="text/css" href="cgi-bin/libraries/map-icons-master/dist/css/map-icons.css">
-<script type="text/javascript" src="cgi-bin/libraries/map-icons-master/dist/js/map-icons.js"></script>
+<link rel="stylesheet" type="text/css" href="bin/libraries/map-icons-master/dist/css/map-icons.css">
+<script type="text/javascript" src="bin/libraries/map-icons-master/dist/js/map-icons.js"></script>
 
 <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/locale/es-us.js"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
@@ -578,7 +578,7 @@ function find_closest_marker(lat, lng ) {
 	            console.log('Error:', status);
 	        } else {
             $.ajax({
-              url:"cgi-bin/php/tooltip/GPS.php",
+              url:"bin/php/tooltip/GPS.php",
               method:"GET",
               data:{
                 ID:EID,
@@ -638,7 +638,7 @@ function getModernizations(){
   if(GETTING_MODERNIZATIONS == 0){
     GETTING_MODERNIZATIONS = 1;
     $.ajax({
-      url:"cgi-bin/php/get/getModernizations.php",
+      url:"bin/php/get/getModernizations.php",
       method:"GET",
       success:function(json){
         var GPS_Data = JSON.parse(json);
@@ -703,7 +703,7 @@ function getShutdowns(){
   if(GETTING_SHUTDOWNS == 0){
     GETTING_SHUTDOWNS = 1;
     $.ajax({
-      url:"cgi-bin/php/get/getShutdowns.php",
+      url:"bin/php/get/getShutdowns.php",
       method:"GET",
       success:function(json){
         var GPS_Data = JSON.parse(json);
@@ -768,7 +768,7 @@ function getEntrapments(){
   if(GETTING_ENTRAPMENTS == 0){
     GETTING_ENTRAPMENTS = 1;
     $.ajax({
-      url:"cgi-bin/php/get/getEntrapments.php",
+      url:"bin/php/get/getEntrapments.php",
       method:"GET",
       success:function(json){
         var GPS_Data = JSON.parse(json);
@@ -866,7 +866,7 @@ function getTimeline(){
   if(GETTING_TIMELINE == 0){
     GETTING_TIMELINE = 1;
     $.ajax({
-      url:"cgi-bin/php/get/Timeline.php?REFRESH_DATETIME=" + TEMP_REFRESH_DATETIME + "&Supervisor=" + Timeline_Supervisor,
+      url:"bin/php/get/Timeline.php?REFRESH_DATETIME=" + TEMP_REFRESH_DATETIME + "&Supervisor=" + Timeline_Supervisor,
       method:"GET",
       error:function(XMLHttpRequest, textStatus, errorThrown){
         GETTING_TIMELINE = 0;
@@ -885,7 +885,7 @@ function getTimeline(){
             + "<div class='row'><div class='col-xs-12'>&nbsp;</div></div>");
             $("#timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID).on('click',function(){
               $.ajax({
-                url:"cgi-bin/php/tooltip/Ticket.php",
+                url:"bin/php/tooltip/Ticket.php",
                 method:"GET",
                 data:{
                   ID:$(this).attr('rel')
@@ -900,7 +900,7 @@ function getTimeline(){
               content: {
                  text: 'Loading...', // The text to use whilst the AJAX request is loading
                  ajax: {
-                     url: 'cgi-bin/php/tooltip/Ticket.php?ID=' + ticketData[i].Entity_ID, // URL to the local file
+                     url: 'bin/php/tooltip/Ticket.php?ID=' + ticketData[i].Entity_ID, // URL to the local file
                      type: 'GET', // POST or GET
                      data: {
                        ID: $(this).attr('rel')
@@ -945,7 +945,7 @@ function getGPS(){
   if(GETTING_GPS == 0){
     GETTING_GPS = 1;
     $.ajax({
-      url:"cgi-bin/php/get/getGPS.php",
+      url:"bin/php/get/getGPS.php",
       method:"GET",
       success:function(json){
         var GPS_Data = JSON.parse(json);
@@ -993,7 +993,7 @@ function getGPS(){
           }
           marker[i].addListener('dblclick', function() {
             $.ajax({
-              url:"cgi-bin/php/tooltip/GPS.php",
+              url:"bin/php/tooltip/GPS.php",
               method:"GET",
               data:{
                 ID:this['Employee_ID']
@@ -1041,7 +1041,7 @@ function codeAddress(address) {
 }
 function takeServiceCall(){
   $.ajax({
-    url:"cgi-bin/php/element/map/Service_Call.php",
+    url:"bin/php/element/map/Service_Call.php",
     method:"GET",
     success:function(code){
       $("body").append(code);

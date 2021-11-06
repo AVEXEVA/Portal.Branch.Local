@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $r = $database->query(
@@ -64,14 +64,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <meta name="description" content="">
     <meta name="author" content="Peter D. Speranza">    
     <title><?php echo $_SESSION[ 'Branch' ] == '' ? 'Nouveau' : $_SESSION[ 'Branch' ]; ?> | Portal</title>
-    <?php require('cgi-bin/css/index.php');?>
+    <?php require('bin/css/index.php');?>
     <style>#Filters { max-width: 500px; }</style>
-    <?php require('cgi-bin/js/index.php');?>
+    <?php require('bin/js/index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require('cgi-bin/php/element/navigation/index.php');?>
-        <?php require('cgi-bin/php/element/loading.php');?>
+        <?php require('bin/php/element/navigation/index.php');?>
+        <?php require('bin/php/element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
 				<div class="panel-heading">
@@ -142,7 +142,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     </div>
     <!-- Bootstrap Core JavaScript -->
     
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     
     <script>
 		var isChromium = window.chrome,
@@ -157,7 +157,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	        serverSide : true,
 	        responsive : true,
 			ajax      : {
-	            url : 'cgi-bin/php/get/Units2.php',
+	            url : 'bin/php/get/Units2.php',
 	            data : function( d ){
 	                d = {
 	                    start : d.start,

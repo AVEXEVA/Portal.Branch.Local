@@ -1,7 +1,7 @@
 <?php
 if(session_id() == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
-    require('cgi-bin/php/index.php');
+    require('bin/php/index.php');
 }
 
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -40,7 +40,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
 	<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
     <div id="page-wrapper" class='content'>
-    	<link rel='stylesheet' href='cgi-bin/css/home.css' />
+    	<link rel='stylesheet' href='bin/css/home.css' />
 		<div class='row'><?php
 		$Start_Date = date('Y-m-01 00:00:00.000');
 		$end = date('m') == 2 ? 28 : 30;//if(date('m')==2) {$end = 28;}  else { $end = 30;}
@@ -235,7 +235,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           $.ajax({
             method:"POST",
             data: {Notes : dt_notes},
-            url:"cgi-bin/php/post/clock_out.php",
+            url:"bin/php/post/clock_out.php",
             success:function(code){
               $(link).replaceWith(code);
             }
@@ -259,7 +259,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $("body").css("overflow","visible");
         $(link).html("Saving <img src='media/images/spinner.gif' height='25px' width='auto' />");
         $(link).attr('disabled','disabled')
-        $.ajax({method:"POST",data:{Notes : dt_notes}, url:"cgi-bin/php/post/clock_in.php",success:function(code){
+        $.ajax({method:"POST",data:{Notes : dt_notes}, url:"bin/php/post/clock_in.php",success:function(code){
             document.location.href='home3.php';
         }});
 
@@ -320,7 +320,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script>
     function toggle_activities(link){
       $('section.container').toggle();
-      $.ajax({url:"cgi-bin/php/post/toggleActivity.php"});
+      $.ajax({url:"bin/php/post/toggleActivity.php"});
     }
     </script>
     <div class='row'><div class='col-xs-12'><button style='width:100%;color:black !important;' onClick='toggle_activities(this);'>Hide/Show</button></div></div>

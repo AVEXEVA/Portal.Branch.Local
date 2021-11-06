@@ -1,7 +1,7 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
 ini_set('max_execution_time', 300);
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -1173,7 +1173,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <!-- Metis Menu Plugin JavaScript -->
         
 
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
     
 

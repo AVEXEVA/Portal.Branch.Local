@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 $serverName = "172.16.12.45";
 nullectionOptions = array(
     "Database" => "nei",

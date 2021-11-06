@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -112,7 +112,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $("input[name='End_Date']").datepicker({});
             var Table_Legal = $('#Table_Legal').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Legal.php",
+                    "url":"bin/php/get/Legal.php",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}

@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -144,7 +144,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	});
 	Editor_Products.field('ID').disable();
 	var Table_Products = $('#Table_Products').DataTable( {
-		"ajax": "cgi-bin/php/get/Products.php",
+		"ajax": "bin/php/get/Products.php",
 		"columns": [
 			{ 
 				"data": "ID",
@@ -229,7 +229,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				}
 			}
 		],
-		<?php require('cgi-bin/js/datatableOptions.php');?>
+		<?php require('bin/js/datatableOptions.php');?>
 	} );
 	yadcf.init(Table_Units,[
 		{   column_number:0,

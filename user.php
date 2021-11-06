@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -61,8 +61,8 @@ if($Mechanic > 0){
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Nouveau Texas | Portal</title>
-    <?php require('cgi-bin/css/index.php');?>
-    <?php require('cgi-bin/js/index.php');?>
+    <?php require('bin/css/index.php');?>
+    <?php require('bin/js/index.php');?>
     <style>
     label.file-upload{
       position:relative;
@@ -128,11 +128,11 @@ if($Mechanic > 0){
 					}(jQuery);
 				</script>
 				<?php
-				if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpg") || file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".png") || file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpeg")) {
-					if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpg")) {
-					$fildir = "cgi-bin/uploads/" . $_GET['ID'] . ".jpg";}
-					else if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".png")){$fildir = "cgi-bin/uploads/" . $_GET['ID'] . ".png";}
-					else{$fildir = "cgi-bin/uploads/" . $_GET['ID'] . ".jpeg";}
+				if(file_exists("bin/uploads/" . $_GET['ID'] . ".jpg") || file_exists("bin/uploads/" . $_GET['ID'] . ".png") || file_exists("bin/uploads/" . $_GET['ID'] . ".jpeg")) {
+					if(file_exists("bin/uploads/" . $_GET['ID'] . ".jpg")) {
+					$fildir = "bin/uploads/" . $_GET['ID'] . ".jpg";}
+					else if(file_exists("bin/uploads/" . $_GET['ID'] . ".png")){$fildir = "bin/uploads/" . $_GET['ID'] . ".png";}
+					else{$fildir = "bin/uploads/" . $_GET['ID'] . ".jpeg";}
 				} else if($_SESSION['User'] == $_GET['ID']){?>
 				<script type="text/javascript">
 					$(document).ready(function() {
@@ -169,20 +169,20 @@ if($Mechanic > 0){
 				<div class='panel-heading'><?php echo proper($User['fFirst'] . " " . $User['Last_Name']);?>'s Information</div>
 				<!--<div class='panel-body' >
 					<?php
-					if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpg") || file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".png") || file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpeg")) {
-  					if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpg")) {
-  					$fildir = "cgi-bin/uploads/" . $_GET['ID'] . ".jpg";}
-  					else if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".png")){$fildir = "cgi-bin/uploads/" . $_GET['ID'] . ".png";}
-  					else{$fildir = "cgi-bin/uploads/" . $_GET['ID'] . ".jpeg";}?>
+					if(file_exists("bin/uploads/" . $_GET['ID'] . ".jpg") || file_exists("bin/uploads/" . $_GET['ID'] . ".png") || file_exists("bin/uploads/" . $_GET['ID'] . ".jpeg")) {
+  					if(file_exists("bin/uploads/" . $_GET['ID'] . ".jpg")) {
+  					$fildir = "bin/uploads/" . $_GET['ID'] . ".jpg";}
+  					else if(file_exists("bin/uploads/" . $_GET['ID'] . ".png")){$fildir = "bin/uploads/" . $_GET['ID'] . ".png";}
+  					else{$fildir = "bin/uploads/" . $_GET['ID'] . ".jpeg";}?>
   					 <div class="img" align="center">
                <div class='col-md-12 col-xs-12'>
                  <img style="display: inline-block;<?php if(isMobile()) { ?>  width: 100px;height: 100px; border-radius: 50px;<?php } if(!isMobile()) { ?> width: 200px; height 300px;<?php } ?> background-repeat: no-repeat; background-position: center center;background-size: cover;" src= <?php echo $fildir; ?> alt="<?php echo $User['Name'];?>">
     					 </div>
   					</div>
 					<?php } ?>
-					<?php if(file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpg")
-                  || file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".png")
-                  || file_exists("cgi-bin/uploads/" . $_GET['ID'] . ".jpeg")
+					<?php if(file_exists("bin/uploads/" . $_GET['ID'] . ".jpg")
+                  || file_exists("bin/uploads/" . $_GET['ID'] . ".png")
+                  || file_exists("bin/uploads/" . $_GET['ID'] . ".jpeg")
                   && $_SESSION['User'] == $User['ID'])  {?>
 						<div class="container">
 							<form enctype="multipart/form-data" action="uploader.php" method="POST" style="margin-left: 0px !important">
@@ -376,7 +376,7 @@ if($Mechanic > 0){
                 <div class='panel-heading'>Attendance</div>
                 <div class='panel-body'>
                   <?php
-                      require("cgi-bin/php/class/calendar.php");
+                      require("bin/php/class/calendar.php");
                       $calendar = new Calendar();
                       echo $calendar->show();
                     ?>
@@ -421,7 +421,7 @@ if($Mechanic > 0){
                   <script>
                   var table = $('#attendance').DataTable( {
                       "ajax": {
-                          "url":"cgi-bin/php/get/attendance.php?User=<?php echo $_GET['ID'];?>",
+                          "url":"bin/php/get/attendance.php?User=<?php echo $_GET['ID'];?>",
                           "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                       },
                       "columns": [
@@ -454,7 +454,7 @@ if($Mechanic > 0){
 						        $(document).ready(function() {
 						            var table = $('#Privileges_Table').DataTable( {
 						                "ajax": {
-						                    "url":"cgi-bin/php/get/Privilege.php?ID=<?php echo $_GET['ID'];?>",
+						                    "url":"bin/php/get/Privilege.php?ID=<?php echo $_GET['ID'];?>",
 						                    "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
 						                },
 						                "columns": [
@@ -489,12 +489,12 @@ if($Mechanic > 0){
     
 
     <!-- Metis Menu Plugin JavaScript -->
-	<?php require('cgi-bin/js/dropdown-scroll.js');?>
+	<?php require('bin/js/dropdown-scroll.js');?>
 
     <!-- Custom Theme JavaScript -->
     
 
-    <?php require("cgi-bin/js/datatables.php");?>
+    <?php require("bin/js/datatables.php");?>
 </body>
 </html>
  <?php

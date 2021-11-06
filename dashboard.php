@@ -1,7 +1,7 @@
 <?php 
 if(session_id() == '' || !isset($_SESSION)) {
 	session_start( [ 'read_and_close' => true ] );
-	require('cgi-bin/php/index.php');
+	require('bin/php/index.php');
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
@@ -1498,7 +1498,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						?>
 						$(document).ready(function(){
 							var Table_Maintenances = $('#Table_Maintenances').DataTable( {
-								"ajax": "cgi-bin/php/get/Maintenances_by_Route.php?ID=<?php echo $Route;?>",
+								"ajax": "bin/php/get/Maintenances_by_Route.php?ID=<?php echo $Route;?>",
 								"columns": [
 									{
 										"data" : "ID",
@@ -1551,7 +1551,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						$(document).ready(function(){
 							var Table_Violations = $('#Table_Violations').DataTable( {
 								"ajax": {
-									"url":"cgi-bin/php/get/Violations_by_Route.php?ID=<?php echo $Route;?>",
+									"url":"bin/php/get/Violations_by_Route.php?ID=<?php echo $Route;?>",
 									"dataSrc":function(json){
 										if(!json.data){json.data = [];}
 										return json.data;}
@@ -1611,7 +1611,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						$(document).ready(function(){
 							var Table_Tickets = $('#Table_Tickets').DataTable( {
 								"ajax": {
-									"url":"cgi-bin/php/get/Active_Tickets_by_Mechanic.php?ID=<?php echo $_SESSION['User'];?>",
+									"url":"bin/php/get/Active_Tickets_by_Mechanic.php?ID=<?php echo $_SESSION['User'];?>",
 									"dataSrc":function(json){
 										if(!json.data){json.data = [];}
 										return json.data;}

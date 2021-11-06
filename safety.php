@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -105,7 +105,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $(link).html("Save");
             $(link).prop('disabled',false);
           },
-          url:"cgi-bin/php/post/safety_form.php",
+          url:"bin/php/post/safety_form.php",
           method:"POST",
           data:formData,
           success:function(code){

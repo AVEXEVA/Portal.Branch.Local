@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $result = $database->query(
@@ -75,7 +75,7 @@ if(     count( $_POST ) > 0
     <?php require( PROJECT_ROOT . 'php/meta.php' );?>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require('cgi-bin/css/index.php');?>
+    <?php require('bin/css/index.php');?>
     <style>
       .form-group>label:first-child {
           min-width  : 175px;
@@ -174,7 +174,7 @@ if(     count( $_POST ) > 0
         paging     : true,
         searching  : false,
         ajax       : {
-        url : 'cgi-bin/php/get/Bugs.php',
+        url : 'bin/php/get/Bugs.php',
         data : function( d ){
             d = {
                     start : d.start,

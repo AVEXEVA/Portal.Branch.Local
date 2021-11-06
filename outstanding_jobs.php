@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -191,7 +191,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			Editor_Outstanding_Jobs.inline( this );
 		} );
         var Table_Outstanding_Jobs = $('#Table_Outstanding_Jobs').DataTable( {
-			"ajax": "cgi-bin/php/get/Outstanding_Jobs.php",
+			"ajax": "bin/php/get/Outstanding_Jobs.php",
 			"columns": [
 				{ 
 					"data": "ID"
@@ -247,7 +247,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				  }
 				}
 			],
-			<?php require('cgi-bin/js/datatableOptions.php');?>
+			<?php require('bin/js/datatableOptions.php');?>
 		} );
 		yadcf.init(Table_Outstanding_Jobs,[
 		{   column_number:0,

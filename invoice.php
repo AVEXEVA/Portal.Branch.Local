@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
+require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
   if(isset($_SESSION[ 'User' ],
            $_SESSION[ 'Hash' ] ) ) {

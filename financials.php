@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -90,7 +90,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         		<script>
                         		function resetSession(){
                         			$.ajax({
-                        				url:"cgi-bin/php/post/resetSessionFinancials.php",
+                        				url:"bin/php/post/resetSessionFinancials.php",
                         				method:"POST",
                         				success:function(){
                         					$("div#subcontent").html("");
@@ -117,19 +117,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             function lookupJobs(link){
                                 $.ajax({
                                     method:"GET",
-                                    url:"cgi-bin/php/element/select_Job_by_Location.php?ID=" + $(link).val(),
+                                    url:"bin/php/element/select_Job_by_Location.php?ID=" + $(link).val(),
                                     success:function(code){$("th#Jobs").html(code);}
                                 });
                                 $.ajax({
                                     method:"GET",
-                                    url:"cgi-bin/php/element/select_Unit_by_Location.php?ID=" + $(link).val(),
+                                    url:"bin/php/element/select_Unit_by_Location.php?ID=" + $(link).val(),
                                     success:function(code){$("th#Units").html(code);}
                                 });
                             }
                             function lookupLocations(link){
                               $.ajax({
                                   method:"GET",
-                                  url:"cgi-bin/php/element/select_Location_by_Customer.php?ID=" + $(link).val(),
+                                  url:"bin/php/element/select_Location_by_Customer.php?ID=" + $(link).val(),
                                   success:function(code){
                                       $("th#Locations").html(code);
                                   }
@@ -178,7 +178,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         			var Unit     = $("select[name='Unit']").val();     	
                         			var formdata = "Operator=" + Operator + "&Customer=" + Customer + "&Location=" + Location + "&JobType=" + JobType + "&Job=" + Job + "&Unit=" + Unit;
                         			$.ajax({
-                        				url:"cgi-bin/php/post/financials.php",
+                        				url:"bin/php/post/financials.php",
                         				metohd:"POST",
                         				data:formdata,
                         				success:function(code){
@@ -277,7 +277,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <!-- Metis Menu Plugin JavaScript -->
         
 
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     
     <!-- Custom Theme JavaScript -->
     

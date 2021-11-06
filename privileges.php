@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -83,9 +83,9 @@ while($a= sqlsrv_fetch_array($r)){}
                 </div>
             </div>
             <script>
-                function grantField(){$.post('cgi-bin/php/post/grantMassField.php', {}).done(function (data) {});}
-                function grantOffice(){$.post('cgi-bin/php/post/grantMassOffice.php', {}).done(function (data) {});}
-                function grantDispatch(){$.post('cgi-bin/php/post/grantMassDispatch.php',{}).done(function(data){});}
+                function grantField(){$.post('bin/php/post/grantMassField.php', {}).done(function (data) {});}
+                function grantOffice(){$.post('bin/php/post/grantMassOffice.php', {}).done(function (data) {});}
+                function grantDispatch(){$.post('bin/php/post/grantMassDispatch.php',{}).done(function(data){});}
                 </script>
             <div class="row">
                 <div class="col-lg-12">
@@ -124,7 +124,7 @@ while($a= sqlsrv_fetch_array($r)){}
         $(document).ready(function() {
             var table = $('#Table_Privileges').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Privileges.php",
+                    "url":"bin/php/get/Privileges.php",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "columns": [

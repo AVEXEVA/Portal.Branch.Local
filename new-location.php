@@ -64,7 +64,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <script>
               function selectCustomers(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/location/selectCustomers.php",
+                  url:"bin/php/element/location/selectCustomers.php",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 alert('Please fill out the necessasry information in order to continue.');
               } else {
                 $.ajax({
-                  url:"cgi-bin/php/post/save_new_location.php",
+                  url:"bin/php/post/save_new_location.php",
                   cache: false,
                   processData: false,
                   contentType: false,

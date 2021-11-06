@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -113,7 +113,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         function updateModernization(){
                             var formdata = $("form#modernization").serialize();
                             $.ajax({
-                                url:"cgi-bin/php/post/updateModernization.php",
+                                url:"bin/php/post/updateModernization.php",
                                 method:"POST",
                                 data:formdata,
                                 success:function(code){
@@ -121,12 +121,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             });
                             var formdata = $("form#Survey_Sheet").serialize();
                             $.ajax({
-                                url:"cgi-bin/php/post/updateModernization.php?ID=" + $("input[name='ID']").val(),
+                                url:"bin/php/post/updateModernization.php?ID=" + $("input[name='ID']").val(),
                                 method:"POST",
                                 data:formdata + "&Unit=" + $("input[name='Unit']").val(),
                                 success:function(code){
                                     $.ajax({
-                                        url:"cgi-bin/php/element/modernization/modernization_tracker.php?ID=" + $("input[name='ID']").val(),
+                                        url:"bin/php/element/modernization/modernization_tracker.php?ID=" + $("input[name='ID']").val(),
                                         method:"GET",
                                         success:function(code){
                                             modernizationTracker(null,code);;
@@ -138,12 +138,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         function updateEquipment(){
                             var formdata = $("form#modernization_equipment").serialize();
                             $.ajax({
-                                url:"cgi-bin/php/post/updateModernizationEquipment.php",
+                                url:"bin/php/post/updateModernizationEquipment.php",
                                 method:"POST",
                                 data:formdata,
                                 success:function(code){
                                     $.ajax({
-                                        url:"cgi-bin/php/element/modernization/modernization_equipment.php?ID=" + $("form#modernization_equipment input[name='ID']").val(),
+                                        url:"bin/php/element/modernization/modernization_equipment.php?ID=" + $("form#modernization_equipment input[name='ID']").val(),
                                         method:"GET",
                                         success:function(code){
                                             modernizationTracker(null,code);
@@ -171,7 +171,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 
                             } else if(protocol == 'tracked_modernizations') {
                                 $.ajax({
-                                    url:"cgi-bin/php/element/modernization/tracked_modernizations.php?ID=" + $(this).children("td:first-child").html(),
+                                    url:"bin/php/element/modernization/tracked_modernizations.php?ID=" + $(this).children("td:first-child").html(),
                                     method:"GET",
                                     success:function(code){
                                         modernizationTracker(null,code);
@@ -182,7 +182,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 
                             } else if(protocol == 'tracked_modernization'){
                                 $.ajax({
-                                    url:"cgi-bin/php/element/modernization/modernization_tracker.php?ID=" + $("form#modernization input[name='ID']").val(),
+                                    url:"bin/php/element/modernization/modernization_tracker.php?ID=" + $("form#modernization input[name='ID']").val(),
                                     method:"GET",
                                     success:function(code){
                                         modernizationTracker(null,code);;
@@ -190,7 +190,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 });
                             } else if(protocol == 'modernization_equipment'){
                                 $.ajax({
-                                    url:"cgi-bin/php/element/modernization/modernization_equipment.php?ID=" + $("form#modernization_equipment input[name='ID']").val(),
+                                    url:"bin/php/element/modernization/modernization_equipment.php?ID=" + $("form#modernization_equipment input[name='ID']").val(),
                                     method:"GET",
                                     success:function(code){
                                         modernizationTracker(null,code);
@@ -202,7 +202,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                         function popupAdd(){
                             $.ajax({
-                                url:"cgi-bin/php/element/modernization/Add_Tracked_Modernization.php",
+                                url:"bin/php/element/modernization/Add_Tracked_Modernization.php",
                                 method:"GET",
                                 success:function(code){
                                     $("div#popup").remove();
@@ -215,7 +215,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 var string = "Job=" + $(".selected td:nth-child(3)").html();
                                 var string = string + "&Unit=" + $(".selected td:nth-child(5)").html();
                                 $.ajax({
-                                    url:"cgi-bin/php/element/modernization/Edit_Tracked_Modernization.php?" + string,
+                                    url:"bin/php/element/modernization/Edit_Tracked_Modernization.php?" + string,
                                     method:"GET",
                                     success:function(code){
                                         $("div#popup").remove();
@@ -229,7 +229,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 if($("form#modernization").length == 0){
                                     var string = "ID=" + $(".selected td:nth-child(1)").html();
                                     $.ajax({
-                                        url:"cgi-bin/php/post/deleteTrackedModernization.php",
+                                        url:"bin/php/post/deleteTrackedModernization.php",
                                         method:"POST",
                                         data:string,
                                         success:function(code){
@@ -240,7 +240,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 } else if($("form#modernization_equipment").length == 0) {
                                     var string = "ID=" + $(".selected td:nth-child(2)").html();
                                     $.ajax({
-                                        url:"cgi-bin/php/post/deleteModernizationEquipment.php",
+                                        url:"bin/php/post/deleteModernizationEquipment.php",
                                         method:"POST",
                                         data:string,
                                         success:function(){
@@ -250,7 +250,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 } else {
                                     var string = "ID=" + $(".selected td:nth-child(1)").html();
                                     $.ajax({
-                                        url:"cgi-bin/php/post/deleteModernizationCorrespondence.php",
+                                        url:"bin/php/post/deleteModernizationCorrespondence.php",
                                         method:"POST",
                                         data:string,
                                         success:function(){
@@ -263,7 +263,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                         function selectRow(){
                             $.ajax({
-                                url:"cgi-bin/php/element/modernization/modernization_tracker.php?ID=" + $(".selected").children("td:first-child").html(),
+                                url:"bin/php/element/modernization/modernization_tracker.php?ID=" + $(".selected").children("td:first-child").html(),
                                 method:"GET",
                                 success:function(code){
                                     modernizationTracker(null,code);;
@@ -272,7 +272,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                         function editRow(link){
                             $.ajax({
-                                url:"cgi-bin/php/element/modernization/Edit_Modernization_Correspondence.php?ID=" + $(link).children("td:first-child").html() + "&Ref=" + $("form#modernization_equipment input[name='ID']").val(),
+                                url:"bin/php/element/modernization/Edit_Modernization_Correspondence.php?ID=" + $(link).children("td:first-child").html() + "&Ref=" + $("form#modernization_equipment input[name='ID']").val(),
                                 method:"GET",
                                 success:function(code){
                                     $("body").append(code);
@@ -281,7 +281,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                         function popupAddEquipment(link){
                             $.ajax({
-                                url:"cgi-bin/php/element/modernization/Add_Modernization_Equipment.php?ID=" + $("input[name='ID']").val(),
+                                url:"bin/php/element/modernization/Add_Modernization_Equipment.php?ID=" + $("input[name='ID']").val(),
                                 method:"GET",
                                 success:function(code){
                                     $("body").append(code);
@@ -290,7 +290,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                         function popupAddCorrespondence(link){
                             $.ajax({
-                                url:"cgi-bin/php/element/modernization/Add_Modernization_Correspondence.php?Modernization=" + $("form#modernization input[name='ID']").val() + "&ID=" + $("form#modernization_equipment input[name='ID']").val(),
+                                url:"bin/php/element/modernization/Add_Modernization_Correspondence.php?Modernization=" + $("form#modernization input[name='ID']").val() + "&ID=" + $("form#modernization_equipment input[name='ID']").val(),
                                 method:"GET",
                                 success:function(code){
                                     $("body").append(code);
@@ -303,7 +303,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 var string = string + "&Unit=" + $(".selected td:nth-child(5)").html();
                                 var string = string + "&ID=" + $(".selected td:nth-child(2)").html();
                                 $.ajax({
-                                    url:"cgi-bin/php/element/modernization/Edit_Modernization_Equipment.php?" + string,
+                                    url:"bin/php/element/modernization/Edit_Modernization_Equipment.php?" + string,
                                     method:"GET",
                                     success:function(code){
                                         $("div#popup").remove();
@@ -317,7 +317,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 var string = "Job=" + $(".selected td:nth-child(3)").html();
                                 var string = string + "&Unit=" + $(".selected td:nth-child(5)").html();
                                 $.ajax({
-                                    url:"cgi-bin/php/post/deleteTrackedModernization.php",
+                                    url:"bin/php/post/deleteTrackedModernization.php",
                                     method:"POST",
                                     data:string,
                                     success:function(code){
@@ -336,13 +336,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         function cloneEquipment(){
                             var formdata = $("form#modernization_equipment").serialize();
                             $.ajax({
-                                url:"cgi-bin/php/post/cloneModernizationEquipment.php?ID=" + $("form#modernization input[name='ID']").val(),
+                                url:"bin/php/post/cloneModernizationEquipment.php?ID=" + $("form#modernization input[name='ID']").val(),
                                 method:"POST",
                                 data:formdata,
                                 success:function(code){
                                     $(".popup").remove();
                                     $.ajax({
-                                        url:"cgi-bin/php/element/modernization/modernization_tracker.php?ID=" + $("form#modernization input[name='ID']").val(),
+                                        url:"bin/php/element/modernization/modernization_tracker.php?ID=" + $("form#modernization input[name='ID']").val(),
                                         method:"GET",
                                         success:function(code){
                                             modernizationTracker(null,code);;
@@ -547,7 +547,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             var Table_Modernizations = $('#Table_Modernizations').DataTable( {
 				
                 "ajax": {
-                    "url":"cgi-bin/php/get/Tracked_Modernizations.php",
+                    "url":"bin/php/get/Tracked_Modernizations.php",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;
@@ -630,7 +630,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $("Table#Table_Modernizations").on("draw.dt",function(){
                 $("Table#Table_Modernizations tr[role='row']").on("dblclick",function(){
                     $.ajax({
-                        url:"cgi-bin/php/element/modernization/modernization_tracker.php?ID=" + $(this).children("td:first-child").html(),
+                        url:"bin/php/element/modernization/modernization_tracker.php?ID=" + $(this).children("td:first-child").html(),
                         method:"GET",
                         success:function(code){
                             modernizationTracker(null,code);;

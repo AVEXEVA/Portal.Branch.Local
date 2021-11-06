@@ -1,7 +1,7 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
 set_time_limit(1200);
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *

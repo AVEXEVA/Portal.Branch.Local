@@ -1,27 +1,27 @@
 <?php
 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 require(PROJECT_ROOT.'php/element/navigation/index.php');
- require('cgi-bin/css/index.php');
- require('cgi-bin/js/index.php');
+ require('bin/css/index.php');
+ require('bin/js/index.php');
 $types = array('image/jpeg', 'image/png','image/jpg');
 $array = explode('.', $_FILES['uploadedfile']['name']);
 $extension = end($array);
-$target_path = "cgi-bin/uploads/";
+$target_path = "bin/uploads/";
 
 $target_path = $target_path . $_SESSION['User'] . "." . $extension; 
 
 
 
-if(file_exists("cgi-bin/php/uploads" . $_SESSION['User'] . ".jpg")) {
-	unlink("cgi-bin/php/uploads" . $_SESSION['User'] . ".jpg");
+if(file_exists("bin/php/uploads" . $_SESSION['User'] . ".jpg")) {
+	unlink("bin/php/uploads" . $_SESSION['User'] . ".jpg");
 }
-if(file_exists("cgi-bin/php/uploads" . $_SESSION['User'] . ".png")) {
-	unlink("cgi-bin/php/uploads" . $_SESSION['User'] . ".png");
+if(file_exists("bin/php/uploads" . $_SESSION['User'] . ".png")) {
+	unlink("bin/php/uploads" . $_SESSION['User'] . ".png");
 }
-if(file_exists("cgi-bin/php/uploads" . $_SESSION['User'] . ".jpeg")) {
-	unlink("cgi-bin/php/uploads" . $_SESSION['User'] . ".jpeg");
+if(file_exists("bin/php/uploads" . $_SESSION['User'] . ".jpeg")) {
+	unlink("bin/php/uploads" . $_SESSION['User'] . ".jpeg");
 }
 if(isset($_FILES['uploadedfile'])){
 	if($_FILES['uploadedfile']['size'] > 150000) {

@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -121,7 +121,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <script>
               function selectLocations(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/requisition/selectLocations.php",
+                  url:"bin/php/element/requisition/selectLocations.php",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -148,7 +148,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <script>
               function selectDropOffs(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/requisition/selectDropOffs.php?Location=<?php echo $_GET['Location'];?>",
+                  url:"bin/php/element/requisition/selectDropOffs.php?Location=<?php echo $_GET['Location'];?>",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -175,7 +175,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <script>
               function selectUnits(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/requisition/selectUnits.php?Location=<?php echo $_GET['Location'];?>&DropOff=<?php echo $_GET['DropOff'];?>",
+                  url:"bin/php/element/requisition/selectUnits.php?Location=<?php echo $_GET['Location'];?>&DropOff=<?php echo $_GET['DropOff'];?>",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -202,7 +202,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             <script>
               function selectJobs(link){
                 $.ajax({
-                  url:"cgi-bin/php/element/requisition/selectJobs.php?Location=<?php echo $_GET['Location'];?>&DropOff=<?php echo $_GET['DropOff'];?>&Unit=<?php echo $_GET['Unit'];?>",
+                  url:"bin/php/element/requisition/selectJobs.php?Location=<?php echo $_GET['Location'];?>&DropOff=<?php echo $_GET['DropOff'];?>&Unit=<?php echo $_GET['Unit'];?>",
                   method:"GET",
                   success:function(code){
                     $("body").append(code);
@@ -1088,7 +1088,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $(link).html("Saving <img src='media/images/spinner.gif' height='25px' width='auto' />");
     $(link).attr('disabled','disabled');
     $.ajax({
-      url:"cgi-bin/php/post/save_requisition.php",
+      url:"bin/php/post/save_requisition.php",
       cache: false,
       processData: false,
       contentType: false,

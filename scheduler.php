@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $result = $database->query(
@@ -70,8 +70,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	<title>Nouveau Elevator Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
-    <link rel='stylesheet' href='cgi-bin/libraries/timepicker/jquery.timepicker.min.css' />
-    <script src='cgi-bin/libraries/timepicker/jquery.timepicker.min.js'></script>
+    <link rel='stylesheet' href='bin/libraries/timepicker/jquery.timepicker.min.css' />
+    <script src='bin/libraries/timepicker/jquery.timepicker.min.js'></script>
 	<style>
 		.panel {background-color:transparent !important;}
 		.panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
@@ -455,8 +455,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     
-    <link href="cgi-bin/libraries/fixedHeader.css" rel="stylesheet" type="text/css" media="screen">
-    <script src="cgi-bin/libraries/fixedHeader.js"></script>
+    <link href="bin/libraries/fixedHeader.css" rel="stylesheet" type="text/css" media="screen">
+    <script src="bin/libraries/fixedHeader.js"></script>
     <script>
       $(document).ready(function(){
         $('#attendance').fixedHeaderTable({height: '650', width:'1500' });

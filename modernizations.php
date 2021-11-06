@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -118,7 +118,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $(document).ready(function() {
             var Table_Modernizations = $('#Table_Modernizations').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/reports/Modernizations.php",
+                    "url":"bin/php/reports/Modernizations.php",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;
@@ -165,7 +165,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						]
 					}
 				],
-                <?php require('cgi-bin/js/datatableOptions.php');?>
+                <?php require('bin/js/datatableOptions.php');?>
             } );
             $("Table#Table_Modernizations").on("draw.dt",function(){hrefModernizations();});
             <?php if(!$Mobile){?>

@@ -1,6 +1,6 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){ session_start( [ 'read_and_close' => true ] ); }
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
   $r = $database->query(
     null,
@@ -53,9 +53,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <?php require('cgi-bin/php/meta.php');?>
+    <?php require('bin/php/meta.php');?>
     <title>Nouveau Elevator Portal</title>
-    <?php require('cgi-bin/css/index.php');?>
+    <?php require('bin/css/index.php');?>
     <style>
     table#Table_Tickets tbody tr { height:50px; }
     table#Table_Tickets tbody tr td { padding:5px; padding-top:12.5px; }
@@ -74,7 +74,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     table.dataTable tr.dtrg-group.dtrg-level-1 td,table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#5d5d5d;color:white;padding-top:0.25em;padding-bottom:0.25em;padding-left:2em;font-size:0.9em}
     /*table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#1d1d1d;color:white;}*/
     </style>
-    <?php require('cgi-bin/js/index.php');?>
+    <?php require('bin/js/index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
   <div id='wrapper' style='background-color:#1d1d1d !important;color:white !important;'>
@@ -107,7 +107,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   </div>
   <script src='https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js'></script>
   <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
-  <?php require('cgi-bin/js/datatables.php');?>
+  <?php require('bin/js/datatables.php');?>
   <style></style>
   <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
   <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
@@ -119,7 +119,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     var Table_Tickets = $('#Table_Tickets').DataTable( {
       dom: 'tp',
       ajax: {
-        url: 'cgi-bin/php/get/Work2.php',
+        url: 'bin/php/get/Work2.php',
         dataSrc:function(json){
           if( !json.data ){ json.data = []; }
           return json.data;}

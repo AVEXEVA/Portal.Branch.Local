@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -716,7 +716,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
     
-	<?php require('cgi-bin/js/flotcharts.php');?>
+	<?php require('bin/js/flotcharts.php');?>
     <?php require(PROJECT_ROOT."js/chart/repair_jobs.php");?>
     <?php require(PROJECT_ROOT."js/pie/repair_jobs_by_supervisor.php");?>
     <?php require(PROJECT_ROOT."js/pie/repair_jobs_hours_by_supervisor.php");?>

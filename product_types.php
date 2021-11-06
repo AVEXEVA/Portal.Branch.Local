@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -126,7 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	});
 	Editor_Product_Types.field('ID').disable();
 	var Table_Product_Types = $('#Table_Product_Types').DataTable( {
-		"ajax": "cgi-bin/php/get/Product_Types.php",
+		"ajax": "bin/php/get/Product_Types.php",
 		"columns": [
 			{ 
 				"data": "ID",
@@ -165,7 +165,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				text:"Edit Survey Sheet"
 			}
 		],
-		<?php require('cgi-bin/js/datatableOptions.php');?>
+		<?php require('bin/js/datatableOptions.php');?>
 	} );
 	</script>
 </body>

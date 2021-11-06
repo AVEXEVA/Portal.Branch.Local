@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -202,7 +202,7 @@ if(isMobile()){?><!DOCTYPE html>
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
     div.data {display:inline-block;width:300px;vertical-align:top;}
     </style>
-	<script src="cgi-bin/js/function/formatTicket.js"></script>
+	<script src="bin/js/function/formatTicket.js"></script>
     <script>
         var reset_loc = 0;
         $(document).ready(function(){
@@ -259,7 +259,7 @@ if(isMobile()){?><!DOCTYPE html>
             Location_Tags = Location_Tags.substring(1);
             var Table_Tickets = $('#Table_Tickets').DataTable( {
                 'ajax': {
-                        "url": "cgi-bin/php/get/Tickets.php?Dashboard=Mechanic&Mechanic=<?php echo (isset($_GET['Mechanic'])) ? $_GET['Mechanic'] : $_SESSION['User'];?>&Start_Date=" + $("input.start_date").val() + "&End_Date=" + $("input.end_date").val() + "&Location_Tag=" + Location_Tags + "" + "&Show_Hours=" + $("input#show_hours[type='radio']:checked").val() + "&Show_Tickets=" + $("input#show_tickets[type='radio']:checked").val(),
+                        "url": "bin/php/get/Tickets.php?Dashboard=Mechanic&Mechanic=<?php echo (isset($_GET['Mechanic'])) ? $_GET['Mechanic'] : $_SESSION['User'];?>&Start_Date=" + $("input.start_date").val() + "&End_Date=" + $("input.end_date").val() + "&Location_Tag=" + Location_Tags + "" + "&Show_Hours=" + $("input#show_hours[type='radio']:checked").val() + "&Show_Tickets=" + $("input#show_tickets[type='radio']:checked").val(),
                         "dataSrc":function(json){
                             if(!json.data){json.data = [];}
                             return json.data;}

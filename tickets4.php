@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/portal.live.local/html/cgi-bin/php/index.php' );
+    require( '/var/www/portal.live.local/html/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(
@@ -146,7 +146,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         dom : 'tp',
         pagingType : 'simple',
         ajax: {
-                url     : 'cgi-bin/php/get/Tickets2.php',
+                url     : 'bin/php/get/Tickets2.php',
                 data:function(d){
                     d = {
                         start : d.start, 
