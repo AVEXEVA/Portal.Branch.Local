@@ -1,12 +1,12 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
     //Connection
-    $result = sqlsrv_query(
-        $NEI,
+    $result = \singleton\database::getInstance( )->query(
+        null,
         "   SELECT  *
             FROM    Connection
             WHERE       Connection.Connector = ?
@@ -17,28 +17,32 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
         )
     );
     $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+
     //User
-    $result = sqlsrv_query($NEI,
-       "   SELECT *,
-                  Emp.fFirst AS First_Name,
-                  Emp.Last   AS Last_Name
-           FROM   Emp
-           WHERE  Emp.ID = ?
+    $result = \singleton\database::getInstance( )->query(
+        null,
+        "   SELECT  *,
+                    Emp.fFirst AS First_Name,
+                    Emp.Last   AS Last_Name
+            FROM    Emp
+            WHERE   Emp.ID = ?
     ;",array($_SESSION[ 'User' ]
         )
     );
     $User = sqlsrv_fetch_array($result);
+
     //Privileges
-    $result = sqlsrv_query($NEI,
-     "   SELECT *
-         FROM   Privilege
-         WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION[ 'User' ]
+    $result = \singleton\database::getInstance( )->query(
+        null,
+        "   SELECT  *
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
         )
     );
     $Privileges = array();
     if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege[ 'Access_Table' ]] = $Privilege;}}
-    //SecurityWall
     if( !isset($Connection[ 'ID' ])
         || !isset($Privileges[ 'Customer' ])
             || $Privileges[ 'Customer' ][ 'User_Privilege' ]  < 4
@@ -46,66 +50,60 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
             || $Privileges[ 'Customer' ][ 'Other_Privilege' ] < 4){
                 ?><?php require('../404.html');?><?php }
     else {
-        sqlsrv_query(
+        \singleton\database::getInstance( )->query(
           $NEI,
-          " INSERT INTO Activity([User], [Date], [Page] ) VALUES( ?, ?, ? );",
+          " INSERT INTO Activity([User], [Date], [Page] ) 
+            VALUES( ?, ?, ? );",
           array(
             $_SESSION['User'],
-            date("Y-m-d H:i:s"),
-            "customers.php"
+            date('Y-m-d H:i:s'),
+            'customers.php'
         )
       );
 ?><!DOCTYPE html>
-<html lang="en"style="min-height:100%;">
+<html lang='en'>
 <head>
-    <?php require(bin_meta.'index.php');?>
-  <title>Nouveau Elevator Portal</title>
-    <?php require(bin_css.'index.php');?>
-    <?php require(bin_js.'index.php');?>
+    <title>Nouveau Elevator Portal</title>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php require( bin_meta . 'index.php');?>
+    <?php require( bin_css  . 'index.php');?>
+    <?php require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
-    <div id='container' style='min-height:100%;height:100%;'>
-        <div id="wrapper" style='height:100%;'>
-            <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
-            <?php require(PROJECT_ROOT.'php/element/loading.php');?>
-            <div id="page-wrapper" class='content' style='background-color:transparent !important;'>
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-	                    <div class='row'>
-	                        <div class='col-xs-10'><h4><?php $Icons->Customer( 1 );?> Customers</div>
-	                        <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
-	                    </div>
-	                </div>
-					<div class="panel-body no-print" id='Filters' style='border-bottom:1px solid #1d1d1d;'>
-	                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-	                    <div class='row'>
-	                        <div class='col-xs-4'>Search:</div>
-	                        <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
-	                    </div>
-	                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-	                    <div class='row'>
-	                    	<div class='col-xs-4'>Name:</div>
-	                    	<div class='col-xs-8'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' /></div>
-	                    </div>
-	                    <div class='row'>
-	                    	<div class='col-xs-4'>Status:</div>
-	                    	<div class='col-xs-8'><select name='Status' onChange='redraw( );'>
-			                	<option value=''>Select</option>
-			                	<option value='0'>Active</option>
-			                	<option value='1'>Inactive</option>
-			                </select></div>
-			            </div>
-	                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-	                </div>
-                    <div class="panel-body">
-                        <table id='Table_Customers' class='display' cellspacing='0' width='100%'>
-                            <thead>
-                                <th title="ID">ID</th>
-                                <th title='Name'>Name</th>
-                                <th title='Status'>Status</th>
-                            </thead>
-                        </table>
-                    </div>
+<body onload='finishLoadingPage();'>
+    <div id='wrapper'>
+        <?php require( bin_php . 'element/navigation.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
+        <div id='page-wrapper' class='content'>
+            <div class='card card-full card-primary border-0'>
+                <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customers</h4></div>
+                <div class='card-body bg-dark'>
+                    <table id='Table_Customers' class='display' cellspacing='0' width='100%'>
+                        <thead><tr>
+                            <th class='text-white border border-white' title='ID'>ID</th>
+                            <th class='text-white border border-white' title='Name'>Name</th>
+                            <th class='text-white border border-white' title='Status'>Status</th>
+                            <th class='text-white border border-white' title='Locations'>Locations</th>
+                            <th class='text-white border border-white' title='Units'>Units</th>
+                            <th class='text-white border border-white' title='Jobs'>Jobs</th>
+                            <th class='text-white border border-white' title='Tickets'>Tickets</th>
+                            <th class='text-white border border-white' title='Violations'>Violations</th>
+                            <th class='text-white border border-white' title='Invoices'>Invoices</th>
+                        </tr><tr>
+                            <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
+                            <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>
+                            <th class='text-white border border-white' title='Status'><select class='redraw form-control'  name='Status'>
+                                <option value=''>Select</option>
+                                <option value='0'>Enabled</option>
+                                <option value='1'>Disabled</option>
+                            </select></th>
+                            <th class='text-white border border-white' title='Locations'><input class='redraw form-control' type='text' name='Locations' value='<?php echo isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null; ?>' placeholder='Locations' /></th>
+                            <th class='text-white border border-white' title='Units'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null; ?>' placeholder='Units' /></th>
+                            <th class='text-white border border-white' title='Jobs'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null; ?>' placeholder='Jobs' /></th>
+                            <th class='text-white border border-white' title='Tickets'><input class='redraw form-control' type='text' name='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null; ?>' placeholder='Tickets' /></th>
+                            <th class='text-white border border-white' title='Violations'><input class='redraw form-control' type='text' name='Violations' value='<?php echo isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null; ?>' placeholder='Violations' /></th>
+                            <th class='text-white border border-white' title='Invoices'><input class='redraw form-control' type='text' name='Invoices' value='<?php echo isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null; ?>' placeholder='Invoices' /></th>
+                        </tr></thead>
+                    </table>
                 </div>
             </div>
         </div>
@@ -114,4 +112,4 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=customers.php';</script></head></html><?php }?>
+} else {?><script>document.location.href='../login.php?Forward=customers.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>

@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
@@ -47,7 +47,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ?>
 </head>
 <body onload='finishLoadingPage();'>
-	<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+	<?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content'>
   		<section class="container">
     		<div class="row">

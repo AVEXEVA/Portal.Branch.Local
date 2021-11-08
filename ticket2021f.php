@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
@@ -205,8 +205,8 @@ if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Sig
     <?php require( bin_meta . 'index.php');?>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
-    <script src="cgi-bin/js/slider-noui.js"></script>
-    <link href='cgi-bin/css/slider-noui.css' rel='stylesheet' />
+    <script src="bin/js/slider-noui.js"></script>
+    <link href='bin/css/slider-noui.css' rel='stylesheet' />
     <style type="text/css" media="print">
         .no-print {
             display:block !important;
@@ -246,7 +246,7 @@ white-space: normal !important;
 </head>
 <body onload="finishLoadingPage();" style='background-color:#2d2d2d !important;color:white !important;/*overscroll-behavior: contain;*/'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>;">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='overflow-x:hidden;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <?php if(!isMobile() && false){?>
@@ -725,7 +725,7 @@ foreach($GPS_Locations as $key=>$GPS_Location){?>
             $(link).siblings().removeClass('active');
             $(link).addClass('active');
             $.ajax({
-                url:"cgi-bin/php/element/ticket/" + URL,
+                url:"bin/php/element/ticket/" + URL,
                 success:function(code){
                     $("div.container-content").html(code);
                 }

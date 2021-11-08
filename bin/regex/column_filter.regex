@@ -1,0 +1,3 @@
+Table.Client.Server, 
+([^.\t ]+)[.]([^. ]+)[.]\[?([^,\]]+|[^., \n]+)\]?,?
+if( isset($_GET[ '$2' ] ) && !in_array( $_GET[ '$2' ], array( '', ' ', null ) ) ){\n\t\t\t$parameters[] = $_GET['$2'];\n\t\t\t$conditions[] = "$1.$3 LIKE '%' + ? + '%'";\n\t\t}\n\t\t

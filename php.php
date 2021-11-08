@@ -2,9 +2,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require('cgi-bin/libraries/PHPMailer-master/src/Exception.php');
-require('cgi-bin/libraries/PHPMailer-master/src/PHPMailer.php');
-require('cgi-bin/libraries/PHPMailer-master/src/SMTP.php');
+require('bin/libraries/PHPMailer-master/src/Exception.php');
+require('bin/libraries/PHPMailer-master/src/PHPMailer.php');
+require('bin/libraries/PHPMailer-master/src/SMTP.php');
 
 $mail = new PHPMailer(true);
 

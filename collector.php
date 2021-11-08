@@ -3,10 +3,10 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
         'read_and_close' => true
     ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-  $result = \singleton\database::getInstance()->query((
+  $result = \singleton\database::getInstance()->query(
     null,
     " SELECT  *
       FROM    Connection
@@ -19,7 +19,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
   $Connection = sqlsrv_fetch_array( $result );
   //User
-  $result = \singleton\database::getInstance()->query((
+  $result = \singleton\database::getInstance()->query(
     null,
     " SELECT  *,
               Emp.fFirst AS First_Name,
@@ -32,7 +32,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
   $User = sqlsrv_fetch_array( $result );
   //Privileges
-  $result = \singleton\database::getInstance()->query((
+  $result = \singleton\database::getInstance()->query(
     null,
     " SELECT  Privilege.Access_Table,
               Privilege.User_Privilege,
@@ -51,10 +51,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       ||  $Privileges[ 'Customer' ][ 'User_Privilege' ]  < 4
       ||  $Privileges[ 'Customer' ][ 'Group_Privilege' ] < 4
       ||  $Privileges[ 'Customer' ][ 'Other_Privilege' ] < 4
-  ){
-      ?><?php require( '../404.html' );?><?php
+  ){ require( '../404.html' );
   } else {
-    \singleton\database::getInstance()->query((
+    \singleton\database::getInstance( )->query(
       null,
       " INSERT INTO Activity( [User], [Date], [Page] )
         VALUES( ?, ?, ? );",
@@ -75,7 +74,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
         <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>

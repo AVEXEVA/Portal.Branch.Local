@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset(
   $_SESSION['User'],
@@ -105,12 +105,12 @@ if(isset(
 </head>
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>">
-        <?php require(bin_php.'element/navigation/index.php');?>
+        <?php require(bin_php.'element/navigation.php');?>
         <?php require(bin_php.'element/loading.php');?>
         <div id="page-wrapper" class='content' style='background-color : white !important; color : black !important;'>
             <div class='row'>
                 <div class='col-xs-12' style='text-align:center;'>
-                    <img src='cgi-bin/media/logo/nouveau-no-white.jpg' height='150px' />
+                    <img src='bin/media/logo/nouveau-no-white.jpg' height='150px' />
                 </div>
                 <!--<div class='col-xs-12'><h1 style='text-align:center;'><b class='BankGothic' >Nouveau Elevator</b></h1></div>-->
             </div>

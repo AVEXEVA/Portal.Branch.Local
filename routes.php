@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $result = $database->query(
@@ -66,7 +66,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper' class='<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>'>
-      <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+      <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
       <?php require( bin_php . 'element/loading.php');?>
       <div id='page-wrapper' class='content'>
         <div class='panel panel-primary'>
@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       </div>
     </div>
     <script src='https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js'></script>
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
     <script>
         var Table_Routes = $('#Table_Routes').DataTable( {
@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			paging    : true,
 			searching : false,
 			ajax      : {
-	            url : 'cgi-bin/php/get/Routes2.php',
+	            url : 'bin/php/get/Routes2.php',
 	            data : function( d ){
 	                d = {
 	                    start : d.start,

@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -56,7 +56,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
@@ -173,7 +173,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script>
 	var Table_Permits = $('#Table_Permits').DataTable( {
 		"ajax": {
-			"url":"cgi-bin/php/get/Permits.php",
+			"url":"bin/php/get/Permits.php",
 			"dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
 		},
 		"columns": [
@@ -249,7 +249,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			var dLocation = $("tr#addPermit input[name='Location']").val();
 			var dLink = $("tr#addPermit input[name='Link']").val();
 			$.ajax({
-				url:"cgi-bin/php/post/addPermit.php",
+				url:"bin/php/post/addPermit.php",
 				data: {Name : dName, Type : dType, Expiration: dExpiration, Description: dDescription, Location: dLocation, Link: dLink},
 				method:"POST",
 				success:function(code){
@@ -268,7 +268,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			var dLocation = $("tr#editPermit input[name='Location']").val();
 			var dLink = $("tr#editPermit input[name='Link']").val();
 			$.ajax({
-				url:"cgi-bin/php/post/updatePermit.php",
+				url:"bin/php/post/updatePermit.php",
 				data: {ID: dID, Name : dName, Type : dType, Expiration: dExpiration, Description: dDescription, Location: dLocation, Link: dLink},
 				method:"POST",
 				success:function(code){
@@ -312,7 +312,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	function deletePermit(){
 		var Permit_ID = $(".selected").children("td:first-child").html();
 		$.ajax({
-			url:"cgi-bin/php/post/deletePermit.php",
+			url:"bin/php/post/deletePermit.php",
 			method:"POST",
 			data:{ID:Permit_ID},
 			success:function(code){
@@ -333,7 +333,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         var hyperlink = $(link).val();
         var string = "ID=" + ID + "&Hyperlink=" + encodeURIComponent(hyperlink);
         $.ajax({
-            url:"cgi-bin/php/post/updateHyperlink.php",
+            url:"bin/php/post/updateHyperlink.php",
             data:string,
             method:"POST",
             success:function(code){}
@@ -342,7 +342,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     function updateActive(link){
         var form_data = $(link).parent().serialize() + "&ID=" + $(link).attr('rel');
         $.ajax({
-            url:"cgi-bin/php/post/updateActive.php",
+            url:"bin/php/post/updateActive.php",
             data:form_data,
             method:"POST",
             success:function(code){}

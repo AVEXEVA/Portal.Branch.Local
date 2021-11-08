@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -62,7 +62,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
@@ -121,7 +121,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         var response = confirm("Would you like to delete the company '" + Company + "'?");
                                         if(response){
                                             $.ajax({
-                                                url:"cgi-bin/php/post/deleteInsuredCompany.php",
+                                                url:"bin/php/post/deleteInsuredCompany.php",
                                                 method:"POST",
                                                 data:"ID=" + $(link).attr('rel'),
                                                 success:function(code){document.location.href='insured_companies.php';}
@@ -308,7 +308,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         var hyperlink = $(link).val();
         var string = "ID=" + ID + "&Hyperlink=" + encodeURIComponent(hyperlink);
         $.ajax({
-            url:"cgi-bin/php/post/updateHyperlink.php",
+            url:"bin/php/post/updateHyperlink.php",
             data:string,
             method:"POST",
             success:function(code){}
@@ -317,7 +317,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     function updateActive(link){
         var form_data = $(link).parent().serialize() + "&ID=" + $(link).attr('rel');
         $.ajax({
-            url:"cgi-bin/php/post/updateActive.php",
+            url:"bin/php/post/updateActive.php",
             data:form_data,
             method:"POST",
             success:function(code){}

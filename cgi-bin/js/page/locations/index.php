@@ -1,1 +1,0 @@
-<script src='cgi-bin/js/page/locations/table.js'></script>

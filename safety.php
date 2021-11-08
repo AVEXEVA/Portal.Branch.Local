@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -48,7 +48,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-      <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+      <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
       <?php require( bin_php . 'element/loading.php');?>
       <div id="page-wrapper" class='content'>
   			<div class="panel panel-primary">
@@ -105,7 +105,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $(link).html("Save");
             $(link).prop('disabled',false);
           },
-          url:"cgi-bin/php/post/safety_form.php",
+          url:"bin/php/post/safety_form.php",
           method:"POST",
           data:formData,
           success:function(code){

@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -67,7 +67,7 @@ while($a= sqlsrv_fetch_array($r)){}
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class='panel panel-primary'>
@@ -93,7 +93,7 @@ while($a= sqlsrv_fetch_array($r)){}
         $(document).ready(function() {
             var table_roles = $('#Table_Roles').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/get/Roles.php",
+                    "url":"bin/php/get/Roles.php",
                     "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
                 },
                 "columns": [

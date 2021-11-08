@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
+require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php');
 setlocale(LC_MONETARY, 'en_US');
   if(isset($_SESSION[ 'User' ],
            $_SESSION[ 'Hash' ] ) ) {
@@ -125,7 +125,7 @@ setlocale(LC_MONETARY, 'en_US');
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper' style='overflow:auto !important;' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION['Toggle_Menu'] : null;?>'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content' style='overflow:auto !important;'>
             <div class='' style='display:none;'>

@@ -1,0 +1,115 @@
+button {
+  border:0px;
+  width:100%;
+  height:auto;
+  color:black;
+  text-align:left;
+  background-color:transparent;
+}
+button.slim {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+#main-menu { padding : 5px; }
+div.toggle-panel.open div.panel-body {
+  max-height:750px;
+  transition:max-height 1s;
+}
+ul.panel-links {
+  margin:20px;
+  padding:0px;
+  list-style-type:none;
+}
+@media screen and (min-width:1980px) {
+  .link-page>div {
+    padding:25px;
+    margin:auto;
+  }
+  #page-wrapper {
+    padding-left:16.666%;
+    padding-right:16.666%;
+  }
+}
+.link-page>div:hover {
+  background-color:gold !important;
+  color:black !important;
+}
+.nav-text{ text-align: center; }
+.nav-icon{ text-align: center; }
+
+table.display.dataTable tbody tr, table#Table_Tickets tbody tr td a {
+    color : black !important;
+}
+table.display.dataTable tbody tr:nth-child( even ) {
+    background-color : rgba( 240, 240, 240, 1 ) !important;
+}
+table.display.dataTable tbody tr:nth-child( odd ) {
+    background-color : rgba( 255, 255, 255, 1 ) !important;
+}
+table.display.dataTable td {
+  border-top : 1px solid gray !important;
+}
+.dashboard .card-heading {
+  padding : 0px;
+  margin  : 0px;
+}
+.dashboard .card-heading .row>div {
+  
+  border : 1px solid #3d3d3d;
+  cursor : pointer;
+}
+.dashboard .card-body {
+  display : none;
+}
+.dashboard .card-body.active {
+  display : block; 
+}
+.dashboard ul {
+  margin:0px;
+  padding:0px;
+  list-style-type:none;
+  position:relative;
+}
+.dashboard ul li {
+  display:none;
+  padding : 15px;
+}
+.dashboard ul li.active, .dashboard ul li.show {
+  display:block;
+}
+.dashboard ul li.active:first-child {
+  top:0px;
+}
+.dashboard ul li.active:nth-child( 2 ){
+  top:50px;
+}
+.dashboard ul li.active:nth-child( 3 ){
+  top:100px;
+}
+.dashboard ul li:nth-child( even ) {
+  background-color:#1d1d1d;
+}
+.dashboard ul li:nth-child( odd ) {
+  background-color:#2d2d2d;
+}
+.link-page>div {
+  background-color : #1f1f1f;
+  font-size        : 16px;
+  position         : relative;
+  padding          : 10px
+}
+@media screen and ( min-width:1400px ){
+  .{
+    width:7.333333%;
+    margin-left:.5%;
+    margin-right:.5%;
+  }
+}
+.round {
+  border-radius : 100px;
+}

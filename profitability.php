@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -48,7 +48,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<table id='Table_Customers' class='display' cellspacing='0' width='100%'>
@@ -87,7 +87,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $(document).ready(function(){
             var Table_Customers = $('#Table_Customers').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/reports/Profitability.php",
+                    "url":"bin/php/reports/Profitability.php",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}

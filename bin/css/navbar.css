@@ -1,0 +1,23 @@
+.navbar[role='navigation'] {
+  background-color : black;
+  width            : 100%;
+  position         : fixed;
+  margin-bottom    : 0px !important;
+  z-index          : 100;
+}
+.navbar-header a { color : white !important; }
+.navbar-header a.logout, .navbar-header .row .col-sm-2 {
+  text-align:right;
+  position:relative;
+  font-size:18px;
+  float:right;
+}
+
+.navbar-brand {
+  padding        : 0px !important;
+  font-size      : 22px !important;
+  vertical-align : middle;
+  height         : auto !important;
+  margin-top     : 10px;
+}
+.navbar-brand>img { padding-right : 5px; }

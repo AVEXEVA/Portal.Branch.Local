@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
    SELECT *
@@ -47,7 +47,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 <body>
 <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-  <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+  <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
   <?php require( bin_php . 'element/loading.php');?>
   <div id="page-wrapper" class='content' style='height:100%;'>
    <div class="panel panel-primary" style='margin-bottom:0px;height:100%;overflow-y:scroll;'>
@@ -157,12 +157,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
     div.data {display:inline-block;width:300px;vertical-align:top;}
     </style>
- <script src="cgi-bin/js/function/formatTicket.js"></script>
+ <script src="bin/js/function/formatTicket.js"></script>
     <script>
         $(document).ready(function() {
             var Table_Tickets = $('#Table_Tickets').DataTable( {
               "ajax": {
-                      "url": "cgi-bin/php/reports/PTO.php",
+                      "url": "bin/php/reports/PTO.php",
                       "dataSrc":function(json){
                           if(!json.data){json.data = [];}
                           return json.data;}

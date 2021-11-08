@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
@@ -78,7 +78,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 <body onload='finishLoadingPage();' style='overflow-y:scroll;height:100%;background-color:#1d1d1d !important;color:white !important;'>
     <div id="wrapper" style='height:100%;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
             <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
@@ -173,7 +173,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <!-- Metis Menu Plugin JavaScript -->
     
 
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
     
 
@@ -192,7 +192,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         function hrefViolations(){hrefRow("Table_Violations","violation");}
         $(document).ready(function(){
             var Table_Locations = $('#Table_Locations').DataTable( {
-                "ajax": "cgi-bin/php/get/Locations_by_Route.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Locations_by_Route.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { "data": "ID" },
                     { "data": "Name"},
@@ -215,7 +215,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $("Table#Table_Locations").on("draw.dt",function(){hrefLocations();});
 
             var Table_Units = $('#Table_Units').DataTable( {
-                "ajax": "cgi-bin/php/get/Units_by_Route.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/get/Units_by_Route.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     { "data": "ID" },
                     { "data": "State"},
@@ -229,7 +229,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             } );
             $("Table#Table_Units").on("draw.dt",function(){hrefUnits();});
             var Table_Maintenances = $('#Table_Maintenances').DataTable( {
-                "ajax": "cgi-bin/php/reports/Maintenances_by_Route.php?ID=<?php echo $_GET['ID'];?>",
+                "ajax": "bin/php/reports/Maintenances_by_Route.php?ID=<?php echo $_GET['ID'];?>",
                 "columns": [
                     {
                         "data": "Location"
@@ -254,7 +254,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $("Table#Table_Maintenances").on("draw.dt",function(){hrefLocations();});
             var Table_Violations = $('#Table_Violations').DataTable( {
                 "ajax": {
-                    "url":"cgi-bin/php/reports/Due_Violations_by_Route.php?ID=<?php echo $_GET['ID'];?>",
+                    "url":"bin/php/reports/Due_Violations_by_Route.php?ID=<?php echo $_GET['ID'];?>",
                     "dataSrc":function(json){
                         if(!json.data){json.data = [];}
                         return json.data;}
@@ -279,7 +279,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                     }
                 ],
-                <?php require('cgi-bin/js/datatableOptions.php');?>
+                <?php require('bin/js/datatableOptions.php');?>
             } );
             finishLoadingPage();
             $("Table#Table_Violations").on("draw.dt",function(){hrefViolations();});
@@ -290,7 +290,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $(link).siblings().removeClass('active');
             $(link).addClass('active');
             $.ajax({
-                url:"cgi-bin/php/element/route/" + URL,
+                url:"bin/php/element/route/" + URL,
                 success:function(code){
                     $("div.container-content").html(code);
                 }

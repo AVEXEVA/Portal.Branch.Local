@@ -1,13 +1,13 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
   session_start( [ 'read_and_close' => true ] );
-  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php');
+  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php');
 }
 if(TRUE){
   require('map5.php');
 } else {
 $_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -53,7 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
   <div id='container'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
             <div class="row">
@@ -214,8 +214,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyBzxfjkN8x4t6TcuynQhk3cfo2AkXmHGiY"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBzxfjkN8x4t6TcuynQhk3cfo2AkXmHGiY"></script>
   	<!-- Map Icons -->
-  	<link rel="stylesheet" type="text/css" href="cgi-bin/libraries/map-icons-master/dist/css/map-icons.css">
-  	<script type="text/javascript" src="cgi-bin/libraries/map-icons-master/dist/js/map-icons.js"></script>
+  	<link rel="stylesheet" type="text/css" href="bin/libraries/map-icons-master/dist/css/map-icons.css">
+  	<script type="text/javascript" src="bin/libraries/map-icons-master/dist/js/map-icons.js"></script>
     <style>
     .map-icon-label .map-icon {
       font-size: 24px;

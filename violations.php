@@ -1,11 +1,13 @@
 <?php
-if(session_id() == '' || !isset($_SESSION) ){
-    session_start( [ 'read_and_close' => true ] );
-    require('cgi-bin/php/index.php');
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+        'read_and_close' => true
+    ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Connection
-    $Connection = $database->query(
+    $Connection = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  * 
             FROM    Connection 
@@ -19,11 +21,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 
     //User
-    $User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
+    $User = \singleton\database::getInstance( )->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     
     //Privileges
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
             FROM   Privilege
@@ -38,7 +40,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     if(!isset($Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=violations.php';</script></head></html><?php }
     else {
-      $database->query(
+      \singleton\database::getInstance( )->query(
         null,
         "   INSERT INTO Activity([User], [Date], [Page])
             VALUES(?,?,?);",
@@ -51,9 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Elevator Portal</title>
-    <?php require( bin_css . 'index.php');?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <style> 
         table#Table_Violations { font-size:10px;} 
         table#Table_Violations tbody tr { height:50px; }
@@ -66,11 +66,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             color:black;
         }
     </style>
+    <?php require( bin_meta . 'index.php');?>
+    <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="panel panel-primary">
@@ -125,7 +127,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     </div>
     
     <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
     
     <script>
@@ -179,7 +181,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     d.Status = $('input[name="Status"]').val( );
                     return d; 
                 },
-                url : 'cgi-bin/php/get/Violations2.php'
+                url : 'bin/php/get/Violations2.php'
             },
             drawCallback : function ( settings ) { hrefViolations( ); },
             rowGroup: { 

@@ -1,7 +1,7 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
 ini_set('max_execution_time', 300);
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -49,7 +49,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload="finishLoadingPage();" style='height:100%;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;'>
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
             <div class='row'>
@@ -1173,7 +1173,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <!-- Metis Menu Plugin JavaScript -->
         
 
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
     
 

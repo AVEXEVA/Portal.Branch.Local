@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/portal.live.local/html/cgi-bin/php/index.php' );
+    require( '/var/www/portal.live.local/html/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Connection
@@ -62,8 +62,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 </head>
 <body onload='finishLoadingPage();'>
   <div id='wrapper'>
-    <?php require( 'cgi-bin/php/element/navigation/index.php'); ?>
-    <?php require( 'cgi-bin/php/element/loading.php'); ?>
+    <?php require( 'bin/php/element/navigation.php'); ?>
+    <?php require( 'bin/php/element/loading.php'); ?>
     <div id='page-wrapper' class='content' >
       <div class='row'>
         <div class='offset-md-3 col-md-6 panel panel-primary panel-sync'><form id='Ticket' action='new-ticket.php' method='POST'>

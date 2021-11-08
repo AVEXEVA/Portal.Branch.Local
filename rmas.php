@@ -1,6 +1,6 @@
 <?php 
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT * 
@@ -45,7 +45,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
@@ -223,7 +223,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		} );
 		var Table_RMAs = $('#Table_RMAs').DataTable( {
 			"ajax": {
-				"url":"cgi-bin/php/get/RMAs.php",
+				"url":"bin/php/get/RMAs.php",
 				"dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
 			},
 			"columns": [
@@ -286,7 +286,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				  }
 				}
 			],
-			<?php require('cgi-bin/js/datatableOptions.php');?>
+			<?php require('bin/js/datatableOptions.php');?>
 		} );
 		
     </script>

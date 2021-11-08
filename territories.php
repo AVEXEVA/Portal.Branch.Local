@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -45,7 +45,7 @@ if(isMobile()){
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<div class="panel panel-primary">
@@ -84,7 +84,7 @@ if(isMobile()){
         var Table_Territories = $('#Table_Territories').DataTable( {
 			"processing":true,
 			"serverSide":true,
-			"ajax": "cgi-bin/php/get/Territories.php",
+			"ajax": "bin/php/get/Territories.php",
 			"order": [[ 1, "asc" ]],
 			"columns": [
 				{

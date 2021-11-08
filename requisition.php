@@ -3,7 +3,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
         'read_and_close' => true
     ] );
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/cgi-bin/php/index.php' );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   $result = \singleton\database::getInstance()->query(
@@ -138,7 +138,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
           <div class='print' style='overflow:hidden;'>
@@ -459,7 +459,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       count++;
     });
     $.ajax({
-      url:"cgi-bin/php/post/save_requisition.php",
+      url:"bin/php/post/save_requisition.php",
       cache: false,
       processData: false,
       contentType: false,

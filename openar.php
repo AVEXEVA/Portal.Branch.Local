@@ -1,6 +1,6 @@
 <?php
 session_start( [ 'read_and_close' => true ] );
-require('cgi-bin/php/index.php');
+require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
 		SELECT *
@@ -62,7 +62,7 @@ if(isMobile()){?>
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
 		<div id="wrapper" style='height:100%;'>
-			<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+			<?php require(PROJECT_ROOT.'php/element/navigation.php');?>
 			<?php require( bin_php . 'element/loading.php');?>
 			<div id="page-wrapper" class='content' style='background-color:transparent !important;'>
 				<div class="row">
@@ -134,7 +134,7 @@ if(isMobile()){?>
 	</div>
     
     
-    <?php require('cgi-bin/js/datatables.php');?>
+    <?php require('bin/js/datatables.php');?>
     
     
     
@@ -218,7 +218,7 @@ if(isMobile()){?>
 		});
 		var Table_Customers = $('#Table_Customers').DataTable( {
 			"ajax": {
-				"url":"cgi-bin/php/get/Customers.php"
+				"url":"bin/php/get/Customers.php"
 			},
 			"processing":true,
 			"serverSide":true,
