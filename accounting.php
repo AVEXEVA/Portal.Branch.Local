@@ -68,7 +68,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <html lang="en">
 <head>
     <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Texas | Portal</title>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>

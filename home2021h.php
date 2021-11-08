@@ -156,7 +156,7 @@ $image_result = $database->query(
           <div class ='nav-text'>Active Ticket</div>
         </div>
       </div><?php }?>
-      <?php if(isset($Privileges['Time']) && $Privileges['Time']['Other_Privilege'] >= 4){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='scheduler.php'">
+      <?php if(isset($Privileges['Time']) && $Privileges['Time']['Other_Privilege'] >= 4){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='schedule.php'">
         <div class='p-1 border border-white'>
           <div class='nav-icon'><i class="fa fa-question-circle fa-3x fa-fw" aria-hidden="true"></i></div>
           <div class ='nav-text'>Attendance</div>
