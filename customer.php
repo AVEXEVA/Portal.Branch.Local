@@ -118,7 +118,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							</div><?php 
 						}?>
 						<?php if(isset($Privileges[ 'Contract' ]) && $Privileges[ 'Contract' ][ 'User_Privilege' ] >= 4){
-							?><div tab='contract'class='Home-Screen-Option col-lg-1 col-md-2 col-3' onClick="document.location.href='contracts.php?Customer=<?php echo $Customer[ 'Name' ];?>';">
+							?><div tab='contract'class='Home-Screen-Option col-lg-1 col-md-2 col-3' onClick="document.location.href='contracts.php?Customer=<?php echo $Location[ 'Name' ];?>';">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract( 3 );?></div>
 									<div class ='nav-text'>Contracts</div>
 							</div><?php 

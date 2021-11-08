@@ -1,56 +1,119 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('../../../../bin/php/index.php');
-setlocale(LC_MONETARY, 'en_US');
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( [ 'read_and_close' => true ] ); 
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $My_User = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User);
-    $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query(null,"
-        SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-        FROM   Privilege
-        WHERE  User_ID = ?
-    ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    //Connection
+    $Connection = $database->query(
+        null,
+        "   SELECT  Connection.* 
+            FROM    Connection 
+            WHERE   Connection.Connector = ? 
+                    AND Connection.Hash = ?;",
+        array(
+            $_SESSION['User'],
+            $_SESSION['Hash']
+        )
+    );
+    $Connection = sqlsrv_fetch_array($Connection);
+
+    //User
+    $User = $database->query(
+        null,
+        "   SELECT  Emp.*, 
+                    Emp.fFirst  AS First_Name, 
+                    Emp.Last    AS Last_Name 
+            FROM    Emp 
+            WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION['User']
+        )
+    );
+    $User = sqlsrv_fetch_array($User);
+
+    //Privileges
+    $r = $database->query(
+        null,
+        "   SELECT  Privilege.Access_Table, 
+                    Privilege.User_Privilege, 
+                    Privilege.Group_Privilege, 
+                    Privilege.Other_Privilege
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+            $_SESSION[ 'User' ]
+        )
+    );
+    $Privileges = array();
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
-        $r = $database->query(  null,"
-        SELECT  *
-        FROM    TicketO
-        WHERE   TicketO.LID='{$_GET['ID']}'
-                AND fWork='{$My_User['fWork']}'");
-        $r2 = $database->query( null,"
-        SELECT  *
-        FROM    TicketD
-        WHERE   TicketD.Loc='{$_GET['ID']}'
-                AND fWork='{$My_User['fWork']}'");
-        $r3 = $database->query( null,"
-        SELECT  *
-        FROM    TicketDArchive
-        WHERE   TicketDArchive.Loc='{$_GET['ID']}'
-                AND fWork='{$My_User['fWork']}'");
-        $r = sqlsrv_fetch_array($r);
-        $r2 = sqlsrv_fetch_array($r2);
-        $r3 = sqlsrv_fetch_array($r3);
-        $Privileged = (is_array($r) || is_array($r2) || is_array($r3)) ? TRUE : FALSE;
+    if( isset($Privileges['Location']) 
+        && $Privileges['Location']['User_Privilege'] >= 4 
+        && $Privileges['Location']['Group_Privilege'] >= 4 
+        && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        $r = $database->query(  
+            null,
+            "   SELECT  Count( Ticket.ID ) AS Count 
+                FROM    (
+                            SELECT  Ticket.ID,
+                                    Ticket.Location,
+                                    Ticket.Field,
+                                    Sum( Ticket.Count ) AS Count
+                            FROM (
+                                (
+                                    SELECT      TicketO.ID,
+                                                TicketO.LID AS Location,
+                                                TicketO.fWork AS Field,
+                                                Count( TicketO.ID ) AS Count
+                                    FROM        TicketO
+                                    GROUP BY    TicketO.ID,
+                                                TicketO.LID,
+                                                TicketO.fWork
+                                ) UNION ALL (
+                                    SELECT      TicketD.ID,
+                                                TicketD.Loc AS Location,
+                                                TicketD.fWork AS Field, 
+                                                Count( TicketD.ID ) AS Count
+                                    FROM        TicketD
+                                    GROUP BY    TicketD.ID,
+                                                TicketD.Loc,
+                                                TicketD.fWork
+                                )
+                            ) AS Ticket
+                            GROUP BY    Ticket.ID,
+                                        Ticket.Location,
+                                        Ticket.Field
+                        ) AS Ticket
+                        LEFT JOIN Emp AS Employee ON Ticket.Field = Employee.fWork
+                WHERE   Employee.ID = ?
+                        AND Ticket.Location = ?;",
+            array( 
+                $_SESSION[ 'User' ],
+                $_GET[ 'ID' ]
+            )
+        );
+        $Tickets = 0;
+        if ( $r ){ $Tickets = sqlsrv_fetch_array( $r )[ 'Count' ]; }
+        $Privileged =  $Tickets > 0 ? true : false;
     }
-    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "location.php"));
-    if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
+    if(     !isset( $Connection[ 'ID' ] )  
+        ||  !$Privileged 
+        ||  !isset( $_GET[ 'ID' ] )
+        ||  !is_int( $_GET[ 'ID' ] ) ){
+            ?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
     else {
         $r = $database->query(null,
             "SELECT TOP 1
-                    Loc.Loc              AS Location_ID,
-                    Loc.ID               AS Location_Name,
-                    Loc.Tag              AS Location_Tag,
-                    Loc.Address          AS Location_Street,
-                    Loc.City             AS Location_City,
-                    Loc.State            AS Location_State,
-                    Loc.Zip              AS Location_Zip,
-                    Loc.Balance          as Location_Balance,
+                    Loc.Loc              AS ID,
+                    Loc.ID               AS Name,
+                    Loc.Tag              AS Tag,
+                    Loc.Address          AS Street,
+                    Loc.City             AS City,
+                    Loc.State            AS State,
+                    Loc.Zip              AS Zip,
+                    Loc.Balance          as Balance,
                     Zone.Name            AS Zone,
                     Loc.Route            AS Route_ID,
                     Emp.ID               AS Route_Mechanic_ID,
@@ -79,142 +142,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         ;",array($_GET['ID']));
         $Location = sqlsrv_fetch_array($r);
         $data = $Location;
-?>
-<div class="panel panel-primary" id='location-information'>
-	<div class='panel-body' style='font-size:16px;padding:5px;'>
-		<div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
-			<?php
-			//echo "Hi! " . $My_User['ID'];
-			$Start_Date = date('Y-m') . "-01 00:00:00.000";
-			if(date('m')==2) {
-				$end = 28;
-			}
-			else { $end = 30;}
-			$End_Date = date('Y-m') . "-" . $end . " 23:59:59.999";
-			$r = $database->query(null,"
-			SELECT Tickets.*,
-				   Loc.ID                      AS Customer,
-				   Loc.Tag                     AS Location,
-				   Loc.Address                 AS Address,
-				   Loc.Address                 AS Street,
-				   Loc.City                    AS City,
-				   Loc.State                   AS State,
-				   Loc.Zip                     AS Zip,
-				   Route.Name 		           AS Route,
-				   Zone.Name 		           AS Division,
-				   Loc.Maint 		           AS Maintenance,
-				   Job.ID                      AS Job_ID,
-				   Job.fDesc                   AS Job_Description,
-				   OwnerWithRol.ID             AS Owner_ID,
-				   OwnerWithRol.Name           AS Customer,
-				   Elev.Unit                   AS Unit_Label,
-				   Elev.State                  AS Unit_State,
-				   Elev.fDesc				   AS Unit_Description,
-				   Elev.Type 				   AS Unit_Type,
-				   Emp.fFirst                  AS First_Name,
-				   Emp.Last                    AS Last_Name,
-				   Emp.fFirst + ' ' + Emp.Last AS Mechanic,
-				   'Unknown'                   AS ClearPR,
-				   JobType.Type                AS Job_Type
-			FROM (
-					(SELECT TicketO.ID       AS ID,
-							TicketO.fDesc    AS Description,
-							''               AS Resolution,
-							TicketO.CDate    AS Created,
-							TicketO.DDate    AS Dispatched,
-							TicketO.EDate    AS Scheduled,
-							TicketO.TimeSite AS On_Site,
-							TicketO.TimeComp AS Completed,
-							TicketO.Who 	 AS Caller,
-							TicketO.fBy      AS Reciever,
-							TicketO.Level    AS Level,
-							TicketO.Cat      AS Category,
-							TicketO.LID      AS Location,
-							TicketO.Job      AS Job,
-							TicketO.LElev    AS Unit,
-							TicketO.Owner    AS Owner,
-							TicketO.fWork    AS Mechanic,
-							TickOStatus.Type AS Status,
-							0                AS Total,
-							0                AS Regular,
-							0                AS Overtime,
-							0                AS Doubletime
-					 FROM   TicketO
-							LEFT JOIN TickOStatus ON TicketO.Assigned = TickOStatus.Ref
-					)
-				) AS Tickets
-				LEFT JOIN Loc          ON Tickets.Location = Loc.Loc
-				LEFT JOIN Job          ON Tickets.Job      = Job.ID
-				LEFT JOIN Elev         ON Tickets.Unit     = Elev.ID
-				LEFT JOIN OwnerWithRol ON Tickets.Owner    = OwnerWithRol.ID
-				LEFT JOIN Emp          ON Tickets.Mechanic = Emp.fWork
-				LEFT JOIN JobType      ON Job.Type         = JobType.ID
-				LEFT JOIN Zone 		   ON Zone.ID          = Loc.Zone
-				LEFT JOIN Route		   ON Route.ID		   = Loc.Route
-			WHERE Emp.ID = ?
-			ORDER BY Tickets.ID DESC
-		",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
-		$data = array();
-		$row_count = sqlsrv_num_rows( $r );
-		if($r){
-			while($i < $row_count){
-				$Ticket = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-				if(is_array($Ticket) && $Ticket != array()){
-					$Tags = array();
-					if(strpos($Ticket['Description'],"s/d") || strpos($Ticket['Description'],"S/D") || strpos($Ticket['Description'],"shutdown")){
-						$Tags[] = "Shutdown";
-					}
-					if($Ticket['Level'] == 10){
-						$Tags[] = "Maintenance";
-					}
-					if($Ticket['Level'] == 1){
-						$Tags[] = "Service Call";
-					}
-					$Ticket['Tags'] = implode(", ",$Tags);
-					$data[] = $Ticket;
-				}
-				$i++;
-			}
-
-		}
-		$row_count = $database->query(null,"
-					SELECT Count(Tickets.ID) AS Open_Tickets
-					FROM (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '0' ) AS Tickets
-
-
-		",array($_GET['ID']));
-		//echo $r ? number_format(sqlsrv_fetch_array($row_count)['Open_Tickets']) : 0;
-
-		$row_count2 =  $database->query(null,"
-                    SELECT Count(Tickets.ID) AS Open_Tickets
-                    FROM   (
-                                (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '0' )
-                            ) AS Tickets
-
-                ;",array($_GET['ID']));
-		//echo $r ? number_format(sqlsrv_fetch_array($row_count2)['Open_Tickets']) : 0;
-			   $open_tickets = number_format(sqlsrv_fetch_array($row_count2)['Open_Tickets']);
-
-		$row_count3 =  $database->query(null,"
-                    SELECT Count(Tickets.ID) AS Assigned_Tickets
-                    FROM   (
-                                (SELECT ID FROM TicketO  WHERE TicketO.Assigned = '1')
-                            ) AS Tickets
-                ;",array($_GET['ID']));
-		//echo $r ? number_format(sqlsrv_fetch_array($row_count3)['Assigned_Tickets']) : 0;
-				$assigned_tickets =  number_format(sqlsrv_fetch_array($row_count3)['Assigned_Tickets']);
-
-		$r = $database->query(null,"
-                    SELECT Tickets, Count(*) AS Count_of_Tickets
-                    FROM   TicketO
-                     GROUP BY TicketO.fWork
-                ;",array($_GET['ID'],$_GET['ID'],$_GET['ID']));
-                //echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
-				$total = number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']);
-
-			//echo (($open_tickets + $assigned_tickets) / $total );
-	?>
-
+?>      <div>
 			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Name:</div>
 			<div class='col-xs-8'><?php echo $Location['Location_Name'];?></div>
 			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Tag:</div>
@@ -317,7 +245,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 			<?php }?>
         </div>
-	</div>
 </div>
 <?php
     }

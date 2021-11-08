@@ -87,9 +87,8 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
       /*?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php */ }
     else {
         $result = $database->query(null,"SELECT TOP 1
-                    Loc.Loc              AS Location_ID,
-                    Loc.ID               AS Name,
-                    Loc.Tag              AS Tag,
+                    Loc.Loc              AS ID,
+                    Loc.Tag              AS Name,
                     Loc.Address          AS Street,
                     Loc.City             AS City,
                     Loc.State            AS State,
@@ -102,23 +101,29 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
                     Emp.fFirst           AS Route_Mechanic_First_Name,
                     Emp.Last             AS Route_Mechanic_Last_Name,
                     Loc.Owner            AS Customer_ID,
-                    OwnerWithRol.Name    AS Customer_Name,
-                    OwnerWithRol.Balance AS Customer_Balance,
+                    Customer.Name    	 AS Customer_Name,
                     Terr.Name            AS Territory_Domain
             FROM    Loc
                     LEFT JOIN Zone         ON Loc.Zone   = Zone.ID
                     LEFT JOIN Route        ON Loc.Route  = Route.ID
                     LEFT JOIN Emp          ON Route.Mech = Emp.fWork
-                    LEFT JOIN OwnerWithRol ON Loc.Owner  = OwnerWithRol.ID
+                    LEFT JOIN (
+            				SELECT 	Owner.ID    AS ID,
+		                    		Rol.Name    AS Name,
+		                    		Rol.Address AS Street,
+				                    Rol.City    AS City,
+				                    Rol.State   AS State,
+				                    Rol.Zip     AS Zip,
+				                    Owner.Status  AS Status,
+									Rol.Website AS Website
+							FROM    Owner
+									LEFT JOIN Rol ON Owner.Rol = Rol.ID
+            		) AS Customer ON Loc.Owner = Customer.ID
                     LEFT JOIN Terr         		   ON Terr.ID    = Loc.Terr
-            WHERE
-                    Loc.Loc = ?
-        ;",array($_GET[ 'ID' ]));
+            WHERE 	Loc.Loc = ?;",array($_GET[ 'ID' ]));
+        var_dump( sqlsrv_errors( ) );
         $Location = sqlsrv_fetch_array($result);
-        $data = $Location;
-		$location = $Location;
-    if(isMobile() || TRUE){?>
-        <!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <title><?php echo $_SESSION[ 'Conneciton' ][ 'Branch' ];?> | Portal</title>
@@ -143,17 +148,17 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							<div class ='nav-text' style="margin: 0">Information</div>
 					</div><?php }?>
 					<?php if(isset($Privileges['Contract']) && $Privileges[ 'Contract' ][ 'User_Privilege' ] >= 4 || $Privileges[ 'Contract' ][ 'Group_Privilege' ] >= 4){
-					?><div tab='contracts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-contracts.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='contracts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='contracts.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract(3);?></div>
 							<div class ='nav-text'>Contracts</div>
 					</div><?php }?>
 					<?php if(isset($Privileges['Collection']) && $Privileges[ 'Collection' ][ 'User_Privilege' ] >= 4){
-					?><div tab='collections' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-collections.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='collections' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='collections.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
 							<div class ='nav-text'>Collections</div>
 					</div><?php }?>
 					<?php if(isset($Privileges['Contact']) && $Privileges[ 'Contact' ][ 'User_Privilege' ] >= 4){
-					?><div tab='contacts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-contacts.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='contacts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='contacts.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Info(3);?></div>
 							<div class ='nav-text'>Contacts</div>
 					</div><?php }?>
@@ -167,7 +172,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							<div class ='nav-text'>Feed</div>
 					</div>
 					<?php if(isset($Privileges['Invoice']) && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 4){
-					?><div tab='invoices' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-invoices.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='invoices' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
 							<div class ='nav-text'>Invoices</div>
 					</div><?php }?>
@@ -180,11 +185,6 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 					?><div tab='jobs' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-jobs.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 							<div class ='nav-text'>Jobs</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Legal']) && $Privileges[ 'Legal' ][ 'User_Privilege' ] >= 4 && false){
-					?><div tab='legal' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-legal.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Legal(3);?></div>
-							<div class ='nav-text'>Legal</div>
 					</div><?php }?>
 					<?php if(isset($Privileges['Log']) && $Privileges[ 'Log' ][ 'User_Privilege' ] >= 4 ){
 					?><div tab='logs' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-log.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
@@ -202,7 +202,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							<div class ='nav-text'>P&L</div>
 					</div><?php }?>
 					<?php if(isset($Privileges['Proposal']) && $Privileges[ 'Proposal' ][ 'User_Privilege' ] >= 4){
-					?><div tab='proposals' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-proposals.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='proposals' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='proposals.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
 							<div class ='nav-text'>Proposals</div>
 					</div><?php }?>
@@ -235,7 +235,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							<div class ='nav-text'>Service</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Ticket' ]) && $Privileges[ 'Ticket' ][ 'User_Privilege' ] >= 4){
-					?><div tab='tickets' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'tickets.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='tickets' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='tickets.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
 							<div class ='nav-text'>Tickets</div>
 					</div><?php }?>
@@ -245,12 +245,12 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							<div class ='nav-text'>Timeline</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Unit' ]) && $Privileges[ 'Unit' ][ 'User_Privilege' ] >= 4){
-					?><div tab='units' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'units.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='units' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='units.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 							<div class ='nav-text'>Units</div>
 					</div><?php }?>
 					<?php if(isset($Privileges[ 'Violation' ]) && $Privileges[ 'Violation' ][ 'User_Privilege' ] >= 4){
-					?><div tab='violations' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-violations.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
+					?><div tab='violations' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='violations.php?Location=<?php echo $Location[ 'Name' ];?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 							<div class ='nav-text'>Violations</div>
 					</div><?php }?>
@@ -280,4 +280,4 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 </div>
 </body>
 </html><?php }
-}} else {?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>

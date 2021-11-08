@@ -70,12 +70,12 @@ $(document).ready(function( ){
         orderCellsTop  : true,
         autoWidth      : true,
         //stateSave      : true,
-        /*responsive     : {
+        responsive     : {
           details : {
             type   : 'column',
             target : 0
           }
-        },*/
+        },
         select         : {
           style : 'multi',
           selector : 'td.ID'

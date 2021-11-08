@@ -1,6 +1,6 @@
 function search( link ){
     var api = link.api();
-    $('input[name="Search"]', api.table().container())
+    $('input:visible[name="Search"]', api.table().container())
         .typeahead({
             minLength : 4,
             highlight : 1,
@@ -10,20 +10,20 @@ function search( link ){
                     url : 'bin/php/get/search/Locations.php',
                     method : 'GET',
                     data    : {
-                        search : $('input[name="Search"]').val(),
-                        ID :  $('input[name="ID"]').val( ),
-                        Customer :  $('input[name="Customer"]').val( ),
-                        Name :  $('input[name="Name"]').val( ),
-                        Type : $('select[name="Type"]').val( ),
-                        Division : $('select[name="Division"]').val( ),
-                        Route : $('select[name="Route"]').val( ),
-                        Street : $('input[name="Street"]').val( ),
-                        City :  $('input[name="City"]').val( ),
-                        Street :  $('input[name="Street"]').val( ),
-                        State :  $('input[name="State"]').val( ),
-                        Zip :  $('select[name="Zip"]').val( ),
-                        Status : $('select[name="Status"]').val( ),
-                        Maintaiend : $('select[name="Maintained"]').val( )
+                        search : $('input:visible[name="Search"]').val(),
+                        ID :  $('input:visible[name="ID"]').val( ),
+                        Customer :  $('input:visible[name="Customer"]').val( ),
+                        Name :  $('input:visible[name="Name"]:visible').val( ),
+                        Type : $('select:visible[name="Type"]').val( ),
+                        Division : $('select:visible[name="Division"]').val( ),
+                        Route : $('select:visible[name="Route"]').val( ),
+                        Street : $('input:visible[name="Street"]').val( ),
+                        City :  $('input:visible[name="City"]').val( ),
+                        Street :  $('input:visible[name="Street"]').val( ),
+                        State :  $('input:visible[name="State"]').val( ),
+                        Zip :  $('select:visible[name="Zip"]').val( ),
+                        Status : $('select:visible[name="Status"]').val( ),
+                        Maintaiend : $('select:visible[name="Maintained"]').val( )
                     },
                     dataType : 'json',
                     success : function( data ){
@@ -36,8 +36,8 @@ function search( link ){
             afterSelect: function( value ){
                 var FieldName = value.split( ' => ' )[ 0 ];
                 var FieldValue = value.split( ' => ' )[ 1 ];
-                $( 'input[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
-                $( 'input[name="Search"]').val( '' );
+                $( 'input:visible[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
+                $( 'input:visible[name="Search"]').val( '' );
             }
         }
     );
@@ -78,19 +78,19 @@ $(document).ready(function( ){
                             column : d.order[0].column,
                             dir : d.order[0].dir
                         },
-                        ID :  $('input[name="ID"]').val( ),
-                        Name :  $('input[name="Name"]').val( ),
-                        Customer :  $('input[name="Customer"]').val( ),
-                        Type : $('select[name="Type"]').val( ),
-                        Division : $('select[name="Division"]').val( ),
-                        Route : $('select[name="Route"]').val( ),
-                        Street : $('input[name="Street"]').val( ),
-                        City :  $('input[name="City"]').val( ),
-                        Street :  $('input[name="Street"]').val( ),
-                        State :  $('input[name="State"]').val( ),
-                        Zip :  $('input[name="Zip"]').val( ),
-                        Status : $('select[name="Status"]').val( ),
-                        Maintained : $('select[name="Maintained"]').val( )
+                        ID :  $('input:visible[name="ID"]').val( ),
+                        Name :  $('input:visible[name="Name"]').val( ),
+                        Customer :  $('input:visible[name="Customer"]').val( ),
+                        Type : $('select:visible[name="Type"]').val( ),
+                        Division : $('select:visible[name="Division"]').val( ),
+                        Route : $('select:visible[name="Route"]').val( ),
+                        Street : $('input:visible[name="Street"]').val( ),
+                        City :  $('input:visible[name="City"]').val( ),
+                        Street :  $('input:visible[name="Street"]').val( ),
+                        State :  $('input:visible[name="State"]').val( ),
+                        Zip :  $('input:visible[name="Zip"]').val( ),
+                        Status : $('select:visible[name="Status"]').val( ),
+                        Maintained : $('select:visible[name="Maintained"]').val( )
                     };
                     return d;
                 }

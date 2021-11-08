@@ -3,8 +3,8 @@
   width            : 100%;
   position         : fixed;
   margin-bottom    : 0px !important;
+  z-index          : 100;
 }
-.navbar-header { width : 100% !important; }
 .navbar-header a { color : white !important; }
 .navbar-header a.logout, .navbar-header .row .col-sm-2 {
   text-align:right;

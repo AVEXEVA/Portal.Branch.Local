@@ -57,12 +57,14 @@ if( $result ){
   }
 }
 ?>
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="border-color:#151515 !important;margin-bottom: 0 !important;;background-color:#151515;color:white;z-index:1;">
-    <div class="navbar-header" style="float:left;">
-        <a class="navbar-brand BankGothic" href="home.php" style='font-size:30px;color:white;'>
+<nav class="navbar navbar-default navbar-static-top row" role="navigation">
+    <div class="navbar-header col-9">
+        <a class="navbar-brand BankGothic" href="index.php">
             <img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='padding-right:5px;' align='left' />
-           <span style='font-size:20px;'><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></span>
+           	<span><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></span>
         </a>
     </div>
-	<div style='clear:both;'></div>
+	<div class='col-3'>
+		<a class='text-white' href='login.php?Logout'>Logout <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a>
+	</div>
 </nav>
