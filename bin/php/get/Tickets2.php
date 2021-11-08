@@ -3,10 +3,10 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
 		'read_and_close' => true
 	] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+   	require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $Connection = $database->query(
+    $Connection = \singleton\database::getInstance( )->query(
     	null,
     	"	SELECT 	Top 1 
     				*
@@ -19,7 +19,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
     $Connection = sqlsrv_fetch_array($Connection);
-	$User    = $database->query(
+	$User    = \singleton\database::getInstance( )->query(
 		null,
 		"	SELECT 	Top 1 
 					Emp.*,
@@ -32,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
 	$User = sqlsrv_fetch_array( $User );
-	$r = $database->query(
+	$r = \singleton\database::getInstance( )->query(
 		null,
 		"	SELECT 	Privilege.Access_Table,
 				   	Privilege.User_Privilege,
@@ -57,11 +57,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if( !isset( $Connection[ 'ID' ] ) || !$Privileged ){ print json_encode( array( 'data' => array( ) ) );}
 	else {
 		$output = array(
-	        'sEcho'         => isset( $_GET[ 'draw' ] ) ? intval( $_GET[ 'draw' ] ) : 1,
-	        'iTotalRecords'     =>  0,
+	        'sEcho'         		=> isset( $_GET[ 'draw' ] ) ? intval( $_GET[ 'draw' ] ) : 1,
+	        'iTotalRecords'     	=>  0,
 	        'iTotalDisplayRecords'  =>  0,
-	        'aaData'        =>  array(),
-	        'options' => array( )
+	        'aaData'        		=>  array(),
+	        'options' 				=> array( )
 	    );
 
 	    $Statuses = array(
@@ -308,7 +308,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			) AS Tbl 
 			WHERE 		Tbl.ROW_COUNT >= ?
 					AND Tbl.ROW_COUNT <= ?;";
-		$rResult = $database->query(
+		$rResult = \singleton\database::getInstance( )->query(
 			null,
 			$Query,
 			$parameters
@@ -375,7 +375,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
 			WHERE 		({$conditions}) AND ({$search});";
 
-	    $stmt = $database->query( 
+	    $stmt = \singleton\database::getInstance( )->query( 
 	    	null, 
 	    	$sQueryRow, 
 	    	$parameters
@@ -394,7 +394,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	                		FROM 	TicketD
 	                	)
 	            	) AS Ticket;";
-	    $rResultTotal = $database->query(
+	    $rResultTotal = \singleton\database::getInstance( )->query(
 	    	null,  
 	    	$sQuery, 
 	    	array( $User[ 'ID' ] )
@@ -403,7 +403,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    $iTotal = $aResultTotal[0];
 
 	    $Types = array( );
-	    $result = $database->query(
+	    $result = \singleton\database::getInstance( )->query(
 	    	null,
 	    	"	SELECT 	JobType.ID,
 	    				JobType.Type

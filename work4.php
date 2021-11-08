@@ -1,8 +1,12 @@
 <?php
-if(session_id() == '' || !isset($_SESSION) ){ session_start( [ 'read_and_close' => true ] ); }
-require('bin/php/index.php');
+if( session_id( ) == '' || !isset($_SESSION)) { 
+    session_start( [
+    'read_and_close' => true
+  ] ); 
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(
+  $result = $database->query(
     null,
     " SELECT *
 		  FROM   Connection
@@ -13,8 +17,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $_SESSION['Hash']
     )
   );
-  $Connection = sqlsrv_fetch_array( $r, SQLSRV_FETCH_ASSOC );
-  $r = $database->query(
+  $Connection = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC );
+  $result = $database->query(
     null,
     " SELECT  *,
   		        Emp.fFirst AS First_Name,
@@ -25,8 +29,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $_SESSION['User']
     )
   );
-  $User = sqlsrv_fetch_array($r);
-	$r = $database->query(
+  $User = sqlsrv_fetch_array($result);
+	$result = $database->query(
     null,
     " SELECT *
 		  FROM   Privilege
@@ -34,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     array( $_SESSION['User'] ) 
   );
   $Privileges = array();
-	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
     if(	!isset($Connection['ID'])
 	   	|| !isset($Privileges['Ticket'])
 	  		|| $Privileges['Ticket']['User_Privilege']  < 4
@@ -53,9 +57,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <?php require('bin/php/meta.php');?>
     <title>Nouveau Elevator Portal</title>
-    <?php require('bin/css/index.php');?>
     <style>
     table#Table_Tickets tbody tr { height:50px; }
     table#Table_Tickets tbody tr td { padding:5px; padding-top:12.5px; }
@@ -74,50 +76,52 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     table.dataTable tr.dtrg-group.dtrg-level-1 td,table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#5d5d5d;color:white;padding-top:0.25em;padding-bottom:0.25em;padding-left:2em;font-size:0.9em}
     /*table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#1d1d1d;color:white;}*/
     </style>
-    <?php require('bin/js/index.php');?>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php require( bin_meta . 'index.php' );?>
+    <?php require( bin_css . 'index.php' );?>
+    <?php require( bin_js  . 'index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
-  <div id='wrapper' style='background-color:#1d1d1d !important;color:white !important;'>
-    <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+  <div id='wrapper'>
+    <?php require( bin_php . 'element/navigation/index.php');?>
     <?php require( bin_php . 'element/loading.php');?>
     <div id='page-wrapper' class='content'>
-		  <div class='panel panel-primary' style='margin-bottom:0px;'>
-				<div class='panel-heading'>
-          <div class='row'>
-            <div class='col-xs-10'><?php echo ucfirst(strtolower($User['First_Name'])) . ' ' . ucfirst(strtolower($User['Last_Name']));?>'s Tickets</div>
-            <div class='col-xs-2' style='text-align:right;' onClick='document.location.href="ticket.php";'><i class='fa fa-plus fa-fw fa-1x'></i></div>
-            <div style='clear:both;'></div>
-          </div>
-        </div>
-  			<div class='panel-body'>
-          <table id='Table_Tickets' class='display' cellspacing='0' width='100%' style='<?php if(isMobile()){?>font-size:10px;<?php }?>font-weight:bold;'>
+		  <div class='card card-full card-primary border-0'>
+				<div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Work</h4></div>
+  			<div class='card-body bg-dark'>
+          <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
   					<thead>
-              <th title='Location'></th>
-              <th title='ID'>ID</th>
-              <th title='Status'>Status</th>
-              <th title='Date'>Date</th>
-              <th title='Unit'>Unit</th>
-  						<th title='Type'>Type</th>
-              <th title='Priority'>Priority</th>
+              <th class='text-white border border-white' title='Location'></th>
+              <th class='text-white border border-white' title='ID'>ID</th>
+              <th class='text-white border border-white' title='Status'>Status</th>
+              <th class='text-white border border-white' title='Date'>Date</th>
+              <th class='text-white border border-white' title='Unit'>Unit</th>
+  						<th class='text-white border border-white' title='Type'>Type</th>
+              <th class='text-white border border-white' title='Priority'>Priority</th>
   					</thead>
   				</table>
   			</div>
       </div>
     </div>
   </div>
-  <script src='https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js'></script>
-  <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
-  <?php require('bin/js/datatables.php');?>
-  <style></style>
-  <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
-  <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
   <script>
     var grouping_id = 5;
     var grouping_name = 'Level';
     var collapsedGroups = [];
     var groupParent = [];
     var Table_Tickets = $('#Table_Tickets').DataTable( {
-      dom: 'tp',
+      dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+      processing     : true,
+      serverSide     : true,
+      searching      : false,
+      lengthChange   : false,
+      scrollResize   : true,
+      scrollY        : 100,
+      scroller       : false,
+      scrollCollapse : false,
+      paging         : false,
+      orderCellsTop  : true,
+      autoWidth      : true,
       ajax: {
         url: 'bin/php/get/Work2.php',
         dataSrc:function(json){
@@ -206,9 +210,70 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           return $('<tr/>').append('<td colspan="'+rows.columns()[0].length+'">' + group  + ' ( ' + rows.count() + ' total' + newString + ' ) </td>').append('<td></td>').attr('data-name', groupAll).toggleClass('collapsed', collapsed);
         }
       },
-      drawCallback : function ( settings ) { 
-        hrefTickets( ); 
-      }
+      buttons: [
+        {
+            text: 'Email Ticket',
+            action: function ( e, dt, node, config ) {
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                $.ajax({
+                    url : 'bin/php/post/emailTicket.php',
+                    method : 'POST',
+                    data : {
+                        email : prompt( "What email would you like to send the ticket to?"),
+                        data : dte
+                    },
+                    success : function( response ){
+                        console.log( response );
+                    }
+                });
+            }
+        },{
+            text: 'Reset Search',
+            action: function ( e, dt, node, config ) {
+                $( 'input, select' ).each( function( ){
+                    $( this ).val( '' );
+                } );
+                Table_Tickets.draw( );
+            }
+        },{
+            text : 'Get URL',
+            action : function( e, dt, node, config ){
+                var d = { };
+                d.ID             = $('input[name="ID"]').val( );
+                d.Person         = $('input[name="Person"]').val( );
+                d.Customer       = $('input[name="Customer"]').val( );
+                d.Location       = $('input[name="Location"]').val( );
+                d.Unit           = $('input[name="Unit"]').val( );
+                d.Job            = $('input[name="Job"]').val( );
+                d.Type           = $('select[name="Type"]').val( );
+                d.Level          = $('select[name="Level"]').val( ); 
+                d.Status         = $('select[name="Status"]').val( );
+                d.Start_Date     = $('input[name="Start_Date"]').val( );
+                d.End_Date       = $('input[name="End_Date"]').val( );
+                d.Time_Route_Start     = $('input[name="Time_Route_Start"]').val( );
+                d.Time_Route_End       = $('input[name="Time_Route_End"]').val( );
+                d.Time_Site_Start     = $('input[name="Time_Site_Start"]').val( );
+                d.Time_Site_End       = $('input[name="Time_Site_End"]').val( );
+                d.Time_Completed_Start     = $('input[name="Time_Completed_Start"]').val( );
+                d.Time_Completed_End       = $('input[name="Time_Completed_End"]').val( );
+                d.LSD       = $('select[name="LSD"]').val( );
+                document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
+            }
+        },
+        { 
+          text: 'create',
+          action : function( e, dt, node, config ){ document.location.href = 'ticket.php'; }
+        },
+        {
+            text: 'Print',
+            action: function ( e, dt, node, config ) {
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                document.location.href = 'print_tickets.php?Tickets=' + dte.join( ',' );
+            }
+        }
+        ]
     } );
     $('tbody').on('click', 'tr.dtrg-start', function () {
         var name = $(this).data('name');
@@ -222,4 +287,4 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=work4.php';</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href='../login.php?Forward=work.php';</script></head></html><?php }?>

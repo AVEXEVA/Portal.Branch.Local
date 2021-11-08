@@ -10,14 +10,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $_SESSION[ 'Version' ] = isset( $_GET[ 'Version' ] ) ? $_GET[ 'Version' ] : $_SESSION[ 'Version' ];
     switch( isset( $_GET[ 'Version' ] ) ? $_GET[ 'Version' ] : $_SESSION[ 'Version' ] ){
       case 'Beta' : 
-        require('tickets5.php');
+        require('tickets1.php');
         break;
       case 'Live':
-        require('tickets5.php');
+        require('tickets1.php');
         break;
     }
   } else {
-    require('tickets5.php');
+    require('tickets1.php');
   }
 } else {
   ?><script>document.location.href="../login.php?Forward=tickets.php?<?php echo http_build_query( $_GET );?>";</script><?php

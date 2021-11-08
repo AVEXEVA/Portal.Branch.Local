@@ -79,7 +79,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Tickets</h4></div>
                 <div class="card-body bg-dark">
                     <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
+                        <thead><tr class='text-center'>
                             <th class='text-white border border-white' title='ID'>ID</th>
                             <th class='text-white border border-white' title='Person'>Person</th>
                             <th class='text-white border border-white' title='Customer'>Customer</th>
@@ -188,4 +188,4 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 </body>
 </html>
 <?php }
-}?>
+} else {?><script>document.location.href='../login.php?Forward=tickets.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>

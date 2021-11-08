@@ -9,7 +9,7 @@
 <script data-pagespeed-no-defer src="https://www.nouveauelevator.com/vendor/datatables-responsive/dataTables.responsive.js"></script>
 <!--<script data-pagespeed-no-defer src=https://www.nouveauelevator.com/portal/bin//js/jquery.dataTables.yadcf.js"></script>-->
 
-
+<script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
 
 <!--<script src='//cdn.datatables.net/plug-ins/1.11.3/features/pageResize/dataTables.pageResize.min.js'></script>-->
 <script src='https://cdn.datatables.net/scroller/2.0.5/js/dataTables.scroller.min.js'></script>

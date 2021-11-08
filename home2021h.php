@@ -40,8 +40,8 @@ $image_result = $database->query(
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php require( bin_meta . 'index.php' );?>
   <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+  <?php require( bin_meta . 'index.php' );?>
   <?php require( bin_css  . 'index.php' );?>
   <?php require( bin_js   . 'index.php' );?>
 </head>

@@ -10,14 +10,14 @@ if( isset( $_SESSION[ 'User' ] ) ){
     $_SESSION[ 'Version' ] = isset( $_GET[ 'Version' ] ) ? $_GET[ 'Version' ] : $_SESSION[ 'Version' ];
     switch( isset( $_GET[ 'Version' ] ) ? $_GET[ 'Version' ] : $_SESSION[ 'Version' ] ){
       case 'Beta' : 
-        require('units2.php');
+        require('units1.php');
         break;
       case 'Live':
-        require('units2.php');
+        require('units1.php');
         break;
     }
   } else {
-    require('units2.php');
+    require('units1.php');
   }
 } else {
   ?><script>document.location.href='../login.php?Forward=units.php';</script><?php

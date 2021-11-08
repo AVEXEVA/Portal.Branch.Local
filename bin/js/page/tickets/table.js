@@ -54,7 +54,7 @@ $(document).ready(function( ){
     var Editor_Tickets = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
-        table    : '#Table_Contracts'
+        table    : '#Table_Tickets'
     } );
     var Table_Tickets = $('#Table_Tickets').DataTable( {
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",

@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Locations</h4></div>
                 <div class="card-body bg-dark">
 					<table id='Table_Locations' class='display' cellspacing='0' width='100%'>
-						<thead><tr>
+						<thead><tr class='text-center'>
 							<th class='text-white border border-white' title='ID'>ID</th>
 							<th class='text-white border border-white' title='Name'>Name</th>
 							<th class='text-white border border-white' title='Customer'>Customer</th>
@@ -90,9 +90,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							<th class='text-white border border-white' title='Maintained'>Maintained</th>
 							<th class='text-white border border-white' title='Status'>Status</th>
 						</tr><tr>
-							<th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' /></th>
-							<th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' /></th>
-							<th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' /></th>
+							<th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
 							<th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
 								<option value=''>Select</option>
 								<?php 
@@ -135,12 +135,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 									if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['ID'];?>'><?php echo $row[ 'Name' ];?> - <?php echo $row['Mechanic'];?></option><?php } }
 								?>
 							</select></th>
-							<th class='text-white border border-white' title='Street'><input class='redraw form-control' type='text' name='Street' /></th>
-							<th class='text-white border border-white' title='City'><input class='redraw form-control' type='text' name='City' /></th>
-							<th class='text-white border border-white' title='State'><input class='redraw form-control' type='text' name='State' /></th>
-							<th class='text-white border border-white' title='Zip'><input class='redraw form-control' type='text' name='Zip' /></th>
-							<th class='text-white border border-white' title='Units'><input disabled class='redraw form-control' type='text' name='Units' /></th>
-							<th class='text-white border border-white' title='Maintained'><select class='redraw form-control' name='Status'>
+							<th class='text-white border border-white' title='Street'><input class='redraw form-control' type='text' name='Street' value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='City'><input class='redraw form-control' type='text' name='City' value='<?php echo isset( $_GET[ 'City' ] ) ? $_GET[ 'City' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='State'><input class='redraw form-control' type='text' name='State' value='<?php echo isset( $_GET[ 'State' ] ) ? $_GET[ 'State' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Zip'><input class='redraw form-control' type='text' name='Zip' value='<?php echo isset( $_GET[ 'Zip' ] ) ? $_GET[ 'Zip' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Units'><input disabled class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Maintained'><select class='redraw form-control'  name='Status'value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' >
 			                	<option value=''>Select</option>
 			                	<option value='0'>Active</option>
 			                	<option value='1'>Inactive</option>
