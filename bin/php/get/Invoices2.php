@@ -1,6 +1,6 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -36,69 +36,66 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
     if( isset( $Privileges[ 'Invoice' ] )
+        && $Privileges[ 'Invoice' ][ 'User_Privilege' ]  >= 4
+        && $Privileges[ 'Invoice' ][ 'Group_Privilege' ]  >= 4
         && $Privileges[ 'Invoice' ][ 'Other_Privilege' ]  >= 4
     ){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-    $conn = null;
-
-    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
-    $Start = $_GET['iDisplayStart'];
-    $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
 
     $conditions = array( );
     $search = array( );
-    $params = array( );
+    $parameters = array( );
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
-        $params[] = $_GET['Customer'];
+        $parameters[] = $_GET['Customer'];
         $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-        $params[] = $_GET['Location'];
+        $parameters[] = $_GET['Location'];
         $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
-        $params[] = $_GET['Job'];
+        $parameters[] = $_GET['Job'];
         $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
-    } 
-    if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
-      $params[] = $_GET['Search'];
+    }
+    /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
+
+      $parameters[] = $_GET['Search'];
       $search[] = "Invoice.Ref LIKE '%' + ? + '%'";
-      
-      $params[] = $_GET['Search'];
+
+      $parameters[] = $_GET['Search'];
       $search[] = "Invoice.fDesc LIKE '%' + ? + '%'";
 
-      $params[] = $_GET['Search'];
+      $parameters[] = $_GET['Search'];
       $search[] = "Customer.Name LIKE '%' + ? + '%'";
 
-      $params[] = $_GET['Search'];
+      $parameters[] = $_GET['Search'];
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
 
-      $params[ ] = $_GET[ 'Search' ];
+      $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "Job.ID LIKE '%' + ? + '%'";
 
-      $params[ ] = $_GET[ 'Search' ];
+      $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "Job.fDesc LIKE '%' + ? + '%'";
-      
-      $params[ ] = $_GET[ 'Search' ];
-      $search[ ] = "JobType.Type LIKE '%' + ? + '%'";
-    }
 
+      $parameters[ ] = $_GET[ 'Search' ];
+      $search[ ] = "JobType.Type LIKE '%' + ? + '%'";
+    }*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    $params[] = $Start;
-    $params[] = $End;
+
+    /*ROW NUMBER*/
+		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+
     $Columns = array(
         0 =>  'Invoice.Ref',
         1 =>  'Customer.Name',
@@ -131,75 +128,59 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Invoice.Amount AS Original,
                             OpenAR.Balance AS Balance,
                             Invoice.fDesc AS Description
-                    FROM    Invoice 
+                    FROM    Invoice
                             LEFT JOIN OpenAR ON OpenAR.Ref  = Invoice.Ref
                             LEFT JOIN Loc AS Location ON Invoice.Loc  = Location.Loc
                             LEFT JOIN (
                                 SELECT  Owner.ID AS ID,
                                         Rol.Name AS Name
-                                FROM    Owner 
+                                FROM    Owner
                                         LEFT JOIN Rol ON Owner.Rol = Rol.ID
                             ) AS Customer ON Location.Owner   = Customer.ID
                             LEFT JOIN Job          ON Invoice.Job = Job.ID
-                            LEFT JOIN JobType      ON Job.Type    = JobType.ID      
+                            LEFT JOIN JobType      ON Job.Type    = JobType.ID
                     WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $params 
+      $conn,
+      $sQuery,
+      $parameters
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                Invoice.Ref AS ID,
-                Customer.Name AS Customer,
-                Location.Tag AS Location,
-                Job.fDesc AS Job,
-                JobType.Type AS Type,
-                Invoice.fDate AS Date,
-                OpenAR.Due AS Due,
-                Invoice.Amount AS Original,
-                OpenAR.Balance AS Balance,
-                Invoice.fDesc AS Description
-        FROM    Invoice 
-                LEFT JOIN OpenAR ON OpenAR.Ref  = Invoice.Ref
-                LEFT JOIN Loc AS Location ON Invoice.Loc  = Location.Loc
-                LEFT JOIN (
-                    SELECT  Owner.ID AS ID,
-                            Rol.Name AS Name
-                    FROM    Owner 
-                            LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                ) AS Customer ON Location.Owner   = Customer.ID
-                LEFT JOIN Job          ON Invoice.Job = Job.ID
-                LEFT JOIN JobType      ON Job.Type    = JobType.ID      
-        WHERE   ({$conditions}) AND ({$search});";
-    $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = $database->query( $conn, $sQueryRow , $params, $options ) or die(print_r(sqlsrv_errors()));
+    $sQueryRow = "SELECT  Count( Invoice.Ref ) AS Count
+                  FROM    Invoice
+                          LEFT JOIN OpenAR ON OpenAR.Ref  = Invoice.Ref
+                          LEFT JOIN Loc AS Location ON Invoice.Loc  = Location.Loc
+                          LEFT JOIN (
+                              SELECT  Owner.ID AS ID,
+                                      Rol.Name AS Name
+                              FROM    Owner
+                                      LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                          ) AS Customer ON Location.Owner   = Customer.ID
+                          LEFT JOIN Job          ON Invoice.Job = Job.ID
+                          LEFT JOIN JobType      ON Job.Type    = JobType.ID
+                  WHERE   ({$conditions}) AND ({$search});";
+    $stmt = $database->query( $conn, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
-    $iFilteredTotal = sqlsrv_num_rows( $stmt );
+    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
-    $params = array(
-      $DateStart,
-      $DateEnd
-    );
     $sQuery = " SELECT  COUNT( Invoice.Ref )
                 FROM    Invoice;";
-    $rResultTotal = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = $database->query($conn,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
     $output = array(
-        'sEcho'         =>  intval($_GET['sEcho']),
+        'sEcho'         =>  intval($_GET[ 'draw' ] ),
         'iTotalRecords'     =>  $iTotal,
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-        $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
+        $Row[ 'Date' ] = date(17 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
         $Row[ 'Due' ] = date( 'm/d/Y', strtotime( $Row[ 'Due' ] ) );
         $Row[ 'Original' ] = '$' . number_format( $Row[ 'Original' ], 2);
         $Row[ 'Balance' ] = '$' . number_format( $Row[ 'Balance' ], 2);
