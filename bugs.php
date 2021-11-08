@@ -4,6 +4,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    //Connection
     $result = $database->query(
         null,
         "   SELECT  *
@@ -16,6 +17,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $Connection = sqlsrv_fetch_array( $result );
+
     //User
     $result = $database->query(
         null,
@@ -29,6 +31,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $result );
+
     //Privileges
 	$result = $database->query(
         null,
@@ -65,130 +68,81 @@ if(     count( $_POST ) > 0
   );
   $result = $database->query(
     $Portal,
-    " INSERT INTO Bug(Name, Severity, Description, Suggestion)
-      VALUES(?,?,?,?);",
+    " INSERT INTO Bug( Name, Severity, Description, Suggestion )
+      VALUES( ?, ?, ?, ? );",
     $Parameters
   );
 }?><!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <?php require( PROJECT_ROOT . 'php/meta.php' );?>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require('bin/css/index.php');?>
-    <style>
-      .form-group>label:first-child {
-          min-width  : 175px;
-          text-align : right;
-      }
-      .hoverGray:hover {
-          background-color : gold !important;
-      }
-      table#Table_Bugs tbody tr, table#Table_Bugs tbody tr td a {
-          color : black !important;
-      }
-      table#Table_Bugs tbody tr:nth-child( even ) {
-          background-color : rgba( 240, 240, 240, 1 ) !important;
-      }
-      table#Table_Bugs tbody tr:nth-child( odd ) {
-          background-color : rgba( 255, 255, 255, 1 ) !important;
-      }
-      .paginate_button {
-        background-color : rgba( 255, 255, 255, .7 ) !important;
-      }
-      .paginate_button:hover {
-        color : white !important;
-      }
-      </style>
-    <?php require( PROJECT_ROOT . 'js/index.php' );?>
+    <?php require( bin_meta . 'index.php' );?>
+    <?php require( bin_css  . 'index.php');?>
+    <?php require( bin_js   . 'index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
-    <div id="wrapper">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+    <div id='wrapper'>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-          <div class="panel panel-primary">
-            <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
-                <div class='panel-body no-print' id='Filters' style='border-bottom:1px solid #1d1d1d;'>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='form-group row'>
-                        <label class='col-auto'>Search:</label>
-                        <div class='col-auto'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='form-group row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='form-group row'>
-                        <label class='col-auto'>ID:</label>
-                        <div class='col-auto'><input type='text' name='ID' placeholder='ID' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='form-group row'>
-                        <label class='col-auto'>Name:</label>
-                        <div class='col-auto'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='form-group row'>
-                        <label class='col-auto'>Description:</label>
-                        <div class='col-auto'><input type='text' name='Description' placeholder='Description' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='form-group row'>
-                        <label class='col-auto'>Severity:</label>
-                        <div class='col-auto'><select name='Severity' onChange='redraw( );'>
-                            <option value=''>Select</option>
-                            <?php 
-                                $result = $database->query( 
-                                    $Portal,
-                                    "   SELECT  *
-                                        FROM    Portal.dbo.Severity;",
-                                    array( )
-                                ); 
-                                if( $result ){ while( $row = sqlsrv_Fetch_array( $result ) ){ ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
-                            ?>
-                        </select></div>
-                    </div>
-                    <div class='form-group row'><div class='col-auto'>&nbsp;</div></div>
-                </div>
-                <div class='panel-body'>
-                    <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Severity</th>
-                            <th>Suggestion</th>
-                            <th>Resolution</th>
-                            <th>Fixed</th>
-                        </tr></thead>
-                    </table>
-                </div>
+        <div id='page-wrapper' class='content'>
+          <div class='card card-full card-primary'>
+            <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Bugs</h4></div>
+            <div class='card-body bg-dark'>
+                <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
+                    <thead><tr>
+                        <th class='text-white border border-white'>ID</th>
+                        <th class='text-white border border-white'>Name</th>
+                        <th class='text-white border border-white'>Description</th>
+                        <th class='text-white border border-white'>Severity</th>
+                        <th class='text-white border border-white'>Suggestion</th>
+                        <th class='text-white border border-white'>Resolution</th>
+                        <th class='text-white border border-white'>Fixed</th>
+                    </tr><tr>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></th>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Severity' placeholder='Severity' value='<?php echo isset( $_GET[ 'Severity' ] ) ? $_GET[ 'Severity' ] : null;?>' /></th>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Suggestion' placeholder='Suggestion' value='<?php echo isset( $_GET[ 'Suggestion' ] ) ? $_GET[ 'Suggestion' ] : null;?>' /></th>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Resolution' placeholder='Resolution' value='<?php echo isset( $_GET[ 'Resolution' ] ) ? $_GET[ 'Resolution' ] : null;?>' /></th>
+                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Fixed' placeholder='Fixed' value='<?php echo isset( $_GET[ 'Fixed' ] ) ? $_GET[ 'Fixed' ] : null;?>' /></th>
+                    </tr></thead>
+                </table>
             </div>
         </div>
-    </div>
-  
-  <?php require(PROJECT_ROOT.'js/datatables.php');?>
-  
-  <script>
+    </div>  
+    <script>
     var Table_Bugs = $('#Table_Bugs').DataTable( {
-        dom        : 'tp',
-        processing : true,
-        serverSide : true,
-        responsive : true,
-        autoWidth  : false,
-        paging     : true,
-        searching  : false,
+        dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+        processing     : true,
+        serverSide     : true,
+        searching      : false,
+        lengthChange   : false,
+        scrollResize   : true,
+        scrollY        : 100,
+        scroller       : true,
+        scrollCollapse : true,
+        paging         : true,
+        orderCellsTop  : true,
+        autoWidth      : true,
         ajax       : {
-        url : 'bin/php/get/Bugs.php',
-        data : function( d ){
-            d = {
+            url : 'bin/php/get/Bugs.php',
+            data : function( d ){
+                d = {
                     start : d.start,
                     length : d.length,
                     order : {
-                        column : d.order[0].column,
-                        dir : d.order[0].dir
-                    } 
+                    column : d.order[0].column,
+                    dir : d.order[0].dir
+                } 
                 };
-                d.Search = $('input[name="Search"]').val( );
                 d.ID = $('input[name="ID"]').val( );
                 d.Name = $('input[name="Name"]').val( );
                 d.Description = $('input[name="Description"]').val( );
-                d.Severity = $('select[name="Severity"]').val( );
+                d.Severity = $('input[name="Severity"]').val( );
+                d.Suggestion = $('input[name="Suggestion"]').val( );
+                d.Resolution = $('input[name="Resolution"]').val( );
+                d.Fixed = $('input[name="Fixed"]').val( );
                 return d;
             }
         },
@@ -210,13 +164,9 @@ if(     count( $_POST ) > 0
             }
         ]
     } );
-    function redraw( ){ Table_Bugs.draw(); }
-    function hrefBugs(){hrefRow('Table_Bugs','bug');}
-    $('Table#Table_Bugs').on('draw.dt',function(){hrefBugs();});
-  </script>
+    </script>
 </body>
 </html>
  <?php
     }
-} else {
-?><html><head><script>document.location.href='../login.php?Forward=profile.php';</script></head></html><?php }?>
+} else {?><script>document.location.href='../login.php?Forward=bugs.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>

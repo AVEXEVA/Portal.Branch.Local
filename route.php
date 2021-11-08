@@ -78,7 +78,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 <body onload='finishLoadingPage();' style='overflow-y:scroll;height:100%;background-color:#1d1d1d !important;color:white !important;'>
     <div id="wrapper" style='height:100%;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
             <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>

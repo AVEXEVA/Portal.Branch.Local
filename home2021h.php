@@ -46,7 +46,7 @@ $image_result = $database->query(
   <?php require( bin_js   . 'index.php' );?>
 </head>
 <body onload='finishLoadingPage();' >
-  <?php require( bin_php . 'element/navigation/index.php');?>
+  <?php require( bin_php . 'element/navigation.php');?>
   <?php require( bin_php . 'element/loading.php');?>
   <div id='page-wrapper' class='content'>
     <section id='account-menu' style='padding:50px;background-color:#0f0f0f;'>
@@ -414,18 +414,6 @@ $image_result = $database->query(
           <div class ='nav-text'>Work</div>
         </div>
       </div>
-      <?php if(isset($Privileges['Admin']) && $Privileges['Admin']['Other_Privilege'] >= 7){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='interface.php'">
-        <div class='p-1 border border-white'>
-          <div class='nav-icon'><i class="fa fa-user-secret fa-3x fa-fw" aria-hidden="true"></i></div>
-          <div class ='nav-text'>Beta</div>
-        </div>
-      </div><?php }?>
-      <?php if(isset($Privileges['Admin']) && $Privileges['Admin']['Other_Privilege'] >= 7){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='../portal2/'">
-        <div class='p-1 border border-white'>
-          <div class='nav-icon'><i class="fa fa-user-secret fa-3x fa-fw" aria-hidden="true"></i></div>
-          <div class ='nav-text'>Legacy</div>
-        </div>
-      </div><?php }?>
     </section>
   </div>
 </div>

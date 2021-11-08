@@ -78,7 +78,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
         <div id="page-wrapper" class='content' style='<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>

@@ -67,7 +67,7 @@ while($a= sqlsrv_fetch_array($r)){}
 </head>
 <body onload=''>
     <div id="wrapper">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">

@@ -73,9 +73,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $parameters[] = $_GET['ID'];
       $conditions[] = "Unit.ID LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'City_ID' ] ) && !in_array( $_GET[ 'City_ID' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['City_ID'];
-      $conditions[] = "Unit.State LIKE '%' + ? + '%'";
+    if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Name'];
+      $parameters[] = $_GET['Name'];
+      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.Unit LIKE '%' + ? + '%' )";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -84,10 +85,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Location'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
-    }
-    if( isset($_GET[ 'Building_ID' ] ) && !in_array( $_GET[ 'Building_ID' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Building_ID'];
-      $conditions[] = "Unit.Unit LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Type'];
@@ -136,6 +133,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Unit.ID AS ID,
+                          Unit.State + ' - ' + Unit.Unit AS Name,
                           CASE WHEN Unit.State IN ( null, ' ', '  ' ) THEN 'Untitled' ELSE Unit.State END AS City_ID,
                           Customer.ID AS Customer_ID,
                           Customer.Name AS Customer_Name,
@@ -173,18 +171,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     ) or die(print_r(sqlsrv_errors()));
 
     $sQueryRow = "
-        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                Unit.ID AS ID,
-                CASE WHEN Unit.State IN ( null, ' ', '  ' ) THEN 'Untitled' ELSE Unit.State END AS City_ID,
-                Customer.ID AS Customer_ID,
-                Customer.Name AS Customer_Name,
-                Location.Loc AS Location_ID,
-                Location.Tag AS Location_Name,
-                Unit.Unit AS Building_ID,
-                Unit.Type AS Type,
-                Unit.Status AS Status,
-                Ticket.ID AS Ticket_ID,
-                Ticket.Date AS Ticket_Date
+        SELECT  Count( Unit.ID ) AS Count
         FROM    Elev AS Unit
                 LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                 LEFT JOIN (
@@ -202,10 +189,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
               ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
         WHERE   ({$conditions}) AND ({$search});";
 
-    $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
     $stmt = $database->query( $conn, $sQueryRow , $parameters, $options ) or die(print_r(sqlsrv_errors()));
-
-    $iFilteredTotal = sqlsrv_num_rows( $stmt );
+    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
     $parameters = array(
       $DateStart,

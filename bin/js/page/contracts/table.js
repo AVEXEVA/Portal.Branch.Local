@@ -86,7 +86,7 @@ $( document ).ready( function() {
       selector : 'td.control'
     },
     ajax       : {
-      url : 'bin/php/get/Contracts2.php',
+      url : 'bin/php/get/Contracts.php',
       data : function( d ){
         d = {
             start : d.start,
@@ -112,9 +112,35 @@ $( document ).ready( function() {
         className : 'control',
         data 	: 'ID'
       },{
-        data 	: 'Customer'
+        data : 'Customer_ID',
+        render : function( data, type, row, meta ){
+          switch( type ){
+            case 'display' :
+              return  row.Customer_ID !== null 
+                ?   "<div class='row'>" + 
+                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" + 
+                    "</div>"
+                :   null;
+            default :
+                return data;
+          }
+
+        }
       },{
-        data 	: 'Location'
+          data : 'Location_ID',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.Location_ID !== null 
+                          ?   "<div class='row'>" + 
+                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'>" + row.Location_Name + "</a></div>" + 
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+
+          } 
       },{
         data 	: 'Job'
       },{

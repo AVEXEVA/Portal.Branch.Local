@@ -30,7 +30,7 @@ $( document ).ready( function( ){
 	            };
 	            d.Search 		= $('input[name="Search"]').val();
 	            d.ID 			= $('input[name="ID"]').val( );
-	            d.City_ID 		= $('input[name="City_ID"]').val( );
+	            d.Name 			= $('input[name="Name"]').val( );
 	            d.Customer 		= $('input[name="Customer"]').val( );
 	            d.Location 		= $('input[name="Location"]').val( );
 	            d.Building_ID 	= $('input[name="Building_ID"]').val( );
@@ -43,7 +43,22 @@ $( document ).ready( function( ){
 			{
 				data : 'ID'
 			},{
-				data : 'City_ID'
+				data : 'Name',
+				render : function ( data, type, row, meta ){
+					switch ( type ) {
+						case 'display':
+							if( row.City_ID === null && row.State === null ){
+								return null;
+							} else {
+								return "<div class='row'>" +
+											( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
+											( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
+										"</div>";
+							}
+						default :
+							return data;
+					}
+				}
 			},{
 	            data : 'Customer_ID',
 	            render : function( data, type, row, meta ){
@@ -75,8 +90,6 @@ $( document ).ready( function( ){
 
 	            }
 	        },{
-				data : 'Building_ID'
-			},{
 				data : 'Type'
 			},{
 				data : 'Status',
@@ -127,7 +140,7 @@ $( document ).ready( function( ){
 	                var d = { };
 	                d.Search 		= $('input[name="Search"]').val();
 	                d.ID 			= $('input[name="ID"]').val( );
-	                d.City_ID 		= $('input[name="City_ID"]').val( );
+	                d.Name 			= $('input[name="Name"]').val( );
 	                d.Customer 		= $('input[name="Customer"]').val( );
 	                d.Location 		= $('input[name="Location"]').val( );
 	                d.Building_ID 	= $('input[name="Building_ID"]').val( );

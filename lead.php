@@ -53,7 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload="finishLoadingPage();" id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
 		<br><br>
 	<div class='col-md-6' style=''>

@@ -105,7 +105,7 @@ if(isset($_POST) && Count($_POST) > 0 ){
      <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#white !important;color:black !important;'>
- <?php require(bin_php.'element/navigation/index.php');?>
+ <?php require(bin_php.'element/navigation.php');?>
     <div id="page-wrapper" class='content'>
    <?php if(FALSE){?><div class='col-xs-12'><form style='height:100%;float:left;width:100%;' action='search.php' method='GET'><input name='Keyword' type='text' placeholder='Search' style='height:50px;color:black;width:100%;'/></form></div><?php }?>
 	<div class='panel-white'>

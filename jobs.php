@@ -72,7 +72,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ) {
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper'>
-        <?php require( bin_php . 'element/navigation/index.php'); ?>
+        <?php require( bin_php . 'element/navigation.php'); ?>
         <?php require( bin_php . 'element/loading.php'); ?>
         <div id='page-wrapper' class='content'>
 			<div class='card card-full card-primary'>

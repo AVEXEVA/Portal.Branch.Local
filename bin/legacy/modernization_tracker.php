@@ -98,7 +98,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta name="description" content="">
     <meta name="author" content="Peter D. Speranza">    
 	<title>Nouveau Texas | Portal</title>    
-    <?php require( bin_php . 'element/navigation/index.php');?>
+    <?php require( bin_php . 'element/navigation.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
 <body>

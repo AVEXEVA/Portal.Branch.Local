@@ -84,7 +84,7 @@ if($Mechanic > 0){
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='overflow-x:hidden;'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <div id="page-wrapper">
 				<script>
 					function ($) {

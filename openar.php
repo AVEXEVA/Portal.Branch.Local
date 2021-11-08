@@ -62,7 +62,7 @@ if(isMobile()){?>
 <body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);height:100%;">
     <div id='container' style='min-height:100%;height:100%;'>
 		<div id="wrapper" style='height:100%;'>
-			<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+			<?php require(PROJECT_ROOT.'php/element/navigation.php');?>
 			<?php require( bin_php . 'element/loading.php');?>
 			<div id="page-wrapper" class='content' style='background-color:transparent !important;'>
 				<div class="row">

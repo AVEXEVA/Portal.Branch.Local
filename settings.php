@@ -47,7 +47,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ?>
 </head>
 <body onload='finishLoadingPage();'>
-	<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+	<?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content'>
   		<section class="container">
     		<div class="row">

@@ -57,8 +57,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         $search = array( );
         $parameters = array( );
 
-        if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
-          $parameters[] = $_GET['Customer'];
+        if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Name'];
           $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
         }
         if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
@@ -112,7 +112,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                 Customer_Locations.Count AS Locations,
                                 Customer_Units.Count AS Units,
                                 Customer_Jobs.Count AS Jobs,
-                                Customer_Tickets.Count AS Tickets
+                                Customer_Tickets.Count AS Tickets,
+                                Customer_Violations.Count AS Violations,
+                                Customer_Invoices.Count AS Invoices
                         FROM    (
                                     SELECT  Owner.ID,
                                             Rol.Name,
@@ -145,6 +147,20 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                                 LEFT JOIN Job ON Ticket.Job = Job.ID
                                     GROUP BY    Job.Owner
                                 ) AS Customer_Tickets ON Customer_Tickets.Customer = Customer.ID
+                                LEFT JOIN (
+                                    SELECT      Job.Owner  AS Customer,
+                                                COUNT( Violation.ID ) AS Count 
+                                    FROM        Violation AS Violation
+                                                LEFT JOIN Job ON Violation.Job = Job.ID
+                                    GROUP BY    Job.Owner
+                                ) AS Customer_Violations ON Customer_Violations.Customer = Customer.ID
+                                LEFT JOIN (
+                                    SELECT      Job.Owner  AS Customer,
+                                                COUNT( Invoice.Ref ) AS Count 
+                                    FROM        Invoice AS Invoice
+                                                LEFT JOIN Job ON Invoice.Job = Job.ID
+                                    GROUP BY    Job.Owner
+                                ) AS Customer_Invoices ON Customer_Invoices.Customer = Customer.ID
                         WHERE   {$conditions}
                     ) AS Tbl
                     WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
@@ -189,6 +205,20 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                     LEFT JOIN Job ON Ticket.Job = Job.ID
                         GROUP BY    Job.Owner
                     ) AS Customer_Tickets ON Customer_Tickets.Customer = Customer.ID
+                    LEFT JOIN (
+                        SELECT      Job.Owner  AS Customer,
+                                    COUNT( Violation.ID ) AS Count 
+                        FROM        Violation AS Violation
+                                    LEFT JOIN Job ON Violation.Job = Job.ID
+                        GROUP BY    Job.Owner
+                    ) AS Customer_Violations ON Customer_Violations.Customer = Customer.ID
+                    LEFT JOIN (
+                        SELECT      Job.Owner  AS Customer,
+                                    COUNT( Invoice.Ref ) AS Count 
+                        FROM        Invoice AS Invoice
+                                    LEFT JOIN Job ON Invoice.Job = Job.ID
+                        GROUP BY    Job.Owner
+                    ) AS Customer_Invoices ON Customer_Invoices.Customer = Customer.ID
             WHERE   {$conditions};";
 
         $stmt = \singleton\database::getInstance( )->query( $conn, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));

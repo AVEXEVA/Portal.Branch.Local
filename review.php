@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
-        <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/element/navigation/index.php' );?>
+        <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/element/navigation.php' );?>
         <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/element/loading.php' );?>
         <div id='page-wrapper' class='content'>
             <div class='panel panel-primary'>

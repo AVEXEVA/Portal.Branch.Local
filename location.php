@@ -131,7 +131,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
-        <?php require( bin_php.'element/navigation/index.php');?>
+        <?php require( bin_php.'element/navigation.php');?>
         <?php require( bin_php.'element/loading.php');?>
         <div id="page-wrapper" class='content'>
 			<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='location.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> Location: <?php echo $Location['Name'];?></a></h4>

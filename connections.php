@@ -87,7 +87,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='margin:0px !important;;'>
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='margin:0px !important; padding-top:50px !important'>
             <script>

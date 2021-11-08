@@ -263,7 +263,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </head>
 <body onload='finishLoadingPage();' style='height:100%;background-color:#151515;'>
     <div id="wrapper"  style='height:100%;overflow-x:hidden;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
 		<?php if(!isMobile() && FALSE){?>
         <style>

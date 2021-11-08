@@ -69,7 +69,7 @@ if($Mechanic > 0){
 <body>
 
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <div id="page-wrapper">
 			<div class='panel panel-primary'>
 				<div class='panel-heading'><?php echo proper($User['fFirst'] . " " . $User['Last_Name']);?></div>

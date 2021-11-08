@@ -38,7 +38,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
-	<?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+	<?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content'>
     	<link rel='stylesheet' href='bin/css/home.css' />
 		<div class='row'><?php

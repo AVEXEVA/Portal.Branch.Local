@@ -125,7 +125,7 @@ setlocale(LC_MONETARY, 'en_US');
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper' style='overflow:auto !important;' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION['Toggle_Menu'] : null;?>'>
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content' style='overflow:auto !important;'>
             <div class='' style='display:none;'>

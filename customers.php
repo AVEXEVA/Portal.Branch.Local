@@ -71,7 +71,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper'>
-        <?php require( bin_php . 'element/navigation/index.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
@@ -86,14 +86,22 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
                             <th class='text-white border border-white' title='Units'>Units</th>
                             <th class='text-white border border-white' title='Jobs'>Jobs</th>
                             <th class='text-white border border-white' title='Tickets'>Tickets</th>
+                            <th class='text-white border border-white' title='Violations'>Violations</th>
+                            <th class='text-white border border-white' title='Invoices'>Invoices</th>
                         </tr><tr>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
                             <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>
-                            <th class='text-white border border-white' title='Status'><input class='redraw form-control' type='text' name='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null; ?>' placeholder='Status' /></th>
+                            <th class='text-white border border-white' title='Status'><select class='redraw form-control'  name='Status'>
+                                <option value=''>Select</option>
+                                <option value='0'>Enabled</option>
+                                <option value='1'>Disabled</option>
+                            </select></th>
                             <th class='text-white border border-white' title='Locations'><input class='redraw form-control' type='text' name='Locations' value='<?php echo isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null; ?>' placeholder='Locations' /></th>
                             <th class='text-white border border-white' title='Units'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null; ?>' placeholder='Units' /></th>
                             <th class='text-white border border-white' title='Jobs'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null; ?>' placeholder='Jobs' /></th>
-                            <th class='text-white border border-white' title='Tickets'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null; ?>' placeholder='Tickets' /></th>
+                            <th class='text-white border border-white' title='Tickets'><input class='redraw form-control' type='text' name='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null; ?>' placeholder='Tickets' /></th>
+                            <th class='text-white border border-white' title='Violations'><input class='redraw form-control' type='text' name='Violations' value='<?php echo isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null; ?>' placeholder='Violations' /></th>
+                            <th class='text-white border border-white' title='Invoices'><input class='redraw form-control' type='text' name='Invoices' value='<?php echo isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null; ?>' placeholder='Invoices' /></th>
                         </tr></thead>
                     </table>
                 </div>
@@ -104,4 +112,4 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=customers.php';</script></head></html><?php }?>
+} else {?><script>document.location.href='../login.php?Forward=customers.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>

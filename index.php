@@ -46,7 +46,7 @@ $image_result = $database->query(
   <?php require( bin_js   . 'index.php' );?>
 </head>
 <body onload='finishLoadingPage();' >
-  <?php require( bin_php . 'element/navigation/index.php');?>
+  <?php require( bin_php . 'element/navigation.php');?>
   <?php require( bin_php . 'element/loading.php');?>
   <div id='page-wrapper' class='content'>
     <section id='account-menu' style='padding:50px;background-color:#0f0f0f;'>

@@ -247,7 +247,7 @@ white-space: normal !important;
 </head>
 <body onload="finishLoadingPage();" style='background-color:#2d2d2d !important;color:white !important;/*overscroll-behavior: contain;*/'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>;">
-        <?php require(PROJECT_ROOT.'php/element/navigation/index.php');?>
+        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='overflow-x:hidden;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
             <?php if(!isMobile() && false){?>
