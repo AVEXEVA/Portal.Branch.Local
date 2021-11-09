@@ -62,15 +62,6 @@ div.padding-center {
   text-align:center;
   border:1px solid darkgray;
 }
-table.display.dataTable tbody tr, table.display.dataTable tbody tr td a {
-    color : black !important;
-}
-table.display.dataTable tbody tr:nth-child( even ) {
-    background-color : rgba( 240, 240, 240, 1 ) !important;
-}
-table.display.dataTable tbody tr:nth-child( odd ) {
-    background-color : rgba( 255, 255, 255, 1 ) !important;
-}
 .paginate_button {
   background-color : rgba( 255, 255, 255, .7 ) !important;
 }

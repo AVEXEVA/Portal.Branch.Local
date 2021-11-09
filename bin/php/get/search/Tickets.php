@@ -150,6 +150,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$search[] = " Ticket.ID LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
 			
+			$search[] = " Customer.Name LIKE '%' + ? + '%'";
+			$parameters[] = $_GET[ 'search' ];
+
 			$search[] = " Location.Tag LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
 

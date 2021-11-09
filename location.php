@@ -93,6 +93,8 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
                     Loc.City             AS City,
                     Loc.State            AS State,
                     Loc.Zip              AS Zip,
+                    Loc.fLong 			 AS Longitude,
+                    Loc.Latt 			 AS Latitude,
                     Loc.Balance          AS Location_Balance,
                     Loc.Custom8          AS Resident_Mechanic,
                     Zone.Name            AS Zone,
@@ -103,6 +105,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
                     Loc.Owner            AS Customer_ID,
                     Customer.Name    	 AS Customer_Name,
                     Terr.Name            AS Territory_Domain
+                    Loc.Custom1 		 AS Custom_Fields.Loc1
             FROM    Loc
                     LEFT JOIN Zone         ON Loc.Zone   = Zone.ID
                     LEFT JOIN Route        ON Loc.Route  = Route.ID
@@ -119,93 +122,122 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 							FROM    Owner
 									LEFT JOIN Rol ON Owner.Rol = Rol.ID
             		) AS Customer ON Loc.Owner = Customer.ID
+            		LEFT JOIN (
+	            		(
+	            			SELECT 	Custom.Name,
+	            					Custom.Label
+	            			FROM 	Custom 
+	            			WHERE 	Custom.Name LIKE '%Loc%' AND 106 <= ID AND ID <= 115
+	            		) AS t
+	            		UNPIVOT(
+	            			val for t.Name IN ( Custom.Label )
+	            		)
+	            	) AS Custom_Fields
                     LEFT JOIN Terr         		   ON Terr.ID    = Loc.Terr
             WHERE 	Loc.Loc = ?;",array($_GET[ 'ID' ]));
-        var_dump( sqlsrv_errors( ) );
         $Location = sqlsrv_fetch_array($result);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php echo $_SESSION[ 'Conneciton' ][ 'Branch' ];?> | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php 
+    	$_GET[ 'Bootstrap' ] = '5.1';
     	require( bin_meta . 'index.php');
     	require( bin_css  . 'index.php');
     	require( bin_js   . 'index.php');
-    ?>
+    ?><style>
+    	.link-page {
+    		font-size : 14px;
+    	}
+    </style>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
-        <?php require( bin_php.'element/navigation.php');?>
-        <?php require( bin_php.'element/loading.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
-			<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='location.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> Location: <?php echo $Location['Name'];?></a></h4>
-			<div class ='Screen-Tabs shadower' style="margin: 0;border-bottom:3px solid black !important;">
-				<div class='row' style="margin: 0">
+			<div class='card card-primary border-0'>
+				<div class='card-heading'><h4><a href='location.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Location();?> Location : <?php echo substr( $Location['Name'], 0, 20 );?></a></h4></div>
+				<div class='card-body links-page bg-darker row'>
 					<?php if(isset($Privileges['Location']) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
-					?><div tab='information' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' style="margin: 0" onClick="someFunction(this,'information.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon' style="margin: 0"><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
-							<div class ='nav-text' style="margin: 0">Information</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Contract']) && $Privileges[ 'Contract' ][ 'User_Privilege' ] >= 4 || $Privileges[ 'Contract' ][ 'Group_Privilege' ] >= 4){
-					?><div tab='contracts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='contracts.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract(3);?></div>
-							<div class ='nav-text'>Contracts</div>
-					</div><?php }?>
+					?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='location/information.php'">
+				        <div class='p-1 border border-white'>
+							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information( 2 );?></div>
+							<div class='nav-text'>Information</div>
+				        </div>
+				    </div><?php }?>
+				    <?php if(isset($Privileges['Location']) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='contracts.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract( 2 );?></div>
+								<div class='nav-text'>Contracts</div>
+					        </div>
+					    </div><?php 
+					}?>
+				    <?php if(isset($Privileges['Location']) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='collections.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+						          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection( 2 );?></div>
+						          <div class='nav-text'>Collections</div>
+					        </div>
+					    </div><?php 
+					}?>
+				    <?php if(isset($Privileges['Contact']) && $Privileges[ 'Contact' ][ 'User_Privilege' ] >= 4){
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='contacts.php'">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User( 2 );?></div>
+								<div class='nav-text'>Contacts</div>
+					        </div>
+					    </div><?php 
+					}?>
 					<?php if(isset($Privileges['Collection']) && $Privileges[ 'Collection' ][ 'User_Privilege' ] >= 4){
-					?><div tab='collections' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='collections.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
-							<div class ='nav-text'>Collections</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Contact']) && $Privileges[ 'Contact' ][ 'User_Privilege' ] >= 4){
-					?><div tab='contacts' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='contacts.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Info(3);?></div>
-							<div class ='nav-text'>Contacts</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Customer']) && $Privileges[ 'Customer' ][ 'User_Privilege' ] >= 4){
-					?><div tab='customer' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='customer.php?ID=<?php echo $Location[ 'Customer_ID' ];?>'">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
-							<div class ='nav-text'>Customer</div>
-					</div><?php }?>
-					<div tab='feed' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'feed.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Activities(3);?></div>
-							<div class ='nav-text'>Feed</div>
-					</div>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='collection.php>Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(2);?></div>
+								<div class ='nav-text'>Collections</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges['Invoice']) && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 4){
-					?><div tab='invoices' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
-							<div class ='nav-text'>Invoices</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Time']) && $Privileges[ 'Time' ][ 'Group_Privilege' ] >= 4){
-					?><div tab='hours' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-hours.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Hours(3);?></div>
-							<div class ='nav-text'>Hours</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(2);?></div>
+								<div class ='nav-text'>Invoices</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges['Job']) && $Privileges[ 'Job' ][ 'User_Privilege' ] >= 4){
-					?><div tab='jobs' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-jobs.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
-							<div class ='nav-text'>Jobs</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Log']) && $Privileges[ 'Log' ][ 'User_Privilege' ] >= 4 ){
-					?><div tab='logs' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-log.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
-							<div class ='nav-text'>Log</div>
-					</div><?php }?>
-					<?php if(isset($Privileges['Job']) && $Privileges[ 'Job' ][ 'User_Privilege' ] >= 4){
-					?><div tab='maintenance' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-maintenance.php?ID=<?php echo $_GET[ 'ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Maintenance(3);?></div>
-							<div class ='nav-text'>Maintenance</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='jobs.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(2);?></div>
+								<div class ='nav-text'>Jobs</div>
+							</div>
+						</div><?php 
+					}?>
+					<?php if(isset($Privileges['Admin']) && $Privileges[ 'Admin' ][ 'User_Privilege' ] >= 4 ){
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='lobs.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Admin(2);?></div>
+								<div class ='nav-text'>Log</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges['Finances']) && $Privileges[ 'Finances' ][ 'User_Privilege' ] >= 4){
-					?><div tab='PNL' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-pnl.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
-							<div class ='nav-text'>P&L</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='pnl.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->PnL(2);?></div>
+								<div class ='nav-text'>P&L</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges['Proposal']) && $Privileges[ 'Proposal' ][ 'User_Privilege' ] >= 4){
-					?><div tab='proposals' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='proposals.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
-							<div class ='nav-text'>Proposals</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(2);?></div>
+								<div class ='nav-text'>Proposals</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php
 						$result = $database->query(
 						    null,
@@ -221,61 +253,256 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 						);
 					$count = sqlsrv_fetch_array($result)[ 'Counter' ];
 					if(		isset($Privileges[ 'Route' ]) 
-						&& 	( (	$Privileges[ 'Route' ][ 'User_Privilege' ] >= 4
+						&& 	( (	$Privileges[ 'Route' ][ 'User_Privilege' ] >= 4 
 							&& 	$count > 0 )
 							||	$Privileges[ 'Route' ][ 'Other_Privilege' ] >= 4
 					) ){
-					?><div tab='route' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='route.php?ID=<?php echo $Location[ 'Route_ID' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Route(3);?></div>
-							<div class ='nav-text'>Route</div>
-					</div><?php }?>
-					<?php if(isset($Privileges[ 'Service' ]) && $Privileges[ 'Service' ][ 'User_Privilege' ] >= 4){
-					?><div tab='service' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-service.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Phone(3);?></div>
-							<div class ='nav-text'>Service</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='route.php?ID=<?php echo $Location[ 'Route_ID' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Route(2);?></div>
+								<div class ='nav-text'>Route</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges[ 'Ticket' ]) && $Privileges[ 'Ticket' ][ 'User_Privilege' ] >= 4){
-					?><div tab='tickets' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='tickets.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
-							<div class ='nav-text'>Tickets</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='tickets.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(2);?></div>
+								<div class ='nv-text'>Tickets</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges[ 'Time' ]) && $Privileges[ 'Time' ][ 'Group_Privilege' ] >= 4){
-					?><div tab='timeline' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'timeline.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->History(3);?></div>
-							<div class ='nav-text'>Timeline</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='timeline.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+					        	<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(2);?></div>
+								<div class ='nav-text'>Timeline</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges[ 'Unit' ]) && $Privileges[ 'Unit' ][ 'User_Privilege' ] >= 4){
-					?><div tab='units' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='units.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
-							<div class ='nav-text'>Units</div>
-					</div><?php }?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='units.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(2);?></div>
+								<div class ='nav-text'>Units</div>
+							</div>
+						</div><?php 
+					}?>
 					<?php if(isset($Privileges[ 'Violation' ]) && $Privileges[ 'Violation' ][ 'User_Privilege' ] >= 4){
-					?><div tab='violations' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='violations.php?Location=<?php echo $Location[ 'Name' ];?>';">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
-							<div class ='nav-text'>Violations</div>
-					</div><?php }?>
-					<?php if(isset($Privileges[ 'Location' ]) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
-					?><div tab='workers' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-workers.php?ID=<?php echo $Location[ 'Location_ID' ];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
-							<div class ='nav-text'>Workers</div>
-					</div><?php }?>
-					<?php /*if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4){
-					?><div tab='testing' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-testing.php?ID=<?php echo $Location['Location_ID'];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Testing(3);?></div>
-							<div class ='nav-text'>Testing</div>
-					</div><?php }*/?>
-					<?php /*<div tab='map' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-map.php?ID=<?php echo $Location['Location_ID'];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
-							<div class ='nav-text'>Map</div>
-					</div>*/?>
-					<?php /*if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4){
-					?><div tab='modernization' class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'location-modernization.php?ID=<?php echo $_GET['ID'];?>');">
-							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Modernization(3);?></div>
-							<div class ='nav-text'>Modernization</div>
-					</div><?php }*/?>
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='violations.php?Location=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(2);?></div>
+								<div class ='nav-text'>Violations</div>
+							</div>
+						</div><?php 
+					}?>
 				</div>
 			</div>
-		<div class='container-content'></div>
+			<div class='card-group'>
+				<?php if( !in_array( $Location[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Location['Longitude' ], array( null, 0 ) ) ){
+					?><div class='card card-primary'>
+						<div class='card-heading'><?php \singleton\fontawesome::getInstance( )->Map( 1 );?> Map</div>
+						<div class='card-body bg-darker'>
+							<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+							<script type="text/javascript">
+				                var map;
+				                function initialize() {
+				                     map = new google.maps.Map(
+				                        document.getElementById( 'map' ),
+				                        {
+				                          zoom: 10,
+				                          center: new google.maps.LatLng( <?php echo $Location[ 'Latitude' ];?>, <?php echo $Location[ 'Longitude' ];?> ),
+				                          mapTypeId: google.maps.MapTypeId.ROADMAP
+				                        }
+				                    );
+				                    var markers = [];
+				                    markers[0] = new google.maps.Marker({
+				                        position: {
+				                            lat:<?php echo $Location['Latitude'];?>,
+				                            lng:<?php echo $Location['Longitude'];?>
+				                        },
+				                        map: map,
+				                        title: '<?php echo $Location[ 'Name' ];?>'
+				                    });
+				                }
+				                $(document).ready(function(){ initialize(); });
+				            </script>
+					        <div class='card-body' id='map' style='min-height:250px;'>&nbsp;</div>
+						</div>
+					</div>
+				<?php }?>
+				<div class='card card-primary '>
+					<div class='card-heading'><?php \singleton\fontawesome::getInstance( )->Info( 1 );?> Information</div>
+					<div class='card-body bg-darker'>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Street:</div>
+				            <div class='col-8'><input disabled type='text' name='Street' value='<?php echo strlen($Location['Street']) ? $Location['Street'] : "&nbsp;";?>' /></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
+				            <div class='col-8'><input disabled type='text' name='City' value='<?php echo strlen($Location['City']) ? $Location['City'] : "&nbsp;";?>' /></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> State:</div>
+				            <div class='col-8'><input disabled type='text' name='State' value='<?php echo strlen($Location['State']) ? $Location['State'] : "&nbsp;";?>' /></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
+				            <div class='col-8'><input disabled type='text' name='Zip' value='<?php echo strlen($Location['Zip']) ? $Location['Zip'] : "&nbsp;";?>' /></div>
+				        </div>
+				    </div>
+				</div>
+				<div class='card card-primary'>
+				    <div class='card-heading'><?php \singleton\fontawesome::getInstance( )->Maintenance( 1 );?> Operations</div>
+				    <div class='card-body bg-darker'>
+				        <div class='row g-0'> 
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
+				            <div class='col-8'><?php  
+				                echo $Privileges['Route']['Other_Privilege'] >= 4 || $User[ 'ID' ] == $Location['Route_Mechanic_ID'] 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . proper( $Location['Route_Mechanic_First_Name'] . ' ' . $Location['Route_Mechanic_Last_Name'] ) . "' /></div><div class='col-4'><button onClick=\"document.location.href='route.php?ID=" . $Location['Route_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
+				                    :   proper( $Location['Route_Mechanic_First_Name'] . ' ' . $Location['Route_Mechanic_Last_Name'] );
+				            ?></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Resident(1);?> Resident:</div> 
+				            <div class='col-8'><input disabled type='text' name='Resident' value='<?php echo isset($Location['Resident_Mechanic']) && $Location['Resident_Mechanic'] != '' ? proper($Location['Resident_Mechanic']) : "No";?>' /></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
+				            <div class='col-8'><?php 
+				                echo $Privileges['Division']['Other_Privilege'] >= 4
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . proper( $Location['Division'] ) . "' /></div><div class='col-4'><button onClick=\"document.location.href='division.php?ID=" . $Location['Division_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
+				                    :   "<input disabled type='text' name='Division' value='" . proper( $Location['Division'] ) . "' />";?></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
+				            <div class='col-8'><?php
+				                $r = $database->query(
+				                    null,
+				                    "   SELECT  Count(Unit.ID) AS Count 
+				                        FROM    Elev AS Unit
+				                        WHERE   Unit.Loc = ?;", 
+				                    array( 
+				                        $_GET[ 'ID' ] 
+				                    ) 
+				                );
+				                echo $r 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . number_format(sqlsrv_fetch_array($r)['Count']) . "' /></div><div class='col-4'><button tab='units' onClick=\"linkTab('units');\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>" 
+				                    :   0;
+				            ?></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
+				            <div class='col-8'><?php
+				                $r = $database->query(
+				                    null,
+				                    "   SELECT  Count(Job.ID) AS Count 
+				                        FROM    Job 
+				                        WHERE   Job.Loc = ?;",
+				                    array( 
+				                        $_GET[ 'ID' ] 
+				                    )
+				                );
+				                echo $r 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . number_format(sqlsrv_fetch_array($r)['Count']) . "' /></div><div class='col-4'><button onClick=\"linkTab('jobs');\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>" 
+				                    :   0;
+				            ?></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
+				            <div class='col-8'><?php
+				                $r = $database->query(
+				                    null,
+				                    "   SELECT  Count(ID) AS Count 
+				                        FROM    Violation 
+				                        WHERE   Violation.Loc = ?;",
+				                    array( 
+				                        $_GET[ 'ID' ]
+				                    )
+				                );
+				                echo $r 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . number_format(sqlsrv_fetch_array($r)['Count']) . "' /></div><div class='col-4'><button onClick=\"linkTab('violations');\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>" 
+				                    :   0;
+				            ?></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
+				            <div class='col-8'><?php
+				                $r = $database->query(
+				                    null,
+				                    "   SELECT  Count(Ticket.ID) AS Count
+				                        FROM    TicketO AS Ticket
+				                        WHERE   Ticket.LID = ?;",
+				                    array(
+				                        $_GET[ 'ID' ]
+				                    )
+				                ); 
+				                echo $r 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . number_format(sqlsrv_fetch_array($r)['Count']) . "' /></div><div class='col-4'><button onClick=\"linkTab('tickets');\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>" 
+				                    :   0;
+				            ?></div>
+				        </div>
+				    </div>
+				</div>
+				<?php if(isset($Privileges['Finances']) && $Privileges['Finances']['Other_Privilege'] >= 4){?>
+				<div class='card card-primary '>
+				    <div class='card-heading'><?php \singleton\fontawesome::getInstance( )->Sales( 1 );?> Sales</div>
+				    <div class='card-body bg-darker'>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Territory(1);?> Territory:</div>
+				            <div class='col-8'>
+				                <div class='row g-0'>
+				                    <div class='col-8'><input disabled type='text' value='<?php echo $Location[ 'Territory_Name'];?>' /></div>
+				                    <div class='col-4'>
+				                        <button onClick="someFunction(this,'proposals.php?ID=<?php echo $Location['Location_ID'];?>">
+				                            <i class='fa fa-search fa-fw fa-1x'></i>
+				                        </button>
+				                    </div>
+				                </div>
+				            </div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
+				            <div class='col-8'><?php 
+				                $r = $database->query(null,"
+				                    SELECT Count(Estimate.ID) AS Count 
+				                    FROM   Estimate
+				                    WHERE  Estimate.LocID = ?
+				                ;",array($_GET['ID']));
+				                echo $r 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . number_format(sqlsrv_fetch_array($r)['Count']) . "' /></div><div class='col-4'><button onClick=\"someFunction(this,'proposals.php?ID=" . $Location['Location_ID'] . "');\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>" 
+				                    :   0;
+				            ?></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Balance:</div>
+				            <div class='col-8'><input disabled type='text' name='Balance' value='<?php echo isset($Location['Location_Balance']) && $Location['Location_Balance'] != '' ? money_format('%.2n',$Location['Location_Balance']) : "&nbsp;";?>' /></div>
+				        </div>
+				        <div class='row g-0'>
+				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Collection</div>
+				            <div class='col-8'><?php 
+				                $r = $database->query(
+				                    null,
+				                    "   SELECT  Count( OpenAR.Ref ) AS Count
+				                        FROM    OpenAR
+				                                LEFT JOIN Invoice ON  OpenAR.Ref = Invoice.Ref
+				                        WHERE   OpenAR.Loc = ? 
+				                                AND Invoice.Status = 1;",
+				                    array(
+				                        $_GET['ID']
+				                    )
+				                ); 
+				                echo $r 
+				                    ?   "<div class='row g-0'><div class='col-8'><input disabled type='text' value='" . number_format(sqlsrv_fetch_array($r)['Count']) . "' /></div><div class='col-4'><button onClick=\"someFunction(this,'proposals.php?ID=" . $Location['Location_ID'] . "');\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>" 
+				                    :   0;
+				            ?></div>
+				        </div>
+				    </div>
+				</div>
+				<?php }?>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 </body>

@@ -7,7 +7,7 @@ function search( link ){
             displayKey : 'FieldValue',
             source: function( query, result ){
                 $.ajax({
-                    url : 'bin/php/get/search/Locations.php',
+                    url : 'bin/php/get/search/Contacts.php',
                     method : 'GET',
                     data    : {
                         search : $('input:visible[name="Search"]').val(),
@@ -43,12 +43,12 @@ function search( link ){
     );
 }
 $(document).ready(function( ){
-    var Editor_Locations = new $.fn.dataTable.Editor( {
+    var Editor_Contacts = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
-        table    : '#Table_Locations'
+        table    : '#Table_Contacts'
     } );
-    var Table_Locations = $('#Table_Locations').DataTable( {
+    var Table_Contacts = $('#Table_Contacts').DataTable( {
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
@@ -59,18 +59,19 @@ $(document).ready(function( ){
         scrollY        : 100,
         scroller       : true,
         scrollCollapse : true,
+        paging         : true,
         orderCellsTop  : true,
         autoWidth      : true,
+        //stateSave      : true,
         responsive     : true,
         select         : {
           style : 'multi',
           selector : 'td.ID'
         },
         ajax: {
-                url : 'bin/php/get/Locations.php',
+                url : 'bin/php/get/Contacts.php',
                 data    : function(d){
                     d = {
-                        draw : d.draw,
                         start : d.start, 
                         length : d.length,
                         order : {
@@ -78,18 +79,17 @@ $(document).ready(function( ){
                             dir : d.order[0].dir
                         },
                         ID :  $('input:visible[name="ID"]').val( ),
-                        Name :  $('input:visible[name="Name"]').val( ),
+                        Entity :  $('input:visible[name="Name"]').val( ),
                         Customer :  $('input:visible[name="Customer"]').val( ),
                         Type : $('select:visible[name="Type"]').val( ),
-                        Division : $('select:visible[name="Division"]').val( ),
-                        Route : $('select:visible[name="Route"]').val( ),
-                        Street : $('input:visible[name="Street"]').val( ),
-                        City :  $('input:visible[name="City"]').val( ),
+                        Name : $('select:visible[name="Division"]').val( ),
+                        Positon : $('select:visible[name="Route"]').val( ),
+                        Phone : $('input:visible[name="Street"]').val( ),
+                        Email :  $('input:visible[name="City"]').val( ),
                         Street :  $('input:visible[name="Street"]').val( ),
+                        City :  $('input:visible[name="City"]').val( ),
                         State :  $('input:visible[name="State"]').val( ),
                         Zip :  $('input:visible[name="Zip"]').val( ),
-                        Status : $('select:visible[name="Status"]').val( ),
-                        Maintained : $('select:visible[name="Maintained"]').val( )
                     };
                     return d;
                 }
@@ -99,68 +99,17 @@ $(document).ready(function( ){
                 className : 'ID',
                 data : 'ID'
             },{
-                data : 'Name',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'>" + row.Name + "</a></div>" + 
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },{
-                data : 'Customer_ID',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Customer_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" + 
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
+                data : 'Entity'
             },{
                 data : 'Type'
             },{
-                data : 'Division_ID',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Division_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'>" + row.Division_Name + "</a></div>" + 
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
+                data : 'Name'
             },{
-                data : 'Route_ID',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Route_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='route.php?ID=" + row.Route_ID + "'>" + row.Route_Name + "</a></div>" + 
-                                        "<div class='col-12'><a href='user.php?ID=" + row.Mechanic_ID + "'>" + row.Mechanic_Name + "</a></div>" + 
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
+                data : 'Position'
+            },{
+                data : 'Phone'
+            },{
+                data : 'Email'
             },{
                 data : 'Street'
             },{
@@ -169,20 +118,14 @@ $(document).ready(function( ){
                 data : 'State'
             },{
                 data : 'Zip'
-            },{
-                data : 'Units'
-            },{
-                data : 'Status'
-            },{
-                data : 'Maintained'
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );' 
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Locations.draw(); });
+            $( '.redraw' ).bind( 'change', function(){ Table_Contacts.draw(); });
         },
         buttons: [
             {
@@ -191,12 +134,12 @@ $(document).ready(function( ){
                     $( 'input, select' ).each( function( ){
                         $( this ).val( '' );
                     } );
-                    Table_Locations.draw( );
+                    Table_Contacts.draw( );
                 }
             },
-            { extend: 'create', editor: Editor_Locations },
-            { extend: 'edit',   editor: Editor_Locations },
-            { extend: 'remove', editor: Editor_Locations },
+            { extend: 'create', editor: Editor_Contacts },
+            { extend: 'edit',   editor: Editor_Contacts },
+            { extend: 'remove', editor: Editor_Contacts },
             'print',
             'copy',
             'csv'

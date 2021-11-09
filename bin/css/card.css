@@ -2,18 +2,36 @@
 	height : 100%;
 }
 @media only screen and ( min-width : 1024px ){
-    div.form-mobile {
+    div.form-mobile, .mobile {
       display : none;
     }
     tr.form-desktop {
       display : table-row;
     }
+    .desktop {
+      .display : block;
+    }
 }
 @media only screen and ( max-width : 1024px ){
-    div.form-mobile {
+    div.form-mobile, .mobile {
       display : block;
     }
-    tr.form-desktop {
+    tr.form-desktop, .desktop {
       display : none;
     }
+}
+.card.card-primary>.card-heading {
+  background-color : gold;
+  color : black;
+}
+.card.card-primary .card-heading h4 {
+  margin : 10px;
+}
+.card.card-primary .card-heading h4 a {
+  color : black;
+  text-decoration : none;
+}
+.card.links-page {
+  height : 100%;
+  width : fit-content;
 }
