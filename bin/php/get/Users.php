@@ -1,39 +1,39 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
     'read_and_close' => true
-  ] ); 
+  ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $Connection = $database->query(
-    null,
-    " SELECT  Top 1 
+  $Connection = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT  Top 1
               *
       FROM    Connection
       WHERE     Connection.Connector  = ?
-            AND Connection.Hash     = ?;", 
+            AND Connection.Hash     = ?;",
     array(
       $_SESSION['User'],
       $_SESSION['Hash']
     )
   );
   $Connection = sqlsrv_fetch_array($Connection);
-  $User    = $database->query(
-    null,
-    " SELECT  Top 1 
+  $User    = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT  Top 1
               Emp.*,
               Emp.fFirst AS First_Name,
               Emp.Last   AS Last_Name
       FROM    Emp
-      WHERE   Emp.ID = ?;", 
+      WHERE   Emp.ID = ?;",
     array(
       $_SESSION['User']
     )
   );
   $User = sqlsrv_fetch_array( $User );
-  $r = $database->query(
-    null,
+  $r = \singleton\database::getInstance( )->query(
+      null,
     " SELECT  Privilege.Access_Table,
               Privilege.User_Privilege,
               Privilege.Group_Privilege,
@@ -82,7 +82,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $parameters[] = $_GET['Last_Name'];
         $conditions[] = "Employee.Last LIKE '%' + ? + '%'";
       }
-      
+
     /*Search Filters*/
     /*NONE*/
 
@@ -109,8 +109,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         : 'ASC';
 
     /*Perform Query*/
-    $Query = "
-      SELECT  *
+    $Query =
+    " SELECT  *
       FROM  (
               SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                       Employee.ID AS ID,
@@ -118,11 +118,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                       Employee.Last AS Last_Name
               FROM    Emp AS Employee
               WHERE   ({$conditions}) AND ({$search})
-            ) AS Tbl 
+            ) AS Tbl
       WHERE     Tbl.ROW_COUNT >= ?
             AND Tbl.ROW_COUNT <= ?;";
-    $rResult = $database->query(
-      null,
+    $rResult = \singleton\database::getInstance( )->query(
+        null,
       $Query,
       $parameters
     ) or die(print_r(sqlsrv_errors()));
@@ -133,14 +133,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 
       /*GET TOTAL NUMBER OF FILTERED ROWS*/
-    $sQueryRow = "
-      SELECT  Count( Employee.ID )
+    $sQueryRow =
+    " SELECT  Count( Employee.ID )
       FROM    Emp AS Employee
       WHERE   ({$conditions}) AND ({$search});";
 
-    $stmt = $database->query( 
-      null, 
-      $sQueryRow, 
+    $stmt = \singleton\database::getInstance( )->query(
+        null,
+      $sQueryRow,
       $parameters
     ) or die(print_r(sqlsrv_errors()));
 
@@ -150,9 +150,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     /*GET TOTAL NUMBER OF ROWS IN TABLE*/
     $sQuery = " SELECT  COUNT(Emp.ID)
                 FROM    Emp;";
-    $rResultTotal = $database->query(
-      null,  
-      $sQuery, 
+    $rResultTotal = \singleton\database::getInstance( )->query(
+        null,  
+      $sQuery,
       array( $User[ 'ID' ] )
     ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);

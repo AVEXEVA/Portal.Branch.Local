@@ -7,22 +7,32 @@ function Check_Date_Time($date_time){
  else {return false;}
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = \singleton\database::getInstance( )->query(
+		null,
+    " SELECT  *
+      FROM Connection
+      WHERE Connector = ?
+      AND Hash = ?;",
+  array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
       $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
-      $My_User = sqlsrv_fetch_array($r);
+      $User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = $database->query($Portal,"
-          SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+      $r = \singleton\database::getInstance( )->query(
+    		null,
+        " SELECT Access_Table,
+                 User_Privilege,
+                 Group_Privilege,
+                 Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
-      $My_Privileges = array();
-      while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+      $Privileges = array();
+      while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
       $Privileged = FALSE;
-      if(isset($My_Privileges['Map']) && $My_Privileges['Map']['User_Privilege'] >= 4 && $My_Privileges['Map']['User_Privilege'] >= 4 && $My_Privileges['Map']['User_Privilege'] >= 4){$Privileged = TRUE;}
+      if(isset($Privileges['Map']) && $Privileges['Map']['User_Privilege'] >= 4 && $Privileges['Map']['User_Privilege'] >= 4 && $Privileges['Map']['User_Privilege'] >= 4){$Privileged = TRUE;}
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
@@ -45,10 +55,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 Elev.State AS Unit_State,
                 Emp.fFirst + ' ' + Emp.Last AS Full_Name,
                 Emp.ID AS Employee_ID
-          FROM    nei.dbo.TicketO
-                  LEFT JOIN nei.dbo.TicketDPDA ON TicketDPDA.ID = TicketO.ID
-                  LEFT JOIN nei.dbo.Loc ON Loc.Loc = TicketO.LID
-                  LEFT JOIN nei.dbo.Elev ON Elev.ID = TicketO.LElev
+          FROM    TicketO
+                  LEFT JOIN TicketDPDA ON TicketDPDA.ID = TicketO.ID
+                  LEFT JOIN Loc ON Loc.Loc = TicketO.LID
+                  LEFT JOIN Elev ON Elev.ID = TicketO.LElev
                   LEFT JOIN Emp ON Emp.fWork = TicketO.fWork
           WHERE   TicketO.Assigned > 0
                   AND (TicketO.CDate >= ?
@@ -149,11 +159,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Ticket_ID = 0;
 
     if(isset($_GET['REFRESH_DATETIME'])){
-      $r = $database->query($Portal_44,
+      $r = \singleton\database::getInstance( )->query(
+    		null,
         " SELECT  *
           FROM    Portal.dbo.Timeline
           WHERE   Timeline.Time_Stamp > ?
-                  AND Timeline.Time_stamp <= ?
+                AND Timeline.Time_stamp <= ?
           ORDER BY Timeline.Time_Stamp ASC
         ;",array(date("Y-m-d H:i:s",strtotime("-15 minutes",strtotime($_GET['REFRESH_DATETIME']))),date("Y-m-d H:i:s",strtotime('+15 minutes'))));
       $pSQL = sqlsrv_prepare(null,
@@ -165,7 +176,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               SELECT  TicketO.fWork,
                       TicketO.ID,
                       TicketO.LID AS Loc
-              FROM    nei.dbo.TicketO
+              FROM    TicketO
               WHERE   TicketO.ID = ?
             )
             UNION ALL
@@ -173,13 +184,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               SELECT  TicketD.fWork,
                       TicketD.ID,
                       TicketD.Loc AS Loc
-              FROM    nei.dbo.TicketD
+              FROM    TicketD
               WHERE   TicketD.ID = ?
             )
           ) AS Ticket
                   LEFT JOIN Emp ON Emp.fWork = Ticket.fWork
-                  LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                  LEFT JOIN nei.dbo.Loc ON Ticket.Loc = Loc.Loc
+                  LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                  LEFT JOIN Loc ON Ticket.Loc = Loc.Loc
           WHERE   tblWork.Super LIKE '%' + ? + '%' OR ? IS NULL
         ;",array(&$Ticket_ID, &$Ticket_ID, &$_GET['Supervisor'], &$_GET['Supervisor']));
       if($r){while($row = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){

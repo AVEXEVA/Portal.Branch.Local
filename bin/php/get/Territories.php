@@ -1,47 +1,50 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-        SELECT * 
-        FROM   Connection 
-        WHERE  Connection.Connector = ? 
+    $r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT *
+        FROM   Connection
+        WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = $database->query(null,"
-        SELECT Emp.*, 
-               Emp.fFirst AS First_Name, 
-               Emp.Last   AS Last_Name 
+    $User    = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Emp.*,
+               Emp.fFirst AS First_Name,
+               Emp.Last   AS Last_Name
         FROM   Emp
         WHERE  Emp.ID = ?
     ;", array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User); 
-    $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
+    $User = sqlsrv_fetch_array($User);
+    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+    $r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Privilege.Access_Table,
+               Privilege.User_Privilege,
+               Privilege.Group_Privilege,
                Privilege.Other_Privilege
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
-    if( isset($My_Privileges['Territory']) 
+    if( isset($Privileges['Territory'])
         && (
-				$My_Privileges['Territory']['Other_Privilege'] >= 4
+				$Privileges['Territory']['Other_Privilege'] >= 4
 		)
 	 ){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
 $serverName = "172.16.12.45"; //serverName\instanceName
-$connectionInfo = array( 
-	"Database"=>"nei", 
-	"UID"=>"sa", 
+$connectionInfo = array(
+	"Database"=>"nei",
+	"UID"=>"sa",
 	"PWD"=>"SQLABC!23456"
 );
 $conn = sqlsrv_connect( $serverName, $connectionInfo);
@@ -68,7 +71,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
     $sTable = "Terr";
 
 
-    /* 
+    /*
      * Paging
      */
     $sLimit = "";
@@ -82,8 +85,8 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
 
     if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
     {
-    $sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS 
-                                FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY "; 
+    $sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS
+                                FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY ";
     }
 
 
@@ -91,7 +94,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
      * Ordering
      */
 
-    $sOrder = ""; 
+    $sOrder = "";
     if ( isset( $_GET['order'][0]['column'] ) )
     {
         $sOrder = "ORDER BY  ";
@@ -113,7 +116,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
     }
 
 
-    /* 
+    /*
      * Filtering
      * NOTE this does not match the built-in DataTables filtering which does it
      * word by word on any field. It's possible to do here, but concerned about efficiency
@@ -161,22 +164,22 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
      */
     $pWhere = $sWhere;
     $sWhere = !isset($sWhere) || $sWhere == '' ? "WHERE '1'='1'" : $sWhere;
-	$sQuery = "
-		SELECT *
-		FROM
+	$sQuery =
+    " SELECT *
+		  FROM
 		 (
 			SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
 			FROM $sTable
 			$sWhere
 		) A
-		WHERE A.ROW_COUNT BETWEEN $Start AND $End
+		  WHERE A.ROW_COUNT BETWEEN $Start AND $End
 	";
 
     $rResult = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
 
     /* Data set length after filtering */
-	$sQueryRow = "
-		SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
+	$sQueryRow =
+  " SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
 		FROM   $sTable
 		$sWhere
 	;";
@@ -189,8 +192,8 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
 
     //echo "TOTAL " . $iFilteredTotal;
     /* Total data set length */
-    $sQuery = "
-        SELECT COUNT(".$sIndexColumn.")
+    $sQuery =
+      " SELECT COUNT(".$sIndexColumn.")
         FROM   $sTable
     ";
     $rResultTotal = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
@@ -232,4 +235,4 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
     echo json_encode( $output );
 	}
 }
-?> 
+?>

@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 require('../index.php');
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
           FROM    Connection
@@ -17,7 +17,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name,
@@ -29,7 +29,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
@@ -37,9 +37,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -89,12 +89,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Type'];
       $conditions[] = "Unit.Type LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Status'] ;
       $conditions[] = "Unit.Status LIKE '%' + ? + '%'";
     }
-    
+
     /*if( $Privileges[ 'Unit' ][ 'Other_Privilege' ] < 4 ){
         $parameters [] = $User[ 'fWork' ];
         $conditions[] = "Unit.ID IN ( SELECT Ticket.Unit FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LElev AS Unit FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Elev AS Unit FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Unit)";
@@ -102,7 +102,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
     /*Search Filters*/
     //if( isset( $_GET[ 'search' ] ) ){ }
-    
+
 
     /*Concatenate Filters*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
@@ -148,14 +148,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                           LEFT JOIN (
                             SELECT  Owner.ID,
-                                    Rol.Name 
-                            FROM    Owner 
+                                    Rol.Name
+                            FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Unit.Owner = Customer.ID
                         LEFT JOIN (
                           SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                                     TicketD.Elev AS Unit,
-                                    TicketD.ID, 
+                                    TicketD.ID,
                                     TicketD.EDate AS Date
                           FROM      TicketD
                         ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
@@ -165,25 +165,25 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //echo $sQuery;
     //var_dump( $parameters );
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $parameters 
+      $conn,
+      $sQuery,
+      $parameters
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  Count( Unit.ID ) AS Count
+    $sQueryRow =
+      " SELECT  Count( Unit.ID ) AS Count
         FROM    Elev AS Unit
                 LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                 LEFT JOIN (
                   SELECT  Owner.ID,
-                          Rol.Name 
-                  FROM    Owner 
+                          Rol.Name
+                  FROM    Owner
                           LEFT JOIN Rol ON Rol.ID = Owner.Rol
               ) AS Customer ON Unit.Owner = Customer.ID
               LEFT JOIN (
                 SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                           TicketD.Elev AS Unit,
-                          TicketD.ID, 
+                          TicketD.ID,
                           TicketD.EDate AS Date
                 FROM      TicketD
               ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
@@ -202,8 +202,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
-    
- 
+
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Ticket_Date' ] = date( 'm/d/Y h:i A', strtotime( $Row[ 'Ticket_Date' ] ) );
       $output['aaData'][]   = $Row;

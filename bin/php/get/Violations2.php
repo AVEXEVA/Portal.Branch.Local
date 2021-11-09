@@ -2,8 +2,8 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-  $r = $database->query(
-    null,
+  $r = \singleton\database::getInstance( )->query(
+      null,
     "   SELECT  *
       FROM    Connection
       WHERE   Connection.Connector = ?
@@ -14,19 +14,19 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     )
   );
   $Connection = sqlsrv_fetch_array( $r );
-  $User = $database->query(
+  $User = \singleton\database::getInstance( )->query(
       null,
       "   SELECT  Emp.*,
                   Emp.fFirst AS First_Name,
                   Emp.Last   AS Last_Name
           FROM    Emp
           WHERE   Emp.ID = ?;",
-      array( 
+      array(
         $_SESSION[ 'User' ]
       )
   );
   $User = sqlsrv_fetch_array( $User );
-  $r = $database->query(
+  $r = \singleton\database::getInstance( )->query(
       null,
       "   SELECT  Privilege.Access_Table,
                   Privilege.User_Privilege,
@@ -34,9 +34,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                   Privilege.Other_Privilege
           FROM    Privilege
           WHERE   Privilege.User_ID = ?;",
-      array( 
-        $_SESSION[ 'User' ] 
-      ) 
+      array(
+        $_SESSION[ 'User' ]
+      )
   );
   $Privileges = array();
   while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -83,7 +83,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $conditions[] = "Violation.Status LIKE '%' + ? + '%'";
     }
 
-    $notStatuses = "'" . implode( 
+    $notStatuses = "'" . implode(
       "', '",
       array(
         'Dismissed',
@@ -100,7 +100,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
 
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Violation.ID LIKE '%' + ? + '%'";
 
@@ -145,13 +145,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $params 
+      $conn,
+      $sQuery,
+      $params
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  Violation.ID        AS ID,
+    $sQueryRow =
+      " SELECT  Violation.ID        AS ID,
                 Violation.Name      AS Customer,
                 Violation.fDate     AS Date,
                 Location.Tag        AS Location,
@@ -181,7 +181,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row['Date'] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
       $output['aaData'][] = $Row;

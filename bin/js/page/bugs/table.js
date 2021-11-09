@@ -34,10 +34,10 @@ data : function( d ){
               dir : d.order[0].dir
           }
       };
-      d.Search = $('input[name='Search']').val( );
-      d.Customer = $('input[name='Customer']').val( );
-      d.Location = $('input[name='Location']').val( );
-      d.Job = $('input[name='Job']').val( );
+      d.Search = $("input[name='Search']").val( );
+      d.Customer = $("input[name='Customer']").val( );
+      d.Location = $("input[name='Location']").val( );
+      d.Job = $("input[name='Job']").val( );
       return d;
       }
 },

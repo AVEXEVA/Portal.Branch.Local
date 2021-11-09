@@ -2,38 +2,38 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-			   AND Connection.Hash = ?
+    $r = $database->query(null,
+    " SELECT *
+		  FROM   Connection
+		  WHERE  Connection.Connector = ?
+			AND    Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = $database->query(null,"
-		SELECT Emp.*,
-			   Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
+	$User    = $database->query(null,
+    " SELECT Emp.*,
+    			   Emp.fFirst AS First_Name,
+    			   Emp.Last   AS Last_Name
+		  FROM   Emp
+		  WHERE  Emp.ID = ?
 	;", array($_SESSION['User']));
-	$My_User = sqlsrv_fetch_array($My_User);
-	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = $database->query(null,"
-		SELECT Privilege.Access_Table,
-			   Privilege.User_Privilege,
-			   Privilege.Group_Privilege,
-			   Privilege.Other_Privilege
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
+	$User = sqlsrv_fetch_array($User);
+	$Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+	$r = $database->query(null,
+    " SELECT Privilege.Access_Table,
+    			   Privilege.User_Privilege,
+    			   Privilege.Group_Privilege,
+    			   Privilege.Other_Privilege
+		  FROM   Privilege
+		  WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+	$Privileges = array();
+	while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
 	$Privileged = False;
-	 if( isset($My_Privileges['Ticket'])
+	 if( isset($Privileges['Ticket'])
         && (
-				$My_Privileges['Ticket']['User_Privilege'] >= 4
-			||	$My_Privileges['Ticket']['Group_Privilege'] >= 4
-			||	$My_Privileges['Ticket']['Other_Privilege'] >= 4)){
+				$Privileges['Ticket']['User_Privilege'] >= 4
+			||	$Privileges['Ticket']['Group_Privilege'] >= 4
+			||	$Privileges['Ticket']['Other_Privilege'] >= 4)){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
 	else {
@@ -50,13 +50,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					   Loc.State         AS State,
 					   Loc.Zip           AS Zip,
 					   Job.ID            AS Job_ID,
-                       Job.fDesc         AS Job_Description,
-                       OwnerWithRol.ID   AS Owner_ID,
-                       OwnerWithRol.Name AS Customer,
-                       Elev.Unit         AS Unit_Label,
-                       Elev.State        AS Unit_State,
-                       Emp.fFirst        AS Worker_First_Name,
-                       Emp.Last          AS Worker_Last_Name,
+             Job.fDesc         AS Job_Description,
+             OwnerWithRol.ID   AS Owner_ID,
+             OwnerWithRol.Name AS Customer,
+             Elev.Unit         AS Unit_Label,
+             Elev.State        AS Unit_State,
+             Emp.fFirst        AS Worker_First_Name,
+             Emp.Last          AS Worker_Last_Name,
 					   'Unknown'         AS ClearPR,
 					   JobType.Type      AS Job_Type,
              Tickets.Level AS Level
@@ -128,7 +128,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
               14=>"M/R"
             );
             $Ticket['Level'] = isset($Ticket['Level']) && isset($levels[$Ticket['Level']]) ? $levels[$Ticket['Level']] : 'Unknown';
-            $Ticket['Status'] = strlen($Ticket['Status']) > 0 
+            $Ticket['Status'] = strlen($Ticket['Status']) > 0
               ? $Ticket['Status']
               : 'Reviewing';
             switch( $Ticket[ 'Status' ] ){
@@ -137,7 +137,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                   ? $Ticket['Status']
                   : 'Signed';
                 break;
-              default: 
+              default:
                 $Ticket['Status'];
                 break;
             }
@@ -148,7 +148,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					$i++;
 				}
 			}
-      $r = $database->query(null,"SELECT Tickets.*,
+      $r = $database->query(null,
+        "  SELECT            Tickets.*,
            Loc.ID            AS Account,
            Loc.Tag           AS Tag,
            Loc.Tag           AS Location,
@@ -158,11 +159,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
            Loc.State         AS State,
            Loc.Zip           AS Zip,
            Job.ID            AS Job_ID,
-                     Job.fDesc         AS Job_Description,
-                     Elev.Unit         AS Unit_Label,
-                     Elev.State        AS Unit_State,
-                     Emp.fFirst        AS Worker_First_Name,
-                     Emp.Last          AS Worker_Last_Name,
+           Job.fDesc         AS Job_Description,
+           Elev.Unit         AS Unit_Label,
+           Elev.State        AS Unit_State,
+           Emp.fFirst        AS Worker_First_Name,
+           Emp.Last          AS Worker_Last_Name,
            'Unknown'         AS ClearPR,
            JobType.Type      AS Job_Type,
            Tickets.Level AS Level

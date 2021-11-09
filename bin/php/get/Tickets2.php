@@ -1,18 +1,18 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
 		'read_and_close' => true
-	] ); 
+	] );
    	require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = \singleton\database::getInstance( )->query(
     	null,
-    	"	SELECT 	Top 1 
+    	"	SELECT 	Top 1
     				*
 			FROM   	Connection
 			WHERE  		Connection.Connector 	= ?
-				   	AND Connection.Hash 		= ?;", 
+				   	AND Connection.Hash 		= ?;",
 		array(
 			$_SESSION['User'],
 			$_SESSION['Hash']
@@ -21,12 +21,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 	$User    = \singleton\database::getInstance( )->query(
 		null,
-		"	SELECT 	Top 1 
+		"	SELECT 	Top 1
 					Emp.*,
 				   	Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
 			FROM   	Emp
-			WHERE  	Emp.ID = ?;", 
+			WHERE  	Emp.ID = ?;",
 		array(
 			$_SESSION['User']
 		)
@@ -35,9 +35,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	$r = \singleton\database::getInstance( )->query(
 		null,
 		"	SELECT 	Privilege.Access_Table,
-				   	Privilege.User_Privilege,
-			   		Privilege.Group_Privilege,
-			   		Privilege.Other_Privilege
+				   	  Privilege.User_Privilege,
+			   		  Privilege.Group_Privilege,
+			   		  Privilege.Other_Privilege
 			FROM   	Privilege
 			WHERE  	Privilege.User_ID = ?;",
 		array(
@@ -137,7 +137,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    }
 	    if( isset( $_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Job'];
-	      $conditions[] = "CAST(Job.ID as VARCHAR( 25 ) ) + ' ' + Job.fDesc LIKE '%' + ? + '%'"; 
+	      $conditions[] = "CAST(Job.ID as VARCHAR( 25 ) ) + ' ' + Job.fDesc LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Type'];
@@ -190,10 +190,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      	default : break;
 	      }
 	    }
-	    
+
 		/*Search Filters*/
 		//if( isset( $_GET[ 'search' ] ) ){ }
-		
+
 
 		/*Concatenate Filters*/
 		$conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
@@ -222,74 +222,74 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      : 'ASC';
 
 		/*Perform Query*/
-		$Query = "
-			SELECT 	*
-			FROM 	(
+		$Query =
+      " SELECT 	*
+			  FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 						Ticket.ID 						AS ID,
 						Ticket.Date 					AS Date,
 						Customer.ID  					AS Customer_ID,
-						Customer.Name 					AS Customer_Name,
+						Customer.Name 				AS Customer_Name,
 						Location.Loc 					AS Location_ID,
 						Location.Tag 					AS Location_Tag,
-						Job.ID  						AS Job_ID,
+						Job.ID  						  AS Job_ID,
 						Job.fDesc 						AS Job_Name,
 						JobType.Type 					AS Job_Type,
 						Ticket.Level 					AS Level,
-						Unit.ID 					 	AS Unit_ID,
+						Unit.ID 					 	  AS Unit_ID,
 						Unit.State 						AS Unit_City_ID,
 						Unit.Unit 						AS Unit_Building_ID,
 						Ticket.Hours 					AS Hours,
-						Ticket.Status 	 				AS Status,
-						Ticket.Payroll  				AS Payroll,
+						Ticket.Status 	 			AS Status,
+						Ticket.Payroll  			AS Payroll,
 						Employee.fFirst + ' ' + Employee.Last AS Person,
 						Employee.ID 					AS Employee_ID,
-						CASE 	WHEN Ticket.Time_Route = '1899-12-30 00:00:00.000' THEN null 
-								ELSE Ticket.Time_Route 
+						CASE 	WHEN Ticket.Time_Route = '1899-12-30 00:00:00.000' THEN null
+								ELSE Ticket.Time_Route
 						END AS Time_Site,
-						CASE 	WHEN Ticket.Time_Site = '1899-12-30 00:00:00.000' THEN null 
-								ELSE Ticket.Time_Site 
+						CASE 	WHEN Ticket.Time_Site = '1899-12-30 00:00:00.000' THEN null
+								ELSE Ticket.Time_Site
 						END AS Time_Route,
-						CASE 	WHEN Ticket.Time_Completed = '1899-12-30 00:00:00.000' THEN null 
-								ELSE Ticket.Time_Completed 
+						CASE 	WHEN Ticket.Time_Completed = '1899-12-30 00:00:00.000' THEN null
+								ELSE Ticket.Time_Completed
 						END AS Time_Completed,
 						CASE 	WHEN Ticket.Resolution LIKE '%LSD%' THEN 1
-								ELSE 0 
+								ELSE 0
 						END AS LSD
 				FROM 	(
 							(
-								SELECT 	TicketO.ID       	AS ID,
+						SELECT 	TicketO.ID          AS ID,
 										TicketO.EDate       AS Date,
-										TicketO.fWork 		AS Field,
+										TicketO.fWork 		  AS Field,
 										TicketO.LID         AS Location,
 										TicketO.Job         AS Job,
 										TicketO.LElev       AS Unit,
 										TicketDPDA.Total    AS Hours,
 										TicketO.Level       AS Level,
 										TicketO.Assigned    AS Status,
-				           	     		0                   AS Payroll,
-				           	     		TicketO.TimeRoute 	AS Time_Route,
-				           	     		TicketO.TimeSite    AS Time_Site,
-				           	     		TicketO.TimeComp    AS Time_Completed,
+				           	0                   AS Payroll,
+				           	TicketO.TimeRoute 	AS Time_Route,
+				           	TicketO.TimeSite    AS Time_Site,
+				           	TicketO.TimeComp    AS Time_Completed,
 				           	     		'' 					AS Resolution
 						 		FROM   	TicketO
 						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
 	                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
 							) UNION ALL (
 								SELECT 	TicketD.ID      	AS ID,
-										TicketD.EDate   	AS Date,
-										TicketD.fWork 		AS Field,
-										TicketD.Loc 		AS Location,
-										TicketD.Job 		AS Job,
-										TicketD.Elev		AS Unit,
-										TicketD.Total 		AS Hours,
-										TicketD.Level 		AS Level,
-										4					AS Status,
-										TicketD.ClearPR 	AS Payroll,
-										TicketD.TimeRoute 	AS Time_Route,
-				           	     		TicketD.TimeSite    AS Time_Site,
-				           	     		TicketD.TimeComp    AS Time_Completed,
-				           	     		TicketD.DescRes 	AS Resolution
+										TicketD.EDate   	    AS Date,
+										TicketD.fWork 		    AS Field,
+										TicketD.Loc 		      AS Location,
+										TicketD.Job 		      AS Job,
+										TicketD.Elev		      AS Unit,
+										TicketD.Total 		    AS Hours,
+										TicketD.Level 		    AS Level,
+										4					            AS Status,
+										TicketD.ClearPR 	    AS Payroll,
+										TicketD.TimeRoute 	  AS Time_Route,
+           	     		TicketD.TimeSite      AS Time_Site,
+           	     		TicketD.TimeComp      AS Time_Completed,
+           	     		TicketD.DescRes 	    AS Resolution
 							 	FROM   	TicketD
 							)
 						) AS Ticket
@@ -299,13 +299,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
 						LEFT JOIN (
                             SELECT  Owner.ID,
-                                    Rol.Name 
-                            FROM    Owner 
+                                    Rol.Name
+                            FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Job.Owner = Customer.ID
 						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
 				WHERE 	({$conditions}) AND ({$search})
-			) AS Tbl 
+			) AS Tbl
 			WHERE 		Tbl.ROW_COUNT >= ?
 					AND Tbl.ROW_COUNT <= ?;";
 		$rResult = \singleton\database::getInstance( )->query(
@@ -324,9 +324,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $output[ 'aaData' ][]   		= $Ticket;
 	    }
 
-		$sQueryRow = "
-	        SELECT 		Count( Ticket.ID ) AS Count
-			FROM 		(
+		$sQueryRow =
+      " SELECT 		Count( Ticket.ID ) AS Count
+			  FROM 		(
 							(
 								SELECT 	TicketO.ID       	AS ID,
 										TicketO.EDate       AS Date,
@@ -368,16 +368,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
 						LEFT JOIN (
                     	    SELECT  Owner.ID,
-                    	            Rol.Name 
-                    	    FROM    Owner 
+                    	            Rol.Name
+                    	    FROM    Owner
                     	            LEFT JOIN Rol ON Rol.ID = Owner.Rol
                     	) AS Customer ON Job.Owner = Customer.ID
 						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
 			WHERE 		({$conditions}) AND ({$search});";
 
-	    $stmt = \singleton\database::getInstance( )->query( 
-	    	null, 
-	    	$sQueryRow, 
+	    $stmt = \singleton\database::getInstance( )->query(
+	    	null,
+	    	$sQueryRow,
 	    	$parameters
 	    ) or die(print_r(sqlsrv_errors()));
 
@@ -395,8 +395,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	                	)
 	            	) AS Ticket;";
 	    $rResultTotal = \singleton\database::getInstance( )->query(
-	    	null,  
-	    	$sQuery, 
+	    	null,
+	    	$sQuery,
 	    	array( $User[ 'ID' ] )
 	    ) or die(print_r(sqlsrv_errors()));
 	    $aResultTotal = sqlsrv_fetch_array($rResultTotal);

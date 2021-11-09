@@ -2,43 +2,46 @@
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-			   AND Connection.Hash = ?
+    $r = \singleton\database::getInstance( )->query(
+        null,
+    " SELECT *
+		  FROM   Connection
+		  WHERE  Connection.Connector = ?
+			AND    Connection.Hash = ?
 	;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-	$My_User    = $database->query(null,"
-		SELECT Emp.*,
-			   Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
+	$User    = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT Emp.*,
+    			   Emp.fFirst AS First_Name,
+    			   Emp.Last   AS Last_Name
+  		FROM   Emp
+  		WHERE  Emp.ID = ?
 	;", array($_SESSION['User']));
-	$My_User = sqlsrv_fetch_array($My_User);
-	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-	$r = $database->query($Portal,"
-		SELECT Privilege.Access_Table,
-			   Privilege.User_Privilege,
-			   Privilege.Group_Privilege,
-			   Privilege.Other_Privilege
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+	$User = sqlsrv_fetch_array($User);
+	$Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+	$r = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT Privilege.Access_Table,
+    			   Privilege.User_Privilege,
+    			   Privilege.Group_Privilege,
+    			   Privilege.Other_Privilege
+  		FROM   Privilege
+  		WHERE  Privilege.User_ID = ?;",
+  array($_SESSION['User']));
+	$Privileges = array();
+	while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
 	$Privileged = False;
-	 if( isset($My_Privileges['Ticket'])
+	 if( isset($Privileges['Ticket'])
         && (
-				$My_Privileges['Ticket']['User_Privilege'] >= 4
-			||	$My_Privileges['Ticket']['Group_Privilege'] >= 4
-			||	$My_Privileges['Ticket']['Other_Privilege'] >= 4)){
+				$Privileges['Ticket']['User_Privilege'] >= 4
+			||	$Privileges['Ticket']['Group_Privilege'] >= 4
+			||	$Privileges['Ticket']['Other_Privilege'] >= 4)){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
 	else {
-        if(isset($_GET['Mechanic']) && !$Field && is_numeric($_GET['Mechanic']) && $My_Privileges['Ticket']['Other_Privilege'] >= 4){$Mechanic = $_GET['Mechanic'];}
-        elseif($My_Privileges['Ticket']['User_Privilege'] >= 4) {$Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;}
+        if(isset($_GET['Mechanic']) && !$Field && is_numeric($_GET['Mechanic']) && $Privileges['Ticket']['Other_Privilege'] >= 4){$Mechanic = $_GET['Mechanic'];}
+        elseif($Privileges['Ticket']['User_Privilege'] >= 4) {$Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;}
         if($Mechanic > 0){
 
             $Call_Sign = "";
@@ -60,8 +63,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if($Start_Date <= $Today && $Today <= $End_Date){$Today = "'1' = '1'";}
 			else {$Today = "'1' = '2'";}
 
-			$r = $database->query(null,"
-				SELECT Tickets.*,
+			$r = \singleton\database::getInstance( )->query(
+          null,
+        "    SELECT               Tickets.*,
 					   Loc.ID            AS Account,
 					   Loc.Tag           AS Tag,
 					   Loc.Tag           AS Location,
@@ -104,9 +108,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								TicketDPDA.DT       AS Doubletime,
                 0                   AS ClearPR,
                 TicketO.Assigned    AS Assigned
-						 FROM   nei.dbo.TicketO
+						 FROM   TicketO
 						        LEFT JOIN TickOStatus ON TicketO.Assigned = TickOStatus.Ref
-                    LEFT JOIN nei.dbo.TicketDPDA ON TicketDPDA.ID = TicketO.ID
+                    LEFT JOIN TicketDPDA ON TicketDPDA.ID = TicketO.ID
 						 WHERE  TicketO.fWork     =  ?
 						        AND (
 										(TicketO.EDate >= ?
@@ -145,8 +149,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								TicketD.DT       AS Doubletime,
                 TicketD.ClearPR  AS ClearPR,
                 4                AS Assigned
-						 FROM   nei.dbo.TicketD
-						 		LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc
+						 FROM   TicketD
+						 		LEFT JOIN Loc ON TicketD.Loc = Loc.Loc
 						 WHERE  TicketD.fWork     =  ?
 						        AND TicketD.EDate >= ?
 								AND TicketD.EDate <= ?
@@ -176,19 +180,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								TicketDArchive.DT       AS Doubletime,
                 TicketDArchive.ClearPR  AS ClearPR,
                 4                       AS Assigned
-						 FROM   nei.dbo.TicketDArchive
-						 		LEFT JOIN nei.dbo.Loc ON TicketDArchive.Loc = Loc.Loc
+						 FROM   TicketDArchive
+						 		LEFT JOIN Loc ON TicketDArchive.Loc = Loc.Loc
 						 WHERE  TicketDArchive.fWork     =  ?
 						        AND TicketDArchive.EDate >= ?
 								AND TicketDArchive.EDate <= ?
 						)
 					) AS Tickets
-					LEFT JOIN nei.dbo.Loc          ON Tickets.Location = Loc.Loc
-					LEFT JOIN nei.dbo.Job          ON Tickets.Job      = Job.ID
-					LEFT JOIN nei.dbo.Elev         ON Tickets.Unit     = Elev.ID
-					LEFT JOIN nei.dbo.OwnerWithRol ON Tickets.Owner    = OwnerWithRol.ID
+					LEFT JOIN Loc          ON Tickets.Location = Loc.Loc
+					LEFT JOIN Job          ON Tickets.Job      = Job.ID
+					LEFT JOIN Elev         ON Tickets.Unit     = Elev.ID
+					LEFT JOIN OwnerWithRol ON Tickets.Owner    = OwnerWithRol.ID
 					LEFT JOIN Emp          ON Tickets.Mechanic = Emp.fWork
-					LEFT JOIN nei.dbo.JobType      ON Job.Type         = JobType.ID
+					LEFT JOIN JobType      ON Job.Type         = JobType.ID
         WHERE Tickets.Assigned >= 4
 			",array($Employee_ID,$Start_Date,$End_Date,$Employee_ID,$Start_Date,$End_Date,$Employee_ID,$Start_Date,$End_Date),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
 			$data = array();
