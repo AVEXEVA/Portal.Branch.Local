@@ -58,13 +58,13 @@ if( $result ){
 }
 ?>
 <nav class="navbar navbar-default navbar-static-top row" role="navigation">
-    <div class="navbar-header col-9">
+    <div class="navbar-header col-10">
         <a class="navbar-brand BankGothic" href="index.php">
             <img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='padding-right:5px;' align='left' />
            	<span><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></span>
         </a>
     </div>
-	<div class='col-3'>
-		<a class='text-white' href='login.php?Logout'>Logout <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a>
+	<div class='col-2'>
+		<a class='text-white' href='login.php?Logout'><span class='desktop'>Logout</span> <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a>
 	</div>
 </nav>

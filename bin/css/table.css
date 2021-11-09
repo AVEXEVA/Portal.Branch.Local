@@ -25,18 +25,9 @@ th input {
 	width : 100%;
 }
 
-table.dataTable tbody tr.selected.even td, table.dataTable tbody tr.selected.odd td {
+table.dataTable tbody tr.selected td, table.dataTable tbody tr.selected td a {
 	background-color : gold !important;
 	color : black !important;
-}
-table.dataTable tbody tr td a {
-	color : black !important;
-}
-table.dataTable tbody tr:nth-child( even ) {
-    background-color : rgba( 240, 240, 240, 1 );
-}
-table.dataTable tbody tr:nth-child( odd ) {
-    background-color : rgba( 255, 255, 255, 1 );
 }
 table.dataTable tbody tr.child li {
 	list-style-type : none;
@@ -54,8 +45,20 @@ table.dataTable tbody tr.child td span.dtr-data {
 div.dataTables_scrollBody {
 	z-index: 1;
 }
+table.dataTable tbody {
+	background-color : black;
+}
+table.dataTable tbody tr {
+	background-color : rgba( 255, 255, 255, .1 );
+	color : white;
+}
+table.dataTable tbody tr.even {
+	background-color: rgba( 255, 255, 255, .15 );
+}
 
-.dataTable tbody tr td .row .col-12 {
-    max-width : 175px;
-    overflow  : hidden;
+table.dataTable tbody tr td a {
+	color : rgba( 255, 255, 255, .9 );
+}
+table.dataTable tbody tr:hover, table.dataTable tbody tr.even:hover, table.dataTable tbody tr td:hover {
+	background-color : rgba( 255, 255, 255, .25 );
 }

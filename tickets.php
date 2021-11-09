@@ -77,6 +77,34 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         <div id="page-wrapper" class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Tickets</h4></div>
+                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='locations.php'>
+                  <div class='row'><div class='col-12'>&nbsp;</div></div>
+                  <div class='row'>
+                      <div class='col-4'>Search:</div>
+                      <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw' /></div>
+                  </div>
+                  <div class='row'><div class='col-12'>&nbsp;</div></div>
+                  <div class='row'>
+                    <div class='col-4'>Person:</div>
+                    <div class='col-8'><input type='text' name='Person' placeholder='Person' class='redraw' value='<?php echo $_GET[ 'Person' ];?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Customer:</div>
+                    <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw' value='<?php echo $_GET[ 'Customer' ];?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Location:</div>
+                    <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' value='<?php echo $_GET[ 'Location' ];?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Unit:</div>
+                    <div class='col-8'><input type='text' name='Unit' placeholder='Unit' class='redraw' value='<?php echo $_GET[ 'Unit' ];?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Job:</div>
+                    <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw' value='<?php echo $_GET[ 'Job' ];?>' /></div>
+                  </div>
+                </form></div>
                 <div class="card-body bg-dark">
                     <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
                         <thead><tr class='text-center'>
