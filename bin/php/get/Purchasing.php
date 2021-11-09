@@ -3,14 +3,16 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,
+    $r = \singleton\database::getInstance( )->query(
+        null,
       " SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $User    = $database->query(null,
+    $User    = \singleton\database::getInstance( )->query(
+        null,
       " SELECT Emp.*,
                Emp.fFirst AS First_Name,
                Emp.Last   AS Last_Name
@@ -19,7 +21,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query($Portal,
+    $r = \singleton\database::getInstance( )->query(
+        null,
       " SELECT Privilege.Access_Table,
                Privilege.User_Privilege,
                Privilege.Group_Privilege,
@@ -42,7 +45,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         $data = array();
         if($Privileges['User_Privilege'] >= 4 && $Privileges['Group_Privilege'] >= 4 && $Privileges['Other_Privilege'] >= 4){
-            $r = $database->query(null,
+            $r = \singleton\database::getInstance( )->query(
+                null,
               " SELECT Mod_Equipment.*,
                        Loc.Tag AS Location
                 FROM   Mod_Equipment

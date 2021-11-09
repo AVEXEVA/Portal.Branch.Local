@@ -37,9 +37,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Portal.dbo.Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privleges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privleges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -137,13 +137,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN {$Start} AND {$End};";
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $params 
+      $conn,
+      $sQuery,
+      $params
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  Violation.ID,
+    $sQueryRow =
+      " SELECT  Violation.ID,
                 Violation.Name,
                 Violation.fDate AS Date,
                 Violation.Status
@@ -193,7 +193,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $output['aaData'][]   = $Row;
     }

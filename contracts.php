@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			<div class='card card-full card-primary border-0'>
 				<div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
 				<div class='card-body bg-dark'>
-					<div id='Form_Lead'>
+					<div id='Form_Contract'>
 						<div class='card'>
 							<div class='card-heading'></div>
 							<div class='card-body'>

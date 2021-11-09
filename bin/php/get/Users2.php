@@ -2,9 +2,9 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
-        "   SELECT  *
+        " SELECT  *
           FROM    Connection
           WHERE   Connection.Connector = ?
                   AND Connection.Hash = ?;",
@@ -14,7 +14,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name,
@@ -26,7 +26,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
@@ -34,9 +34,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Portal.dbo.Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -67,10 +67,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $conditions[] = "Emp.Status = ?";
 
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Emp.fFirst LIKE '%' + ? + '%'";
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Emp.Last LIKE '%' + ? + '%'";
 
@@ -100,8 +100,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       ? $_GET['order']['dir']
       : 'ASC';
 
-    $sQuery = " SELECT *
-                FROM (
+    $sQuery =
+                " SELECT *
+                  FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Emp.ID AS Branch_ID,
                           Emp.fFirst AS First_Name,
@@ -109,14 +110,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           Emp.fFirst + ' ' + Emp.Last AS Full_Name,
                           Portal.Email AS Email,
                           tblWork.Super AS Supervisor
-                  FROM    Emp 
+                  FROM    Emp
                           LEFT JOIN (
                             SELECT    Portal.Branch,
                                       Portal.Branch_ID,
-                                      Portal.Email 
+                                      Portal.Email
                             FROM      Portal.dbo.Portal
                             GROUP BY  Portal.Branch,
-                                      Portal.Branch_ID, 
+                                      Portal.Branch_ID,
                                       Portal.Email
                           ) AS Portal ON Portal.Branch_ID = Emp.ID AND Portal.Branch = ?
                           LEFT JOIN tblWork ON CONVERT( INT, SUBSTRING( tblWork.Members, 2, LEN( tblWork.Members ) - 2 ) ) = Emp.ID
@@ -125,8 +126,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
+      $conn,
+      $sQuery,
       array_mege( array( $_SESSION[ 'Conneciton' ][ 'Branch' ] ), $params  )
     ) or die(print_r(sqlsrv_errors()));
 
@@ -137,14 +138,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Emp.fFirst + ' ' + Emp.Last AS Full_Name,
                             Portal.Email AS Email,
                             tblWork.Super AS Supervisor
-                    FROM    Emp 
+                    FROM    Emp
                             LEFT JOIN (
                             SELECT    Portal.Branch,
                                       Portal.Branch_ID,
-                                      Portal.Email 
+                                      Portal.Email
                             FROM      Portal.dbo.Portal
                             GROUP BY  Portal.Branch,
-                                      Portal.Branch_ID, 
+                                      Portal.Branch_ID,
                                       Portal.Email
                           ) AS Portal ON Portal.Branch_ID = Emp.ID AND Portal.Branch = 'Nouveau Elevator'
                             LEFT JOIN tblWork ON CONVERT( INT, SUBSTRING( tblWork.Members, 2, LEN( tblWork.Members ) - 2 ) ) = Emp.ID
@@ -171,7 +172,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row['Start_Date'] = date('m/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
       $Row['End_Date'] = date('m/d/Y', strtotime( $Row[ 'End_Date' ] ) );

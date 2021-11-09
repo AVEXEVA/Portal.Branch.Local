@@ -24,15 +24,22 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
   }
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT *
+      FROM Connection
+      WHERE Connector = ?
+      AND Hash = ?;",
+  array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
       $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = $database->query($Portal,"
-          SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+      $r = \singleton\database::getInstance( )->query(
+          null,
+        " SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
@@ -43,7 +50,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
-    $r = $database->query(null,
+    $r = \singleton\database::getInstance( )->query(
+        null,
       " SELECT  TicketO.*,
                 Loc.Latt AS Latitude,
                 Loc.fLong AS Longitude,
@@ -53,10 +61,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 Emp.fFirst + ' ' + Emp.Last AS Full_Name,
                 Zone.Name AS Division,
                 TicketO.Assigned
-        FROM    nei.dbo.TicketO
-                LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc
+        FROM    TicketO
+                LEFT JOIN Loc ON TicketO.LID = Loc.Loc
                 LEFT JOIN Emp ON Emp.fWork = TicketO.fWork
-                LEFT JOIN nei.dbo.Zone ON Loc.Zone = Zone.ID
+                LEFT JOIN Zone ON Loc.Zone = Zone.ID
         WHERE   (TicketO.fDesc LIKE '%shutdown%'
                 OR TicketO.fDesc LIKE '%s/d%')
                 AND TicketO.Assigned < 4

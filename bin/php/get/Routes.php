@@ -2,23 +2,26 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(null,"
-      SELECT *
+  $r = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT *
       FROM   Connection
       WHERE  Connection.Connector = ?
              AND Connection.Hash = ?
   ;", array($_SESSION['User'],$_SESSION['Hash']));
   $Connection = sqlsrv_fetch_array($r);
-  $My_User    = $database->query(null,"
-      SELECT Emp.*,
+  $User    = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT Emp.*,
              Emp.fFirst AS First_Name,
              Emp.Last   AS Last_Name
       FROM   Emp
       WHERE  Emp.ID = ?
   ;", array($_SESSION['User']));
-  $My_User = sqlsrv_fetch_array($My_User);
-  $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-  $r = $database->query($Portal,
+  $User = sqlsrv_fetch_array($User);
+  $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+  $r = \singleton\database::getInstance( )->query(
+      null,
     " SELECT Privilege.Access_Table,
              Privilege.User_Privilege,
              Privilege.Group_Privilege,
@@ -26,19 +29,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       FROM   Privilege
       WHERE  Privilege.User_ID = ?
   ;",array($_SESSION['User']));
-  $My_Privileges = array();
-  while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+  $Privileges = array();
+  while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
   $Privileged = False;
-  if( isset($My_Privileges['Route'])
-      && $My_Privileges['Route']['Other_Privilege'] >= 4){$Privileged = True;}
+  if( isset($Privileges['Route'])
+      && $Privileges['Route']['Other_Privilege'] >= 4){$Privileged = True;}
   if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
   else {
-      $r = $database->query(null,"
-          SELECT Route.ID   AS ID,
+      $r = \singleton\database::getInstance( )->query(
+          null,
+        " SELECT Route.ID   AS ID,
                  Route.Name AS Route,
                  Emp.fFirst AS First_Name,
                  Emp.Last	  AS Last_Name
-          FROM   nei.dbo.Route
+          FROM   Route
                  LEFT JOIN Emp ON Route.Mech = Emp.fWork
           WHERE  Route.ID <> 76
 	    ;");

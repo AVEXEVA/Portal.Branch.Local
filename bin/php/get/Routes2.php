@@ -2,7 +2,7 @@
 session_start( [ 'read_and_close' => true ] );
 require('../index.php');
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
           FROM    Connection
@@ -14,7 +14,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name,
@@ -26,7 +26,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
@@ -34,9 +34,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -71,10 +71,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
     }
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Route.ID LIKE '%' + ? + '%'";
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Route.Name LIKE '%' + ? + '%'";
 
@@ -113,11 +113,11 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             SELECT    Loc.Route,
                                       Count( Loc.Loc ) AS Count,
                                       Sum( Units.Count ) AS Unit
-                            FROM       Loc 
+                            FROM       Loc
                                       LEFT JOIN (
                                         SELECT    Elev.Loc,
                                                   Count( Elev.ID ) AS Count
-                                        FROM      Elev 
+                                        FROM      Elev
                                         GROUP BY  Elev.Loc
                                       ) AS Units ON Loc.Loc = Units.Loc
                             GROUP BY  Loc.Route
@@ -125,11 +125,11 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN (
                             SELECT    Loc.Route,
                                       Sum( Units.Count ) AS Count
-                            FROM      Loc 
+                            FROM      Loc
                                       LEFT JOIN (
                                         SELECT    Elev.Loc,
                                                   Count( Elev.ID ) AS Count
-                                        FROM      Elev 
+                                        FROM      Elev
                                         GROUP BY  Elev.Loc
                                       ) AS Units ON Loc.Loc = Units.Loc
                             GROUP BY  Loc.Route
@@ -139,9 +139,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $params 
+      $conn,
+      $sQuery,
+      $params
     ) or die(print_r(sqlsrv_errors()));
 
     $sQueryRow = "SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
@@ -156,11 +156,11 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             SELECT    Loc.Route,
                                       Count( Loc.Loc ) AS Count,
                                       Sum( Units.Count ) AS Unit
-                            FROM      Loc 
+                            FROM      Loc
                                       LEFT JOIN (
                                         SELECT    Elev.Loc,
                                                   Count( Elev.ID ) AS Count
-                                        FROM      Elev 
+                                        FROM      Elev
                                         GROUP BY  Elev.Loc
                                       ) AS Units ON Loc.Loc = Units.Loc
                             GROUP BY  Loc.Route
@@ -168,11 +168,11 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN (
                             SELECT    Loc.Route,
                                       Sum( Units.Count ) AS Count
-                            FROM      Loc 
+                            FROM      Loc
                                       LEFT JOIN (
                                         SELECT    Elev.Loc,
                                                   Count( Elev.ID ) AS Count
-                                        FROM      Elev 
+                                        FROM      Elev
                                         GROUP BY  Elev.Loc
                                       ) AS Units ON Loc.Loc = Units.Loc
                             GROUP BY  Loc.Route
@@ -200,7 +200,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $output['aaData'][]   = $Row;
     }
