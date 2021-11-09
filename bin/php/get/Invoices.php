@@ -1,44 +1,48 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-        SELECT * 
-        FROM   Connection 
-        WHERE  Connection.Connector = ? 
+    $r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT *
+        FROM   Connection
+        WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = $database->query(null,"
-        SELECT Emp.*, 
-               Emp.fFirst AS First_Name, 
-               Emp.Last   AS Last_Name 
+    $User    = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Emp.*,
+               Emp.fFirst AS First_Name,
+               Emp.Last   AS Last_Name
         FROM   Emp
         WHERE  Emp.ID = ?
     ;", array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User); 
-    $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
+    $User = sqlsrv_fetch_array($User);
+    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+    $r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Privilege.Access_Table,
+               Privilege.User_Privilege,
+               Privilege.Group_Privilege,
                Privilege.Other_Privilege
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
-    if( isset($My_Privileges['Invoice']) 
-        && $My_Privileges['Invoice']['Other_Privilege'] >= 4){
-            $Privileged = True;}
+    if( isset($Privileges['Invoice'])
+        && $Privileges['Invoice']['User_Privilege'] >= 4)
+        && $Privileges['Invoice']['Group_Privilege'] >= 4)
+        && $Privileges['Invoice']['Other_Privilege'] >= 4){$Privileged = True;}
     if(!isset($Connection['ID'])  || !$Privileged){print json_encode(array('data'=>array()));}
     else {
 		$serverName = "172.16.12.45"; //serverName\instanceName
-		$connectionInfo = array( 
-			"Database"=>"nei", 
-			"UID"=>"sa", 
+		$connectionInfo = array(
+			"Database"=>"nei",
+			"UID"=>"sa",
 			"PWD"=>"SQLABC!23456"
 		);
 		$conn = sqlsrv_connect( $serverName, $connectionInfo);
@@ -65,7 +69,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		$sTable = "Invoice";
 
 
-		/* 
+		/*
 		 * Paging
 		 */
 		$sLimit = "";
@@ -79,8 +83,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 		if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
 		{
-		$sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS 
-									FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY "; 
+		$sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS
+									FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY ";
 		}
 
 
@@ -88,7 +92,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		 * Ordering
 		 */
 
-		$sOrder = ""; 
+		$sOrder = "";
 		if ( isset( $_GET['order'][0]['column'] ) )
 		{
 			$sOrder = "ORDER BY  CAST(";
@@ -110,7 +114,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		}
 
 
-		/* 
+		/*
 		 * Filtering
 		 * NOTE this does not match the built-in DataTables filtering which does it
 		 * word by word on any field. It's possible to do here, but concerned about efficiency
@@ -153,15 +157,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		 */
 		$pWhere = $sWhere;
 		$sWhere = !isset($sWhere) || $sWhere == '' ? "WHERE '1'='1'" : $sWhere;
-		$sQuery = "
-		SELECT *
-		FROM
+		$sQuery =
+      " SELECT *
+		    FROM
 		 (
-			SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-			FROM $sTable
+			  SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
+			  FROM $sTable
 			$sWhere
 		 ) A
-		WHERE A.ROW_COUNT BETWEEN $Start AND $End
+		    WHERE A.ROW_COUNT BETWEEN $Start AND $End
 		";
 		//echo $sQuery;
 
@@ -169,8 +173,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 		$sWhere =$pWhere;
 		/* Data set length after filtering */
-		$sQueryRow = "
-			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
+		$sQueryRow =
+    " SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
 			FROM   $sTable
 			$sWhere
 		";
@@ -183,17 +187,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 		//echo "TOTAL " . $iFilteredTotal;
 		/* Total data set length */
-		$sQuery = "
-			SELECT COUNT(".$sIndexColumn.")
-			FROM   $sTable
-		";
+		$sQuery =
+    " SELECT COUNT(".$sIndexColumn.")
+			FROM   $sTable";
 		$rResultTotal = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
 		$aResultTotal = sqlsrv_fetch_array($rResultTotal);
 		$iTotal = $aResultTotal[0];
-
-
-
-
 		/*
 		 * Output
 		 */
@@ -240,10 +239,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             FROM   Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = false;
-    if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['User_Privilege'] >= 4){$Privileged = true;}
+    if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >= 4){$Privileged = true;}
     if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
         $r = $database->query(null,"

@@ -24,27 +24,42 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
   }
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+  $r = \singleton\database::getInstance( )->query(null,
+    " SELECT *
+      FROM Connection
+      WHERE Connector = ?
+      AND Hash = ?;",
+  array($_SESSION['User'],$_SESSION['Hash']));
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
-      $My_User = sqlsrv_fetch_array($r);
+      $r = \singleton\database::getInstance( )->query(null,
+        " SELECT  *
+          FROM Emp
+          WHERE ID = ?",
+        array($_SESSION['User']));
+      $User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = $database->query($Portal,"
-          SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+      $r = \singleton\database::getInstance( )->query(null,
+        " SELECT Access_Table,
+                 User_Privilege,
+                 Group_Privilege,
+                 Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
-      $My_Privileges = array();
-      while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+      $Privileges = array();
+      while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
       $Privileged = FALSE;
-      if(isset($My_Privileges['Map']) && $My_Privileges['Map']['User_Privilege'] >= 4 && $My_Privileges['Map']['User_Privilege'] >= 4 && $My_Privileges['Map']['User_Privilege'] >= 4){$Privileged = TRUE;}
+      if(isset($Privileges['Map'])
+      && $Privileges['Map']['User_Privilege'] >= 4
+      && $Privileges['Map']['Group_Privilege'] >= 4
+      && $Privileges['Map']['Other_Privilege'] >= 4){$Privileged = TRUE;}
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
     if(isset($_GET['Employee_ID'])){
-      $r = $database->query($Portal_44,
+      $r = \singleton\database::getInstance( )->query(null,
         " SELECT TOP 1
                  GPS.ID       AS ID,
                  GPS.Employee_ID AS Employee_ID,
@@ -57,7 +72,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
           WHERE  GPS.Employee_ID = ?
           ORDER BY GPS.ID DESC
         ;",array($_GET['Employee_ID']));
-      $r2 = $database->query(null,
+      $r2 = \singleton\database::getInstance( )->query(null,
         " SELECT  Emp.fFirst, Emp.Last, tblWork.Super AS Supervisor, Loc.fLong AS Longitude, Loc.Latt AS Latitude
           FROM    Emp
                   LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
@@ -94,7 +109,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       }
       print json_encode($row);
     } else {
-      $r = $database->query($Portal_44,
+      $r = \singleton\database::getInstance( )->query(null,
       "   SELECT GPS.ID       AS GPS_ID,
                  GPS.Employee_ID AS Employee_ID,
                  GPS.Latitude AS Latitude,
@@ -102,7 +117,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                  GPS.Altitude AS Altitude,
                  GPS.Accuracy AS Accuracy,
                  Max(GPS.Time_Stamp) AS Time_Stamp
-          FROM   Portal.dbo.GPS
+          FROM   GPS
           WHERE GPS.Time_Stamp >= ?
           GROUP BY GPS.ID, GPS.Employee_ID, GPS.Latitude, GPS.Longitude, GPS.Altitude, GPS.Accuracy
       ;",array(date("Y-m-d H:i:s",strtotime("-4 hours"))));
@@ -110,7 +125,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       if($r){while($row = sqlsrv_fetch_array($r)){
         $GPS_Data[$row['Employee_ID']] = $row;
       }}
-      $r = $database->query(null,
+      $r = \singleton\database::getInstance( )->query(null,
         " SELECT Emp.ID,
                  Emp.fFirst AS First_Name,
                  Emp.Last AS Last_Name,
@@ -120,10 +135,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                  [Attendance].[Start] AS Attendance_Start,
                  [Attendance].[End] AS Attendance_End
           FROM   Emp
-                 LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                 LEFT JOIN nei.dbo.TicketO ON TicketO.fWork = Emp.fWork
-                 LEFT JOIN nei.dbo.Loc ON Loc.Loc = TicketO.LID
-                 LEFT JOIN Portal.dbo.Attendance ON Emp.ID = [Attendance].[User] AND [Attendance].[End] IS NULL
+                 LEFT JOIN .tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                 LEFT JOIN TicketO ON TicketO.fWork = Emp.fWork
+                 LEFT JOIN Loc ON Loc.Loc = TicketO.LID
+                 LEFT JOIN Attendance ON Emp.ID = [Attendance].[User] AND [Attendance].[End] IS NULL
           WHERE  Emp.Status = 0;");
       if($r){while($row = sqlsrv_fetch_array($r)){
         if(isset($GPS_Data[$row['ID']]) && !isset($GPS_Data[$row['ID']]['Geofence'])){

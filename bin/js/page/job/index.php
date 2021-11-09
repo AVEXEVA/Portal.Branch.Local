@@ -1,3 +1,4 @@
+<script src='bin/js/page/Job/table.js'></script>
 <script>
 function someFunction(link,URL){
   $(link).siblings().removeClass('active');

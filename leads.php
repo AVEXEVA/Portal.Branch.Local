@@ -67,13 +67,13 @@ if(isset($_SESSION[ 'User' ],
         <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
-			<div class='panel panel-primary'>
+			<div class='card card-full card-primary'>
 				<div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
 				<div class='panel-body'>
 					<div id='Form_Lead'>
 						<div class='panel panel-primary'>
-							<div class='panel-heading' style='position:fixed;width:750px;z-index:999;'><h2 style='display:block;'>Location Form</h2></div>
-							<div class='panel-body white-background BankGothic shadow' style='padding-top:100px;'>
+							<div class='panel-heading'><h2>Location Form</h2></div>
+							<div class='panel-body white-background BankGothic shadow'>
 								<div style='display:block !important;'>
 									<fieldset >
 										<legend>Names</legend>

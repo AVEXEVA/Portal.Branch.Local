@@ -1,10 +1,10 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
           FROM    Connection
@@ -16,7 +16,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name,
@@ -28,7 +28,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
@@ -36,9 +36,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -80,10 +80,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
 
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Bug.ID LIKE '%' + ? + '%'";
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Bug.Name LIKE '%' + ? + '%'";
 
@@ -97,8 +97,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    $params[] = $Start;
-    $params[] = $End;
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
     $Columns = array(
       0 =>  'Bug.ID',
       1 =>  'Bug.Name',
@@ -131,37 +131,22 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
-    $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $params 
+    $rResult = \singleton\database::getInstance( )->query(
+      $conn,
+      $sQuery,
+      $params
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                Bug.ID            AS ID,
-                Bug.Name          AS Name,
-                Bug.Description   AS Description,
-                Severity.Name     AS Severity,
-                Bug.Suggestion    AS Suggestion,
-                Bug.Resolution    AS Resolution,
-                Bug.Fixed         AS Fixed
+    $sQueryRow = "  SELECT  Count( Bug.ID ) AS Count
         FROM    Portal.dbo.Bug
                 LEFT JOIN Portal.dbo.Severity ON Bug.Severity = Severity.ID
         WHERE   ({$conditions}) AND ({$search});";
+    $stmt = \singleton\database::getInstance( )->query( $conn, $sQueryRow , $params ) or die(print_r(sqlsrv_errors()));
 
-    $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = $database->query( $conn, $sQueryRow , $params, $options ) or die(print_r(sqlsrv_errors()));
-
-    $iFilteredTotal = sqlsrv_num_rows( $stmt );
-
-    $params = array(
-      $DateStart,
-      $DateEnd
-    );
+    $iFilteredTotal = sqlsrv_fetch_array( $stmt )['Count'];
     $sQuery = " SELECT  COUNT(Bug.ID)
                 FROM    Portal.dbo.Bug;";
-    $rResultTotal = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = \singleton\database::getInstance( )->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
@@ -171,7 +156,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $output['aaData'][]   = $Row;
     }

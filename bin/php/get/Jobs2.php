@@ -1,8 +1,8 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
     'read_and_close' => true
-  ] ); 
+  ] );
   require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -43,16 +43,17 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                   Privilege.Other_Privilege
           FROM    Privilege
           WHERE   Privilege.User_ID = ?;",
-      array( 
-        $_SESSION[ 'User' ] 
-      ) 
+      array(
+        $_SESSION[ 'User' ]
+      )
   );
   $Privileges = array();
   while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
   $Privileged = False;
-  if(     isset( $Privileges[ 'Job' ] ) 
+  if(     isset( $Privileges[ 'Job' ] )
       &&  $Privileges[ 'Job' ][ 'User_Privilege' ]  >= 4
       &&  $Privileges[ 'Job' ][ 'Group_Privilege' ]  >= 4
+      &&  $Privileges[ 'Job' ][ 'Other_Privilege' ]  >= 4
   ){        $Privileged = True; }
   if( !isset($Connection['ID']) || !$Privileged ){print json_encode( array( 'data' => array( ) ) );}
   else {
@@ -76,7 +77,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Location'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Type'];
       $conditions[] = "Job_Type.Type LIKE '%' + ? + '%'";
@@ -91,10 +92,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }*/
 
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $parameters[] = $_GET['Search'];
       $search[] = "Job.ID LIKE '%' + ? + '%'";
-      
+
       $parameters[] = $_GET['Search'];
       $search[] = "Job.fDesc LIKE '%' + ? + '%'";
 
@@ -149,8 +150,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
                           LEFT JOIN (
                               SELECT  Owner.ID,
-                                      Rol.Name 
-                              FROM    Owner 
+                                      Rol.Name
+                              FROM    Owner
                                       LEFT JOIN Rol ON Rol.ID = Owner.Rol
                           ) AS Customer ON Job.Owner = Customer.ID
                           LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
@@ -159,19 +160,19 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = \singleton\database::getInstance( )->query(
-      null,  
-      $sQuery, 
-      $parameters 
+      null,
+      $sQuery,
+      $parameters
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  Count( Job.ID ) AS Count
+    $sQueryRow =
+      " SELECT  Count( Job.ID ) AS Count
         FROM    Job
                 LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
                 LEFT JOIN (
                     SELECT  Owner.ID,
-                            Rol.Name 
-                    FROM    Owner 
+                            Rol.Name
+                    FROM    Owner
                             LEFT JOIN Rol ON Rol.ID = Owner.Rol
                 ) AS Customer ON Job.Owner = Customer.ID
                 LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
@@ -192,7 +193,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $output['aaData'][]   = $Row;
     }
