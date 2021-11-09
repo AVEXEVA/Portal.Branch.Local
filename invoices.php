@@ -5,7 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION[ 'User' ],
          $_SESSION[ 'Hash' ] ) ) {
-        $result = $database->query(
+     $result = \singleton\database::getInstance( )->query(
           null,
         '   SELECT  *
     		FROM    Connection
@@ -17,7 +17,7 @@ if(isset($_SESSION[ 'User' ],
         )
     );
         $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-        $result = $database->query(
+          $result = \singleton\database::getInstance( )->query(
           null,
         '   SELECT    *,
     		           Emp.fFirst AS First_Name,
@@ -29,7 +29,7 @@ if(isset($_SESSION[ 'User' ],
         )
     );
       $User = sqlsrv_fetch_array($result);
-    	$result = $database->query(
+    	  $result = \singleton\database::getInstance( )->query(
           null,
       '     SELECT    *
     		    FROM   Privilege
@@ -46,62 +46,79 @@ if(isset($_SESSION[ 'User' ],
   	  		|| $Privileges[ 'Invoice' ][ 'Other_Privilege' ] < 4){
   				?><?php require('../404.html');?><?php }
       else {
-		$database->query(
+		   \singleton\database::getInstance( )->query(
       null,
    '    INSERT INTO Activity([User], [Date], [Page])
 			  VALUES(?,?,?);',
       array($_SESSION[ 'User' ],
             date('Y-m-d H:i:s'),
-                 'Invoices.php')
+                 'invoices.php')
     );
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <meta name='description' content=''>
-    <meta name='author' content='Peter D. Speranza'>
-    <title>Nouveau Texas | Portal</title>
+    <title><?php echo $_SESSION['Connection']['Branch'];?> | Portal</title>
+    <?php $_GET [ 'Bootstrap' ] = '5.1'; ?>
+    <?php require(bin_meta.'index.php');?>
     <?php require(bin_css.'index.php');?>
     <?php require(bin_js.'index.php');?>
 </head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <div id='wrapper' class=''>
-        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+<body onload='finishLoadingPage();'>
+    <div id='wrapper'>
+        <?php require(bin_php.'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
-            <div class='panel panel-primary'>
-                <div class='panel-heading'>
-                    <div class='row'>
-                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
-                        <div class='col-xs-2'><button style='width:100%;color:black;' onClick='$('#Filters').toggle();'>+/-</button></div>
-                    </div>
-                </div>
-				<div class='panel-body no-print' id='Filters' style='border-bottom:1px solid #1d1d1d;'>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Search:</div>
-                        <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Customer:</div>
-                    	<div class='col-xs-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Location:</div>
-                    	<div class='col-xs-8'><input type='text' name='Location' placeholder='Location' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-xs-4'>Job:</div>
-                    	<div class='col-xs-8'><input type='text' name='Job' placeholder='Job' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                </div>
-                <div class='panel-body'>
-                    <table id='Table_Invoices' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
+            <div class='card card-full card-primary'>
+                <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</h4></div>
+        				<div class='card-body form-mobile'><form action='invoices.php'>
+                  <div class='row'><div class='col-12'>&nbsp;</div></div>
+                  <div class='row'>
+                      <div class='col-4'>Search:</div>
+                      <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'><div class='col-12'>&nbsp;</div></div>
+                  <div class='row'>
+                    <div class='col-4'>Customer:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Locaton:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Locaton' ] ) ? $_GET[ 'Locaton' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Job:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Type:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Date:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Due:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Origional:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Origional' ] ) ? $_GET[ 'Origional' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Balance:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col-4'>Description:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></div>
+                  </div>
+                  <div class='row'><div class='col-12'>&nbsp;</div></div>
+                </form></div>
+                <div class='card-body'>
+                    <table id='Table_Invoices' class='display' cellspacing='0' width='100%'>
                         <thead>
+                          <tr>
                             <th>Invoice #</th>
                             <th>Customer</th>
                             <th>Location</th>
@@ -112,7 +129,20 @@ if(isset($_SESSION[ 'User' ],
                             <th>Original</th>
                             <th>Balance</th>
                             <th>Description</th>
-                        </thead>
+                        </tr>
+                        <tr class='form-desktop'>
+                          <th><input class='redraw form-control' type='text' name='Invoice #' placeholder='Invoice #' value='<?php echo isset( $_GET[ 'Invoice #' ] ) ? $_GET[ 'Invoice #' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Due' placeholder='Due' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Original' placeholder='Original' value='<?php echo isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Balance' placeholder='Balance' value='<?php echo isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null;?>' /></th>
+                          <th><input class='redraw form-control' type='text' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></th>
+                      </tr>
+                     </thead>
                   </table>
               </div>
           </div>
@@ -122,4 +152,4 @@ if(isset($_SESSION[ 'User' ],
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=Invoices.php';</script></head></html><?php }?>
+} else {?><script>document.location.href='../login.php?Forward=invoices.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>

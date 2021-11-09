@@ -1,10 +1,10 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
           FROM    Connection
@@ -16,7 +16,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name,
@@ -28,7 +28,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
@@ -36,15 +36,17 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
     if( isset( $Privileges[ 'Location' ] )
         && $Privileges[ 'Location' ][ 'User_Privilege' ]  >= 4
+        && $Privileges[ 'Location' ][ 'Group_Privilege' ]  >= 4
+        && $Privileges[ 'Location' ][ 'Other_Privilege' ]  >= 4
     ){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
@@ -75,7 +77,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $params[] = $_GET['Customer'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
       $params[] = $_GET['Location'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
@@ -94,10 +96,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
 
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Estimate.ID LIKE '%' + ? + '%'";
-      
+
       $params[] = $_GET['Search'];
       $search[] = "Estimate.fDate LIKE '%' + ? + '%'";
 
@@ -157,8 +159,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name,
-                                      Owner.Status 
-                              FROM    Owner 
+                                      Owner.Status
+                              FROM    Owner
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Job.Owner = Customer.ID
                   WHERE   ({$conditions}) AND ({$search})
@@ -166,13 +168,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = $database->query(
-      $conn,  
-      $sQuery, 
-      $params 
+      $conn,
+      $sQuery,
+      $params
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+    $sQueryRow =
+      " SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                 Estimate.ID       AS ID,
                 Estimate.fDate    AS Date,
                 Estimate.Name     AS Contact,
@@ -189,8 +191,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 LEFT JOIN (
                     SELECT  Owner.ID,
                             Rol.Name,
-                            Owner.Status 
-                    FROM    Owner 
+                            Owner.Status
+                    FROM    Owner
                             LEFT JOIN Rol ON Owner.Rol = Rol.ID
                 ) AS Customer ON Job.Owner = Customer.ID
         WHERE   ({$conditions}) AND ({$search});";
@@ -216,7 +218,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Date' ]  = date('m/d/Y', strtotime( $Row[ 'Date' ] ) );
       $Row[ 'Cost' ]  = '$' . number_format( $Row[ 'Cost' ], 2 );

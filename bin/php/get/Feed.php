@@ -23,27 +23,42 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
     }
   }
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
+if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
+  $r = \singleton\database::getInstance( )->query(
+      null,
+    " SELECT  *
+      FROM Connection
+      WHERE Connector = ?
+      AND Hash = ?;",
+    array($_SESSION[ 'User' ],$_SESSION[ 'Hash' ]
+  )
+);
   $array = sqlsrv_fetch_array($r);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
       $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
-      $My_User = sqlsrv_fetch_array($r);
+      $User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = $database->query($Portal,"
-          SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+      $r = $database->query($Portal,
+        " SELECT Access_Table,
+                 User_Privilege,
+                 Group_Privilege,
+                 Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
-      $My_Privileges = array();
-      while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+      $Privileges = array();
+      while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
       $Privileged = FALSE;
-      if(isset($My_Privileges['Map']) && $My_Privileges['Map']['User_Privilege'] >= 4 && $My_Privileges['Map']['User_Privilege'] >= 4 && $My_Privileges['Map']['User_Privilege'] >= 4){$Privileged = TRUE;}
+      if(isset($Privileges['Map'])
+      && $Privileges['Map']['User_Privilege'] >= 4
+      && $Privileges['Map']['Group_Privilege'] >= 4
+      && $Privileges['Map']['Other_Privilege'] >= 4){$Privileged = TRUE;}
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
-    $r = $database->query(null,
+    $r = \singleton\database::getInstance( )->query(
+        null,
       " SELECT  TicketO.ID AS ID,
                 TicketO.fDesc AS Description,
                 TicketDPDA.TimeRoute,

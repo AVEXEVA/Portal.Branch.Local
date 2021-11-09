@@ -1,37 +1,42 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-        SELECT * 
-        FROM   Connection 
-        WHERE  Connection.Connector = ? 
+    $r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT *
+        FROM   Connection
+        WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $My_User    = $database->query(null,"
-        SELECT Emp.*, 
-               Emp.fFirst AS First_Name, 
-               Emp.Last   AS Last_Name 
+    $User    = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Emp.*,
+               Emp.fFirst AS First_Name,
+               Emp.Last   AS Last_Name
         FROM   Emp
         WHERE  Emp.ID = ?
     ;", array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User); 
-    $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
+    $User = sqlsrv_fetch_array($User);
+    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+    $r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Privilege.Access_Table,
+               Privilege.User_Privilege,
+               Privilege.Group_Privilege,
                Privilege.Other_Privilege
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
-    if( isset($My_Privleges['Ticket']) 
-	  	&& $My_Privileges['Ticket']['Other_Privilege'] >= 4){
+    if( isset($Privleges['Ticket'])
+	  	&& $Privileges['Ticket']['User_Privilege'] >= 4){
+      && $Privileges['Ticket']['Group_Privilege'] >= 4)
+      && $Privileges['Ticket']['Other_Privilege'] >= 4)
             $Privileged = True;}
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
@@ -41,7 +46,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    $SQL_Supervisors = "";
 		    $Supervisors_SQL = array();
 		    foreach($Selected_Supervisors as $key=>$Selected_Supervisor){$Supervisors_SQL[$key] = "tblWork.Super = '" . $Selected_Supervisor . "'";}
-		    $SQL_Supervisors = "(" . implode(" OR ",$Supervisors_SQL) . ")"; 
+		    $SQL_Supervisors = "(" . implode(" OR ",$Supervisors_SQL) . ")";
 		}
 		$Selected_Mechanics = explode(",",$_GET['Mechanics']);
 
@@ -52,18 +57,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
 		    $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 		}
-		$r = $database->query(null,"
-			SELECT Emp.*, 
-				   tblWork.Super 
-			FROM   Emp 
-				   LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members 
-			WHERE  Field          = 1
+		$r = \singleton\database::getInstance( )->query(
+        null,
+      " SELECT Emp.*,
+				   tblWork.Super
+			  FROM   Emp
+				   LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+			  WHERE  Field          = 1
 				   AND Emp.Status = 0
 		;");
 		$Mechanics = array();
 		if($r){
 			while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$Mechanics[] = $array;}
-		}	
+		}
 		//GET TICKETS
 		if($_GET['Start_Date'] > 0){$Start_Date = DateTime::createFromFormat('m/d/Y', $_GET['Start_Date'])->format("Y-m-d 00:00:00.000");}
 		else{
@@ -84,40 +90,41 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		if($End_Date < date('Y-m-d 00:00:00.000')){$Closeout = " AND TickOStatus.Type='Completed'";}
 		else {$Clouseout = '';}
 
-		$r = $database->query(null,"
-			SELECT TicketO.*, 
-				   Loc.Tag 			 AS Tag, 
-				   Loc.Address 		 AS Address, 
-				   Loc.City 		 AS City, 
-				   Loc.State 		 AS State, 
-				   Loc.Zip 			 AS Zip, 
-				   Job.ID 			 AS Job_ID, 
-				   Job.fDesc 		 AS Job_Description, 
-				   OwnerWithRol.ID 	 AS Owner_ID, 
-				   OwnerWithRol.Name AS Customer, 
-				   JobType.Type 	 AS Job_Type, 
-				   Elev.Unit 		 AS Unit_Label, 
-				   Elev.State 		 AS Unit_State, 
-				   TickOStatus.Type  AS Status, 
-				   Emp.CallSign 	 AS CallSign, 
-				   Emp.fFirst 		 AS fFirst, 
+		$r = \singleton\database::getInstance( )->query(
+        null,
+      "    SELECT TicketO.  *,
+				   Loc.Tag 			 AS Tag,
+				   Loc.Address 		 AS Address,
+				   Loc.City 		 AS City,
+				   Loc.State 		 AS State,
+				   Loc.Zip 			 AS Zip,
+				   Job.ID 			 AS Job_ID,
+				   Job.fDesc 		 AS Job_Description,
+				   OwnerWithRol.ID 	 AS Owner_ID,
+				   OwnerWithRol.Name AS Customer,
+				   JobType.Type 	 AS Job_Type,
+				   Elev.Unit 		 AS Unit_Label,
+				   Elev.State 		 AS Unit_State,
+				   TickOStatus.Type  AS Status,
+				   Emp.CallSign 	 AS CallSign,
+				   Emp.fFirst 		 AS fFirst,
 				   Emp.Last 		 AS Last
-			FROM 
-				nei.dbo.TicketO 
-				LEFT JOIN nei.dbo.Loc 		   ON TicketO.LID = Loc.Loc 
+			FROM
+				nei.dbo.TicketO
+				LEFT JOIN nei.dbo.Loc 		   ON TicketO.LID = Loc.Loc
 				LEFT JOIN nei.dbo.Job 		   ON TicketO.Job = Job.ID
 				LEFT JOIN nei.dbo.OwnerWithRol ON TicketO.Owner = OwnerWithRol.ID
 				LEFT JOIN nei.dbo.JobType 	   ON Job.Type = JobType.ID
 				LEFT JOIN nei.dbo.Elev 		   ON TicketO.LElev = Elev.ID
 				LEFT JOIN nei.dbo.TickOStatus  ON TicketO.Assigned = TickOStatus.Ref
 				LEFT JOIN Emp 		   ON TicketO.fWork = Emp.fWork
-				LEFT JOIN nei.dbo.tblWork 	   ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members 
-			WHERE 
+				LEFT JOIN nei.dbo.tblWork 	   ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+			WHERE
 				{$SQL_Supervisors}
 				AND (
-					(EDate >= ? AND EDate <= ?) 
-					OR Assigned=3 OR Assigned=1) 
-				AND (Tag = '{$Location_Tag}') 
+					(EDate >= ? AND EDate <= ?)
+					OR Assigned=3 OR Assigned=1)
+				AND (Tag = '{$Location_Tag}')
 				AND Emp.Status = 0
 		;",array($Start_Date,$End_Date));
 		$Tickets = array();
@@ -135,47 +142,48 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketD.fWork = '" . $Selected_Mechanic . "'";}
 		    $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 		}
-	    $r = $database->query(null,"
-	    	SELECT 
-	    		TicketD.CDate 	  AS CDate, 
-	    		TicketD.ID 		  AS ID, 
-	    		TicketD.EDate 	  AS EDate, 
-	    		TicketD.fWork	  AS fWork, 
-	    		TicketD.Job 	  AS Job, 
-	    		TicketD.Loc 	  AS Loc, 
-	    		TicketD.fDesc 	  AS fDesc, 
-	    		TicketD.DescRes   AS DescRes, 
-	    		TicketD.ClearPR   AS ClearPR, 
-	    		TicketD.Total 	  AS Total, 
+	    $r = \singleton\database::getInstance( )->query(
+          null,
+        " SELECT
+	    		TicketD.CDate 	  AS CDate,
+	    		TicketD.ID 		  AS ID,
+	    		TicketD.EDate 	  AS EDate,
+	    		TicketD.fWork	  AS fWork,
+	    		TicketD.Job 	  AS Job,
+	    		TicketD.Loc 	  AS Loc,
+	    		TicketD.fDesc 	  AS fDesc,
+	    		TicketD.DescRes   AS DescRes,
+	    		TicketD.ClearPR   AS ClearPR,
+	    		TicketD.Total 	  AS Total,
 	    		Loc.Tag  		  AS Tag,
 	    		Loc.Address 	  AS Address,
 	    		Loc.City 		  AS City,
 	    		Loc.State 		  AS State,
 	    		Loc.Zip 		  AS Zip,
-	    		Job.ID 			  AS Job_ID, 
-	    		Job.fDesc 		  AS Job_Description, 
-	    		OwnerWithRol.ID   AS Owner_ID, 
-	    		OwnerWithRol.Name AS Customer, 
-	    		JobType.Type 	  AS Job_Type, 
-	    		Elev.Unit 		  AS Unit_Label, 
-	    		Elev.State 		  AS Unit_State, 
-	    		Emp.fFirst 		  AS fFirst, 
-	    		Emp.Last 		  AS Last, 
+	    		Job.ID 			  AS Job_ID,
+	    		Job.fDesc 		  AS Job_Description,
+	    		OwnerWithRol.ID   AS Owner_ID,
+	    		OwnerWithRol.Name AS Customer,
+	    		JobType.Type 	  AS Job_Type,
+	    		Elev.Unit 		  AS Unit_Label,
+	    		Elev.State 		  AS Unit_State,
+	    		Emp.fFirst 		  AS fFirst,
+	    		Emp.Last 		  AS Last,
 	    		Emp.CallSign 	  AS CallSign
 	    	FROM
-	    		nei.dbo.TicketD 
+	    		nei.dbo.TicketD
 	    		LEFT JOIN nei.dbo.Loc 		   ON TicketD.Loc = Loc.Loc
-	    		LEFT JOIN nei.dbo.Job 		   ON TicketD.Job = Job.ID 
+	    		LEFT JOIN nei.dbo.Job 		   ON TicketD.Job = Job.ID
 	    		LEFT JOIN nei.dbo.OwnerWithRol ON Loc.Owner = OwnerWithRol.ID
 	    		LEFT JOIN nei.dbo.JobType  	   ON Job.Type = JobType.ID
 	    		LEFT JOIN nei.dbo.Elev 		   ON TicketD.Elev = Elev.ID
 	    		LEFT JOIN Emp 	 	   ON TicketD.fWork = Emp.fWork
-	    		LEFT JOIN nei.dbo.tblWork  	   ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members 
-	    	WHERE 
-				{$SQL_Supervisors} 
-	    		AND EDate 	   >= ? 
+	    		LEFT JOIN nei.dbo.tblWork  	   ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+	    	WHERE
+				{$SQL_Supervisors}
+	    		AND EDate 	   >= ?
 	    		AND EDate 	   <= ?
-	    		AND (Tag 	   =  '{$Location_Tag}') 
+	    		AND (Tag 	   =  '{$Location_Tag}')
 	    		AND Emp.Status =  0
 		;",array($Start_Date,$End_Date));
 	    if($r){
@@ -184,48 +192,49 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		        $Tickets[$array['ID']]['Status'] = "Completed";
 		    }
 		}
-		$r = $database->query(null,"
-	    	SELECT 
-	    		TicketDArchive.CDate 	AS CDate, 
-	    		TicketDArchive.ID 		AS ID, 
-	    		TicketDArchive.EDate 	AS EDate, 
-	    		TicketDArchive.fWork	AS fWork, 
-	    		TicketDArchive.Job 		AS Job, 
-	    		TicketDArchive.Loc 		AS Loc, 
-	    		TicketDArchive.fDesc 	AS fDesc, 
-	    		TicketDArchive.DescRes 	AS DescRes, 
-	    		TicketDArchive.ClearPR 	AS ClearPR, 
-	    		TicketDArchive.Total 	AS Total, 
+		$r = \singleton\database::getInstance( )->query(
+        null,
+      "   SELECT
+	    		TicketDArchive.CDate 	AS CDate,
+	    		TicketDArchive.ID 		AS ID,
+	    		TicketDArchive.EDate 	AS EDate,
+	    		TicketDArchive.fWork	AS fWork,
+	    		TicketDArchive.Job 		AS Job,
+	    		TicketDArchive.Loc 		AS Loc,
+	    		TicketDArchive.fDesc 	AS fDesc,
+	    		TicketDArchive.DescRes 	AS DescRes,
+	    		TicketDArchive.ClearPR 	AS ClearPR,
+	    		TicketDArchive.Total 	AS Total,
 	    		Loc.Tag  				AS Tag,
 	    		Loc.Address 			AS Address,
 	    		Loc.City 				AS City,
 	    		Loc.State 				AS State,
 	    		Loc.Zip 				AS Zip,
-	    		Job.ID 					AS Job_ID, 
-	    		Job.fDesc 				AS Job_Description, 
-	    		OwnerWithRol.ID 		AS Owner_ID, 
-	    		OwnerWithRol.Name 		AS Customer, 
-	    		JobType.Type 			AS Job_Type, 
-	    		Elev.Unit 				AS Unit_Label, 
-	    		Elev.State 				AS Unit_State, 
-	    		Emp.fFirst 				AS fFirst, 
-	    		Emp.Last 				AS Last, 
+	    		Job.ID 					AS Job_ID,
+	    		Job.fDesc 				AS Job_Description,
+	    		OwnerWithRol.ID 		AS Owner_ID,
+	    		OwnerWithRol.Name 		AS Customer,
+	    		JobType.Type 			AS Job_Type,
+	    		Elev.Unit 				AS Unit_Label,
+	    		Elev.State 				AS Unit_State,
+	    		Emp.fFirst 				AS fFirst,
+	    		Emp.Last 				AS Last,
 	    		Emp.CallSign 			AS CallSign,
-				'Completed'				AS Status
+				  'Completed'				AS Status
 	    	FROM
-	    		nei.dbo.TicketDArchive 
+	    		nei.dbo.TicketDArchive
 	    		LEFT JOIN nei.dbo.Loc 			ON TicketDArchive.Loc = Loc.Loc
 	    		LEFT JOIN nei.dbo.Job 			ON TicketDArchive.Job = Job.ID
 	    		LEFT JOIN nei.dbo.OwnerWithRol 	ON Loc.Owner = OwnerWithRol.ID
 	    		LEFT JOIN nei.dbo.JobType 		ON Job.Type = JobType.ID
 	    		LEFT JOIN nei.dbo.Elev 			ON TicketDArchive.Elev = Elev.ID
 	    		LEFT JOIN Emp 			ON TicketDArchive.fWork = Emp.fWork
-	    		LEFT JOIN nei.dbo.tblWork 		ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members 
-	    	WHERE 
-				{$SQL_Supervisors} 
+	    		LEFT JOIN nei.dbo.tblWork 		ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+	    	WHERE
+				{$SQL_Supervisors}
 	    		AND EDate      >= ?
 	    		AND EDate      <= ?
-	    		AND (Tag       =  '{$Location_Tag}') 
+	    		AND (Tag       =  '{$Location_Tag}')
 	    		AND Emp.Status =  0
 		;",array($Start_Date,$End_Date));
 	    if($r){
