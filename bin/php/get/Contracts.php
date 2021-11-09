@@ -1,6 +1,6 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -31,14 +31,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
-                  Privilege.User_Privilege,
-                  Privilege.Group_Privilege,
-                  Privilege.Other_Privilege
+                    Privilege.User_Privilege,
+                    Privilege.Group_Privilege,
+                    Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privleges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privleges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -127,10 +127,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }*/
 
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $parameters[] = $_GET['Search'];
       $search[] = "Contract.ID LIKE '%' + ? + '%'";
-      
+
       $parameters[] = $_GET['Search'];
       $search[] = "Customer.Name LIKE '%' + ? + '%'";
 
@@ -183,7 +183,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Contract.BFinish    AS End_Date,
                             Contract.BAmt       AS Amount,
                             Contract.BLenght    AS Length,
-                            CASE    WHEN Contract.BCycle = 0 THEN 'Monthly' 
+                            CASE    WHEN Contract.BCycle = 0 THEN 'Monthly'
                                     WHEN Contract.BCycle = 1 THEN 'Bi-Monthly'
                                     WHEN Contract.BCycle = 2 THEN 'Quarterly'
                                     WHEN Contract.BCycle = 3 THEN 'Trimester'
@@ -198,12 +198,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Contract.BEscCycle  AS Escalation_Cycle,
                             Job.Custom15        AS Link,
                             Job.Remarks         AS Remarks
-                    FROM    Contract 
+                    FROM    Contract
                             LEFT JOIN Loc          ON Contract.Loc = Loc.Loc
                             LEFT JOIN (
                                 SELECT  Owner.ID,
-                                        Rol.Name 
-                                FROM    Owner 
+                                        Rol.Name
+                                FROM    Owner
                                         LEFT JOIN Rol ON Rol.ID = Owner.Rol
                             ) AS Customer ON Loc.Owner = Customer.ID
                             LEFT JOIN Job          ON Contract.Job = Job.ID
@@ -212,19 +212,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
 
     $rResult = \singleton\database::getInstance( )->query(
-      null,  
-      $sQuery, 
-      $parameters 
+      null,
+      $sQuery,
+      $parameters
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "
-        SELECT  Count( Contract.ID ) AS Count
-        FROM    Contract 
+    $sQueryRow = "SELECT  Count( Contract.ID ) AS Count
+                FROM    Contract
                 LEFT JOIN Loc          ON Contract.Loc = Loc.Loc
                 LEFT JOIN (
                     SELECT  Owner.ID,
-                            Rol.Name 
-                    FROM    Owner 
+                            Rol.Name
+                    FROM    Owner
                             LEFT JOIN Rol ON Rol.ID = Owner.Rol
                 ) AS Customer ON Loc.Owner = Customer.ID
                 LEFT JOIN Job          ON Contract.Job = Job.ID
@@ -248,7 +247,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'aaData'        =>  array(),
         'options' => array( )
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Start_Date' ]      = date( 'Y-m-d', strtotime( $Row[ 'Start_Date' ] ) );
       $Row[ 'End_Date' ]        = date( 'Y-m-d', strtotime( $Row[ 'End_Date' ] ) );
@@ -258,7 +257,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
     }
-    $output[ 'options' ][ 'Cycle' ] = array( 
+    $output[ 'options' ][ 'Cycle' ] = array(
       array(
         'label' => 'Monthly',
         'value' => 0

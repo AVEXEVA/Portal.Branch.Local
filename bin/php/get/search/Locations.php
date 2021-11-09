@@ -1,8 +1,8 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
     'read_and_close' => true
-  ] ); 
+  ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -38,9 +38,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
     $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
@@ -61,6 +61,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $conditions = array( );
     $search = array( );
     $parameters = array( );
+
+    $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+    /*ROW NUMBER*/
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
 
     if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['ID'];
@@ -89,7 +95,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     if( isset($_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Street'];
       $conditions[] = "Location.Address LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'City' ] ) && !in_array( $_GET[ 'City' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['City'];
       $conditions[] = "Location.City LIKE '%' + ? + '%'";
@@ -117,7 +123,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     }
 
     if( isset( $_GET[ 'search' ] ) && !in_array( $_GET[ 'search' ], array( '', ' ', null ) )  ){
-      
+
       $parameters[] = $_GET['search'];
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
 
@@ -141,7 +147,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
       $parameters[] = $_GET['search'];
       $search[] = "Location.State LIKE '%' + ? + '%'";
-      
+
       $parameters[] = $_GET['search'];
       $search[] = "Location.Zip LIKE '%' + ? + '%'";
 
@@ -167,20 +173,19 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         : 'ASC';
 
       $parameters[ ] = $_GET[ 'search' ];
-      
-      $Query = "
-        SELECT    Top 10 
-              tbl.FieldName,
-              tbl.FieldValue
+
+      $Query = "  SELECT    Top 10
+                  tbl.FieldName,
+                  tbl.FieldValue
         FROM    (
 
                 SELECT
                     attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
-                    attr.insRow.value('.', 'nvarchar(max)') as FieldValue 
-                FROM ( Select      
+                    attr.insRow.value('.', 'nvarchar(max)') as FieldValue
+                FROM ( Select
                           convert(xml, (select i.* for xml raw)) as insRowCol
                        FROM (
-                     
+
                      (
                         SELECT  Top 10
                           Location.Loc         AS ID,
@@ -199,18 +204,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           Location.State       AS State,
                           Location.Zip         AS Zip,
                           CASE  WHEN  Location_Units.Count IS NULL THEN 0
-                                ELSE  Location_Units.Count 
+                                ELSE  Location_Units.Count
                           END AS Units,
-                          CASE  WHEN Location.Maint = 0 THEN 'Active' 
+                          CASE  WHEN Location.Maint = 0 THEN 'Active'
                                 ELSE 'Inactive' END AS Maintained,
-                          CASE  WHEN Location.Status = 0 THEN 'Active' 
+                          CASE  WHEN Location.Status = 0 THEN 'Active'
                                 ELSE 'Inactive' END AS Status
                   FROM    Loc AS Location
                           LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name,
-                                      Owner.Status 
-                              FROM    Owner 
+                                      Owner.Status
+                              FROM    Owner
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Location.Owner = Customer.ID
                           LEFT JOIN (
@@ -219,12 +224,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             FROM      Elev
                             GROUP BY  Elev.Loc
                           ) AS Location_Type ON Location_Type.Location = Location.Loc
-                          LEFT JOIN Zone ON Location.Zone = Zone.ID 
+                          LEFT JOIN Zone ON Location.Zone = Zone.ID
                           LEFT JOIN Route ON Location.Route = Route.ID
                           LEFT JOIN (
                             SELECT    Elev.Loc AS Location,
                                       Count( Elev.ID ) AS Count
-                            FROM      Elev 
+                            FROM      Elev
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
                           LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech

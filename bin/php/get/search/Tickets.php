@@ -1,8 +1,8 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
 		'read_and_close' => true
-	] ); 
+	] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
@@ -11,7 +11,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     	"	SELECT 	*
 			FROM   	Connection
 			WHERE  		Connection.Connector 	= ?
-				   	AND Connection.Hash 		= ?;", 
+				   	AND Connection.Hash 		= ?;",
 		array(
 			$_SESSION['User'],
 			$_SESSION['Hash']
@@ -24,7 +24,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				   	Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
 			FROM   	Emp
-			WHERE  	Emp.ID = ?;", 
+			WHERE  	Emp.ID = ?;",
 		array(
 			$_SESSION['User']
 		)
@@ -33,9 +33,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	$r = $database->query(
 		null,
 		"	SELECT 	Privilege.Access_Table,
-				   	Privilege.User_Privilege,
-			   		Privilege.Group_Privilege,
-			   		Privilege.Other_Privilege
+    			   	Privilege.User_Privilege,
+    		   		Privilege.Group_Privilege,
+    		   		Privilege.Other_Privilege
 			FROM   	Privilege
 			WHERE  	Privilege.User_ID = ?;",
 		array(
@@ -90,7 +90,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    }
 	    if( isset( $_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Job'];
-	      $conditions[] = "CAST(Job.ID as VARCHAR( 25 ) ) + ' ' + Job.fDesc LIKE '%' + ? + '%'"; 
+	      $conditions[] = "CAST(Job.ID as VARCHAR( 25 ) ) + ' ' + Job.fDesc LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Type'];
@@ -144,13 +144,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      	default : break;
 	      }
 	    }
+      $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+      $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+
+      /*ROW NUMBER*/
+      $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
+      $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
 
 		if( isset( $_GET[ 'search' ] ) ){
 
 			$search[] = " Ticket.ID LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
-			
-			$search[] = " Customer.Name LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
 
 			$search[] = " Location.Tag LIKE '%' + ? + '%'";
@@ -164,9 +167,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 			$search[] = " Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
-			
+
 		}
-		
+
 
 		/*Concatenate Filters*/
 		$conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
@@ -192,19 +195,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    $parameters[ ] = $_GET[ 'search' ];
 
 		/*Perform Query*/
-		$Query = "
-			SELECT 		Top 10 
-						tbl.FieldName,
-						tbl.FieldValue
-			FROM 		(
+		$Query = " SELECT 		Top 10
+  						tbl.FieldName,
+  						tbl.FieldValue
+  			FROM 		(
 
 							SELECT
 							    attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
-							    attr.insRow.value('.', 'nvarchar(max)') as FieldValue 
-							FROM ( Select      
+							    attr.insRow.value('.', 'nvarchar(max)') as FieldValue
+							FROM ( Select
 							          convert(xml, (select i.* for xml raw)) as insRowCol
 							       FROM (
-								   
+
 								   (
 											SELECT 	Top 100
 													Ticket.ID 						AS ID,
@@ -249,8 +251,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
 													LEFT JOIN (
 							                            SELECT  Owner.ID,
-							                                    Rol.Name 
-							                            FROM    Owner 
+							                                    Rol.Name
+							                            FROM    Owner
 							                                    LEFT JOIN Rol ON Rol.ID = Owner.Rol
 							                        ) AS Customer ON Job.Owner = Customer.ID
 													LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
