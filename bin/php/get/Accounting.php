@@ -14,8 +14,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = $database->query($Portal,"
-          SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+      $r = $database->query($Portal, "SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
           FROM   Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
@@ -33,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       " SELECT    Top 1000
                   Invoice.*,
                   Loc.Tag AS Location_Tag
-        FROM      nei.dbo.Invoice
+        FROM      Invoice
                   LEFT JOIN nei.dbo.Loc ON Loc.Loc = Invoice.Loc
         WHERE     Invoice.Ref > ?
                   And Invoice.Ref <> 2805952

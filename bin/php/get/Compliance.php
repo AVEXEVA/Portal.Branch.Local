@@ -3,8 +3,7 @@ session_start( [ 'read_and_close' => true ] );
 $_GET['Type'] = isset($_GET['Type']) ? $_GET['Type'] : 'Live';
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
+    $r = $database->query(null, "SELECT *
 		FROM   Connection
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
@@ -77,7 +76,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                       var jsonData = JSON.parse(code);
                       for(i in jsonData){
                         Last_ID = i;
-                        if(TIMELINE[i]){} 
+                        if(TIMELINE[i]){}
                         else {
                           TIMELINE[i] = jsonData[i];
                           $("#Timeline").prepend("<div class='row'>"

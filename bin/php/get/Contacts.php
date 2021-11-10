@@ -1,18 +1,18 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
 		'read_and_close' => true
-	] ); 
+	] );
    	require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = \singleton\database::getInstance( )->query(
     	null,
-    	"	SELECT 	Top 1 
+    	"	SELECT 	Top 1
     				*
 			FROM   	Connection
 			WHERE  		Connection.Connector 	= ?
-				   	AND Connection.Hash 		= ?;", 
+				   	AND Connection.Hash 		= ?;",
 		array(
 			$_SESSION['User'],
 			$_SESSION['Hash']
@@ -21,12 +21,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = sqlsrv_fetch_array($Connection);
 	$User    = \singleton\database::getInstance( )->query(
 		null,
-		"	SELECT 	Top 1 
+		"	SELECT 	Top 1
 					Emp.*,
 				   	Emp.fFirst AS First_Name,
 			   		Emp.Last   AS Last_Name
 			FROM   	Emp
-			WHERE  	Emp.ID = ?;", 
+			WHERE  	Emp.ID = ?;",
 		array(
 			$_SESSION['User']
 		)
@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 		/*Parse GET*/
 		/*None*/
-		
+
 		$conditions = array( );
 		$search 	= array( );
 
@@ -104,7 +104,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    }
 	    if( isset( $_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Street'];
-	      $conditions[] = "Contact.Street LIKE '%' + ? + '%'"; 
+	      $conditions[] = "Contact.Street LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'City' ] ) && !in_array( $_GET[ 'City' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['City'];
@@ -118,18 +118,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $parameters[] = $_GET['Zip'];
 	      $conditions[] = "Contact.Zip LIKE '%' + ? + '%'";
 	    }
-	    
+
 		/*Search Filters*/
 		//if( isset( $_GET[ 'search' ] ) ){ }
-		
+
 
 		/*Concatenate Filters*/
 		$conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     	$search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
 		/*ROW NUMBER*/
+<<<<<<< HEAD
 		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
 		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 25;
+=======
+		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
+		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
+>>>>>>> 46bac5b11075b4003a1c0fe8b63c5782c74e39bb
 
 		/*Order && Direction*/
 		//update columns from bin/js/tickets/table.js
@@ -152,8 +157,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      : 'ASC';
 
 		/*Perform Query*/
-		$Query = "
-			SELECT 	*
+		$Query = "SELECT 	*
 			FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 						Contact.ID 						AS ID,
@@ -173,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						END 	AS [Type]
 				FROM 	Rol AS Contact
 				WHERE 	({$conditions}) AND ({$search})
-			) AS Tbl 
+			) AS Tbl
 			WHERE 		Tbl.ROW_COUNT >= ?
 					AND Tbl.ROW_COUNT <= ?;";
 		$rResult = \singleton\database::getInstance( )->query(
@@ -190,9 +194,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						FROM 	Rol AS Contact
 						WHERE 	({$conditions}) AND ({$search})";
 
-	    $stmt = \singleton\database::getInstance( )->query( 
-	    	null, 
-	    	$sQueryRow, 
+	    $stmt = \singleton\database::getInstance( )->query(
+	    	null,
+	    	$sQueryRow,
 	    	$parameters
 	    ) or die(print_r(sqlsrv_errors()));
 
@@ -202,8 +206,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    $sQuery = " SELECT  COUNT(Contact.ID)
 	                FROM    Rol AS Contact;";
 	    $rResultTotal = \singleton\database::getInstance( )->query(
-	    	null,  
-	    	$sQuery, 
+	    	null,
+	    	$sQuery,
 	    	array( $User[ 'ID' ] )
 	    ) or die(print_r(sqlsrv_errors()));
 	    $aResultTotal = sqlsrv_fetch_array($rResultTotal);

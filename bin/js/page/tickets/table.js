@@ -79,7 +79,7 @@ $(document).ready(function( ){
                 data    : function(d){
                     d = {
                         draw : d.draw,
-                        start : d.start, 
+                        start : d.start,
                         length : d.length,
                         order : {
                             column : d.order[0].column,
@@ -93,7 +93,7 @@ $(document).ready(function( ){
                     d.Unit           = $('input:visible[name="Unit"]').val( );
                     d.Job            = $('input:visible[name="Job"]').val( );
                     d.Type           = $('select:visible[name="Type"]').val( );
-                    d.Level          = $('select:visible[name="Level"]').val( ); 
+                    d.Level          = $('select:visible[name="Level"]').val( );
                     d.Status         = $('select:visible[name="Status"]').val( );
                     d.Start_Date     = $('input:visible[name="Start_Date"]').val( );
                     d.End_Date       = $('input:visible[name="End_Date"]').val( );
@@ -114,9 +114,9 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='ticket.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Ticket #" + row.ID + "</a></div>" + 
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='ticket.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Ticket #" + row.ID + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -130,8 +130,8 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display':
-                            return row.Employee_ID !== null 
-                                ?   "<a href='user.php?ID=" + row.Employee_ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Person + "</a>" 
+                            return row.Employee_ID !== null
+                                ?   "<a href='user.php?ID=" + row.Employee_ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Person + "</a>"
                                 :   null;
                         default :
                             return data;
@@ -142,9 +142,9 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Customer_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
+                            return  row.Customer_ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -157,15 +157,15 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Location_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Tag + "</a></div>" + 
+                            return  row.Location_ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Tag + "</a></div>" +
                                         "<div class='col-12'>" +
                                             "<div class='row'>" +
-                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" + 
-                                                "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" + 
+                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
+                                                "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
                                             "</div>" +
-                                        "</div>" +  
+                                        "</div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -178,10 +178,10 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Unit_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i>" + ( row.Unit_City_ID !== null && !row.Unit_City_ID.replace(/\s/g, '' ).length < 1 ? row.Unit_City_ID : 'Missing City ID' ) + "</a></div>" + 
-                                        "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Unit_Building_ID + "</a></div>" + 
+                            return  row.Unit_ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i>" + ( row.Unit_City_ID !== null && !row.Unit_City_ID.replace(/\s/g, '' ).length < 1 ? row.Unit_City_ID : 'Missing City ID' ) + "</a></div>" +
+                                        "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Unit_Building_ID + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -189,14 +189,12 @@ $(document).ready(function( ){
                     }
 
                 }
-            },{
-                data : 'Job_ID',
-                render : function( data, type, row, meta ){
+            },{ row, meta ){
                     switch( type ){
                         case 'display':
-                            return row.Job_ID !== null 
+                            return row.Job_ID !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" + 
+                                        "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" +
                                         "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
                                     "</div>"
                                 :   null;
@@ -210,7 +208,7 @@ $(document).ready(function( ){
                     switch ( type ){
                         case 'display':
                             return row.Job_Type !== null
-                                ?   "<div class='row'>" + 
+                                ?   "<div class='row'>" +
                                         "<div class='col-12'>" + row.Job_Type + "</div>" +
                                         "<div class='col-12'>" + row.Level + "</div>" +
                                     "</div>"
@@ -226,12 +224,12 @@ $(document).ready(function( ){
                 render: function( data, type, row, meta ){
                     switch( type ){
                         case 'display':
-                            return row.Date !== null 
+                            return row.Date !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" + 
+                                        "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" +
                                     "</div>"
                                 :   null;
-                            default : 
+                            default :
                                 return data;
 
                     }
@@ -241,12 +239,12 @@ $(document).ready(function( ){
                 render: function( data, type, row, meta ){
                     switch( type ){
                         case 'display':
-                            return row.Date !== null 
+                            return row.Date !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Route + "</div>" + 
+                                        "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Route + "</div>" +
                                     "</div>"
                                 :   null;
-                            default : 
+                            default :
                                 return data;
 
                     }
@@ -256,12 +254,12 @@ $(document).ready(function( ){
                 render: function( data, type, row, meta ){
                     switch( type ){
                         case 'display':
-                            return row.Date !== null 
+                            return row.Date !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Site + "</div>" + 
+                                        "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Site + "</div>" +
                                     "</div>"
                                 :   null;
-                            default : 
+                            default :
                                 return data;
 
                     }
@@ -271,12 +269,12 @@ $(document).ready(function( ){
                 render: function( data, type, row, meta ){
                     switch( type ){
                         case 'display':
-                            return row.Date !== null 
+                            return row.Date !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Completed + "</div>" + 
+                                        "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Completed + "</div>" +
                                     "</div>"
                                 :   null;
-                            default : 
+                            default :
                                 return data;
 
                     }
@@ -299,7 +297,7 @@ $(document).ready(function( ){
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
@@ -340,7 +338,7 @@ $(document).ready(function( ){
                     d.Unit           = $('input[name="Unit"]').val( );
                     d.Job            = $('input[name="Job"]').val( );
                     d.Type           = $('select[name="Type"]').val( );
-                    d.Level          = $('select[name="Level"]').val( ); 
+                    d.Level          = $('select[name="Level"]').val( );
                     d.Status         = $('select[name="Status"]').val( );
                     d.Start_Date     = $('input[name="Start_Date"]').val( );
                     d.End_Date       = $('input[name="End_Date"]').val( );
