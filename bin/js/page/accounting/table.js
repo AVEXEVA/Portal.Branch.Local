@@ -23,7 +23,7 @@ $(document).ready(function( ){
           selector : 'td.ID'
         },
         ajax: {
-                url     : 'bin/php/get/Accounting.php',
+                url     : 'bin/php/get/accounting.php',
                 data    : function(d){
                     d = {
                         draw : d.draw,
