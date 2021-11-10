@@ -136,7 +136,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Estimate.ID 		  AS ID,
                           Estimate.fDate    AS Date,
-                          Estimate.Name	 	  AS Contact,
+                          Contact.ID        AS Contact_ID,
+                          Contact.Name      AS Contact_Name,
+                          Contact.EMail     AS Contact_Email,
+                          Contact.Cellular  AS Contact_Phone,
+                          Contact.Address   AS Contact_Street,
+                          Contact.City      AS Contact_City,
+                          Contact.State     AS Contact_State,
+                          Contact.Zip       AS Contact_Zip,
                           Customer.Name     AS Customer,
                           Location.Tag      AS Location,
                           Job.fDesc         AS Job,
@@ -144,6 +151,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           Estimate.Cost     AS Cost,
                           Estimate.Price    AS Price,
                           Estimate.Status   AS Status
+                          
                   FROM    Estimate
                           LEFT JOIN Job ON Job.ID = Estimate.Job
                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
@@ -154,6 +162,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                               FROM    Owner
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Job.Owner = Customer.ID
+                          LEFT JOIN Rol AS Contact ON Contact.ID = Estimate.RolID
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";

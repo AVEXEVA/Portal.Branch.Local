@@ -133,7 +133,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             OpenAR.Due AS Due,
                             OpenAR.Original AS Original,
                             OpenAR.Balance AS Balance,
-                            OpenAR.fDesc AS Description
+                            OpenAR.fDesc AS Description,
+                            Executive.ID AS Executive_ID,
+                            Executive.Name AS Executive_Name
                     FROM    OpenAR 
                             LEFT JOIN Invoice      ON OpenAR.Ref  = Invoice.Ref
                             LEFT JOIN Loc AS Location ON OpenAR.Loc  = Location.Loc
@@ -144,29 +146,20 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                         LEFT JOIN Rol ON Owner.Rol = Rol.ID
                             ) AS Customer ON Location.Owner   = Customer.ID
                             LEFT JOIN Job          ON Invoice.Job = Job.ID
-                            LEFT JOIN JobType      ON Job.Type    = JobType.ID      
+                            LEFT JOIN JobType      ON Job.Type    = JobType.ID  
+                            LEFT JOIN Terr AS Executive ON Executive.ID = Location.Terr    
                     WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = $database->query(
-      $conn,  
+      null,  
       $sQuery, 
       $params 
     ) or die(print_r(sqlsrv_errors()));
 
     $sQueryRow = "
-        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                OpenAR.Ref AS ID,
-                Customer.Name AS Customer,
-                Location.Tag AS Location,
-                Job.fDesc AS Job,
-                JobType.Type AS Type,
-                OpenAR.fDate AS Date,
-                OpenAR.Due AS Due,
-                OpenAR.Original AS Original,
-                OpenAR.Balance AS Balance,
-                OpenAR.fDesc AS Description
+        SELECT  Count( OpenAR.Ref ) AS Count
         FROM    OpenAR 
                 LEFT JOIN Invoice      ON OpenAR.Ref  = Invoice.Ref
                 LEFT JOIN Loc AS Location ON OpenAR.Loc  = Location.Loc
@@ -179,10 +172,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 LEFT JOIN Job          ON Invoice.Job = Job.ID
                 LEFT JOIN JobType      ON Job.Type    = JobType.ID      
         WHERE   ({$conditions}) AND ({$search});";
-    $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = $database->query( $conn, $sQueryRow , $params, $options ) or die(print_r(sqlsrv_errors()));
+    
+    $stmt = $database->query( null, $sQueryRow , $params ) or die(print_r(sqlsrv_errors()));
 
-    $iFilteredTotal = sqlsrv_num_rows( $stmt );
+    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
     $params = array(
       $DateStart,
@@ -190,7 +183,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $sQuery = " SELECT  COUNT( OpenAR.Ref )
                 FROM    OpenAR;";
-    $rResultTotal = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = $database->query( null,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 

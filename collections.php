@@ -126,6 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <table id='Table_Collections' class='display' cellspacing='0' width='100%'>
                         <thead><tr class='text-white text-center'>
                             <th class='border border-white'>ID</th>
+                            <th class='border border-white'>Executive</th>
                             <th class='border border-white'>Customer</th>
                             <th class='border border-white'>Location</th>
                             <th class='border border-white'>Job</th>
@@ -137,6 +138,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <th class='border border-white'>Description</th>
                         </tr><tr class='form-desktop'>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                            <th class='border border-white'><input class='redraw form-control' type='text' name='Executive' placeholder='Executive' value='<?php echo isset( $_GET[ 'Executive' ] ) ? $_GET[ 'Executive' ] : null;?>' /></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
