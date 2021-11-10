@@ -116,7 +116,7 @@ $(document).ready(function( ){
                         case 'display' :
                             return  row.ID !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='ticket.php?ID=" + row.ID + "'><i class='fa fa-ticket fa-fw fa-1x'></i> Ticket #" + row.ID + "</a></div>" + 
+                                        "<div class='col-12'><a href='ticket.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Ticket #" + row.ID + "</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :

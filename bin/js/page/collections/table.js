@@ -50,6 +50,20 @@ $( document ).ready( function( ){
       {
         data : 'ID' ,
       },{
+        data : 'Executive_ID',
+        render : function( data, type, row, meta ){
+          switch( type ){
+            case 'display' :
+                return  row.Executive_ID !== null 
+                    ?   "<div class='row'>" + 
+                            "<div class='col-12'><a href='executive.php?ID=" + row.Executive_ID + "'>" + row.Executive_Name + "</a></div>" + 
+                        "</div>"
+                    :   null;
+            default :
+                return data;
+          }
+        }
+      },{
         data : 'Customer_ID',
         render : function( data, type, row, meta ){
           switch( type ){

@@ -34,16 +34,74 @@ data : function( d ){
               dir : d.order[0].dir
           }
       };
-      d.Search = $('input[name='Search']').val( );
-      d.Customer = $('input[name='Customer']').val( );
-      d.Location = $('input[name='Location']').val( );
-      d.Job = $('input[name='Job']').val( );
+      d.Search = $("input[name='Search']").val( );
+      d.Customer = $("input[name='Customer']").val( );
+      d.Location = $("input[name='Location']").val( );
+      d.Job = $("input[name='Job']").val( );
       return d;
       }
 },
 columns: [
 {
-  data : 'ID' ,
+                className : 'ID',
+                data : 'ID',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null 
+                                ?   "<div class='row'>" + 
+                                        "<div class='col-12'><a href='proposal.php?ID=" + row.ID + "'><i class='fa fa-ticket fa-fw fa-1x'></i> Proposal #" + row.ID + "</a></div>" + 
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+
+                }
+
+            },{
+    data : 'Contact_ID',
+    render : function( data, type, row, meta ){
+        switch( type ){
+            case 'display' :
+                return  row.Contact_ID !== null
+                    ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='customer.php?ID=" + row.Contact_ID + "'>" + row.Contact_Name + "</a></div>" +
+                        "</div>"
+                    :   null;
+            default :
+                return data;
+        }
+
+    }
+},{
+  data : 'Title'
+},{ 
+  data : 'Contact_Email'
+},{ 
+  data : 'Contact_Phone'
+},{
+  data : 'Contact_Street',
+  render : function( data, type, row, meta ){
+      switch( type ){
+          case 'display' :
+              return  row.Contact_Street !== null 
+                  ?   "<div class='row'>" + 
+                          "<div class='col-12'>" +
+                              "<div class='row' onClick=\"document.location.href='https://www.google.com/maps/search/?api=1&query=" + encodeURI( row.Contact_Street + ' ' + row.Contact_City + ' ' + row.Contact_State + ' ' + row.Contact_Zip ) + "';\">" +
+                                  "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Contact_Street + "</div>" + 
+                                  "<div class='col-12'>" + row.Contact_City + ", " + row.Contact_State + " " + row.Contact_Zip + "</div>" + 
+                              "</div>" +
+                          "</div>" +  
+                      "</div>"
+                  :   null;
+          default :
+              return data;
+      }
+
+  }
+},{
+  data   : 'Date'
 },{
     data : 'Customer_ID',
     render : function( data, type, row, meta ){
@@ -90,26 +148,10 @@ columns: [
         }
     }
 },{
-  data   : 'Date'
+  data    :  'Cost'
 },{
-  data   : 'Contract'
-},{
-  data      : 'Customer',
-},{
-  data    :  'Description'
-},{
-  data      : 'Jobs',
-},{
-  data      : 'Location',
-},{
-  data      : 'Jobs',
-},{
-  data      : 'Title',
-},{
-  data      : 'Cost',
-},{
-  data      : 'Price',
+  data      : 'Price'
 }
 ]
 } );
-}
+});

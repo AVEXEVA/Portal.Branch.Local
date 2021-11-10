@@ -104,36 +104,25 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
                     Emp.Last             AS Route_Mechanic_Last_Name,
                     Loc.Owner            AS Customer_ID,
                     Customer.Name    	 AS Customer_Name,
-                    Terr.Name            AS Territory_Domain
-                    Loc.Custom1 		 AS Custom_Fields.Loc1
+                    Territory.ID 		 AS Territory_ID,
+                    Territory.Name       AS Territory_Name
             FROM    Loc
                     LEFT JOIN Zone         ON Loc.Zone   = Zone.ID
                     LEFT JOIN Route        ON Loc.Route  = Route.ID
                     LEFT JOIN Emp          ON Route.Mech = Emp.fWork
                     LEFT JOIN (
-            				SELECT 	Owner.ID    AS ID,
-		                    		Rol.Name    AS Name,
-		                    		Rol.Address AS Street,
-				                    Rol.City    AS City,
-				                    Rol.State   AS State,
-				                    Rol.Zip     AS Zip,
-				                    Owner.Status  AS Status,
-									Rol.Website AS Website
+            				SELECT 	Owner.ID    	AS ID,
+		                    		Rol.Name    	AS Name,
+		                    		Rol.Address 	AS Street,
+				                    Rol.City    	AS City,
+				                    Rol.State   	AS State,
+				                    Rol.Zip     	AS Zip,
+				                    Owner.Status  	AS Status,
+									Rol.Website 	AS Website
 							FROM    Owner
-									LEFT JOIN Rol ON Owner.Rol = Rol.ID
+							LEFT JOIN Rol ON Owner.Rol = Rol.ID
             		) AS Customer ON Loc.Owner = Customer.ID
-            		LEFT JOIN (
-	            		(
-	            			SELECT 	Custom.Name,
-	            					Custom.Label
-	            			FROM 	Custom 
-	            			WHERE 	Custom.Name LIKE '%Loc%' AND 106 <= ID AND ID <= 115
-	            		) AS t
-	            		UNPIVOT(
-	            			val for t.Name IN ( Custom.Label )
-	            		)
-	            	) AS Custom_Fields
-                    LEFT JOIN Terr         		   ON Terr.ID    = Loc.Terr
+                    LEFT JOIN Terr AS Territory ON Territory.ID    = Loc.Terr
             WHERE 	Loc.Loc = ?;",array($_GET[ 'ID' ]));
         $Location = sqlsrv_fetch_array($result);
 ?><!DOCTYPE html>
@@ -308,7 +297,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				                var map;
 				                function initialize() {
 				                     map = new google.maps.Map(
-				                        document.getElementById( 'map' ),
+				                        document.getElementById( 'location_map' ),
 				                        {
 				                          zoom: 10,
 				                          center: new google.maps.LatLng( <?php echo $Location[ 'Latitude' ];?>, <?php echo $Location[ 'Longitude' ];?> ),
@@ -327,7 +316,9 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				                }
 				                $(document).ready(function(){ initialize(); });
 				            </script>
-					        <div class='card-body' id='map' style='min-height:250px;'>&nbsp;</div>
+					        <div class='card-body'>
+					        	<div id='location_map' class='map'>&nbsp;</div>
+					        </div>
 						</div>
 					</div>
 				<?php }?>
@@ -454,7 +445,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				                <div class='row g-0'>
 				                    <div class='col-8'><input disabled type='text' value='<?php echo $Location[ 'Territory_Name'];?>' /></div>
 				                    <div class='col-4'>
-				                        <button onClick="someFunction(this,'proposals.php?ID=<?php echo $Location['Location_ID'];?>">
+				                        <button onClick="document.location.href='territory.php?ID=<?php echo $Location['Territory_ID'];?>';">
 				                            <i class='fa fa-search fa-fw fa-1x'></i>
 				                        </button>
 				                    </div>

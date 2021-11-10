@@ -54,35 +54,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <html lang="en">
 <head>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <style> 
-        table#Table_Violations { font-size:10px;} 
-        table#Table_Violations tbody tr { height:50px; }
-        td.indent { width:0px; }
-        table.dataTable tr.dtrg-group td{background-color:#1d1d1d;color:white;}
-        table.dataTable tr.dtrg-group.dtrg-level-0 td{font-weight:bold}
-        table.dataTable tr.dtrg-group.dtrg-level-1 td,table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#5d5d5d;color:white;padding-top:0.25em;padding-bottom:0.25em;padding-left:2em;font-size:0.9em}
-        table.dataTable tr[role='row'] td.sorting_2 {
-            background-color:gold !important;
-            color:black;
-        }
-    </style>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php');?>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+    <?php require( bin_css  . 'index.php');?>
+    <?php require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+<body onload='finishLoadingPage();'>
+    <div id="wrapper">
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
-            <div class="panel panel-primary">
-                <div class="panel-heading">
+            <div class="card card-full card-primary border-0">
+                <div class="card-heading">
                     <div class='row'>
                         <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</div>
                         <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
                     </div>
                 </div>
-                <div class="panel-body no-print" id='Filters' style='border-bottom:1px solid #1d1d1d;'>
+                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='locations.php'>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class='row'>
                         <div class='col-xs-4'>Search:</div>
@@ -110,59 +99,120 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         </select></div>
                     </div>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                </div>
-                <div class='panel-body'>
+                </form></div>
+                <div class='card-body bg-dark'>
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
                             <th title='ID'>ID</th>
-                            <th title='Name'>Name</th>
-                            <th title="Date">Date</th>
+                            <th title='Customer'>Customer</th>
                             <th title='Location'>Location</th>
+                            <th title="Date">Date</th>
                             <th title='Status'>Status</th>
+                        </tr><tr class='form-desktop'>
+                            <th title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                            <th title='Customer'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
+                            <th title='Location'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+                            <th title="Date"><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
+                            
+                            <th title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
                         </tr></thead>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-    
-    <?php $_GET[ 'Datatables_Simple' ] = 1; ?>
-    <?php require('bin/js/datatables.php');?>
-    <script src='https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js'></script>
-    
     <script>
-        var grouping_id = 5;
-        var grouping_name = 'Status';
-        var collapsedGroups = [];
-        var groupParent = [];
+        var Editor_Violations = new $.fn.dataTable.Editor( {
+        idSrc    : 'ID',
+        ajax     : 'index.php',
+        table    : '#Table_Violations'
+    } );
         var Table_Violations = $('#Table_Violations').DataTable( {
-            dom        : 'tlp',
-            processing : true,
-            serverSide : true,
-            responsive : true,
-            autoWidth  : false,
-            paging     : false,
-            searching  : false,
+            dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+            processing     : true,
+            serverSide     : true,
+            searching      : false,
+            lengthChange   : false,
+            scrollResize   : true,
+            scrollY        : 100,
+            scroller       : true,
+            scrollCollapse : true,
+            paging         : true,
+            orderCellsTop  : true,
+            autoWidth      : true,
+            responsive     : true,
             columns    : [
                 {
                     data      : 'ID',
-                    className : 'hidden'
-                },{
-                    data : 'Name',
-                    render: function ( d ){
-                        return d == null 
-                            ?   'Untitled'
-                            :   d;
+                    render : function( data, type, row, meta ){
+                        switch( type ){
+                            case 'display' :
+                                return  row.ID !== null  
+                                    ?   "<div class='row'>" + 
+                                            "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> Violation #" + row.ID + "</a></div>" + 
+                                            "<div class='col-12'>" + ( row.Name !== null && row.Name != '' ? row.Name : 'Misisng Name' )+ "</a></div>" + 
+                                        "</div>"
+                                    :   'Missing Name';
+                            default :
+                                return data;
+                        }
                     }
                 },{
-                    data : 'Date'
+                    data : 'Customer_ID',
+                    render : function( data, type, row, meta ){
+                        switch( type ){
+                            case 'display' :
+                                return  row.Customer_ID !== null 
+                                    ?   "<div class='row'>" + 
+                                            "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
+                                        "</div>"
+                                    :   null;
+                            default :
+                                return data;
+                        }
+
+                    }
                 },{
-                    data : 'Location'
+                    data : 'Location_ID',
+                    render : function( data, type, row, meta ){
+                        switch( type ){
+                            case 'display' :
+                                return  row.Location_ID !== null 
+                                    ?   "<div class='row'>" + 
+                                            "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" + 
+                                            "<div class='col-12'>" +
+                                                "<div class='row'>" +
+                                                    "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" + 
+                                                    "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" + 
+                                                "</div>" +
+                                            "</div>" +  
+                                        "</div>"
+                                    :   null;
+                            default :
+                                return data;
+                        }
+
+                    }
+                },{
+                    data : 'Date',
+                    render: function( data, type, row, meta ){
+                        switch( type ){
+                            case 'display':
+                                return row.Date !== null 
+                                    ?   "<div class='row'>" +
+                                            "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" + 
+                                        "</div>"
+                                    :   null;
+                                default : 
+                                    return data;
+
+                        }
+                    }
+                
                 },{
                     data : 'Status'
                 }
             ],
-            order: [ [ 4, 'asc' ], [2, 'asc' ] ],
             ajax : {
                 data : function( d ){ 
                     d = {
@@ -174,56 +224,50 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         }
                     };
                     d.Search = $('input[name="Search"]').val( );
-                    d.Name = $('input[name="Name"]').val( );
                     d.Location = $('input[name="Location"]').val( );
                     d.Date_Start = $('input[name="Date_Start"]').val( );
                     d.Date_End = $('input[name="Date_End"]').val( );
                     d.Status = $('input[name="Status"]').val( );
                     return d; 
                 },
-                url : 'bin/php/get/Violations2.php'
+                url : 'bin/php/get/Violations.php'
             },
-            drawCallback : function ( settings ) { hrefViolations( ); },
-            rowGroup: { 
-                // Uses the 'row group' plugin
-                dataSrc: [
-                  'Status',
-                  'Location'
-                ],
-                startRender: function(rows, group, level) {
-                    groupParent[level] = group;
-
-                    var groupAll = '';
-                    for (var i = 0; i < level; i++) {groupAll += groupParent[i]; if (collapsedGroups[groupAll]) {return;}}
-                    groupAll += group;
-
-                    if ((typeof(collapsedGroups[groupAll]) == 'undefined') || (collapsedGroups[groupAll] === null)) {collapsedGroups[groupAll] = true;} //True = Start collapsed. False = Start expanded.
-
-                    var collapsed = collapsedGroups[groupAll];
-                    var newTickets = 0;
-                    rows.nodes().each(function(r) {
-                        if(( $(r).children(':nth-child(2)').html() != 'On Site' && $(r).children(':nth-child(2)').html() != 'En Route'  && $(r).children(':nth-child(6)').html() != 'Yes') || $(r).children(':nth-child(2)').html() == 'Reviewing' || $(r).children(':nth-child(2)').html() == 'Signed' || $(r).children(':nth-child(2)').html() == 'Completed'){
-                          r.style.display = (collapsed ? 'none' : '');
-                        }
-                        /*var start = new Date();
-                        start.setHours(0,0,0,0);
-                        var end = new Date();
-                        end.setHours(23,59,59,999);
-
-                        if( new Date($(r).children(':nth-child(3)').html()) >= start && new Date($(r).children(':nth-child(3)').html()) < end && $(r).children(':nth-child(2)').html() != 'Reviewing' && $(r).children(':nth-child(2)').html() != 'Signed' && $(r).children(':nth-child(2)').html() != 'Completed'){ newTickets++; }*/
-                    });
-                    var newString = '';
-                    return $('<tr/>').append('<td colspan="'+rows.columns()[0].length+'">' + group  + ' ( ' + rows.count() + ' total' + newString + ' ) </td>').attr('data-name', groupAll).toggleClass('collapsed', collapsed);
+            initComplete : function( ){
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
+            $('input.date').datepicker( { } );
+            $('input.time').timepicker( {  timeFormat : 'h:i A' } );
+            //search( this );
+            $( '.redraw' ).bind( 'change', function(){ Table_Violations.draw(); });
+        },
+        buttons: [
+            {
+                text: 'Reset Search',
+                action: function ( e, dt, node, config ) {
+                    $( 'input, select' ).each( function( ){
+                        $( this ).val( '' );
+                    } );
+                    Table_Violations.draw( );
                 }
-            }
+            },{
+                text : 'Get URL',
+                action : function( e, dt, node, config ){
+                    var d = { };
+                    d.Search = $('input[name="Search"]').val( );
+                    d.Name = $('input[name="Name"]').val( );
+                    d.Location = $('input[name="Location"]').val( );
+                    d.Date_Start = $('input[name="Date_Start"]').val( );
+                    d.Date_End = $('input[name="Date_End"]').val( );
+                    d.Status = $('input[name="Status"]').val( );
+                    document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
+                }
+            },
+            { extend: 'create', editor: Editor_Violations },
+            { extend: 'edit',   editor: Editor_Violations },
+            { extend: 'remove', editor: Editor_Violations },
+            'copy',
+            'csv'
+        ]
         } );
-        $('tbody').on('click', 'tr.dtrg-start', function () {
-            var name = $(this).data('name');
-            collapsedGroups[name] = !collapsedGroups[name];
-            Table_Violations.draw( );
-        });
-        function redraw( ){ Table_Violations.draw( ); }
-        function hrefViolations(){hrefRow("Table_Violations","violation");}
     </script>
 </body>
 </html>
