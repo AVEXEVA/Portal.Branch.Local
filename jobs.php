@@ -82,13 +82,20 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ) {
 						<thead><tr class='text-align:center;'>
                             <th class='text-white border border-white' title='ID'>ID</th>
                             <th class='text-white border border-white' title='Name'>Name</th>
+                            <th class='text-white border border-white' title='Date'>Date</th>
                             <th class='text-white border border-white' title='Customer'>Customer</th>
                             <th class='text-white border border-white' title='Location'>Location</th>
                             <th class='text-white border border-white' title='Type'>Type</th>
                             <th class='text-white border border-white' title='Status'>Status</th>
+                            <th class='text-white border border-white' title='Tickets'>Tickets</th>
+                            <th class='text-white border border-white' title='Invoices'>Invoices</th>
                         </tr><tr>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Name'><input class='redraw form-control' text='text'name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+                            <th class='border border-white'><div class='row g-0'>
+                                <div class='col-12'><input class='redraw date' type='text' name='Date_Start' placeholder='Date Start' value='<?php echo isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null;?>' /></div>
+                                <div class='col-12'><input class='redraw date' type='text' name='Date_End' placeholder='Date End' value='<?php echo isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null;?>' /></div>
+                            </div></th>
                             <th class='text-white border border-white' title='Customer'><input class='redraw form-control' text='text'name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Location'><input class='redraw form-control' text='text'name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
@@ -96,13 +103,18 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ) {
                                 <?php 
                                     $result = \singleton\database::getInstance( )->query( 
                                         null,
-                                        "   SELECT  JobType.Type,
-                                            FROM    JobType"
+                                        "   SELECT  JobType.ID,
+                                                    JobType.Type
+                                            FROM    JobType
+                                            WHERE   Type <> 'LAWSUITS';",
+                                        array( )
                                     );
                                     if( $result ){while ($row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Type'];?></option><?php }}
                                 ?>  
                             </select></th>
                             <th class='text-white border border-white' title='Status'><input class='form-control' text='text'name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
+                            <th class='text-white border border-white' title='Tickets'><input class='form-control' text='text'name='Tickets' placeholder='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null;?>' /></th>
+                            <th class='text-white border border-white' title='Invoices'><input class='form-control' text='text'name='Invoices' placeholder='Invoices' value='<?php echo isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null;?>' /></th>
                         </tr></thead>
 				   </table>
 			    </div>

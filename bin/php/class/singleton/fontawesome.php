@@ -39,6 +39,7 @@ class fontawesome extends \singleton\index {
 	public function Invoice($Size=null){?><i class='fa fa-stack-overflow fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Activities($Size=null){?><i class='fa fa-feed fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Collection($Size=null){?><i class='fa fa-dollar fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function Dollar($Size=null){?><i class='fa fa-dollar fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Proposal($Size=null){?><i class='fa fa-folder-open fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Search($Size=null){?><i class='fa fa-search fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Contract($Size=null){?><i class='fa fa-pencil fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }

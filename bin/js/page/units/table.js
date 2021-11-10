@@ -9,25 +9,25 @@ function search( link ){
                 $.ajax({
                     url : 'bin/php/get/search/Units.php',
                     method : 'GET',
-										data : function( d ){
-						            d = {
-						                start : d.start,
-						                length : d.length,
-						                order : {
-						                    column : d.order[0].column,
-						                    dir : d.order[0].dir
-						                }
-						            };
-						            d.Search 		= $('input[name="Search"]').val();
-						            d.ID 			= $('input[name="ID"]').val( );
-						            d.Name 			= $('input[name="Name"]').val( );
-						            d.Customer 		= $('input[name="Customer"]').val( );
-						            d.Location 		= $('input[name="Location"]').val( );
-						            d.Building_ID 	= $('input[name="Building_ID"]').val( );
-						            d.Type 			= $('select[name="Type"]').val( );
-						            d.Status 		= $('select[name="Status"]').val( );
-						            return d;
-						        }
+					data : function( d ){
+			            d = {
+			                start : d.start,
+			                length : d.length,
+			                order : {
+			                    column : d.order[0].column,
+			                    dir : d.order[0].dir
+			                }
+			            };
+			            d.Search 		= $('input[name="Search"]').val();
+			            d.ID 			= $('input[name="ID"]').val( );
+			            d.Name 			= $('input[name="Name"]').val( );
+			            d.Customer 		= $('input[name="Customer"]').val( );
+			            d.Location 		= $('input[name="Location"]').val( );
+			            d.Building_ID 	= $('input[name="Building_ID"]').val( );
+			            d.Type 			= $('select[name="Type"]').val( );
+			            d.Status 		= $('select[name="Status"]').val( );
+			            return d;
+			        },
                     dataType : 'json',
                     beforeSend : function( ){
                         abort( );

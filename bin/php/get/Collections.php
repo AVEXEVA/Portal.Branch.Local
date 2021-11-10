@@ -4,7 +4,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
             FROM    Connection
@@ -16,7 +16,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name,
@@ -28,7 +28,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
                     Privilege.User_Privilege,
@@ -58,58 +58,111 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
     $conditions = array( );
     $search = array( );
-    $params = array( );
+    $parameters = array( );
+
+    if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Customer'];
+        $conditions[] = "OpenAR.Ref LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Territory' ] ) && !in_array( $_GET[ 'Territory' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Territory'];
+        $conditions[] = "Territory.Name LIKE '%' + ? + '%'";
+    }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
-        $params[] = $_GET['Customer'];
+        $parameters[] = $_GET['Customer'];
         $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-        $params[] = $_GET['Location'];
+        $parameters[] = $_GET['Location'];
         $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
     } 
     if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
-        $params[] = $_GET['Job'];
+        $parameters[] = $_GET['Job'];
         $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
-    } 
+    }
+    if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Type'];
+        $conditions[] = "JobType.Type LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Date_Start' ] ) && !in_array( $_GET[ 'Date_Start' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Date_Start'];
+        $conditions[] = "OpenAR.fDate >= ?";
+    }
+    if( isset($_GET[ 'Date_End' ] ) && !in_array( $_GET[ 'Date_End' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Date_End'];
+        $conditions[] = "OpenAR.fDate < ?";
+    }
+    if( isset($_GET[ 'Due_Start' ] ) && !in_array( $_GET[ 'Due_Start' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Due_Start'];
+        $conditions[] = "OpenAR.Due >= ?";
+    }
+    if( isset($_GET[ 'Due_End' ] ) && !in_array( $_GET[ 'Due_End' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Due_End'];
+        $conditions[] = "OpenAR.fDate < ?";
+    }
+    if( isset($_GET[ 'Original_Start' ] ) && !in_array( $_GET[ 'Original_Start' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Original_Start'];
+        $conditions[] = "OpenAR.Original >= ?";
+    }
+    if( isset($_GET[ 'Original_End' ] ) && !in_array( $_GET[ 'Original_End' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Original_End'];
+        $conditions[] = "OpenAR.Original < ?";
+    }
+    if( isset($_GET[ 'Balance_Start' ] ) && !in_array( $_GET[ 'Balance_Start' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Balance_Start'];
+        $conditions[] = "OpenAR.Balance >= ?";
+    }
+    if( isset($_GET[ 'Balance_End' ] ) && !in_array( $_GET[ 'Balance_End' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Balance_End'];
+        $conditions[] = "OpenAR.Balance < ?";
+    }
+    if( isset($_GET[ 'Description' ] ) && !in_array( $_GET[ 'Description' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Description'];
+        $conditions[] = "OpenAR.fDesc < ?";
+    }
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
       
-      $params[] = $_GET['Search'];
+      $parameters[] = $_GET['Search'];
       $search[] = "OpenAR.Ref LIKE '%' + ? + '%'";
       
-      $params[] = $_GET['Search'];
+      $parameters[] = $_GET['Search'];
       $search[] = "OpenAR.fDesc LIKE '%' + ? + '%'";
 
-      $params[] = $_GET['Search'];
+      $parameters[] = $_GET['Search'];
       $search[] = "Customer.Name LIKE '%' + ? + '%'";
 
-      $params[] = $_GET['Search'];
+      $parameters[] = $_GET['Search'];
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
 
-      $params[ ] = $_GET[ 'Search' ];
+      $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "Job.ID LIKE '%' + ? + '%'";
 
-      $params[ ] = $_GET[ 'Search' ];
+      $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "Job.fDesc LIKE '%' + ? + '%'";
       
-      $params[ ] = $_GET[ 'Search' ];
+      $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "JobType.Type LIKE '%' + ? + '%'";
     }*/
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    $params[] = $Start;
-    $params[] = $End;
+    
+    /*ROW NUMBER*/
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+
     $Columns = array(
         0 =>  'OpenAR.Ref',
-        1 =>  'Customer.Name',
-        2 =>  'Location.Tag',
-        3 =>  'Job.fDesc',
-        4 =>  'JobType.Type',
-        5 =>  'OpenAR.fDate',
-        6 =>  'OpenAR.Due',
-        7 =>  'OpenAR.Original',
-        8 =>  'OpenAR.Balance',
-        9 =>  'OpenAR.fDesc'
+        1 =>  'Territory.Name',
+        2 =>  'Customer.Name',
+        3 =>  'Location.Tag',
+        4 =>  'Job.fDesc',
+        5 =>  'JobType.Type',
+        6 =>  'OpenAR.fDate',
+        7 =>  'OpenAR.Due',
+        8 =>  'OpenAR.Original',
+        9 =>  'OpenAR.Balance',
+        10 =>  'OpenAR.fDesc'
     );
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
@@ -126,6 +179,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Customer.Name AS Customer_Name,
                             Location.Loc AS Location_ID,
                             Location.Tag AS Location_Name,
+                            Location.Address AS Location_Street,
+                            Location.City AS Location_City,
+                            Location.State AS Location_State,
+                            Location.Zip AS Location_Zip,
                             Job.ID AS Job_ID,
                             Job.fDesc AS Job_Name,
                             JobType.Type AS Type,
@@ -134,8 +191,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             OpenAR.Original AS Original,
                             OpenAR.Balance AS Balance,
                             OpenAR.fDesc AS Description,
-                            Executive.ID AS Executive_ID,
-                            Executive.Name AS Executive_Name
+                            Territory.ID AS Territory_ID,
+                            Territory.Name AS Territory_Name
                     FROM    OpenAR 
                             LEFT JOIN Invoice      ON OpenAR.Ref  = Invoice.Ref
                             LEFT JOIN Loc AS Location ON OpenAR.Loc  = Location.Loc
@@ -147,15 +204,15 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             ) AS Customer ON Location.Owner   = Customer.ID
                             LEFT JOIN Job          ON Invoice.Job = Job.ID
                             LEFT JOIN JobType      ON Job.Type    = JobType.ID  
-                            LEFT JOIN Terr AS Executive ON Executive.ID = Location.Terr    
+                            LEFT JOIN Terr AS Territory ON Territory.ID = Location.Terr    
                     WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
-    $rResult = $database->query(
+    $rResult = \singleton\database::getInstance( )->query(
       null,  
       $sQuery, 
-      $params 
+      $parameters 
     ) or die(print_r(sqlsrv_errors()));
 
     $sQueryRow = "
@@ -173,22 +230,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 LEFT JOIN JobType      ON Job.Type    = JobType.ID      
         WHERE   ({$conditions}) AND ({$search});";
     
-    $stmt = $database->query( null, $sQueryRow , $params ) or die(print_r(sqlsrv_errors()));
+    $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
     $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
-    $params = array(
-      $DateStart,
-      $DateEnd
-    );
     $sQuery = " SELECT  COUNT( OpenAR.Ref )
                 FROM    OpenAR;";
-    $rResultTotal = $database->query( null,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = \singleton\database::getInstance( )->query( null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
     $output = array(
-        'sEcho'         =>  intval($_GET['sEcho']),
+        'sEcho'         =>  intval( $_GET[ 'draw' ] ),
         'iTotalRecords'     =>  $iTotal,
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()

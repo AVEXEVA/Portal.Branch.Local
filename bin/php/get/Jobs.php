@@ -1,317 +1,223 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('index.php');
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = \singleton\database::getInstance( )->query(
-        null,
-      " SELECT *
-        FROM   Connection
-        WHERE  Connection.Connector = ?
-               AND Connection.Hash = ?
-    ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r);
-    $User    = \singleton\database::getInstance( )->query(
-        null,
-    "   SELECT Emp.*,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name
-        FROM   Emp
-        WHERE  Emp.ID = ?;",
-      array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = \singleton\database::getInstance( )->query(
-        null,
-      " SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?;",
-      array($_SESSION['User']));
-    $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = False;
-    if( isset($Privileges['Job'])
-        && (
-				$Privileges['Job']['Other_Privilege'] >= 4
-			||	$Privileges['Job']['Group_Privlege'] >= 4
-			||  $Privileges['Job']['User_Privilege'] >= 4
-		)
-	 ){
-            $Privileged = True;}
-    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
-    else {
-$serverName = "172.16.12.45"; //serverName\instanceName
-$connectionInfo = array(
-	"Database"=>"nei",
-	"UID"=>"sa",
-	"PWD"=>"SQLABC!23456",
-	'ReturnDatesAsStrings'=>true
-);
-$conn = sqlsrv_connect( $serverName, $connectionInfo);
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+    'read_and_close' => true
+  ] );
+  require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+  //Connection
+  $result = \singleton\database::getInstance( )->query(
+      null,
+      "   SELECT  *
+          FROM    Connection
+          WHERE       Connection.Connector = ?
+                  AND Connection.Hash = ?;",
+      array(
+        $_SESSION[ 'User' ],
+        $_SESSION[ 'Hash' ]
+      )
+    );
+  $Connection = sqlsrv_fetch_array( $result );
 
-    /*
-     * Script:    DataTables server-side script for PHP and MySQL
-     * Copyright: 2010 - Allan Jardine
-     * License:   GPL v2 or BSD (3-point)
-     */
+  //User
+  $result = \singleton\database::getInstance( )->query(
+      null,
+      "   SELECT  Emp.*,
+                  Emp.fFirst AS First_Name,
+                  Emp.Last   AS Last_Name
+          FROM    Emp
+          WHERE   Emp.ID = ?;",
+      array(
+        $_SESSION[ 'User' ]
+      )
+  );
+  $User = sqlsrv_fetch_array( $result );
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * Easy set variables
-     */
+  //Privileges
+  $result = \singleton\database::getInstance( )->query(
+      null,
+      "   SELECT  Privilege.Access_Table,
+                  Privilege.User_Privilege,
+                  Privilege.Group_Privilege,
+                  Privilege.Other_Privilege
+          FROM    Privilege
+          WHERE   Privilege.User_ID = ?;",
+      array(
+        $_SESSION[ 'User' ]
+      )
+  );
+  $Privileges = array();
+  while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+  $Privileged = False;
+  if(     isset( $Privileges[ 'Job' ] )
+      &&  $Privileges[ 'Job' ][ 'User_Privilege' ]  >= 4
+      &&  $Privileges[ 'Job' ][ 'Group_Privilege' ]  >= 4
+      &&  $Privileges[ 'Job' ][ 'Other_Privilege' ]  >= 4
+  ){        $Privileged = True; }
+  if( !isset($Connection['ID']) || !$Privileged ){print json_encode( array( 'data' => array( ) ) );}
+  else {
 
-    /* Array of database columns which should be read and sent back to DataTables. Use a space where
-     * you want to insert a non-database field (for example a counter or static image)
-     */
-    $aColumns = array( 'ID', 'fDesc', 'Type', 'fDate', 'Status','Loc');
+    $conditions = array( );
+    $search = array( );
+    $parameters = array( );
 
-    /* Indexed column (used for fast and accurate table cardinality) */
-    $sIndexColumn = "ID";
-
-    /* DB table to use */
-    $sTable = "Job";
-
-
-    /*
-     * Paging
-     */
-    $sLimit = "";
-	$_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-	$_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
-
-    $Start = $_GET['iDisplayStart'];
-    $Length = $_GET['iDisplayLength'];
-
-    $End = $Length == '-1' ? 9999999999 : intval($Start) + intval($Length);
-
-    if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
-    {
-    $sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS
-                                FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY ";
+    if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['ID'];
+      $conditions[] = "Job.ID LIKE '%' + ? + '%'";
     }
-
-
-    /*
-     * Ordering
-     */
-
-    $sOrder = "";
-    if ( isset( $_GET['order'][0]['column'] ) )
-    {
-        $sOrder = "ORDER BY  ";
-        $sOrder .= $aColumns[$_GET['order'][0]['column']] . " " . $_GET['order'][0]['dir'];
-        /*for ( $i=0 ; $i<intval( $_GET['iSortingCols'] ) ; $i++ )
-        {
-            if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
-            {
-                $sOrder .= $aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."
-                    ".addslashes( $_GET['sSortDir_'.$i] ) .", ";
-            }
-        }
-
-        $sOrder = substr_replace( $sOrder, "", -2 );
-        if ( $sOrder == "ORDER BY" )
-        {
-            $sOrder = "";
-        }*/
+    if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Name'];
+      $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
     }
-
-
-    /*
-     * Filtering
-     * NOTE this does not match the built-in DataTables filtering which does it
-     * word by word on any field. It's possible to do here, but concerned about efficiency
-     * on very large tables, and MySQL's regex functionality is very limited
-     */
-    $sWhere = "";
-	$_GET['sSearch'] = isset($_GET['search']['value']) ? $_GET['search']['value'] : "";
-	if(isset($_SESSION['Forward-Backward'],$_SESSION['Forward-Backward']['Jobs'])) {
-		$_SESSION['Forward-Backward']['Jobs'] = $_GET['search']['value'];
-	} else {
-		$_SESSION['Forward-Backward'] = array('Jobs'=>'');
-	}
-    if ( $_GET['sSearch'] != "" )
-    {
-        $sWhere = "WHERE (";
-        for ( $i=0 ; $i<count($aColumns) ; $i++ )
-        {
-            $sWhere .= $aColumns[$i]." LIKE '%".addslashes( $_GET['sSearch'] )."%' OR ";
-        }
-        $sWhere = substr_replace( $sWhere, "", -3 );
-        $sWhere .= ')';
+    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer'];
+      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
-
-    /* Individual column filtering */
-    for ( $i=0 ; $i<count($aColumns) ; $i++ )
-    {
-        if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-        {
-            if ( $sWhere == "" )
-            {
-                $sWhere = "WHERE ";
-            }
-            else
-            {
-                $sWhere .= " AND ";
-            }
-            $sWhere .= $aColumns[$i]." LIKE '%".addslashes($_GET['sSearch_'.$i])."%' ";
-        }
+    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location'];
+      $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
     }
-
-
-    /*
-     * SQL queries
-     * Get data to display
-     */
-    $pWhere = $sWhere;
-    $sWhere = !isset($sWhere) || $sWhere == '' ? "WHERE '1'='1'" : $sWhere;
-
-    $params = array();
-    if(isset($_GET['Loc'])){
-      $sWhere .= " AND Job.Loc = ?";
-      array_push($params, $_GET['Loc']);
+    if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Type'];
+      $conditions[] = "Job_Type.Type LIKE '%' + ? + '%'";
     }
-	if($Privileges['Job']['Other_Privilege'] >= 4){
-		$sQuery =
-      " SELECT *
-			  FROM
-			 (
-				SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-				FROM $sTable
-				$sWhere
-        AND Job.Type <> 9 AND Job.Type <> 12
-			) A
-			WHERE A.ROW_COUNT BETWEEN $Start AND $End
-		";
-	} else {
-		$sQuery =
-      "SELECT *
-			 FROM
-			 (
-				SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-				FROM $sTable
-				$sWhere
-        AND Job.Type <> 9 AND Job.Type <> 12
-				AND Job.Loc IN
-					(
-						SELECT Tickets.Location_ID
-						FROM
-						(
-							(
-								SELECT   TicketO.LID AS Location_ID
-								FROM     nei.dbo.TicketO
-										 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketO.LID
-							)
-							UNION ALL
-							(
-								SELECT   TicketD.Loc AS Location_ID
-								FROM     nei.dbo.TicketD
-										 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketD.Loc
-							)
-						) AS Tickets
-						GROUP BY Tickets.Location_ID
-					)
-			 ) A
-			WHERE A.ROW_COUNT BETWEEN $Start AND $End
-		";
-	}
+    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Status'];
+      $conditions[] = "Job.Status LIKE '%' + ? + '%'";
+    }
+    /*if( $Privileges[ 'Job' ][ 'Other_Privilege' ] < 4 ){
+        $parameters [] = $User[ 'fWork' ];
+        $conditions[] = "Location.Loc IN ( SELECT Ticket.Location FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LID AS Location FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Loc AS Location FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Location)";
+    }*/
 
-    $rResult = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
+    /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
-    /* Data set length after filtering */
-	if($Privileges['Job']['Other_Privilege'] >= 4){
-		$sQueryRow = "
-			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
-			FROM   $sTable
-			$sWhere
-      AND Job.Type <> 9 AND Job.Type <> 12
-		;";
-	} else {
-		$sQueryRow = "
-			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
-			FROM   $sTable
-			$sWhere
-      AND Job.Type <> 9 AND Job.Type <> 12
-			AND  Job.Loc IN
-					(
-						SELECT Tickets.Location_ID
-						FROM
-						(
-							(
-								SELECT   TicketO.LID AS Location_ID
-								FROM     nei.dbo.TicketO
-										 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketO.LID
-							)
-							UNION ALL
-							(
-								SELECT   TicketD.Loc AS Location_ID
-								FROM     nei.dbo.TicketD
-										 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
-								WHERE    Emp.ID = {$_SESSION['User']}
-								GROUP BY TicketD.Loc
-							)
-						) AS Tickets
-						GROUP BY Tickets.Location_ID
-					)
-		";
-	}
-    $options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-    $stmt = $database->query( $conn, $sQueryRow , $params, $options );
+      $parameters[] = $_GET['Search'];
+      $search[] = "Job.ID LIKE '%' + ? + '%'";
 
-    $iFilteredTotal = sqlsrv_num_rows( $stmt );
+      $parameters[] = $_GET['Search'];
+      $search[] = "Job.fDesc LIKE '%' + ? + '%'";
 
+      $parameters[] = $_GET['Search'];
+      $search[] = "Customer.Name LIKE '%' + ? + '%'";
 
-    //echo "TOTAL " . $iFilteredTotal;
-    /* Total data set length */
-    $sQuery = "
-        SELECT COUNT(".$sIndexColumn.")
-        FROM   $sTable
-    ";
-    $rResultTotal = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
+      $parameters[] = $_GET['Search'];
+      $search[] = "Location.Tag LIKE '%' + ? + '%'";
+
+      $parameters[] = $_GET['Search'];
+      $search[] = "Job_Type.Type LIKE '%' + ? + '%'";
+
+      $parameters[] = $_GET['Search'];
+      $search[] = "Job.Status LIKE '%' + ? + '%'";
+
+    }*/
+
+    $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+
+    /*ROW NUMBER*/
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+
+    $Columns = array(
+      0 =>  'Job.ID',
+      1 =>  'Job.fDesc',
+      2 =>  'Customer.Name',
+      3 =>  'Location.Tag',
+      4 =>  'Job_Type.Type',
+      5 =>  'Job.Status'
+    );
+    $Order = isset( $Columns[ $_GET['order']['column'] ] )
+        ? $Columns[ $_GET['order']['column'] ]
+        : "Job.ID";
+    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
+      ? $_GET['order']['dir']
+      : 'ASC';
+
+    $sQuery = " SELECT *
+                FROM (
+                  SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                          Job.ID                AS ID,
+                          Job.fDesc             AS Name,
+                          Job.fDate             AS Date,
+                          Customer.ID           AS Customer_ID,
+                          Customer.Name         AS Customer_Name,
+                          Location.Loc          AS Location_ID,
+                          Location.Tag          AS Location_Name,
+                          Location.Address      AS Location_Street,
+                          Location.City         AS Location_City,
+                          Location.State        AS Location_State,
+                          Location.Zip          AS Location_Zip,
+                          Job_Type.Type         AS Type,
+                          Job.Status            AS Status,
+                          Job_Tickets.Count     AS Tickets,
+                          Job_Invoices.Count    AS Invoices
+                  FROM    Job
+                          LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
+                          LEFT JOIN (
+                              SELECT  Owner.ID,
+                                      Rol.Name
+                              FROM    Owner
+                                      LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                          ) AS Customer ON Job.Owner = Customer.ID
+                          LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
+                          LEFT JOIN (
+                            SELECT    TicketD.Job,
+                                      Count( TicketD.ID ) AS Count
+                            FROM      TicketD
+                            GROUP BY  TicketD.Job
+                          ) AS Job_Tickets ON Job_Tickets.Job = Job.ID
+                          LEFT JOIN (
+                            SELECT    Invoice.Job,
+                                      Count( Invoice.Ref ) AS Count
+                            FROM      Invoice
+                            GROUP BY  Invoice.Job
+                          ) AS Job_Invoices ON Job_Invoices.Job = Job.ID
+                  WHERE   ({$conditions}) AND ({$search})
+                ) AS Tbl
+                WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
+    //echo $sQuery;
+    $rResult = \singleton\database::getInstance( )->query(
+      null,
+      $sQuery,
+      $parameters
+    ) or die(print_r(sqlsrv_errors()));
+
+    $sQueryRow =
+      " SELECT  Count( Job.ID ) AS Count
+        FROM    Job
+                LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
+                LEFT JOIN (
+                    SELECT  Owner.ID,
+                            Rol.Name
+                    FROM    Owner
+                            LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                ) AS Customer ON Job.Owner = Customer.ID
+                LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
+        WHERE   ({$conditions}) AND ({$search})";
+
+    $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+
+    $sQuery = " SELECT  COUNT( Job.ID )
+                FROM    Job;";
+    $rResultTotal = \singleton\database::getInstance( )->query( null,  $sQuery ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
-
-
-
-    /*
-     * Output
-     */
     $output = array(
-        "sEcho" => intval($_GET['sEcho']),
-        "iTotalRecords" => $iTotal,
-        "iTotalDisplayRecords" => $iFilteredTotal,
-        "aaData" => array()
+        'sEcho'         =>  intval( $_GET[ 'draw' ] ),
+        'iTotalRecords'     =>  $iTotal,
+        'iTotalDisplayRecords'  =>  $iFilteredTotal,
+        'aaData'        =>  array()
     );
 
-    while ( $aRow = sqlsrv_fetch_array( $rResult ) )
-    {
-        $row = array();
-        for ( $i=0 ; $i<count($aColumns) ; $i++ )
-        {
-            if ( $aColumns[$i] == "version" )
-            {
-                /* Special output formatting for 'version' column */
-                $row[] = ($aRow[ $aColumns[$i] ]=="0") ? '-' : $aRow[ $aColumns[$i] ];
-            }
-            else if ( $aColumns[$i] != ' ' )
-            {
-                /* General output */
-                $row[] = $aRow[ $aColumns[$i] ];
-            }
-        }
-        $output['aaData'][] = $row;
+    while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+      $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
+      $output['aaData'][]   = $Row;
     }
-
     echo json_encode( $output );
-	}
+  }
 }
 ?>

@@ -1,264 +1,197 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('index.php');
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $r = \singleton\database::getInstance( )->query(
         null,
-      " SELECT *
-        FROM   Connection
-        WHERE  Connection.Connector = ?
-               AND Connection.Hash = ?
-    ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r);
-    $User    = \singleton\database::getInstance( )->query(
+        "   SELECT  *
+            FROM    Connection
+            WHERE       Connection.Connector = ?
+                    AND Connection.Hash = ?;",
+        array(
+          $_SESSION[ 'User' ],
+          $_SESSION[ 'Hash' ]
+        )
+      );
+    $Connection = sqlsrv_fetch_array( $r );
+    $User = \singleton\database::getInstance( )->query(
         null,
-      " SELECT Emp.*,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name
-        FROM   Emp
-        WHERE  Emp.ID = ?
-    ;", array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+        "   SELECT  Emp.*,
+                    Emp.fFirst AS First_Name,
+                    Emp.Last   AS Last_Name
+            FROM    Emp
+            WHERE   Emp.ID = ?;",
+        array(
+          $_SESSION[ 'User' ]
+        )
+    );
+    $User = sqlsrv_fetch_array( $User );
     $r = \singleton\database::getInstance( )->query(
         null,
-      " SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION['User']));
+        "   SELECT  Privilege.Access_Table,
+                    Privilege.User_Privilege,
+                    Privilege.Group_Privilege,
+                    Privilege.Other_Privilege
+            FROM    Privilege
+            WHERE   Privilege.User_ID = ?;",
+        array(
+          $_SESSION[ 'User' ]
+        )
+    );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
-    if( isset($Privileges['Invoice'])
-        && $Privileges['Invoice']['User_Privilege'] >= 4)
-        && $Privileges['Invoice']['Group_Privilege'] >= 4)
-        && $Privileges['Invoice']['Other_Privilege'] >= 4){$Privileged = True;}
-    if(!isset($Connection['ID'])  || !$Privileged){print json_encode(array('data'=>array()));}
+    if( isset( $Privileges[ 'Invoice' ] )
+        && $Privileges[ 'Invoice' ][ 'User_Privilege' ]  >= 4
+        && $Privileges[ 'Invoice' ][ 'Group_Privilege' ]  >= 4
+        && $Privileges[ 'Invoice' ][ 'Other_Privilege' ]  >= 4
+    ){ $Privileged = True; }
+    if( !isset($Connection['ID']) || !$Privileged ){ print json_encode( array( 'data' => array( ) ) ); }
     else {
-		$serverName = "172.16.12.45"; //serverName\instanceName
-		$connectionInfo = array(
-			"Database"=>"nei",
-			"UID"=>"sa",
-			"PWD"=>"SQLABC!23456"
-		);
-		$conn = sqlsrv_connect( $serverName, $connectionInfo);
 
-		/*
-		 * Script:    DataTables server-side script for PHP and MySQL
-		 * Copyright: 2010 - Allan Jardine
-		 * License:   GPL v2 or BSD (3-point)
-		 */
+    $conditions = array( );
+    $search = array( );
+    $parameters = array( );
+    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Customer'];
+        $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Location'];
+        $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Job'];
+        $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
+    }
+    /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 * Easy set variables
-		 */
+      $parameters[] = $_GET['Search'];
+      $search[] = "Invoice.Ref LIKE '%' + ? + '%'";
 
-		/* Array of database columns which should be read and sent back to DataTables. Use a space where
-		 * you want to insert a non-database field (for example a counter or static image)
-		 */
-		$aColumns = array( 'Ref','fDesc','Total');
+      $parameters[] = $_GET['Search'];
+      $search[] = "Invoice.fDesc LIKE '%' + ? + '%'";
 
-		/* Indexed column (used for fast and accurate table cardinality) */
-		$sIndexColumn = "Ref";
+      $parameters[] = $_GET['Search'];
+      $search[] = "Customer.Name LIKE '%' + ? + '%'";
 
-		/* DB table to use */
-		$sTable = "Invoice";
+      $parameters[] = $_GET['Search'];
+      $search[] = "Location.Tag LIKE '%' + ? + '%'";
 
+      $parameters[ ] = $_GET[ 'Search' ];
+      $search[ ] = "Job.ID LIKE '%' + ? + '%'";
 
-		/*
-		 * Paging
-		 */
-		$sLimit = "";
-		$_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-		$_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
+      $parameters[ ] = $_GET[ 'Search' ];
+      $search[ ] = "Job.fDesc LIKE '%' + ? + '%'";
 
-		$Start = $_GET['iDisplayStart'];
-		$Length = $_GET['iDisplayLength'];
+      $parameters[ ] = $_GET[ 'Search' ];
+      $search[ ] = "JobType.Type LIKE '%' + ? + '%'";
+    }*/
+    $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-		$End = $Length == '-1' ? 9999999999 : intval($Start) + intval($Length);
+    /*ROW NUMBER*/
+	$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
+	$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 25;
 
-		if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
-		{
-		$sLimit = "OFFSET  ".$_GET['iDisplayStart']." ROWS
-									FETCH NEXT ".$_GET['iDisplayLength']." ROWS ONLY ";
-		}
+    $Columns = array(
+        0 =>  'Invoice.Ref',
+        1 =>  'Customer.Name',
+        2 =>  'Location.Tag',
+        3 =>  'Job.fDesc',
+        4 =>  'JobType.Type',
+        5 =>  'Invoice.fDate',
+        6 =>  'OpenAR.Due',
+        7 =>  'Invoice.Amount',
+        8 =>  'OpenAR.Balance',
+        9 =>  'Invoice.fDesc'
+    );
+    $Order = isset( $Columns[ $_GET['order']['column'] ] )
+        ? $Columns[ $_GET['order']['column'] ]
+        : "Invoice.Ref";
+    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
+      ? $_GET['order']['dir']
+      : 'ASC';
 
+    $sQuery = " SELECT *
+                FROM (
+                    SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                            Invoice.Ref AS ID,
+                            Customer.ID AS Customer_ID,
+                            Customer.Name AS Customer_Name,
+                            Location.Loc AS Location_ID,
+                            Location.Tag AS Location_Name,
+                            Location.Address AS Location_Street,
+                            Location.City AS Location_City,
+                            Location.State AS Location_State,
+                            Location.Zip AS Location_Zip,
+                            Job.ID AS Job_ID,
+                            Job.fDesc AS Job_Name,
+                            JobType.Type AS Type,
+                            Invoice.fDate AS Date,
+                            OpenAR.Due AS Due,
+                            Invoice.Amount AS Original,
+                            OpenAR.Balance AS Balance,
+                            Invoice.fDesc AS Description
+                    FROM    Invoice
+                            LEFT JOIN OpenAR ON OpenAR.Ref           = Invoice.Ref
+                            LEFT JOIN Loc AS Location ON Invoice.Loc = Location.Loc
+                            LEFT JOIN (
+                                SELECT  Owner.ID AS ID,
+                                        Rol.Name AS Name
+                                FROM    Owner
+                                        LEFT JOIN Rol ON Owner.Rol  = Rol.ID
+                            ) AS Customer ON Location.Owner         = Customer.ID
+                            LEFT JOIN Job          ON Invoice.Job   = Job.ID
+                            LEFT JOIN JobType      ON Job.Type      = JobType.ID
+                    WHERE   ({$conditions}) AND ({$search})
+                ) AS Tbl
+                WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
+    $rResult = \singleton\database::getInstance( )->query(
+      null,
+      $sQuery,
+      $parameters
+    ) or die(print_r(sqlsrv_errors()));
 
-		/*
-		 * Ordering
-		 */
+    $sQueryRow = "SELECT  Count( Invoice.Ref ) AS Count
+                  FROM    Invoice
+                          LEFT JOIN OpenAR ON OpenAR.Ref  = Invoice.Ref
+                          LEFT JOIN Loc AS Location ON Invoice.Loc  = Location.Loc
+                          LEFT JOIN (
+                              SELECT  Owner.ID AS ID,
+                                      Rol.Name AS Name
+                              FROM    Owner
+                                      LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                          ) AS Customer ON Location.Owner   = Customer.ID
+                          LEFT JOIN Job          ON Invoice.Job = Job.ID
+                          LEFT JOIN JobType      ON Job.Type    = JobType.ID
+                  WHERE   ({$conditions}) AND ({$search});";
+    $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
-		$sOrder = "";
-		if ( isset( $_GET['order'][0]['column'] ) )
-		{
-			$sOrder = "ORDER BY  CAST(";
-			$sOrder .= $aColumns[$_GET['order'][0]['column']] . " AS NVARCHAR(100))" . $_GET['order'][0]['dir'];
-			/*for ( $i=0 ; $i<intval( $_GET['iSortingCols'] ) ; $i++ )
-			{
-				if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
-				{
-					$sOrder .= $aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."
-						".addslashes( $_GET['sSortDir_'.$i] ) .", ";
-				}
-			}
+    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
-			$sOrder = substr_replace( $sOrder, "", -2 );
-			if ( $sOrder == "ORDER BY" )
-			{
-				$sOrder = "";
-			}*/
-		}
+    $sQuery = " SELECT  COUNT( Invoice.Ref )
+                FROM    Invoice;";
+    $rResultTotal = \singleton\database::getInstance( )->query( null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+    $iTotal = $aResultTotal[0];
 
+    $output = array(
+        'sEcho'         =>  intval( $_GET[ 'draw' ] ),
+        'iTotalRecords'     =>  $iTotal,
+        'iTotalDisplayRecords'  =>  $iFilteredTotal,
+        'aaData'        =>  array()
+    );
 
-		/*
-		 * Filtering
-		 * NOTE this does not match the built-in DataTables filtering which does it
-		 * word by word on any field. It's possible to do here, but concerned about efficiency
-		 * on very large tables, and MySQL's regex functionality is very limited
-		 */
-		$sWhere = "";
-		$_GET['sSearch'] = isset($_GET['search']['value']) ? $_GET['search']['value'] : "";
-		if ( $_GET['sSearch'] != "" )
-		{
-			$sWhere = "WHERE (";
-			for ( $i=0 ; $i<count($aColumns) ; $i++ )
-			{
-				$sWhere .= $aColumns[$i]." LIKE '%".addslashes( $_GET['sSearch'] )."%' OR ";
-			}
-			$sWhere = substr_replace( $sWhere, "", -3 );
-			$sWhere .= ')';
-		}
-
-		/* Individual column filtering */
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
-		{
-			if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-			{
-				if ( $sWhere == "" )
-				{
-					$sWhere = "WHERE ";
-				}
-				else
-				{
-					$sWhere .= " AND ";
-				}
-				$sWhere .= $aColumns[$i]." LIKE '%".addslashes($_GET['sSearch_'.$i])."%' ";
-			}
-		}
-
-
-		/*
-		 * SQL queries
-		 * Get data to display
-		 */
-		$pWhere = $sWhere;
-		$sWhere = !isset($sWhere) || $sWhere == '' ? "WHERE '1'='1'" : $sWhere;
-		$sQuery =
-      " SELECT *
-		    FROM
-		 (
-			  SELECT ROW_NUMBER() OVER ($sOrder) AS ROW_COUNT," . str_replace(" , ", " ", implode(", ", $aColumns)) . "
-			  FROM $sTable
-			$sWhere
-		 ) A
-		    WHERE A.ROW_COUNT BETWEEN $Start AND $End
-		";
-		//echo $sQuery;
-
-		$rResult = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
-
-		$sWhere =$pWhere;
-		/* Data set length after filtering */
-		$sQueryRow =
-    " SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
-			FROM   $sTable
-			$sWhere
-		";
-		$params = array();
-		$options =  array( "Scrollable" => SQLSRV_CURSOR_KEYSET );
-		$stmt = $database->query( $conn, $sQueryRow , $params, $options );
-
-		$iFilteredTotal = sqlsrv_num_rows( $stmt );
-
-
-		//echo "TOTAL " . $iFilteredTotal;
-		/* Total data set length */
-		$sQuery =
-    " SELECT COUNT(".$sIndexColumn.")
-			FROM   $sTable";
-		$rResultTotal = $database->query($conn,  $sQuery ) or die(print_r(sqlsrv_errors()));
-		$aResultTotal = sqlsrv_fetch_array($rResultTotal);
-		$iTotal = $aResultTotal[0];
-		/*
-		 * Output
-		 */
-		$output = array(
-			"sEcho" => intval($_GET['sEcho']),
-			"iTotalRecords" => $iTotal,
-			"iTotalDisplayRecords" => $iFilteredTotal,
-			"aaData" => array()
-		);
-
-		while ( $aRow = sqlsrv_fetch_array( $rResult ) )
-		{
-			$row = array();
-			for ( $i=0 ; $i<count($aColumns) ; $i++ )
-			{
-				if ( $aColumns[$i] == "version" )
-				{
-					/* Special output formatting for 'version' column */
-					$row[] = ($aRow[ $aColumns[$i] ]=="0") ? '-' : $aRow[ $aColumns[$i] ];
-				}
-				else if ( $aColumns[$i] != ' ' )
-				{
-					/* General output */
-					$row[] = $aRow[ $aColumns[$i] ];
-				}
-			}
-			$output['aaData'][] = $row;
-		}
-
-		echo json_encode( $output );
-	}
-}?>
-<?php /*
-session_start( [ 'read_and_close' => true ] );
-require('index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $User = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
-    $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
-    $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-    $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = false;
-    if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >= 4){$Privileged = true;}
-    if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
-    else {
-        $r = $database->query(null,"
-            SELECT Invoice.Ref       AS  ID,
-                   Invoice.fDesc     AS  Description,
-                   Invoice.Total     AS  Total,
-                   Job.fDesc         AS  Job,
-                   Loc.Tag           AS  Location,
-                   Invoice.fDate     AS  fDate,
-                   OwnerWithRol.Name AS Customer
-            FROM   nei.dbo.Invoice
-                   LEFT JOIN nei.dbo.Loc   ON  Invoice.Loc           = Loc.Loc
-                   LEFT JOIN nei.dbo.Job   ON  Invoice.Job           = Job.ID
-                   LEFT JOIN nei.dbo.OwnerWithRol ON OwnerWithRol.ID = Loc.Owner
-        ;");
-        $data = array();
-        if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-        print json_encode(array('data'=>$data));   }
-}*/?>
+    while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+        $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
+        $Row[ 'Due' ] = date( 'm/d/Y', strtotime( $Row[ 'Due' ] ) );
+        $Row[ 'Original' ] = '$' . number_format( $Row[ 'Original' ], 2);
+        $Row[ 'Balance' ] = '$' . number_format( $Row[ 'Balance' ], 2);
+        $output['aaData'][]   = $Row;
+    }
+    echo json_encode( $output );
+}}
+?>
