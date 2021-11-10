@@ -14,12 +14,6 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56288874-1"></script>
 <script src="bin/js/index.js"></script>
 <script src="bin/js/index.js?<?php echo rand( 1000, 9999999 );?>"></script>
-<script>
-  function linkTab( Tab ){ 
-    $("div[tab='" + Tab + "']")[0].scrollIntoView( );
-    $("div[tab='" + Tab + "']").click( ); 
-  }
-</script>
 <?php 
 if( file_exists( bin_js . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '/index.php') ){
   require( bin_js . 'page/' .  substr( basename( $_SERVER['SCRIPT_NAME'] ), 0, strlen( basename( $_SERVER['SCRIPT_NAME'] ) ) - 4 ) . '/index.php' );

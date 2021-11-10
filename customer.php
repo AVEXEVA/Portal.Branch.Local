@@ -117,7 +117,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								</div><?php 
 							}?>
 							<?php if(isset($Privileges[ 'Contract' ]) && $Privileges[ 'Contract' ][ 'User_Privilege' ] >= 4){
-								?><div tab='contract'class='link-page text-white col-xl-1 col-4' onClick="document.location.href='contracts.php?Customer=<?php echo $Location[ 'Name' ];?>';">
+								?><div tab='contract'class='link-page text-white col-xl-1 col-4' onClick="document.location.href='contracts.php?Customer=<?php echo $Customer[ 'Name' ];?>';">
 									<div class='p-1 border border-dark border-5'>
 										<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract( 3 );?></div>
 										<div class ='nav-text'>Contracts</div>
@@ -146,7 +146,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									</div>
 							</div><?php }?>
 							<?php if(isset($Privileges[ 'Invoice' ]) && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 4){
-								?><div tab='invoice' class='link-page text-white col-xl-1 col-4' onClick="document.location.href='invoices.php?Customer=</php echo $Customer[ 'Name' ];?>';">
+								?><div tab='invoice' class='link-page text-white col-xl-1 col-4' onClick="document.location.href='invoices.php?Customer=<?php echo $Customer[ 'Name' ];?>';">
 									<div class='p-1 border border-dark border-5'>
 										<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice( 3 );?></div>
 										<div class ='nav-text'>Invoices</div>

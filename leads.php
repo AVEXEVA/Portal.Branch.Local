@@ -5,7 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if(isset($_SESSION[ 'User' ],
          $_SESSION[ 'Hash' ] ) ) {
-        $result = $database->query(
+        $result = \singleton\database::getInstance( )->query(
           null,
           " SELECT  *
     		    FROM    Connection
@@ -17,7 +17,7 @@ if(isset($_SESSION[ 'User' ],
           )
         );
         $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-        $result = $database->query(
+        $result = \singleton\database::getInstance( )->query(
           null,
         "   SELECT    *,
     		           Emp.fFirst AS First_Name,
@@ -29,7 +29,7 @@ if(isset($_SESSION[ 'User' ],
         )
     );
       $User = sqlsrv_fetch_array($result);
-    	$result = $database->query(
+    	$result = \singleton\database::getInstance( )->query(
           null,
       "     SELECT    *
     		    FROM   Privilege
@@ -40,65 +40,60 @@ if(isset($_SESSION[ 'User' ],
 	$Privileges = array();
 	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege[ 'Access_Table' ]] = $Privilege;}}
     if(	!isset($Connection[ 'ID' ])
-	   	|| !isset($Privileges[ 'Admin' ])
-	  		|| $Privileges[ 'Admin' ][ 'User_Privilege' ]  < 4
-	  		|| $Privileges[ 'Admin' ][ 'Group_Privilege' ] < 4
-	  		|| $Privileges[ 'Admin'][ 'Other_Privilege' ] < 4){
+	   	|| !isset($Privileges[ 'Lead' ])
+	  		|| $Privileges[ 'Lead' ][ 'User_Privilege' ]  < 4
+	  		|| $Privileges[ 'Lead' ][ 'Group_Privilege' ] < 4
+	  		|| $Privileges[ 'Lead'][ 'Other_Privilege' ] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		$database->query(
+		\singleton\database::getInstance( )->query(
       null,
-      '   INSERT INTO Activity([User], [Date], [Page])
-			    VALUES(?, ?, ?);',
-    array($_SESSION[ 'User' ],
-          date('Y-m-d H:i:s'),
-                'leads.php')
-      );
+      "   INSERT INTO Activity([User], [Date], [Page])
+			    VALUES(?, ?, ?);",
+      array($_SESSION[ 'User' ],
+        date('Y-m-d H:i:s'),
+        'leads.php'
+      )
+    );
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <title>Nouveau Texas | Portal</title>
-    <?php require(bin_css.'index.php');?>
-    <?php require(bin_js.'index.php');?>
-    <?php require(bin_meta.'index.php');?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php require( bin_meta . 'index.php' ); ?>
+    <?php require( bin_css  . 'index.php' ); ?>
+    <?php require( bin_js   . 'index.php' ); ?>
 </head>
 <body onload='finishLoadingPage();'>
-    <div id='wrapper' class='<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>'>
-        <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id='page-wrapper' class='content'>
-			<div class='card card-full card-primary'>
-				<div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
-				<div class='panel-body'>
-					<div id='Form_Lead'>
-						<div class='panel panel-primary'>
-							<div class='panel-heading'><h2>Location Form</h2></div>
-							<div class='panel-body white-background BankGothic shadow'>
-								<div style='display:block !important;'>
-									<fieldset >
-										<legend>Names</legend>
-										<editor-field name='ID'></editor-field>
-										<editor-field name='Name'></editor-field>
-										<editor-field name='Address'></editor-field>
-										<editor-field name='City'></editor-field>
-										<editor-field name='State'></editor-field>
-										<editor-field name='Zip'></editor-field>
-										<editor-field name='Customer'></editor-field>
-									</fieldset>
-								</div>
-							</div>
-						</div>
-					</div>
-					<table id='Table_Leads' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
-						<thead>
-							<th title='ID'></th>
-							<th title='Name'></th>
-							<th title='Address'></th>
-							<th title='City'></th>
-							<th title='State'></th>
-							<th title='Zip'></th>
-							<th title='Owner'></th>
-						</thead>
+  <div id='wrapper'>
+    <?php require( bin_php . 'element/navigation.php');?>
+    <?php require( bin_php . 'element/loading.php');?>
+    <div id='page-wrapper' class='content'>
+			<div class='card card-full card-primary border-0'>
+				<div class='card-heading'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
+				<div class='card-body bg-dark'>
+          <table id='Table_Leads' class='display' cellspacing='0' width='100%'>
+						<thead><tr>
+              <th class='text-white border border-white' title='ID'>ID</th>
+              <th class='text-white border border-white' title='Name'>Name</th>
+              <th class='text-white border border-white' title='Customer'>Customer</th>
+              <th class='text-white border border-white' title='Type'>Type</th>
+              <th class='text-white border border-white' title='Street'>Street</th>
+              <th class='text-white border border-white' title='City'>City</th>
+              <th class='text-white border border-white' title='State'>State</th>
+              <th class='text-white border border-white' title='Zip'>Zip</th>
+              
+            </tr><tr>
+              <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Type'><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Street'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='City'><input class='redraw form-control' type='text' name='City' placeholder='City' value='<?php echo isset( $_GET[ 'City' ] ) ? $_GET[ 'City' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='State'><input class='redraw form-control' type='text' name='State' placeholder='State' value='<?php echo isset( $_GET[ 'State' ] ) ? $_GET[ 'State' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Zip'><input class='redraw form-control' type='text' name='Zip' placeholder='Zip' value='<?php echo isset( $_GET[ 'Zip' ] ) ? $_GET[ 'Zip' ] : null;?>' /></th>
+              
+            </tr></thead>
 					</table>
 				</div>
 		  </div>
