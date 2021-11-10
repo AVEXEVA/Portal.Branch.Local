@@ -128,13 +128,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     	$search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
 		/*ROW NUMBER*/
-<<<<<<< HEAD
-		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
-		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 25;
-=======
 		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
 		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
->>>>>>> 46bac5b11075b4003a1c0fe8b63c5782c74e39bb
 
 		/*Order && Direction*/
 		//update columns from bin/js/tickets/table.js
