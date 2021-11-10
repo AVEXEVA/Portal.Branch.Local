@@ -2,9 +2,9 @@ $(document).ready(function( ){
     var Editor_Accounting = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
-        table    : '#Table_Tickets'
+        table    : '#Table_Accounting'
     } );
-    var Table_Accounting = $('#Table_Tickets').DataTable( {
+    var Table_Accounting = $('#Table_Accounting').DataTable( {
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
@@ -55,3 +55,75 @@ $(document).ready(function( ){
                     return d;
                 }
 },
+columns: [
+{
+  className : 'ID',
+  data : 'ID',
+  render : function( data , type, row, meta ) {
+    switch( type ){
+      case 'display' :
+        return row.ID !== null
+          ? "<div class='row'>" +
+              "<div class='col-12'><a href='accounting.php?ID=" + row.ID + "'><i class='fa fa-ticket fa-fw fa-1x'></i> Ticket #" + row.ID + "</a></div>" +
+              "</div>"
+              :   null;
+      default :
+          return data;
+    }
+  }
+},{
+  data   : 'Name',
+  render : function( data, type, row, meta ){
+      switch( type ){
+          case 'display':
+              return row.Name !== null
+                  ?   "<a href='user.php?ID=" + row.Name + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a>"
+                  :   null;
+          default :
+              return data;
+{
+  data : 'Customer' ,
+  render : function( data, type, row, meta ){
+      switch( type ){
+          case 'display':
+              return row.Customer !== null
+                  ?   "<a href='customer.php?ID=" + row.Customer + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Customer + "</a>"
+                  :   null;
+          default :
+              return data;
+},{
+  data : 'Location' ,
+  render : function( data, type, row, meta ){
+      switch( type ){
+          case 'display':
+              return row.Location !== null
+                  ?   "<a href='location.php?ID=" + row.Location + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Location + "</a>"
+                  :   null;
+          default :
+              return data;
+},{
+  data : 'Unit' ,
+},{
+  data : 'Job' ,
+},{
+  data : 'Type' ,
+},{
+  data : 'Level' ,
+},{
+  data : 'Status' ,
+},{
+  data : 'Start_Date' ,
+},{
+  data : 'End_Date' ,
+},{
+  data : 'Time_Route_Start' ,
+},{
+  data : 'Time_Route_End' ,
+},{
+  data : 'Time_Completed_Start' ,
+},{
+  data : 'Time_Completed_End' ,
+},{
+  data : 'LSD' ,
+},{
+]

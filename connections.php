@@ -1,11 +1,11 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
+		SELECT *
+		FROM   Connection
+		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
@@ -13,18 +13,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
-		FROM   Emp 
+		FROM   Emp
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
 	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
+		SELECT *
+		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
 	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
+    if(	!isset($My_Connection['ID'])
 	   	|| !isset($My_Privileges['Admin'])
 	  		|| $My_Privileges['Admin']['User_Privilege']  < 4
 	  		|| $My_Privileges['Admin']['Group_Privilege'] < 4
@@ -32,7 +32,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				?><?php require('../404.html');?><?php }
     else {
 		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
+			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "connection.php?ID=" . $_GET['ID']));
         $r = $database->query(null,
@@ -64,8 +64,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 Emp.fFirst           AS Mechanic_First_Name,
                 Emp.Last             AS Mechanic_Last_Name,
                 Route.ID             AS Route_ID
-            FROM 
-                ((((((Job 
+            FROM
+                ((((((Job
                 LEFT JOIN nei.dbo.Loc          ON Job.Loc   = Loc.Loc)
                 LEFT JOIN nei.dbo.Zone         ON Loc.Zone  = Zone.ID)
                 LEFT JOIN nei.dbo.JobType      ON Job.Type  = JobType.ID)
@@ -80,8 +80,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>    
-    <title>Nouveau Texas | Portal</title>    
+    <?php require( bin_meta . 'index.php');?>
+    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -116,11 +116,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    
-    
+
+
     <?php require('bin/js/datatables.php');?>
-    
-    
+
+
     <script>
         $(document).ready(function() {
             var Table_Connections = $('#Table_Connections').DataTable( {
@@ -144,7 +144,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     $("tr[role='row']>th:nth-child(5)").click().click();
                     hrefConnections();
                     finishLoadingPage();
-                }   
+                }
 
             } );
 
