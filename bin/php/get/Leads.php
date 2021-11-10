@@ -1,8 +1,12 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('index.php');
-setlocale(LC_MONETARY, 'en_US');
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [
+		'read_and_close' => true
+	] );
+   	require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
+	//Connection
     $r = \singleton\database::getInstance( )->query(
         null,
       " SELECT *
@@ -11,15 +15,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                AND Connection.Hash = ?;",
     array($_SESSION['User'],$_SESSION['Hash']));
     $Connection = sqlsrv_fetch_array($r);
-    $User    = $database->query(null,
-      " SELECT Emp.*,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name
-        FROM   Emp
-        WHERE  Emp.ID = ?
-    ;", array($_SESSION[ 'User' ] ) );
+    //User
+    $User    = $database->query(
+    	null,
+		" 	SELECT 	Emp.*,
+		       		Emp.fFirst AS First_Name,
+		       		Emp.Last   AS Last_Name
+			FROM   	Emp
+			WHERE  	Emp.ID = ?;", 
+		array(
+			$_SESSION[ 'User' ] 
+		) 
+	);
     $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+    //Privileges
     $r = \singleton\database::getInstance( )->query(
         null,
       " SELECT Privilege.Access_Table,
@@ -38,8 +47,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	 ){
             $Privileged = True;}
-    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
-    else {
+    if(		!isset($Connection['ID']) 
+    	|| 	!$Privileged){
+    			print json_encode(array('data'=>array()));
+    } else {
+    	$conditions = array( );
+	    $search = array( );
+	    $parameters = array( );
 
         if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
 			$parameters[] = $_GET['ID'];
@@ -48,6 +62,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
 			$parameters[] = $_GET['Customer'];
 			$conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+		}
+		if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
+			$parameters[] = $_GET['Type'];
+			$conditions[] = "Lead.Type LIKE '%' + ? + '%'";
 		}
 		if( isset($_GET[ 'Description' ] ) && !in_array( $_GET[ 'Description' ], array( '', ' ', null ) ) ){
 			$parameters[] = $_GET['Description'];
@@ -69,30 +87,66 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$parameters[] = $_GET['Zip'];
 			$conditions[] = "Lead.Zip LIKE '%' + ? + '%'";
 		}
-      $r = \singleton\database::getInstance( )->query(
+
+		$conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+	    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+	    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+	    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+
+	    $Columns = array(
+	      0 =>  'Lead.ID',
+	      1 =>  'Lead.fDesc',
+	      2 =>  'Customer_Name',
+	      3 =>  'Lead.Type',
+	      4 =>  'Lead.Address',
+	      5 =>  'Lead.City',
+	      6 =>  'Lead.State',
+	      7 =>  'Lead.Zip',
+	    );
+	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
+	        ? $Columns[ $_GET['order']['column'] ]
+	        : "Lead.ID";
+	    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
+	      ? $_GET['order']['dir']
+	      : 'ASC';
+
+        $result = \singleton\database::getInstance( )->query(
             null,
-          "  SELECT   Lead.ID           AS ID,
-				     Lead.fDesc        AS Name,
-				     Lead.Address      AS Street,
-				     Lead.City         AS City,
-				     Lead.State        AS State,
-				     Lead.Zip          AS Zip,
-				     OwnerWithRol.Name AS Customer
-			FROM     Lead
-					 LEFT JOIN OwnerWithRol ON OwnerWithRol.ID = Lead.Owner
-			ORDER BY Lead.fDesc ASC",
-      array(),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
-		$data = array();
-		$row_count = sqlsrv_num_rows( $r );
-		if($r){
-			while($i < $row_count){
-				$Lead = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-				if(is_array($Lead) && $Lead != array()){
-					$data[] = $Lead;
-				}
-				$i++;
-			}
-		}
-		print json_encode(array('data'=>$data));
+          	"SELECT *
+             FROM (
+                  	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                            Lead.ID           AS ID,
+					        Lead.fDesc        AS Name,
+					        Customer.ID       AS Customer_ID,
+					        Customer.Name 	  AS Customer_Name,
+					        Lead.Type 		  AS Type,
+					        Lead.Address      AS Street,
+					        Lead.City         AS City,
+					        Lead.State        AS State,
+					        Lead.Zip          AS Zip
+                  	FROM    Lead
+                  			LEFT JOIN (
+		                        SELECT  Owner.ID,
+		                                Rol.Name,
+		                                Owner.Status 
+		                        FROM    Owner 
+		                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
+		                    ) AS Customer ON Lead.Owner = Customer.ID
+                  WHERE   ({$conditions}) AND ({$search})
+                ) AS Tbl
+             WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;",
+      		$parameters
+      	);
+		$output = array(
+	        'sEcho'         =>  intval($_GET['sEcho']),
+	        'iTotalRecords'     =>  $iTotal,
+	        'iTotalDisplayRecords'  =>  $iFilteredTotal,
+	        'aaData'        =>  array()
+	    );
+
+	    while ( $Row = sqlsrv_fetch_array( $result ) ){
+	      $output['aaData'][]   = $Row;
+	    }
+	    echo json_encode( $output );
 	}
 }?>

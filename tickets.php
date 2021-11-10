@@ -64,7 +64,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Nouveau Elevator Portal</title>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php');?>
     <?php require( bin_css . 'index.php');?>
