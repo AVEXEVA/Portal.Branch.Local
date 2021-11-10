@@ -62,7 +62,6 @@ $(document).ready(function( ){
         paging         : true,
         orderCellsTop  : true,
         autoWidth      : true,
-        //stateSave      : true,
         responsive     : true,
         select         : {
           style : 'multi',
@@ -72,6 +71,7 @@ $(document).ready(function( ){
                 url : 'bin/php/get/Contacts.php',
                 data    : function(d){
                     d = {
+                        draw : d.draw,
                         start : d.start, 
                         length : d.length,
                         order : {
@@ -79,7 +79,8 @@ $(document).ready(function( ){
                             dir : d.order[0].dir
                         },
                         ID :  $('input:visible[name="ID"]').val( ),
-                        Entity :  $('input:visible[name="Name"]').val( ),
+                        Type :  $('input:visible[name="Type"]').val( ),
+                        Entity :  $('input:visible[name="Entity"]').val( ),
                         Customer :  $('input:visible[name="Customer"]').val( ),
                         Type : $('select:visible[name="Type"]').val( ),
                         Name : $('select:visible[name="Division"]').val( ),
@@ -99,9 +100,32 @@ $(document).ready(function( ){
                 className : 'ID',
                 data : 'ID'
             },{
-                data : 'Entity'
-            },{
                 data : 'Type'
+            },{
+              data : 'Entity',
+              render : function( data, type, row, meta ){
+                  switch( type ){
+                      case 'display' :
+                        return row.Entity !== null 
+                            ?   ( 
+                                    row.Type == 'Customer'
+                                        ?   "<div class='row'>" +
+                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
+                                            "</div>"
+                                        :   ( 
+                                                row.Type == 'Location' 
+                                                    ?   "<div class='row'>" +
+                                                            "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
+                                                        "</div>"
+                                                    :   null
+                                            )
+                                )
+                            :   null;
+                      default :
+                          return data;
+                  }
+
+              }
             },{
                 data : 'Name'
             },{

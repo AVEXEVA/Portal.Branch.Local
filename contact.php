@@ -47,10 +47,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   $Privileges = array();
   if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
   if(     !isset( $Connection[ 'ID' ] )
-      ||  !isset($Privileges[ 'Location' ])
-      ||  $Privileges[ 'Location' ][ 'User_Privilege' ]  < 4
-      ||  $Privileges[ 'Location' ][ 'Group_Privilege' ] < 4
-      ||  $Privileges[ 'Location' ][ 'Other_Privilege' ] < 4
+      ||  !isset($Privileges[ 'Contact' ])
+      ||  $Privileges[ 'Contact' ][ 'User_Privilege' ]  < 4
+      ||  $Privileges[ 'Contact' ][ 'Group_Privilege' ] < 4
+      ||  $Privileges[ 'Contact' ][ 'Other_Privilege' ] < 4
   ){
       ?><?php require( '../404.html' );?><?php
   } else {
@@ -63,45 +63,65 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         date( 'Y-m-d H:i:s' ),
         'contact.php'
       )
-  );?>
-        <!DOCTYPE html>
-<html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
+  );
+?><!DOCTYPE html>
+<html lang='en'>
 <head>
-    <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Texas | Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  
+    
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php 
+      require( bin_meta . 'index.php');
+      require( bin_css  . 'index.php');
+      require( bin_js   . 'index.php');
+    ?>
 </head>
-<body onload='finishLoadingPage();' style="min-height:100%;background-size:cover;background-color:rgba(255,255,255,.7);">
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='height:100%;overflow-y:scroll;'>
-        <?php require(bin_php.'element/navigation.php');?>
-        <?php require(bin_php.'element/loading.php');?>
-        <div id="page-wrapper" class='content' style='background-color:transparent !important;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
-			<h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='contact.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Info();?> Contact: <?php echo $Contact['Contact'];?></a></h4>
-			<div class='col-xs-4'>Name:</div>
-			<div class='col-xs-8'><?php echo $Contact['Contact'];?></div>
-			<div class='col-xs-4'>Phone:</div>
-			<div class='col-xs-8'><?php echo $Contact['Phone'];?></div>
-			<?php if(strlen($Contact['Email']) > 0){?>
-			<div class='col-xs-4'>Email:</div>
-			<div class='col-xs-8'><?php echo $Contact['Email'];?></div>
-			<?php }?>
-			<?php if(strlen($Contact['Fax']) > 0){?>
-			<div class='col-xs-4'>Fax:</div>
-			<div class='col-xs-8'><?php echo $Contact['Fax'];?></div>
-			<?php }?>
-			<div class='col-xs-4'>Street:</div>
-			<div class='col-xs-8'><?php echo $Contact['Address'];?></div>
-			<div class='col-xs-4'>City:</div>
-			<div class='col-xs-8'><?php echo $Contact['City'];?></div>
-			<div class='col-xs-4'>Zip:</div>
-			<div class='col-xs-8'><?php echo $Contact['Zip'];?></div>
-			<div class='col-xs-4'>State:</div>
-			<div class='col-xs-8'><?php echo $Contact['State'];?></div>
+<body onload='finishLoadingPage();'>
+    <div id='wrapper'>
+        <?php require( bin_php . 'element/navigation.php' ); ?>
+        <?php require( bin_php . 'element/loading.php' ); ?>
+        <div id='page-wrapper' class='content'>
+          <div class='card card-primary text-white'>
+            <div class='card-heading'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Contact: <?php echo $Contact['Contact'];?></div>
+            <div class='card-body bg-dark'>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Name:</div>
+          			<div class='col-xs-8'><?php echo $Contact['Contact'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
+          			<div class='col-xs-8'><?php echo $Contact['Phone'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
+          			<div class='col-xs-8'><?php echo $Contact['Email'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Fax:</div>
+          			<div class='col-xs-8'><?php echo $Contact['Fax'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Address( 1 );?> Street:</div>
+          			<div class='col-xs-8'><?php echo $Contact['Address'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> City:</div>
+          			<div class='col-xs-8'><?php echo $Contact['City'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Zip:</div>
+          			<div class='col-xs-8'><?php echo $Contact['Zip'];?></div>
+              </div>
+              <div class='row'>
+          			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> State:</div>
+          			<div class='col-xs-8'><?php echo $Contact['State'];?></div>
+              </div>
+            </div>
         </div>
     </div>
 </body>
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href="../login.php?Forward=contact<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>

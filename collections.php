@@ -126,7 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <table id='Table_Collections' class='display' cellspacing='0' width='100%'>
                         <thead><tr class='text-white text-center'>
                             <th class='border border-white'>ID</th>
-                            <th class='border border-white'>Executive</th>
+                            <th class='border border-white'>Territory</th>
                             <th class='border border-white'>Customer</th>
                             <th class='border border-white'>Location</th>
                             <th class='border border-white'>Job</th>
@@ -138,15 +138,39 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <th class='border border-white'>Description</th>
                         </tr><tr class='form-desktop'>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Executive' placeholder='Executive' value='<?php echo isset( $_GET[ 'Executive' ] ) ? $_GET[ 'Executive' ] : null;?>' /></th>
+                            <th class='border border-white'><select name='redraw form-control' name='Territory'>
+                                <option value=''>Select</option>
+                                <?php 
+                                $result = \singleton\database::getInstance( )->query(
+                                    null,
+                                    "   SELECT  Territory.ID,
+                                                Territory.Name 
+                                        FROM    Terr AS Territory
+                                    ;",
+                                    array( )
+                                );
+                                if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row[ 'Name' ];?>' name'Te><?php echo $row[ 'Name' ];?></option><?php } }?>
+                            </select></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Due' placeholder='Due' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Original' placeholder='Original' value='<?php echo isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Balance' placeholder='Balance' value='<?php echo isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null;?>' /></th>
+                            <th class='border border-white'><div class='row g-0'>
+                                <div class='col-12'><input class='redraw date' type='text' name='Date_Start' placeholder='Date Start' value='<?php echo isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null;?>' /></div>
+                                <div class='col-12'><input class='redraw date' type='text' name='Date_End' placeholder='Date End' value='<?php echo isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null;?>' /></div>
+                            </div></th>
+                            <th class='border border-white'><div class='row g-0'>
+                                <div class='col-12'><input class='redraw date' type='text' name='Due_Start' placeholder='Due Start' value='<?php echo isset( $_GET[ 'Due_Start' ] ) ? $_GET[ 'Due_Start' ] : null;?>' /></div>
+                                <div class='col-12'><input class='redraw date' type='text' name='Due_End' placeholder='Due End' value='<?php echo isset( $_GET[ 'Due_End' ] ) ? $_GET[ 'Due_End' ] : null;?>' /></div>
+                            </div></th>
+                            <th class='border border-white'><div class='row g-0'>
+                                <div class='col-12'><input class='redraw' type='text' name='Original_Start' placeholder='OriginalStart' value='<?php echo isset( $_GET[ 'Original_Start' ] ) ? $_GET[ 'Original_Start' ] : null;?>' /></div>
+                                <div class='col-12'><input class='redraw' type='text' name='Original_End' placeholder='Original End' value='<?php echo isset( $_GET[ 'Original_End' ] ) ? $_GET[ 'Original_End' ] : null;?>' /></div>
+                            </div></th>
+                            <th class='border border-white'><div class='row g-0'>
+                                <div class='col-12'><input class='redraw' type='text' name='Balance_Start' placeholder='Balance Start' value='<?php echo isset( $_GET[ 'Balance_Start' ] ) ? $_GET[ 'Balance_Start' ] : null;?>' /></div>
+                                <div class='col-12'><input class='redraw' type='text' name='Balance_End' placeholder='Balance End' value='<?php echo isset( $_GET[ 'Balance_End' ] ) ? $_GET[ 'Balance_End' ] : null;?>' /></div>
+                            </div></th>
                             <th class='border border-white'><input class='redraw form-control' type='text' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></th>
                         </tr></thead>
                     </table>
@@ -158,4 +182,5 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=collections.php';</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href='../login.php?Forward=collections.php';</script></head></html><?php }?>,
+array( )

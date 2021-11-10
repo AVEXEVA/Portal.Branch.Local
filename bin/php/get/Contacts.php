@@ -64,33 +64,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	        'options' 				=> array( )
 	    );
 
-	    $Statuses = array(
-			0 => 'Unassigned',
-			1 => 'Assigned',
-			2 => 'En Route',
-			3 => 'On Site',
-			4 => 'Completed',
-			5 => 'On Hold',
-			6 => 'Reviewing'
-		);
-	    $Levels = array(
-			0  => '',
-			1  => 'Service Call',
-			2  => 'Trucking',
-			3  => 'Modernization',
-			4  => 'Violations',
-			5  => 'Level 5',
-			6  => 'Repair',
-			7  => 'Annual',
-			8  => 'Escalator',
-			9  => 'Email',
-			10 => 'Maintenance',
-			11 => 'Survey',
-			12 => 'Engineering',
-			13 => 'Support',
-			14 => "M/R"
-		);
-
 		/*Parse GET*/
 		/*None*/
 		
@@ -104,6 +77,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Contact.ID LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Type' ] ) && !in_array(  $_GET[ 'Type' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Type'];
+	      $conditions[] = "Contact.Type LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Entity' ] ) && !in_array(  $_GET[ 'Entity' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Entity'];
+	      $conditions[] = "Contact.Name LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Person'];
@@ -147,8 +128,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     	$search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
 		/*ROW NUMBER*/
-		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
-		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
+		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 25;
 
 		/*Order && Direction*/
 		//update columns from bin/js/tickets/table.js

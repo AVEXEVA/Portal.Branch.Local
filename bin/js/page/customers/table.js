@@ -22,7 +22,7 @@ $( document ).ready( function( ){
           selector : 'td.ID'
         },
         ajax      : {
-            url : 'bin/php/get/Customers2.php',
+            url : 'bin/php/get/Customers.php',
             data : function( d ){
                 d = {
                     start : d.start,
@@ -41,16 +41,29 @@ $( document ).ready( function( ){
         },
         columns: [
             {
-              data : 'ID',
-              className : 'ID'
-            },{
+                  className : 'ID',
+                  data : 'ID',
+                  render : function( data, type, row, meta ){
+                      switch( type ){
+                          case 'display' :
+                              return  row.ID !== null 
+                                  ?   "<div class='row'>" + 
+                                          "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" + 
+                                      "</div>"
+                                  :   null;
+                          default :
+                              return data;
+                      }
+
+                  }
+              },{
                 data : 'Name',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
                             return  row.ID !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'>" + row.Name + "</a></div>" + 
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -66,7 +79,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.Locations !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'>" + row.Locations + " locations</a></div>" + 
+                                        "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -81,7 +94,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.Units !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'>" + row.Units + " units</a></div>" + 
+                                        "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -96,7 +109,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.Jobs !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'>" + row.Jobs + " jobs</a></div>" + 
+                                        "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -111,7 +124,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.Tickets !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'>" + row.Tickets + " tickets</a></div>" + 
+                                        "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -126,7 +139,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.Tickets !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'>" + row.Violations + " violations</a></div>" + 
+                                        "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -141,7 +154,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.Tickets !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'>" + row.Invoices + " invoices</a></div>" + 
+                                        "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :

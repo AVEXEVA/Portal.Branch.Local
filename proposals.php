@@ -108,6 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     <table id='Table_Proposals' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
                             <th title='ID'>ID</th>
+                            <th title='Territory'>Territory</th>
                             <th title='Contact'>Contact</th>
                             <th title='Title'>Title</th>
                             <th title='Phone'>Phone</th>
@@ -121,6 +122,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <th title='Price'>Price</th>
                         </tr><tr class='form-desktop'>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                            <th title='Territory'><input class='redraw form-control' type='text' name='Territory' placeholder='Territory' value='<?php echo isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null;?>' /></th>
                             <th title='Contact'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>
                             <th title='Title'><input class='redraw form-control' type='text' name='Title' placeholder='Title' value='<?php echo isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null;?>' /></th>
                             <th title='Phone'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>

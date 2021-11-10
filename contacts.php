@@ -130,7 +130,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			            <div class='col-12'><input type='submit' value='Submit' /></div>
 			        </div>
 		        </form></div>
-				<div class='card-body bg-darker'>
+				<!--<div class='card-body bg-darker'>
 					<div id='Form_Contacts'>
 						<div class='card'>
 							<div class='card-heading'></div>
@@ -154,13 +154,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							</div>
 						</div>
 					</div>
-				</div>
+				</div>-->
 				<div class='card-body bg-darker'>
 					<table id='Table_Contacts' class='display' cellspacing='0' width='100%'>
 						<thead class='text-white border border-white'><tr>
 							<th class='text-white border border-white'>ID</th>
-							<th class='text-white border border-white'>Entity</th>
 							<th class='text-white border border-white'>Type</th>
+							<th class='text-white border border-white'>Entity</th>
 							<th class='text-white border border-white'>Name</th>
 							<th class='text-white border border-white'>Position</th>
 							<th class='text-white border border-white'>Phone</th>
@@ -172,8 +172,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			            </tr>
 			            <tr class='form-desktop'>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+							<th class='text-white border border-white'><select name='Type' class='redraw form-control'>
+								<option value=''>Select</option>
+								<option value='0'>Customer</option>
+								<option value='4'>Location</option>
+							</select></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Entity' placeholder='Entity' value='<?php echo isset( $_GET[ 'Entity' ] ) ? $_GET[ 'Entity' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>

@@ -150,7 +150,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           Estimate.fDesc 	  AS Title,
                           Estimate.Cost     AS Cost,
                           Estimate.Price    AS Price,
-                          Estimate.Status   AS Status
+                          Estimate.Status   AS Status,
+                          Territory.ID      AS Territory_ID,
+                          Territory.Name    AS Territory_Name
                           
                   FROM    Estimate
                           LEFT JOIN Job ON Job.ID = Estimate.Job
@@ -163,6 +165,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Job.Owner = Customer.ID
                           LEFT JOIN Rol AS Contact ON Contact.ID = Estimate.RolID
+                          LEFT JOIN Terr AS Territory ON Territory.ID = Location.Terr
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";

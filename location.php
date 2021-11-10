@@ -5,7 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
-    $result = $database->query(
+    $result = \singleton\database::getInstance( )->query(
     	null,
     	"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",
     	array(
@@ -14,7 +14,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     	)
     );
     $Connection = sqlsrv_fetch_array($result);
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
     	null,
     	"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",
     	array(
@@ -22,7 +22,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     	)
     );
     $User = sqlsrv_fetch_array($User);
-    $result = $database->query(
+    $result = \singleton\database::getInstance( )->query(
     	null,
     	"	SELECT 	  Access_Table,
         			    User_Privilege,
@@ -43,7 +43,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         && $Privileges[ 'Location' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
     elseif($Privileges[ 'Location' ][ 'User_Privilege' ] >= 4
         && is_numeric($_GET[ 'ID' ])){
-        $result = $database->query(
+        $result = \singleton\database::getInstance( )->query(
         	null,
         	"	SELECT Tickets.*
 				FROM
@@ -74,7 +74,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         $result = sqlsrv_fetch_array($result);
         $Privileged = is_array($result) ? TRUE : FALSE;
     }
-    $database->query(
+    \singleton\database::getInstance( )->query(
       null,
       "   INSERT INTO Activity([User], [Date], [Page])
           VALUES(?,?,?);",
@@ -83,48 +83,58 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
               date("Y-m-d H:i:s"),
                   "location.php")
       );
-    if(!isset($Connection[ 'ID' ])  || !$Privileged){
-      /*?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php */ }
-    else {
-        $result = $database->query(null,"SELECT TOP 1
-                    Loc.Loc              AS ID,
-                    Loc.Tag              AS Name,
-                    Loc.Address          AS Street,
-                    Loc.City             AS City,
-                    Loc.State            AS State,
-                    Loc.Zip              AS Zip,
-                    Loc.fLong 			 AS Longitude,
-                    Loc.Latt 			 AS Latitude,
-                    Loc.Balance          AS Location_Balance,
-                    Loc.Custom8          AS Resident_Mechanic,
-                    Zone.Name            AS Zone,
-                    Loc.Route            AS Route_ID,
-                    Emp.ID               AS Route_Mechanic_ID,
-                    Emp.fFirst           AS Route_Mechanic_First_Name,
-                    Emp.Last             AS Route_Mechanic_Last_Name,
-                    Loc.Owner            AS Customer_ID,
-                    Customer.Name    	 AS Customer_Name,
-                    Territory.ID 		 AS Territory_ID,
-                    Territory.Name       AS Territory_Name
-            FROM    Loc
-                    LEFT JOIN Zone         ON Loc.Zone   = Zone.ID
-                    LEFT JOIN Route        ON Loc.Route  = Route.ID
-                    LEFT JOIN Emp          ON Route.Mech = Emp.fWork
-                    LEFT JOIN (
-            				SELECT 	Owner.ID    	AS ID,
-		                    		Rol.Name    	AS Name,
-		                    		Rol.Address 	AS Street,
-				                    Rol.City    	AS City,
-				                    Rol.State   	AS State,
-				                    Rol.Zip     	AS Zip,
-				                    Owner.Status  	AS Status,
-									Rol.Website 	AS Website
-							FROM    Owner
-							LEFT JOIN Rol ON Owner.Rol = Rol.ID
-            		) AS Customer ON Loc.Owner = Customer.ID
-                    LEFT JOIN Terr AS Territory ON Territory.ID    = Loc.Terr
-            WHERE 	Loc.Loc = ?;",array($_GET[ 'ID' ]));
-        $Location = sqlsrv_fetch_array($result);
+    if(		!isset($Connection[ 'ID' ])  
+    	|| 	!$Privileged
+    ){
+    	?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php 
+	} else {
+        $result = \singleton\database::getInstance( )->query(
+        	null,
+        	"	SELECT TOP 1
+	                    Location.Loc         AS ID,
+	                    Location.Tag         AS Name,
+	                    Location.Address     AS Street,
+	                    Location.City        AS City,
+	                    Location.State       AS State,
+	                    Location.Zip         AS Zip,
+	                    Location.fLong 		 AS Longitude,
+	                    Location.Latt 		 AS Latitude,
+	                    Location.Balance     AS Balance,
+	                    Location.Custom8 	 AS Resident_Mechanic,
+	                    Zone.Name            AS Zone,
+	                    Location.Route       AS Route_ID,
+	                    Emp.ID               AS Route_Mechanic_ID,
+	                    Emp.fFirst           AS Route_Mechanic_First_Name,
+	                    Emp.Last             AS Route_Mechanic_Last_Name,
+	                    Location.Owner 	     AS Customer_ID,
+	                    Customer.Name    	 AS Customer_Name,
+	                    Territory.ID 		 AS Territory_ID,
+	                    Territory.Name       AS Territory_Name
+	            FROM    Loc AS Location
+	                    LEFT JOIN Zone         ON Location.Zone   = Zone.ID
+	                    LEFT JOIN Route        ON Location.Route  = Route.ID
+	                    LEFT JOIN Emp          ON Route.Mech = Emp.fWork
+	                    LEFT JOIN (
+	            				SELECT 	Owner.ID    	AS ID,
+			                    		Rol.Name    	AS Name,
+			                    		Rol.Address 	AS Street,
+					                    Rol.City    	AS City,
+					                    Rol.State   	AS State,
+					                    Rol.Zip     	AS Zip,
+					                    Owner.Status  	AS Status,
+										Rol.Website 	AS Website
+								FROM    Owner
+								LEFT JOIN Rol ON Owner.Rol 			= Rol.ID
+	            		) AS Customer ON Location.Owner 			= Customer.ID
+	                    LEFT JOIN Terr AS Territory ON Territory.ID = Location.Terr
+	            WHERE 		Location.Loc = ?
+	            		OR 	Location.Tag = ?;",
+	        array(
+	        	isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null,
+	        	isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null
+	        )
+	    );
+        $Location = sqlsrv_fetch_array( $result );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,6 +166,14 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        </div>
 				    </div><?php }?>
 				    <?php if(isset($Privileges['Location']) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='contacts.php?Type=Location&Entity=<?php echo $Location[ 'Name' ];?>';">
+					        <div class='p-1 border border-white'>
+								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users( 2 );?></div>
+								<div class='nav-text'>Contacts</div>
+					        </div>
+					    </div><?php 
+					}?>
+				    <?php if(isset($Privileges['Location']) && $Privileges[ 'Location' ][ 'User_Privilege' ] >= 4){
 						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='contracts.php?Location=<?php echo $Location[ 'Name' ];?>';">
 					        <div class='p-1 border border-white'>
 								<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract( 2 );?></div>
@@ -186,6 +204,14 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 								<div class ='nav-text'>Collections</div>
 							</div>
 						</div><?php 
+					}?>
+					<?php if(isset($Privileges['Customer']) && $Privileges[ 'Customer' ][ 'User_Privilege' ] >= 4){
+						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='customer.php?ID=<?php echo $Location[ 'Customer_ID' ];?>';">
+					        <div class='p-1 border border-white'>
+						          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer( 2 );?></div>
+						          <div class='nav-text'>Customer</div>
+					        </div>
+					    </div><?php 
 					}?>
 					<?php if(isset($Privileges['Invoice']) && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 4){
 						?><div class='link-page text-white col-xl-1 col-4' onclick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';">
@@ -228,7 +254,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 						</div><?php 
 					}?>
 					<?php
-						$result = $database->query(
+						$result = \singleton\database::getInstance( )->query(
 						    null,
 						    " 	SELECT 	Count(Route.ID) AS Counter
 								FROM	Route
@@ -368,7 +394,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(
+				                $r = \singleton\database::getInstance( )->query(
 				                    null,
 				                    "   SELECT  Count(Unit.ID) AS Count 
 				                        FROM    Elev AS Unit
@@ -385,7 +411,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(
+				                $r = \singleton\database::getInstance( )->query(
 				                    null,
 				                    "   SELECT  Count(Job.ID) AS Count 
 				                        FROM    Job 
@@ -402,7 +428,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(
+				                $r = \singleton\database::getInstance( )->query(
 				                    null,
 				                    "   SELECT  Count(ID) AS Count 
 				                        FROM    Violation 
@@ -419,7 +445,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(
+				                $r = \singleton\database::getInstance( )->query(
 				                    null,
 				                    "   SELECT  Count(Ticket.ID) AS Count
 				                        FROM    TicketO AS Ticket
@@ -455,7 +481,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
 				            <div class='col-8'><?php 
-				                $r = $database->query(null,"
+				                $r = \singleton\database::getInstance( )->query(null,"
 				                    SELECT Count(Estimate.ID) AS Count 
 				                    FROM   Estimate
 				                    WHERE  Estimate.LocID = ?
@@ -472,7 +498,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Collection</div>
 				            <div class='col-8'><?php 
-				                $r = $database->query(
+				                $r = \singleton\database::getInstance( )->query(
 				                    null,
 				                    "   SELECT  Count( OpenAR.Ref ) AS Count
 				                        FROM    OpenAR
