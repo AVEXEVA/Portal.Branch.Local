@@ -1,7 +1,11 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if(isset(
+  $_SESSION['User'],
+  $_SESSION['Hash'] ) ) {
     $r = \singleton\database::getInstance( )->query(
       null,
       " SELECT *
@@ -9,7 +13,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     		WHERE      Connection.Connector = ?
     		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
+    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
     $r = $database->query(null,
       " SELECT *,
     		       Emp.fFirst AS First_Name,
@@ -17,19 +21,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     		FROM   Emp
     		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
+    $User = sqlsrv_fetch_array($r);
 	$r = \singleton\database::getInstance( )->query(
     null,
     " SELECT *
   		FROM   Privilege
   		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-	   	|| !isset($My_Privileges['Admin'])
-	  		|| $My_Privileges['Admin']['User_Privilege']  < 4
-	  		|| $My_Privileges['Admin']['Group_Privilege'] < 4){
+	$Privileges = array();
+	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if(	!isset($Connection['ID'])
+	   	|| !isset($Privileges['Admin'])
+	  		|| $Privileges['Admin']['User_Privilege']  < 4
+	  		|| $Privileges['Admin']['Group_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
       \singleton\database::getInstance( )->query(

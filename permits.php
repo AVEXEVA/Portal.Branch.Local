@@ -1,45 +1,50 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
+    $r = \singleton\database::getInstance( )->query(
+      null,
+        " SELECT *
+      		FROM   Connection
+      		WHERE  Connection.Connector = ?
+      		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
+    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
+    $r = \singleton\database::getInstance( )->query(
+      null,
+        " SELECT *,
+      		       Emp.fFirst AS First_Name,
+      			     Emp.Last   AS Last_Name
+      		FROM   Emp
+      		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
+    $User = sqlsrv_fetch_array($r);
+	$r = \singleton\database::getInstance( )->query(
+    null,
+      " SELECT  *
+		    FROM   Privilege
+		    WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
-	   	|| !isset($My_Privileges['Job'])
-	  		|| $My_Privileges['Job']['User_Privilege']  < 4
-	  		|| $My_Privileges['Job']['Group_Privilege'] < 4
-	  		|| $My_Privileges['Job']['Other_Privilege'] < 4){
+	$Privileges = array();
+	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if(	!isset($Connection['ID'])
+	   	|| !isset($Privileges['Job'])
+	  		|| $Privileges['Job']['User_Privilege']  < 4
+	  		|| $Privileges['Job']['Group_Privilege'] < 4
+	  		|| $Privileges['Job']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
+      \singleton\database::getInstance( )->query(
+        null,
+      " INSERT INTO Activity([User], [Date], [Page])
+			  VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "permits.php"));
 		if(count($_POST) > 0){
 			if(isset($_POST['Location']) && is_numeric($_POST['Location']) && isset($_POST['Name']) && strlen($_POST['Name']) > 0){
-				$database->query(null,"
-					INSERT INTO Permit(Name, Description, Location, Type, Expiration, Link)
-					VALUES(?,?,?,?,?,?)
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Permit(Name, Description, Location, Type, Expiration, Link)
+					  VALUES(?,?,?,?,?,?)
 				;",array($POST['Name'],$_POST['Description'],$_POST['Location'],$_POST['Type'],$_POST['Expiration'],$_POST['Link']));
 			}
 		}
@@ -50,7 +55,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -114,57 +119,57 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									</div>
 								</div>
 							</div>
-                            <table id='Table_Permits' class='display' cellspacing='0' width='100%' style='border-collapse:collapse !important;'>
-                                <thead>
-									<th>Internal ID</th>
-                                    <th>Permit Name</th>
-                                    <th>Type</th>
-									<th>Location</th>
-									<th>Expiration</th>
-									<th>Description</th>
-									<th>Link</th>
-                                    <th></th>
-									<th></th>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <table id='Table_Permits' class='display' cellspacing='0' width='100%' style='border-collapse:collapse !important;'>
+            <thead>
+                  <th>Internal ID</th>
+                  <th>Permit Name</th>
+                  <th>Type</th>
+                  <th>Location</th>
+                  <th>Expiration</th>
+                  <th>Description</th>
+                  <th>Link</th>
+                  <th></th>
+                  <th></th>
+                  </thead>
+                <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-    
-    <!-- /#wrapper -->
+  </div>
+</div>
+
+<!-- /#wrapper -->
 
 
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-        
+
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
     <script>
         $(document).ready(function(){
-            
+
         });
     </script>
     <style>
     Table#Table_Modernizations td.hide_column { display:none; }
     </style>
     <!-- Custom Date Filters-->
-    
+
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
@@ -208,7 +213,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		"initComplete":function(){
 		}
 	});
-	var Locations = [<?php 
+	var Locations = [<?php
 		$r = $database->query(null,"
 			SELECT Loc.Loc AS Loc,
 				   Loc.Tag AS Tag
@@ -221,7 +226,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$Locations[] = "{value:'{$Location['Loc']}', label:'{$Location['Tag']}'}";
 		}}
 		echo implode(",",$Locations);
-		
+
 	?>];
 	function addPermit(){
 		$("#Table_Permits").prepend("<tr id='addPermit' style='border-bottom:3px solid #333333;'><td class='hidden'></td><td><input type='text' name='Name' placeholder='Name' /></td><td><select name='Type'><option value='EA'>EA</option><option value='EBN'>EBN</option></select></td><td><input name='Location_Name' type='text' size='30' /><input type='hidden' name='Location' /></td><td><input type='text' name='Expiration' /></td><td><textarea name='Description' cols='50' rows='3'></textarea></td><td><input type='text' name='Link' /></td></tr>");

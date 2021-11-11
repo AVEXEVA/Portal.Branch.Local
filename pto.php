@@ -1,38 +1,46 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-   SELECT *
-   FROM   Connection
-   WHERE  Connection.Connector = ?
-          AND Connection.Hash  = ?
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if(isset(
+  $_SESSION['User'],
+  $_SESSION['Hash'] ) ) {
+    $r = \singleton\database::getInstance( )->query(
+    	null,
+      " SELECT  *
+        FROM    Connection
+        WHERE   Connection.Connector = ?
+        AND     Connection.Hash  = ?
  ;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-   SELECT *,
-          Emp.fFirst AS First_Name,
-        Emp.Last   AS Last_Name
-   FROM   Emp
-   WHERE  Emp.ID = ?
+    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
+    $r = \singleton\database::getInstance( )->query(
+    	null,
+      " SELECT  *,
+                Emp.fFirst AS First_Name,
+                Emp.Last   AS Last_Name
+        FROM    Emp
+        WHERE   Emp.ID = ?
  ;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
- $r = $database->query(null,"
-   SELECT *
-   FROM   Privilege
-   WHERE  Privilege.User_ID = ?
+    $User = sqlsrv_fetch_array($r);
+ $r = \singleton\database::getInstance( )->query(
+   null,
+    " SELECT  *
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?
  ;",array($_SESSION['User']));
- $My_Privileges = array();
- if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-     || !isset($My_Privileges['Ticket'])
-       || $My_Privileges['Ticket']['User_Privilege']  < 4
-       || $My_Privileges['Ticket']['Group_Privilege'] < 4){
+ $Privileges = array();
+ if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if(	!isset($Connection['ID'])
+     || !isset($Privileges['Ticket'])
+       || $Privileges['Ticket']['User_Privilege']  < 4
+       || $Privileges['Ticket']['Group_Privilege'] < 4){
        ?><?php require('../404.html');?><?php }
     else {
-   $database->query(null,"
-     INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
-     VALUES(?,?,?)
+      \singleton\database::getInstance( )->query(
+        null,
+    " INSERT INTO Activity([User], [Date], [Page])
+      VALUES(?,?,?)
    ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "pto.php"));
 
 ?><!DOCTYPE html>
@@ -47,15 +55,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 <body>
 <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-  <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+  <?php require( bin_php . 'element/navigation.php');?>
   <?php require( bin_php . 'element/loading.php');?>
   <div id="page-wrapper" class='content' style='height:100%;'>
    <div class="panel panel-primary" style='margin-bottom:0px;height:100%;overflow-y:scroll;'>
      <div class="panel-heading">Paid Time Off</div>
      <div class='panel-body'>
       <?php
-        $r = $database->query(null,"
-            SELECT
+        $r = $database->query(null,
+          " SELECT
                 Emp.*,
                 Emp.Last as Last_Name,
                 Emp.Last AS Last,
@@ -128,10 +136,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   </div>
 </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-    
+
 
     <!-- Morris Charts JavaScript -->
     <!--<script src="https://www.nouveauelevator.com/vendor/raphael/raphael.min.js"></script>
@@ -139,19 +147,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="../data/morris-data.php"></script>-->
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
 
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 
     <!-- Custom Date Filters-->
-    
+
     <style>
     div.column {display:inline-block;vertical-align:top;}
     div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}

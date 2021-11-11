@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 $serverName = "172.16.12.45";
@@ -23,18 +23,19 @@ $Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;
 
 if($Mechanic > 0){
     $Call_Sign = "";
-    $r = $database->query(null,"
-        SELECT 
-            Emp.*, 
-            Emp.Last as Last_Name, 
-            Rol.*, 
-            PRWage.Reg as Wage_Regular, 
-            PRWage.OT1 as Wage_Overtime, 
-            PRWage.OT2 as Wage_Double_Time 
-        FROM 
-            (Emp LEFT JOIN PRWage ON Emp.WageCat = PRWage.ID) 
-            LEFT JOIN Rol ON Emp.Rol = Rol.ID 
-        WHERE Emp.ID = " . $_SESSION['User']);
+    $r = \singleton\database::getInstance( )->query(
+      null,
+        " SELECT
+              Emp.*,
+              Emp.Last as Last_Name,
+              Rol.*,
+              PRWage.Reg as Wage_Regular,
+              PRWage.OT1 as Wage_Overtime,
+              PRWage.OT2 as Wage_Double_Time
+          FROM
+              (Emp LEFT JOIN PRWage ON Emp.WageCat = PRWage.ID)
+              LEFT JOIN Rol ON Emp.Rol = Rol.ID 
+          WHERE Emp.ID = " . $_SESSION['User']);
     $User = sqlsrv_fetch_array($r);
     $Call_Sign = $array['CallSign'];
     $Alias = $array['fFirst'][0] . $array['Last'];
@@ -43,8 +44,8 @@ if($Mechanic > 0){
 }?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>    
-    <title>Nouveau Texas | Portal</title>    
+    <?php require( bin_meta . 'index.php');?>
+    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -96,7 +97,7 @@ if($Mechanic > 0){
                                     </select>
                                 </div>
                             </div>
-                            <div class='row'>   
+                            <div class='row'>
                                 <div class='col-xs-4'><b>Job:</b></div>
                                 <div class='col-xs-8 input-group'>
                                     <input id="job" name='Job'" class='form-control'>
@@ -128,16 +129,16 @@ if($Mechanic > 0){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-    
+
 
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 
     <script>
         var reset_loc = 0;
@@ -147,7 +148,7 @@ if($Mechanic > 0){
     </script>
     <script>
     $(document).ready(function(){
-        var Tickets = [<?php 
+        var Tickets = [<?php
                 $r = $database->query(null,"SELECT Job.ID, Job.fDesc as Description, JobType.Type as Type, Loc.Tag FROM Job LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID LEFT JOIN TicketD ON Job.ID = TicketD.Job LEFT JOIN nei.dbo.Loc ON Job.Loc = Loc.Loc LEFT JOIN Emp ON TicketD.fWork = Emp.fWork where Emp.ID='{$_SESSION['User']}'");
                 $Jobs = array();
                 while($Job = sqlsrv_fetch_array($r)){

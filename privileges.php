@@ -1,73 +1,71 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
+    $r = \singleton\database::getInstance( )->query(
+    	null,
+        " SELECT *
+    	    FROM   Connection
+    	    WHERE  Connection.Connector = ?
+    	    AND    Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
+    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
+    $r = \singleton\database::getInstance( )->query(
+    	null,
+        " SELECT *,
+		              Emp.fFirst AS First_Name,
+			            Emp.Last   AS Last_Name
+          FROM    Emp
+    		  WHERE   Emp.ID = ?
 	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
+    $User = sqlsrv_fetch_array($r);
+	$r = \singleton\database::getInstance( )->query(
+    null,
+      " SELECT *
+		    FROM   Privilege
+		    WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
-	   	|| !isset($My_Privileges['Admin']) 
-	  		|| $My_Privileges['Admin']['User_Privilege']  < 4
-	  		|| $My_Privileges['Admin']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Admin']['Other_Privilege'] < 4){
+	$Privileges = array();
+	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if(	!isset($Connection['ID'])
+	   	|| !isset($Privileges['Admin'])
+	  		|| $Privileges['Admin']['User_Privilege']  < 4
+	  		|| $Privileges['Admin']['Group_Privilege'] < 4
+	  	    || $Privileges['Admin']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
+      \singleton\database::getInstance( )->query(
+      	null,
+          "   INSERT INTO Activity([User], [Date], [Page])
+			        VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "privileges.php"));
-$r = $database->query(null,"
-    SELECT 
-        Emp.*, 
-        Rol.*, 
-        Emp.Last            AS Last_Name,            
-        PRWage.Reg          AS Wage_Regular, 
-        PRWage.OT1          AS Wage_Overtime, 
-        PRWage.OT2          AS Wage_Double_Time 
-    FROM 
-        (Emp 
-        LEFT JOIN PRWage    ON Emp.WageCat  = PRWage.ID) 
-        LEFT JOIN Rol       ON Emp.Rol      = Rol.ID 
-    WHERE 
-        Emp.ID = '{$_SESSION['User']}'");
-/*$User = sqlsrv_fetch_array($r);
-$Call_Sign = $array['CallSign'];
-$Alias = $array['fFirst'][0] . $array['Last'];
-$Employee_ID = $array['fWork'];*/
+$r = \singleton\database::getInstance( )->query(
+  null,
+  "   SELECT
+              Emp.*,
+              Rol.*,
+              Emp.Last            AS Last_Name,
+              PRWage.Reg          AS Wage_Regular,
+              PRWage.OT1          AS Wage_Overtime,
+              PRWage.OT2          AS Wage_Double_Time
+      FROM
+              (Emp
+              LEFT JOIN PRWage    ON Emp.WageCat  = PRWage.ID)
+              LEFT JOIN Rol       ON Emp.Rol      = Rol.ID
+      WHERE
+              Emp.ID = '{$_SESSION['User']}'");
 while($a= sqlsrv_fetch_array($r)){}
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>    
-    <title>Nouveau Texas | Portal</title>    
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+<?php require( bin_meta . 'index.php');?>
+<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+<?php require( bin_css . 'index.php');?>
+<?php require( bin_js . 'index.php');?>
 </head>
 <body onload=''>
     <div id="wrapper">
-        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+        <?php require( bin_php.'php/element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
@@ -114,11 +112,11 @@ while($a= sqlsrv_fetch_array($r)){}
             </div>
         </div>
     </div>
-    
-    
+
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    
+
+
     <script>
         function hrefEmployees(){$("#Table_Privileges tbody tr").each(function(){$(this).on('click',function(){document.location.href="privilege.php?User_ID=" + $(this).children(":first-child").html();});});}
         $(document).ready(function() {
@@ -139,11 +137,11 @@ while($a= sqlsrv_fetch_array($r)){}
                 },
                 "initComplete":function(){
                     hrefEmployees();
-                    $("input[type='search'][aria-controls='Table_Privileges']").on('keyup',function(){hrefEmployees();});       
+                    $("input[type='search'][aria-controls='Table_Privileges']").on('keyup',function(){hrefEmployees();});
                     $('#Table_Privileges').on( 'page.dt', function () {setTimeout(function(){hrefEmployees();},100);});
                     $("#Table_Privileges th").on("click",function(){setTimeout(function(){hrefEmployees();},100);});
                     finishLoadingPage();
-                }   
+                }
 
             } );
         } );
