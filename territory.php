@@ -59,7 +59,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 ?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
-    
+
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php');?>
@@ -284,7 +284,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 				</div>
 				<div class="card card-full card-primary" id='location-information'>
 					<div class='card-body card-col-4-max-350 white-background'>
-						
+
 					</div>
 				</div>
 			</div>

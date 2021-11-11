@@ -1,39 +1,56 @@
-<?php 
-session_start( [ 'read_and_close' => true ] );
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
-	   	|| !isset($My_Privileges['Admin'])
-	  		|| $My_Privileges['Admin']['User_Privilege']  < 4
-	  		|| $My_Privileges['Admin']['Group_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
+setlocale(LC_MONETARY, 'en_US');
+if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
+    $result = \singleton\database::getInstance( )->query(
+    	null,
+    	"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",
+    	array(
+    		$_SESSION[ 'User' ],
+    		$_SESSION[ 'Hash' ]
+    	)
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    $User = \singleton\database::getInstance( )->query(
+    	null,
+    	"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",
+    	array(
+    		$_SESSION[ 'User' ]
+    	)
+    );
+    $User = sqlsrv_fetch_array($User);
+    $result = \singleton\database::getInstance( )->query(
+    	null,
+    	"	SELECT 	  Access_Table,
+        			    User_Privilege,
+        			    Group_Privilege,
+        			    Other_Privilege
+        	FROM   	Privilege
+        	WHERE  	User_ID = ?;",
+        array(
+        	$_SESSION[ 'User' ]
+        )
+    );
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
+    $Privileged = FALSE;
+    if(isset($Privileges[ 'Admin' ] )
+        && $Privileges[ 'Admin' ][ 'User_Privilege' ] >= 4
+        && $Privileges[ 'Admin' ][ 'Group_Privilege' ] >= 4
+        && $Privileges[ 'Admin' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
+    if(		!isset($Connection[ 'ID' ])
+    	|| 	!$Privileged
+    ){ require( '401.php' ); }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
+    	$result = \singleton\database::getInstance( )->query(
+    		null,
+    		"",//REPLACE SQL HERE
+    		array( )
+    	)
+    	$Object_Name = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +58,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -71,24 +89,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-        
+
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 
     <!-- Custom Date Filters-->
-    
+
     <script>
 	var Editor_Products = new $.fn.dataTable.Editor({
 		ajax: "php/post/Products.php?ID=<?php echo $_GET['ID'];?>",
@@ -146,16 +164,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	var Table_Products = $('#Table_Products').DataTable( {
 		"ajax": "bin/php/get/Products.php",
 		"columns": [
-			{ 
+			{
 				"data": "ID",
 				"visible":false
-			},{ 
+			},{
 				"data": "Name"
-			},{ 
+			},{
 				"data": "Type",
 				render:function(data){
 					switch(data){
-						<?php 
+						<?php
 						$r = $database->query(null,"
 							SELECT Product_Type.ID   AS ID,
 								   Product_Type.Name AS Name
@@ -164,14 +182,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						if($r){while($array = sqlsrv_fetch_array($r)){?>case '<?php echo $array['ID'];?>':return '<?php echo $array['Name'];?>';<?php }}?>
 					}
 				}
-			},{ 
+			},{
 				"data": "Description",
 				"visible":false
-			},{ 
+			},{
 				"data": "Manufacturer"
-			},{ 
+			},{
 				"data": "Model"
-			},{ 
+			},{
 				"data": "Model_Number"
 			},{
 				"data" : "Notes",
@@ -191,26 +209,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					'pdf',
 					'print'
 				]
-			},{ 
-				extend: "create", 
+			},{
+				extend: "create",
 				editor: Editor_Products
-			},{ 
-				extend: "edit",   
-				editor: Editor_Products 
-			},{ 
-				extend: "remove", 
-				editor: Editor_Products 
-			},{ 
-				extend: "edit",   
-				editor:Editor_Products, 
+			},{
+				extend: "edit",
+				editor: Editor_Products
+			},{
+				extend: "remove",
+				editor: Editor_Products
+			},{
+				extend: "edit",
+				editor:Editor_Products,
 				text:"Edit Survey Sheet"
-			},{ 
+			},{
 				text:"View",
 			  	action:function(e,dt,node,config){
 					var data = Table_Products.rows({selected:true}).data()[0];
 				  	document.location.href = 'product.php?ID=' + data.ID;
 			  	}
-			},{ 
+			},{
 				text : "Preview",
 				action:function(e,dt,node,config){
 					$("tr.selected").each(function(){
@@ -250,7 +268,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			filter_default_label:"Customer"},
 		{   column_number:6,
 			filter_default_label:"Location"}
-		
+
 	]);
 	function format ( d ) {
 		return "<div>"+

@@ -1,6 +1,6 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -22,7 +22,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			          Emp.fFirst AS First_Name,
 				        Emp.Last   AS Last_Name
 			  FROM    Emp
-			  WHERE   Emp.ID = ?;",  
+			  WHERE   Emp.ID = ?;",
 		array(
 			$_SESSION[ 'User' ]
 		)
@@ -51,8 +51,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       		" 	INSERT INTO Activity( [User], [Date], [Page] )
   				VALUES( ?, ?, ? );"
     		, array(
-    			$_SESSION[ 'User' ],  
-    			date('Y-m-d H:i:s' ),  
+    			$_SESSION[ 'User' ],
+    			date('Y-m-d H:i:s' ),
     			'routes.php'
     		)
     	);
@@ -60,13 +60,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 <html lang="en">
 <head>
     <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Texas | Portal</title>
-    <?php require(PROJECT_ROOT.'css/index.php');?>
+<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>    <?php require(PROJECT_ROOT.'css/index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper' class='<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>'>
-      <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+      <?php require( bin_php . 'element/navigation.php');?>
       <?php require( bin_php . 'element/loading.php');?>
       <div id='page-wrapper' class='content'>
         <div class='panel panel-primary'>
@@ -102,58 +101,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         </div>
       </div>
     </div>
-    <script src='https://www.nouveauelevator.com/vendor/bootstrap/js/bootstrap.min.js'></script>
-    <?php require('bin/js/datatables.php');?>
-    <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
-    <script>
-        var Table_Routes = $('#Table_Routes').DataTable( {
-        	dom 	   : 'tlp',
-	        processing : true,
-	        serverSide : true,
-	        responsive : true,
-	        autoWidth : false,
-			paging    : true,
-			searching : false,
-			ajax      : {
-	            url : 'bin/php/get/Routes2.php',
-	            data : function( d ){
-	                d = {
-	                    start : d.start,
-	                    length : d.length,
-	                    order : {
-	                        column : d.order[0].column,
-	                        dir : d.order[0].dir
-	                    }
-	                };
-	                d.Search = $('input[name="Search"]').val( );
-	                d.ID = $('input[name="ID"]').val( );
-	                d.Name = $('input[name="Name"]').val( );
-	                d.User = $('input[name="Customer"]').val( ); 
-	                return d; 
-	            },
-	        },
-            columns : [
-                { 
-                	data : 'ID' 
-                },{ 
-                	data : 'Name' 
-                },{   
-                	data : 'Employee' 
-                },{
-                	data : 'Locations'
-                },{
-                	data : 'Units'
-                }
-            ],
-            order : [ [ 1, 'asc' ] ],
-            language : { 
-            	loadingRecords : ''
-            }
-        } );
-        function redraw( ){ Table_Routes.draw( ); }
-		function hrefRoutes( ){ hrefRow( 'Table_Routes', 'route' ); }
-		$( 'Table#Table_Routes' ).on( 'draw.dt', function( ){ hrefRoutes( ); } );
-    </script>
 </body>
 </html>
 <?php

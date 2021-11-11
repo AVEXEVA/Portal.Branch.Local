@@ -1,3 +1,4 @@
+$( document ).ready( function( ){
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -72,7 +73,7 @@ $(document).ready(function( ){
                 data    : function(d){
                     d = {
                         draw : d.draw,
-                        start : d.start, 
+                        start : d.start,
                         length : d.length,
                         order : {
                             column : d.order[0].column,
@@ -106,14 +107,14 @@ $(document).ready(function( ){
               render : function( data, type, row, meta ){
                   switch( type ){
                       case 'display' :
-                        return row.Entity !== null 
-                            ?   ( 
+                        return row.Entity !== null
+                            ?   (
                                     row.Type == 'Customer'
                                         ?   "<div class='row'>" +
                                                 "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
                                             "</div>"
-                                        :   ( 
-                                                row.Type == 'Location' 
+                                        :   (
+                                                row.Type == 'Location'
                                                     ?   "<div class='row'>" +
                                                             "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
                                                         "</div>"
@@ -145,7 +146,7 @@ $(document).ready(function( ){
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
@@ -170,3 +171,4 @@ $(document).ready(function( ){
         ]
     } );
 } );
+}
