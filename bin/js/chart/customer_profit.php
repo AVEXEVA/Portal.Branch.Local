@@ -1,6 +1,6 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -19,7 +19,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
-                    Emp.fFirst AS First_Name, 
+                    Emp.fFirst AS First_Name,
                     Emp.Last   AS Last_Name
             FROM    Emp
             WHERE   Emp.ID = ?;",
@@ -31,16 +31,16 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege, 
+                    Privilege.User_Privilege,
                     Privilege.Group_Privilege,
                     Privilege.Other_Privilege
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+        array(
+          $_SESSION[ 'User' ]
+        )
     );
-    $Privileges = array(); 
+    $Privileges = array();
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
     if( isset( $Privileges[ 'Invoice' ] )
