@@ -1,3 +1,5 @@
+<link href='bin/css/slider-noui.css' rel='stylesheet' />
+<script src="bin/js/slider-noui.js"></script>
 <script src='bin/js/function/closePopup.js'></script>
 <script>
   function saveTicket(link){

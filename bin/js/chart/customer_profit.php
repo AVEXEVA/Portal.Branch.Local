@@ -4,7 +4,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
             FROM    Connection
@@ -16,7 +16,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
-    $User = $database->query(
+    $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
                     Emp.fFirst AS First_Name, 
@@ -28,10 +28,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = $database->query(
+    $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
+                    Privilege.User_Privilege, 
                     Privilege.Group_Privilege,
                     Privilege.Other_Privilege
             FROM    Privilege
@@ -40,7 +40,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           $_SESSION[ 'User' ] 
         ) 
     );
-    $Privileges = array();
+    $Privileges = array(); 
     while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
     if( isset( $Privileges[ 'Invoice' ] )
@@ -48,31 +48,26 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     ){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-function random_color_part() {
-    return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
-}
-
-function random_color() {
-    return random_color_part() . random_color_part() . random_color_part();
-}?>
-<script>
-function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
-	<?php
+    	function random_color_part() { return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT); }
+		function random_color() { return random_color_part() . random_color_part() . random_color_part(); }
+?><script>
+	function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
+<?php
 	$data = array();
 	$Jobs = array();
 	$dates = array();
 	$totals = array();
-	$r = $database->query(null,"SELECT Loc.Custom3 FROM Loc WHERE Loc.Owner = ? AND Loc.Custom3 IS NOT NULL AND Loc.Custom3 <> ' ' AND Loc.Custom3 <> '';", array($_GET['ID']));
+	$r = \singleton\database::getInstance( )->query(null,"SELECT Loc.Custom3 FROM Loc WHERE Loc.Owner = ? AND Loc.Custom3 IS NOT NULL AND Loc.Custom3 <> ' ' AND Loc.Custom3 <> '';", array($_GET['ID']));
 	$groups = array();
 	$groups2 = array();
 	if($r){while($array = sqlsrv_fetch_array($r)){
-		$r2 = $database->query(null,"SELECT Loc.Owner FROM Loc WHERE Loc.Custom3 = ?;", array($array['Custom3']));
+		$r2 = \singleton\database::getInstance( )->query(null,"SELECT Loc.Owner FROM Loc WHERE Loc.Custom3 = ?;", array($array['Custom3']));
 		if($r2){while($row2 = sqlsrv_fetch_array($r2)){
 			$groups2[] = "Job.Owner = {$row2['Owner']}";
 		}}
 	}}
 	$groups2 = count($groups2) > 0 ? implode(" OR ", $groups2) : "'1' = '2'";
-	$r = $database->query(null,
+	$r = \singleton\database::getInstance( )->query(null,
 	" SELECT   Job.Loc,
 							Invoice.Amount AS Amount,
 				 		Invoice.fDate  AS fDate
@@ -88,26 +83,15 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 					 ))
 
 		ORDER BY Invoice.fDate ASC
-	;",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
-	if( ($errors = sqlsrv_errors() ) != null) {
-        foreach( $errors as $error ) {
-            echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
-            echo "code: ".$error[ 'code']."<br />";
-            echo "message: ".$error[ 'message']."<br />";
-        }
-    }
+	;",array($_GET['ID']));
 	if($r){
-		$i = 0;
-		$row_count = sqlsrv_num_rows($r);
-		while($i < $row_count){
-			$array = sqlsrv_fetch_array($r);
-			$date = substr($array['fDate'],0,10);
-			$dates[$array['Loc']] = isset($dates[$array['Loc']]) ? $dates[$array['Loc']] : array();
-			$dates[$array['Loc']][$date] = isset($dates[$array['Loc']][$date]) ? $dates[$array['Loc']][$date] + ($array['Amount']) : $array['Amount'];
-			$i++;
+		while( $row = sqlsrv_fetch_array( $r ) ){
+			$date = substr($row['fDate'],0,10);
+			$dates[$row['Loc']] = isset($dates[$row['Loc']]) ? $dates[$row['Loc']] : array();
+			$dates[$row['Loc']][$date] = isset($dates[$row['Loc']][$date]) ? $dates[$row['Loc']][$date] + ($row['Amount']) : $row['Amount'];
 		}
 	}
-	$r = $database->query(null,
+	$r = \singleton\database::getInstance( )->query(null,
 	" SELECT Job.Loc, JobI.Amount AS Amount,
 			   JobI.fDate as fDate
 		FROM   Loc
@@ -123,20 +107,17 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 						AND Job.fDate >= '2017-03-30 00:00:00.000'
 					 ))
 			ORDER BY JobI.fDate ASC
-	;",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
+	;",array($_GET['ID']));
 
 	if($r){
-		$i = 0;
-		$row_count = sqlsrv_num_rows($r);
-		while($i < $row_count){
-			$array = sqlsrv_fetch_array($r);
-			$date = substr($array['fDate'],0,10);
-			$dates[$array['Loc']] = isset($dates[$array['Loc']]) ? $dates[$array['Loc']] : array();
-			$dates[$array['Loc']][$date] = isset($dates[$array['Loc']][$date]) ? $dates[$array['Loc']][$date] - floatval($array['Amount']) : 0 - floatval($array['Amount']);
-			$i++;
+		while( $row = sqlsrv_fetch_array( $r ) ){
+			$date = substr($row['fDate'],0,10);
+			$dates[$row['Loc']] = isset($dates[$row['Loc']]) ? $dates[$row['Loc']] : array();
+			$dates[$row['Loc']][$date] = isset($dates[$row['Loc']][$date]) ? $dates[$row['Loc']][$date] - floatval($row['Amount']) : 0 - floatval($row['Amount']);$dates[$row['Loc']][$date] = isset($dates[$row['Loc']][$date]) ? $dates[$row['Loc']][$date] + ($row['Amount']) : $row['Amount'];
 		}
 	}
-	$r = $database->query(null,
+
+	$r = \singleton\database::getInstance( )->query(null,
 	"	SELECT   Job.Loc, JobI.Amount AS Amount,
 				 JobI.fDate as fDate
 		FROM     Loc
@@ -159,16 +140,12 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 					 ))
 
 		ORDER BY JobI.fDate ASC
-	;",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
+	;",array($_GET['ID']));
 	if($r){
-		$i = 0;
-		$row_count = sqlsrv_num_rows($r);
-		while($i < $row_count){
-			$array = sqlsrv_fetch_array($r);
-			$date = substr($array['fDate'],0,10);
-			$dates[$array['Loc']] = isset($dates[$array['Loc']]) ? $dates[$array['Loc']] : array();
-			$dates[$array['Loc']][$date] = isset($dates[$array['Loc']][$date]) ? $dates[$array['Loc']][$date] - floatval($array['Amount']) : 0 - floatval($array['Amount']);
-			$i++;
+		while( $row = sqlsrv_fetch_array( $r ) ){
+			$date = substr($row['fDate'],0,10);
+			$dates[$row['Loc']] = isset($dates[$row['Loc']]) ? $dates[$row['Loc']] : array();
+			$dates[$row['Loc']][$date] = isset($dates[$row['Loc']][$date]) ? $dates[$row['Loc']][$date] - floatval($row['Amount']) : 0 - floatval($row['Amount']);
 		}
 	}
 	$total = 0;
@@ -196,20 +173,20 @@ function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
 			if($Year == '' || is_null($Year)){continue;}
 			$data[] = "[gd({$Year},{$Month},{$Day}),{$total}]";
 		}
-		?>var location_data_<?php echo $Loc;?> = [<?php
+		?>var customer_data_<?php echo $Loc;?> = [<?php
 		echo implode(",",$data);?>];
 		<?php
 		?><?php }?>
-		var location_dataset = [<?php $i = 0;?>
+		var customer_dataset = [<?php $i = 0;?>
 				<?php foreach($Locs as $Loc){?><?php echo $i == 0 ? NULL : ',';$i=1;?>{
-						label: "<?php $r = $database->query(null,"SELECT Loc.Tag FROM Loc WHERE Loc.Loc = ?;", array($Loc));echo sqlsrv_fetch_array($r)['Tag'];?>",
-						data: location_data_<?php echo $Loc;?>,
+						label: "<?php $r = \singleton\database::getInstance( )->query(null,"SELECT Loc.Tag FROM Loc WHERE Loc.Loc = ?;", array($Loc));echo sqlsrv_fetch_array($r)['Tag'];?>",
+						data: customer_data_<?php echo $Loc;?>,
 						color: "#<?php $color =  random_color(); echo $color;?>",
 						points: { fillColor: "#<?php echo $color;?>", show: true },
 						lines: { show: true }
 				}<?php }?>
 		];
-var job_profit_options = {
+var customer_profit_options = {
     series: {shadowSize: 5},
     xaxes: [{
         mode: "time",
@@ -251,6 +228,7 @@ var job_profit_options = {
     legend: {
         noColumns: 0,
         labelFormatter: function (label, series) {
+        	return null;
             return "<font color=\"white\">" + label + "</font>";
         },
         backgroundColor: "#000",
@@ -268,8 +246,8 @@ var job_profit_options = {
 };
 
 $(document).ready(function () {
-    $.plot($("#flot-placeholder-profit"), location_dataset, job_profit_options);
-    $("#flot-placeholder-profit").UseTooltip();
+    $.plot($("#customer-profit"), customer_dataset, customer_profit_options);
+    $("#customer-profit").UseTooltip();
 });
 
 
@@ -323,5 +301,6 @@ function showTooltip(x, y, color, contents) {
     }).appendTo("body").fadeIn(200);
 }
 </script>
+<div id='customer-profit' style='width:100%;height:350px;'></div>
 <?php }
 }?>

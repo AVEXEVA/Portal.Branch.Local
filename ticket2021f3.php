@@ -203,11 +203,10 @@ if($r){while($array = sqlsrv_fetch_array($r)){$Ticket['Signature'] = $array['Sig
 <html lang="en">
 <head>
     <title>Nouveau Texas Portal</title>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php');?>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
-    <script src="bin/js/slider-noui.js"></script>
-    <link href='bin/css/slider-noui.css' rel='stylesheet' />
     <style type="text/css" media="print">
         .no-print {
             display:block !important;
@@ -247,24 +246,24 @@ white-space: normal !important;
 </head>
 <body onload="finishLoadingPage();" style='background-color:#2d2d2d !important;color:white !important;/*overscroll-behavior: contain;*/'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>;">
-        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+        <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='overflow-x:hidden;<?php if(isset($_SESSION['Branch']) && $_SESSION['Branch'] == 'Customer'){?>margin:0px !important;<?php }?>'>
-            <?php if(!isMobile() && false){?>
+            <?php if(!isMobile() && true){?>
             <div class='print'>
-				<div class="panel panel-primary" style='margin-bottom:0px;'>
-					<div class="panel-heading">
+				<div class="card card-primary" style='margin-bottom:0px;'>
+					<div class="card-heading">
 						<div style='float:left;'>
 							<h3><?php \singleton\fontawesome::getInstance( )->Ticket();?> <?php echo $Location['Tag'];  ?> Ticket #<?php echo $Ticket['ID'];?></h3>
 						</div>
 						<div style='clear:both;'></div>
 					</div>
-					<div class="panel-body print" style='background-color:rgba(255,255,255,.9) !important;'>
+					<div class="card-body print" style='background-color:rgba(255,255,255,.9) !important;'>
 						<div class="row">
 							<div class='col-md-6' style=''>
-								<div class="panel panel-primary">
-									<div class="panel-heading">Basic Information</div>
-									<div class='panel-body'>
+								<div class="card card-primary">
+									<div class="card-heading">Basic Information</div>
+									<div class='card-body'>
 										<div style='font-size:24px;text-decoration:underline;'><b>
 											<?php /*Need to make one big row and multiple cols*/?>
 											<div class='row'><div class='col-xs-12'><a href='ticket.php?ID=<?php echo $Ticket['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Ticket();?> Ticket #<?php echo $Ticket['ID'];?></a></div></div>
@@ -276,9 +275,9 @@ white-space: normal !important;
 								</div>
 								<div class='row'>
 									<div class='col-md-12' style=''>
-										<div class="panel panel-primary">
-											<div class="panel-heading">Ticket Information</div>
-											<div class='panel-body'>
+										<div class="card card-primary">
+											<div class="card-heading">Ticket Information</div>
+											<div class='card-body'>
 												<div class='row'>
 													<div class='col-xs-4'><b>Total Hours</b></div>
 													<div class='col-xs-8'><pre><?php
@@ -330,11 +329,11 @@ white-space: normal !important;
 							<div class='col-md-6'>
 								<div class='row' >
 									<div class='col-md-6' >
-										<div class="panel panel-primary">
-											<div class="panel-heading">
+										<div class="card card-primary">
+											<div class="card-heading">
 												<i class="fa fa-map fa-fw"></i> Location Details
 											</div>
-											<div class="panel-body">
+											<div class="card-body">
 												<div class='row'>
 													<div class='col-xs-4'><b>Customer:</b></div>
 													<div class='col-xs-8'><?php if(!$Field){?><a href="<?php echo (strlen($Ticket['Owner_ID']) > 0) ? 'customer.php?ID=' . $Ticket['Owner_ID'] : '#';?>"><pre><?php echo (strlen($Ticket['Customer']) > 0) ? $Ticket["Customer"] : 'Unlisted';?></pre></a><?php } else {?><pre><?php echo (strlen($Ticket['Customer']) > 0) ? $Ticket["Customer"] : 'Unlisted';?><?php }?></pre></div>
@@ -364,18 +363,18 @@ white-space: normal !important;
 										</div>
 									</div>
 									<div class='col-md-6' >
-										<div class="panel panel-primary">
-											<div class="panel-heading"><i class="fa fa-map fa-fw"></i> Map</div>
-											<div class="panel-body">
+										<div class="card card-primary">
+											<div class="card-heading"><i class="fa fa-map fa-fw"></i> Map</div>
+											<div class="card-body">
 												<style>#map {height:100%;}</style>
                                					<div id="map" style='height:300px;overflow:visible;width:100%;'></div>
 											</div>
 										</div>
 									</div>
 									<div class='col-md-6' style=''>
-										<div class="panel panel-primary">
-											<div class="panel-heading">Job Information</div>
-											<div class='panel-body'>
+										<div class="card card-primary">
+											<div class="card-heading">Job Information</div>
+											<div class='card-body'>
 													<div class='row'>
 														<div class='col-xs-4'><b>Job:</b></div>
 														<div class='col-xs-8'><a href="<?php echo (strlen($Ticket['Job_ID']) > 0) ? 'job.php?ID=' . $Ticket['Job_ID'] : '#';?>"><pre><?php echo strlen($Ticket['Job_ID']) ? $Ticket['Job_ID'] : "Unlisted";?></pre></a></div>
@@ -408,9 +407,9 @@ white-space: normal !important;
 										</div>
 									</div>
 									<div class='col-md-6' style=''>
-										<div class="panel panel-primary">
-											<div class="panel-heading">Clock Information</div>
-											<div class='panel-body'>
+										<div class="card card-primary">
+											<div class="card-heading">Clock Information</div>
+											<div class='card-body'>
 												<div class='row'>
 													<div class='col-xs-4'><b>Creation:</b></div>
 													<div class='col-xs-8'><pre><?php echo strlen($Ticket["CDate"]) > 0 ? date("m/d/Y h:i:s a", strtotime($Ticket["CDate"])) : "Unlisted";?></pre></div>
@@ -451,11 +450,11 @@ white-space: normal !important;
 						</div>
 						<div class='row'>
 							<div class='col-lg-12'>
-								<div class='panel panel-primary'>
-									<div class='panel-heading'>
+								<div class='card card-primary'>
+									<div class='card-heading'>
 										<i class='fa fa-map fa-fw'></i> GPS Details
 									</div>
-									<div class='panel-body' style='height:200px;overflow-y:scroll;'>
+									<div class='card-body' style='height:200px;overflow-y:scroll;'>
 										<?php
 											$r = $database->query(null,"
 												SELECT TOP 100 TechLocation.*
@@ -662,80 +661,6 @@ white-space: normal !important;
             <div class='container-content'></div>
             <?php }?>
         </div>
-        <!-- /#page-wrapper -->
-
-    </div>
-
-
-    <!-- Bootstrap Core JavaScript -->
-    
-
-    <!-- Metis Menu Plugin JavaScript -->
-    
-
-    <!-- Custom Theme JavaScript -->
-    
-
-    <!-- JQUERY UI Javascript -->
-    
-<?php if(!isMobile()){?>
-    <script type="text/javascript">
-  function initialize() {
-    var latlng = new google.maps.LatLng(40.7831, -73.9712);
-    var myOptions = {
-      zoom: 10,
-      center: latlng,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var map = new google.maps.Map(document.getElementById("map"),
-        myOptions);
-    var marker = new Array();
-<?php
-$r = $database->query(null,"
-    SELECT TOP 100 TechLocation.*
-    FROM TechLocation
-    WHERE TicketID = '" . $Ticket['ID'] . "';");
-$GPS_Locations = array();
-while($array = sqlsrv_fetch_array($r)){$GPS_Locations[] = $array;}
-foreach($GPS_Locations as $key=>$GPS_Location){?>
-    marker[<?php echo $key;?>] = new google.maps.Marker({
-      position: {lat:<?php echo substr($GPS_Location['Latitude'],0,7);?>,lng:<?php echo substr($GPS_Location['Longitude'],0,8);?>},
-      map: map,
-      title: '<?php echo $GPS_Location['ActionGroup'];?>'
-    });
-  <?php }?>}</script>
-   <?php }?><style>
-    div.column {display:inline-block;vertical-align:top;}
-    div.label1 {display:inline-block;font-weight:bold;width:150px;vertical-align:top;}
-    div.data {display:inline-block;width:300px;vertical-align:top;}
-    div#map * {overflow:invisible;}
-    </style>
-    <script>
-        function clickTab(Tab,Subtab){
-            $("a[tab='" + Tab + "']").click();
-            setTimeout(function(){
-                $("a[tab='" + Subtab + "']").click();
-            },2500);
-        }
-        $(document).ready(function(){
-            $("a[tab='overview-pills']").click();
-        });
-    </script>
-    <script>
-        function someFunction(link,URL){
-            $(link).siblings().removeClass('active');
-            $(link).addClass('active');
-            $.ajax({
-                url:"bin/php/element/ticket/" + URL,
-                success:function(code){
-                    $("div.container-content").html(code);
-                }
-            });
-        }
-        $(document).ready(function(){
-            $("div.Screen-Tabs>div>div:first-child").click();
-        });
-    </script>
 </body>
 </html>
 <?php
