@@ -48,6 +48,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     ){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
+        $_GET['rand'] = rand( 0, 999999 );
 ?>
 <script>
 function gd(year, month, day) {return new Date(year, month - 1, day).getTime();}
@@ -70,14 +71,7 @@ var job_profit_data_<?php echo $_GET['rand'];?> = [
 						AND Job.fDate >= '2017-03-30 00:00:00.000'
 					 ))
 		ORDER BY Invoice.fDate ASC
-	;",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
-	if( ($errors = sqlsrv_errors() ) != null) {
-        foreach( $errors as $error ) {
-            echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
-            echo "code: ".$error[ 'code']."<br />";
-            echo "message: ".$error[ 'message']."<br />";
-        }
-    }
+	;",array($_GET['ID']));
 	if($r){
 		$i = 0;
 		$row_count = sqlsrv_num_rows($r);
@@ -92,7 +86,7 @@ var job_profit_data_<?php echo $_GET['rand'];?> = [
 	$r = $database->query(null,
 	" SELECT JobI.Amount AS Amount,
 			   JobI.fDate as fDate
-		FROM   Loc
+		FROM   Loc 
 			   LEFT JOIN Job  ON Loc.Loc = Job.Loc
 			   LEFT JOIN JobI ON Job.ID  = JobI.Job
 		WHERE  Loc.Loc = ?
@@ -104,7 +98,7 @@ var job_profit_data_<?php echo $_GET['rand'];?> = [
 						AND Job.Status <> 0
 						AND Job.fDate >= '2017-03-30 00:00:00.000'
 					 ))
-	;",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
+	;",array($_GET['ID']));
 
 	if($r){
 		$i = 0;
@@ -140,7 +134,7 @@ var job_profit_data_<?php echo $_GET['rand'];?> = [
 					 ))
 
 		ORDER BY JobI.fDate ASC
-	;",array($_GET['ID']),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
+	;",array($_GET['ID']));
 	if($r){
 		$i = 0;
 		$row_count = sqlsrv_num_rows($r);
@@ -343,5 +337,6 @@ function showTooltip(x, y, color, contents) {
     }).appendTo("body");
 }
 </script>
+<div id='flot-placeholder-profit-<?php echo $_GET['rand'];?>' style='width:100%;height:350px;'></div>
 <?php }
 }?>
