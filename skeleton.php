@@ -41,9 +41,9 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         && $Privileges[ 'Object_Name' ][ 'User_Privilege' ] >= 4
         && $Privileges[ 'Object_Name' ][ 'Group_Privilege' ] >= 4
         && $Privileges[ 'Object_Name' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
-    if(		!isset($Connection[ 'ID' ])  
+    if(		!isset($Connection[ 'ID' ])
     	|| 	!$Privileged
-    ){ require( '401.php' ); } 
+    ){ require( '401.php' ); }
     else {
     	$result = \singleton\database::getInstance( )->query(
     		null,
@@ -55,7 +55,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 <html lang="en">
 <head>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php 
+    <?php
     	$_GET[ 'Bootstrap' ] = '5.1';
     	require( bin_meta . 'index.php');
     	require( bin_css  . 'index.php');

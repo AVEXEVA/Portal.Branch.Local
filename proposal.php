@@ -6,8 +6,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 if(isset(
   $_SESSION['User'],
   $_SESSION['Hash'] ) ) {
-        $result = $database->query(
-          null,
+        $result = \singleton\database::getInstance( )->query(
+        	null,
             "   SELECT  *
                 FROM    Connection
                 WHERE   Connector = ?
@@ -18,8 +18,8 @@ if(isset(
       )
   );
         $array = sqlsrv_fetch_array($result);
-        $result= $database->query(
-          null,
+        $result= \singleton\database::getInstance( )->query(
+        	null,
           "   SELECT    *, fFirst
               AS        First_Name, Last as Last_Name
               FROM Emp

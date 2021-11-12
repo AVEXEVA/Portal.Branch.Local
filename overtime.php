@@ -1,40 +1,58 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT *
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-	   	|| !isset($My_Privileges['Job'])
-	  		|| $My_Privileges['Job']['User_Privilege']  < 4
-	  		|| $My_Privileges['Job']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Job']['Other_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+}
+setlocale(LC_MONETARY, 'en_US');
+if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
+    $result = \singleton\database::getInstance( )->query(
+    	null,
+    	"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",
+    	array(
+    		$_SESSION[ 'User' ],
+    		$_SESSION[ 'Hash' ]
+    	)
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    $User = \singleton\database::getInstance( )->query(
+    	null,
+    	"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",
+    	array(
+    		$_SESSION[ 'User' ]
+    	)
+    );
+    $User = sqlsrv_fetch_array($User);
+    $result = \singleton\database::getInstance( )->query(
+    	null,
+    	"	SELECT 	  Access_Table,
+        			    User_Privilege,
+        			    Group_Privilege,
+        			    Other_Privilege
+        	FROM   	Privilege
+        	WHERE  	User_ID = ?;",
+        array(
+        	$_SESSION[ 'User' ]
+        )
+    );
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
+    $Privileged = FALSE;
+    if(isset($Privileges[ 'Admin' ] )
+        && $Privileges[ 'Admin' ][ 'User_Privilege' ] >= 4
+        && $Privileges[ 'Admin' ][ 'Group_Privilege' ] >= 4
+        && $Privileges[ 'Admin' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
+    if(		!isset($Connection[ 'ID' ])
+    	|| 	!$Privileged
+    ){ require( '401.php' ); }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "overtime.php"));
+    	$result = \singleton\database::getInstance( )->query(
+    		null,
+    		"			INSERT INTO Activity([User], [Date], [Page])
+			VALUES(?,?,?);",
+    	$Object_Name = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC );
+		array($_SESSION['User'],
+      date  ("Y-m-d H:i:s"),
+            "overtime.php"));
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +60,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
+    <meta name="author" content="Peter D. Speranza">
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
     <style>
@@ -74,7 +93,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <div class='col-xs-1' style='text-align:right;'>Job Type:</div>
                                 <div class='col-xs-11'><select name='Job_Type' style='color:black;'><option value=''>Select</option>
                                   <?php
-                                    $r = $database->query(null,"SELECT * FROM nei.dbo.JobType WHERE ID <> 9 AND ID <> 12;");
+                                    $r = \singleton\database::getInstance( )->query(
+                                    	null,
+                                      " SELECT  *
+                                        FROM  JobType
+                                        WHERE ID <> 9 AND ID <> 12;");
                                     if($r){while($row = sqlsrv_fetch_array($r)){
                                       ?><option value='<?php echo $row['ID'];?>' <?php echo isset($_GET['Job_Type']) && $row['ID'] == $_GET['Job_Type'] && $_GET['Job_Type'] != '' ? 'selected' : '';?>><?php echo $row['Type'];?></option><?php
                                     }}?>
@@ -84,7 +107,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <div class='col-xs-1' style='text-align:right;'>Supervisor:</div>
                                 <div class='col-xs-11'><select name='Supervisor' style='color:black;'><option value=''>Select</option>
                                   <?php
-                                    $r = $database->query(null,"SELECT Job.Custom1 FROM nei.dbo.Job WHERE Job.ID <> 9 AND Job.ID <> 12 AND Job.Custom1 <> '' GROUP BY Job.Custom1 ORDER BY Job.Custom1 ASC ;");
+                                    $r = \singleton\database::getInstance( )->query(
+                                    	null,
+                                      " SELECT   Job.Custom1
+                                        FROM     Job
+                                        WHERE    Job.ID <> 9
+                                        AND      Job.ID <> 12
+                                        AND      Job.Custom1 <> '' GROUP BY Job.Custom1
+                                        ORDER BY Job.Custom1 ASC ;");
                                     if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['Custom1'];?>' <?php echo isset($_GET['Supervisor']) && $row['Custom1'] == $_GET['Supervisor']  && $_GET['Supervisor'] != '' ? 'selected' : '';?>><?php echo $row['Custom1'];?></option><?php }}?>
                                 </select></div>
                               </div>
@@ -254,21 +284,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-    
+
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
     <script>
         $(document).ready(function(){
             $("input[name='Start']").datepicker();

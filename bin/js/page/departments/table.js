@@ -24,7 +24,7 @@ style : 'multi',
 selector : 'td.ID'
 },
 ajax: {
-url     : 'bin/php/get/departments.php',
+url     : 'bin/php/get/Departments.php',
 data : function( d ){
       d = {
           start : d.start,

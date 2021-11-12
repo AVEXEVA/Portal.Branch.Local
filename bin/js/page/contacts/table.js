@@ -1,3 +1,4 @@
+$( document ).ready( function( ){
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -72,7 +73,7 @@ $(document).ready(function( ){
                 data    : function(d){
                     d = {
                         draw : d.draw,
-                        start : d.start, 
+                        start : d.start,
                         length : d.length,
                         order : {
                             column : d.order[0].column,
@@ -97,19 +98,36 @@ $(document).ready(function( ){
                 className : 'ID',
                 data : 'ID'
             },{
-                data : 'Name',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                          return    row.Name !== null 
+                data : 'Type'
+            },{
+              data : 'Entity',
+              render : function( data, type, row, meta ){
+                  switch( type ){
+                      case 'display' :
+                        return row.Entity !== null
+                            ?   (
+                                    row.Type == 'Customer'
                                         ?   "<div class='row'>" +
                                                 "<div class='col-12'><a href='contact.php?Name=" + row.ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
                                             "</div>"
-                                        :   null;
-                        default :
-                            return data;
-                    }
-                }
+                                        :   (
+                                                row.Type == 'Location'
+                                                    ?   "<div class='row'>" +
+                                                            "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
+                                                        "</div>"
+                                                    :   null
+                                            )
+                                )
+                            :   null;
+                      default :
+                          return data;
+                  }
+
+              }
+            },{
+                data : 'Name'
+            },{
+                data : 'Position'
             },{
                 data : 'Type'
             },{
@@ -117,14 +135,14 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                          return row.Entity !== null 
-                              ?   ( 
+                          return row.Entity !== null
+                              ?   (
                                       row.Type == 'Customer'
                                           ?   "<div class='row'>" +
                                                   "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
                                               "</div>"
-                                          :   ( 
-                                                  row.Type == 'Location' 
+                                          :   (
+                                                  row.Type == 'Location'
                                                       ?   "<div class='row'>" +
                                                               "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
                                                           "</div>"
@@ -146,7 +164,7 @@ $(document).ready(function( ){
                             return row.Email !== null && row.Phone != ''
                                 ?   "<a href='tel:" + row.Phone + "'><i class='fa fa-phone fa-fw fa-1x'></i>" + row.Phone + "</a>"
                                 :   null;
-                        default : 
+                        default :
                             return data;
                     }
                 }
@@ -158,7 +176,7 @@ $(document).ready(function( ){
                             return row.Email !== null && row.Email != ''
                                 ?   "<a href='mailto:" + row.Email + "'><i class='fa fa-envelope fa-fw fa-1x'></i>" + row.Email + "</a>"
                                 :   null;
-                        default : 
+                        default :
                             return data;
                     }
                 }
@@ -167,13 +185,13 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  "<div class='row'>" + 
+                            return  "<div class='row'>" +
                                         "<div class='col-12'>" +
                                             "<div class='row'>" +
-                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" + 
-                                                "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" + 
+                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
+                                                "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
                                             "</div>" +
-                                        "</div>" +  
+                                        "</div>" +
                                     "</div>"
                         default :
                             return data;
@@ -182,7 +200,7 @@ $(document).ready(function( ){
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
@@ -207,3 +225,4 @@ $(document).ready(function( ){
         ]
     } );
 } );
+}

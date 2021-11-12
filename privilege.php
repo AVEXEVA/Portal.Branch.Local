@@ -2,50 +2,54 @@
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-        SELECT *
+    $r = \singleton\database::getInstance( )->query(
+      null,
+      " SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash  = ?
     ;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-        SELECT *,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name
-        FROM   Emp
-        WHERE  Emp.ID = ?
+    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
+    $r = \singleton\database::getInstance( )->query(
+      null,
+        " SELECT *,
+                 Emp.fFirst AS First_Name,
+                 Emp.Last   AS Last_Name
+          FROM   Emp
+          WHERE  Emp.ID = ?
     ;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-    $r = $database->query(null,"
-        SELECT *
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
+    $User = sqlsrv_fetch_array($r);
+    $r = \singleton\database::getInstance( )->query(
+      null,
+        " SELECT *
+          FROM   Privilege
+          WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if( !isset($My_Connection['ID'])
+    $Privileges = array();
+    if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if( !isset($Connection['ID'])
         || !(isset($_GET['User_ID']) || isset($_POST['User_ID']))
-        || !isset($My_Privileges['Admin'])
-            || $My_Privileges['Admin']['User_Privilege']  < 4
-            || $My_Privileges['Admin']['Group_Privilege'] < 4
-            || $My_Privileges['Admin']['Other_Privilege'] < 4){
+        || !isset($Privileges['Admin'])
+            || $Privileges['Admin']['User_Privilege']  < 4
+            || $Privileges['Admin']['Group_Privilege'] < 4
+            || $Privileges['Admin']['Other_Privilege'] < 4){
                 ?><?php require('../404.html');?><?php }
     else {
-        $database->query(null,"
-            INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
+      \singleton\database::getInstance( )->query(
+        null,
+          " INSERT INTO Activity([User], [Date], [Page])
             VALUES(?,?,?)
         ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "privilege.php?User_ID=" . $_GET['User_ID']));
 $Selected_User_ID = isset($_GET['User_ID']) ? $_GET['User_ID'] : $_POST['User_ID'];
 if(isset($_POST['User_ID'])){
     if(isset($_POST['Type']) && $_POST['Type'] == 'Update'){
-        $r = $database->query($Portal,"
-            UPDATE Portal
-            SET
-                Email = ?,
-                Password = ?
-            WHERE Branch_ID = ?
-                  AND Branch='Nouveau Texas';
+        $r = $database->query($Portal,
+          "   UPDATE Portal
+              SET
+                  Email = ?,
+                  Password = ?
+              WHERE Branch_ID = ?
+                    AND Branch='Nouveau Texas';
         ",array($_POST['Email'],$_POST['Password'],$_POST['User_ID']));
     } elseif(isset($_POST['Type']) && $_POST['Type'] == 'Insert'){
         $r = $database->query($Portal,"
@@ -172,7 +176,7 @@ $Selected_User = sqlsrv_fetch_array($r);
                 </script>
                 <div class='col-lg-12'>&nbsp;</div>
                 <div class='col-lg-12' style='color: black !important;'>
-                    <button onClick="grantBeta();" type='button'>Grant Beta Access</button> 
+                    <button onClick="grantBeta();" type='button'>Grant Beta Access</button>
                     <button onClick="grantSalesAdmin();" type='button'>Grant Beta Access</button>
                     <button onClick="grantField();" type='button'>Grant Field Access</button>
                     <button onClick="grantDispatch();" type='button'>Grant Dispatch Access</button>
@@ -244,11 +248,11 @@ $Selected_User = sqlsrv_fetch_array($r);
             </div>
         </div>
     </div>
-    
-    
+
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    
+
+
     <script>
         $(document).ready(function() {
             var table = $('#Privileges_Table').DataTable( {
