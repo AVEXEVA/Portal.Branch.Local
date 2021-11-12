@@ -70,7 +70,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['ID'];
-	      $conditions[] = "Ticket.ID LIKE '%' + ? + '%'";
+	      $conditions[] = "CAST( Ticket.ID AS VARCHAR( 32 ) ) LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Person' ] ) && !in_array( $_GET[ 'Person' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Person'];
@@ -78,7 +78,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    }
 	    if( isset( $_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Customer'];
-	      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+	      $conditions[] = "Customer.Name LIKE '%' + ? + '%'"; 
 	    }
 	    if( isset( $_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Location'];
@@ -144,20 +144,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      	default : break;
 	      }
 	    }
-      $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
-      $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-      /*ROW NUMBER*/
-      $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
-      $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
+	    if( isset( $_GET[ 'search' ] ) && !in_array(  $_GET[ 'search' ], array( '', ' ', null ) ) ){
 
-		if( isset( $_GET[ 'search' ] ) ){
+			$search[] = "CAST( Ticket.ID AS VARCHAR( 32 ) ) LIKE '%' + ? + '%'";
+			$parameters[] = $_GET[ 'search' ];
 
-			$search[] = " Ticket.ID LIKE '%' + ? + '%'";
+			$search[] = " Customer.Name LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
 
 			$search[] = " Location.Tag LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
+			
 
 			$search[] = " Unit.State + ' - ' + Unit.Unit LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
@@ -165,11 +163,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			$search[] = " CAST( Job.ID AS VARCHAR( 32 ) ) + ' - ' + Job.fDesc LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
 
+			$search[] = " JobType.Type LIKE '%' + ? + '%'";
+			$parameters[] = $_GET[ 'search' ];
+
 			$search[] = " Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
 			$parameters[] = $_GET[ 'search' ];
 
 		}
-
 
 		/*Concatenate Filters*/
 		$conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );

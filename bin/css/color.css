@@ -1,3 +1,9 @@
 .bg-darker {
 	background-color : #252525;
 }
+.text-green {
+	color : green;
+}
+.text-red {
+	color : red;
+}

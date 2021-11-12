@@ -59,6 +59,7 @@
 <link rel='stylesheet' href='bin/library/timepicker/jquery.timepicker.min.css'>
 <script src='bin/library/timepicker/jquery.timepicker.min.js'></script>
 
+<link rel='stylesheet' href='bin/library/bootstrap/typeahead.css'>
 <script src='bin/library/bootstrap/typeahead.js'></script>
 <!--
 <link rel="stylesheet" href=https://www.nouveauelevator.com/portal/bin//Editor-1.7.0/css/editor.bootstrap.min.css">

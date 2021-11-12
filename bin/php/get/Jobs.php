@@ -86,10 +86,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $parameters[] = $_GET['Status'];
       $conditions[] = "Job.Status LIKE '%' + ? + '%'";
     }
-    /*if( $Privileges[ 'Job' ][ 'Other_Privilege' ] < 4 ){
-        $parameters [] = $User[ 'fWork' ];
-        $conditions[] = "Location.Loc IN ( SELECT Ticket.Location FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LID AS Location FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Loc AS Location FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Location)";
-    }*/
+    if( !isset( $Privileges[ 'Legal' ] ) || $Privileges[ 'Legal' ][ 'Other_Privilege' ] < 4 || true ){
+        $conditions[] = "Job.Type <> 9";
+    }
 
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 

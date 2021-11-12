@@ -78,6 +78,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $parameters[] = $_GET['Job'];
       $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
     }
+    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Status'];
+      $conditions[] = "Estimate.Status LIKE '%' + ? + '%'";
+    }
     if( isset($_GET[ 'Title' ] ) && !in_array( $_GET[ 'Title' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Title'];
       $conditions[] = "Estimate.Name LIKE '%' + ? + '%'";
@@ -130,12 +134,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
       ? $_GET['order']['dir']
       : 'ASC';
-
     $sQuery = " SELECT *
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Estimate.ID 		  AS ID,
                           Estimate.fDate    AS Date,
+                          CASE  WHEN Estimate.Status = 0 THEN 'Open'
+                                WHEN Estimate.Status = 1 THEN 'Canceled'
+                                WHEN Estimate.Status = 2 THEN 'Withdrawn'
+                                WHEN Estimate.Status = 3 THEN 'Disqualified'
+                                WHEN Estimate.Status = 4 THEN 'Award Successful'
+                                ELSE 'Unknown Status'
+                          END AS Status,
                           Contact.ID        AS Contact_ID,
                           Contact.Name      AS Contact_Name,
                           Contact.EMail     AS Contact_Email,
@@ -150,10 +160,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           Estimate.fDesc 	  AS Title,
                           Estimate.Cost     AS Cost,
                           Estimate.Price    AS Price,
-                          Estimate.Status   AS Status,
                           Territory.ID      AS Territory_ID,
                           Territory.Name    AS Territory_Name
-                          
                   FROM    Estimate
                           LEFT JOIN Job ON Job.ID = Estimate.Job
                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc

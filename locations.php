@@ -136,6 +136,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
               <th class='text-white border border-white' title='Units'>Units</th>
               <th class='text-white border border-white' title='Maintained'>Maintained</th>
               <th class='text-white border border-white' title='Status'>Status</th>
+              <!--<th class='text-white border border-white' title='Labor'>Labor</th>
+              <th class='text-white border border-white' title='Revenue'>Revenue</th>
+              <th class='text-white border border-white' title='Net Income'>Net Income</th>-->
             </tr><tr class='form-desktop'>
               <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
@@ -197,6 +200,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 <option value='1'>Active</option>
                 <option value='0'>Inactive</option>
               </select></th>
+              <!--<th class='text-white border border-white' title='Zip'>
+                <input class='redraw form-control' type='text' name='Revenue_Start' value='<?php echo isset( $_GET[ 'Revenue_Start' ] ) ? $_GET[ 'Revenue_Start' ] : null;?>' />
+                <input class='redraw form-control' type='text' name='Revenue_End' value='<?php echo isset( $_GET[ 'Revenue_Start' ] ) ? $_GET[ 'Revenue_End' ] : null;?>' />
+              </th>
+              <th class='text-white border border-white' title='Zip'>
+                <input class='redraw form-control' type='text' name='Expenses_Start' value='<?php echo isset( $_GET[ 'Expenses_Start' ] ) ? $_GET[ 'Expenses_Start' ] : null;?>' />
+                <input class='redraw form-control' type='text' name='Expenses_End' value='<?php echo isset( $_GET[ 'Expenses_End' ] ) ? $_GET[ 'Expenses_End' ] : null;?>' />
+              </th>
+              <th class='text-white border border-white' title='Zip'>
+                <input class='redraw form-control' type='text' name='Net_Income_Start' value='<?php echo isset( $_GET[ 'Net_Income_Start' ] ) ? $_GET[ 'Net_Income_Start' ] : null;?>' />
+                <input class='redraw form-control' type='text' name='Net_Income_End' value='<?php echo isset( $_GET[ 'Net_Income_End' ] ) ? $_GET[ 'Net_Income_End' ] : null;?>' />
+              </th>-->
             </tr></thead>
           </table>
         </div>

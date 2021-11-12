@@ -83,6 +83,7 @@ class fontawesome extends \singleton\index {
 	public function Purchase($Size=null){?><i class='fa fa-shopping-cart fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Privilege($Size=null){?><i class='fa fa-codepen fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Report($Size=null){?><i class='fa fa-paperclip fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function Inspection($Size=null){?><i class='fa fa-paperclip fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Github($Size=null){?><i class='fa fa-github fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Paragraph($Size=null){?><i class='fa fa-paragraph fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 }?>
