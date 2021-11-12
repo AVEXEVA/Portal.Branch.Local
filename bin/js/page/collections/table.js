@@ -146,10 +146,48 @@ $( document ).ready( function( ){
         data   : 'Due'
       },{
         data      : 'Original',
-        className :'sum'
+        render : function( data, type, row, meta ){
+          switch( type ){
+            case 'display':
+              if( row.Original > 0 ){
+                return "<div class='row'>" + 
+                  "<div class='col-12'>" + row.Original + "</div>" + 
+                "</div>"
+              } else if( row.Original < 0 ){
+                return "<div class='row'>" + 
+                  "<div class='col-12'>" + row.Original + "</div>" + 
+                "</div>"
+              } else if( row.Original == 0 ){
+                return "<div class='row'>" + 
+                  "<div class='col-12'>" + row.Original + "</div>" + 
+                "</div>"
+              }
+            default :
+              return null;
+          }
+        }
       },{
-        data      : 'Balance',
-        className : 'sum'
+        data      : 'Original',
+        render : function( data, type, row, meta ){
+          switch( type ){
+            case 'display':
+              if( row.Original > 0 ){
+                return "<div class='row'>" + 
+                  "<div class='col-12'>" + row.Original + "</div>" + 
+                "</div>"
+              } else if( row.Original < 0 ){
+                return "<div class='row'>" + 
+                  "<div class='col-12'>" + row.Original + "</div>" + 
+                "</div>"
+              } else if( row.Original == 0 ){
+                return "<div class='row'>" + 
+                  "<div class='col-12'>" + row.Original + "</div>" + 
+                "</div>"
+              }
+            default :
+              return null;
+          }
+        }
       },{
         data : 'Description'
       }

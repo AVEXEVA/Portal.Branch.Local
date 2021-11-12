@@ -3,34 +3,15 @@ function search( link ){
     $('input[name="Search"]', api.table().container())
         .typeahead({
             minLength : 4,
-            hint: true,
-            highlight: true,
-            limit : 5,
-            display : 'FieldValue',
+            highlight : 1,
             source: function( query, result ){
                 $.ajax({
-                    url : 'bin/php/get/search/Tickets.php',
+                    url : 'bin/php/get/search/Category_Tests.php',
                     method : 'GET',
                     data    : {
-                        search                :  $('input:visible[name="Search"]').val(),
-                        ID                    :  $('input:visible[name="ID"]').val( ),
-                        Person                :  $('input:visible[name="Person"]').val( ),
-                        Customer              :  $('input:visible[name="Customer"]').val( ),
-                        Location              :  $('input:visible[name="Location"]').val( ),
-                        Unit                  :  $('input:visible[name="Unit"]').val( ),
-                        Job                   :  $('input:visible[name="Job"]').val( ),
-                        Type                  :  $('select:visible[name="Type"]').val( ),
-                        Level                 :  $('select:visible[name="Level"]').val( ),
-                        Status                :  $('select:visible[name="Status"]').val( ),
-                        Start_Date            :  $('input:visible[name="Start_Date"]').val( ),
-                        End_Date              :  $('input:visible[name="End_Date"]').val( ),
-                        Time_Route_Start      :  $('input:visible[name="Time_Route_Start"]').val( ),
-                        Time_Route_End        :  $('input:visible[name="Time_Route_End"]').val( ),
-                        Time_Site_Start       :  $('input:visible[name="Time_Site_Start"]').val( ),
-                        Time_Site_End         :  $('input:visible[name="Time_Site_End"]').val( ),
-                        Time_Completed_Start  :  $('input:visible[name="Time_Completed_Start"]').val( ),
-                        Time_Completed_End    :  $('input:visible[name="Time_Completed_End"]').val( ),
-                        LSD                   :  $('select:visible[name="LSD"]').val( )
+                        search  : $('input[name="Search"]').val(),
+                        ID      : $('input[name="ID"]').val( ),
+                        Name    : $('input[name="Name"]').val( )
                     },
                     dataType : 'json',
                     beforeSend : function( ){
@@ -53,13 +34,13 @@ function search( link ){
     );
 }
 $(document).ready(function( ){
-    var Editor_Tickets = new $.fn.dataTable.Editor( {
+    var Editor_Category_Tests = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
-        table    : '#Table_Tickets'
+        table    : '#Table_Category_Tests'
     } );
-    var Table_Tickets = $('#Table_Tickets').DataTable( {
-        dom            : "<'row desktop'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+    var Table_Category_Tests = $('#Table_Category_Tests').DataTable( {
+        dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
         searching      : false,
@@ -77,7 +58,7 @@ $(document).ready(function( ){
           selector : 'td.ID'
         },
         ajax: {
-                url     : 'bin/php/get/Tickets.php',
+                url     : 'bin/php/get/Category_Tests.php',
                 data    : function(d){
                     d = {
                         draw : d.draw,
@@ -118,7 +99,7 @@ $(document).ready(function( ){
                         case 'display' :
                             return  row.ID !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='ticket.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #" + row.ID + "</a></div>" + 
+                                        "<div class='col-12'><a href='ticket.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Ticket #" + row.ID + "</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -300,11 +281,11 @@ $(document).ready(function( ){
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' autocomplete='off' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Category_Tests\").DataTable().ajax.reload( );' 
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Tickets.draw(); });
+            $( '.redraw' ).bind( 'change', function(){ Table_Category_Tests.draw(); });
         },
         buttons: [
             {
@@ -328,7 +309,7 @@ $(document).ready(function( ){
                     $( 'input, select' ).each( function( ){
                         $( this ).val( '' );
                     } );
-                    Table_Tickets.draw( );
+                    Table_Category_Tests.draw( );
                 }
             },{
                 text : 'Get URL',
@@ -352,18 +333,18 @@ $(document).ready(function( ){
                     d.Time_Completed_Start     = $('input[name="Time_Completed_Start"]').val( );
                     d.Time_Completed_End       = $('input[name="Time_Completed_End"]').val( );
                     d.LSD       = $('select[name="LSD"]').val( );
-                    document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
+                    document.location.href = 'Category_Tests.php?' + new URLSearchParams( d ).toString();
                 }
             },
-            { extend: 'create', editor: Editor_Tickets },
-            { extend: 'edit',   editor: Editor_Tickets },
-            { extend: 'remove', editor: Editor_Tickets },
+            { extend: 'create', editor: Editor_Category_Tests },
+            { extend: 'edit',   editor: Editor_Category_Tests },
+            { extend: 'remove', editor: Editor_Category_Tests },
             {
                 text: 'Print',
                 action: function ( e, dt, node, config ) {
                     var rows = dt.rows( { selected : true } ).indexes( );
                     var dte = dt.cells( rows, 0 ).data( ).toArray( );
-                    document.location.href = 'print_tickets.php?Tickets=' + dte.join( ',' );
+                    document.location.href = 'print_Category_Tests.php?Category_Tests=' + dte.join( ',' );
                 }
             },
             'copy',

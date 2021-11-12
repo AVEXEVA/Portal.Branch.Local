@@ -102,21 +102,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $parameters[] = $_GET['Email'];
 	      $conditions[] = "Contact.Email LIKE '%' + ? + '%'";
 	    }
-	    if( isset( $_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
+	    if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Street'];
-	      $conditions[] = "Contact.Street LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'City' ] ) && !in_array( $_GET[ 'City' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['City'];
-	      $conditions[] = "Contact.City LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'State' ] ) && !in_array( $_GET[ 'State' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['State'];
-	      $conditions[] = "Contact.State LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Zip' ] ) && !in_array( $_GET[ 'Zip' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Zip'];
-	      $conditions[] = "Contact.Zip LIKE '%' + ? + '%'";
+	      $conditions[] = "Contact.Street + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
 	    }
 
 		/*Search Filters*/
@@ -137,12 +125,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			0 =>  'Contact.ID',
 			1 =>  'Contact.Contact',
 			2 =>  "Contact.Position",
-			2 =>  "Contact.Phone",
-			2 =>  "Contact.Email",
-			2 =>  "Contact.Street",
-			2 =>  "Contact.City",
-			2 =>  "Contact.State",
-			2 =>  "Contact.Zip"
+			3 =>  "Contact.Phone",
+			4 =>  "Contact.Email",
+			5 =>  "Contact.Contact.Street + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip"
 	    );
 	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
 	        ? $Columns[ $_GET['order']['column'] ]

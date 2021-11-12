@@ -86,16 +86,16 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			            <div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw form-input'value='<?php echo $_GET[ 'ID' ];?>' /></div>
 			        </div>
 			        <div class='row'>
+			            <div class='col-4'>Name:</div>
+			            <div class='col-8'><input type='text' name='Name' placeholder='Name' class='redraw form-input'value='<?php echo $_GET[ 'Name' ];?>' /></div>
+			        </div>
+			        <div class='row'>
 			            <div class='col-4'>Entity:</div>
 			            <div class='col-8'><input type='text' name='Name' placeholder='Name' class='redraw form-input'value='<?php echo $_GET[ 'Name' ];?>' /></div>
 			        </div>
 			        <div class='row'>
 			            <div class='col-4'>Type:</div>
 			            <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw form-input'value='<?php echo $_GET[ 'Customer' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Name:</div>
-			            <div class='col-8'><input type='text' name='Name' placeholder='Name' class='redraw form-input'value='<?php echo $_GET[ 'Name' ];?>' /></div>
 			        </div>
 			        <div class='row'>
 			            <div class='col-4'>Position:</div>
@@ -159,33 +159,27 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 					<table id='Table_Contacts' class='display' cellspacing='0' width='100%'>
 						<thead class='text-white border border-white'><tr>
 							<th class='text-white border border-white'>ID</th>
+							<th class='text-white border border-white'>Name</th>
 							<th class='text-white border border-white'>Type</th>
 							<th class='text-white border border-white'>Entity</th>
-							<th class='text-white border border-white'>Name</th>
 							<th class='text-white border border-white'>Position</th>
 							<th class='text-white border border-white'>Phone</th>
 							<th class='text-white border border-white'>Email</th>
-							<th class='text-white border border-white'>Street</th>
-							<th class='text-white border border-white'>City</th>
-							<th class='text-white border border-white'>State</th>
-							<th class='text-white border border-white'>Zip</th>
+							<th class='text-white border border-white'>Address</th>
 			            </tr>
 			            <tr class='form-desktop'>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
 							<th class='text-white border border-white'><select name='Type' class='redraw form-control'>
 								<option value=''>Select</option>
-								<option value='0'>Customer</option>
-								<option value='4'>Location</option>
+								<option value='0' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 0 ? 'selected' : true;?>>Customer</option>
+								<option value='4' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 4 ? 'selected' : true;?>>Location</option>
 							</select></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Entity' placeholder='Entity' value='<?php echo isset( $_GET[ 'Entity' ] ) ? $_GET[ 'Entity' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></th>
+							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Position' placeholder='Position' value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Position' placeholder='Position' value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='City' placeholder='City' value='<?php echo isset( $_GET[ 'City' ] ) ? $_GET[ 'City' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='State' placeholder='State' value='<?php echo isset( $_GET[ 'State' ] ) ? $_GET[ 'State' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Zip' placeholder='Zip' value='<?php echo isset( $_GET[ 'Zip' ] ) ? $_GET[ 'Zip' ] : null;?>' /></th>
+							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
 			            </tr></thead>
 					</table>
 				</div>

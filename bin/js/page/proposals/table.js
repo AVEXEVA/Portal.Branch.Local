@@ -27,6 +27,7 @@ $( document ).ready( function( ){
   url     : 'bin/php/get/Proposals.php',
   data : function( d ){
         d = {
+            draw : d.draw,
             start : d.start,
             length : d.length,
             order : {
@@ -37,11 +38,13 @@ $( document ).ready( function( ){
         d.Search = $("input[name='Search']").val( );
         d.Customer = $("input[name='Customer']").val( );
         d.Location = $("input[name='Location']").val( );
+        d.Status = $("select[name='Status']").val( );
         d.Job = $("input[name='Job']").val( );
         return d;
         }
   },
-  columns: [{
+  columns: [
+    {
         className : 'ID',
         data : 'ID',
         render : function( data, type, row, meta ){
@@ -57,7 +60,6 @@ $( document ).ready( function( ){
             }
 
         }
-
     },{
       data : 'Territory_ID',
       render : function( data, type, row, meta ){
@@ -91,6 +93,8 @@ $( document ).ready( function( ){
     },{
       data : 'Title'
     },{ 
+      data : 'Status'
+    },{
       data : 'Contact_Email'
     },{ 
       data : 'Contact_Phone'

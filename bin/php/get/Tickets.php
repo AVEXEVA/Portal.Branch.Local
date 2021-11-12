@@ -152,12 +152,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	      $conditions[] = "Ticket.Status LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Start_Date' ] ) && !in_array( $_GET[ 'Start_Date' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Start_Date'];
-	      $conditions[] = "Ticket.Date >= ?";
+			$parameters[] = $_GET['Start_Date'];
+			$conditions[] = "Ticket.Date >= ?";
 	    }
 	    if( isset( $_GET[ 'End_Date' ] ) && !in_array( $_GET[ 'End_Date' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['End_Date'];
-	      $conditions[] = "Ticket.Date <= ?";
+	      	$parameters[] = $_GET['End_Date'];
+	     	$conditions[] = "Ticket.Date <= ?";
 	    }
 	    if( isset( $_GET[ 'Time_Route_Start' ] ) && !in_array( $_GET[ 'Time_Route_Start' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Time_Route_Start'];

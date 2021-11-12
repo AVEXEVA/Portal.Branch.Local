@@ -1,0 +1,1 @@
+<script src='bin/js/page/category_test/table.js?<?php echo rand( 0, 999999999 );?>'></script>

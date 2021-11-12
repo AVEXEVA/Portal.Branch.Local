@@ -112,10 +112,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $conditions[] = "Location.Status LIKE '%' + ? + '%'";
     }
 
-    if( $Privileges[ 'Location' ][ 'Other_Privilege' ] < 4 ){
+    /*if( $Privileges[ 'Location' ][ 'Other_Privilege' ] < 4 ){
         $parameters [] = $User[ 'fWork' ];
         $conditions[] = "Location.Loc IN ( SELECT Ticket.Location FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LID AS Location FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Loc AS Location FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Location)";
-    }
+    }*/
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
@@ -188,10 +188,58 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
                           LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
+                          
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-    
+    /*Location_Revenue.Revenue AS Revenue,
+    Location_Labor.Labor AS Labor,
+    Location_Materials.Materials AS Materials*/
+    /*LEFT JOIN (
+      SELECT    Job.Loc AS Location,
+                Sum( Invoice.Amount ) AS Revenue 
+      FROM      Invoice
+                LEFT JOIN Job ON Invoice.Job = Job.ID
+      GROUP BY  Job.Loc
+    ) AS Location_Revenue ON Location_Revenue.Location = Location.Loc
+    LEFT JOIN (
+        SELECT    Job.Loc AS Location,
+                  Sum(JobI.Amount) AS Labor
+        FROM      JobI
+                  LEFT JOIN Job ON JobI.Job = Job.ID
+        WHERE     JobI.Type   = 1
+                  AND JobI.Labor  = 1
+                  AND (
+                    (
+                        (Job.Type    =   2 OR Job.Type = 3)
+                        AND Job.Status  <>  0
+                    )
+                    OR  (Job.Type <>  2 AND Job.Type <> 3)
+                  )
+        GROUP BY  Job.Loc
+    ) AS Location_Labor ON Location_Labor.Location = Location.Loc
+    LEFT JOIN (
+      SELECT    Job.Loc AS Location,
+                Sum(JobI.Amount) AS Materials
+      FROM      JobI
+                LEFT JOIN Job ON JobI.Job = Job.ID
+      WHERE     (
+                  JobI.Labor <> 1
+                  OR JobI.Labor = ''
+                  OR JobI.Labor = 0
+                  OR JobI.Labor = ' '
+                  OR JobI.Labor IS NULL
+                )
+                AND JobI.Type = 1
+                AND (
+                  (
+                      (Job.Type    =   2 OR Job.Type = 3)
+                      AND Job.Status  <>  0
+                  )
+                  OR  (Job.Type <>  2 AND Job.Type <> 3)
+                )
+      GROUP BY  Job.Loc
+    ) AS Location_Materials ON Location_Materials.Location = Location.Loc*/
     $rResult = $database->query(
       $conn,  
       $sQuery, 

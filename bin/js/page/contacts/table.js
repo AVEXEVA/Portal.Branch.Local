@@ -87,10 +87,7 @@ $(document).ready(function( ){
                         Positon : $('select:visible[name="Route"]').val( ),
                         Phone : $('input:visible[name="Street"]').val( ),
                         Email :  $('input:visible[name="City"]').val( ),
-                        Street :  $('input:visible[name="Street"]').val( ),
-                        City :  $('input:visible[name="City"]').val( ),
-                        State :  $('input:visible[name="State"]').val( ),
-                        Zip :  $('input:visible[name="Zip"]').val( ),
+                        Address :  $('input:visible[name="Address"]').val( ),
                     };
                     return d;
                 }
@@ -100,48 +97,88 @@ $(document).ready(function( ){
                 className : 'ID',
                 data : 'ID'
             },{
+                data : 'Name',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                          return    row.Name !== null 
+                                        ?   "<div class='row'>" +
+                                                "<div class='col-12'><a href='contact.php?Name=" + row.ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                            "</div>"
+                                        :   null;
+                        default :
+                            return data;
+                    }
+                }
+            },{
                 data : 'Type'
             },{
-              data : 'Entity',
-              render : function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display' :
-                        return row.Entity !== null 
-                            ?   ( 
-                                    row.Type == 'Customer'
-                                        ?   "<div class='row'>" +
-                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
-                                            "</div>"
-                                        :   ( 
-                                                row.Type == 'Location' 
-                                                    ?   "<div class='row'>" +
-                                                            "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
-                                                        "</div>"
-                                                    :   null
-                                            )
-                                )
-                            :   null;
-                      default :
-                          return data;
-                  }
-
-              }
-            },{
-                data : 'Name'
+                data : 'Entity',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                          return row.Entity !== null 
+                              ?   ( 
+                                      row.Type == 'Customer'
+                                          ?   "<div class='row'>" +
+                                                  "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
+                                              "</div>"
+                                          :   ( 
+                                                  row.Type == 'Location' 
+                                                      ?   "<div class='row'>" +
+                                                              "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
+                                                          "</div>"
+                                                      :   null
+                                              )
+                                  )
+                              :   null;
+                        default :
+                            return data;
+                    }
+                }
             },{
                 data : 'Position'
             },{
-                data : 'Phone'
+                data : 'Phone',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return row.Email !== null && row.Phone != ''
+                                ?   "<a href='tel:" + row.Phone + "'><i class='fa fa-phone fa-fw fa-1x'></i>" + row.Phone + "</a>"
+                                :   null;
+                        default : 
+                            return data;
+                    }
+                }
             },{
-                data : 'Email'
+                data : 'Email',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return row.Email !== null && row.Email != ''
+                                ?   "<a href='mailto:" + row.Email + "'><i class='fa fa-envelope fa-fw fa-1x'></i>" + row.Email + "</a>"
+                                :   null;
+                        default : 
+                            return data;
+                    }
+                }
             },{
-                data : 'Street'
-            },{
-                data : 'City'
-            },{
-                data : 'State'
-            },{
-                data : 'Zip'
+                data : 'Address',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  "<div class='row'>" + 
+                                        "<div class='col-12'>" +
+                                            "<div class='row'>" +
+                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" + 
+                                                "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" + 
+                                            "</div>" +
+                                        "</div>" +  
+                                    "</div>"
+                        default :
+                            return data;
+                    }
+                }
             }
         ],
         initComplete : function( ){

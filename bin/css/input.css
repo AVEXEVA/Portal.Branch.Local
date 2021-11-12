@@ -1,3 +1,10 @@
 div#ui-datepicker-div {
 	z-index : 10;
 }
+input.form-control, select.form-control {
+	background-color: rgba( 255, 255, 255, .9 );
+}
+input.form-control:disabled {
+	background-color: rgba( 255, 255, 255, .35 );
+	color : white;
+}

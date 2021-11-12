@@ -111,6 +111,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <th title='Territory'>Territory</th>
                             <th title='Contact'>Contact</th>
                             <th title='Title'>Title</th>
+                            <th title='Status'>Status</th>
                             <th title='Phone'>Phone</th>
                             <th title='Email'>Email</th>
                             <th title='Address'>Address</th>
@@ -125,6 +126,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <th title='Territory'><input class='redraw form-control' type='text' name='Territory' placeholder='Territory' value='<?php echo isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null;?>' /></th>
                             <th title='Contact'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>
                             <th title='Title'><input class='redraw form-control' type='text' name='Title' placeholder='Title' value='<?php echo isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null;?>' /></th>
+                            <th title='Status'><select class='redraw form-control' name='Status'>
+                                <option value=''  <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == null ? 'selected' : null;?>>Select</option>
+                                <option value='0' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 0 ? 'selected' : null;?>>Open</option>
+                                <option value='1' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 1 ? 'selected' : null;?>>Canceled</option>
+                                <option value='2' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 2 ? 'selected' : null;?>>Withdrawn</option>
+                                <option value='3' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 3 ? 'selected' : null;?>>Disqualified</option>
+                                <option value='4' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 4 ? 'selected' : null;?>>Award Successful</option>
+                            </select></th>
                             <th title='Phone'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>
                             <th title='Email'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>
                             <th title='Address'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>

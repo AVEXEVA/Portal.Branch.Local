@@ -49,7 +49,7 @@ $(document).ready(function( ){
         table    : '#Table_Locations'
     } );
     var Table_Locations = $('#Table_Locations').DataTable( {
-        dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+        dom            : "<'row'<'col-sm-3 search'><'col-sm-6'B><'col-sm-3 columns-visibility'>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
         autoWidth      : false,
@@ -61,7 +61,7 @@ $(document).ready(function( ){
         scrollCollapse : true,
         orderCellsTop  : true,
         autoWidth      : true,
-        responsive     : true,
+        responsive     : true,  
         select         : {
           style : 'multi',
           selector : 'td.ID'
@@ -105,7 +105,7 @@ $(document).ready(function( ){
                         case 'display' :
                             return  row.ID !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'>" + row.Name + "</a></div>" + 
+                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -120,7 +120,7 @@ $(document).ready(function( ){
                         case 'display' :
                             return  row.Customer_ID !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" + 
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -137,7 +137,7 @@ $(document).ready(function( ){
                         case 'display' :
                             return  row.Division_ID !== null 
                                 ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'>" + row.Division_Name + "</a></div>" + 
+                                        "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'><i class='fa fa-divide fa-fw fa-1x'></i>" + row.Division_Name + "</a></div>" + 
                                     "</div>"
                                 :   null;
                         default :
@@ -177,12 +177,41 @@ $(document).ready(function( ){
                 data : 'Maintained'
             }
         ],
-        initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );' 
-            $('input.date').datepicker( { } );
+        initComplete : function( settings, json ){
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );' 
+            $("div.columns-visibility").html(
+                "<div class='desktop bg-dark'>" + 
+                  "<div class='row'>" + 
+                    "<div class='col-3'>Toggle Columns:</div>" +
+                    "<div class='col-9'>" +
+                      "<a class='toggle-vis text-white' data-column='0'>ID</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='1'>Name</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='2'>Customer</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='3'>Type</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='4'>Division</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='5'>Route</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='6'>Street</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='7'>City</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='8'>State</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='9'>Zip</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='10'>Units</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='11'>Maintained</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='12'>Status</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='13'>Labor</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='14'>Revenue</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='15'>Net Income</a>" +
+                    "</div>" + 
+                  "</div>" +
+                "</div>"
+            );
+            $('input.date').datepicker( { } ); 
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
             $( '.redraw' ).bind( 'change', function(){ Table_Locations.draw(); });
+            $('a.toggle-vis').bind( 'click', function( e ){
+                e.preventDefault();
+                columnVisibility( this, Table_Locations );
+            });
         },
         buttons: [
             {
@@ -192,7 +221,7 @@ $(document).ready(function( ){
                         $( this ).val( '' );
                     } );
                     Table_Locations.draw( );
-                }
+                } 
             },
             { extend: 'create', editor: Editor_Locations },
             { extend: 'edit',   editor: Editor_Locations },
