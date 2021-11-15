@@ -42,4 +42,9 @@ class database extends \singleton\index {
 					$parameters
 				);
 	}
+	public function changeDefault( $database = 'Demo' ){
+		if( in_array( $database, $this->databaess ) ){
+			$this->default = $database;
+		}
+	}
 }?>
