@@ -45,11 +45,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	$Privileges = array();
 	while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
 	$Privileged = False;
-	if( isset($Privileges['Violations'])
+	if( isset($Privileges['Route'])
         && (
-				$Privileges['Violations']['User_Privilege'] >= 4
-			||	$Privileges['Violations']['Group_Privilege'] >= 4
-			||	$Privileges['Violations']['Other_Privilege'] >= 4)){
+				$Privileges['Route']['User_Privilege'] >= 4
+			||	$Privileges['Route']['Group_Privilege'] >= 4
+			||	$Privileges['Route']['Other_Privilege'] >= 4)){
             	$Privileged = True;
     }
     if( !isset( $Connection[ 'ID' ] ) || !$Privileged ){ print json_encode( array( 'data' => array( ) ) );}
@@ -139,8 +139,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    if( isset( $_GET[ 'LSD' ] ) && !in_array( $_GET[ 'LSD' ], array( '', ' ', null ) ) ){
 	      //$parameters[] = $_GET['LSD'];
 	      switch( $_GET[ 'LSD'] ){
-	      	case 0:	$conditions[ ] = "Violations.Resolution NOT LIKE '%LSD%'";break;
-	      	case 1:	$conditions[ ] = "Violations.Resolution LIKE '%LSD%'";break;
+	      	case 0:	$conditions[ ] = "Route.Resolution NOT LIKE '%LSD%'";break;
+	      	case 1:	$conditions[ ] = "Route.Resolution LIKE '%LSD%'";break;
 	      	default : break;
 	      }
 	    }

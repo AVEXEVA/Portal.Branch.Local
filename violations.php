@@ -54,6 +54,42 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             'violations.php'
         )
     );
+    if(     !isset($array['ID'])
+        ||  !$Privileged
+        || !is_numeric($_GET['ID'])){
+          ?><html><head><script>document.location.href="../login.php?Forward=violations<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html> <?php }
+    else {
+        $r = \singleton\database::getInstance( )->query(
+          null,
+            "SELECT
+                Loc.ID               AS ID,
+                Elev.ID              AS Unit_ID,
+                Job.fdate            AS Start_Date,
+                Violation.Status     AS Violation_Status,
+                Violation.Quote      AS Violation_Quote,
+                Violation.Ticket     AS Violation_Ticket,
+                Job.Remarks          AS Remarks,
+                Route.Name           AS Route_Name,
+                Route.ID             AS Route_ID,
+                Emp.fFirst           AS First_Name,
+                Emp.Last             AS Last_Name,
+                Emp.ID               AS Employee_ID,
+                Emp.fFirst           AS Employee_First_Name,
+                Emp.Last             AS Employee_Last_Name,
+                Emp.fWork            AS fWork,
+                Emp.ID               AS Route_Mechanic_ID,
+                Emp.fFirst           AS Route_Mechanic_First_Name,
+                Emp.Last             AS Route_Mechanic_Last_Name,
+                Rol.Phone            AS Route_Mechanic_Phone_Number
+            FROM
+                Route
+                LEFT JOIN Emp   ON  Route.Mech = Emp.fWork
+                LEFT JOIN Rol          ON Emp.Rol    = Rol.ID
+            WHERE
+                Route.ID        =   ?
+        ;",array(
+            $_GET['ID']));
+        $Route = sqlsrv_fetch_array($r);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>

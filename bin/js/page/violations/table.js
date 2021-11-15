@@ -138,8 +138,20 @@ function search( link ){
 
           {
               data : 'Customer'
-          },{
-              data : 'Status'
+            },{
+              data : 'Status',
+              render : function( data, type, row, meta ){
+                switch( type ){
+                  case 'display' :
+                    switch( data ){
+                      case 0: return 'Open';
+                      case 1: return 'Closed';
+                      case 2: return 'On Hold';
+                    }
+                  default :
+                    return data;
+                }
+              }
           }
       ],
       ajax : {
@@ -152,15 +164,15 @@ function search( link ){
                       dir : d.order[0].dir
                   }
               };
-              d.Search = $('input[name="Search"]').val( );
-              d.Name = $('input[name="Name"]').val( );
-              d.Date_Start = $('input[name="Date_Start"]').val( );
-              d.Date_End = $('input[name="Date_End"]').val( );
-              d.Location = $('input[name="Location"]').val( );
-              d.Select = $('input[name="Select"]').val( );
-              d.ID = $('input[name="ID"]').val( );
-              d.Customer = $('input[name="Customer"]').val( );
-              d.Status = $('input[name="Status"]').val( );
+              d.Search = $("input[name='Search']").val( );
+              d.Name = $("input[name='Name']").val( );
+              d.Date_Start = $("input[name='Date_Start']").val( );
+              d.Date_End = $("input[name='Date_End']").val( );
+              d.Location = $("input[name='Location']").val( );
+              d.Select = $("select[name='Select']").val( );
+              d.ID = $("input[name='ID']").val( );
+              d.Customer = $("input[name='Customer']").val( );
+              d.Status = $("input[name='Status']").val( );
               return d;
           },
           url : 'bin/php/get/violations.php'
@@ -185,15 +197,15 @@ function search( link ){
           text : 'Get URL',
           action : function( e, dt, node, config ){
               var d = { };
-              d.Search = $('input[name="Search"]').val( );
-              d.Name = $('input[name="Name"]').val( );
-              d.Date_Start = $('input[name="Date_Start"]').val( );
-              d.Date_End = $('input[name="Date_End"]').val( );
-              d.Location = $('input[name="Location"]').val( );
-              d.Select = $('input[name="Select"]').val( );
-              d.ID = $('input[name="ID"]').val( );
-              d.Customer = $('input[name="Customer"]').val( );
-              d.Status = $('input[name="Status"]').val( );
+              d.Search = $("input[name='Search']").val( );
+              d.Name = $("input[name='Name']").val( );
+              d.Date_Start = $("input[name='Date_Start']").val( );
+              d.Date_End = $("input[name='Date_End']").val( );
+              d.Location = $("input[name='Location']").val( );
+              d.Select = $("select[name='Select']").val( );
+              d.ID = $("input[name='ID']").val( );
+              d.Customer = $("input[name='Customer']").val( );
+              d.Status = $("select[name='Status']").val( );
               document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
           }
       },
