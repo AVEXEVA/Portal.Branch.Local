@@ -71,7 +71,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+    <?php require(bin_php.'hvkhvelement/navigation.php');?>
     <div id="page-wrapper" class='content'>
       <div class='panel panel-primary'>
         <div class='panel-heading'>Reports</div>
