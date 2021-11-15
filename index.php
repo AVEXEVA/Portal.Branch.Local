@@ -1,40 +1,67 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(     !isset( $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
-    ||  !connection( 'Demo', \singleton\database::getInstance( ), $_SESSION[ 'Connection' ][ 'Branch_ID' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-        header( 'Location: https://beta.nouveauelevator.com/login.php' );
-        exit; }
-$result = $database->query(
-  null,
-  " SELECT *,
-          Emp.fFirst AS First_Name,
-          Emp.Last   AS Last_Name,
-          Emp.Field  AS Field
-    FROM  Emp
-    WHERE Emp.ID = ?;",
-  array(
-    $_SESSION[ 'Connection' ][ 'Branch_ID' ]
-  )
-);
-$User = sqlsrv_fetch_array( $result );
+if(isset($_SESSION['User'],$_SESSION['Hash'])){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      null,
+      " SELECT  *
+        FROM  Connection
+        WHERE     Connector = ?
+            AND Hash = ?;",
+      array(
+        $_SESSION['User'],
+        $_SESSION['Hash']
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = \singleton\database::getInstance( )->query(null,
+    "   SELECT  Privilege.Access_Table,
+          Privilege.User_Privilege,
+          Privilege.Group_Privilege,
+          Privilege.Other_Privilege
+      FROM    Privilege
+      WHERE   Privilege.User_ID = ?;",
+    array(
+      $_SESSION[ 'User' ]
+    )
+  );
+  $Privileges = array();
+  $Privileged = false;
+  while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+  if(  !isset($Connection['ID']) ){ }
+  else {
 
-$Privileges = privileges( null, \singleton\database::getInstance( ), $_SESSION[ 'Connection' ][ 'Branch_ID' ] );
-
-$image_result = $database->query( 
-  'Portal',
-  " SELECT  Picture,
-            Picture_Type AS Type 
-    FROM    Portal.dbo.Portal 
-    WHERE   Portal.Branch = ? 
-            AND Portal.Branch_ID = ?;",
-  array( 
-    $_SESSION[ 'Connection' ][ 'Branch' ],
-    $_SESSION[ 'User' ]
-  )
-);
+    $image_result = $database->query( 
+      'Portal',
+      " SELECT  Picture,
+                Picture_Type AS Type 
+        FROM    Portal.dbo.Portal 
+        WHERE   Portal.Branch = ? 
+                AND Portal.Branch_ID = ?;",
+      array( 
+        $_SESSION[ 'Connection' ][ 'Branch' ],
+        $_SESSION[ 'User' ]
+      )
+    );
 
 ?><!DOCTYPE html>
 <html lang='en'>
@@ -205,18 +232,12 @@ $image_result = $database->query(
           <div class ='nav-text'>Errors</div>
         </div>
       </div>
-      <?php if(isset($User['Title']) && strpos($User['Title'], 'SUPER') === false && ($User['Title'] != 'OFFICE' || in_array($User['ID'],array(895,250)))){?><div class='link-page text-white col-xl-2 col-6' onclick="window.open('https://docs.google.com/forms/d/1kqijgH7gnxEVwYaobgCn8nbjNFG-vXXpecXMHkqy0GA/viewform?edit_requested=true');">
+      <div class='link-page text-white col-xl-1 col-3' onclick="window.open('https://docs.google.com/a/nouveauelevator.com/forms/d/1yeaJSLEJMkt8HYnx_fzGHJtBjU_iOlXCNtQT6r5pXTE/edit?usp=drive_web');">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Safety_Report(3);?></div>
           <div class ='nav-text'>Incident Report</div>
         </div>
-      </div><?php } ?>
-      <?php if(isset($User['Title']) && strpos($User['Title'], 'SUPER') !== false && ($User['Title'] != 'OFFICE' || in_array($User['ID'],array(895,250)))){?><div class='link-page text-white col-xl-1 col-3' onclick="window.open('https://docs.google.com/a/nouveauelevator.com/forms/d/1yeaJSLEJMkt8HYnx_fzGHJtBjU_iOlXCNtQT6r5pXTE/edit?usp=drive_web');">
-        <div class='p-1 border'>
-          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Safety_Report(3);?></div>
-          <div class ='nav-text'>Incident Report</div>
-        </div>
-      </div><?php } ?>
+      </div>
       <?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >=4){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='invoices.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
@@ -441,4 +462,5 @@ $image_result = $database->query(
   </div>
 </div>
 </body>
-</html>
+</html><?php }
+}?>

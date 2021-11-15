@@ -25,6 +25,7 @@ $( document ).ready( function( ){
             url : 'bin/php/get/Customers.php',
             data : function( d ){
                 d = {
+                    draw : d.draw,
                     start : d.start,
                     length : d.length,
                     order : {

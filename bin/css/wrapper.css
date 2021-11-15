@@ -8,7 +8,6 @@ div#page-wrapper {
   overflow-y : scroll;
 }
 div#page-wrapper.loading { display:block; }
-div#page-wrapper.content { display:none; }
 <?php if(!isMobile()){?>#page-wrapper { height:100%; }<?php }?>
 div#wrapper {
 	overflow-y:scroll;

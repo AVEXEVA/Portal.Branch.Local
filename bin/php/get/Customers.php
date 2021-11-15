@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+    session_start( ); 
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -166,13 +166,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
 
         $rResult = \singleton\database::getInstance( )->query(
-          $conn,  
+          null,  
           $sQuery, 
           $parameters 
         ) or die(print_r(sqlsrv_errors()));
 
         $sQueryRow = "
-           SELECT   Count( Customer.ID ) AS Count
+           SELECT   Customer.ID
             FROM    (
                         SELECT  Owner.ID,
                                 Rol.Name,
@@ -221,20 +221,26 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     ) AS Customer_Invoices ON Customer_Invoices.Customer = Customer.ID
             WHERE   {$conditions};";
 
-        $stmt = \singleton\database::getInstance( )->query( $conn, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+        $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
 
-        $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+        $iFilteredTotal = 0;
+        if( count( $_SESSION[ 'Tables' ][ 'Customers' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Customers' ] as &$Value ){ $Value = false; } }
+        $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] = $_GET;
+        while( $Row = sqlsrv_fetch_array( $fResult ) ){
+            $_SESSION[ 'Tables' ][ 'Customers' ][ $Row[ 'ID' ] ] = true;
+            $iFilteredTotal++;
+        }
 
         $parameters = array( );
         $sQuery = " SELECT  COUNT(Owner.ID)
                     FROM    Owner;";
-        $rResultTotal = \singleton\database::getInstance( )->query($conn,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+        $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
         $aResultTotal = sqlsrv_fetch_array($rResultTotal);
         $iTotal = $aResultTotal[0];
 
         $output = array(
-            'sEcho'         =>  intval($_GET['draw']),
+            'sEcho'         =>  intval( $_GET[ 'draw' ] ),
             'iTotalRecords'     =>  $iTotal,
             'iTotalDisplayRecords'  =>  $iFilteredTotal,
             'aaData'        =>  array()

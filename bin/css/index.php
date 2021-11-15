@@ -38,6 +38,10 @@ if( !isset( $_GET[ 'JQUERY_UI' ]) || $_GET[ 'JQUERY_UI' ]  == 1 ){?><link rel="s
 <link href="bin/css/scrollbar.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="bin/css/map.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
 <link href="bin/css/input.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet">
+<?php 
+if( isset( $_GET[ 'Entity_CSS' ] ) ){
+  ?><link href="bin/css/entity.css?v=<?php echo rand(1000,999999999);?>" rel="stylesheet"><?php
+}?>
 <style>
 /*Fonts*/
 @font-face {
