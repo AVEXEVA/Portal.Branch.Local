@@ -21,6 +21,7 @@ $( document ).ready( function( ){
       url : 'bin/php/get/Jobs.php',
       data : function( d ){
         d = {
+            draw : d.draw,
             start : d.start,
             length : d.length,
             order : {
@@ -28,13 +29,20 @@ $( document ).ready( function( ){
                 dir : d.order[0].dir
             }
         };
-        d.Search = $('input[name="Search"]').val( );
-        d.ID = $('input[name="ID"]').val( );
-        d.Name = $('input[name="Name"]').val( );
-        d.Customer = $('input[name="Customer"]').val( );
-        d.Location = $('input[name="Location"]').val( );
-        d.Type = $('input[name="Type"]').val( );
-        d.Status = $('select[name="Status"]').val( );
+        d.ID = $('input[name='ID']').val( );
+        d.Name = $('input[name='Name']').val( );
+        d.Date = $('input[name='Date']').val( );
+        d.Customer_ID = $('input[name='Customer_ID']').val( );
+        d.Customer_Name = $('input[name='Customer_Name']').val( );
+        d.Locaton_ID = $('input[name='Location_ID']').val( );
+        d.Location_Name = $('input[name='Location_Name']').val( );
+        d.Location_Street = $('input[name='Location_Street']').val( );
+        d.Location_State = $('input[name='Location_State']').val( );
+        d.Location_Zip = $('input[name='Location_Zip']').val( );
+        d.Type = $('input[name='Type']').val( );
+        d.Status = $('input[name='Status']').val( );
+        d.Tickets = $('input[name='Tickets']').val( );
+        d.Invoices = $('input[name='Invoices']').val( );
         return d;
       }
     },
@@ -45,15 +53,14 @@ $( document ).ready( function( ){
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.ID !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='job`.php?ID=" + row.ID + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> Job #" + row.ID + "</a></div>" + 
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='job`.php?ID=" + row.ID + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> Job #" + row.ID + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
                       return data;
               }
-
           }
       },{
         data : 'Name'
@@ -64,36 +71,34 @@ $( document ).ready( function( ){
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Customer_ID !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
+                      return  row.Customer_ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
                       return data;
               }
-
           }
       },{
           data : 'Location_ID',
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Location_ID !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" + 
+                      return  row.Location_ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
                                   "<div class='col-12'>" +
                                       "<div class='row'>" +
-                                          "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" + 
-                                          "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" + 
+                                          "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
+                                          "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
                                       "</div>" +
-                                  "</div>" +  
+                                  "</div>" +
                               "</div>"
                           :   null;
                   default :
                       return data;
               }
-
           }
       },{
         data : 'Type'
@@ -116,24 +121,23 @@ $( document ).ready( function( ){
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Tickets !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='tickets.php?Job=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i>" + row.Tickets + " tickets</a></div>" + 
+                      return  row.Tickets !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='tickets.php?Job=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i>" + row.Tickets + " tickets</a></div>" +
                               "</div>"
                           :   null;
                   default :
                       return data;
               }
-
           }
       },{
           data : 'Invoices',
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Invoices !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='invoices.php?Job=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i>" + row.Invoices + " invoices</a></div>" + 
+                      return  row.Invoices !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='invoices.php?Job=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i>" + row.Invoices + " invoices</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -148,7 +152,7 @@ $( document ).ready( function( ){
           $('input.date').datepicker( { } );
           $('input.time').timepicker( {  timeFormat : 'h:i A' } );
           //search( this );
-          $( '.redraw' ).bind( 'change', function(){ Table_Units.draw(); });
+          $( '.redraw' ).bind( 'change', function(){ Table_Jobs.draw(); });
       },
       buttons: [
           {
@@ -157,19 +161,26 @@ $( document ).ready( function( ){
                   $( 'input, select' ).each( function( ){
                       $( this ).val( '' );
                   } );
-                  Table_Units.draw( );
+                  Table_Jobs.draw( );
               }
           },{
               text : 'Get URL',
               action : function( e, dt, node, config ){
                   var d = { };
-                  d.Search = $('input[name="Search"]').val( );
-                  d.ID = $('input[name="ID"]').val( );
-                  d.Name = $('input[name="Name"]').val( );
-                  d.Customer = $('input[name="Customer"]').val( );
-                  d.Location = $('input[name="Location"]').val( );
-                  d.Type = $('input[name="Type"]').val( );
-                  d.Status = $('select[name="Status"]').val( );
+                  d.ID = $('input[name='ID']').val( );
+                  d.Name = $('input[name='Name']').val( );
+                  d.Date = $('input[name='Date']').val( );
+                  d.Customer_ID = $('input[name='Customer_ID']').val( );
+                  d.Customer_Name = $('input[name='Customer_Name']').val( );
+                  d.Locaton_ID = $('input[name='Location_ID']').val( );
+                  d.Location_Name = $('input[name='Location_Name']').val( );
+                  d.Location_Street = $('input[name='Location_Street']').val( );
+                  d.Location_State = $('input[name='Location_State']').val( );
+                  d.Location_Zip = $('input[name='Location_Zip']').val( );
+                  d.Type = $('input[name='Type']').val( );
+                  d.Status = $('input[name='Status']').val( );
+                  d.Tickets = $('input[name='Tickets']').val( );
+                  d.Invoices = $('input[name='Invoices']').val( );
                   document.location.href = 'jobs.php?' + new URLSearchParams( d ).toString();
               }
           },
