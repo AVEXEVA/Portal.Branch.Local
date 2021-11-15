@@ -1,4 +1,4 @@
-<style><?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/library/datatable/datatable.css' );?></style>
+<style><?php require( '/var/www/html/Portal.Branch.Local/bin/library/datatable/datatable.css' );?></style>
 <link rel='stylesheet' href='https://cdn.datatables.net/scroller/2.0.5/css/scroller.dataTables.min.css'>
 <link rel='stylesheet' href="https://cdn.datatables.net/select/1.2.4/css/select.dataTables.min.css">
 <link rel='stylesheet' href="//cdn.datatables.net/buttons/1.5.1/css/buttons.jqueryui.min.css">
@@ -16,7 +16,7 @@
 <script src='//cdn.datatables.net/plug-ins/1.11.3/features/scrollResize/dataTables.scrollResize.min.js'></script>
 
 
-<script><?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/library/datatable/ellipsis.js' );?></script>
+<script><?php require( '/var/www/html/Portal.Branch.Local/bin/library/datatable/ellipsis.js' );?></script>
 
 
 <!--<link rel='stylesheet' href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.bootstrap.min.css">

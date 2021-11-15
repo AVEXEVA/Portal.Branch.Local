@@ -1,7 +1,7 @@
 <?php
 if(session_id() == '' || !isset($_SESSION) ){
   session_start( [ 'read_and_close' => true ] );
-  require('/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php');
+  require('/var/www/html/Portal.Branch.Local/bin/php/index.php');
 }
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

@@ -1,9 +1,9 @@
 <?php 
 
-define('PROJECT_ROOT', '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/');
+define('PROJECT_ROOT', '/var/www/html/Portal.Branch.Local/bin/');
 define( 
 	'bin', 
-	'/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/'
+	'/var/www/html/Portal.Branch.Local/bin/'
 );
 define( 
 	'bin_meta', 
