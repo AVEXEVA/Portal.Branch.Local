@@ -1,308 +1,179 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-    $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query(null,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = FALSE;
-    if(isset($My_Privileges['Route']) && $My_Privileges['Route']['User_Privilege'] >= 4 && $My_Privileges['Route']['Group_Privilege'] >= 4 && $My_Privileges['Route']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $result = \singleton\database::getInstance( )->query(
+        null,
+	    " SELECT  *
+			  FROM    Connection
+			  WHERE   Connection.Connector = ?
+			          AND Connection.Hash  = ?;",
+		array(
+			$_SESSION[ 'User' ],
+			$_SESSION[ 'Hash' ]
+		)
+	);
+    $Connection = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
+    $result = \singleton\database::getInstance( )->query(
+        null,
+	    	" SELECT  *,
+			          Emp.fFirst AS First_Name,
+				        Emp.Last   AS Last_Name
+			  FROM    Emp
+			  WHERE   Emp.ID = ?;",
+		array(
+			$_SESSION[ 'User' ]
+		)
+	);
+  	$User = sqlsrv_fetch_array( $result );
+	$result = \singleton\database::getInstance( )->query(
+      null,
+  		" 	SELECT *
+			FROM   Privilege
+			WHERE  Privilege.User_ID = ?;",
+		array(
+			$_SESSION[ 'User' ]
+		)
+	);
+	$Privileges = array();
+	if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+    if(		!isset( $Connection[ 'ID' ] )
+	   	|| 		!isset($Privileges[ 'Route' ] )
+	  		|| 	$Privileges[ 'Route' ][ 'User_Privilege' ]  < 4
+	  		|| 	$Privileges[ 'Route' ][ 'Group_Privilege' ] < 4
+	  	    || 	$Privileges[ 'Route' ][ 'Other_Privilege' ] < 4){
+				?><?php require('../404.html');?><?php }
     else {
-        if(is_numeric($_GET['ID'])){
-                $r = $database->query(null,
-                "SELECT
-                    Route.ID        AS  ID,
-                    Route.Name      AS  Route,
-                    Emp.fFirst      AS  First_Name,
-                    Emp.Last        AS  Last_Name,
-                    Emp.ID          AS  Employee_ID,
-                    Emp.fWork       AS  fWork
-                FROM
-                    Route
-                    LEFT JOIN Emp   ON  Route.Mech = Emp.fWork
-                WHERE
-                    Route.ID        =   '{$_GET['ID']}'");
-            $Route = sqlsrv_fetch_array($r);
-            if($My_Privileges['Route']['User_Privilege'] >= 4 && $_SESSION['User'] == $Route['Employee_ID']){$Privileged = TRUE;}
-        }
-    }
-    $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "route.php"));
-    if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="../login.php?Forward=route<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }
-    else {
-        $r = $database->query(null,
-            "SELECT
-                Route.ID             AS ID,
-                Route.Name           AS Route,
-                Route.Name           AS Route_Name,
-                Route.ID             AS Route_ID,
-                Emp.fFirst           AS First_Name,
-                Emp.Last             AS Last_Name,
-                Emp.ID               AS Employee_ID,
-                Emp.fFirst           AS Employee_First_Name,
-                Emp.Last             AS Employee_Last_Name,
-                Emp.fWork            AS fWork,
-                Emp.ID               AS Route_Mechanic_ID,
-                Emp.fFirst           AS Route_Mechanic_First_Name,
-                Emp.Last             AS Route_Mechanic_Last_Name,
-                Rol.Phone            AS Route_Mechanic_Phone_Number
-            FROM
-                Route
-                LEFT JOIN Emp   ON  Route.Mech = Emp.fWork
-                LEFT JOIN Rol          ON Emp.Rol    = Rol.ID
-            WHERE
-                Route.ID        =   ?
-        ;",array($_GET['ID']));
-        $Route = sqlsrv_fetch_array($r);
+      \singleton\database::getInstance( )->query(
+          null,
+      		" 	INSERT INTO Activity( [User], [Date], [Page] )
+  				VALUES( ?, ?, ? );"
+    		, array(
+    			$_SESSION[ 'User' ],
+    			date('Y-m-d H:i:s' ),
+    			'routes.php'
+    		)
+    	);
+      if(     !isset($array['ID'])
+          ||  !$Privileged
+          || !is_numeric($_GET['ID'])){
+            ?><html><head><script>document.location.href="../login.php?Forward=route<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html> <?php }
+      else {
+          $r = \singleton\database::getInstance( )->query(
+            null,
+              "SELECT
+                  Route.ID             AS ID,
+                  Route.Name           AS Route,
+                  Route.Name           AS Route_Name,
+                  Route.ID             AS Route_ID,
+                  Emp.fFirst           AS First_Name,
+                  Emp.Last             AS Last_Name,
+                  Emp.ID               AS Employee_ID,
+                  Emp.fFirst           AS Employee_First_Name,
+                  Emp.Last             AS Employee_Last_Name,
+                  Emp.fWork            AS fWork,
+                  Emp.ID               AS Route_Mechanic_ID,
+                  Emp.fFirst           AS Route_Mechanic_First_Name,
+                  Emp.Last             AS Route_Mechanic_Last_Name,
+                  Rol.Phone            AS Route_Mechanic_Phone_Number
+              FROM
+                  Route
+                  LEFT JOIN Emp   ON  Route.Mech = Emp.fWork
+                  LEFT JOIN Rol          ON Emp.Rol    = Rol.ID
+              WHERE
+                  Route.ID        =   ?
+          ;",array(
+              $_GET['ID']));
+          $Route = sqlsrv_fetch_array($r);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">    <title>Nouveau Elevator Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+	<?php
+		$_GET[ 'Bootstrap' ] = '5.1';
+		$_GET[ 'Entity_CSS' ] = 1;
+	?>
+	<?php require( bin_meta . 'index.php' );?>
+    <?php require( bin_css  . 'index.php' );?>
+    <?php require( bin_js   . 'index.php' );?>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
-
-<body onload='finishLoadingPage();' style='overflow-y:scroll;height:100%;background-color:#1d1d1d !important;color:white !important;'>
-    <div id="wrapper" style='height:100%;' class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
+<body>
+    <div id="wrapper">
         <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-            <h4 style='margin:0px;padding:10px;background-color:whitesmoke;border-bottom:1px solid darkgray;'><a href='route.php?ID=<?php echo $_GET['ID'];?>'><?php \singleton\fontawesome::getInstance( )->Route();?> Route : <?php echo $Route['Route_Name'];?> : <?php echo $Route['Employee_First_Name'] . " " . $Route['Employee_Last_Name'];?></a></h4>
-            <style>
-            .nav-text{
-                font-weight: bold;
-                text-align: center;
-            }
-            .nav-icon{
-                text-align: center;
-            }
-            </style>
-            <style>
-                * { margin: 0 }
-
-                .Screen-Tabs { overflow-x: hidden }
-
-                .Screen-Tabs>div {
-                    --n: 1;
-                    display: flex;
-                    align-items: center;
-                    overflow-y: hidden;
-                    width: 100%; // fallback
-                    width: calc(var(--n)*100%);
-                    /*height: 50vw;*/ max-height: 100vh;
-                    transform: translate(calc(var(--tx, 0px) + var(--i, 0)/var(--n)*-100%));
-
-                    div {
-                        /*width: 100%; // fallback
-                        width: calc(100%/var(--n));*/
-                        user-select: none;
-                        pointer-events: none
-                    }
-
-                }
-
-                .smooth { transition: transform  calc(var(--f, 1)*.5s) ease-out }
-                div.Home-Screen-Option.active {
-                    background-color:#3d3d3d !important;
-                    color:white !important;
-                }
-            </style>
-            <div class='Screen-Tabs shadower'>
-                <div class='row'>
-                    <div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-information.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
-                            <div class ='nav-text'>Information</div>
+          <div class='card card-primary'>
+            <div class='card-heading'>
+              <div class='row g-0 px-3 py-2'>
+                <div class='col-6'>
+                  <h5><?php \singleton\fontawesome::getInstance( )->Route( 1 );?><a href='Route.php?<?php
+                    echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Routes' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Routes' ][ 0 ] : array( ) );
+                  ?>'>Route</a>: <span><?php
+                    echo is_null( $Customer[ 'ID' ] )
+                      ? 'New'
+                      : $Customer[ 'Name' ];
+                  ?></span></h5>
+                KN,B </div>
+                <div class='col-2'></div>
+                <div class='col-2'>
+                  <div class='row g-0'>
+                    <div class='col-4'>
+                      <button
+                        class='form-control rounded'
+                        onClick="document.location.href='customer.php';"
+                      >Create</button>
                     </div>
-                    <?php
-                    $r = $database->query(null,"SELECT Elev.ID FROM Elev LEFT JOIN Loc ON Elev.Loc = Loc.Loc WHERE Loc.Route = ?;",array($_GET['ID']));
-                    if($r){
-                      $Units = array();
-                      while($row = sqlsrv_fetch_array($r)){$Units[] = $row['ID'];}
-                      if(count($Units) > 0){
-                        $Units = "WHERE (CM_Unit.Elev_ID = " . implode(" OR CM_Unit.Elev_ID = ",$Units) . ")";
-                        $r = $database->query($database_Device,"SELECT CM_Unit.* FROM Device.dbo.CM_Unit {$Units}");
-                        if($r && is_array(sqlsrv_fetch_array($r))){
-                        ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-faults.php?ID=<?php echo $_GET['ID'];?>');">
-                                <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
-                                <div class ='nav-text'>Faults</div>
-                        </div><?php }
-                      }
-                    }?>
-                    <?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
-                    ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-locations.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
-                            <div class ='nav-text'>Locations</div>
-                    </div><?php }?>
-                    <?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4){
-                    ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-units.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
-                            <div class ='nav-text'>Units</div>
-                    </div><?php }?>
-                    <?php if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['User_Privilege'] >= 4){
-                    ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'route-violations.php?ID=<?php echo $_GET['ID'];?>');">
-                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
-                            <div class ='nav-text'>Violations</div>
-                    </div><?php }?>
-                    <?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Other_Privilege'] >= 4){
-                    ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='user.php?ID=<?php echo $_GET['ID'];?>';">
-                            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
-                            <div class ='nav-text'>User</div>
-                    </div><?php }?>
+                    <div class='col-4'>
+                      <button
+                        class='form-control rounded'
+                        onClick="document.location.href='customer.php?ID=<?php echo $Customer[ 'ID' ];?>';"
+                      >Refresh</button>
+                    </div>
+                  </div>
                 </div>
-            </div>
-            <div class='container-content'></div>
-        </div>
-    </div>
-    <!-- Bootstrap Core JavaScript -->
-    
-
-    <!-- Metis Menu Plugin JavaScript -->
-    
-
-    <?php require('bin/js/datatables.php');?>
-    <!-- Custom Theme JavaScript -->
-    
-
-    <!--Moment JS Date Formatter-->
-    
-
-    <!-- JQUERY UI Javascript -->
-    
-
-    <!-- Custom Date Filters-->
-    
-    <?php if( !isMobile() && false ){?>
-    <script>
-        function hrefLocations(){hrefRow("Table_Locations","location");}
-        function hrefUnits(){hrefRow("Table_Units","unit");}
-        function hrefViolations(){hrefRow("Table_Violations","violation");}
-        $(document).ready(function(){
-            var Table_Locations = $('#Table_Locations').DataTable( {
-                "ajax": "bin/php/get/Locations_by_Route.php?ID=<?php echo $_GET['ID'];?>",
-                "columns": [
-                    { "data": "ID" },
-                    { "data": "Name"},
-                    { "data": "Tag"},
-                    { "data": "Street"},
-                    { "data": "City"},
-                    { "data": "State"},
-                    { "data": "Zip"},
-                    { "data": "Route"},
-                    { "data": "Zone"},
-                    { "data": "Units"}
-                ],
-                "order": [[1, 'asc']],
-                "language":{
-                    "loadingRecords":""
-                },
-                "initComplete":function(){}
-
-            } );
-            $("Table#Table_Locations").on("draw.dt",function(){hrefLocations();});
-
-            var Table_Units = $('#Table_Units').DataTable( {
-                "ajax": "bin/php/get/Units_by_Route.php?ID=<?php echo $_GET['ID'];?>",
-                "columns": [
-                    { "data": "ID" },
-                    { "data": "State"},
-                    { "data": "Unit"},
-                    { "data": "Type"},
-                    { "data": "Location"}
-                ],
-                "order": [[1, 'asc']],
-                "language":{"loadingRecords":""},
-                "initComplete":function(){}
-            } );
-            $("Table#Table_Units").on("draw.dt",function(){hrefUnits();});
-            var Table_Maintenances = $('#Table_Maintenances').DataTable( {
-                "ajax": "bin/php/reports/Maintenances_by_Route.php?ID=<?php echo $_GET['ID'];?>",
-                "columns": [
-                    {
-                        "data": "Location"
-                    },{
-                        "data": "Unit"
-                    },{
-                        "data": "State"
-                    },{
-                        "data": "Last_Date",
-                        "render": function(data){
-                            if(data === null || typeof data === 'undefined'){return '';}
-                            else {return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}}
-                    }
-                ],
-                "order": [[1, 'asc']],
-                "language":{
-                    "loadingRecords":""
-                },
-                "initComplete":function(){}
-
-            } );
-            $("Table#Table_Maintenances").on("draw.dt",function(){hrefLocations();});
-            var Table_Violations = $('#Table_Violations').DataTable( {
-                "ajax": {
-                    "url":"bin/php/reports/Due_Violations_by_Route.php?ID=<?php echo $_GET['ID'];?>",
-                    "dataSrc":function(json){
-                        if(!json.data){json.data = [];}
-                        return json.data;}
-                },
-                "columns": [
-                    { "data": "ID" },
-                    { "data": "Name"},
-                    { "data": "Location"},
-                    { "data": "Unit"},
-                    { "data": "Date",
-                      render: function(data){
-                        if(data === null || typeof data === 'undefined'){return '';}
-                        else {return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}}
-                    },
-                    { "data": "Due_Date"
-                    },
-                    { "data": "Status"},
-                    { "data": "Maintenance",
-                        render:function(data){
-                            if(data == '1'){return 'In Scope';}
-                            else{return 'N/A';}
-                        }
-                    }
-                ],
-                <?php require('bin/js/datatableOptions.php');?>
-            } );
-            finishLoadingPage();
-            $("Table#Table_Violations").on("draw.dt",function(){hrefViolations();});
-        });
-    </script><?php } else {?>
-    <script>
-        function someFunction(link,URL){
-            $(link).siblings().removeClass('active');
-            $(link).addClass('active');
-            $.ajax({
-                url:"bin/php/element/route/" + URL,
-                success:function(code){
-                    $("div.container-content").html(code);
-                }
-            });
-        }
-        $(document).ready(function(){
-            $("div.Screen-Tabs>div>div:first-child").click();
-        });
-    </script>
-    <?php }?>
-</body>
-</html>
+                <div class='col-2'>
+                  <div class='row g-0'>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Route' ], true )[ array_search( $Customer[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Route' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Route' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Route' ][ 0 ] : array( ) );?>';">Table</button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Route' ], true )[ array_search( $Customer[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Route' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+                  </div>
+                  <div class='card-body'>
+                    <div class='card-columns'>
+                    <div class='card card-primary border-0'>
+                      <div class='card-heading'>Routes</div>
+                      <div class='card-body'>
+                        <div class='row g-0'>
+                          <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Faults</div>
+                          <div class='col-8'><?php echo $Route[ 'Faults' ];?></div>
+                        </div>
+                        <div class='row g-0'>
+                          <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Location</div>
+                          <div class='col-8'><?php echo $Route[ 'Location_Name' ];?></div>
+                        </div>
+                        <div class='row g-0'>
+                          <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Units</div>
+                          <div class='col-8'><?php echo $Route[ 'Unit' ];?></div>
+                        </div>
+                        <div class='row g-0'>
+                          <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Violations</div>
+                          <div class='col-8'><?php echo $Route[ 'Violation' ];?> hrs</div>
+                        </div>
+                        <div class='row g-0'>
+                          <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> User</div>
+                          <div class='col-8'><?php echo $Route[ 'User' ];?></div>
+                        </div>
+                        <div class='row g-0'>
+                          <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Date(1);?> Date</div>
+                          <div class='col-8'><?php echo $Route[ 'Date' ];?></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </body>
+  </html>
 <?php
     }
 } else {?><html><head><script>document.location.href="../login.php?Forward=route<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>

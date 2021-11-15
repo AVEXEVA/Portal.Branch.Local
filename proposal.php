@@ -30,8 +30,8 @@ if(isset(
   );
         $User = sqlsrv_fetch_array($result);
         $Field = ($User[ 'Field' ] == 1 && $User[ 'Title' ] != "OFFICE") ? True : False;
-        $result = $database->query(
-          $Portal,
+        $result = \singleton\database::getInstance( )->query(
+        	null,
           "   SELECT Access_Table,
                      User_Privilege,
                      Group_Privilege,
@@ -45,37 +45,57 @@ if(isset(
     $Privileges = array();
     while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2[ 'Access_Table' ]] = $array2;}
     $Privileged = FALSE;
-    if(isset($Privileges[ 'Proposal' ]) && $Privileges[ 'Proposal' ][ 'User_Privilege' ] >= 6 && $Privileges[ 'Proposal' ][ 'Group_Privilege' ] >= 4 && $Privileges[ 'Proposal' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
+    if(isset($Privileges[ 'Proposal' ]) && $Privileges[ 'Proposal' ][ 'User_Privilege' ] >= 6
+          && $Privileges[ 'Proposal' ][ 'Group_Privilege' ] >= 4
+          && $Privileges[ 'Proposal' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
     else {
         //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
     }
-    $database->query(
+    \singleton\database::getInstance( )->query(
+      null,
       $Portal,
       "   INSERT INTO Activity([User], [Date], [Page])
           VALUES(?,?,?);",
       array(
         $_SESSION['User'],
-                  date("Y-m-d H:i:s"),
+
+                  date("Y-m-d H:i:s"),//date( 'm/d/Y' );
                       "proposal.php"));
     if(!isset($array[ 'ID' ]) || !is_numeric($_GET[ 'ID' ])  || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
         $ID = $_GET['ID'];
-        $result = $database->query(
-            null,
+        $result = \singleton\database::getInstance( )->query(
+        	null,
             "   SELECT  TOP 1
                         Estimate.ID             AS  ID,
                         Estimate.Name           AS  Contact,
                         Estimate.fDesc          AS  Title,
                         Estimate.fDate          AS  Date,
-                        Estimate.Cost           AS  Cost,
-                        Estimate.Price          AS  Price,
+                        Estimate.Type           AS  Type,
+                        Estimate.Template       AS  Template,
                         EStimate.Remarks        AS  Remarks,
-                        Loc.Tag                 AS  Location,
+                        Estimate.Cost           AS  Cost,
+                        Estimate.Hours          AS  Hours,
+                        Estimate.Labor          AS  Labor,
+                        Estimate.Overhead       AS  Overhead,
+                        Estimate.Price          AS  Price,
+                        Estimate.Profit         AS  Profit,
+                        Estimate.SubTotal1      AS  SubTotal_1,
+                        Estimate.SubTotal2      AS  SubTotal_2,
+                        Estimate.Job            AS  Job,
+                        Estimate.EstTemplate    AS  EstTemplate,
+                        Estimate.STaxRate       AS  Sales_Tax_Rate,
+                        Estimate.STax           AS  Sales_Tax,
+                        Estimate.SExpense       AS  Sales_Expense,
+                        Estimate.Quoted         AS  Quoted,
+                        Estimate.Phase          AS  Phase,
+                        Estimate.Probability    AS  Porbability,
                         Loc.Address             AS  Street,
                         Loc.State               AS  State,
                         Loc.City                AS  City,
                         Loc.Zip                 AS  Zip,
-                        Customer.Name       AS  Customer,
+                        Customer.Name           AS  Customer,
+                        Rol.Contact             AS  Contact,
                         Rol.Fax                 AS  Fax,
                         Rol.Phone               AS  Phone,
                         Rol.EMail               AS  Email
@@ -98,10 +118,17 @@ if(isset(
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require(bin_meta.'index.php');?>
-    <title>Nouveau Elevator Portal</title>
-    <?php require(bin_css.'index.php');?>
-    <?php require(bin_js.'index.php');?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+    <?php
+    	$_GET[ 'Bootstrap' ] = '5.1';
+    	require( bin_meta . 'index.php');
+    	require( bin_css  . 'index.php');
+    	require( bin_js   . 'index.php');
+    ?><style>
+    	.link-page {
+    		font-size : 14px;
+    	}
+    </style>
 </head>
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>">

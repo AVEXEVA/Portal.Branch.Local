@@ -62,24 +62,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     			"customer.php"
     		)
     	);
-    	$ID = isset( $_GET[ 'ID' ] ) 
-			? $_GET[ 'ID' ] 
+    	$ID = isset( $_GET[ 'ID' ] )
+			? $_GET[ 'ID' ]
 			: (
-				isset( $_POST[ 'ID' ] ) 
+				isset( $_POST[ 'ID' ] )
 					? $_POST[ 'ID' ]
 					: null
 			);
-		$Name = isset( $_GET[ 'Name' ] ) 
-    		? $_GET[ 'Name' ] 
+		$Name = isset( $_GET[ 'Name' ] )
+    		? $_GET[ 'Name' ]
     		: (
-    			isset( $_POST[ 'Name' ] ) 
+    			isset( $_POST[ 'Name' ] )
     				? $_POST[ 'Name' ]
     				: null
     		);
         $result = \singleton\database::getInstance( )->query(
 
         	null,
-            "	SELECT 	Top 1 
+            "	SELECT 	Top 1
             			Customer.*
             	FROM    (
             				SELECT 	Owner.ID    AS ID,
@@ -105,10 +105,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             			OR 	Customer.Name = ?;",
             array(
             	$ID,
-            	$Name	
+            	$Name
             )
         );
-        $Customer = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array( 
+        $Customer = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
         	'ID' => null,
         	'Name' => null,
         	'Login' => null,
@@ -216,7 +216,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         				)
         				VALUES ( @MAXID + 1, ?, 0, 0, 0, ?, 0, null, ?, ?, 0, 0, 0, 0, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, null, '', '', null );
         				SELECT @MAXID + 1;",
-        			array( 
+        			array(
         				$Customer[ 'Status' ],
         				$Customer[ 'Type' ],
         				$Customer[ 'Rolodex' ],
@@ -231,7 +231,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         	} else {
         		\singleton\database::getInstance( )->query(
 	        		null,
-	        		"	UPDATE 	Owner 
+	        		"	UPDATE 	Owner
 	        			SET 	Owner.Status = ?,
 	        					Owner.Internet = ?,
 	        					Owner.fLogin = ?,
@@ -277,7 +277,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
 	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-	<?php 
+	<?php
 		$_GET[ 'Bootstrap' ] = '5.1';
 		$_GET[ 'Entity_CSS' ] = 1;
 	?>
@@ -289,10 +289,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
         <?php require( bin_php . 'element/navigation.php'); ?>
-        <?php require( bin_php . 'element/loading.php'); ?>
-        <style>
-        	
-		</style>
         <div id="page-wrapper" class='content'>
         	<div class='card card-primary'>
         		<div class='card-heading'>
@@ -349,7 +345,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						                }
 						                $(document).ready(function(){ initialize(); });
 						            </script>
-							</div><?php 
+							</div><?php
 						}?>
 						<div class='card card-primary my-3'>
 							<div class='card-heading'>
@@ -478,7 +474,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
 									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
-								
+
 							</form></div>
 						</div>
 						<div class='card card-primary my-3'>
@@ -486,7 +482,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Portal</span></h5></div>
 									<div class='col-2'>&nbsp;</div>
-								</div> 
+								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Portal' ] ) && $_SESSION[ 'Cards' ][ 'Portal' ] == 0 ? "style='display:none;'" : null;?>><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 						 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
@@ -511,7 +507,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						 		</div>
 						 		<div class='row g-0' <?php echo $Customer[ 'Internet' ] == 0 ? "style='display:none;'" : null;?>>
 						 			<div class='col-1'>&nbsp;</div>
-						 			<div class='col-3'>Password:</div> 
+						 			<div class='col-3'>Password:</div>
 						 			<div class='col-8'><input type='password' class='form-control edit' name='Login' value='<?php echo $Customer[ 'Login' ];?>' name='Password' value='<?php echo $Customer[ 'Password' ];?>' /></div>
 						 		</div>
 						 		<div class='row g-0'>
@@ -530,7 +526,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><span>Locations</span></h5></div>
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='locations.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div> 
+								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Locations' ] ) && $_SESSION[ 'Cards' ][ 'Locations' ] == 0 ? "style='display:none;'" : null;?>>
 								<?php
@@ -539,11 +535,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										"	SELECT 		Count( Location.ID ) AS Count,
 														Location.Maint AS Maintenance
 											FROM   		Loc AS Location
-											WHERE  		Location.Owner = ? 
+											WHERE  		Location.Owner = ?
 											GROUP BY 	Location.Maint
 											ORDER BY 	Location.Maint DESC;",
 										array(
-											$Customer[ 'ID' ] 
+											$Customer[ 'ID' ]
 										)
 									);
 									$Locations = array( );
@@ -577,7 +573,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div> 
+								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
 								<?php
@@ -588,7 +584,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											   		LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
 											WHERE  	Location.Owner = ? ;",
 										array(
-											$Customer[ 'ID' ] 
+											$Customer[ 'ID' ]
 										)
 									);
 								?>
@@ -606,7 +602,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											"	SELECT 	Count( Unit.ID ) AS Units
 												FROM   	Elev AS Unit
 												   		LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-												WHERE  		Location.Owner = ? 
+												WHERE  		Location.Owner = ?
 														AND Unit.Type = 'Elevator'
 										;",array($Customer[ 'ID' ]));
 										echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
@@ -621,7 +617,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											SELECT 	Count( Unit.ID ) AS Units
 											FROM   	Elev AS Unit
 												   	LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-											WHERE  		Location.Owner = ? 
+											WHERE  		Location.Owner = ?
 													AND Unit.Type = 'Escalator'
 										;",array($Customer[ 'ID' ]));
 										echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
@@ -636,7 +632,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											SELECT 	Count( Unit.ID ) AS Units
 											FROM   	Elev AS Unit
 												   	LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-											WHERE  		Location.Owner = ? 
+											WHERE  		Location.Owner = ?
 													AND Unit.Type NOT IN ( 'Elevator', 'Escalator' )
 										;",array($Customer[ 'ID' ]));
 										echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
@@ -943,7 +939,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								    <div class='col-3 border-bottom border-white my-auto'>Awarded</div>
 								    <div class='col-6'><input class='form-control' type='text' readonly name='Proposals' value='<?php
 										$r = \singleton\database::getInstance( )->query(null,"
-											SELECT 	Count(Estimate.ID) AS Proposals 
+											SELECT 	Count(Estimate.ID) AS Proposals
 											FROM   	Estimate
 												   	LEFT JOIN Loc AS Location ON Estimate.LocID = Location.Loc
 											WHERE  		Location.Owner = ?
