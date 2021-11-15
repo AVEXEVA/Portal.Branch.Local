@@ -29,20 +29,15 @@ $( document ).ready( function( ){
                 dir : d.order[0].dir
             }
         };
-        d.ID = $('input[name='ID']').val( );
-        d.Name = $('input[name='Name']').val( );
-        d.Date = $('input[name='Date']').val( );
-        d.Customer_ID = $('input[name='Customer_ID']').val( );
-        d.Customer_Name = $('input[name='Customer_Name']').val( );
-        d.Locaton_ID = $('input[name='Location_ID']').val( );
-        d.Location_Name = $('input[name='Location_Name']').val( );
-        d.Location_Street = $('input[name='Location_Street']').val( );
-        d.Location_State = $('input[name='Location_State']').val( );
-        d.Location_Zip = $('input[name='Location_Zip']').val( );
-        d.Type = $('input[name='Type']').val( );
-        d.Status = $('input[name='Status']').val( );
-        d.Tickets = $('input[name='Tickets']').val( );
-        d.Invoices = $('input[name='Invoices']').val( );
+        d.ID = $("input[name='ID']").val( );
+        d.Name = $("input[name='Name']").val( );
+        d.Date = $("input[name='Date']").val( );
+        d.Customer = $("input[name='Customer']").val( );
+        d.Locaton = $("input[name='Location']").val( );
+        d.Type = $("select[name='Type']").val( );
+        d.Status = $("select[name='Status']").val( );
+        d.Tickets = $("input[name='Tickets']").val( );
+        d.Invoices = $("input[name='Invoices']").val( );
         return d;
       }
     },
@@ -167,20 +162,15 @@ $( document ).ready( function( ){
               text : 'Get URL',
               action : function( e, dt, node, config ){
                   var d = { };
-                  d.ID = $('input[name='ID']').val( );
-                  d.Name = $('input[name='Name']').val( );
-                  d.Date = $('input[name='Date']').val( );
-                  d.Customer_ID = $('input[name='Customer_ID']').val( );
-                  d.Customer_Name = $('input[name='Customer_Name']').val( );
-                  d.Locaton_ID = $('input[name='Location_ID']').val( );
-                  d.Location_Name = $('input[name='Location_Name']').val( );
-                  d.Location_Street = $('input[name='Location_Street']').val( );
-                  d.Location_State = $('input[name='Location_State']').val( );
-                  d.Location_Zip = $('input[name='Location_Zip']').val( );
-                  d.Type = $('input[name='Type']').val( );
-                  d.Status = $('input[name='Status']').val( );
-                  d.Tickets = $('input[name='Tickets']').val( );
-                  d.Invoices = $('input[name='Invoices']').val( );
+                  d.ID = $("input[name='ID']").val( );
+                  d.Name = $("input[name='Name']").val( );
+                  d.Date = $("input[name='Date']").val( );
+                  d.Customer = $("input[name='Customer']").val( );
+                  d.Locaton = $("input[name='Location']").val( );
+                  d.Type = $("select[name='Type']").val( );
+                  d.Status = $("select[name='Status']").val( );
+                  d.Tickets = $("input[name='Tickets']").val( );
+                  d.Invoices = $("input[name='Invoices']").val( );
                   document.location.href = 'jobs.php?' + new URLSearchParams( d ).toString();
               }
           },

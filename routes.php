@@ -4,8 +4,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = $database->query(
-    	null,
+    $result = \singleton\database::getInstance( )->query(
+        null,
 	    " SELECT  *
 			  FROM    Connection
 			  WHERE   Connection.Connector = ?
@@ -16,8 +16,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
     $Connection = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
-    $result = $database->query(
-    	null,
+    $result = \singleton\database::getInstance( )->query(
+        null,
 	    	" SELECT  *,
 			          Emp.fFirst AS First_Name,
 				        Emp.Last   AS Last_Name
@@ -28,8 +28,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
   	$User = sqlsrv_fetch_array( $result );
-	$result = $database->query(
-		null,
+	$result = \singleton\database::getInstance( )->query(
+      null,
   		" 	SELECT *
 			FROM   Privilege
 			WHERE  Privilege.User_ID = ?;",
@@ -46,8 +46,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  	    || 	$Privileges[ 'Route' ][ 'Other_Privilege' ] < 4){
 				?><?php require('../404.html');?><?php }
     else {
-		$database->query(
-			null,
+      \singleton\database::getInstance( )->query(
+          null,
       		" 	INSERT INTO Activity( [User], [Date], [Page] )
   				VALUES( ?, ?, ? );"
     		, array(
