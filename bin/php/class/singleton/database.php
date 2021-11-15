@@ -5,23 +5,15 @@ class database extends \singleton\index {
 	private $resources = array( );
 	private $databases = array(
 		'Portal',
-		'Demo',
-		'NEI',
-		'N-FL',
-		'N-IL',
-		'N-CT',
-		'N-TX',
-		'Nustar',
-		'Paradox',
-		'Attendance'
+		'Demo'
 	);
-	private $host = '172.16.12.45';
-	private $user = 'sa';
-	private $password = 'SQLABC!23456';
+	private $host = '52.191.64.69';
+	private $user = 'development';
+	private $password = '484138thstreetLongislandcity';
 	private $options = array(
 		'Database' 				=> 	null,
-	    'Uid' 					=> 	'sa',
-	    'PWD' 					=> 	'SQLABC!23456',
+	    'Uid' 					=> 	'development',
+	    'PWD' 					=> 	'484138thstreetLongislandcity',
 	    'ReturnDatesAsStrings'	=>	true,
 	    'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 	    'TraceOn' 				=> 	false

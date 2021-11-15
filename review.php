@@ -1,7 +1,7 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) { 
     session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
     //Connection
@@ -99,24 +99,24 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/meta.php' );?>
+    <?php require( 'var/www/html/Portal.Branch.Local/bin/php/meta.php' );?>
 	<title>Nouveau Texas | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/css/index.php' );?>
+    <?php require( 'var/www/html/Portal.Branch.Local/bin/css/index.php' );?>
     <style>
         .form-group>label:first-child {
             min-width  : 175px;
             text-align : right;
         }
     </style>
-    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/js/index.php' );?>
+    <?php require( 'var/www/html/Portal.Branch.Local/bin/js/index.php' );?>
     
-    <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/js/datatables.php' );?>
+    <?php require( 'var/www/html/Portal.Branch.Local/bin/js/datatables.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
-        <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/element/navigation.php' );?>
-        <?php require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/element/loading.php' );?>
+        <?php require( 'var/www/html/Portal.Branch.Local/bin/php/element/navigation.php' );?>
+        <?php require( 'var/www/html/Portal.Branch.Local/bin/php/element/loading.php' );?>
         <div id='page-wrapper' class='content'>
             <div class='panel panel-primary'>
                 <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Review Timesheets</div>
