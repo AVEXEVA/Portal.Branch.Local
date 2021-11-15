@@ -38,7 +38,7 @@ class database extends \singleton\index {
 		}
 	}
 	public function query( $database, $query, $parameters = array( ) ){
-		return is_null ( $database ) || in_array( $database, array_keys( $this->resources ) )
+		return is_null ( $database ) || !in_array( $database, array_keys( $this->resources ) )
 			?	sqlsrv_query(
 					$this->resources[ $this->default ],
 					$query,

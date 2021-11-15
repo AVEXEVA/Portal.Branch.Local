@@ -51,7 +51,7 @@ if(isset($_SESSION[ 'User'],$_SESSION[ 'Hash' ])){
                 ?><?php require('../404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
-          $NEI,
+          null,
           " INSERT INTO Activity([User], [Date], [Page] ) 
             VALUES( ?, ?, ? );",
           array(
