@@ -68,39 +68,38 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <?php require( bin_php . 'element/navigation.php');?>
         <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
-            <div class="card card-full card-primary border-0">
-                <div class="card-heading">
-                    <div class='row'>
-                        <div class='col-xs-10'><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</div>
-                        <div class='col-xs-2'><button style='width:100%;color:black;' onClick="$('#Filters').toggle();">+/-</button></div>
-                    </div>
-                </div>
+          <div class='card card-primary my-3'>
+            <div class='card-heading'>
+              <div class='row g-0 px-3 py-2'>
+                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Violation</span></h5></div>
+                <div class='col-2'>&nbsp;</div>
+              </div>
+            </div>
                 <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='locations.php'>
+                  <div class='row g-0'>
+                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Search(1);?>Search:</div>
+                    <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Search' value='<?php echo $Violation['Search'];?>' /></div>
+                  </div>
+                  <div class='row g-0'>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
+                    <div class='row g-0'>
+    									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
+    									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Violation['Name'];?>' /></div>
+    								</div>
+                    <div class='row g-0'>
+    									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Date(1);?>Date:</div>
+    									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Date' value='<?php echo $Violation['Date'];?>' /></div>
+    								</div>
+                    <div class='row g-0'>
+    									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?>Location:</div>
+    									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Location' value='<?php echo $Violation['Location'];?>' /></div>
+    								</div>
                     <div class='row'>
-                        <div class='col-xs-4'>Search:</div>
-                        <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Name:</div>
-                        <div class='col-xs-8'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Date:</div>
-                        <div class='col-xs-8'><input type='text' name='Date' placeholder='Date' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Location:</div>
-                        <div class='col-xs-8'><input type='text' name='Location' placeholder='Location' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Status:</div>
-                        <div class='col-xs-8'><select name='Status' onChange='redraw( );'>
-                            <option value=''>Select</option>
-                            <option value='0'>Active</option>
-                            <option value='1'>Inactive</option>
-                        </select></div>
+                      <div class='col-8'><select name='Status' class='form-control edit'>
+    										<option value=''>Select</option>
+    										<option value='0' <?php echo $Violation[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
+    										<option value='1' <?php echo $Violation[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
+    									</select></div>
                     </div>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                 </form></div>
