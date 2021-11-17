@@ -28,10 +28,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   $User = sqlsrv_fetch_array( $User );
   $r = \singleton\database::getInstance( )->query(
       null,
-      "   SELECT  Privilege.Access_Table,
-                  Privilege.User_Privilege,
-                  Privilege.Group_Privilege,
-                  Privilege.Other_Privilege
+      "   SELECT  Privilege.Access,
+                  Privilege.Owner,
+                  Privilege.Group,
+                  Privilege.Other
           FROM    Privilege
           WHERE   Privilege.User_ID = ?;",
       array(
@@ -39,10 +39,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
   );
   $Privileges = array();
-  while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+  while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
   $Privileged = False;
   if( isset( $Privileges[ 'Violation' ] )
-      && $Privileges[ 'Violation' ][ 'User_Privilege' ]  >= 4
+      && $Privileges[ 'Violation' ][ 'Owner' ]  >= 4
   ){ $Privileged = True; }
   if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
   else {
@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     ) . "'";
     $conditions[] = "Violation.Status NOT IN ({$notStatuses})";
 
-    if( $Privileges[ 'Violation' ][ 'Other_Privilege' ] < 4 ){
+    if( $Privileges[ 'Violation' ][ 'Other' ] < 4 ){
         $parameters [] = $User[ 'fWork' ];
         $conditions[] = "Violation.Loc IN ( SELECT Ticket.Location FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LID AS Location FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Loc AS Location FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Location)";
     }

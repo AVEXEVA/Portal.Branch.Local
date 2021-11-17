@@ -16,15 +16,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
     $User = sqlsrv_fetch_array($r);
     $r = $database->query(null,"
-        SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+        SELECT Access, Owner, Group, Other
         FROM   Privilege
         WHERE  User_ID = ?
     ;",array($_SESSION['User']));
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
-    if(isset($Privileges['Ticket']) && $Privileges['Ticket']['User_Privilege'] >= 4 && $Privileges['Ticket']['Group_Privilege'] >= 4 && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Ticket']['Group_Privilege'] >= 4){
+    if(isset($Privileges['Ticket']) && $Privileges['Ticket']['Owner'] >= 4 && $Privileges['Ticket']['Group'] >= 4 && $Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Ticket']['Group'] >= 4){
         $r = $database->query(  null,"SELECT LID FROM TicketO WHERE TicketO.ID='{$ID}'");
         $r2 = $database->query( null,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$ID}'");
         $r3 = $database->query( null,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$ID}'");
@@ -49,7 +49,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
         }
         if(!$Privileged){
-            if($Privileges['Ticket']['User_Privilege'] >= 4 && is_numeric($ID)){
+            if($Privileges['Ticket']['Owner'] >= 4 && is_numeric($ID)){
                 $r = $database->query(  null,"SELECT ID FROM TicketO WHERE TicketO.ID='{$ID}' AND fWork='{$User['fWork']}'");
                 $r2 = $database->query( null,"SELECT ID FROM TicketD WHERE TicketD.ID='{$ID}' AND fWork='{$User['fWork']}'");
                 $r3 = $database->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$ID}' AND fWork='{$User['fWork']}'");

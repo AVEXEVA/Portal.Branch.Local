@@ -1,74 +1,88 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('/var/www/html/Portal.Branch.Local/bin/php/index.php');
-setlocale(LC_MONETARY, 'en_US');
-  if(isset($_SESSION[ 'User' ],
-           $_SESSION[ 'Hash' ] ) ) {
-        $result = $database->query(
-            null,
-          '     SELECT  *
-          FROM      Connection
-          WHERE         Connector = ?
-                        AND Hash = ?;',
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Invoice' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Invoice' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
           array(
-                $_SESSION['User'],
-                $_SESSION['Hash']
-          )
-    );
-          $array = sqlsrv_fetch_array( $result );
-          if(!isset(
-              $_SESSION[ 'Branch' ]) || $_SESSION[ 'Branch' ] == 'Nouveau Elevator'){
-            $result= $database->query(
-              null,
-            '      SELECT   *,
-                          Emp.fFirst AS First_Name,
-                          Emp.Last   AS Last_Name
-                   FROM   Emp
-                   WHERE  Emp.ID= ?',
-          array(
-            $_SESSION[ 'User' ]
-          )
-    );
-          $User = sqlsrv_fetch_array( $result );
-          $Field = ($User[ 'Field' ] == 1
-              && $User[ 'Title' ] != 'OFFICE') ? True : False;
-          $result = $database->query(
-            null,
-          '       SELECT Access_Table,
-                         User_Privilege,
-                         Group_Privilege,
-                         Other_Privilege
-                  FROM   Privilege
-                  WHERE  User_ID = ?;',
-          array(
-            $_SESSION[ 'User' ]
-          )
-    );
-  $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2[ 'Access_Table' ]] = $array2;}
-    $Privileged = FALSE;
-      if(isset($Privileges[ 'Invoice' ])
-        && $Privileges[ 'Invoice' ][ 'User_Privilege' ] >= 6
-        && $Privileges[' Invoice' ][ 'Group_Privilege' ] >= 4
-        && $Privileges[ 'Invoice' ][ 'Other_Privilege' ] >= 4) {$Privileged = TRUE;}
-        else {
-      //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
-    }
-    } elseif(
-      $_SESSION[ 'Branch' ] == 'Customer' && is_numeric($_GET[ 'ID' ] ) ) {
-            $result =  $database->query(
-               null,
-               '    SELECT Ref
-                    FROM  Invoice LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
-                    WHERE Invoice.Ref='{$_GET[ 'ID' ] }' AND Loc.Owner = '{$_SESSION[ 'Branch_ID' ]}';');
-               $Privileged = $result ? TRUE : FALSE;
-    }
-  $database->query($Portal,'INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);',
-  array(
-    $_SESSION[ 'User' ],
-      date('Y-m-d H:i:s'),
-           'invoice.php')
-    );
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'invoice.php'
+        )
+      );
     if(!isset($array['ID']) || !is_numeric($_GET['ID'])  || !$Privileged){?><html><head><script></script></head></html><?php }
     else {
         $result = $database->query(null,

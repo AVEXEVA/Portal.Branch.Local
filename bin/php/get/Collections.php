@@ -1,10 +1,10 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
             FROM    Connection
@@ -15,7 +15,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           $_SESSION[ 'Hash' ]
         )
       );
-    $Connection = sqlsrv_fetch_array( $r );
+    $Connection = sqlsrv_fetch_array( $result );
     $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
@@ -28,20 +28,20 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $User = sqlsrv_fetch_array( $User );
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
-                    Privilege.Group_Privilege,
-                    Privilege.Other_Privilege
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array( 
-          $_SESSION[ 'User' ] 
-        ) 
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Other]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+      )
     );
     $Privileges = array();
-    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
     $Privileged = False;
     if( isset( $Privileges[ 'Invoice' ] )
         && $Privileges[ 'Invoice' ][ 'Other_Privilege' ]  >= 4
@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Location'];
         $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Job'];
         $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
@@ -121,10 +121,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         $conditions[] = "OpenAR.fDesc < ?";
     }
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
-      
+
       $parameters[] = $_GET['Search'];
       $search[] = "OpenAR.Ref LIKE '%' + ? + '%'";
-      
+
       $parameters[] = $_GET['Search'];
       $search[] = "OpenAR.fDesc LIKE '%' + ? + '%'";
 
@@ -139,14 +139,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
       $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "Job.fDesc LIKE '%' + ? + '%'";
-      
+
       $parameters[ ] = $_GET[ 'Search' ];
       $search[ ] = "JobType.Type LIKE '%' + ? + '%'";
     }*/
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    
+
     /*ROW NUMBER*/
     $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
     $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
@@ -193,43 +193,43 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             OpenAR.fDesc AS Description,
                             Territory.ID AS Territory_ID,
                             Territory.Name AS Territory_Name
-                    FROM    OpenAR 
+                    FROM    OpenAR
                             LEFT JOIN Invoice      ON OpenAR.Ref  = Invoice.Ref
                             LEFT JOIN Loc AS Location ON OpenAR.Loc  = Location.Loc
                             LEFT JOIN (
                                 SELECT  Owner.ID AS ID,
                                         Rol.Name AS Name
-                                FROM    Owner 
+                                FROM    Owner
                                         LEFT JOIN Rol ON Owner.Rol = Rol.ID
                             ) AS Customer ON Location.Owner   = Customer.ID
                             LEFT JOIN Job          ON Invoice.Job = Job.ID
-                            LEFT JOIN JobType      ON Job.Type    = JobType.ID  
-                            LEFT JOIN Terr AS Territory ON Territory.ID = Location.Terr    
+                            LEFT JOIN JobType      ON Job.Type    = JobType.ID
+                            LEFT JOIN Terr AS Territory ON Territory.ID = Location.Terr
                     WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
     $rResult = \singleton\database::getInstance( )->query(
-      null,  
-      $sQuery, 
-      $parameters 
+      null,
+      $sQuery,
+      $parameters
     ) or die(print_r(sqlsrv_errors()));
 
     $sQueryRow = "
         SELECT  Count( OpenAR.Ref ) AS Count
-        FROM    OpenAR 
+        FROM    OpenAR
                 LEFT JOIN Invoice      ON OpenAR.Ref  = Invoice.Ref
                 LEFT JOIN Loc AS Location ON OpenAR.Loc  = Location.Loc
                 LEFT JOIN (
                     SELECT  Owner.ID AS ID,
                             Rol.Name AS Name
-                    FROM    Owner 
+                    FROM    Owner
                             LEFT JOIN Rol ON Owner.Rol = Rol.ID
                 ) AS Customer ON Location.Owner   = Customer.ID
                 LEFT JOIN Job          ON Invoice.Job = Job.ID
-                LEFT JOIN JobType      ON Job.Type    = JobType.ID      
+                LEFT JOIN JobType      ON Job.Type    = JobType.ID
         WHERE   ({$conditions}) AND ({$search});";
-    
+
     $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
     $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
@@ -246,7 +246,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array()
     );
- 
+
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
         $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
         $Row[ 'Due' ] = date( 'm/d/Y', strtotime( $Row[ 'Due' ] ) );

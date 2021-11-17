@@ -8,14 +8,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
     $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = false;
-    if(isset($My_Privileges['Admin']) && $My_Privileges['Admin']['Other_Privilege'] >= 4){$Privileged = true;}
+    if(isset($My_Privileges['Admin']) && $My_Privileges['Admin']['Other'] >= 4){$Privileged = true;}
     if(!isset($array['ID']) || !$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
 		$data = array();

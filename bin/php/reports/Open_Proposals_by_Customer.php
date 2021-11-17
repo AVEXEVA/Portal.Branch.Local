@@ -9,7 +9,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Field = ($User['Field'] == 1 && "OFFICE" != $User['Title']) ? True : False;
 	$Privileged = False;
     if( isset($My_Privileges['Customer']) 
-        && $My_Privileges['Customer']['Other_Privilege'] >= 4){
+        && $My_Privileges['Customer']['Other'] >= 4){
             $Privileged = True;}
     if(!isset($array['ID'],$_GET['ID']) || !is_numeric($_GET['ID']) ){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {

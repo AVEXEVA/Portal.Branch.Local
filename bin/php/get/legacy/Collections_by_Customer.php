@@ -41,11 +41,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     );
     $Privileges = array();
     $Privileged = false;
-    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
     if(     isset($Privileges['Invoice']) 
-        &&  $Privileges[ 'Invoice' ][ 'User_Privilege' ]  >= 4 
-        &&  $Privileges[ 'Invoice' ][ 'Group_Privilege' ] >= 4 
-        &&  $Privileges[ 'Invoice' ][ 'Other_Privilege' ] >= 4){
+        &&  $Privileges[ 'Invoice' ][ 'Owner' ]  >= 4 
+        &&  $Privileges[ 'Invoice' ][ 'Group' ] >= 4 
+        &&  $Privileges[ 'Invoice' ][ 'Other' ] >= 4){
                 $Privileged = true;}
     if(     !isset($Connection['ID'])  
         ||  !is_numeric($_GET['ID']) 

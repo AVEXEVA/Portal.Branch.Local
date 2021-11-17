@@ -30,17 +30,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
     //Privileges
     $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+        'Portal',
+        "   SELECT Access, Owner, Group, Other
             FROM   Privilege
             WHERE  User_ID = ?;",
         array($_SESSION['User']));
     $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array( $r )){ $Privileges[$Privilege['Access_Table']] = $Privilege;}
+    while($Privilege = sqlsrv_fetch_array( $r )){ $Privileges[$Privilege['Access']] = $Privilege;}
     $Privileged = FALSE;
     if( isset($Privileges['Violation'])
-        && $Privileges['Violation']['User_Privilege'] >= 4
-        && $Privileges['Violation']['Group_Privilege'] >= 4){$Privileged = TRUE;}
+        && $Privileges['Violation']['Owner'] >= 4
+        && $Privileges['Violation']['Group'] >= 4){$Privileged = TRUE;}
 
     if(!isset($Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=violations.php';</script></head></html><?php }
     else {

@@ -32,27 +32,27 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   );
   $User = sqlsrv_fetch_array( $result );
   //Privileges
-  $result = sqlsrv_query(
-    $NEI,
-    " SELECT  Privilege.Access_Table,
-              Privilege.User_Privilege,
-              Privilege.Group_Privilege,
-              Privilege.Other_Privilege
-      FROM    Privilege
-      WHERE   Privilege.User_ID = ?;",
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Other]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
     array(
-      $_SESSION[ 'User' ]
+      $_SESSION[ 'Connection' ][ 'User' ]
     )
   );
   $Privileges = array();
-  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; } }
   if(     !isset( $Connection[ 'ID' ] )
       ||  !isset($Privileges[ 'Admin' ])
-      ||  $Privileges[ 'Admin' ][ 'User_Privilege' ]  < 4
-      ||  $Privileges[ 'Admin' ][ 'Group_Privilege' ] < 4
-      ||  $Privileges[ 'Admin' ][ 'Other_Privilege' ] < 4
+      ||  $Privileges[ 'Admin' ][ 'Owner' ]  < 4
+      ||  $Privileges[ 'Admin' ][ 'Group' ] < 4
+      ||  $Privileges[ 'Admin' ][ 'Other' ] < 4
   ){
-      ?><?php require( '../404.html' );?><?php
+      ?><?php require( '404.html' );?><?php
   } else {
     sqlsrv_query(
       $NEI,

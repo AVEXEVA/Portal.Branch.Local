@@ -1,8 +1,8 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
         'read_and_close' => true
-    ] ); 
+    ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
@@ -32,24 +32,27 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $User = sqlsrv_fetch_array( $result );
     //Privileges
-    $result = $database->query(
-        null,
-        "   SELECT  *
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array(
-            $_SESSION['User']
-        )
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Other]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+      )
     );
     $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; } }
     if( !isset( $Connection[ 'ID' ] )
         || !isset($Privileges[ 'Ticket' ])
-            || $Privileges[ 'Ticket' ][ 'User_Privilege' ]  < 4
-            || $Privileges[ 'Ticket' ][ 'Group_Privilege' ] < 4
-            || $Privileges[ 'Ticket' ][ 'Other_Privilege' ] < 4
-    ){      
-        ?><?php require( '../404.html' );?><?php 
+            || $Privileges[ 'Ticket' ][ 'Owner' ]  < 4
+            || $Privileges[ 'Ticket' ][ 'Group' ] < 4
+            || $Privileges[ 'Ticket' ][ 'Other' ] < 4
+    ){
+        ?><?php require( '404.html' );?><?php
     } else {
 ?><!DOCTYPE html>
 <html lang="en">
@@ -65,14 +68,14 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
-<?php 
+<?php
 $_GET[ 'Tickets' ] = isset( $_GET[ 'Tickets' ] ) ? explode( ',', $_GET[ 'Tickets' ] ) : array( );
 if( isset( $_GET[ 'Tickets' ] ) && is_array( $_GET[ 'Tickets' ] ) && count( $_GET[ 'Tickets' ] ) > 0){ foreach( $_GET[ 'Tickets' ] as $Ticket_ID ){
   if( is_numeric( $Ticket_ID ) && $Ticket_ID > 0 ){
     $_GET[ 'ID' ] = $Ticket_ID;
-    require( 'short-ticket.php' );  
+    require( 'short-ticket.php' );
   }
-} }?>          
+} }?>
 </body>
 </html>
 <?php

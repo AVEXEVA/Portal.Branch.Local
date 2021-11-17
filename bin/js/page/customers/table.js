@@ -47,9 +47,9 @@ $( document ).ready( function( ){
                   render : function( data, type, row, meta ){
                       switch( type ){
                           case 'display' :
-                              return  row.ID !== null 
-                                  ?   "<div class='row'>" + 
-                                          "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" + 
+                              return  row.ID !== null
+                                  ?   "<div class='row'>" +
+                                          "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
                                       "</div>"
                                   :   null;
                           default :
@@ -62,9 +62,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" + 
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -78,9 +78,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Locations !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" + 
+                            return  row.Locations !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -93,9 +93,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Units !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" + 
+                            return  row.Units !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -108,9 +108,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Jobs !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" + 
+                            return  row.Jobs !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -123,9 +123,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Tickets !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" + 
+                            return  row.Tickets !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -138,9 +138,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Tickets !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" + 
+                            return  row.Tickets !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -153,9 +153,9 @@ $( document ).ready( function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Tickets !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" + 
+                            return  row.Tickets !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -189,7 +189,7 @@ $( document ).ready( function( ){
                     $( 'input, select' ).each( function( ){
                         $( this ).val( '' );
                     } );
-                    Table_Tickets.draw( );
+                    Table_Customers.draw( );
                 }
             },{
                 text : 'Get URL',
@@ -200,15 +200,35 @@ $( document ).ready( function( ){
                     d.Status = $('select[name="Status"]').val( );
                     document.location.href = 'customers.php?' + new URLSearchParams( d ).toString();
                 }
+            },{
+                text : 'Create',
+                action : function( e, dt, node, config ){
+                    document.location.href='customer.php';
+                }
             },
-            { extend: 'create', editor: Editor_Customers },
-            { extend: 'edit',   editor: Editor_Customers },
-            { extend: 'remove', editor: Editor_Customers },
+            {
+                text : 'Delete',
+                action : function( e, dt, node, config ){
+                  var rows = dt.rows( { selected : true } ).indexes( );
+                  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                  $.ajax ({
+                    url    : 'bin/php/post/customer.php',
+                    method : 'POST',
+                    data   : {
+                      action : 'delete' ,
+                      data : dte
+                    },
+                    success : function(response){
+                      Table_Customers.draw();
+                    }
+                  })
+                }
+              },
             'copy',
             'csv'
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             //search( this );

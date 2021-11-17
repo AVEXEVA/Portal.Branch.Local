@@ -11,12 +11,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
     $SQL_Result_Privileges = \singleton\database::getInstance( )->query(
         null,,
-      " SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+      " SELECT Access, Owner, Group, Other
         FROM   Privilege
         WHERE User_ID='{$_SESSION['User']}';"
     );
     $Privileges = array();
-    if($SQL_Result_Privileges){while($Privilege = sqlsrv_fetch_array($SQL_Result_Privileges)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if($SQL_Result_Privileges){while($Privilege = sqlsrv_fetch_array($SQL_Result_Privileges)){$Privileges[$Privilege['Access']] = $Privilege;}}
     if(!isset($array['ID']) || !isset($_GET['Keyword']) || trim($_GET['Keyword']) == ''){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
     else {
         $data = array();
@@ -29,7 +29,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Job_Type = "JobType.Type LIKE '%" . str_replace(" ","%' OR JobType.Type LIKE '%",$Keyword) . "%'";
             $Job_fDate = "Job.fDate LIKE '%" . str_replace(" ","%' OR Job.fDate LIKE '%",$Keyword) . "%'";
             $Job_Status = "Job_Status.Status LIKE '%" . str_replace(" ","%' OR Job_Status.Status LIKE '%",$Keyword) . "%'";
-            if($Privileges['Job']['User_Privilege'] >= 4 && $Privileges['Job']['Group_Privilege'] >= 4 && $Privileges['Job']['Other_Privilege'] >= 4){
+            if($Privileges['Job']['Owner'] >= 4 && $Privileges['Job']['Group'] >= 4 && $Privileges['Job']['Other'] >= 4){
                 $SQL_Result_Jobs = \singleton\database::getInstance( )->query(
                     null,,
                   " SELECT DISTINCT
@@ -53,7 +53,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($SQL_Result_Jobs){while($Job = sqlsrv_fetch_array($SQL_Result_Jobs)){$data[] = $Job;}}
             } else {
                 $SQL_Jobs = array();
-                if($Privileges['Job']['Group_Privilege'] >= 4){
+                if($Privileges['Job']['Group'] >= 4){
                     $SQL_Result_Jobs = \singleton\database::getInstance( )->query(
                         null,
                     "   SELECT TicketO.Job AS Job
@@ -71,7 +71,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Jobs[] = "Job.ID='{$array['Job']}'";}}
 
                 }
-                if($Privileges['Job']['User_Privilege'] >= 4){
+                if($Privileges['Job']['Owner'] >= 4){
                     $r = \singleton\database::getInstance( )->query(
                         null,
                       " SELECT DISTINCT Job.ID AS Job
@@ -110,7 +110,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }
             }
         }
-        if(isset($Privileges['Customer']) && $Privileges['Customer']['User_Privilege'] >= 4 && $Privileges['Customer']['Group_Privilege'] >= 4 && $Privileges['Customer']['Other_Privilege'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("customer",array_map("strtolower",$Keywords)))){
+        if(isset($Privileges['Customer']) && $Privileges['Customer']['Owner'] >= 4 && $Privileges['Customer']['Group'] >= 4 && $Privileges['Customer']['Other'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("customer",array_map("strtolower",$Keywords)))){
             $SQL_Result_Customers = \singleton\database::getInstance( )->query(
                 null,
               " SELECT DISTINCT
@@ -140,7 +140,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $TicketDArchive_DescRes = "TicketDArchive.DescRes LIKE '%" . str_replace(" ","%' OR TicketDArchive.DescRes LIKE '%",$Keyword) . "%'";
             $Emp_fFirst = "Emp.fFirst LIKE '%" . str_replace(" ","%' OR Emp.fFirst LIKE '%",$Keyword) . "%'";
             $Emp_Last = "Emp.Last LIKE '%" . str_replace(" ","%' OR Emp.Last LIKE '%",$Keyword) . "%'";
-            if($Privileges['Ticket']['User_Privilege'] >= 4 && $Privileges['Ticket']['Group_Privilege'] >= 4 && $Privileges['Ticket']['Other_Privilege'] >= 4){
+            if($Privileges['Ticket']['Owner'] >= 4 && $Privileges['Ticket']['Group'] >= 4 && $Privileges['Ticket']['Other'] >= 4){
             	$r = \singleton\database::getInstance( )->query(
                   null,
                 "   SELECT TicketO.ID                  AS ID,
@@ -210,7 +210,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						OR {$Emp_Last}*/
                 ;");
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-            } elseif($Privileges['Ticket']['User_Privilege'] >= 4) {
+            } elseif($Privileges['Ticket']['Owner'] >= 4) {
                 $r = \singleton\database::getInstance( )->query(
                     null,
                   " SELECT
@@ -299,7 +299,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Location_City = "Loc.City LIKE '%" . str_replace(" ","%' OR Loc.City LIKE '%",$Keyword) . "%'";
             $Location_State = "Loc.State LIKE '%" . str_replace(" ","%' OR Loc.State LIKE '%",$Keyword) . "%'";
             $Location_Zip = "Loc.Zip LIKE '%" . str_replace(" ","%' OR Loc.Zip LIKE '%",$Keyword) . "%'";
-            if($Privileges['Location']['User_Privilege'] >= 4 && $Privileges['Location']['Group_Privilege'] >= 4 && $Privileges['Location']['Other_Privilege'] >= 4){
+            if($Privileges['Location']['Owner'] >= 4 && $Privileges['Location']['Group'] >= 4 && $Privileges['Location']['Other'] >= 4){
                 $SQL_Result_Locations = \singleton\database::getInstance( )->query(
                     null,
                   " SELECT DISTINCT
@@ -321,7 +321,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($SQL_Result_Locations){while($Location = sqlsrv_fetch_array($SQL_Result_Locations)){$data[] = $Location;}}
             } else {
                 $SQL_Locations = array();
-                if($Privileges['Location']['Group_Privilege'] >= 4){
+                if($Privileges['Location']['Group'] >= 4){
                     $r = \singleton\database::getInstance( )->query(
                         null,
                       " SELECT
@@ -346,7 +346,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
                     while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
                 }
-                if($Privileges['Location']['User_Privilege'] >= 4){
+                if($Privileges['Location']['Owner'] >= 4){
                     $r = \singleton\database::getInstance( )->query(
                         null,
                       " SELECT Loc.Loc          AS Location
@@ -391,7 +391,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Unit_Type = "Elev.Type LIKE '%" . str_replace(" ","%' OR Elev.Type LIKE '%",$Keyword) . "%'";
             $Unit_Loc = "Loc.Loc LIKE '%" . str_replace(" ","%' OR Loc.Loc LIKE '%",$Keyword) . "%'";
             $Unit_Tag = "Loc.Tag LIKE '%" . str_replace(" ","%' OR Loc.Tag LIKE '%",$Keyword) . "%'";
-            if($Privileges['Unit']['User_Privilege'] > 4 && $Privileges['Unit']['Group_Privilege'] > 4 && $Privileges['Unit']['Other_Privilege'] > 4){
+            if($Privileges['Unit']['Owner'] > 4 && $Privileges['Unit']['Group'] > 4 && $Privileges['Unit']['Other'] > 4){
                 $SQL_Result_Units = \singleton\database::getInstance( )->query(
                     null,
                   " SELECT DISTINCT
@@ -420,7 +420,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 if($SQL_Result_Units){while($Unit = sqlsrv_fetch_array($SQL_Result_Units)){$data[] = $Unit;}}
             } else {
                 $SQL_Units = array();
-                if($Privileges['Unit']['Group_Privilege'] >= 4){
+                if($Privileges['Unit']['Group'] >= 4){
                     $r = \singleton\database::getInstance( )->query(
                         null,
                       " SELECT
@@ -445,7 +445,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 
                     if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Elev.ID='{$array['Unit']}'";}}
                 }
-                if($Privileges['Unit']['User_Privilege'] >= 4){
+                if($Privileges['Unit']['Owner'] >= 4){
                     $r = \singleton\database::getInstance( )->query(
                         null,
                       " SELECT Elev.ID          AS Unit
@@ -492,7 +492,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }
             }
         }
-        if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >= 4 && $Privileges['Invoice']['Group_Privilege'] >= 4 && $Privileges['Invoice']['Other_Privilege'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("invoice",array_map("strtolower",$Keywords)))){
+        if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Owner'] >= 4 && $Privileges['Invoice']['Group'] >= 4 && $Privileges['Invoice']['Other'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("invoice",array_map("strtolower",$Keywords)))){
             $Invoice_Ref = "Invoice.Ref LIKE '%" . str_replace(" ","%' OR Invoice.Ref LIKE '%",$Keyword) . "%'";
             $Invoice_fDesc = "Invoice.fDesc LIKE '%" . str_replace(" ","%' OR Invoice.fDesc LIKE '%",$Keyword) . "%'";
             $Invoice_Total = "Invoice.Total LIKE '%" . str_replace(" ","%' OR Invoice.Total LIKE '%",$Keyword) . "%'";
@@ -516,7 +516,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ;");
             if($SQL_Result_Invoices){while($Invoice = sqlsrv_fetch_array($SQL_Result_Invoices)){$data[] = $Invoice;}}
         }
-        if(isset($Privileges['Proposal']) && $Privileges['Proposal']['User_Privilege'] >= 4 && $Privileges['Proposal']['Group_Privilege'] >= 4 && $Privileges['Proposal']['Other_Privilege'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("proposal",array_map("strtolower",$Keywords)))){
+        if(isset($Privileges['Proposal']) && $Privileges['Proposal']['Owner'] >= 4 && $Privileges['Proposal']['Group'] >= 4 && $Privileges['Proposal']['Other'] >= 4 && (empty(array_intersect(array_map("strtolower",$Keywords),array_map("strtolower",$Objects))) || in_array("proposal",array_map("strtolower",$Keywords)))){
             $Proposal_ID = "Estimate.ID LIKE '%" . str_replace(" ","%' OR Estimate.ID LIKE '%",$Keyword) . "%'";
             $Proposal_Name = "Estimate.Name LIKE '%" . str_replace(" ","%' OR Estimate.Name LIKE '%",$Keyword) . "%'";
             $Proposal_fDesc = "Estimate.fDesc LIKE '%" . str_replace(" ","%' OR Estimate.fDesc LIKE '%",$Keyword) . "%'";

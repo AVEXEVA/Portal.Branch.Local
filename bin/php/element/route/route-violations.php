@@ -8,17 +8,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query(null,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Privilege
             WHERE  User_ID = ? 
         ;",array($_SESSION['User']));
     $My_Privileges = array(); 
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
     if(isset($My_Privileges['Route']) 
-        && $My_Privileges['Route']['User_Privilege'] >= 4 
-        && $My_Privileges['Route']['Group_Privilege'] >= 4 
-        && $My_Privileges['Route']['Other_Privilege'] >= 4){
+        && $My_Privileges['Route']['Owner'] >= 4 
+        && $My_Privileges['Route']['Group'] >= 4 
+        && $My_Privileges['Route']['Other'] >= 4){
             $Privileged = TRUE;}
     else {
         if(is_numeric($_GET['ID'])){
@@ -36,7 +36,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 WHERE
                     Route.ID        =   ?",array($_GET['ID']));
             $Route = sqlsrv_fetch_array($r);
-            if($My_Privileges['Route']['User_Privilege'] >= 4 && $_SESSION['User'] == $Route['Employee_ID']){$Privileged = TRUE;}
+            if($My_Privileges['Route']['Owner'] >= 4 && $_SESSION['User'] == $Route['Employee_ID']){$Privileged = TRUE;}
         }
     }
     if(!isset($array['ID'])  || !$Privileged || !is_numeric($_GET['ID'])){?><html><head><script>document.location.href="401.html";</script></head></html><?php }

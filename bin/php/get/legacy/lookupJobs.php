@@ -20,21 +20,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query(null,"
-        SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
+        SELECT Privilege.Access,
+               Privilege.Owner,
+               Privilege.Group,
+               Privilege.Other
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Job'])
         && (
-				$My_Privileges['Job']['Other_Privilege'] >= 4
+				$My_Privileges['Job']['Other'] >= 4
 			||	$My_Privileges['Job']['Group_Privlege'] >= 4
-			||  $My_Privileges['Job']['User_Privilege'] >= 4
+			||  $My_Privileges['Job']['Owner'] >= 4
 		)
 	 ){
             $Privileged = True;}
@@ -163,7 +163,7 @@ $conn = null;
       $sWhere .= " AND Job.Loc = ?";
       array_push($params, $_GET['Loc']);
     }
-	if($My_Privileges['Job']['Other_Privilege'] >= 4 || TRUE){
+	if($My_Privileges['Job']['Other'] >= 4 || TRUE){
 		$sQuery = "
 			SELECT *
 			FROM
@@ -216,7 +216,7 @@ $conn = null;
     $rResult = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
 
     /* Data set length after filtering */
-	if($My_Privileges['Job']['Other_Privilege'] >= 4 || TRUE){
+	if($My_Privileges['Job']['Other'] >= 4 || TRUE){
 		$sQueryRow = "
 			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns))."
 			FROM   $sTable

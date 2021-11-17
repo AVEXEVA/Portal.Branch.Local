@@ -1,56 +1,119 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
-    require( '/var/www/portal.live.local/html/bin/php/index.php' );
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
   //Connection
-  $result = $database->query(
-    null,
-    " SELECT  Connection.* 
-      FROM    Connection 
-      WHERE       Connection.Connector = ? 
-              AND Connection.Hash = ?;",
-    array(
-      $_SESSION[ 'User' ],
-      $_SESSION[ 'Hash' ]
-    )
-  );
-  $Connection = sqlsrv_fetch_array( $result );
-  //User
-  $result = $database->query(
-    null,
-    " SELECT  Emp.*, 
-              Emp.fFirst AS First_Name, 
-              Emp.Last as Last_Name 
-      FROM    Emp 
-      WHERE   Emp.ID = ?;",
-    array(
-      $_SESSION[ 'User' ]
-    )
-  );
-  $User = sqlsrv_fetch_array( $result );
-  //Privileges
-  $Privileges = array( );
-  $Privileged = false;
-  $result = $database->query(
-    null,
-    " SELECT  Privilege.Access_Table, 
-              Privilege.User_Privilege, 
-              Privilege.Group_Privilege, 
-              Privilege.Other_Privilege 
-      FROM    Portal.dbo.Privilege 
-      WHERE   Privilege.User_ID = ?;",
-    array(
-      $_SESSION[ 'User' ]
-    )
-  );
-  if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
-  
-  if( isset( $Privileges[ 'Ticket' ] ) && $Privileges[ 'Ticket' ][ 'User_Privilege' ] >= 6){ $Privileged = TRUE; }
-  if( !isset($Connection['ID'])  || !$Privileged ){require("401.html");}
-  else {
-    $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'job.php'
+        )
+      );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Ticket' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Ticket' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'ticket.php'
+        )
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,7 +146,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 <div class='row form-group g-0'>
                   <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</label>
                   <div class='col-auto padding v1'><button type='button' onClick='selectLocations(this);'><?php
-                  $pass = false; 
+                  $pass = false;
                   if(isset($_GET['Location']) && is_numeric($_GET['Location'])){
                     $r = $database->query(null,"SELECT * FROM Loc WHERE Loc.Loc = ?;",array($_GET['Location']));
                     if($r){
@@ -95,7 +158,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     }
                   }
                   if(!$pass){?>Select Location<?php }?></button></div>
-                 
+
                 </div>
                 <div class='row form-group g-0'>
                   <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</label>
@@ -112,7 +175,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     }
                   }
                   if(!$pass){?>Select Unit<?php }?></button></div>
-                 
+
                 </div>
                 <div class='row form-group g-0'>
                   <label class='col-auto border-bottom v1'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</label>

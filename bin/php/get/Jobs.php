@@ -37,10 +37,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Privileges
   $result = \singleton\database::getInstance( )->query(
       null,
-      "   SELECT  Privilege.Access_Table,
-                  Privilege.User_Privilege,
-                  Privilege.Group_Privilege,
-                  Privilege.Other_Privilege
+      "   SELECT  Privilege.Access,
+                  Privilege.Owner,
+                  Privilege.Group,
+                  Privilege.Other
           FROM    Privilege
           WHERE   Privilege.User_ID = ?;",
       array(
@@ -48,12 +48,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
   );
   $Privileges = array();
-  while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+  while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
   $Privileged = False;
   if(     isset( $Privileges[ 'Job' ] )
-      &&  $Privileges[ 'Job' ][ 'User_Privilege' ]  >= 4
-      &&  $Privileges[ 'Job' ][ 'Group_Privilege' ]  >= 4
-      &&  $Privileges[ 'Job' ][ 'Other_Privilege' ]  >= 4
+      &&  $Privileges[ 'Job' ][ 'Owner' ]  >= 4
+      &&  $Privileges[ 'Job' ][ 'Group' ]  >= 4
+      &&  $Privileges[ 'Job' ][ 'Other' ]  >= 4
   ){        $Privileged = True; }
   if( !isset($Connection['ID']) || !$Privileged ){print json_encode( array( 'data' => array( ) ) );}
   else {
@@ -86,7 +86,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $parameters[] = $_GET['Status'];
       $conditions[] = "Job.Status LIKE '%' + ? + '%'";
     }
-    if( !isset( $Privileges[ 'Legal' ] ) || $Privileges[ 'Legal' ][ 'Other_Privilege' ] < 4 || true ){
+    if( !isset( $Privileges[ 'Legal' ] ) || $Privileges[ 'Legal' ][ 'Other' ] < 4 || true ){
         $conditions[] = "Job.Type <> 9";
     }
 

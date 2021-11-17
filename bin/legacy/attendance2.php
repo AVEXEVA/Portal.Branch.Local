@@ -34,10 +34,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Privileges
   $result = sqlsrv_query(
     $NEI,
-    " SELECT  Privilege.Access_Table,
-              Privilege.User_Privilege,
-              Privilege.Group_Privilege,
-              Privilege.Other_Privilege
+    " SELECT  Privilege.Access,
+              Privilege.Owner,
+              Privilege.Group,
+              Privilege.Other
       FROM    Privilege
       WHERE   Privilege.User_ID = ?;",
     array(
@@ -45,12 +45,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     )
   );
   $Privileges = array();
-  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; } }
   if(     !isset( $Connection[ 'ID' ] )
       ||  !isset($Privileges[ 'Time' ])
-      ||  $Privileges[ 'Time' ][ 'User_Privilege' ]  < 4
-      ||  $Privileges[ 'Time' ][ 'Group_Privilege' ] < 4
-      ||  $Privileges[ 'Time' ][ 'Other_Privilege' ] < 4
+      ||  $Privileges[ 'Time' ][ 'Owner' ]  < 4
+      ||  $Privileges[ 'Time' ][ 'Group' ] < 4
+      ||  $Privileges[ 'Time' ][ 'Other' ] < 4
   ){
       ?><?php require( '../404.html' );?><?php
   } else {

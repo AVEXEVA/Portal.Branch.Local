@@ -1,11 +1,11 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
+		SELECT *
+		FROM   Connection
+		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
@@ -13,26 +13,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
-		FROM   Emp 
+		FROM   Emp
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
+	$r = $database->query('Portal',"
+		SELECT *
+		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
+	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
+    if(	!isset($My_Connection['ID'])
 	   	|| !isset($My_Privileges['Financials'])
-	  		|| $My_Privileges['Financials']['User_Privilege']  < 4
-	  		|| $My_Privileges['Financials']['Group_Privilege'] < 4
-	  		|| $My_Privileges['Financials']['Other_Privilege'] < 4){
+	  		|| $My_Privileges['Financials']['Owner']  < 4
+	  		|| $My_Privileges['Financials']['Group'] < 4
+	  		|| $My_Privileges['Financials']['Other'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
 		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
+			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "financials.php"));
         if(count($_POST) > 0){
@@ -56,7 +56,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -108,7 +108,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	                        			$("input[name='Location'] option").hide();
 	                        			$("input[name='Location'] option[customer='" + Customer + "']").show();
 	                        		} else {
-	                        			$("input[name='Location'] option").show(); 
+	                        			$("input[name='Location'] option").show();
 	                        			$("select[name='Job'] option").show();
                         				$("select[name='Unit'] option").show();
 	                        		}
@@ -141,12 +141,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         				$("select[name='Job'] option").hide();
 	                        			$("select[name='Job'] option[location='" + Location + "']").show();
 	                        			$("select[name='Unit'] option").hide();
-	                        			$("select[name='Unit'] option[location='" + Location + "']").show();	
+	                        			$("select[name='Unit'] option[location='" + Location + "']").show();
                         			} else {
                         				$("select[name='Job'] option").show();
                         				$("select[name='Unit'] option").show();
                         			}
-                        			
+
                         		}
                         		function selectJobType(link){
                         			var JobType = $(link).val();
@@ -175,7 +175,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         			var Location = $("input[name='Location']").val();
                         			var JobType  = $("select[name='JobType']").val();
                         			var Job      = $("select[name='Job']").val();
-                        			var Unit     = $("select[name='Unit']").val();     	
+                        			var Unit     = $("select[name='Unit']").val();
                         			var formdata = "Operator=" + Operator + "&Customer=" + Customer + "&Location=" + Location + "&JobType=" + JobType + "&Job=" + Job + "&Unit=" + Unit;
                         			$.ajax({
                         				url:"bin/php/post/financials.php",
@@ -191,7 +191,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		                        			$("table#filters tbody").append("<tr><td>" + Operator + "</td><td>" + Customer + "</td><td>" + Location + "</td><td>" + JobType + "</td><td>" + Job + "</td><td>" + Unit + "</td></tr>");
                         					$("div#subcontent").html(code);}
                         			});
-                        		}	
+                        		}
                         		</script>
                         		<table id='filters' class='no-print'>
                         			<thead>
@@ -200,7 +200,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         					<th>Customer</th>
                         					<th>Location</th>
                         					<th>Job Type</th>
-                        					<th>Job</th> 
+                        					<th>Job</th>
                         					<th>Unit</th>
                         					<th></th>
                         				</tr>
@@ -208,7 +208,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         					<th><select name="Operator"><option value="Add">Add</option><option value="Subtract">Subtract</option></select></th>
                    							<th><select name='Customer' style='width:300px;' onchange='selectCustomer(this);'>
                    								<option value=''>Select</option>
-                   								<?php 
+                   								<?php
                    									$r = $database->query(null,"SELECT * FROM OwnerWithRol ORDER BY Name");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
@@ -222,7 +222,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 </th>
                    							<th><select name='JobType' style='width:150px;' onchange='selectJobType(this);'>
                    								<option value='' selected='selceted'>Select</option>
-                   								<?php 
+                   								<?php
                    									$r = $database->query(null,"SELECT * FROM JobType ORDER BY Type");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
@@ -232,7 +232,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    								?></select></th>
                    							<th id='Jobs'><select name='Job' style='width:300px;' onchange='selectJob(this);'>
                    								<option value=''>Select</option>
-                   								<?php 
+                   								<?php
                    									$r = $database->query(null,"SELECT * FROM Job ORDER BY Job.fDesc");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
@@ -242,7 +242,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                    								?></select></th>
                    							<th id='Units'><select name='Unit' style='width:150px;' onchange='selectCustomer(this);'>
                    								<option value=''>Select</option>
-                   								<?php 
+                   								<?php
                    									$r = $database->query(null,"SELECT * FROM Elev ORDER BY Elev.State");
                    									if($r){
                    										while($array = sqlsrv_fetch_array($r)){
@@ -267,26 +267,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    
+
     <!-- /#wrapper -->
 
 
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-        
+
 
     <?php require('bin/js/datatables.php');?>
-    
+
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 
     <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
@@ -296,14 +296,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.symbol.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.axislabels.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
-    
+
     <script>
     $(document).ready(function(){
     	finishLoadingPage();
     });
     </script>
     <script>
-      var availableLocations = [<?php 
+      var availableLocations = [<?php
         $r = $database->query(null,"SELECT Loc.Loc AS ID, Loc.Tag as Name FROM Loc ORDER BY Loc.Tag ASC");
         $Locations = array();
         if($r){while($Location = sqlsrv_fetch_array($r)){$Locations[$Location['ID']] = $Location['Name'];}}

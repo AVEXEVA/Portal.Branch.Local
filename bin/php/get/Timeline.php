@@ -22,17 +22,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
       $r = \singleton\database::getInstance( )->query(
     		null,
-        " SELECT Access_Table,
-                 User_Privilege,
-                 Group_Privilege,
-                 Other_Privilege
+        " SELECT Access,
+                 Owner,
+                 Group,
+                 Other
           FROM   Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
       $Privileges = array();
-      while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+      while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access']] = $array2;}
       $Privileged = FALSE;
-      if(isset($Privileges['Map']) && $Privileges['Map']['User_Privilege'] >= 4 && $Privileges['Map']['User_Privilege'] >= 4 && $Privileges['Map']['User_Privilege'] >= 4){$Privileged = TRUE;}
+      if(isset($Privileges['Map']) && $Privileges['Map']['Owner'] >= 4 && $Privileges['Map']['Owner'] >= 4 && $Privileges['Map']['Owner'] >= 4){$Privileged = TRUE;}
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {

@@ -35,10 +35,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Privileges
     $r = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -46,13 +46,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}
     $Privileged = FALSE;
     if( isset($Privileges['Unit']) 
-        && $Privileges['Unit']['User_Privilege'] >= 4 
-        && $Privileges['Unit']['Group_Privilege'] >= 4 
-        && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        && $Privileges['Unit']['Owner'] >= 4 
+        && $Privileges['Unit']['Group'] >= 4 
+        && $Privileges['Unit']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Unit']['Owner'] >= 4 && is_numeric($_GET['ID'])){
         $r = $database->query(  
             null,
             "   SELECT  Sum( Ticket.Count ) AS Count 

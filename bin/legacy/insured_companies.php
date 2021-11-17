@@ -26,12 +26,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		  WHERE   Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$Privileges = array();
-	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}}
     if(	!isset($Connection['ID'])
 	   	|| !isset($Privileges['Job'])
-	  		|| $Privileges['Job']['User_Privilege']  < 4
-	  		|| $Privileges['Job']['Group_Privilege'] < 4
-	  		|| $Privileges['Job']['Other_Privilege'] < 4){
+	  		|| $Privileges['Job']['Owner']  < 4
+	  		|| $Privileges['Job']['Group'] < 4
+	  		|| $Privileges['Job']['Other'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
       \singleton\database::getInstance( )->query(

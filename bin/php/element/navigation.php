@@ -12,7 +12,7 @@ $result = \singleton\database::getInstance( )->query(
                     FROM    Portal.dbo.Alert
                 );",
     array(
-        $_SESSION[ 'User' ]
+        $_SESSION[ 'Connection' ][ 'User' ]
     )
 );
 if( $result ){

@@ -1,17 +1,82 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(     !isset( $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
-    ||  !connection( 'Demo', \singleton\database::getInstance( ), $_SESSION[ 'Connection' ][ 'Branch_ID' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-        header( 'Location: https://beta.nouveauelevator.com/login.php' );
-        exit; }
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+    $result = \singleton\database::getInstance( )->query(
+        null,
+        " SELECT  Emp.fFirst  AS First_Name,
+                  Emp.Last    AS Last_Name,
+                  Emp.fFirst + ' ' + Emp.Last AS Name,
+                  Emp.Title AS Title,
+                  Emp.Field   AS Field
+          FROM  Emp
+          WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION[ 'Connection' ][ 'User' ]
+        )
+    );
+    $User   = sqlsrv_fetch_array( $result );
+    //Privileges
+    $Access = 0;
+    $Hex = 0;
+    $result = \singleton\database::getInstance( )->query(
+        'Portal',
+        "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner], 
+                    [Privilege].[Group], 
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+          FROM      dbo.[Privilege]
+          WHERE     Privilege.[User] = ?;",
+        array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+        )
+    );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+        
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+            dechex( $Privilege[ 'Owner' ] ),
+            dechex( $Privilege[ 'Group' ] ),
+            dechex( $Privilege[ 'Department' ] ),
+            dechex( $Privilege[ 'Database' ] ),
+            dechex( $Privilege[ 'Server' ] ),
+            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Token' ] ),
+            dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( !isset( $Connection[ 'ID' ] ) ){ return false; }
+    else {
 
-$_SESSION[ 'Cards' ] = isset( $_SESSION[ 'Cards' ] ) ? $_SESSION[ 'Cards' ] : array( );
+		$_SESSION[ 'Cards' ] = isset( $_SESSION[ 'Cards' ] ) ? $_SESSION[ 'Cards' ] : array( );
 
-if( isset( $_POST[ 'Card' ] ) ){
-	$_SESSION[ 'Cards' ][ $_POST[ 'Card' ] ] = isset( $_SESSION[ 'Cards' ][ $_POST[ 'Card' ] ] ) 
-		? !$_SESSION[ 'Cards' ][ $_POST[ 'Card' ] ] 
-		: 0;
-};?>
+		if( isset( $_POST[ 'Card' ] ) ){
+			$_SESSION[ 'Cards' ][ $_POST[ 'Card' ] ] = isset( $_SESSION[ 'Cards' ][ $_POST[ 'Card' ] ] ) 
+				? !$_SESSION[ 'Cards' ][ $_POST[ 'Card' ] ] 
+				: 0;
+		}
+	}
+}?>

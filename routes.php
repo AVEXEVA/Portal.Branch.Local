@@ -3,48 +3,56 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
     $result = \singleton\database::getInstance( )->query(
-        null,
-	    " SELECT  *
-			  FROM    Connection
-			  WHERE   Connection.Connector = ?
-			          AND Connection.Hash  = ?;",
-		array(
-			$_SESSION[ 'User' ],
-			$_SESSION[ 'Hash' ]
-		)
-	);
-    $Connection = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
-    $result = \singleton\database::getInstance( )->query(
-        null,
-	    	" SELECT  *,
-			          Emp.fFirst AS First_Name,
-				        Emp.Last   AS Last_Name
-			  FROM    Emp
-			  WHERE   Emp.ID = ?;",
-		array(
-			$_SESSION[ 'User' ]
-		)
-	);
-  	$User = sqlsrv_fetch_array( $result );
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
 	$result = \singleton\database::getInstance( )->query(
-      null,
-  		" 	SELECT *
-			FROM   Privilege
-			WHERE  Privilege.User_ID = ?;",
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
 		array(
-			$_SESSION[ 'User' ]
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+		            [Privilege].[Owner],
+		            [Privilege].[Group],
+		            [Privilege].[Other]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
 		)
 	);
 	$Privileges = array();
-	if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+	if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; } }
     if(		!isset( $Connection[ 'ID' ] )
 	   	|| 		!isset($Privileges[ 'Route' ] )
-	  		|| 	$Privileges[ 'Route' ][ 'User_Privilege' ]  < 4
-	  		|| 	$Privileges[ 'Route' ][ 'Group_Privilege' ] < 4
-	  	    || 	$Privileges[ 'Route' ][ 'Other_Privilege' ] < 4){
-				?><?php require('../404.html');?><?php }
+	  		|| 	$Privileges[ 'Route' ][ 'Owner' ]  < 4
+	  		|| 	$Privileges[ 'Route' ][ 'Group' ] < 4
+	  	    || 	$Privileges[ 'Route' ][ 'Other' ] < 4){
+				?><?php require('404.html');?><?php }
     else {
       \singleton\database::getInstance( )->query(
           null,

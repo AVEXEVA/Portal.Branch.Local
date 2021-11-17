@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         null,
       " SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
 ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r);
+    $Connection = sqlsrv_fetch_array($result);
     $User    = \singleton\database::getInstance( )->query(
         null,
       " SELECT Emp.*,
@@ -21,17 +21,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = \singleton\database::getInstance( )->query(
-        null,
-      " SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION['User']));
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Other]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+      )
+    );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
     if( isset($Privileges['User'])
         && $Privileges['User']['User_Privilege'] >= 4)
@@ -40,7 +43,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             $Privileged = True;}
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-        $r = \singleton\database::getInstance( )->query(
+        $result = \singleton\database::getInstance( )->query(
             null,
           " SELECT Emp.ID          AS ID,
                    Emp.fFirst      AS First_Name,
@@ -51,6 +54,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             WHERE  Field          = 1
                    AND Emp.Status = 0;");
         $data = array();
-        if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
+        if($result){while($array = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
         print json_encode(array('data'=>$data));	}
 }?>

@@ -34,10 +34,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Privileges
   $result = \singleton\database::getInstance()->query((
     null,
-    " SELECT  Privilege.Access_Table,
-              Privilege.User_Privilege,
-              Privilege.Group_Privilege,
-              Privilege.Other_Privilege
+    " SELECT  Privilege.Access,
+              Privilege.Owner,
+              Privilege.Group,
+              Privilege.Other
       FROM    Privilege
       WHERE   Privilege.User_ID = ?;",
     array(
@@ -45,12 +45,12 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     )
   );
   $Privileges = array();
-  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; } }
   if(     !isset( $Connection[ 'ID' ] )
       ||  !isset($Privileges[ 'Attendance' ])
-      ||  $Privileges[ 'Attendance' ][ 'User_Privilege' ]  < 4
-      ||  $Privileges[ 'Attendance' ][ 'Group_Privilege' ] < 4
-      ||  $Privileges[ 'Attendance' ][ 'Other_Privilege' ] < 4
+      ||  $Privileges[ 'Attendance' ][ 'Owner' ]  < 4
+      ||  $Privileges[ 'Attendance' ][ 'Group' ] < 4
+      ||  $Privileges[ 'Attendance' ][ 'Other' ] < 4
   ){
       ?><?php require( '../404.html' );?><?php
   } else {

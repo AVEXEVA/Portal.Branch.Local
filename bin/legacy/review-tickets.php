@@ -23,7 +23,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$Privileges = array();
-	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}}
     if(	!isset($My_Connection['ID']) ){require('../401.html'); }
     else {?>
 <style>

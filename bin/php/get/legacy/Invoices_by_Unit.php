@@ -33,10 +33,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Establish Priivleges
     $result = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -45,10 +45,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
     $Privileges = array( );
     $Privileged = False;
-    if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege;} }
+    if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege;} }
     if( isset( $Privileges[ 'Invoice' ], $Privileges[ 'Location' ] ) 
-        &&  $Privileges[ 'Invoice' ][ 'Other_Privilege' ]  >= 4
-	  	&&  $Privileges[ 'Location' ][ 'Other_Privilege' ] >= 4){
+        &&  $Privileges[ 'Invoice' ][ 'Other' ]  >= 4
+	  	&&  $Privileges[ 'Location' ][ 'Other' ] >= 4){
                 $Privileged = True;}
     if(     !isset( $Connection[ 'ID' ] )  
         ||  !is_numeric( $_GET[ 'ID' ] ) 

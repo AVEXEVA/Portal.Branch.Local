@@ -1,65 +1,117 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = $database->query(
-      null,
-      " SELECT  * 
-        FROM    Connection 
-        WHERE   Connection.Connector = ? 
-                AND Connection.Hash = ?;",
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
       array(
-        $_SESSION[ 'User' ],
-        $_SESSION[ 'Hash' ]
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
       )
     );
-    $Connection = sqlsrv_fetch_array( $result );
-    $result = $database->query(
-      null,
-      " SELECT  *, 
-                fFirst AS First_Name, 
-                Last as Last_Name 
-        FROM    Emp 
-        WHERE   ID = ?",
-      array(
-        $_SESSION[ 'User' ]
-      )
-    );
-    $User = sqlsrv_fetch_array( $result );
-    $result = $database->query(
-      null,
-      " SELECT  Access_Table, 
-                User_Privilege, 
-                Group_Privilege, 
-                Other_Privilege
-        FROM    Privilege
-        WHERE   User_ID = ?;",
-      array(
-        $_SESSION[ 'User' ]
-      )
-    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
     $Privileges = array();
-    $Privileged = false;
-    if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
-    if(     isset( $Privileges[ 'Time' ] ) 
-        &&  $Privileges[ 'Time' ][ 'User_Privilege' ] >= 4 
-        &&  $Privileges[ 'Time' ][ 'Group_Privilege' ] >= 4 
-        &&  $Privileges[ 'Time' ][ 'Other_Privilege' ] >= 4){ 
-              $Privileged = TRUE; }
-    if(     !isset($Connection['ID']) 
-        ||  !$Privileged){ ?><script>document.location.href='../login.php';</script><?php }
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		  $database->query(
-        null,
-        " INSERT INTO Activity( [User], [Date], [Page] ) 
-          VALUES( ?, ?, ? );",
-        array(
-          $_SESSION[ 'User' ],
-          date( 'Y-m-d H:i:s' ), 
-          'scheduler.php'
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'job.php'
+        )
+      );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Time' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Time' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'schedule.php'
         )
       );
 ?><!DOCTYPE html>
@@ -153,7 +205,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                       while($i <= cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'))){?><th><?php echo $i > 10 ? date("D",strtotime(date("Y-m-{$i} 00:00:00.000"))) : date("D",strtotime(date("Y-m-0{$i} 00:00:00.000")));?></th><?php $i++;}?></tr></thead>
                     <tbody style=''>
                       <?php
-                      
+
                       if(isset($_GET['Supervisor'])  && strlen($_GET['Supervisor']) > 0) {
                         $result = $database->query(
                           null,
@@ -175,7 +227,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         $_GET[ 'End' ]   = date( 'Y-m-d H:i:s', strtotime( $_GET[ 'End' ] ) );
                         $result = $database->query(
                           null,
-                          " SELECT    Top 25 
+                          " SELECT    Top 25
                                       Emp.ID AS ID,
                                       Emp.fWork AS fWork,
                                       Emp.fFirst,
@@ -186,10 +238,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         );
                       }
                       $data = array( );
-                      $sQuery = " SELECT    Attendance.[Start], 
-                                            Attendance.[End] 
-                                  FROM      Attendance 
-                                  WHERE     Attendance.[User] = ? 
+                      $sQuery = " SELECT    Attendance.[Start],
+                                            Attendance.[End]
+                                  FROM      Attendance
+                                  WHERE     Attendance.[User] = ?
                                   ORDER BY  Attendance.[ID] DESC;";
                       if( $result ){ while($row = sqlsrv_fetch_array( $result ) ){
                         $r2 = $database->query(null, $sQuery, array( $row[ 'ID' ]));
@@ -452,9 +504,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         </div>
     </div>
 	</div>
-    
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
     <link href="bin/libraries/fixedHeader.css" rel="stylesheet" type="text/css" media="screen">
     <script src="bin/libraries/fixedHeader.js"></script>
     <script>

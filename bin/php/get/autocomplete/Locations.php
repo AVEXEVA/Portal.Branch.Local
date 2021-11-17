@@ -32,10 +32,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   $User = sqlsrv_fetch_array( $result );
   $result = $database->query(
       null,
-      "   SELECT  Privilege.Access_Table,
-                  Privilege.User_Privilege,
-                  Privilege.Group_Privilege,
-                  Privilege.Other_Privilege
+      "   SELECT  Privilege.Access,
+                  Privilege.Owner,
+                  Privilege.Group,
+                  Privilege.Other
           FROM    Privilege
           WHERE   Privilege.User_ID = ?;",
       array( 
@@ -43,10 +43,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       ) 
   );
   $Privileges = array();
-  while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+  while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
   $Privileged = False;
   if( isset( $Privileges[ 'Location' ] )
-      && $Privileges[ 'Location' ][ 'User_Privilege' ]  >= 4
+      && $Privileges[ 'Location' ][ 'Owner' ]  >= 4
   ){ $Privileged = True; }
   if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
   else {

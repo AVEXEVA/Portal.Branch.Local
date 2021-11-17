@@ -3,51 +3,55 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-	//Connection
-    $result = \singleton\database::getInstance( )->query(
-    	null,
-    	"	SELECT 	*
-    		FROM 	Connection
-    		WHERE 		Connector = ?
-    				AND Hash = ?;",
-    	array(
-    		$_SESSION['User'],
-    		$_SESSION['Hash']
-    	)
-    );
-    $Connection = sqlsrv_fetch_array($result);
-    //User
-	$result = \singleton\database::getInstance( )->query(
-		null,
-		"	SELECT 	Emp.fFirst 	AS First_Name,
-					Emp.Last 	AS Last_Name
-			FROM 	Emp
-			WHERE 	Emp.ID = ?;",
-		array(
-			$_SESSION[ 'User' ]
-		)
-	);
-	$User   = sqlsrv_fetch_array( $result );
-	//Privileges
-	$result = \singleton\database::getInstance( )->query(null,
-		" 	SELECT 	Privilege.Access_Table,
-					Privilege.User_Privilege,
-					Privilege.Group_Privilege,
-					Privilege.Other_Privilege
-			FROM   	Privilege
-			WHERE  	Privilege.User_ID = ?;",
-		array(
-			$_SESSION[ 'User' ]
-		)
-	);
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    " SELECT  [Connection].[ID]
+      FROM    dbo.[Connection]
+      WHERE       [Connection].[User] = ?
+              AND [Connection].[Hash] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ],
+      $_SESSION[ 'Connection' ][ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array($result);
+  //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Other]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
 	$Privileges = array();
 	$Privileged = false;
-	while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+	while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
 	if(		isset($Privileges['Customer'])
-		&& 	$Privileges[ 'Customer' ][ 'User_Privilege' ]  >= 4
-		&& 	$Privileges[ 'Customer' ][ 'Group_Privilege' ] >= 4
-		&& 	$Privileges[ 'Customer' ][ 'Other_Privilege' ] >= 4){
+		&& 	$Privileges[ 'Customer' ][ 'Owner' ]  >= 4
+		&& 	$Privileges[ 'Customer' ][ 'Group' ] >= 4
+		&& 	$Privileges[ 'Customer' ][ 'Other' ] >= 4){
 				$Privileged = true;}
     if(		!isset($Connection['ID'])
     	|| !$Privileged
@@ -57,7 +61,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     		null,
     		"	INSERT INTO Activity( [User], [Date], [Page] ) VALUES( ?, ?, ? );",
     		array(
-    			$_SESSION[ 'User' ],
+    			$_SESSION[ 'Connection' ][ 'User' ],
     			date("Y-m-d H:i:s"),
     			"customer.php"
     		)
@@ -147,7 +151,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         		$result = \singleton\database::getInstance( )->query(
         			null,
         			"	DECLARE @MAXID INT;
-        				SET @MAXID = ( SELECT Max( ID ) FROM Rol );
+        				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
         				INSERT INTO Rol(
     						ID,
         					Type,
@@ -176,13 +180,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         				$Customer[ 'Geofence' ]
         			)
         		);
+
         		sqlsrv_next_result( $result );
         		$Customer[ 'Rolodex' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
         		$result = \singleton\database::getInstance( )->query(
         			null,
         			"	DECLARE @MAXID INT;
-        				SET @MAXID = ( SELECT Max( ID ) FROM Owner );
+        				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Owner ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Owner ) END ;
         				INSERT INTO Owner(
         					ID,
         					Status,
@@ -223,6 +228,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         				$Customer[ 'Internet' ]
         			)
         		);
+
         		sqlsrv_next_result( $result );
         		$Customer[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
@@ -293,7 +299,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         	<div class='card card-primary'>
         		<div class='card-heading'>
         			<div class='row g-0 px-3 py-2'>
-        				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) );?>'>Customer</a>: <span><?php echo is_null( $Customer[ 'ID' ] ) ? 'New' : $Customer[ 'Name' ];?></span></h5></div>
+        				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='customers.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Customer' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) ) : null;?>'>Customer</a>: <span><?php echo is_null( $Customer[ 'ID' ] ) ? 'New' : $Customer[ 'Name' ];?></span></h5></div>
         				<div class='col-2'></div>
         				<div class='col-2'>
         					<div class='row g-0'>
@@ -347,14 +353,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						            </script>
 							</div><?php
 						}?>
-						<div class='card card-primary my-3'>
+						<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
 							</div>
-						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
 						 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
@@ -366,7 +372,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										<option value=''>Select</option>
 										<option value='General' <?php echo $Customer[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
 										<option value='Bank' <?php echo $Customer[ 'Type' ] == 'Bank' ? 'selected' : null;?>>Bank</option>
-										<option value='Churches' <?php echo $Customer[ 'Type' ] == 'Churches' ? 'selected' : null;?>>General</option>
+										<option value='Churches' <?php echo $Customer[ 'Type' ] == 'Churches' ? 'selected' : null;?>>Churches</option>
 										<option value='Commercial' <?php echo $Customer[ 'Type' ] == 'Commercial' ? 'selected' : null;?>>Commercial</option>
 										<option value='Hospitals' <?php echo $Customer[ 'Type' ] == 'Hospitals' ? 'selected' : null;?>>General</option>
 										<option value='Property Manage' <?php echo $Customer[ 'Type' ] == 'Property Manage' ? 'selected' : null;?>>Property Manage</option>
@@ -474,17 +480,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
 									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
-
-							</form></div>
-						</div>
-						<div class='card card-primary my-3'>
+							</div>
+                            <div class='card-footer'>
+                                <div class='row'>
+                                    <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                                </div>
+                            </div>
+						</form></div>
+						<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Portal</span></h5></div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
 							</div>
-							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Portal' ] ) && $_SESSION[ 'Cards' ][ 'Portal' ] == 0 ? "style='display:none;'" : null;?>><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Portal' ] ) && $_SESSION[ 'Cards' ][ 'Portal' ] == 0 ? "style='display:none;'" : null;?>>
 						 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
 						 		<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Privilege(1);?> Login:</div>
@@ -519,13 +529,144 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						 				<option value='1' <?php echo $Customer[ 'Geofence' ] == 1 ? 'selected' : null;?>>Enabled</option>
 						 			</select></div>
 						 		</div>
-							</form></div>
-						</div>
+							</div>
+              <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
+						</form></div>
+            <?php
+            $r = \singleton\database::getInstance( )->query(
+                null,
+                "   SELECT  Count(TicketD.ID) AS Count,
+                            Substring(TicketD.DescRes, 18, PATINDEX('%-----Notes-----%', TicketD.DescRes ) - 18 ) AS Codes
+                    FROM    [TicketD]
+                            LEFT JOIN Job ON TicketD.Job = Job.ID
+                    WHERE   TicketD.DescRes LIKE '%-----Notes-----%'
+                            AND TicketD.EDate >= ?
+                            AND Job.Owner = ?
+                    GROUP BY TicketD.DescRes
+                    ORDER BY Count( TicketD.ID ) DESC;",
+                array(
+                    date( 'Y-m-d H:i:s', strtotime( '-1 year' ) ),
+                    $Customer[ 'ID' ]
+                )
+            );
+            $tResolutionCodes = array( );
+            $total = 0;
+            while( $rResolutionCodes = sqlsrv_fetch_array( $r ) ){
+                if( strpos( $rResolutionCodes['Codes'],  "\n" ) !== false ){
+                    $eResolutionCodes = explode("\n", $rResolutionCodes[ 'Codes' ] );
+                    while( ( $eResolutionCode = array_pop( $eResolutionCodes ) ) !== null ){
+                        $eResolutionCode = trim( $eResolutionCode );
+                        $tResolutionCodes[ $eResolutionCode ] = isset( $tResolutionCodes[ $eResolutionCode ] ) ? $tResolutionCodes[ $eResolutionCode ] + $rResolutionCodes[ 'Count' ] : $rResolutionCodes[ 'Count' ];
+                        $total += $rResolutionCodes[ 'Count' ];
+                    }
+                } else {
+                    $tResolutionCodes[ trim( $rResolutionCodes[ 'Codes' ] ) ] = isset( $tResolutionCodes[ trim( $rResolutionCodes[ 'Codes' ] ) ] ) ? $tResolutionCodes[ trim( $rResolutionCodes ['Codes' ] ) ] + $rResolutionCodes[ 'Count' ] : $rResolutionCodes ['Count' ];
+                    $total += $rResolutionCodes[ 'Count' ];
+                }
+            }
+            $ttResolutionCodes = array();
+            foreach( $tResolutionCodes as $key=>$value ){ $ttResolutionCodes[ explode( ' - ', $key )[ 0 ] ] = $value; }
+            ?><div class='card card-primary my-3'>
+                <div class='card-heading'>
+                    <div class='row g-0 px-3 py-2'>
+                        <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Codes</span></h5></div>
+                        <div class='col-2'>&nbsp;</div>
+                    </div>
+                </div>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Codes' ] ) && $_SESSION[ 'Cards' ][ 'Codes' ] == 0 || true ? "style='display:none;'" : null;?>><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+                    <div class='row'>
+                        <div id='ticket-resolution-codes-pie-chart' class='col-xs-12'><div id='ticketResolutionCodes-flot-pie' style='width:100%;height:350px;'>&nbsp;</div></div>
+                        <script>
+                            function resize_ticketResolutionCodes(){
+                                $('#ticketResolutionCodes-flot-pie').width( 'width', $('#ticketTypes-flot-pie').width( ) + 'px' );
+                            }
+                            function plotResolutionCodes(){
+                                $.plot(
+                                    $('#ticketResolutionCodes-flot-pie'),
+                                    [
+                                        <?php
+                                            $pResolutionCodes = array( );
+                                            if( count( $ttResolutionCodes ) > 0 ){ foreach( $ttResolutionCodes as $key=>$value ){
+                                                $pResolutionCodes[ ] = "{ label : \"" . $key . "\", data : " . $value . ", color: '#" . str_pad(dechex(rand(0x000000, 0x333333)), 6, 0, STR_PAD_LEFT) . "' }";
+                                            } }
+                                            echo implode( ', ', $pResolutionCodes );
+                                        ?>
+                                    ],{
+                                        series: {
+                                            pie: {
+                                                show: true
+                                            }
+                                        },
+                                        legend : {
+                                            show : false
+                                        },
+                                        grid: {
+                                            hoverable: true
+                                        },
+                                        tooltip : true,
+                                        tooltipOpts: {
+                                            cssClass: "flotTip",
+                                            content: "%p.0%, %s",
+                                            shifts: {
+                                                x: 55,
+                                                y: 0
+                                            },
+                                            defaultTheme: false
+                                        }
+                                    }
+                                );
+                            }
+                            $(document).ready( function() {
+                                resize_ticketResolutionCodes( );
+                                plotResolutionCodes();
+                            });
+                            $(window).resize( function(){
+                                resize_ticketResolutionCodes( )
+                                plotResolutionCodes( );
+                            });
+                        </script>
+                        <div id='ticket-resolution-codes-table' class='col-xs-12 action-rows' style='display:none;'>
+                            <div class='row'>
+                                <div class='col-xs-6'>Type</div>
+                                <div class='col-xs-3'>Count</div>
+                                <div class='col-xs-3'>Percent</div>
+                            </div>
+                            <?php
+                                foreach( $tResolutionCodes as $key=>$value ){
+                                    if( $key == '' ){ continue; }
+                                    ?><div class='row'>
+                                        <div class='col-xs-6'><?php echo $key;?></div>
+                                        <div class='col-xs-3'><?php echo $value;?></div>
+                                        <div class='col-xs-3'><?php echo round( $value / $total * 100, 2 ) . '%';?></div>
+                                    </div><?php
+                                }
+                            ?><script>
+                            function hoverType( level ){
+                              document.location.href='dashboard.php?Location=<?php
+                                echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;
+                              ?>&Unit=<?php
+                                echo isset($_GET['Unit']) ? $_GET['Unit'] : null;
+                              ?>&Assigned=<?php
+                                echo isset($_GET['Assigned']) ? $_GET['Assigned'] : null;
+                              ?>&Level=' + level;
+                            }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <div class='card-footer'><div class='row'><div class='col-xs-12'>&nbsp;</div></div></div>
+            </div>
 						<div class='card card-primary my-3'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><span>Locations</span></h5></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='locations.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+									<div class='col-2'>
+                    <button class='h-100 w-100' type='button' onClick="document.location.href='locations.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button>
+                  </div>
 								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Locations' ] ) && $_SESSION[ 'Cards' ][ 'Locations' ] == 0 ? "style='display:none;'" : null;?>>
@@ -533,7 +674,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									$result = \singleton\database::getInstance( )->query(
 										null,
 										"	SELECT 		Count( Location.ID ) AS Count,
-														Location.Maint AS Maintenance
+														    Location.Maint AS Maintenance
 											FROM   		Loc AS Location
 											WHERE  		Location.Owner = ?
 											GROUP BY 	Location.Maint
@@ -553,7 +694,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'>Yes</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
+								    <div class='col-6'><input class='form-control' type='text' readonly name='Locations' value='<?php
 										echo isset( $Locations[ 1 ] ) ? $Locations[ 1 ] : 0;
 									?>' /></div>
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Customer[ 'Name' ];?>&Type=Elevator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
@@ -561,7 +702,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'>No</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
+								    <div class='col-6'><input class='form-control' type='text' readonly name='Locations' value='<?php
 										echo isset( $Locations[ 0 ] ) ? $Locations[ 0 ] : 0;
 									?>' /></div>
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Customer[ 'Name' ];?>&Type=Elevator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
@@ -706,7 +847,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+									<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
@@ -964,7 +1105,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								    <div class='col-6'>&nbsp;</div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Owner'] >= 4) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
@@ -981,7 +1122,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
 								<?php }?>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Owner'] >= 4) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
@@ -1010,7 +1151,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
-								<?php if(isset($Privileges['Collection']) && $Privileges['Collection']['User_Privilege'] >= 4) {?>
+								<?php if(isset($Privileges['Collection']) && $Privileges['Collection']['Owner'] >= 4) {?>
 								<div class='row g-0'>
 								    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
 								    <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php

@@ -35,10 +35,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Privileges
     $r = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -46,13 +46,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}
     $Privileged = FALSE;
     if( isset($Privileges['Location']) 
-        && $Privileges['Location']['User_Privilege'] >= 4 
-        && $Privileges['Location']['Group_Privilege'] >= 4 
-        && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        && $Privileges['Location']['Owner'] >= 4 
+        && $Privileges['Location']['Group'] >= 4 
+        && $Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Location']['Owner'] >= 4 && is_numeric($_GET['ID'])){
         $r = $database->query(  
             null,
             "   SELECT  Count( Ticket.ID ) AS Count 
@@ -171,14 +171,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				<div class='panel-body '>
 					<div class='row' style='font-size:16px;padding:5px;'>
 						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
-                        <div class='col-xs-8'><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
+                        <div class='col-xs-8'><?php if($My_Privileges['Route']['Other'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
 						</div>
                         <?php if(isset($Location['Route_Mechanic_Phone_Number']) && strlen($Location['Route_Mechanic_Phone_Number']) > 0){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Phone();?> Phone:</div>
 						<div class='col-xs-8'><?php echo $Location['Route_Mechanic_Phone_Number'];?></div><?php }?>
 						<?php if(strlen($Location['Route_Mechanic_Email']) > 0){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email();?> Email:</div>
                         <div class='col-xs-8'><?php echo $Location['Route_Mechanic_Email'];?></div><?php }?>
 						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Division();?> Division:</div>
-                        <div class='col-xs-8'><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
+                        <div class='col-xs-8'><?php if($My_Privileges['Ticket']['Other'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other'] >= 4){?></a><?php }?></div>
 					</div>
 				</div>
                 <!--<div class='panel-heading'><h4>Monthly Maintenance Due</h4></div>-->

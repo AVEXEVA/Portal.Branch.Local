@@ -23,19 +23,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
     $r = \singleton\database::getInstance( )->query(
         null,
-      " SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
+      " SELECT Privilege.Access,
+               Privilege.Owner,
+               Privilege.Group,
+               Privilege.Other
         FROM   Privilege
         WHERE  Privilege.User_ID = ?;",
     array($_SESSION['User']));
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($Privileges['Legal'])
         && (
-				$Privileges['Legal']['Other_Privilege'] >= 4
+				$Privileges['Legal']['Other'] >= 4
 		)
 	 ){
             $Privileged = True;}

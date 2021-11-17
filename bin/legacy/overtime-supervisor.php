@@ -23,12 +23,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
+	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
     if(	!isset($My_Connection['ID'])
 	   	|| !isset($My_Privileges['Job'])
-	  		|| $My_Privileges['Job']['User_Privilege']  < 4
-	  		|| $My_Privileges['Job']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Job']['Other_Privilege'] < 4){
+	  		|| $My_Privileges['Job']['Owner']  < 4
+	  		|| $My_Privileges['Job']['Group'] < 4
+	  	    || $My_Privileges['Job']['Other'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
 		$database->query(null,"

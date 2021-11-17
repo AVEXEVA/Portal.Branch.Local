@@ -35,10 +35,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Privileges
     $r = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -46,13 +46,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}
     $Privileged = FALSE;
     if( isset($Privileges['Location']) 
-        && $Privileges['Location']['User_Privilege'] >= 4 
-        && $Privileges['Location']['Group_Privilege'] >= 4 
-        && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        && $Privileges['Location']['Owner'] >= 4 
+        && $Privileges['Location']['Group'] >= 4 
+        && $Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Location']['Owner'] >= 4 && is_numeric($_GET['ID'])){
         $r = $database->query(  
             null,
             "   SELECT  Count( Ticket.ID ) AS Count 
@@ -170,7 +170,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Name:</div>
             <div class='col-xs-9'><?php
-                echo $Privileges['Customer']['Other_Privilege'] >= 4
+                echo $Privileges['Customer']['Other'] >= 4
                     ?   "<div class='row'><div class='col-xs-9'><input disabled type='text' value='" . proper( $Location['Customer_Name'] ) . "' /></div><div class='col-xs-3'><button onClick=\"document.location.href='division.php?ID=" . $Location['Customer_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
                     :   proper( $Location['Customer_Name'] );
             ?></div>
@@ -229,7 +229,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'> 
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
             <div class='col-xs-9'><?php  
-                echo $Privileges['Route']['Other_Privilege'] >= 4 || $User[ 'ID' ] == $Location['Route_Mechanic_ID'] 
+                echo $Privileges['Route']['Other'] >= 4 || $User[ 'ID' ] == $Location['Route_Mechanic_ID'] 
                     ?   "<div class='row'><div class='col-xs-9'><input disabled type='text' value='" . proper( $Location['Route_Mechanic_First_Name'] . ' ' . $Location['Route_Mechanic_Last_Name'] ) . "' /></div><div class='col-xs-3'><button onClick=\"document.location.href='route.php?ID=" . $Location['Route_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
                     :   proper( $Location['Route_Mechanic_First_Name'] . ' ' . $Location['Route_Mechanic_Last_Name'] );
             ?></div>
@@ -241,7 +241,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row'>
             <div class='col-xs-3'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
             <div class='col-xs-9'><?php 
-                echo $Privileges['Division']['Other_Privilege'] >= 4
+                echo $Privileges['Division']['Other'] >= 4
                     ?   "<div class='row'><div class='col-xs-9'><input disabled type='text' value='" . proper( $Location['Division'] ) . "' /></div><div class='col-xs-3'><button onClick=\"document.location.href='division.php?ID=" . $Location['Division_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
                     :   "<input disabled type='text' name='Division' value='" . proper( $Location['Division'] ) . "' />";?></div>
         </div>
@@ -314,7 +314,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ?></div>
         </div>
     </div>
-    <?php if(isset($Privileges['Finances']) && $Privileges['Finances']['Other_Privilege'] >= 4){?>
+    <?php if(isset($Privileges['Finances']) && $Privileges['Finances']['Other'] >= 4){?>
     <div class='panel-heading'><h4><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Sales</h4></div>
     <div class='panel-body'>
         <div class='row'>

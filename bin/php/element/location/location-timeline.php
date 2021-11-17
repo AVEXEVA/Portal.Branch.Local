@@ -11,15 +11,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $My_User = sqlsrv_fetch_array($My_User);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
         $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
         $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
         $Privileged = FALSE;
-        if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4 && $My_Privileges['Location']['Group_Privilege'] >= 4 && $My_Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-        elseif($My_Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Owner'] >= 4 && $My_Privileges['Location']['Group'] >= 4 && $My_Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
+        elseif($My_Privileges['Location']['Owner'] >= 4 && is_numeric($_GET['ID'])){
             $r = $database->query(  null,"
 			SELECT 	*
 			FROM 	nei.dbo.TicketO
@@ -222,7 +222,7 @@ if($SQL_Created_Estimates){while($Estimate = sqlsrv_fetch_array($SQL_Created_Est
 	if(!isset($Timeline[date('Y-m-d',strtotime($Estimate['Date']))])){$Timeline[date('Y-m-d',strtotime($Estimate['Date']))] = array();}
 	$Timeline[date('Y-m-d',strtotime($Estimate['Date']))][] = $Estimate;
 }}
-if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privilege'] >= 4){
+if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other'] >= 4){
 	$SQL_Paid_Invoices = $database->query(null,"
 		SELECT Trans.ID      AS ID,
 			   Trans.fDate   AS Date,
@@ -363,7 +363,7 @@ if($SQL_Contract_Starts){while($Contract = sqlsrv_fetch_array($SQL_Contract_Star
 		$Date->add($oneMonthDateInterval);
 	}
 }}
-if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other_Privilege'] >= 4){
+if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Other'] >= 4){
 	$SQL_Overdue_Invoices = $database->query(null,"
 		SELECT OpenAR.Ref AS ID,
 			   OpenAR.Due AS Date,

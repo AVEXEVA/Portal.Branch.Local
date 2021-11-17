@@ -3,51 +3,117 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
-    $result = $database->query(
-    	null,
-    	"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",
-    	array(
-    		$_SESSION[ 'User' ],
-    		$_SESSION[ 'Hash' ]
-    	)
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
     $Connection = sqlsrv_fetch_array($result);
-    $User = $database->query(
-    	null,
-    	"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",
-    	array(
-    		$_SESSION[ 'User' ]
-    	)
-    );
-    $User = sqlsrv_fetch_array($User);
-    $result = $database->query(
-    	null,
-    	"	SELECT 	  Access_Table,
-        			    User_Privilege,
-        			    Group_Privilege,
-        			    Other_Privilege
-        	FROM   	Privilege
-        	WHERE  	User_ID = ?;",
-        array(
-        	$_SESSION[ 'User' ]
-        )
-    );
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = FALSE;
-    if(isset($Privileges['Executive'])
-        && $Privileges[ 'Executive' ][ 'User_Privilege' ] >= 4
-        && $Privileges[ 'Executive' ][ 'Group_Privilege' ] >= 4
-        && $Privileges[ 'Executive' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
-    if(!isset($Connection[ 'ID' ])  || !$Privileged){
-      /*?><html><head><script>document.location.href="../login.php?Forward=location<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php */ }
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-      \singleton\database::getInstance( )->query(null,
-        " INSERT INTO Activity([User], [Date], [Page])
-  			  VALUES(?,?,?)
-  		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "territory.php?ID=" . $_GET['ID']));
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'job.php'
+        )
+      );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Executive' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Executive' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'territory.php'
+        )
+      );
         $r = \singleton\database::getInstance( )->query(null,
             "	SELECT 	TOP 1
                     	Terr.ID   AS Territory_ID,
@@ -77,27 +143,27 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 					<div class='card-heading'><h4>Territory: <?php echo $Territroy[ 'Name' ];?></h4></div>
 					<div class='card-body bg-dark'>
 						<div class='row' style="margin: 0">
-							<?php if(isset($Privileges['Location']) && $Privileges['Location']['User_Privilege'] >= 4){
+							<?php if(isset($Privileges['Location']) && $Privileges['Location']['Owner'] >= 4){
 							?><div tab='information' class='Home-Screen-Option col-lg-1 col-md-2 col-' style="margin: 0" onClick="document.location.href='information.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon' style="margin: 0"><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
 									<div class ='nav-text' style="margin: 0">Information</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4 || $Privileges['Job']['Group_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Job']) && $Privileges['Job']['Owner'] >= 4 || $Privileges['Job']['Group'] >= 4 && false){
 							?><div tab='code' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='violations.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 									<div class ='nav-text'>Violations</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Collection']) && $Privileges['Collection']['User_Privilege'] >= 4 ){
+							<?php if(isset($Privileges['Collection']) && $Privileges['Collection']['Owner'] >= 4 ){
 							?><div tab='collections' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='collections.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
 									<div class ='nav-text'>Collections</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Contact']) && $Privileges['Contact']['User_Privilege'] >= 4 && false ) {
+							<?php if(isset($Privileges['Contact']) && $Privileges['Contact']['Owner'] >= 4 && false ) {
 							?><div tab='contacts' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='contacts.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Info(3);?></div>
 									<div class ='nav-text'>Contacts</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['User_Privilege'] >= 4){
+							<?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Owner'] >= 4){
 							?><div tab='customer' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='customers.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 									<div class ='nav-text'>Customers</div>
@@ -107,27 +173,27 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Activities(3);?></div>
 									<div class ='nav-text'>Feed</div>
 							</div><?php } ?>
-							<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['User_Privilege'] >= 4 && false ){
+							<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Owner'] >= 4 && false ){
 							?><div tab='invoices' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='invoices.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
 									<div class ='nav-text'>Invoices</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4 && false ){
+							<?php if(isset($Privileges['Job']) && $Privileges['Job']['Owner'] >= 4 && false ){
 							?><div tab='jobs' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='jobs.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 									<div class ='nav-text'>Jobs</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Location']) && $Privileges['Location']['User_Privilege'] >= 4){
+							<?php if(isset($Privileges['Location']) && $Privileges['Location']['Owner'] >= 4){
 							?><div tab='locations' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='locations.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
 									<div class ='nav-text'>Locations</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Legal']) && $Privileges['Legal']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Legal']) && $Privileges['Legal']['Owner'] >= 4 && false){
 							?><div tab='legal' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='legal.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Legal(3);?></div>
 									<div class ='nav-text'>Legal</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Job']) && $Privileges['Job']['Owner'] >= 4 && false){
 							?><div tab='maintenance' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="someFunction(this,'territory-maintenance.php?ID=<?php echo $_GET['ID'];?>');">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Maintenance(3);?></div>
 									<div class ='nav-text'>Maintenance</div>
@@ -137,42 +203,42 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
 									<div class ='nav-text'>Map</div>
 							</div><?php } ?>
-							<?php if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4 && false ){
+							<?php if(isset($Privileges['Job']) && $Privileges['Job']['Owner'] >= 4 && false ){
 							?><div tab='modernization' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="someFunction(this,'territory-modernization.php?ID=<?php echo $_GET['ID'];?>');">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Modernization(3);?></div>
 									<div class ='nav-text'>Modernization</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Finances']) && $Privileges['Finances']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Finances']) && $Privileges['Finances']['Owner'] >= 4 && false){
 							?><div tab='PNL' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='pnl.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 									<div class ='nav-text'>P&L</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Proposal']) && $Privileges['Proposal']['User_Privilege'] >= 4 && false ){
+							<?php if(isset($Privileges['Proposal']) && $Privileges['Proposal']['Owner'] >= 4 && false ){
 							?><div tab='proposals' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='proposals.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
 									<div class ='nav-text'>Proposals</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Service']) && $Privileges['Service']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Service']) && $Privileges['Service']['Owner'] >= 4 && false){
 							?><div tab='service' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='service.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Phone(3);?></div>
 									<div class ='nav-text'>Service</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Job']) && $Privileges['Job']['Owner'] >= 4 && false){
 							?><div tab='testing' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='testing.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Testing(3);?></div>
 									<div class ='nav-text'>Testing</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Time']) && $Privileges['Time']['Group_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Time']) && $Privileges['Time']['Group'] >= 4 && false){
 							?><div tab='timeline' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='timeline.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->History(3);?></div>
 									<div class ='nav-text'>Timeline</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Unit']) && $Privileges['Unit']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Unit']) && $Privileges['Unit']['Owner'] >= 4 && false){
 							?><div tab='units' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='units.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 									<div class ='nav-text'>Units</div>
 							</div><?php }?>
-							<?php if(isset($Privileges['Violation']) && $Privileges['Violation']['User_Privilege'] >= 4 && false){
+							<?php if(isset($Privileges['Violation']) && $Privileges['Violation']['Owner'] >= 4 && false){
 							?><div tab='violations' class='Home-Screen-Option col-lg-1 col-md-2 col-' onClick="document.location.href='violations.php?Territory=<?php echo $Territory[ 'Territory_Name' ];?>'">
 									<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 									<div class ='nav-text'>Violations</div>

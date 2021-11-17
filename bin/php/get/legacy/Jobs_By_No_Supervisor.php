@@ -20,28 +20,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
-               Privilege.Other_Privilege
+        SELECT Privilege.Access, 
+               Privilege.Owner, 
+               Privilege.Group, 
+               Privilege.Other
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Job']) 
         && (
-				$My_Privileges['Job']['Other_Privilege'] >= 4
+				$My_Privileges['Job']['Other'] >= 4
 			||	$My_Privileges['Job']['Group_Privlege'] >= 4
-			||  $My_Privileges['Job']['User_Privilege'] >= 4
+			||  $My_Privileges['Job']['Owner'] >= 4
 		)
 	 ){
             $Privileged = True;}
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
         $data = array();
-        if($My_Privileges['User_Privilege'] >= 4 && $My_Privileges['Group_Privilege'] >= 4 && $My_Privileges['Other_Privilege'] >= 4){
+        if($My_Privileges['Owner'] >= 4 && $My_Privileges['Group'] >= 4 && $My_Privileges['Other'] >= 4){
 			$r = $database->query(null,"
 				SELECT Job.ID                  AS  ID,
                        Job.fDesc               AS  Name,
@@ -70,7 +70,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
         } else {
             $SQL_Jobs = array();
-            if($My_Privileges['Group_Privilege'] >= 4){
+            if($My_Privileges['Group'] >= 4){
                 $r = $database->query(null,"
                     SELECT Job AS Job
                     FROM   TicketO
@@ -98,7 +98,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 }
 
             }
-            if($My_Privileges['User_Privilege'] >= 4){
+            if($My_Privileges['Owner'] >= 4){
                 $r = $database->query(null,"
                     SELECT Job.ID AS Job
                     FROM Job

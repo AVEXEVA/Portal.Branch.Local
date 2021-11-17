@@ -17,19 +17,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
+	$r = $database->query('Portal',"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
+	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
     if(	!isset($My_Connection['ID'])
 	   	|| !isset($My_Privileges['Admin'])
-	  		|| $My_Privileges['Admin']['User_Privilege']  < 4
-	  		|| $My_Privileges['Admin']['Group_Privilege'] < 4
-	  		|| $My_Privileges['Admin']['Other_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+	  		|| $My_Privileges['Admin']['Owner']  < 4
+	  		|| $My_Privileges['Admin']['Group'] < 4
+	  		|| $My_Privileges['Admin']['Other'] < 4){
+				?><?php require('404.html');?><?php }
     else {
 		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
@@ -132,15 +132,15 @@ if(isMobile()){?>
 			</div>
 		</div>
 	</div>
-    
-    
+
+
     <?php require('bin/js/datatables.php');?>
-    
-    
-    
+
+
+
 
     <!-- Custom Date Filters-->
-    
+
     <script>
         var Editor_Customers = new $.fn.dataTable.Editor({
 			ajax: "php/post/Customer.php?ID=<?php echo $_GET['ID'];?>",

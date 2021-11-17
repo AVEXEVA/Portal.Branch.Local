@@ -23,11 +23,11 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     );
     $User = sqlsrv_fetch_array($User);
     $result = \singleton\database::getInstance( )->query(
-    	null,
-    	"	SELECT 	  Access_Table,
-        			    User_Privilege,
-        			    Group_Privilege,
-        			    Other_Privilege
+    	'Portal',
+    	"	SELECT 	  Access,
+        			    Owner,
+        			    Group,
+        			    Other
         	FROM   	Privilege
         	WHERE  	User_ID = ?;",
         array(
@@ -35,15 +35,15 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         )
     );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
     if(isset($Privileges[ 'Lead' ] )
-        && $Privileges[ 'Lead' ][ 'User_Privilege' ] >= 4
-        && $Privileges[ 'Lead' ][ 'Group_Privilege' ] >= 4
-        && $Privileges[ 'Lead' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
-    if(		!isset($Connection[ 'ID' ])  
+        && $Privileges[ 'Lead' ][ 'Owner' ] >= 4
+        && $Privileges[ 'Lead' ][ 'Group' ] >= 4
+        && $Privileges[ 'Lead' ][ 'Other' ] >= 4){$Privileged = TRUE;}
+    if(		!isset($Connection[ 'ID' ])
     	|| 	!$Privileged
-    ){ require( '401.php' ); } 
+    ){ require( '401.php' ); }
     else {
     	$result = \singleton\database::getInstance( )->query(
     		null,
@@ -59,8 +59,8 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 					 (
                         SELECT  Owner.ID,
                                 Rol.Name,
-                                Owner.Status 
-                        FROM    Owner 
+                                Owner.Status
+                        FROM    Owner
                                 LEFT JOIN Rol ON Owner.Rol = Rol.ID
                     ) AS Customer ON Lead.Owner = Customer.ID
 			ORDER BY Lead.fDesc ASC",//REPLACE SQL HERE
@@ -71,7 +71,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 <html lang="en">
 <head>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php 
+    <?php
     	$_GET[ 'Bootstrap' ] = '5.1';
     	require( bin_meta . 'index.php');
     	require( bin_css  . 'index.php');
@@ -155,12 +155,12 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
 		</div>
 	</div>
 </div>
-								
-    
-    
+
+
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    
+
+
 </body>
 </html>
 <?php

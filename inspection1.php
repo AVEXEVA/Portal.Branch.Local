@@ -1,11 +1,11 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('bin/php/index.php');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
+		SELECT *
+		FROM   Connection
+		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
     $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
@@ -13,25 +13,25 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
-		FROM   Emp 
+		FROM   Emp
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
+	$r = $database->query('Portal',"
+		SELECT *
+		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
+	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
+    if(	!isset($My_Connection['ID'])
 	   	|| !isset($My_Privileges['Unit'])
-	  		|| $My_Privileges['Unit']['User_Privilege']  < 4
-	  		|| $My_Privileges['Unit']['Group_Privilege'] < 4){
+	  		|| $My_Privileges['Unit']['Owner']  < 4
+	  		|| $My_Privileges['Unit']['Group'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
 		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
+			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
 			VALUES(?,?,?)
 		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "units.php"));
 		if(count($_POST) > 0){
@@ -59,7 +59,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -122,7 +122,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							$headers[] = "Content-type: text/html; charset=iso-8859-1";
 							$headers[] = "Mesaage-id: " .generateMessageID();
 							$headers[] = "From: 'WebServices' <$from>";
-							$headers[] = "Reply-To: $Arranger <$replyto>"; 
+							$headers[] = "Reply-To: $Arranger <$replyto>";
 							$headers[] = "Date: $date";
 							$headers[] = "Return-Path: <$from>";
 							$headers[] = "X-Priority: 3";//1 = High, 3 = Normal, 5 = Low
@@ -133,7 +133,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							Thank you for submitting your Vehicle Inspection. You will be redirected to the home page.
 							<script>
 							$(document).ready(function(){
-								setTimeout(function(){document.location.href='index.php';},2500);	
+								setTimeout(function(){document.location.href='index.php';},2500);
 							});
 							</script>
 						</div>
@@ -142,10 +142,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             </div>
         </div>
     </div>
-    
-        
-    
-    
+
+
+
+
 </body>
 </html>
 <?php
@@ -157,7 +157,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -222,7 +222,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									<div><input type='radio' value='1' name='Liftgate_and_Handheld' size='25' /> Operable &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='radio' value='0' name='Liftgate_and_Handheld' size='25' /> Inoperable</div>
 								</div>
 							</div>
-							
+
 							<div class='col-xs-12' style='margin:0px;padding:0px;'>
 								<div style='background-color:#3d3d3d;color:white;padding:15px;'><b>All Lights and Blinkers</b></div>
 								<div style='text-align:center;padding:10px;'>
@@ -271,16 +271,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<div class='col-xs-12'>&nbsp;</div>
 							<div class='col-xs-12'>&nbsp;</div>
 						</div>
-						
+
 					</form>
 				</div>
             </div>
         </div>
     </div>
-    
-        
-    
-    
+
+
+
+
 </body>
 </html>
 <?php

@@ -1,41 +1,119 @@
-<?php 
-session_start( [ 'read_and_close' => true ] );
-ini_set('max_execution_time', 300);
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
-	   	|| !isset($My_Privileges['Executive']) 
-	  		|| $My_Privileges['Executive']['User_Privilege']  < 4
-	  		|| $My_Privileges['Executive']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Executive']['Other_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "overview.php"));
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'job.php'
+        )
+      );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Overview' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Overview' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'overview.php'
+        )
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +121,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>    
+    <meta name="author" content="Peter D. Speranza">    <title>Nouveau Texas | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>
@@ -96,7 +174,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 																<tr>
 																	<td style='text-align:right;'><b>Employees:</b></td>
 																	<td>&nbsp;</td>
-																	<td><?php 
+																	<td><?php
 																		$r = $database->query(null,"
 																			SELECT Count(ID) AS Count_of_Employees
 																			FROM Emp
@@ -107,7 +185,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 																<tr>
 																	<td style='text-align:right;'><b>Locations:</b></td>
 																	<td>&nbsp;</td>
-																	<td><?php 
+																	<td><?php
 																		$r = $database->query(null,"
 																			SELECT Count(Loc) AS Count_of_Locations
 																			FROM Loc
@@ -118,7 +196,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 																<tr>
 																	<td style='text-align:right;'><b>Customers:</b></td>
 																	<td>&nbsp;</td>
-																	<td><?php 
+																	<td><?php
 																		$r = $database->query(null,"
 																			SELECT OwnerWithRol.ID
 																			FROM Loc LEFT JOIN nei.dbo.OwnerWithRol ON Loc.Owner = OwnerWithRol.ID
@@ -273,90 +351,90 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <tbody style='border:1px solid black;'><?php if(isset($SQL_Jobs) || TRUE){?>
                                             <tr>
                                                 <td><b>Revenue</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2012
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2012-01-01 00:00:00.000' AND Invoice.fDate < '2013-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2012-01-01 00:00:00.000' AND Invoice.fDate < '2013-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2012 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2012'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2013
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2013-01-01 00:00:00.000' AND Invoice.fDate < '2014-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2013-01-01 00:00:00.000' AND Invoice.fDate < '2014-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2013 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2013'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2014
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2014-01-01 00:00:00.000' AND Invoice.fDate < '2015-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2014-01-01 00:00:00.000' AND Invoice.fDate < '2015-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2014 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2014'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2015
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2015-01-01 00:00:00.000' AND Invoice.fDate < '2016-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2015-01-01 00:00:00.000' AND Invoice.fDate < '2016-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2015 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2015'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2015);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2016
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2016-01-01 00:00:00.000' AND Invoice.fDate < '2017-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2016-01-01 00:00:00.000' AND Invoice.fDate < '2017-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2016 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2016'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2016);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2017
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2017-01-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2017-01-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2017 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2017'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2017);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_3_Year
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2015-01-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2015-01-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Revenue_3_Year'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_3_Year);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_5_Year
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2013-01-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2013-01-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Revenue_5_Year'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_5_Year);
@@ -364,245 +442,245 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             </tr>
                                             <tr>
                                                 <td><b>Labor</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2012
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2012-01-01 00:00:00.000' AND JobI.fDate < '2013-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2012 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2012'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2012
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2012-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2013-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2012 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2012'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2013
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2013-01-01 00:00:00.000' AND JobI.fDate < '2014-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2013 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2013'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2013
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2013-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2014-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2013 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2013'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2014
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2014-01-01 00:00:00.000' AND JobI.fDate < '2015-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2014 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2014'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2014
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2014-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2015-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2014 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2014'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2015
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2015-01-01 00:00:00.000' AND JobI.fDate < '2016-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2015 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2015'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2015
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2015-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2016-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2015 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2015'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2015);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2016
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2016-01-01 00:00:00.000' AND JobI.fDate < '2017-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2016 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2016'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2016
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2016-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2017-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2016 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2016'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2016);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2017
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
-                                                    
+
                                                     $Temp_Labor_2017 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2017'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2017
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2017-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2017-03-30 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2017 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2017'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2017
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-03-30 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ");
                                                     $Total_Labor_2017 = $r ? $Total_Labor_2017 + sqlsrv_fetch_array($r)['Total_Labor_2017'] : $Total_Labor_3_Year;
                                                     echo money_format('%(n',$Total_Labor_2017);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_3_Year
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2015-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_3_Year
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2015-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2017-03-30 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_3_Year
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-03-30 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ");
                                                     $Total_Labor_3_Year = $r ? $Total_Labor_3_Year + sqlsrv_fetch_array($r)['Total_Labor_3_Year'] : $Total_Labor_3_Year;
                                                     echo money_format('%(n',$Total_Labor_3_Year);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_5_Year
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2013-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_5_Year'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_5_Year
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2013-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2017-03-30 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_5_Year = $r ? sqlsrv_fetch_array($r)['Total_Labor_5_Year'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_5_Year
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-03-30 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ");
@@ -612,120 +690,120 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             </tr>
                                             <tr style='border-bottom:1px solid black;'>
                                                 <td><b>Materials</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2012
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE  
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2012-01-01 00:00:00.000' AND JobI.fDate < '2013-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2012 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2012'] - $Temp_Labor_2012 : 0;
                                                     echo money_format('%(n',$Total_Materials_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2013
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2013-01-01 00:00:00.000' AND JobI.fDate < '2014-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2013 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2013'] - $Temp_Labor_2013 : 0;
                                                     echo money_format('%(n',$Total_Materials_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2014
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2014-01-01 00:00:00.000' AND JobI.fDate < '2015-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2014 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2014'] - $Temp_Labor_2014 : 0;
                                                     echo money_format('%(n',$Total_Materials_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2015
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2015-01-01 00:00:00.000' AND JobI.fDate < '2016-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2015 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2015'] - $Temp_Labor_2015 : 0;
                                                     echo money_format('%(n',$Total_Materials_2015);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2016
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2016-01-01 00:00:00.000' AND JobI.fDate < '2017-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2016 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2016'] - $Temp_Labor_2016 : 0;
                                                     echo money_format('%(n',$Total_Materials_2016);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2017
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2017-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2017 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2017'] - $Temp_Labor_2017 : 0;
                                                     echo money_format('%(n',$Total_Materials_2017);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_3_Year
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2015-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_3_Year = $r ? sqlsrv_fetch_array($r)['Total_Materials_3_Year'] - $Temp_Labor_3_Year : 0;
                                                     echo money_format('%(n',$Total_Materials_3_Year);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_5_Year
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2013-01-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
@@ -781,70 +859,70 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             </tr>
                                             <tr style='border-bottom:1px solid black;'>
                                                 <td><b>Overhead Cost</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2012 = $Total_Revenue_2012 * .1608;
                                                     echo money_format('%(n',$Overhead_Cost_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2013 = $Total_Revenue_2013 * .1450;
                                                     echo money_format('%(n',$Overhead_Cost_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2014 = $Total_Revenue_2014 * .1770;
                                                     echo money_format('%(n',$Overhead_Cost_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2015 = $Total_Revenue_2015 * .1791;
                                                     echo money_format('%(n',$Overhead_Cost_2015);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2016 = $Total_Revenue_2016 * .1520;
                                                     echo money_format('%(n',$Overhead_Cost_2016);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2017 = $Total_Revenue_2017 * .1620;
                                                     echo money_format('%(n',$Overhead_Cost_2017);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_3_Year = $Overhead_Cost_2015 + $Overhead_Cost_2016 + $Overhead_Cost_2017;
                                                     echo money_format('%(n',$Overhead_Cost_3_Year);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_5_Year = $Overhead_Cost_2013 + $Overhead_Cost_2014 + $Overhead_Cost_3_Year;
                                                     echo money_format('%(n',$Overhead_Cost_5_Year);
                                                 ?></td>
                                             </tr>
                                             <tr>
                                                 <td><b>Profit</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2012 = $Total_Revenue_2012 - ($Total_Labor_2012 + $Total_Materials_2012 + $Overhead_Cost_2012);
                                                     echo money_format('%(n',$Total_Profit_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2013 = $Total_Revenue_2013 - ($Total_Labor_2013 + $Total_Materials_2013 + $Overhead_Cost_2013);
                                                     echo money_format('%(n',$Total_Profit_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2014 = $Total_Revenue_2014 - ($Total_Labor_2014 + $Total_Materials_2014 + $Overhead_Cost_2014);
                                                     echo money_format('%(n',$Total_Profit_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2015 = $Total_Revenue_2015 - ($Total_Labor_2015 + $Total_Materials_2015 + $Overhead_Cost_2015);
                                                     echo money_format('%(n',$Total_Profit_2015);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2016 = $Total_Revenue_2016 - ($Total_Labor_2016 + $Total_Materials_2016 + $Overhead_Cost_2016);
                                                     echo money_format('%(n',$Total_Profit_2016);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2017 = $Total_Revenue_2017 - ($Total_Labor_2017 + $Total_Materials_2017 + $Overhead_Cost_2017);
                                                     echo money_format('%(n',$Total_Profit_2017);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_3_Year = $Total_Revenue_3_Year - ($Total_Labor_3_Year + $Total_Materials_3_Year + $Overhead_Cost_3_Year);
                                                     echo money_format('%(n',$Total_Profit_3_Year);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_5_Year = $Total_Revenue_5_Year - ($Total_Labor_5_Year + $Total_Materials_5_Year + $Overhead_Cost_5_Year);
                                                     echo money_format('%(n',$Total_Profit_5_Year);
                                                 ?></td>
@@ -863,46 +941,46 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <tbody style='border:1px solid black;'><?php if(isset($SQL_Jobs) || TRUE){?>
                                             <tr>
                                                 <td><b>Revenue</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2012
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2017-01-01 00:00:00.000' AND Invoice.fDate < '2017-04-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2017-01-01 00:00:00.000' AND Invoice.fDate < '2017-04-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2012 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2012'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2013
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2017-04-01 00:00:00.000' AND Invoice.fDate < '2017-07-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2017-04-01 00:00:00.000' AND Invoice.fDate < '2017-07-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2013 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2013'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2014
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2017-07-01 00:00:00.000' AND Invoice.fDate < '2017-10-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2017-07-01 00:00:00.000' AND Invoice.fDate < '2017-10-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2014 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2014'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
                                                         SELECT Sum(Amount) AS Total_Revenue_2015
-                                                        FROM 
+                                                        FROM
                                                             Invoice
                                                             LEFT JOIN nei.dbo.Loc ON Invoice.Loc = Loc.Loc
-                                                        WHERE Invoice.fDate >= '2017-10-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000' 
+                                                        WHERE Invoice.fDate >= '2017-10-01 00:00:00.000' AND Invoice.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Total_Revenue_2015 = $r ? sqlsrv_fetch_array($r)['Total_Revenue_2015'] : 0;
                                                     echo money_format('%(n',$Total_Revenue_2015);
@@ -910,119 +988,119 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             </tr>
                                             <tr>
                                                 <td><b>Labor</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2012
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-01-01 00:00:00.000' AND JobI.fDate < '2017-04-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2012 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2012'] : 0;
                                                     $r = $database->query($Paradox,"
-                                                        SELECT 
+                                                        SELECT
                                                             SUM([JOBLABOR].[TOTAL COST])     AS Total_Labor_2012
-                                                        FROM 
+                                                        FROM
                                                             nei.dbo.Job as Job
                                                             LEFT JOIN Paradox.dbo.JOBLABOR AS JOBLABOR ON Job.ID = [JOBLABOR].[JOB #]
-                                                        WHERE 
+                                                        WHERE
                                                             convert(date,[JOBLABOR].[Week Ending]) >= '2017-01-01 00:00:00.000'
                                                             AND convert(date,[JOBLABOR].[Week Ending]) < '2017-03-30 00:00:00.000'
                                                     ;");
                                                     $Total_Labor_2012 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2012'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2013
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-03-30 00:00:00.000' AND JobI.fDate < '2017-04-01 00:00:00.000'
                                                     ");
                                                     $Total_Labor_2012 = $r ? $Total_Labor_2012 + sqlsrv_fetch_array($r)['Total_Labor_2012'] : $Total_Labor_2012;
                                                     echo money_format('%(n',$Total_Labor_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2013
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-04-01 00:00:00.000' AND JobI.fDate < '2017-07-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2013 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2013'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2013
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-04-01 00:00:00.000' AND JobI.fDate < '2017-07-01 00:00:00.000'
                                                     ");
                                                     $Total_Labor_2013 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2013'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2014
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-07-01 00:00:00.000' AND JobI.fDate < '2017-10-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2014 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2014'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2014
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-07-01 00:00:00.000' AND JobI.fDate < '2017-10-01 00:00:00.000'
                                                     ");
                                                     $Total_Labor_2014 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2014'] : 0;
                                                     echo money_format('%(n',$Total_Labor_2014);
                                                 ?></td>
-												<td><?php 
+												<td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2015
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-10-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
                                                     $Temp_Labor_2015 = $r ? sqlsrv_fetch_array($r)['Total_Labor_2015'] : 0;
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Labor_2015
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1' AND JobI.Labor = '1'
                                                             AND JobI.fDate >= '2017-10-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ");
@@ -1032,60 +1110,60 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             </tr>
                                             <tr style='border-bottom:1px solid black;'>
                                                 <td><b>Materials</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2012
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE  
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2017-01-01 00:00:00.000' AND JobI.fDate < '2017-04-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2012 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2012'] - $Temp_Labor_2012 : 0;
                                                     echo money_format('%(n',$Total_Materials_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2013
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2017-04-01 00:00:00.000' AND JobI.fDate < '2017-07-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2013 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2013'] - $Temp_Labor_2013 : 0;
                                                     echo money_format('%(n',$Total_Materials_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2014
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2017-07-01 00:00:00.000' AND JobI.fDate < '2017-10-01 00:00:00.000'
                                                     ;");
                                                     $Total_Materials_2014 = $r ? sqlsrv_fetch_array($r)['Total_Materials_2014'] - $Temp_Labor_2014 : 0;
                                                     echo money_format('%(n',$Total_Materials_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $r = $database->query(null,"
-                                                        SELECT 
+                                                        SELECT
                                                             Sum(JobI.Amount) AS Total_Materials_2015
-                                                        FROM 
-                                                            (Loc 
+                                                        FROM
+                                                            (Loc
                                                             LEFT JOIN nei.dbo.Job ON Loc.Loc = Job.Loc)
                                                             LEFT JOIN nei.dbo.JobI ON Job.ID = JobI.Job
-                                                        WHERE 
+                                                        WHERE
                                                             JobI.Type='1'
                                                             AND JobI.fDate >= '2017-10-01 00:00:00.000' AND JobI.fDate < '2018-01-01 00:00:00.000'
                                                     ;");
@@ -1121,38 +1199,38 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             </tr>
                                             <tr style='border-bottom:1px solid black;'>
                                                 <td><b>Overhead Cost</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2012 = $Total_Revenue_2012 * .1608;
                                                     echo money_format('%(n',$Overhead_Cost_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2013 = $Total_Revenue_2013 * .1450;
                                                     echo money_format('%(n',$Overhead_Cost_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2014 = $Total_Revenue_2014 * .1770;
                                                     echo money_format('%(n',$Overhead_Cost_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Overhead_Cost_2015 = $Total_Revenue_2015 * .1791;
                                                     echo money_format('%(n',$Overhead_Cost_2015);
                                                 ?></td>
                                             </tr>
                                             <tr>
                                                 <td><b>Profit</b></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2012 = $Total_Revenue_2012 - ($Total_Labor_2012 + $Total_Materials_2012 + $Overhead_Cost_2012);
                                                     echo money_format('%(n',$Total_Profit_2012);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2013 = $Total_Revenue_2013 - ($Total_Labor_2013 + $Total_Materials_2013 + $Overhead_Cost_2013);
                                                     echo money_format('%(n',$Total_Profit_2013);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2014 = $Total_Revenue_2014 - ($Total_Labor_2014 + $Total_Materials_2014 + $Overhead_Cost_2014);
                                                     echo money_format('%(n',$Total_Profit_2014);
                                                 ?></td>
-                                                <td><?php 
+                                                <td><?php
                                                     $Total_Profit_2015 = $Total_Revenue_2015 - ($Total_Labor_2015 + $Total_Materials_2015 + $Overhead_Cost_2015);
                                                     echo money_format('%(n',$Total_Profit_2015);
                                                 ?></td>
@@ -1168,18 +1246,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-        
+
 
     <?php require('bin/js/datatables.php');?>
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!--Moment JS Date Formatter-->
-    
-    
+
+
     <script src="https://www.nouveauelevator.com/vendor/flot/excanvas.min.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.js"></script>
     <script src="https://www.nouveauelevator.com/vendor/flot/jquery.flot.pie.js"></script>
@@ -1198,7 +1276,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require(PROJECT_ROOT."js/chart/hours_by_job_type.php");?>
     <?php require(PROJECT_ROOT."js/chart/payroll_by_job_type.php");?>
     <?php require(PROJECT_ROOT."js/chart/invoices.php");?>
-    
+
 </body>
 </html>
 <?php

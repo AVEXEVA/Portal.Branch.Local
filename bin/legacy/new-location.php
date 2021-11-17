@@ -8,11 +8,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?;",array($_SESSION['User']));
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query($Portal,"SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege FROM Privilege WHERE User_ID = ?;",array($_SESSION['User']));
+    $r = $database->query($Portal,"SELECT Access, Owner, Group, Other FROM Privilege WHERE User_ID = ?;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 6){$Privileged = TRUE;}
+    if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['Owner'] >= 6){$Privileged = TRUE;}
   }
   if(!isset($array['ID'])  || !$Privileged){require("401.html");}
   else {?><!DOCTYPE html>

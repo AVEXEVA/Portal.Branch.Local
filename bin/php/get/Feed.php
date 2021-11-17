@@ -24,7 +24,7 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
   }
 }
 if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
-  $r = \singleton\database::getInstance( )->query(
+  $result = \singleton\database::getInstance( )->query(
       null,
     " SELECT  *
       FROM Connection
@@ -33,13 +33,13 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     array($_SESSION[ 'User' ],$_SESSION[ 'Hash' ]
   )
 );
-  $array = sqlsrv_fetch_array($r);
+  $array = sqlsrv_fetch_array($result);
   $Privileged = FALSE;
   if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-      $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
-      $User = sqlsrv_fetch_array($r);
+      $result = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_SESSION['User']));
+      $User = sqlsrv_fetch_array($result);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = $database->query($Portal,
+      $result = $database->query($Portal,
         " SELECT Access_Table,
                  User_Privilege,
                  Group_Privilege,
@@ -48,7 +48,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
       $Privileges = array();
-      while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+      while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
       $Privileged = FALSE;
       if(isset($Privileges['Map'])
       && $Privileges['Map']['User_Privilege'] >= 4
@@ -57,7 +57,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
   }
   if(!$Privileged){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
   else {
-    $r = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         null,
       " SELECT  TicketO.ID AS ID,
                 TicketO.fDesc AS Description,
@@ -81,7 +81,7 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         WHERE   TicketO.Assigned > 0
       ;",array());
     $rows = array();
-    if($r){while($row = sqlsrv_fetch_array($r)){
+    if($result){while($row = sqlsrv_fetch_array($result)){
       $rows[$row['Employee_ID']] = isset($rows[$row['Employee_ID']]) && is_array($rows[$row['Employee_ID']]) ? $rows[$row['Employee_ID']] : array();
       $rows[$row['Employee_ID']][$row['ID']] = $row;
     }}

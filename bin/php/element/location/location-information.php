@@ -35,10 +35,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     //Privileges
     $r = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -46,13 +46,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         )
     );
     $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}
     $Privileged = FALSE;
     if( isset($Privileges['Location']) 
-        && $Privileges['Location']['User_Privilege'] >= 4 
-        && $Privileges['Location']['Group_Privilege'] >= 4 
-        && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Location']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        && $Privileges['Location']['Owner'] >= 4 
+        && $Privileges['Location']['Group'] >= 4 
+        && $Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Location']['Owner'] >= 4 && is_numeric($_GET['ID'])){
         $r = $database->query(  
             null,
             "   SELECT  Count( Ticket.ID ) AS Count 
@@ -161,12 +161,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Territory(1);?> Territory:</div>
             <div class='col-xs-8'><?php echo isset($Location['Territory_Name']) && $Location['Territory_Name'] != '' ? $Location['Territory_Name'] : "&nbsp;";?></div>
-			<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other_Privilege'] >= 4){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Balance:</div>
+			<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other'] >= 4){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Balance:</div>
             <div class='col-xs-8'><?php echo isset($Location['Location_Balance']) && $Location['Location_Balance'] != '' ? money_format('%.2n',$Location['Location_Balance']) : "&nbsp;";?></div><?php }?>
         </div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
 			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Route();?> Route:</div>
-            <div class='col-xs-8'><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other_Privilege'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
+            <div class='col-xs-8'><?php if($My_Privileges['Route']['Other'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?><a href="route.php?ID=<?php echo $Location['Route_ID'];?>"><?php }?><?php echo proper($Location["Route_Mechanic_First_Name"] . " " . $Location["Route_Mechanic_Last_Name"]);?><?php if($My_Privileges['Route']['Other'] >= 4 || $My_User['ID'] == $Location['Route_Mechanic_ID']){?></a><?php }?>
 			</div>
 			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Resident(1);?> Resident:</div>
             <div class='col-xs-8'><?php echo isset($Location['Resident_Mechanic']) && $Location['Resident_Mechanic'] != '' ? proper($Location['Resident_Mechanic']) : "No";?></div>
@@ -177,7 +177,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			<?php /*<?php if(strlen($Location['Route_Mechanic_Email']) > 0){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
             <div class='col-xs-8'><a href="mailto:<?php echo $Location['Route_Mechanic_Email'];?>"><?php echo $Location['Route_Mechanic_Email'];?></a></div><?php }?>*/?>
 			<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
-            <div class='col-xs-8'><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other_Privilege'] >= 4){?></a><?php }?></div>
+            <div class='col-xs-8'><?php if($My_Privileges['Ticket']['Other'] >= 4){?><a href="dispatch.php?Supervisors=Division%201&Mechanics=undefined&Start_Date=07/13/2017&End_Date=07/13/2017"><?php }?><?php echo proper($Location["Zone"]);?><?php if($My_Privileges['Ticket']['Other'] >= 4){?></a><?php }?></div>
 		</div>
         <div class='row shadower' style='padding-top:10px;padding-bottom:10px;'>
             <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>

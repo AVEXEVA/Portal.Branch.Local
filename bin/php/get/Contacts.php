@@ -3,7 +3,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [
 		'read_and_close' => true
 	] );
-   	require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+   	require( '/var/www/beta.nouveauelevator.com/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $Connection = \singleton\database::getInstance( )->query(
@@ -32,20 +32,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		)
 	);
 	$User = sqlsrv_fetch_array( $User );
-	$r = \singleton\database::getInstance( )->query(
-		null,
-		"	SELECT 	Privilege.Access_Table,
-				   	Privilege.User_Privilege,
-			   		Privilege.Group_Privilege,
-			   		Privilege.Other_Privilege
-			FROM   	Privilege
-			WHERE  	Privilege.User_ID = ?;",
-		array(
-			$_SESSION['User']
-		)
-	);
-	$Privileges = array();
-	while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Other]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );ileges = array();
+	while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
 	$Privileged = False;
 	if( isset($Privileges['Contact'])
         && (

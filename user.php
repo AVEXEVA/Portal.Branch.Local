@@ -8,7 +8,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
+    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
     $r = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
@@ -16,15 +16,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		FROM   Emp
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
+    $User = sqlsrv_fetch_array($r);
+	$r = $database->query('Portal',"
 		SELECT *
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) ){?><?php require('../404.html');?><?php }
+	$Privileges = array();
+	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}}
+    if(	!isset($Connection['ID']) ){?><?php require('404.html');?><?php }
     else {
 		$database->query(null,"
 			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
@@ -372,7 +372,7 @@ if($Mechanic > 0){
             </div>
           </div>
           <?php }?>
-                <?php if(!$ASDF || (isset($My_Privileges['Time']) && $_SESSION['ID'] != $_GET['ID'] && $My_Privileges['Time']['Other_Privilege'] >= 4)){?>
+                <?php if(!$ASDF || (isset($Privileges['Time']) && $_SESSION['ID'] != $_GET['ID'] && $Privileges['Time']['Other'] >= 4)){?>
                 <div class='panel-heading'>Attendance</div>
                 <div class='panel-body'>
                   <?php
@@ -436,7 +436,7 @@ if($Mechanic > 0){
                   </script>
               </div><?php }?>
                 <?php
-                if(isset($My_Privileges['Admin']['Other_Privilege'])){
+                if(isset($Privileges['Admin']['Other'])){
                 	?><div class='panel panel-primary'>
                 		<div class='panel-heading'>Privileges</div>
                 		<div class='panel-body'>
@@ -458,10 +458,10 @@ if($Mechanic > 0){
 						                    "dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
 						                },
 						                "columns": [
-						                    { "data": "Access_Table"},
-						                    { "data": "User_Privilege"},
-						                    { "data": "Group_Privilege"},
-						                    { "data": "Other_Privilege"}
+						                    { "data": "Access"},
+						                    { "data": "Owner"},
+						                    { "data": "Group"},
+						                    { "data": "Other"}
 						                ],
 						                "order": [[1, 'asc']],
 						                "language":{"loadingRecords":""},
@@ -486,13 +486,13 @@ if($Mechanic > 0){
         </div>
     </div>
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
 	<?php require('bin/js/dropdown-scroll.js');?>
 
     <!-- Custom Theme JavaScript -->
-    
+
 
     <?php require("bin/js/datatables.php");?>
 </body>

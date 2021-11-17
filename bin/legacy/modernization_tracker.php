@@ -23,12 +23,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
+	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
     if(	!isset($My_Connection['ID']) 
 	   	|| !isset($My_Privileges['Job']) 
-	  		|| $My_Privileges['Job']['User_Privilege']  < 4
-	  		|| $My_Privileges['Job']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Job']['Other_Privilege'] < 4){
+	  		|| $My_Privileges['Job']['Owner']  < 4
+	  		|| $My_Privileges['Job']['Group'] < 4
+	  	    || $My_Privileges['Job']['Other'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
 		$database->query(null,"
@@ -373,7 +373,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <span class='hidden' onClick="modernizationTracker('tracked_modernization');" style='cursor:pointer;'><span id='tracked_modernization'> > Modernization Entity</span></span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
-                            <?php if(isset($My_Privileges['Admin']['User_Privilege']) && $My_Privileges['Admin']['User_Privilege'] > 4){?>
+                            <?php if(isset($My_Privileges['Admin']['Owner']) && $My_Privileges['Admin']['Owner'] > 4){?>
                             <div class='delete' style='cursor:pointer;float:right;margin-left:25px;' onClick="deleteRow();"><?php \singleton\fontawesome::getInstance( )->Edit();?> Delete</div><?php }?>
                             <div class='add' style='float:right;margin-left:25px;cursor:pointer;' onClick="popupAdd();"><?php \singleton\fontawesome::getInstance( )->Add();?> Add</div>
                             <div style='clear:both;'></div>

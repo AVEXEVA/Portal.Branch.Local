@@ -1,5 +1,5 @@
 <?php 
 function check($requestedPerm, $level, $permInt){
-    return ($requestedPerm << $level) & $permInt != 0;
+    return ( hexdec( dechex( $requestedPerm << $level ) ) & hexdec( $permInt ) ) != 0;
 }
 ?>

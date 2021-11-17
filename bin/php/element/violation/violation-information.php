@@ -9,14 +9,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
         $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
         $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
         $Privileged = FALSE;
-        if(isset($My_Privileges['Violation']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Violation']['Group_Privilege'] >= 4 && $My_Privileges['Violation']['Other_Privilege'] >= 0){$Privileged = TRUE;}
+        if(isset($My_Privileges['Violation']) && $My_Privileges['Unit']['Owner'] >= 4 && $My_Privileges['Violation']['Group'] >= 4 && $My_Privileges['Violation']['Other'] >= 0){$Privileged = TRUE;}
         else {
             //NEEDS TO INCLUDE SECURITY FOR OTHER PRIVILEGE
         }

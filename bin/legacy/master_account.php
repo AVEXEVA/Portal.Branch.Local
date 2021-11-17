@@ -11,17 +11,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($User['Field'] == 1 && $User['Title'] != 'OFFICE') ? True : False;
         $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
         $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
         $Privileged = FALSE;
-        if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4 && $My_Privileges['Customer']['Group_Privilege'] >= 4 && $My_Privileges['Customer']['Other_Privilege'] >= 4){
+        if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Owner'] >= 4 && $My_Privileges['Customer']['Group'] >= 4 && $My_Privileges['Customer']['Other'] >= 4){
             $database->query($Portal,"INShERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
             $Privileged = TRUE;}
-        elseif($My_Privileges['Customer']['User_Privilege'] >= 4 && $My_Privileges['Ticket']['Group_Privilege'] >= 4 ){
+        elseif($My_Privileges['Customer']['Owner'] >= 4 && $My_Privileges['Ticket']['Group'] >= 4 ){
             $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "customer.php"));
             $r = $database->query(  null,"
                 SELECT TicketO.ID AS ID 
@@ -98,14 +98,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <li class=''><a href="#jobs-pills"       data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Job();?>Jobs</a></li>
                                 <li class='' onClick="setTimeout(function(){initialize()},1000);"><a href="#tickets-pills"    data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</a></li>
                                 <li><a href="#maintenance-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Maintenance();?> Maintenance</a></li>
-                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?><li class=''><a href="#financials-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Financial();?>Financials</a></li><?php }?>
+                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other'] >= 4)){?><li class=''><a href="#financials-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Financial();?>Financials</a></li><?php }?>
                                 <li class=''><a href="#violations-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Violation();?>Violations</a></li>
                                 <li class=''><a href="#workers-pills" data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->User();?>Workers</a></li>
                                 <li class=''><a href="#contracts-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Contract();?>Contracts</a></li>
                                 <li class=''><a href="#proposals-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Proposal();?>Proposals</a></li>
                                 <li class=''><a href="#invoices-pills"   data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</a></li>
                                 <li class=''><a href="#collections-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Collection();?>Collections</a></li>
-                                <!--<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && $My_Privileges['Legal']['Group_Privilege'] >= 4 && $My_Privileges['Legal']['Other_Privilege'] >= 4){?><li class=''><a href="#legal-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Legal();?>Legal</a></li><?php }?>-->
+                                <!--<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['Owner'] >= 4 && $My_Privileges['Legal']['Group'] >= 4 && $My_Privileges['Legal']['Other'] >= 4){?><li class=''><a href="#legal-pills"  data-toggle="tab"><?php \singleton\fontawesome::getInstance( )->Legal();?>Legal</a></li><?php }?>-->
                             </ul>
                             <br />
                             <div class="tab-content">
@@ -583,14 +583,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                             <th>ID</th>
                                             <th>Last Name</th>
                                             <th>First Name</th>
-                                            <?php if(isset($My_Privileges['Ticket']['Other_Privilege']) && $My_Privileges['Ticket']['Other_Privilege'] >= 4){?><th>Regular</th>
+                                            <?php if(isset($My_Privileges['Ticket']['Other']) && $My_Privileges['Ticket']['Other'] >= 4){?><th>Regular</th>
                                             <th>Overtime</th>
                                             <th>Doubletime</th>
                                             <th>Total</th><?php }?>
                                         </thead>
                                     </table>
                                 </div>
-                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?>
+                                <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other'] >= 4)){?>
                                  <div class="tab-pane fade in" id="financials-pills">
                                     <ul class="nav nav-tabs">
                                         <li class="active"><a href="#financials-summary-pills" data-toggle="tab">Summary</a></li>
@@ -2476,7 +2476,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                     {   "data": "ID",
                         "visible":true},
                     { "data": "Last_Name" },
-                    { "data": "First_Name"}<?php if(isset($My_Privileges['Ticket']['Other_Privilege']) && $My_Privileges['Ticket']['Other_Privilege'] >= 4){?>,
+                    { "data": "First_Name"}<?php if(isset($My_Privileges['Ticket']['Other']) && $My_Privileges['Ticket']['Other'] >= 4){?>,
                     { "data": "Regular",className:"sum"},
                     { "data": "Overtime",className:"sum"},
                     { "data": "Doubletime",className:"sum"},
@@ -2517,7 +2517,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 {   column_number:1,
                     filter_type:"auto_complete"},
                 {   column_number:2,
-                    filter_type:"auto_complete"}<?php if(isset($My_Privileges['Ticket']['Other_Privilege']) && $My_Privileges['Ticket']['Other_Privilege'] >= 4){?>,
+                    filter_type:"auto_complete"}<?php if(isset($My_Privileges['Ticket']['Other']) && $My_Privileges['Ticket']['Other'] >= 4){?>,
                 {   column_number:3,
                     filter_type: "range_number_slider",
                     filter_delay: 500},
@@ -2533,7 +2533,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ]);
             stylizeYADCF();
             <?php }?>
-            <?php if($My_Privileges['Legal']['Group_Privilege'] >= 4){?>
+            <?php if($My_Privileges['Legal']['Group'] >= 4){?>
             var Table_Legal = $('#Table_Legal').DataTable( {
                 "ajax": {
                     "url":"bin/php/get/Legal_by_Master.php?ID=<?php echo $_GET['ID'];?>",
@@ -2579,7 +2579,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php /*require(PROJECT_ROOT."js/chart/invoices_this_year_for_customer.php");*/?>
     <?php /*require(PROJECT_ROOT."js/chart/tickets_this_year_for_customer.php");?>
     <?php require(PROJECT_ROOT."js/chart/service_calls_this_year_for_customer.php");?>
-    <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){
+    <?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other'] >= 4)){
         require(PROJECT_ROOT."js/chart/customer_profit.php");
     }?>
     <?php require(PROJECT_ROOT."js/pie/invoices_by_job_type_for_customer.php");?>

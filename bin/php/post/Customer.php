@@ -1,27 +1,89 @@
-<?php 
-session_start( [ 'read_and_close' => true ] );
-require('../get/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    $Privileged = FALSE;
-    if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $r = $database->query(null,"SELECT * FROM Emp WHERE ID = ?",array($_GET['User']));
-        $My_User = sqlsrv_fetch_array($r);
-        $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-        $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-        $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
-        $Privileged = FALSE;
-        if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 6 && $My_Privileges['Location']['Group_Privilege'] >= 6 && $My_Privileges['Location']['Other_Privilege'] >= 6){$Privileged = TRUE;}
-    }
-    if(!$Privileged || count($_POST) == 0){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Customer' ] )
+        || 	!check( privilege_delete, level_group, $Privileges[ 'Customer' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'post/customer.php'
+        )
+      );
 		if(isset($_POST['action']) && $_POST['action'] == 'edit'){
+      echo '1';
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				$data = array();
 				foreach($_POST['data'] as $ID=>$Customer){
@@ -64,6 +126,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				print json_encode(array('data'=>$data));
 			}
 		} elseif(isset($_POST['action']) && $_POST['action'] == 'create'){
+      echo '2';
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID=>$Customer){
 					$resource = $database->query(null,"SELECT Max(Rol.ID) AS ID FROM nei.dbo.Rol;");
@@ -88,17 +151,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					print json_encode(array('data'=>$Location));
 				}
 			}
-		} elseif(isset($_POST['action']) && $_POST['action'] == 'removeX'){
+		} elseif(isset($_POST['action']) && $_POST['action'] == 'delete'){
+      echo '3';
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
-				foreach($_POST['data'] as $ID=>$Location){
-					$resource = $database->query(null,"SELECT Loc.Rol as Rolodex_ID FROM nei.dbo.Loc WHERE Loc = ?;",array($ID));
+				foreach($_POST['data'] as $ID){
+					$resource = $database->query(null,"SELECT [Owner].[Rol] as Rolodex_ID FROM [Owner] WHERE [ID] = ?;",array($ID));
 					if($resource){
 						$Rolodex_ID = sqlsrv_fetch_array($resource)['Rolodex_ID'];
 						if(is_numeric($Rolodex_ID) && $Rolodex_ID > 0){
-							$database->query(null,"DELETE FROM nei.dbo.Rol WHERE Rol.ID = ?",array($Rolodex_ID));
+							$database->query(null,"DELETE FROM dbo.Rol WHERE Rol.ID = ?;",array($Rolodex_ID));
 						}
 					}
-					$database->query(null,"DELETE FROM nei.dbo.Loc WHERE Loc.Loc = ?",array($ID));
+					$database->query(null,"DELETE FROM [Owner] WHERE [Owner].[ID] = ?;",array($ID));
 				}
 				print json_encode(array('data'=>array()));
 			}

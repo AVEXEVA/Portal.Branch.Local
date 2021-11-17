@@ -35,10 +35,10 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Privileges
     $r = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -46,13 +46,13 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
+    while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}
     $Privileged = FALSE;
     if( isset($Privileges['Unit']) 
-        && $Privileges['Unit']['User_Privilege'] >= 4 
-        && $Privileges['Unit']['Group_Privilege'] >= 4 
-        && $Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Unit']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        && $Privileges['Unit']['Owner'] >= 4 
+        && $Privileges['Unit']['Group'] >= 4 
+        && $Privileges['Unit']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Unit']['Owner'] >= 4 && is_numeric($_GET['ID'])){
         $r = $database->query(  
             null,
             "   SELECT  Count( Ticket.Count ) AS Count 
@@ -170,7 +170,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                         <div class='col-xs-8'><?php echo strlen($Unit[ 'Type' ])>0 ? $Unit[ 'Type' ] : "&nbsp;";?></div>
           </div>
           <div class='row'>
-                        <?php if( isset( $Privileges[ 'Invoice' ] ) && $Privileges[ 'Invoice' ][ 'Other_Privilege' ] >= 4){
+                        <?php if( isset( $Privileges[ 'Invoice' ] ) && $Privileges[ 'Invoice' ][ 'Other' ] >= 4){
               ?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Price:</div>
                           <div class='col-xs-8'><?php echo strlen($Unit[ 'Price' ])>0 ? money_format( '%.2n', $Unit[ 'Price' ] ): "&nbsp;";?></div><?php 
             }?>
@@ -185,7 +185,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                     <div class='row'>
                         <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Name:</div>
                         <div class='col-xs-8'><?php 
-              echo $Privileges['Location']['Other_Privilege'] >= 4 
+              echo $Privileges['Location']['Other'] >= 4 
                     ?   "<div class='row'><div class='col-xs-8'><input disabled type='text' value='" . proper( $Unit['Location_Tag'] ) . "' /></div><div class='col-xs-4'><button onClick=\"document.location.href='location.php?ID=" . $Unit['Location_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
                     :   proper( $Unit['Location_Tag'] );
             ?></div>
@@ -212,7 +212,7 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 <div class='row'>
                     <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Name: </div>
                     <div class='col-xs-8'><?php 
-              echo $Privileges['Customer']['Other_Privilege'] >= 4 
+              echo $Privileges['Customer']['Other'] >= 4 
                     ?   "<div class='row'><div class='col-xs-8'><input disabled type='text' value='" . proper( $Unit['Customer_Name'] ) . "' /></div><div class='col-xs-4'><button onClick=\"document.location.href='customer.php?ID=" . $Unit['Customer_ID'] . "';\"><i class='fa fa-search fa-fw fa-1x'></i></button></div></div>"
                     :   proper( $Unit['Customer_Name'] );
             ?></div>

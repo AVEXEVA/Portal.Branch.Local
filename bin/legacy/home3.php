@@ -26,7 +26,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   		WHERE  Privilege.User_ID = ?
   	;",array($_SESSION['User']));
 	$My_Privileges = array(); 
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
+	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
   if(	!isset($My_Connection['ID']) ){?><?php require('../404.html');?><?php }
   else {
 ?><!DOCTYPE html>
@@ -324,47 +324,47 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     }
     </script>
     <div class='row'><div class='col-xs-12'><button style='width:100%;color:black !important;' onClick='toggle_activities(this);'>Hide/Show</button></div></div>
-		<?php if(isset($My_Privileges['Collection']) && $My_Privileges['Invoice']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='collections.php'">
+		<?php if(isset($My_Privileges['Collection']) && $My_Privileges['Invoice']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='collections.php'">
 			<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
 			<div class ='nav-text'>Collections</div>
 		</div><?php } ?>
-    <?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Other_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='scheduler.php'">
+    <?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Other'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='scheduler.php'">
       <div class='nav-icon'><i class="fa fa-question-circle fa-3x fa-fw" aria-hidden="true"></i></div>
       <div class ='nav-text'>Attendance</div>
     </div><?php }?>
-    <?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Other_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='attendance_report.php'">
+    <?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Other'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='attendance_report.php'">
       <div class='nav-icon'><i class="fa fa-clock-o fa-3x fa-fw" aria-hidden="true"></i></div>
       <div class ='nav-text'>Clocker</div>
     </div><?php }?>
-			<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='customers.php'">
+			<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='customers.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 				<div class ='nav-text'>Customers</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Dispatch']) && $My_Privileges['Dispatch']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='dispatch.php'">
+			<?php if(isset($My_Privileges['Dispatch']) && $My_Privileges['Dispatch']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='dispatch.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Dispatch(3);?></div>
 				<div class ='nav-text'>Dispatch</div>
 			</div><?php } ?>
-      <?php if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='tickets.php'">
+      <?php if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['Owner'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='tickets.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->History(3);?></div>
 				<div class ='nav-text'>History</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='invoices.php'">
+			<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='invoices.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
 				<div class ='nav-text'>Invoices</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='jobs.php'">
+			<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='jobs.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 				<div class ='nav-text'>Jobs</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Lead']) && $My_Privileges['Lead']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='leads.php'">
+			<?php if(isset($My_Privileges['Lead']) && $My_Privileges['Lead']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='leads.php'">
 					<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 					<div class ='nav-text'>Leads</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='locations.php'">
+			<?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='locations.php'">
 					<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
 					<div class ='nav-text'>Locations</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Privilege']) && $My_Privileges['Privilege']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='privileges.php'">
+			<?php if(isset($My_Privileges['Privilege']) && $My_Privileges['Privilege']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='privileges.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Privilege(3);?></div>
 				<div class ='nav-text'>Privileges</div>
 			</div><?php } ?>
@@ -372,15 +372,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
 					<div class ='nav-text'>Profile</div>
 			</div>
-			<?php if(isset($My_Privileges['Proposal']) && $My_Privileges['Proposal']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='proposals.php'">
+			<?php if(isset($My_Privileges['Proposal']) && $My_Privileges['Proposal']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='proposals.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
 				<div class ='nav-text'>Proposals</div>
 			</div><?php } ?>
-      <?php if(isset($My_Privileges['Requisition']) && $My_Privileges['Requisition']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='requisitions.php'">
+      <?php if(isset($My_Privileges['Requisition']) && $My_Privileges['Requisition']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='requisitions.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Requisition(3);?></div>
 				<div class ='nav-text'>Requisitions</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Route']) && $My_Privileges['Route']['Other_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='routes.php'">
+			<?php if(isset($My_Privileges['Route']) && $My_Privileges['Route']['Other'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='routes.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Route(3);?></div>
 				<div class ='nav-text'>Routes</div>
 			</div><?php } ?>
@@ -392,39 +392,39 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				WHERE  Emp.ID = ?
 			;",array($_SESSION['User']));
 			$RouteNav = sqlsrv_fetch_array($result);
-			if(isset($My_Privileges['Route']) && $My_Privileges['Route']['User_Privilege'] >=4 && is_array($RouteNav) && isset($RouteNav['ID']) && $RouteNav['ID'] > 0 ){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='route.php?ID=<?php echo $RouteNav['ID'];?>'">
+			if(isset($My_Privileges['Route']) && $My_Privileges['Route']['Owner'] >=4 && is_array($RouteNav) && isset($RouteNav['ID']) && $RouteNav['ID'] > 0 ){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='route.php?ID=<?php echo $RouteNav['ID'];?>'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Route(3);?></div>
 				<div class ='nav-text'>Route</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Safety_Report']) && $My_Privileges['Safety_Report']['User_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='reports.php'">
+			<?php if(isset($My_Privileges['Safety_Report']) && $My_Privileges['Safety_Report']['Owner'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='reports.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Report(3);?></div>
 				<div class ='nav-text'>Reports</div>
 			</div><?php } ?>
-      <?php if(isset($My_Privileges['Admin']) && $My_Privileges['Admin']['User_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='supervisors.php'">
+      <?php if(isset($My_Privileges['Admin']) && $My_Privileges['Admin']['Owner'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='supervisors.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 				<div class ='nav-text'>Supervisors</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Territory']) && $My_Privileges['Territory']['User_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='territories.php'">
+			<?php if(isset($My_Privileges['Territory']) && $My_Privileges['Territory']['Owner'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='territories.php'">
 					<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Territory(3);?></div>
 					<div class ='nav-text'>Territories</div>
 			</div><?php }?>
-      <?php if((isset($My_Privileges['Admin']) && $My_Privileges['Admin']['Other_Privilege'] >= 4) || (isset($My_Privileges['Testing']) && $My_Privileges['Testing']['User_Privilege'] >= 4)){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='category-test.php'">
+      <?php if((isset($My_Privileges['Admin']) && $My_Privileges['Admin']['Other'] >= 4) || (isset($My_Privileges['Testing']) && $My_Privileges['Testing']['Owner'] >= 4)){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='category-test.php'">
         <div class='nav-icon'><i class="fa fa-clipboard fa-3x fa-fw" aria-hidden="true"></i></div>
         <div class ='nav-text'>Test</div>
       </div><?php }?>
-			<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['User_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='timesheet.php'">
+			<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Owner'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='timesheet.php'">
 					<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Timesheet(3);?></div>
 					<div class ='nav-text'>Timesheet</div>
 			</div><?php }?>
-			<?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 || $My_Privileges['Unit']['Group_Privilege'] >= 4 || $My_Privileges['Unit']['Other_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='units.php'">
+			<?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Owner'] >= 4 || $My_Privileges['Unit']['Group'] >= 4 || $My_Privileges['Unit']['Other'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='units.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 				<div class ='nav-text'>Units</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Other_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='users.php'">
+			<?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Other'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='users.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
 				<div class ='nav-text'>Users</div>
 			</div><?php } ?>
-			<?php if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['User_Privilege'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='violations.php'">
+			<?php if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['Owner'] >=4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='violations.php'">
 				<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 				<div class ='nav-text'>Violations</div>
 			</div><?php } ?>
@@ -440,7 +440,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Logout(3);?></div>
 		<div class ='nav-text'>Logout</div>
 	</div>
-      <?php if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['Other_Privilege'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='support.php'">
+      <?php if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['Other'] >= 4){?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onclick="document.location.href='support.php'">
 				<div class='nav-icon'><i class="fa fa-question-circle fa-3x fa-fw" aria-hidden="true"></i></div>
 				<div class ='nav-text'>Support</div>
 			</div><?php }?>
