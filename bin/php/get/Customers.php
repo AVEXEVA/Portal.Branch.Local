@@ -246,6 +246,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 
         $iFilteredTotal = 0;
+        $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+        $_SESSION[ 'Tables' ][ 'Customers' ] = isset( $_SESSION[ 'Tables' ][ 'Customers' ]  ) ? $_SESSION[ 'Tables' ][ 'Customers' ] : array( );
         if( count( $_SESSION[ 'Tables' ][ 'Customers' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Customers' ] as &$Value ){ $Value = false; } }
         $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] = $_GET;
         while( $Row = sqlsrv_fetch_array( $fResult ) ){

@@ -80,38 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'job.php'
-        )
-      );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Payroll' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Payroll' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'payroll.php'
+            'jobs.php'
         )
       );
 $Mechanic = is_numeric($_SESSION['Connection']['User']) ? $_SESSION['Connection']['User'] : -1;
@@ -273,7 +242,7 @@ if($Mechanic > 0){
                                         $Thursday = date('Y-m-d',strtotime($Thursday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Thursday . " 00:00:00.000'
@@ -284,7 +253,7 @@ if($Mechanic > 0){
                                         <?php $Friday = date('Y-m-d',strtotime($Friday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Friday . " 00:00:00.000'
                                                     AND EDate <= '" . $Friday . " 23:59:59.999' AND ClearPR='1'");?>
@@ -294,7 +263,7 @@ if($Mechanic > 0){
                                         <?php $Saturday = date('Y-m-d',strtotime($Saturday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Saturday . " 00:00:00.000'
@@ -305,7 +274,7 @@ if($Mechanic > 0){
                                         <?php $Sunday = date('Y-m-d',strtotime($Sunday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Sunday . " 00:00:00.000'
@@ -316,7 +285,7 @@ if($Mechanic > 0){
                                         <?php $Monday = date('Y-m-d',strtotime($Monday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Monday . " 00:00:00.000'
@@ -327,7 +296,7 @@ if($Mechanic > 0){
                                         <?php $Tuesday = date('Y-m-d',strtotime($Tuesday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Tuesday . " 00:00:00.000'
@@ -338,7 +307,7 @@ if($Mechanic > 0){
                                         <?php $Wednesday = date('Y-m-d',strtotime($Wednesday . ' -7 days'));
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Wednesday . " 00:00:00.000'
@@ -349,7 +318,7 @@ if($Mechanic > 0){
                                         <td><?php
                                             $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Thursday . " 00:00:00.000'
@@ -360,7 +329,7 @@ if($Mechanic > 0){
                                         <td>$<?php
                                             $result = $database->query(null,"
                                                 SELECT Sum(Zone) + 0 as Zone_Sum, Sum(OtherE) + 0 as Other_Sum
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Thursday . " 00:00:00.000'

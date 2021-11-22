@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   $result = \singleton\database::getInstance( )->query(
     'Portal',
     "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   );
   $Privileges = array();
   if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-      
+
       $key = $Privilege['Access'];
       unset( $Privilege[ 'Access' ] );
       $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         dechex( $Privilege[ 'Department' ] ),
         dechex( $Privilege[ 'Database' ] ),
         dechex( $Privilege[ 'Server' ] ),
-        dechex( $Privilege[ 'Other' ] ), 
+        dechex( $Privilege[ 'Other' ] ),
         dechex( $Privilege[ 'Token' ] ),
         dechex( $Privilege[ 'Internet' ] )
       ) );
@@ -92,32 +92,32 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	"	SELECT TOP 1
                     Location.Loc         AS ID,
                     Location.Tag         AS Name,
-                 	Location.Status      AS Status,
+                 	  Location.Status      AS Status,
                     Location.Address     AS Street,
                     Location.City        AS City,
                     Location.State       AS State,
                     Location.Zip         AS Zip,
-                    Location.fLong 		 AS Longitude,
-                    Location.Latt 		 AS Latitude,
+                    Location.fLong 		   AS Longitude,
+                    Location.Latt 		   AS Latitude,
                     Location.Balance     AS Balance,
-                    Location.Custom8 	 AS Resident_Mechanic,
-                    Location.Maint 		 AS Maintenance,
-                    Location.Geolock 	 AS Geofence,
-                    Location.STax 		 AS Sales_Tax,
-                    Location.InUse 		 AS In_Use,
-                    Customer.ID 		 AS Customer_ID,
+                    Location.Custom8 	   AS Resident_Mechanic,
+                    Location.Maint 		   AS Maintenance,
+                    Location.Geolock 	   AS Geofence,
+                    Location.STax 		   AS Sales_Tax,
+                    Location.InUse 		   AS In_Use,
+                    Customer.ID 		     AS Customer_ID,
                     Customer.Name        AS Customer_Name,
                     Location.Route       AS Route_ID,
-                    Route.NAme 			 AS Route_Name,
+                    Route.NAme 			     AS Route_Name,
                     Emp.ID               AS Route_Mechanic_ID,
                     Emp.fFirst           AS Route_Mechanic_First_Name,
                     Emp.Last             AS Route_Mechanic_Last_Name,
                     Location.Owner 	     AS Customer_ID,
-                    Customer.Name    	 AS Customer_Name,
-                    Territory.ID 		 AS Territory_ID,
+                    Customer.Name    	   AS Customer_Name,
+                    Territory.ID 		     AS Territory_ID,
                     Territory.Name       AS Territory_Name,
-                    Division.ID 		 AS Division_ID,
-                    Division.Name 		 AS Division_Name
+                    Division.ID 		     AS Division_ID,
+                    Division.Name 		    AS Division_Name
             FROM    Loc AS Location
                     LEFT JOIN Zone         ON Location.Zone   = Zone.ID
                     LEFT JOIN Route        ON Location.Route  = Route.ID
@@ -144,7 +144,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         )
     );
 
-    $Location = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array( 
+    $Location = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
     	'ID' => null,
     	'Name' => null,
     	'Status' => null,
@@ -220,7 +220,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    		null,
 	    		"	UPDATE 	Loc
 	    			SET 	Loc.Tag = ?,
-	                		Loc.Status = ?,
+	                Loc.Status = ?,
 	      					Loc.Address = ?,
 	      					Loc.City = ?,
 	      					Loc.State = ?,
@@ -229,20 +229,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      					Loc.fLong = ?,
 	      					Loc.Maint = ?,
 	      					Loc.Owner = (
-	      						SELECT 	ID 
+	      						SELECT 	ID
 	      						FROM 	(
-		                                    SELECT  Owner.ID,
-		                                            Rol.Name,
-		                                            Owner.Status
-		                                    FROM    Owner
-		                                            LEFT JOIN Rol ON Owner.Rol = Rol.ID
-		                                ) AS Customer
+                            SELECT  Owner.ID,
+                                    Rol.Name,
+                                    Owner.Status
+                            FROM    Owner
+                                    LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                          ) AS Customer
 	      						WHERE 	Customer.Name = ?
 	      					)
 	    			WHERE 	Loc.Loc= ?;",
 	    		array(
 	    			$Location[ 'Name' ],
-	          		$Location[ 'Status' ],
+	          $Location[ 'Status' ],
 	    			$Location[ 'Street' ],
 	    			$Location[ 'City' ],
 	    			$Location[ 'State' ],
@@ -391,7 +391,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								    </div>
 								    <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='customer.php?ID=<?php echo $Location[ 'Customer_ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
-				                <div class='row g-0'>
+				         <div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
 									<div class='col-8'><select name='Status' class='form-control edit'>
 										<option value=''>Select</option>
@@ -399,7 +399,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										<option value='1' <?php echo $Location[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
 									</select></div>
 								</div>
-				                <div class='row g-0'>
+				        <div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
 									<div class='col-6'></div>
 									<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
@@ -516,7 +516,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								    	<input type='hidden' disabled name='Division' value='<?php echo $Location[ 'Division_ID' ];?>' />
 								    	<input type='text' class='form-control edit' name='Division_Autocomplete' value='<?php echo $Location[ 'Division_Name' ];?>' />
 								    </div>
-								    <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+								    <div class='col-2'><button class='h-100 w-100' type='button' <?php
 								    	if( in_array( $Location[ 'Route_ID' ], array( null, 0, '', ' ') ) ){
 								    		echo "onClick=\"document.location.href='divisions.php';\"";
 								    	} else {
@@ -562,7 +562,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										    );
 								    	</script>
 								    </div>
-								    <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+								    <div class='col-2'><button class='h-100 w-100' type='button' <?php
 								    	if( in_array( $Location[ 'Route_ID' ], array( null, 0, '', ' ') ) ){
 								    		echo "onClick=\"document.location.href='routes.php';\"";
 								    	} else {

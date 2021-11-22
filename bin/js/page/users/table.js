@@ -17,13 +17,6 @@ $(document).ready(function( ){
         paging         : true,
         orderCellsTop  : true,
         autoWidth      : true,
-        //stateSave      : true,
-        /*responsive     : {
-          details : {
-            type   : 'column',
-            target : 0
-          }
-        },*/
         select         : {
           style : 'multi',
           selector : 'td.ID'
@@ -40,20 +33,24 @@ $(document).ready(function( ){
                             dir : d.order[0].dir
                         }
                     };
-                    d.ID            = $('input[name="ID"]').val( );
-                    d.First_Name    = $('input[name="First_Name"]').val( );
-                    d.Last_Name     = $('input[name="Last_Name"]').val( );
+                    d.ID = $('input[name="ID"]').val( );
+                    d.Email = $('input[name="Email"]').val( );
                     return d;
                 }
         },
         columns: [
             {
-                data    : 'ID',
-                visible : false
+              data    : 'ID'
             },{
-                data : 'First_Name'
+              data : 'Email'
             },{
-                data : 'Last_Name'
+              data : 'Verified'
+            },{
+              data : 'Branch'
+            },{
+              data : 'Branch_Type'
+            },{
+              data : 'Branch_ID'
             }
         ],
         initComplete : function( ){
@@ -61,32 +58,64 @@ $(document).ready(function( ){
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             //search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Tickets.draw(); });
+            $( '.redraw' ).bind( 'change', function(){ Table_Users.draw(); });
         },
-        buttons: [
+        buttons : [
             {
-                text: 'Reset Search',
-                action: function ( e, dt, node, config ) {
-                    $( 'input, select' ).each( function( ){
-                        $( this ).val( '' );
-                    } );
-                    Table_Tickets.draw( );
-                }
+              text: 'Reset Search',
+              className : 'form-control',
+              action: function ( e, dt, node, config ) {
+                  $( 'input:visible, select:visible' ).each( function( ){
+                      $( this ).val( '' );
+                  } );
+                  Table_Users.draw( );
+              }
             },{
-                text : 'Get URL',
-                action : function( e, dt, node, config ){
-                    var d = { };
-                    d.ID            = $('input[name="ID"]').val( );
-                    d.First_Name    = $('input[name="First_Name"]').val( );
-                    d.Last_Name     = $('input[name="Last_Name"]').val( );
-                    document.location.href = 'users.php?' + new URLSearchParams( d ).toString();
-                }
-            },
-            { extend: 'create', editor: Editor_Users },
-            { extend: 'edit',   editor: Editor_Users },
-            { extend: 'remove', editor: Editor_Users },
-            'copy',
-            'csv'
+              text : 'Get URL',
+              className : 'form-control',
+              action : function( e, dt, node, config ){
+                  d = { }
+                  d.ID = $('input[name="ID"]').val( );
+                  d.Email = $('input[name="Email"]').val( );
+                  document.location.href = 'users.php?' + new URLSearchParams( d ).toString();
+              }
+            },{
+              text : 'Create',
+              className : 'form-control',
+              action : function( e, dt, node, config ){
+                  document.location.href='user.php';
+              }
+            },{
+              text : 'Delete',
+              className : 'form-control',
+              action : function( e, dt, node, config ){
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                $.ajax ({
+                  url    : 'bin/php/post/user.php',
+                  method : 'POST',
+                  data   : {
+                    action : 'delete',
+                    data : dte
+                  },
+                  success : function(response){
+                    Table_Users.draw();
+                  }
+                })
+              }
+            },{
+                extend : 'print',
+                text : 'Print',
+                className : 'form-control'
+            },{
+                extend : 'copy',
+                text : 'Copy',
+                className : 'form-control'
+            },{
+                extend : 'csv',
+                text : 'CSV',
+                className : 'form-control'
+            }
         ]
     } );
 });

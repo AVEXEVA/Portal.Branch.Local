@@ -167,32 +167,17 @@ $( document ).ready( function( ){
         ],
         buttons: [
             {
-                text: 'Email Ticket',
-                action: function ( e, dt, node, config ) {
-                    var rows = dt.rows( { selected : true } ).indexes( );
-                    var dte = dt.cells( rows, 0 ).data( ).toArray( );
-                    $.ajax({
-                        url : 'bin/php/post/emailTicket.php',
-                        method : 'POST',
-                        data : {
-                            email : prompt( "What email would you like to send the ticket to?"),
-                            data : dte
-                        },
-                        success : function( response ){
-                            console.log( response );
-                        }
-                    });
-                }
-            },{
                 text: 'Reset Search',
+                className : 'form-control',
                 action: function ( e, dt, node, config ) {
-                    $( 'input, select' ).each( function( ){
+                    $( 'input:visible, select:visible' ).each( function( ){
                         $( this ).val( '' );
                     } );
                     Table_Customers.draw( );
                 }
             },{
                 text : 'Get URL',
+                className : 'form-control',
                 action : function( e, dt, node, config ){
                     d = { }
                     d.ID = $('input[name="ID"]').val( );
@@ -202,12 +187,14 @@ $( document ).ready( function( ){
                 }
             },{
                 text : 'Create',
+                className : 'form-control',
                 action : function( e, dt, node, config ){
                     document.location.href='customer.php';
                 }
             },
             {
                 text : 'Delete',
+                className : 'form-control',
                 action : function( e, dt, node, config ){
                   var rows = dt.rows( { selected : true } ).indexes( );
                   var dte = dt.cells( rows, 0 ).data( ).toArray( );
@@ -223,9 +210,19 @@ $( document ).ready( function( ){
                     }
                   })
                 }
-              },
-            'copy',
-            'csv'
+              },{
+                extend : 'print',
+                text : 'Print',
+                className : 'form-control'
+            },{
+                extend : 'copy',
+                text : 'Copy',
+                className : 'form-control'
+            },{
+                extend : 'csv',
+                text : 'CSV',
+                className : 'form-control'
+            }
         ],
         initComplete : function( ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'

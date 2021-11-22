@@ -142,43 +142,63 @@ $( document ).ready( function( ){
           }
       }
     ],
-    initComplete : function( ){
-          $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
-          $('input.date').datepicker( { } );
-          $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-          //search( this );
-          $( '.redraw' ).bind( 'change', function(){ Table_Jobs.draw(); });
-      },
-      buttons: [
-          {
-              text: 'Reset Search',
-              action: function ( e, dt, node, config ) {
-                  $( 'input, select' ).each( function( ){
-                      $( this ).val( '' );
-                  } );
-                  Table_Jobs.draw( );
-              }
+    buttons: [
+        {
+            text: 'Reset Search',
+            className: 'form-control',
+            action: function ( e, dt, node, config ) {
+                $( 'input, select' ).each( function( ){
+                    $( this ).val( '' );
+                } );
+                Table_Tickets.draw( );
+            }
+        },{
+            text : 'Get URL',
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+                var d = { };
+                d.ID             = $('input[name="ID"]').val( );
+                d.Person         = $('input[name="Person"]').val( );
+                d.Customer       = $('input[name="Customer"]').val( );
+                d.Location       = $('input[name="Location"]').val( );
+                d.Unit           = $('input[name="Unit"]').val( );
+                d.Job            = $('input[name="Job"]').val( );
+                d.Type           = $('select[name="Type"]').val( );
+                d.Level          = $('select[name="Level"]').val( );
+                d.Status         = $('select[name="Status"]').val( );
+                d.Start_Date     = $('input[name="Start_Date"]').val( );
+                d.End_Date       = $('input[name="End_Date"]').val( );
+                d.Time_Route_Start     = $('input[name="Time_Route_Start"]').val( );
+                d.Time_Route_End       = $('input[name="Time_Route_End"]').val( );
+                d.Time_Site_Start     = $('input[name="Time_Site_Start"]').val( );
+                d.Time_Site_End       = $('input[name="Time_Site_End"]').val( );
+                d.Time_Completed_Start     = $('input[name="Time_Completed_Start"]').val( );
+                d.Time_Completed_End       = $('input[name="Time_Completed_End"]').val( );
+                d.LSD       = $('select[name="LSD"]').val( );
+                document.location.href = 'jobs.php?' + new URLSearchParams( d ).toString();
+            }
           },{
-              text : 'Get URL',
-              action : function( e, dt, node, config ){
-                  var d = { };
-                  d.ID = $("input[name='ID']").val( );
-                  d.Name = $("input[name='Name']").val( );
-                  d.Date = $("input[name='Date']").val( );
-                  d.Customer = $("input[name='Customer']").val( );
-                  d.Locaton = $("input[name='Location']").val( );
-                  d.Type = $("select[name='Type']").val( );
-                  d.Status = $("select[name='Status']").val( );
-                  d.Tickets = $("input[name='Tickets']").val( );
-                  d.Invoices = $("input[name='Invoices']").val( );
-                  document.location.href = 'jobs.php?' + new URLSearchParams( d ).toString();
-              }
-          },
-          { extend: 'create', editor: Editor_Jobs },
-          { extend: 'edit',   editor: Editor_Jobs },
-          { extend: 'remove', editor: Editor_Jobs },
-          'copy',
-          'csv'
-      ]
-    } );
+          text : 'Create',
+          className: 'form-control',
+          action : function( e, dt, node, config ){
+              document.location.href='job.php';}
+            },{
+            text: 'Print',
+            className: 'form-control',
+            action: function ( e, dt, node, config ) {
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                document.location.href = 'jobs.php?Tickets=' + dte.join( ',' );
+            }
+          },{
+              extend : 'copy',
+              text : 'Copy',
+              className : 'form-control'
+          },{
+              extend : 'csv',
+              text : 'CSV',
+              className : 'form-control'
+          }
+      ],
+  } );
 } );

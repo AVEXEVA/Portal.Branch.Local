@@ -1,145 +1,129 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [
-        'read_and_close' => true
-    ] );
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    //Connection
-    $Connection = \singleton\database::getInstance( )->query(
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+    $result = \singleton\database::getInstance( )->query(
         null,
-        "   SELECT  *
-            FROM    Connection
-            WHERE   Connector = ?
-                    AND Hash = ?;",
+        " SELECT  Emp.fFirst  AS First_Name,
+                  Emp.Last    AS Last_Name,
+                  Emp.fFirst + ' ' + Emp.Last AS Name,
+                  Emp.Title AS Title,
+                  Emp.Field   AS Field
+          FROM  Emp
+          WHERE   Emp.ID = ?;",
         array(
-            $_SESSION['User'],
-            $_SESSION['Hash']
+            $_SESSION[ 'Connection' ][ 'User' ]
         )
     );
-    $Connection = sqlsrv_fetch_array($Connection);
-
-    //User
-    $User = \singleton\database::getInstance( )->query(null,
-        "  SELECT   *, fFirst AS First_Name, Last as Last_Name
-           FROM Emp
-           WHERE ID= ?",
-    array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($User);
-
+    $User   = sqlsrv_fetch_array( $result );
     //Privileges
-    $r = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         'Portal',
-        "   SELECT Access, Owner, Group, Other
-            FROM   Privilege
-            WHERE  User_ID = ?;",
-        array($_SESSION['User']));
-    $Privileges = array();
-    while($Privilege = sqlsrv_fetch_array( $r )){ $Privileges[$Privilege['Access']] = $Privilege;}
-    $Privileged = FALSE;
-    if( isset($Privileges['Violation'])
-        && $Privileges['Violation']['Owner'] >= 4
-        && $Privileges['Violation']['Group'] >= 4){$Privileged = TRUE;}
-
-    if(!isset($Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=violations.php';</script></head></html><?php }
-    else {
-      \singleton\database::getInstance( )->query(
-        null,
-        "   INSERT INTO Activity([User], [Date], [Page])
-            VALUES(?,?,?);",
+        "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner], 
+                    [Privilege].[Group], 
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+          FROM      dbo.[Privilege]
+          WHERE     Privilege.[User] = ?;",
         array(
-            $_SESSION['User'],
-            date("Y-m-d H:i:s"),
+            $_SESSION[ 'Connection' ][ 'User' ],
+        )
+    );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+        
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+            dechex( $Privilege[ 'Owner' ] ),
+            dechex( $Privilege[ 'Group' ] ),
+            dechex( $Privilege[ 'Department' ] ),
+            dechex( $Privilege[ 'Database' ] ),
+            dechex( $Privilege[ 'Server' ] ),
+            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Token' ] ),
+            dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(     !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Route' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Violation' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] ) 
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
             'violations.php'
         )
-    );
-    if(     !isset($array['ID'])
-        ||  !$Privileged
-        || !is_numeric($_GET['ID'])){
-          ?><html><head><script>document.location.href="../login.php?Forward=violations<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html> <?php }
-    else {
-        $r = \singleton\database::getInstance( )->query(
-          null,
-            "SELECT
-                Loc.ID               AS ID,
-                Elev.ID              AS Unit_ID,
-                Job.fdate            AS Start_Date,
-                Violation.Status     AS Violation_Status,
-                Violation.Quote      AS Violation_Quote,
-                Violation.Ticket     AS Violation_Ticket,
-                Job.Remarks          AS Remarks,
-                Route.Name           AS Route_Name,
-                Route.ID             AS Route_ID,
-                Emp.fFirst           AS First_Name,
-                Emp.Last             AS Last_Name,
-                Emp.ID               AS Employee_ID,
-                Emp.fFirst           AS Employee_First_Name,
-                Emp.Last             AS Employee_Last_Name,
-                Emp.fWork            AS fWork,
-                Emp.ID               AS Route_Mechanic_ID,
-                Emp.fFirst           AS Route_Mechanic_First_Name,
-                Emp.Last             AS Route_Mechanic_Last_Name,
-                Rol.Phone            AS Route_Mechanic_Phone_Number
-            FROM
-                Route
-                LEFT JOIN Emp   ON  Route.Mech = Emp.fWork
-                LEFT JOIN Rol          ON Emp.Rol    = Rol.ID
-            WHERE
-                Route.ID        =   ?
-        ;",array(
-            $_GET['ID']));
-        $Route = sqlsrv_fetch_array($r);
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php');?>
-    <?php require( bin_css  . 'index.php');?>
-    <?php require( bin_js   . 'index.php');?>
+    <?php require( bin_css . 'index.php');?>
+    <?php require( bin_js  . 'index.php' );?>
 </head>
-<body onload='finishLoadingPage();'>
-    <div id="wrapper">
+<body>
+    <div id='wrapper'>
         <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Violation</span></h5></div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
-                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='locations.php'>
-                  <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Search(1);?>Search:</div>
-                    <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Search' value='<?php echo $Violation['Search'];?>' /></div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
+        <div id='page-wrapper' class='content'>
+            <div class="card card-full card-primary border-0">
+                <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</h4></div>
+                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='violations.php'>
                     <div class='row g-0'>
-    									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
-    									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Violation['Name'];?>' /></div>
-    								</div>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Search(1);?>Search:</div>
+                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Search' value='<?php echo $Violation['Search'];?>' /></div>
+                    </div>
+                    <div class='row g-0'><div class='col-xs-12'>&nbsp;</div></div>
                     <div class='row g-0'>
-    									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Date(1);?>Date:</div>
-    									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Date' value='<?php echo $Violation['Date'];?>' /></div>
-    								</div>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
+                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Violation['Name'];?>' /></div>
+                    </div>
                     <div class='row g-0'>
-    									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?>Location:</div>
-    									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Location' value='<?php echo $Violation['Location'];?>' /></div>
-    								</div>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?>Date:</div>
+                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Date' value='<?php echo $Violation['Date'];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?>Location:</div>
+                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Location' value='<?php echo $Violation['Location'];?>' /></div>
+                    </div>
                     <div class='row'>
-                      <div class='col-8'><select name='Status' class='form-control edit'>
-    										<option value=''>Select</option>
-    										<option value='0' <?php echo $Violation[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
-    										<option value='1' <?php echo $Violation[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
-    									</select></div>
+                        <div class='col-12'><select name='Status' class='form-control edit'>
+                            <option value=''>Select</option>
+                            <option value='0' <?php echo $Violation[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
+                            <option value='1' <?php echo $Violation[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
+                        </select></div>
                     </div>
                     <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
                 </form></div>
-                <div class='card-body bg-dark'>
+                <div class="card-body bg-dark">
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
                             <th title='ID'>ID</th>
@@ -152,7 +136,6 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                             <th title='Customer'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                             <th title='Location'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                             <th title="Date"><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
-
                             <th title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
                         </tr></thead>
                     </table>

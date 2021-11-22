@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Customer' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Bugs' ] )
+        ||  !isset( $Privileges[ 'Admin' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Admin' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -80,7 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'customers.php'
+            'bugs.php'
         )
       );
 ?><!DOCTYPE html>

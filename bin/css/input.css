@@ -4,7 +4,11 @@ div#ui-datepicker-div {
 input.form-control, select.form-control {
 	background-color: rgba( 255, 255, 255, .9 );
 }
-input.form-control[readonly] {
+input.form-control[readonly], select.form-control[readonly] {
 	background-color: rgba( 255, 255, 255, .35 );
 	color : white;
+}
+button.dt-button.form-control {
+	width : auto;
+	display : inline-block;
 }

@@ -71,6 +71,7 @@ $( document ).ready( function( ){
 	        url : 'bin/php/get/Units.php',
 	        data : function( d ){
 	            d = {
+	            	draw : d.draw,
 	                start : d.start,
 	                length : d.length,
 	                order : {

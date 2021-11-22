@@ -7,7 +7,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   //Connection
     $result = \singleton\database::getInstance( )->query(
       'Portal',
-      " SELECT  [Connection].[ID]
+      " SELECT      s[Connection].[ID]
         FROM    dbo.[Connection]
         WHERE       [Connection].[User] = ?
                 AND [Connection].[Hash] = ?;",
@@ -69,37 +69,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'job.php'
-        )
-      );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Profile' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Profile' ] )
     ){ ?><?php require('404.html');?><?php }
@@ -114,8 +83,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'profile.php'
         )
       );
-$Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;
-
+$Mechanic = is_numeric($_SESSION[ 'Connection' ]['User']) ? $_SESSION[ 'Connection' ]['User'] : -1;
 if($Mechanic > 0){
     $Call_Sign = "";
     $r = \singleton\database::getInstance( )->query(
@@ -131,7 +99,7 @@ if($Mechanic > 0){
            FROM
             (Emp LEFT JOIN PRWage ON Emp.WageCat = PRWage.ID)
             LEFT JOIN Rol ON Emp.Rol = Rol.ID
-        WHERE Emp.ID = ?;",array($_SESSION['User']));
+        WHERE Emp.ID = ?;",array($_SESSION[ 'Connection' ]['User']));
     $User = sqlsrv_fetch_array($r);
     while($a= sqlsrv_fetch_array($r)){}
 }?><!DOCTYPE html>
@@ -142,13 +110,17 @@ if($Mechanic > 0){
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
+    <?php$_GET[ 'Bootstrap' ] = '5.1';
+      $_GET[ 'Entity_CSS' ] = 1;?>
+    <?php require( bin_meta . 'index.php' );?>
+      <?php require( bin_css  . 'index.php' );?>
+      <?php require( bin_js   . 'index.php' );?>
     <title>Nouveau Texas | Portal</title>
     <?php require('css/index.php');
     require('js/index.php');?>
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation.php');?>
         <div id="page-wrapper">
 			<div class='panel panel-primary'>
 				<div class='panel-heading'><?php echo proper($User['fFirst'] . " " . $User['Last_Name']);?></div>

@@ -69,39 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'job.php'
-        )
-      );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Review' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Review' ] )
+        ||  !isset( $Privileges[ 'Time' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Time' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -156,24 +125,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/php/meta.php' );?>
-	<title>Nouveau Texas | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/css/index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+  <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+  <?php require( bin_css . 'index.php');?>
+  <?php require( bin_js . 'index.php');?>
     <style>
         .form-group>label:first-child {
             min-width  : 175px;
             text-align : right;
         }
     </style>
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/js/index.php' );?>
-
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/js/datatables.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
-        <?php require( 'var/www/html/Portal.Branch.Local/bin/php/element/navigation.php' );?>
-        <?php require( 'var/www/html/Portal.Branch.Local/bin/php/element/loading.php' );?>
+      <?php require(bin_php  . 'element/navigation.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
             <div class='panel panel-primary'>
                 <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Review Timesheets</div>
@@ -183,13 +149,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         <label for='Supers' class='col-auto'>Supervisor:</label>
                         <div class='col-auto'>
                             <select class='form-control' name='Supervisors' onChange='refresh_get( );'>
-                                <option value='All' <?php if($_GET['Supervisors'] == "All"){?>selected='selected'<?php }?>>All</option>
+                                <option value='All' <?php if($_GET['Supervisors'] == "All"){?>selected='selected'<?php }?> >All</option>
                                 <?php $Supervisors = array();
                                 foreach($Mechanics as $Mechanic){
                                     $Mechanic['Super'] = ucfirst(strtolower($Mechanic['Super']));
                                     if(!in_array($Mechanic['Super'],$Supervisors) && !in_array($Mechanic['Super'],['Office','Warehouse','firemen','Dean','Office','Firemen','',' ','  '])){
                                         array_push($Supervisors,$Mechanic['Super']);
-                                        ?><option value="<?php echo $Mechanic['Super'];?>" <?php if(in_array($Mechanic['Super'],$Selected_Supervisors)){?>selected='selected'<?php }?>><?php echo $Mechanic['Super'];?></option>
+                                        ?><option value="<?php echo $Mechanic['Super'];?>" <?php if(in_array($Mechanic['Super'],$Selected_Supervisors)){?>selected='selected'<?php }?> ><?php echo $Mechanic['Super'];?></option>
                                         <?php
                                     }
                                 }?>
@@ -199,7 +165,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='form-group row'>
                         <label class='date col-auto' for="filter_start_date">Week Ending:</label>
                         <?php
-                            switch( $Today ){
+                            switch( date('N') ){
                                 case 'Wednesday' : $Wednesday = date('m/d/Y', strtotime( $Wednesday . ' +0 days')); break;
                                 case 'Thursday'  : $Wednesday = date('m/d/Y', strtotime( $Wednesday . ' +6 days')); break;
                                 case 'Friday'    : $Wednesday = date('m/d/Y', strtotime( $Wednesday . ' +5 days')); break;

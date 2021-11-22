@@ -54,7 +54,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	);
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -69,8 +68,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Requisition' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Requisition' ] )
+        ||  !isset( $Privileges[ 'Customer' ] )
+        || 	!check( privilege_delete, level_group, $Privileges[ 'Customer' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -80,56 +79,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'requisitions.php'
+            'post/employee.php'
         )
       );
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
-</head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(bin_php  . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Requisitions</span></h5></div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
-          <div style='float:right;' onClick="document.location.href='purchase-requisition.php';"><?php \singleton\fontawesome::getInstance( )->Add(1);?></div>
-          <div style='clear:both;'></div>
-        </div>
-				<div class="panel-body">
-					<table id='Table_Requisitions' class='display' cellspacing='0' width='100%'>
-						<thead>
-							<th>ID</th>
-							<th>User</th>
-							<th>Date</th>
-							<th>Required</th>
-							<th>Location</th>
-							<th>Drop Off</th>
-							<th>Unit</th>
-							<th>Job</th>
-						</thead>
-					</table>
-				</div>
-      </div>
-  </div>
-</div>
-</body>
-</html>
-<?php
+		if(isset($_POST['action']) && $_POST['action'] == 'delete'){
+			if(isset($_POST['data']) && count($_POST['data']) > 0){
+				foreach($_POST['data'] as $ID){
+					$resource = $database->query(null,"SELECT [Emp].[Rol] as Rolodex_ID FROM [Emp] WHERE [ID] = ?;",array($ID));
+					if($resource){
+						$Rolodex_ID = sqlsrv_fetch_array($resource)['Rolodex_ID'];
+						if(is_numeric($Rolodex_ID) && $Rolodex_ID > 0){
+							$database->query(null,"DELETE FROM dbo.Rol WHERE Rol.ID = ?;",array($Rolodex_ID));
+						}
+					}
+					$database->query(null,"DELETE FROM [Emp] WHERE [Emp].[ID] = ?;",array($ID));
+				}
+				print json_encode(array('data'=>array()));
+			}
+		}
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=units.php';</script></head></html><?php }?>
+}?>

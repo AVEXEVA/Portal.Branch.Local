@@ -2,7 +2,7 @@ $( document ).ready( function( ){
   var Editor_Collections = new $.fn.dataTable.Editor( {
       idSrc    : 'ID',
       ajax     : 'index.php',
-      table    : '#Table_Collections'
+      table    : '#Table_Collection'
   } );
   var Table_Collections = $('#Table_Collections').DataTable( {
       dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
@@ -31,12 +31,13 @@ $( document ).ready( function( ){
         url     : 'bin/php/get/Collections.php',
         data : function( d ){
           d = {
-              start : d.start,
-              length : d.length,
-              order : {
-                  column : d.order[0].column,
-                  dir : d.order[0].dir
-              }
+            draw : d.draw,
+            start : d.start,
+            length : d.length,
+            order : {
+                column : d.order[0].column,
+                dir : d.order[0].dir
+            }
           };
           d.Search = $('input[name="Search"]').val( );
           d.ID = $('input[name="ID"]').val( );
@@ -64,9 +65,9 @@ $( document ).ready( function( ){
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.ID !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='collection.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Invoice #" + row.ID + "</a></div>" + 
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='collection.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Invoice #" + row.ID + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -78,9 +79,9 @@ $( document ).ready( function( ){
         render : function( data, type, row, meta ){
           switch( type ){
             case 'display' :
-                return  row.Territory_ID !== null 
-                    ?   "<div class='row'>" + 
-                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-black-tie fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" + 
+                return  row.Territory_ID !== null
+                    ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-black-tie fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" +
                         "</div>"
                     :   null;
             default :
@@ -92,9 +93,9 @@ $( document ).ready( function( ){
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Customer_ID !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
+                      return  row.Customer_ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -107,15 +108,15 @@ $( document ).ready( function( ){
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Location_ID !== null 
-                          ?   "<div class='row'>" + 
-                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" + 
+                      return  row.Location_ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
                                   "<div class='col-12'>" +
                                       "<div class='row'>" +
-                                          "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" + 
-                                          "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" + 
+                                          "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
+                                          "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
                                       "</div>" +
-                                  "</div>" +  
+                                  "</div>" +
                               "</div>"
                           :   null;
                   default :
@@ -128,9 +129,9 @@ $( document ).ready( function( ){
         render : function( data, type, row, meta ){
           switch( type ){
             case 'display':
-              return row.Job_ID !== null 
+              return row.Job_ID !== null
                 ? "<div class='row'>" +
-                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" + 
+                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" +
                     "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
                   "</div>"
                 : null;
@@ -150,16 +151,16 @@ $( document ).ready( function( ){
           switch( type ){
             case 'display':
               if( row.Original > 0 ){
-                return "<div class='row'>" + 
-                  "<div class='col-12'>" + row.Original + "</div>" + 
+                return "<div class='row'>" +
+                  "<div class='col-12'>" + row.Original + "</div>" +
                 "</div>"
               } else if( row.Original < 0 ){
-                return "<div class='row'>" + 
-                  "<div class='col-12'>" + row.Original + "</div>" + 
+                return "<div class='row'>" +
+                  "<div class='col-12'>" + row.Original + "</div>" +
                 "</div>"
               } else if( row.Original == 0 ){
-                return "<div class='row'>" + 
-                  "<div class='col-12'>" + row.Original + "</div>" + 
+                return "<div class='row'>" +
+                  "<div class='col-12'>" + row.Original + "</div>" +
                 "</div>"
               }
             default :
@@ -172,16 +173,16 @@ $( document ).ready( function( ){
           switch( type ){
             case 'display':
               if( row.Original > 0 ){
-                return "<div class='row'>" + 
-                  "<div class='col-12'>" + row.Original + "</div>" + 
+                return "<div class='row'>" +
+                  "<div class='col-12'>" + row.Original + "</div>" +
                 "</div>"
               } else if( row.Original < 0 ){
-                return "<div class='row'>" + 
-                  "<div class='col-12'>" + row.Original + "</div>" + 
+                return "<div class='row'>" +
+                  "<div class='col-12'>" + row.Original + "</div>" +
                 "</div>"
               } else if( row.Original == 0 ){
-                return "<div class='row'>" + 
-                  "<div class='col-12'>" + row.Original + "</div>" + 
+                return "<div class='row'>" +
+                  "<div class='col-12'>" + row.Original + "</div>" +
                 "</div>"
               }
             default :
@@ -193,7 +194,7 @@ $( document ).ready( function( ){
       }
     ],
     initComplete : function( ){
-        $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );' 
+        $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
         $('input.date').datepicker( { } );
         $('input.time').timepicker( {  timeFormat : 'h:i A' } );
         //search( this );
@@ -202,6 +203,7 @@ $( document ).ready( function( ){
     buttons: [
         {
             text: 'Email Invoice',
+            className: 'form-control',
             action: function ( e, dt, node, config ) {
                 var rows = dt.rows( { selected : true } ).indexes( );
                 var dte = dt.cells( rows, 0 ).data( ).toArray( );
@@ -217,6 +219,7 @@ $( document ).ready( function( ){
             }
         },{
             text: 'Reset Search',
+            className: 'form-control',
             action: function ( e, dt, node, config ) {
                 $( 'input, select' ).each( function( ){
                     $( this ).val( '' );
@@ -225,6 +228,7 @@ $( document ).ready( function( ){
             }
         },{
             text : 'Get URL',
+            className: 'form-control',
             action : function( e, dt, node, config ){
                 var d = { };
                 d.ID             = $('input[name="ID"]').val( );
@@ -234,7 +238,7 @@ $( document ).ready( function( ){
                 d.Unit           = $('input[name="Unit"]').val( );
                 d.Job            = $('input[name="Job"]').val( );
                 d.Type           = $('select[name="Type"]').val( );
-                d.Level          = $('select[name="Level"]').val( ); 
+                d.Level          = $('select[name="Level"]').val( );
                 d.Status         = $('select[name="Status"]').val( );
                 d.Start_Date     = $('input[name="Start_Date"]').val( );
                 d.End_Date       = $('input[name="End_Date"]').val( );
@@ -247,20 +251,28 @@ $( document ).ready( function( ){
                 d.LSD       = $('select[name="LSD"]').val( );
                 document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
             }
-        },
-        { extend: 'create', editor: Editor_Collections },
-        { extend: 'edit',   editor: Editor_Collections },
-        { extend: 'remove', editor: Editor_Collections },
-        {
+          },{
+          text : 'Create',
+          className: 'form-control',
+          action : function( e, dt, node, config ){
+              document.location.href='invoices.php';}
+            },{
             text: 'Print',
+            className: 'form-control',
             action: function ( e, dt, node, config ) {
                 var rows = dt.rows( { selected : true } ).indexes( );
                 var dte = dt.cells( rows, 0 ).data( ).toArray( );
                 document.location.href = 'print_tickets.php?Tickets=' + dte.join( ',' );
             }
-        },
-        'copy',
-        'csv'
-    ]
+          },{
+              extend : 'copy',
+              text : 'Copy',
+              className : 'form-control'
+          },{
+              extend : 'csv',
+              text : 'CSV',
+              className : 'form-control'
+          }
+      ],
   } );
 } );

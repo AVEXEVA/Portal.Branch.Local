@@ -50,7 +50,7 @@
 -->
 
 
-<link rel="stylesheet" href="bin/library/datatable/edit-client/dataTables.editor.css">
+<link rel="stylesheet" href="bin/library/datatable/editor-client/css/dataTables.editor.css">
 <script data-pagespeed-no-defer src="bin/library/datatable/editor-client/js/dataTables.editor.min.js"></script>
 
 <link rel='stylesheet' href='https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css'>

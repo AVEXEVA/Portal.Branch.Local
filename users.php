@@ -72,7 +72,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         privilege_read,
         level_group,
         isset( $Privileges[ 'User' ] )
-            ? $Privileges[ 'User' ] 
+            ? $Privileges[ 'User' ]
             : 0
     );
 
@@ -85,7 +85,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    	array(
     	    		$_SESSION[ 'Connection' ][ 'User' ],
     	    		date( 'Y-m-d H:i:s' ),
-    	    		'users.php'
+    	    		           'users.php'
     	    	)
     	    );
 ?><!DOCTYPE html>
@@ -108,12 +108,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <table id='Table_Users' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
                             <th class='text-white border border-white'  title='ID'>ID</th>
-                            <th class='text-white border border-white'  title='First Name'>First Name</th>
-                            <th class='text-white border border-white'  title='Last Name'>Last Name</th>
+                            <th class='text-white border border-white'  title='Email'>Email</th>
+                            <th class='text-white border border-white'  title='Verified'>Verified</th>
+                            <th class='text-white border border-white'  title='Branch'>Branch</th>
+                            <th class='text-white border border-white'  title='Branch_Type'>Type</th>
+                            <th class='text-white border border-white'  title='Branch_ID'>Reference</th>
                         </tr><tr>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='First Name'><input class='redraw form-control' type='text' name='First_Name' value='<?php echo isset( $_GET[ 'First_Name' ] ) ? $_GET[ 'First_Name' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Last Name'><input class='redraw form-control' type='text' name='Last_Name' value='<?php echo isset( $_GET[ 'Last_Name' ] ) ? $_GET[ 'Last_Name' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='Email'><input class='redraw form-control' type='text' name='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null; ?>' /></th>
+                            <th class='text-white border border-white'  title='Verified'><input class='redraw form-control' type='text' name='Verified' value='<?php echo isset( $_GET[ 'Verified' ] ) ? $_GET[ 'Verified' ] : null; ?>' /></th>
+                            <th class='text-white border border-white'  title='Branch'><input class='redraw form-control' type='text' name='Branch' value='<?php echo isset( $_GET[ 'Branch' ] ) ? $_GET[ 'Branch' ] : null; ?>' /></th>
+                            <th class='text-white border border-white'  title='Branch_Type'><input class='redraw form-control' type='text' name='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null; ?>' /></th>
+                            <th class='text-white border border-white'  title='Branch_ID'><input class='redraw form-control' type='text' name='Reference' value='<?php echo isset( $_GET[ 'Reference' ] ) ? $_GET[ 'Reference' ] : null; ?>' /></th>
                         </tr></thead>
                     </table>
                 </div>

@@ -33,8 +33,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	);
 	$User   = sqlsrv_fetch_array( $result );
 	//Privileges
-	$Access = 0;
-	$Hex = 0;
 	$result = \singleton\database::getInstance( )->query(
 		'Portal',
 		"   SELECT  [Privilege].[Access],

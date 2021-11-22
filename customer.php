@@ -5,67 +5,84 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
   //Connection
-  $result = \singleton\database::getInstance( )->query(
-    'Portal',
-    " SELECT  [Connection].[ID]
-      FROM    dbo.[Connection]
-      WHERE       [Connection].[User] = ?
-              AND [Connection].[Hash] = ?;",
-    array(
-      $_SESSION[ 'Connection' ][ 'User' ],
-      $_SESSION[ 'Connection' ][ 'Hash' ]
-    )
-  );
-  $Connection = sqlsrv_fetch_array($result);
-  //User
-  $result = \singleton\database::getInstance( )->query(
-    null,
-    " SELECT  Emp.fFirst  AS First_Name,
-              Emp.Last    AS Last_Name,
-              Emp.fFirst + ' ' + Emp.Last AS Name,
-              Emp.Title AS Title,
-              Emp.Field   AS Field
-      FROM  Emp
-      WHERE   Emp.ID = ?;",
-    array(
-      $_SESSION[ 'Connection' ][ 'User' ]
-    )
-  );
-  $User   = sqlsrv_fetch_array( $result );
-  //Privileges
-  $result = \singleton\database::getInstance( )->query(
-    'Portal',
-    "   SELECT  [Privilege].[Access],
-                [Privilege].[Owner],
-                [Privilege].[Group],
-                [Privilege].[Other]
-      FROM      dbo.[Privilege]
-      WHERE     Privilege.[User] = ?;",
-    array(
-      $_SESSION[ 'Connection' ][ 'User' ]
-    )
-  );
-	$Privileges = array();
-	$Privileged = false;
-	while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
-	if(		isset($Privileges['Customer'])
-		&& 	$Privileges[ 'Customer' ][ 'Owner' ]  >= 4
-		&& 	$Privileges[ 'Customer' ][ 'Group' ] >= 4
-		&& 	$Privileges[ 'Customer' ][ 'Other' ] >= 4){
-				$Privileged = true;}
-    if(		!isset($Connection['ID'])
-    	|| !$Privileged
-    ){ ?><html><head><script>document.location.href="../login.php?Forward=customer<?php echo (!isset($_GET[ 'ID' ]) || !is_numeric($Customer[ 'ID' ])) ? "s.php" : ".php?ID={$_GET[ 'ID' ]}";?>";</script></head></html><?php }
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Customer' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Customer' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-    	\singleton\database::getInstance( )->query(
-    		null,
-    		"	INSERT INTO Activity( [User], [Date], [Page] ) VALUES( ?, ?, ? );",
-    		array(
-    			$_SESSION[ 'Connection' ][ 'User' ],
-    			date("Y-m-d H:i:s"),
-    			"customer.php"
-    		)
-    	);
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'customer.php'
+        )
+      );
     	$ID = isset( $_GET[ 'ID' ] )
 			? $_GET[ 'ID' ]
 			: (
@@ -81,29 +98,31 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     				: null
     		);
         $result = \singleton\database::getInstance( )->query(
-
         	null,
             "	SELECT 	Top 1
             			Customer.*
             	FROM    (
             				SELECT 	Owner.ID    AS ID,
-            						Owner.Type  AS Type,
-            						Rol.ID 		AS Rolodex,
-		                    		Rol.Name    AS Name,
-		                    		Rol.Address AS Street,
-				                    Rol.City    AS City,
-				                    Rol.State   AS State,
-				                    Rol.Zip     AS Zip,
-				                    Rol.Latt 	AS Latitude,
-				                    Rol.fLong   AS Longitude,
-				                    Owner.Status  AS Status,
-									Rol.Website AS Website,
-									Owner.Internet AS Internet,
-									Owner.fLogin AS Login,
-									Owner.Password AS Password,
-									Rol.Geolock AS Geofence
-							FROM    Owner
-									LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                						Owner.Type  AS Type,
+                						Rol.ID 		AS Rolodex,
+                        		Rol.Name    AS Name,
+                            Rol.Phone   AS Phone,
+                            Rol.Email   AS Email,
+                            Rol.Contact AS Contact,
+                        		Rol.Address AS Street,
+      	                    Rol.City    AS City,
+      	                    Rol.State   AS State,
+      	                    Rol.Zip     AS Zip,
+      	                    Rol.Latt 	AS Latitude,
+      	                    Rol.fLong   AS Longitude,
+      	                    Owner.Status  AS Status,
+          									Rol.Website AS Website,
+          									Owner.Internet AS Internet,
+          									Owner.fLogin AS Login,
+          									Owner.Password AS Password,
+          									Rol.Geolock AS Geofence
+							    FROM    Owner
+									        LEFT JOIN Rol ON Owner.Rol = Rol.ID
             		) AS Customer
             	WHERE   	Customer.ID = ?
             			OR 	Customer.Name = ?;",
@@ -112,7 +131,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	$Name
             )
         );
-        $Customer = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
+        $Customer =   (       empty( $ID )
+                        &&    !empty( $Name )
+                        &&    !$result
+                      ) || (  empty( $ID )
+                        &&    empty( $Name )
+                      )  ? array(
         	'ID' => null,
         	'Name' => null,
         	'Login' => null,
@@ -128,19 +152,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Zip' => null,
         	'Latitude' => null,
         	'Longitude' => null,
-        	'Rolodex' => null
+          'Phone'   =>  null,
+          'Email'   =>  null,
+        	'Rolodex' => null,
+          'Phone' => null,
+          'Email' => null
         ) : sqlsrv_fetch_array($result);
+
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
         	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
+  	      $Customer[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Customer[ 'Contact' ];
+        	$Customer[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Customer[ 'Phone' ];
+        	$Customer[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Customer[ 'Email' ];
         	$Customer[ 'Login' ] 		= isset( $_POST[ 'Login' ] ) 	 ? $_POST[ 'Login' ] 	 : $Customer[ 'Login' ];
-        	$Customer[ 'Password' ] 	= isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Customer[ 'Password' ];
-        	$Customer[ 'Geofence' ] 	= isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Customer[ 'Geofence' ];
-        	$Customer[ 'Type' ]         = isset( $_POST[ 'Type' ] ) 	 ? $_POST[ 'Type' ] 	 : $Customer[ 'Type' ];
-        	$Customer[ 'Status' ] 		= isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Customer[ 'Status' ];
-        	$Customer[ 'Website' ] 		= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Customer[ 'Website' ];
-        	$Customer[ 'Internet' ] 	= isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Customer[ 'Internet' ];
-        	$Customer[ 'Street' ] 		= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Customer[ 'Street' ];
+        	$Customer[ 'Password' ] = isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Customer[ 'Password' ];
+        	$Customer[ 'Geofence' ] = isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Customer[ 'Geofence' ];
+        	$Customer[ 'Type' ]     = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Customer[ 'Type' ];
+        	$Customer[ 'Status' ] 	= isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Customer[ 'Status' ];
+        	$Customer[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Customer[ 'Website' ];
+        	$Customer[ 'Internet' ] = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Customer[ 'Internet' ];
+        	$Customer[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Customer[ 'Street' ];
         	$Customer[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Customer[ 'City' ];
         	$Customer[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Customer[ 'State' ];
         	$Customer[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Customer[ 'Zip' ];
@@ -153,7 +185,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         			"	DECLARE @MAXID INT;
         				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
         				INSERT INTO Rol(
-    						ID,
+    						  ID,
         					Type,
         					Name,
         					Website,
@@ -169,7 +201,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SELECT @MAXID + 1;",
         			array(
         				$Customer[ 'Name' ],
-        				$Customer[ 'Status' ],
         				$Customer[ 'Website' ],
         				$Customer[ 'Street' ],
         				$Customer[ 'City' ],
@@ -177,10 +208,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				$Customer[ 'Zip' ],
         				$Customer[ 'Latitude' ],
         				$Customer[ 'Longitude' ],
-        				$Customer[ 'Geofence' ]
+        				isset( $Customer[ 'Geofence' ] ) ? $Customer[ 'Geofence' ] : 0
         			)
         		);
-
         		sqlsrv_next_result( $result );
         		$Customer[ 'Rolodex' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
@@ -190,7 +220,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Owner ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Owner ) END ;
         				INSERT INTO Owner(
         					ID,
-        					Status,
+                  Status,
         					Locs,
         					Elevs,
         					Balance,
@@ -238,7 +268,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		\singleton\database::getInstance( )->query(
 	        		null,
 	        		"	UPDATE 	Owner
-	        			SET 	Owner.Status = ?,
+	        			SET Owner.Status = ?,
 	        					Owner.Internet = ?,
 	        					Owner.fLogin = ?,
 	        					Owner.Password = ?,
@@ -263,7 +293,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        					Rol.State = ?,
 	        					Rol.Zip = ?,
 	        					Rol.Latt = ?,
-	        					Rol.fLong = ?
+	        					Rol.fLong = ?,
+                    Rol.Phone = ?,
+                    Rol.EMail = ?
+
 	        			WHERE 	Rol.ID = ?;",
 	        		array(
 	        			$Customer[ 'Name' ],
@@ -274,6 +307,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        			$Customer[ 'Zip' ],
 	        			$Customer[ 'Latitude' ],
 	        			$Customer[ 'Longitude' ],
+                $Customer[ 'Phone' ],
+                $Customer[ 'Email' ],
 	        			$Customer[ 'Rolodex' ]
 	        		)
 	        	);
@@ -382,10 +417,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
-									<div class='col-8'><select name='Status' class='form-control edit <?php echo $Customer[ 'Status' ] == 1 ? 'bg-success' : 'bg-warning';?>'>
+									<div class='col-8'><select name='Status' class='form-control edit <?php echo $Customer[ 'Status' ] == 1 ? 'bg-warning' : 'bg-success';?>'>
 										<option value=''>Select</option>
-										<option value='0' <?php echo $Customer[ 'Status' ] == 0 ? 'selected' : null;?>>Inactive</option>
-										<option value='1' <?php echo $Customer[ 'Status' ] == 1 ? 'selected' : null;?>>Active</option>
+										<option value='0' <?php echo $Customer[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
+										<option value='1' <?php echo $Customer[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
 									</select></div>
 								</div>
 								<div class='row g-0'>
@@ -481,13 +516,42 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
 							</div>
-                            <div class='card-footer'>
-                                <div class='row'>
-                                    <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                                </div>
-                            </div>
+              <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
 						</form></div>
-						<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contacts</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Contacts' ] ) && $_SESSION[ 'Cards' ][ 'Contacts' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Name:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Name' value='<?php echo $Customer[ 'Name' ];?>' /></div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Customer[ 'Phone' ];?>' /></div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Customer[ 'Email' ];?>' /></div>
+                </div>
+              </div>
+              <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
+            </form>
+            </div>
+            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Portal</span></h5></div>
@@ -1105,7 +1169,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								    <div class='col-6'>&nbsp;</div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Owner'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Customer'] >= 4) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
@@ -1122,7 +1186,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
 								<?php }?>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Owner'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Customer'] >= 4) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
@@ -1151,7 +1215,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								</div>
 							</div>
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
-								<?php if(isset($Privileges['Collection']) && $Privileges['Collection']['Owner'] >= 4) {?>
+								<?php if(isset($Privileges['Collection']) && $Privileges['Collection']['Customer'] >= 4) {?>
 								<div class='row g-0'>
 								    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
 								    <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php

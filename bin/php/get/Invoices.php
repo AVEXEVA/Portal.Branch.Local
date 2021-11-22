@@ -3,54 +3,76 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  *
-            FROM    Connection
-            WHERE       Connection.Connector = ?
-                    AND Connection.Hash = ?;",
-        array(
-          $_SESSION[ 'User' ],
-          $_SESSION[ 'Hash' ]
-        )
-      );
-    $Connection = sqlsrv_fetch_array( $r );
-    $User = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Emp.*,
-                    Emp.fFirst AS First_Name,
-                    Emp.Last   AS Last_Name
-            FROM    Emp
-            WHERE   Emp.ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
-        )
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
-    $User = sqlsrv_fetch_array( $User );
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Privilege.Access,
-                    Privilege.Owner,
-                    Privilege.Group,
-                    Privilege.Other
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
-        )
-    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
     $Privileges = array();
-    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
-    $Privileged = False;
-    if( isset( $Privileges[ 'Invoice' ] )
-        && $Privileges[ 'Invoice' ][ 'Owner' ]  >= 4
-        && $Privileges[ 'Invoice' ][ 'Group' ]  >= 4
-        && $Privileges[ 'Invoice' ][ 'Other' ]  >= 4
-    ){ $Privileged = True; }
-    if( !isset($Connection['ID']) || !$Privileged ){ print json_encode( array( 'data' => array( ) ) ); }
-    else {
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Invoice' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Invoice' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
     $conditions = array( );
     $search = array( );
     $parameters = array( );
@@ -155,7 +177,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $parameters
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "SELECT  Count( Invoice.Ref ) AS Count
+    $sQueryRow = "SELECT  Invoice.Ref AS ID
                   FROM    Invoice
                           LEFT JOIN OpenAR ON OpenAR.Ref  = Invoice.Ref
                           LEFT JOIN Loc AS Location ON Invoice.Loc  = Location.Loc
@@ -168,13 +190,20 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN Job          ON Invoice.Job = Job.ID
                           LEFT JOIN JobType      ON Job.Type    = JobType.ID
                   WHERE   ({$conditions}) AND ({$search});";
-    $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+    $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
-    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+    $iFilteredTotal = 0;
+    if( count( $_SESSION[ 'Tables' ][ 'Customers' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Customers' ] as &$Value ){ $Value = false; } }
+    $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] = $_GET;
+    while( $Row = sqlsrv_fetch_array( $fResult ) ){
+        $_SESSION[ 'Tables' ][ 'Customers' ][ $Row[ 'ID' ] ] = true;
+        $iFilteredTotal++;
+    }
 
+    $parameters = array( );
     $sQuery = " SELECT  COUNT( Invoice.Ref )
                 FROM    Invoice;";
-    $rResultTotal = \singleton\database::getInstance( )->query( null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
@@ -186,11 +215,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     );
 
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-        $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
-        $Row[ 'Due' ] = date( 'm/d/Y', strtotime( $Row[ 'Due' ] ) );
-        $Row[ 'Original' ] = '$' . number_format( $Row[ 'Original' ], 2);
-        $Row[ 'Balance' ] = '$' . number_format( $Row[ 'Balance' ], 2);
-        $output['aaData'][]   = $Row;
+      $output['aaData'][]       = $Row;
     }
     echo json_encode( $output );
 }}

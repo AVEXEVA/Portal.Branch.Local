@@ -204,13 +204,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Position' placeholder='Position' value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
-			            </tr></thead>
+							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
+			     </tr></thead>
 					</table>
 				</div>
-      		</div>
     	</div>
-  	</div>
+    </div>
+  </div>
 </body>
 </html>
 <?php

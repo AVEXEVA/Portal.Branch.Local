@@ -69,39 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'job.php'
-        )
-      );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Report' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Report' ] )
+        ||  !isset( $Privileges[ 'Admin' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Admin' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -124,7 +93,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require( bin_js . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <?php require(bin_php.'hvkhvelement/navigation.php');?>
+    <?php require(bin_php.'element/navigation.php');?>
     <div id="page-wrapper" class='content'>
       <div class='panel panel-primary'>
         <div class='panel-heading'>Reports</div>
@@ -230,26 +199,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       </div>
     </div>
   </div>
-    <!-- Bootstrap Core JavaScript -->
-
-
-    <!-- Metis Menu Plugin JavaScript -->
-
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-    <!-- Custom Theme JavaScript -->
-
-
-    <!--Moment JS Date Formatter-->
-
-
-    <!-- JQUERY UI Javascript -->
-
-
-    <!-- Custom Date Filters-->
-
-
 </body>
 </html>
 <?php
