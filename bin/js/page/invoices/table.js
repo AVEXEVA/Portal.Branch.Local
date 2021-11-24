@@ -1,4 +1,9 @@
 $( document ).ready( function( ){
+    var Editor_Customers = new $.fn.dataTable.Editor( {
+        idSrc    : 'ID',
+        ajax     : 'index.php',
+        table    : '#Table_Invoices'
+    } );
   var Table_Invoices = $('#Table_Invoices').DataTable( {
     dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
     processing     : true,
@@ -187,15 +192,12 @@ $( document ).ready( function( ){
           text : 'Create',
           className: 'form-control',
           action : function( e, dt, node, config ){
-              document.location.href='invoices.php';}
+              document.location.href='invoice.php';}
             },{
-            text: 'Print',
-            className: 'form-control',
-            action: function ( e, dt, node, config ) {
-                var rows = dt.rows( { selected : true } ).indexes( );
-                var dte = dt.cells( rows, 0 ).data( ).toArray( );
-                document.location.href = 'print_tickets.php?Tickets=' + dte.join( ',' );
-            }
+              extend : 'print',
+              text : 'Print',
+              className : 'form-control'
+
           },{
               extend : 'copy',
               text : 'Copy',
@@ -204,7 +206,25 @@ $( document ).ready( function( ){
               extend : 'csv',
               text : 'CSV',
               className : 'form-control'
-          }
-      ],
-  } );
-} );
+          },{
+              text : 'Delete',
+              className: 'form-control',
+              action : function( e, dt, node, config ){
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                $.ajax ({
+                  url    : 'bin/php/post/invoice.php',
+                  method : 'POST',
+                  data   : {
+                    action : 'delete' ,
+                    data : dte
+                  },
+                  success : function(response){
+                    Table_Invoices.draw();
+                }
+              })
+            }
+          },
+        ],
+      });
+    });

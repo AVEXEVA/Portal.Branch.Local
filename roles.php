@@ -69,37 +69,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'job.php'
-        )
-      );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Admin' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Admin' ] )
     ){ ?><?php require('404.html');?><?php }
@@ -114,8 +83,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'roles.php'
         )
       );
-$r = $database->query(null,"
-    SELECT
+$r = $database->query(null,
+  " SELECT
         Emp.*,
         Rol.*,
         Emp.Last            AS Last_Name,
@@ -139,10 +108,12 @@ while($a= sqlsrv_fetch_array($r)){}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Texas | Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -162,11 +133,7 @@ while($a= sqlsrv_fetch_array($r)){}
             </div>
         </div>
     </div>
-
-
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-
     <script>
         function hrefRoles(){$("#Table_Roles tbody tr").each(function(){$(this).on('click',function(){document.location.href="role.php?User_ID=" + $(this).children(":first-child").html();});});}
         $(document).ready(function() {
@@ -190,9 +157,7 @@ while($a= sqlsrv_fetch_array($r)){}
                     $("input[type='search'][aria-controls='Table_Roles']").on('keyup',function(){hrefRoles();});
                     $('#Table_Roles').on( 'page.dt', function () {setTimeout(function(){hrefRoles();},100);});
                     $("#Table_Roles th").on("click",function(){setTimeout(function(){hrefRoles();},100);});
-
                 }
-
             } );
         } );
     </script>

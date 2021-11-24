@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				$data = array();
 				foreach($_POST['data'] as $ID=>$Customer){
 					$database->query(null,"
-						UPDATE nei.dbo.OwnerWithRol
+						UPDATE dbo.OwnerWithRol
 						SET    OwnerWithRol.Name    = ?,
 							   OwnerWithRol.Address = ?,
 							   OwnerWithRol.City    = ?,
@@ -106,7 +106,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					;",array($ID));
 					$Rolodex_ID = sqlsrv_fetch_array($resource)['Rolodex'];
 					$database->query(null,"
-						UPDATE nei.dbo.Rol
+						UPDATE dbo.Rol
 						SET    Rol.Name    = ?,
 							   Rol.Address = ?,
 							   Rol.City    = ?,
@@ -135,7 +135,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					$Owner_Primary_Key = sqlsrv_fetch_array($resource)['ID'];
 					$Owner_Primary_Key++;
 					$resource = $database->query(null,"
-						INSERT INTO nei.dbo.Owner()
+						INSERT INTO dbo.Owner()
 						VALUES()
 					;SELECT SCOPE_IDENTITY();", array($Owner_Primary_Key, $_GET['ID'], $Territory_ID, $Location['Name'], $Location['Tag'], $Location['Street'], $Location['City'], $Location['State'], $Location['Zip'], $Route_ID, $Division_ID, $Location['Maintenance'],0,8009,0,0,0,'.00',$Rolodex_Primary_Key,$Location['Latitude'],$Location['Longitude'],0,'Non-Contract',0,0,0,0,0,0,3,'United States',0,0,0,0,1,0,0,'.00',0,0));
 					$Location['ID'] = $Location_Primary_Key;

@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Category_Tests' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Category_Tests' ] )
+        ||  !isset( $Privileges[ 'Category_Test' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Category_Test' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -80,17 +80,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'customers.php'
+            'category_tests.php'
         )
       );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta . 'index.php');?>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js  . 'index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+    <?php	require( bin_meta . 'index.php');?>
+    <?php	require( bin_css  . 'index.php');?>
+      <?php require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">

@@ -96,10 +96,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-  <?php require( bin_meta . 'index.php' );?>
-  <?php require( bin_css  . 'index.php' );?>
-  <?php require( bin_js   . 'index.php' );?>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();' >
   <?php require( bin_php . 'element/navigation.php');?>
@@ -214,7 +215,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           </div>
         </div><?php
       }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Time' ] ) ){
+      <?php if( check( privilege_read, level_group, $Privileges[ 'Ticket' ] ) ){
         ?><div class='link-page text-white col-xl-2 col-6 btn-two' onclick="document.location.href='schedule.php'">
           <div class='p-1 border'>
             <div class='nav-icon'><i class="fa fa-question-circle fa-3x fa-fw" aria-hidden="true"></i></div>
@@ -222,7 +223,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           </div>
         </div><?php
       }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Contact' ] ) ){
+      <?php if( check( privilege_read, level_group, $Privileges[ 'Customer' ] ) ){
         ?><div class='link-page text-white col-xl-1 col-3 btn-three' onclick="document.location.href='contacts.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
@@ -311,7 +312,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div>
       </div>
       <?php if( check( privilege_read, level_group, $Privileges[ 'Map' ] ) ){
-        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='map.php'">
+        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='maps.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
           <div class ='nav-text'>Map</div>
@@ -329,7 +330,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Processing</div>
         </div>
       </div><?php }?>
-      <div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='user.php?ID=<?php echo $_SESSION[ 'Connection' ][ 'User' ];?>';">
+      <div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='users.php?ID=<?php echo $_SESSION[ 'Connection' ][ 'User' ];?>';">
           <div class='p-1 border'>
             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
             <div class ='nav-text'>Profile</div>
@@ -417,7 +418,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Tests</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Testing' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='draft_category_tests.php'">
+      <?php if( check( privilege_read, level_group, $Privileges[ 'Testing' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='testing.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><i class="fa fa-clipboard fa-3x fa-fw" aria-hidden="true"></i></div>
           <div class ='nav-text'>Testing</div>

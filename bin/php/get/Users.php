@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     /*Concatenate Filters*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
-      $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
     $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
     $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;

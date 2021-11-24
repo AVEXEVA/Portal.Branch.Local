@@ -54,7 +54,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	);
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -69,8 +68,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'User' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'User' ] )
+        ||  !isset( $Privileges[ 'Customer' ] )
+        || 	!check( privilege_delete, level_group, $Privileges[ 'User' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -80,36 +79,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'settings.php'
+            'post/customer.php'
         )
       );
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Nouveau Texas | Portal</title>
-    <?php
-        require( bin_meta . 'index.php' );
-        require( bin_css  . 'index.php' );
-        require( bin_js   . 'index.php' );
-    ?>
-</head>
-<body onload='finishLoadingPage();'>
-	<?php require(PROJECT_ROOT.'php/element/navigation.php');?>
-    <div id="page-wrapper" class='content'>
-  		<section class="container">
-    		<div class="row">
-          <div class='col-lg-12'>
-            <button class='js-push-button' disabled>Enable Alerts</button>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-</body>
-</html>
-<?php
+		if(isset($_POST['action']) && $_POST['action'] == 'delete'){
+			if(isset($_POST['data']) && count($_POST['data']) > 0){
+				foreach($_POST['data'] as $ID){
+					$database->query(
+						'Portal',
+						"	DELETE FROM dbo.[User] 
+							WHERE 		[User].[ID] = ?;",
+						array(
+							$ID
+						)
+					);
+				}
+				print json_encode(array('data'=>array()));
+			}
+		}
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=locations.php';</script></head></html><?php }
-?>
+}?>

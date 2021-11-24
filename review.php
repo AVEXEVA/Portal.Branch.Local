@@ -101,14 +101,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
             $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
         }
-        $r = $database->query(null,"
-        	SELECT Emp.*,
-        	       tblWork.Super
-        	FROM   Emp
-        		   LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-        	WHERE  Emp.Field = 1
-        		   AND Emp.Status = 0
-          ORDER BY Last ASC
+        $r = $database->query(null,
+          " SELECT Emp.*,
+          	       tblWork.Super
+          	FROM   Emp
+          		     LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+          	WHERE  Emp.Field = 1
+          		 AND Emp.Status = 0
+            ORDER BY Last ASC
         ;",array(),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
         $Mechanics = array();
         $row_count = sqlsrv_num_rows( $r );
@@ -121,14 +121,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		}
         		$i++;
         	}
-        }
+      }
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-  <?php require( bin_css . 'index.php');?>
-  <?php require( bin_js . 'index.php');?>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
     <style>
         .form-group>label:first-child {
             min-width  : 175px;

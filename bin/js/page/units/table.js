@@ -176,35 +176,62 @@ $( document ).ready( function( ){
 	        search( this );
 	        $( '.redraw' ).bind( 'change', function(){ Table_Units.draw(); });
 	    },
-	    buttons: [
-	        {
-	            text: 'Reset Search',
-	            action: function ( e, dt, node, config ) {
-	                $( 'input, select' ).each( function( ){
-	                    $( this ).val( '' );
-	                } );
-	                Table_Units.draw( );
-	            }
-	        },{
-	            text : 'Get URL',
-	            action : function( e, dt, node, config ){
-	                var d = { };
-	                d.Search 		= $('input[name="Search"]').val();
-	                d.ID 			= $('input[name="ID"]').val( );
-	                d.Name 			= $('input[name="Name"]').val( );
-	                d.Customer 		= $('input[name="Customer"]').val( );
-	                d.Location 		= $('input[name="Location"]').val( );
-	                d.Building_ID 	= $('input[name="Building_ID"]').val( );
-	                d.Type 			= $('select[name="Type"]').val( );
-	                d.Status 		= $('select[name="Status"]').val( );
-	                document.location.href = 'units.php?' + new URLSearchParams( d ).toString();
-	            }
-	        },
-	        { extend: 'create', editor: Editor_Units },
-	        { extend: 'edit',   editor: Editor_Units },
-	        { extend: 'remove', editor: Editor_Units },
-	        'copy',
-	        'csv'
-	    ]
-	} );
-} );
+      buttons : [
+          {
+            text: 'Reset Search',
+            className : 'form-control',
+            action: function ( e, dt, node, config ) {
+                $( 'input:visible, select:visible' ).each( function( ){
+                    $( this ).val( '' );
+                } );
+                Table_Users.draw( );
+            }
+          },{
+            text : 'Get URL',
+            className : 'form-control',
+            action : function( e, dt, node, config ){
+                d = { }
+                d.ID = $('input[name="ID"]').val( );
+                d.Email = $('input[name="Email"]').val( );
+                document.location.href = 'unit.php?' + new URLSearchParams( d ).toString();
+            }
+          },{
+            text : 'Create',
+            className : 'form-control',
+            action : function( e, dt, node, config ){
+                document.location.href='unit.php';
+            }
+          },{
+            text : 'Delete',
+            className : 'form-control',
+            action : function( e, dt, node, config ){
+              var rows = dt.rows( { selected : true } ).indexes( );
+              var dte = dt.cells( rows, 0 ).data( ).toArray( );
+              $.ajax ({
+                url    : 'bin/php/post/unit.php',
+                method : 'POST',
+                data   : {
+                  action : 'delete',
+                  data : dte
+                },
+                success : function(response){
+                  Table_Users.draw();
+                }
+              })
+            }
+          },{
+              extend : 'print',
+              text : 'Print',
+              className : 'form-control'
+          },{
+              extend : 'copy',
+              text : 'Copy',
+              className : 'form-control'
+          },{
+              extend : 'csv',
+              text : 'CSV',
+              className : 'form-control'
+          }
+      ]
+  } );
+});

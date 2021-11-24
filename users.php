@@ -91,11 +91,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta .'index.php');?>
-    <?php require( bin_css  . 'index.php');?>
-    <?php require( bin_js   .'index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
@@ -104,7 +105,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id="page-wrapper" class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Users( 1 );?> Users</h4></div>
-                <div class="card-body bg-dark">
+                  <div class="card-body bg-dark">
                     <table id='Table_Users' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
                             <th class='text-white border border-white'  title='ID'>ID</th>
@@ -122,6 +123,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th class='text-white border border-white'  title='Branch_ID'><input class='redraw form-control' type='text' name='Reference' value='<?php echo isset( $_GET[ 'Reference' ] ) ? $_GET[ 'Reference' ] : null; ?>' /></th>
                         </tr></thead>
                     </table>
+                  </div>
                 </div>
             </div>
         </div>

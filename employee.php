@@ -115,6 +115,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		FROM 	dbo.Emp AS Employee
         				LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
         				LEFT JOIN dbo.Rol AS Rolodex ON Employee.Rol = Rolodex.ID
+                LEFT JOIN dbo.Emp AS Employee ON Employee.Rol = Employeee.ID
         		WHERE 	Employee.ID = ?
         				OR Employee.fFirst + ' ' + Employee.Last = ?;",
         	array(
@@ -269,19 +270,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-	<?php
-		$_GET[ 'Bootstrap' ] = '5.1';
-		$_GET[ 'Entity_CSS' ] = 1;
-	?>
-	<?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css  . 'index.php' );?>
-    <?php require( bin_js   . 'index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
 <body>
     <div id="wrapper">
-    <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+    <?php require(bin_php .'element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
       <div class='card card-primary'>
         <div class='card-heading'>
@@ -468,9 +467,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
                   </div>
               </div>
-            </form></div>
+        </form></div>
+        <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+          <div class='card-heading'>
+            <div class='row g-0 px-3 py-2'>
+              <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>User</span></h5></div>
+            </div>
           </div>
-        </div>
+          <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'User' ] ) && $_SESSION[ 'Cards' ][ 'User' ] == 0 ? "style='display:none;'" : null;?>>
+            <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
+            <div class='row g-0'>
+              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Username:</div>
+              <div class='col-8'><input type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['User'];?>' /></div>
+            </div>
+            <div class='row g-0'>
+              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Employee ID:</div>
+              <div class='col-8'><input type='text' class='form-control edit animation-focus' name='ID' value='<?php echo $Employee['ID'];?>' /></div>
+            </div>
+          </div>
+        </div></form>
       </div>
     </div>
   </div>

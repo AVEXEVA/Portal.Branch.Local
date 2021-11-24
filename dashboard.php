@@ -86,10 +86,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Texas | Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">

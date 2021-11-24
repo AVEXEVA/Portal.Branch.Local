@@ -91,8 +91,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+       <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+       <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+       <?php	require( bin_meta . 'index.php');?>
+       <?php	require( bin_css  . 'index.php');?>
+       <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -112,7 +115,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div>
     </div>
 	<!-- Bootstrap Core JavaScript -->
-
 
     <!-- Metis Menu Plugin JavaScript -->
 

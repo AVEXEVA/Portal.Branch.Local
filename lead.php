@@ -3,166 +3,224 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
     $result = \singleton\database::getInstance( )->query(
-    	null,
-    	"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",
-    	array(
-    		$_SESSION[ 'User' ],
-    		$_SESSION[ 'Hash' ]
-    	)
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
     $Connection = sqlsrv_fetch_array($result);
-    $User = \singleton\database::getInstance( )->query(
-    	null,
-    	"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID = ?",
-    	array(
-    		$_SESSION[ 'User' ]
-    	)
-    );
-    $User = sqlsrv_fetch_array($User);
-    $result = \singleton\database::getInstance( )->query(
-    	'Portal',
-    	"	SELECT 	  Access,
-        			    Owner,
-        			    Group,
-        			    Other
-        	FROM   	Privilege
-        	WHERE  	User_ID = ?;",
-        array(
-        	$_SESSION[ 'User' ]
-        )
-    );
+    //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access']] = $array2;}
-    $Privileged = FALSE;
-    if(isset($Privileges[ 'Lead' ] )
-        && $Privileges[ 'Lead' ][ 'Owner' ] >= 4
-        && $Privileges[ 'Lead' ][ 'Group' ] >= 4
-        && $Privileges[ 'Lead' ][ 'Other' ] >= 4){$Privileged = TRUE;}
-    if(		!isset($Connection[ 'ID' ])
-    	|| 	!$Privileged
-    ){ require( '401.php' ); }
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(   !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Lead' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Lead' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
+      $ID = isset( $_GET[ 'ID' ] )
+      ? $_GET[ 'ID' ]
+      : (
+        isset( $_POST[ 'ID' ] )
+          ? $_POST[ 'ID' ]
+          : null
+      );
+      $Name = isset( $_GET[ 'Name' ] )
+          ? $_GET[ 'Name' ]
+          : (
+            isset( $_POST[ 'Name' ] )
+              ? $_POST[ 'Name' ]
+              : null
+      );
     	$result = \singleton\database::getInstance( )->query(
     		null,
-    		"SELECT Lead.ID           AS ID,
+    		"SELECT Lead.ID       AS ID,
 				    Lead.fDesc        AS Name,
 				    Lead.Address      AS Street,
 				    Lead.City         AS City,
 				    Lead.State        AS State,
 				    Lead.Zip          AS Zip,
-				    Customer.ID 	  AS Customer_ID,
+				    Customer.ID 	    AS Customer_ID,
 				    Customer.Name 	  AS Customer_Name
 			FROM     Lead
-					 (
-                        SELECT  Owner.ID,
-                                Rol.Name,
-                                Owner.Status
-                        FROM    Owner
-                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                    ) AS Customer ON Lead.Owner = Customer.ID
-			ORDER BY Lead.fDesc ASC",//REPLACE SQL HERE
-    		array( )
-    	)
+					  LEFT JOIN (
+                SELECT  Owner.ID,
+                        Rol.Name,
+                        Owner.Status
+                FROM    Owner
+                        LEFT JOIN Rol ON Owner.Rol = Rol.ID
+            ) AS Customer ON Lead.Owner = Customer.ID
+			WHERE Lead.ID = ?",
+    		array( 
+          $ID,
+          $Name
+        )
+    	);
     	$Lead = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC );
-?>?><!DOCTYPE html>
-<html lang="en">
+?><!DOCTYPE html>
+<html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php
-    	$_GET[ 'Bootstrap' ] = '5.1';
-    	require( bin_meta . 'index.php');
-    	require( bin_css  . 'index.php');
-    	require( bin_js   . 'index.php');
-    ?><style>
-    	.link-page {
-    		font-size : 14px;
-    	}
-    </style>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php  require( bin_meta . 'index.php');?>
+     <?php  require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
 <body onload='finishLoadingPage();'>
-    <div id="wrapper">
-        <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-        	<div class='card-deck row'>
-        		<div clas='card card-primary col-12 border-0'>
-        			<div class='card-heading'><h4><a href='lead.php?ID=<?php echo $_GET[ 'ID' ];?>'><?php \singleton\fontawesome::getInstance( )->Lead( );?> Lead : <?php echo $Lead[ 'Name' ];?></a></h4></div>
-        			<div class='card-body links-page bg-dark row'>
-        				<!--
-							ADD LINKS HERE
-        				-->
+  <div id="wrapper">
+    <?php require( bin_php . 'element/navigation.php'); ?>
+    <div id="page-wrapper" class='content'>
+      <div class='card card-primary'>
+        <div class='card-heading'>
+          <div class='row g-0 px-3 py-2'>
+            <div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='leads.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Customer' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] : array( ) ) : null;?>'>Lead</a>: <span><?php echo is_null( $Lead[ 'ID' ] ) ? 'New' : $Lead[ 'Name' ];?></span></h5></div>
+            <div class='col-2'></div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php';">Create</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo $Lead[ 'ID' ];?>';">Refresh</button></div>
+              </div>
+            </div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo !is_null( $Lead[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true )[ array_search( $Lead[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='leads.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] : array( ) );?>';">Table</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo !is_null( $Lead[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true )[ array_search( $Lead[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='card-body bg-dark text-white'>
+          <div class='card-columns'>
+        		<div class='card card-primary my-3'><form action='lead.php?ID=<?php echo $Lead[ 'ID' ];?>' method='POST'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                <input type='hidden' name='ID' value='<?php echo $Lead[ 'ID' ];?>' />
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> ID:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='ID' value='<?php echo $Lead['ID'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Name:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Lead['Name'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
+                  <div class='col-6'>
+                    <input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Lead[ 'Customer_Name' ];?>' />
+                    <script>
+                      $( 'input[name="Customer"]' )
+                          .typeahead({
+                              minLength : 4,
+                              hint: true,
+                              highlight: true,
+                              limit : 5,
+                              display : 'FieldValue',
+                              source: function( query, result ){
+                                  $.ajax({
+                                      url : 'bin/php/get/search/Locations.php',
+                                      method : 'GET',
+                                      data    : {
+                                          search :  $('input:visible[name="Customer"]').val( )
+                                      },
+                                      dataType : 'json',
+                                      beforeSend : function( ){
+                                          abort( );
+                                      },
+                                      success : function( data ){
+                                          result( $.map( data, function( item ){
+                                              return item.FieldValue;
+                                          } ) );
+                                      }
+                                  });
+                              },
+                              afterSelect: function( value ){
+                                  $( 'input[name="Customer"]').val( value );
+                                  $( 'input[name="Customer"]').closest( 'form' ).submit( );
+                              }
+                          }
+                      );
+                    </script>
+                  </div>
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                    if( in_array( $Lead[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
+                      echo "onClick=\"document.location.href='customers.php';\"";
+                    } else {
+                      echo "onClick=\"document.location.href='customer.php?ID=" . $Lead[ 'Customer_ID' ] . "';\"";
+                    }
+                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              </div>
         			</div>
-        		</div>
-        		<div class='card card-primary col-4 border-0'>
-        			<div class='card-heading'><h5>Infomation</h5></div>
-        			<div class='card-body'>
-        				<div class='row g-0'>
-        					<div class='col-4'><?php \singleton\fontawesome::getInstance( )->ID( 1 );?> ID:</div>
-        					<div class='col-8'><?php echo $Lead[ 'ID' ];?></div>
-        				</div>
-        				<div class='row g-0'>
-        					<div class='col-4'><?php \singleton\fontawesome::getInstance( )->Name( 1 );?> Name:</div>
-        					<div class='col-8'><?php echo $Lead[ 'Name' ];?></div>
-        				</div>
-        			</div>
-        		</div>
-        		<div class='card card-primary col-4 border-0'>
-        			<div class='card-heading'><h5>Address</h5></div>
-        			<div class='card-body'>
-        				<div class='row g-0'>
-        					<div class='col-4'><?php \singleton\fontawesome::getInstance( )->Address( 1 );?> Street:</div>
-        					<div class='col-8'><?php echo $Lead[ 'Street' ];?></div>
-        				</div>
-        				<div class='row g-0'>
-        					<div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> City:</div>
-        					<div class='col-8'><?php echo $Lead[ 'City' ];?></div>
-        				</div>
-        				<div class='row g-0'>
-        					<div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> State:</div>
-        					<div class='col-8'><?php echo $Lead[ 'State' ];?></div>
-        				</div>
-        				<div class='row g-0'>
-        					<div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Zip:</div>
-        					<div class='col-8'><?php echo $Lead[ 'Zip' ];?></div>
-        				</div>
-        			</div>
-        		</div>
-        		<div class='card card-primary col-4 border-0'>
-					<div class='card-heading'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customer</div>
-				 	<div class='card-body'>
-						<div class='row'>
-							<div class='col-4'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Name:</div>
-							<div class='col-8'><a href='customer.php?ID=<?php echo $Lead[ 'Customer_ID' ];?>'><?php echo $Lead['Customer_Name'];?></a></div>
-						</div>
-					</div>
-				</div>
+        		</form></div>
         	</div>
         </div>
+      </div>
     </div>
+  </div>
 </body>
 </html>
 <?php
     }
 }?>
-
-			<div class='panel-body' style='padding:15px;'>
-				<div class='col-xs-4' style='text-align:right;'><b>Customer:</b></div>
-				<div class='col-xs-8'><?php echo strlen($_GET["Customer"]) > 0 ? proper($_GET['Unit_Type']) : "Unlisted";?></div>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-
-</body>
-</html>
-<?php
-    }
-} else {?><html><head><script>document.location.href="../login.php?Forward=violation<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>

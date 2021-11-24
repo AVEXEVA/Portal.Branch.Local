@@ -69,7 +69,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Customer' ] )
+        ||  !isset( $Privileges[ 'Admin' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Admin' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
@@ -80,15 +80,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'customers.php'
+            'admin.php'
         )
       );
 ?><!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;background-image:url('http://www.nouveauelevator.com/Images/Backgrounds/New_York_City_Skyline.jpg');webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php');?>
-	<title>Nouveau Illinois Portal</title>
+	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
 </head>

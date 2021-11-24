@@ -86,11 +86,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <title><?php echo $_SESSION['Connection']['Branch'];?> | Portal</title>
-    <?php $_GET [ 'Bootstrap' ] = '5.1'; ?>
-    <?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css  . 'index.php' );?>
-    <?php require( bin_js   . 'index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper'>
@@ -131,8 +132,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></div>
                   </div>
                   <div class='row'>
-                    <div class='col-4'>Origional:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Origional' ] ) ? $_GET[ 'Origional' ] : null;?>' /></div>
+                    <div class='col-4'>Original:</div>
+                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null;?>' /></div>
                   </div>
                   <div class='row'>
                     <div class='col-4'>Balance:</div>

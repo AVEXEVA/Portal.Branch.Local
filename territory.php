@@ -69,37 +69,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'job.php'
-        )
-      );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Executive' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Executive' ] )
     ){ ?><?php require('404.html');?><?php }
@@ -114,23 +83,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'territory.php'
         )
       );
-        $r = \singleton\database::getInstance( )->query(null,
+        $result = \singleton\database::getInstance( )->query(null,
             "	SELECT 	TOP 1
                     	Terr.ID   AS Territory_ID,
 						Terr.Name AS Territory_Name
 			 	FROM   	Terr
 			    WHERE  	Terr.ID = ?;"
         ,array($_GET['ID']));
-        $Territory = sqlsrv_fetch_array($r);
+        $Territory = sqlsrv_fetch_array($result);
 ?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
-
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta . 'index.php');?>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 
 <body onload='finishLoadingPage();'>
@@ -256,7 +225,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Units</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(null,"
+				                $result = $database->query(null,"
 									SELECT Count(Elev.ID) AS Count_of_Elevators
 									FROM   Elev
 										   LEFT JOIN Loc ON Elev.Loc = Loc.Loc
@@ -264,38 +233,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										   AND Elev.Status = 0
 										   AND Loc.Maint = 1
 								;",array($_GET['ID']));
-				                echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Elevators']) : 0;
+				                echo $result ? number_format(sqlsrv_fetch_array($result)['Count_of_Elevators']) : 0;
 				            ?></div>
 				        </div>
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Jobs</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(null,"
+				                $result = $database->query(null,"
 									SELECT Count(Job.ID) AS Count_of_Jobs
 									FROM   Job
 										   LEFT JOIN Loc ON Job.Loc = Loc.Loc
 									WHERE Loc.Terr = ?
 										  AND Job.Status = 0
 								;",array($_GET['ID']));
-				                echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
+				                echo $result ? number_format(sqlsrv_fetch_array($result)['Count_of_Jobs']) : 0;
 				            ?></div>
 				        </div>
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Violations</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(null,"
+				                $result = $database->query(null,"
 									SELECT Count(Violation.ID) AS Count_of_Jobs
 									FROM   Violation
 										   LEFT JOIN Loc ON Violation.Loc = Loc.Loc
 									WHERE Loc.Terr = ?
 								;",array($_GET['ID']));
-				                echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Jobs']) : 0;
+				                echo $result ? number_format(sqlsrv_fetch_array($result)['Count_of_Jobs']) : 0;
 				            ?></div>
 				        </div>
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Tickets</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(null,"
+				                $result = $database->query(null,"
 				                    SELECT Count(Tickets.ID) AS Count_of_Tickets
 				                    FROM   (
 				                                (
@@ -319,31 +288,31 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 													WHERE  Loc.Terr = ?)
 				                            ) AS Tickets
 				                ;",array($_GET['ID'],$_GET['ID'],$_GET['ID']));
-				                echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
+				                echo $result ? number_format(sqlsrv_fetch_array($result)['Count_of_Tickets']) : 0;
 				            ?></div>
 				        </div>
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposals</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(null,"
+				                $result = $database->query(null,"
 				                    SELECT Count(Estimate.ID) AS Count_of_Tickets
 				                    FROM   Estimate
 										   LEFT JOIN Loc ON Estimate.LocID = Loc.Loc
 				                    WHERE  Loc.Terr = ?
 				                ;",array($_GET['ID']));
-				                echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Tickets']) : 0;
+				                echo $result ? number_format(sqlsrv_fetch_array($result)['Count_of_Tickets']) : 0;
 				            ?></div>
 				        </div>
 				        <div class='row g-0'>
 				            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Invoices</div>
 				            <div class='col-8'><?php
-				                $r = $database->query(null,"
+				                $result = $database->query(null,"
 				                    SELECT Count(Invoice.Ref) AS Count_of_Invoices
 				                    FROM   Invoice
 										   LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
 				                    WHERE  Loc.Terr = ?;
 				                ;",array($_GET['ID']));
-				                echo $r ? number_format(sqlsrv_fetch_array($r)['Count_of_Invoices']) : 0;
+				                echo $result ? number_format(sqlsrv_fetch_array($result)['Count_of_Invoices']) : 0;
 				            ?></div>
 				        </div>
 				    </div>

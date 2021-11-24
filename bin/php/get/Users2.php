@@ -70,13 +70,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }}
     if(!isset( $Connection[ 'ID' ] ) ){ ?><?php require('404.html');?><?php }
     else {
-    $conn = null;
-
-    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '15';
-    $Start = $_GET['iDisplayStart'];
-    $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
 
     $conditions = array( );
     $search = array( );
@@ -108,8 +101,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    $params[] = $Start;
-    $params[] = $End;
+
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+    
     $Columns = array(
       0 =>  'Emp.ID',
       1 =>  'Emp.fFirst',

@@ -105,10 +105,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     table.dataTable tr.dtrg-group.dtrg-level-1 td,table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#5d5d5d;color:white;padding-top:0.25em;padding-bottom:0.25em;padding-left:2em;font-size:0.9em}
     /*table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#1d1d1d;color:white;}*/
     </style>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css . 'index.php' );?>
-    <?php require( bin_js  . 'index.php' );?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+       <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+       <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+       <?php	require( bin_meta . 'index.php');?>
+       <?php	require( bin_css  . 'index.php');?>
+       <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
   <div id='wrapper'>

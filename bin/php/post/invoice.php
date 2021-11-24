@@ -54,7 +54,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	);
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -69,36 +68,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Ticket' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Ticket' ] )
+        ||  !isset( $Privileges[ 'Invoice' ] )
+        || 	!check( privilege_delete, level_group, $Privileges[ 'Invoice' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-       <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-       <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-       <?php	require( bin_meta . 'index.php');?>
-       <?php	require( bin_css  . 'index.php');?>
-       <?php  require( bin_js   . 'index.php');?>
-</head>
-<body onload='finishLoadingPage();'>
-<?php
-$_GET[ 'Tickets' ] = isset( $_GET[ 'Tickets' ] ) ? explode( ',', $_GET[ 'Tickets' ] ) : array( );
-if( isset( $_GET[ 'Tickets' ] ) && is_array( $_GET[ 'Tickets' ] ) && count( $_GET[ 'Tickets' ] ) > 0){ foreach( $_GET[ 'Tickets' ] as $Ticket_ID ){
-  if( is_numeric( $Ticket_ID ) && $Ticket_ID > 0 ){
-    $_GET[ 'ID' ] = $Ticket_ID;
-    require( 'short-ticket.php' );
-  }
-} }?>
-</body>
-</html>
-<?php
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'post/invoice.php'
+        )
+      );
+		if(isset($_POST['action']) && $_POST['action'] == 'delete'){
+			if(isset($_POST['data']) && count($_POST['data']) > 0){
+				foreach($_POST['data'] as $ID){
+					$database->query(null,"DELETE FROM dbo.Invoice WHERE Invoice.Ref = ?;",array($ID));
+				}
+				print json_encode(array('data'=>array()));
+			}
+		}
     }
 }?>

@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
+        ||  !isset( $Privileges[ 'Time' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Time' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -80,17 +80,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'job.php'
+            'schedule.php'
         )
       );
 ?><!DOCTYPE html>
 <html lang="en"style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
-    <?php require( bin_meta . 'index.php');?>
-    <!--<meta http-equiv="refresh" content="300">-->
-	<title>Nouveau Elevator Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
     <link rel='stylesheet' href='bin/libraries/timepicker/jquery.timepicker.min.css' />
     <script src='bin/libraries/timepicker/jquery.timepicker.min.js'></script>
 	<style>

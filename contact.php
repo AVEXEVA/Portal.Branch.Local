@@ -250,14 +250,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php
-    	$_GET[ 'Bootstrap' ] = '5.1';
-      $_GET[ 'Entity_CSS' ] = 1;
-      	require( bin_meta . 'index.php');
-      	require( bin_css  . 'index.php');
-      	require( bin_js   . 'index.php');
-    ?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php require( bin_js   . 'index.php');?>
 </head>
 <body>
     <div id="wrapper">
@@ -304,7 +302,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										<option value=''>Select</option>
 										<option value='0' <?php echo $Contact[ 'Type' ] == 0 ? 'selected' : null;?>>Customer</option>
 										<option value='4' <?php echo $Contact[ 'Type' ] == 4 ? 'selected' : null;?>>Location</option>
-                    <option value='5' <?php echo $Contact[ 'Type' ] == 5 ? 'selected' : null;?>>Employee</option>
+                    					<option value='5' <?php echo $Contact[ 'Type' ] == 5 ? 'selected' : null;?>>Employee</option>
 									</select></div>
 								</div>
 								<div class='row g-0'>
@@ -319,18 +317,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
 									<div class='col-8'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website'] : "&nbsp;";?>' /></div>
 								</div>
-                <div class='row'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Contact:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Contact' value='<?php echo $Contact[ 'Contact' ];?>' /></div>
-                </div>
-                <div class='row'>
-                  <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Contact[ 'Phone' ];?>' /></div>
-                </div>
-                <div class='row'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Contact[ 'Email' ];?>' /></div>
-                </div>
+				                <div class='row'>
+				                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Contact:</div>
+				                  <div class='col-8'><input type='text' class='form-control edit' name='Contact' value='<?php echo $Contact[ 'Contact' ];?>' /></div>
+				                </div>
+				                <div class='row'>
+				                  <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
+				                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Contact[ 'Phone' ];?>' /></div>
+				                </div>
+				                <div class='row'>
+				                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
+				                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Contact[ 'Email' ];?>' /></div>
+				                </div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
 									<div class='col-6'></div>

@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Profile' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Profile' ] )
+        ||  !isset( $Privileges[ 'User' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'User' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -111,11 +111,11 @@ if($Mechanic > 0){
     <meta name="description" content="">
     <meta name="author" content="">
     <?php$_GET[ 'Bootstrap' ] = '5.1';
-      $_GET[ 'Entity_CSS' ] = 1;?>
+         $_GET[ 'Entity_CSS' ] = 1;?>
     <?php require( bin_meta . 'index.php' );?>
-      <?php require( bin_css  . 'index.php' );?>
-      <?php require( bin_js   . 'index.php' );?>
-    <title>Nouveau Texas | Portal</title>
+    <?php require( bin_css  . 'index.php' );?>
+    <?php require( bin_js   . 'index.php' );?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
     <?php require('css/index.php');
     require('js/index.php');?>
 </head>

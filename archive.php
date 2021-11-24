@@ -69,7 +69,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Customer' ] )
+        ||  !isset( $Privileges[ 'Archive' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Archive' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
@@ -80,7 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'customers.php'
+            'archive.php'
         )
       );
 ?><!DOCTYPE html>

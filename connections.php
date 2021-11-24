@@ -114,12 +114,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         Route.ID             AS Route_ID
     FROM
         ((((((Job
-        LEFT JOIN nei.dbo.Loc          ON Job.Loc   = Loc.Loc)
-        LEFT JOIN nei.dbo.Zone         ON Loc.Zone  = Zone.ID)
-        LEFT JOIN nei.dbo.JobType      ON Job.Type  = JobType.ID)
-        LEFT JOIN nei.dbo.OwnerWithRol ON Job.Owner = OwnerWithRol.ID)
-        LEFT JOIN nei.dbo.Elev         ON Job.Elev  = Elev.ID)
-        LEFT JOIN nei.dbo.Route        ON Loc.Route = Route.ID)
+        LEFT JOIN dbo.Loc          ON Job.Loc   = Loc.Loc)
+        LEFT JOIN dbo.Zone         ON Loc.Zone  = Zone.ID)
+        LEFT JOIN dbo.JobType      ON Job.Type  = JobType.ID)
+        LEFT JOIN dbo.OwnerWithRol ON Job.Owner = OwnerWithRol.ID)
+        LEFT JOIN dbo.Elev         ON Job.Elev  = Elev.ID)
+        LEFT JOIN dbo.Route        ON Loc.Route = Route.ID)
         LEFT JOIN Emp          ON Emp.fWork = Route.Mech
     WHERE
         Job.ID = ?
@@ -128,10 +128,12 @@ $Job = sqlsrv_fetch_array($result);
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>
-    <title>Nouveau Texas | Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php require( bin_js   . 'index.php');?>
 </head>
 <body onload=''>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>" style='margin:0px !important;;'>

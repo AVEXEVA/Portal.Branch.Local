@@ -146,7 +146,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         &&    !$result
                       ) || (  empty( $ID )
                         &&    empty( $Name )
-                      )  
+                      )
             ? array(
                 'ID' => null,
                 'Contact' => null,
@@ -187,14 +187,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php
-    	$_GET[ 'Bootstrap' ] = '5.1';
-        $_GET[ 'Entity_CSS' ] = 1;
-    	require( bin_meta . 'index.php');
-    	require( bin_css  . 'index.php');
-    	require( bin_js   . 'index.php');
-    ?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body>
     <div id="wrapper">
@@ -205,9 +203,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card-heading'>
                         <div class='row g-0 px-3 py-2'>
                             <div class='col-6'>
-                              <h5><?php \singleton\fontawesome::getInstance( )->Route( 1 );?><a href='proposals.php?<?php
+                              <h5><?php \singleton\fontawesome::getInstance( )->proposal( 1 );?><a href='proposals.php?<?php
                                 echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Proposals' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Proposals' ][ 0 ] : array( ) );
-                              ?>'>Route</a>: <span><?php
+                              ?>'>New Proposal</a>: <span><?php
                                 echo is_null( $Estimate[ 'ID' ] )
                                   ? 'New'
                                   : $Estimate[ 'Name' ];
@@ -292,7 +290,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                       );
                                     </script>
                                   </div>
-                                  <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+                                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
                                     if( in_array( $Estimate[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
                                       echo "onClick=\"document.location.href='jobs.php';\"";
                                     } else {
@@ -338,7 +336,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                       );
                                     </script>
                                   </div>
-                                  <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+                                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
                                     if( in_array( $Estimate[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
                                       echo "onClick=\"document.location.href='customers.php';\"";
                                     } else {

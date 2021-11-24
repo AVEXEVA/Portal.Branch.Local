@@ -86,7 +86,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-	<title><?php echo $_SESSION['Connection']['Branch'];?> | Portal </title>
+	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal </title>
 	<?php $_GET[ 'Bootstrap' ] = '5.1';?>
     <?php require( bin_meta . 'index.php' );?>
     <?php require( bin_css  . 'index.php' );?>

@@ -240,7 +240,7 @@ $( document ).ready( function() {
         text : 'Create',
         className: 'form-control',
         action : function( e, dt, node, config ){
-            document.location.href='contract_form.php';}
+            document.location.href='contract.php';}
 
         },{ extend: 'edit',
             editor: Editor_Contracts,

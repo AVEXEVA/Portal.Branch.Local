@@ -87,12 +87,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php
-        $_GET[ 'Bootstrap' ] = '5.1';
-        require( bin_meta . 'index.php');
-        require( bin_css . 'index.php');
-        require( bin_js  . 'index.php');
-    ?>
+    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php require( bin_meta . 'index.php' );?>
+    <?php require( bin_css  . 'index.php' );?>
+    <?php require( bin_js   . 'index.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id='wrapper'>

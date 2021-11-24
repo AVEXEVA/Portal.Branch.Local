@@ -40,7 +40,8 @@ $(document).ready(function( ){
         },
         columns: [
             {
-              data    : 'ID'
+              data    : 'ID',
+              className : 'ID'
             },{
               data : 'Email'
             },{

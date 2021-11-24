@@ -90,13 +90,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					? $_POST[ 'ID' ]
 					: null
 			);
-		$Name = isset( $_GET[ 'Name' ] )
-    		? $_GET[ 'Name' ]
-    		: (
-    			isset( $_POST[ 'Name' ] )
-    				? $_POST[ 'Name' ]
-    				: null
-    		);
+    		$Name = isset( $_GET[ 'Name' ] )
+        		? $_GET[ 'Name' ]
+        		: (
+        			isset( $_POST[ 'Name' ] )
+        				? $_POST[ 'Name' ]
+        				: null
+      	);
         $result = \singleton\database::getInstance( )->query(
         	null,
             "	SELECT 	Top 1
@@ -129,14 +129,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             array(
             	$ID,
             	$Name
-            )
-        );
-        $Customer =   (       empty( $ID )
-                        &&    !empty( $Name )
-                        &&    !$result
-                      ) || (  empty( $ID )
-                        &&    empty( $Name )
-                      )  ? array(
+                  )
+              );
+              $Customer =   (  empty( $ID )
+                           &&  !empty( $Name )
+                           &&  !$result
+                      )    || (empty( $ID )
+                           &&  empty( $Name )
+                      )    ? array(
         	'ID' => null,
         	'Name' => null,
         	'Login' => null,
@@ -317,14 +317,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
-	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-	<?php
-		$_GET[ 'Bootstrap' ] = '5.1';
-		$_GET[ 'Entity_CSS' ] = 1;
-	?>
-	<?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css  . 'index.php' );?>
-    <?php require( bin_js   . 'index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
 <body onload='finishLoadingPage();'>
@@ -516,12 +514,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
 							</div>
-              <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-              </div>
-						</form></div>
+                             <div class='card-footer'>
+                                <div class='row'>
+                                    <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                                </div>
+                            </div>
+            			</form></div>
             <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
                 <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
               <div class='card-heading'>

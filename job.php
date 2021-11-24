@@ -80,7 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             array(
               $_SESSION[ 'Connection' ][ 'User' ],
               date('Y-m-d H:i:s'),
-              'employees.php'
+              'job.php'
           )
         );
         $ID = isset( $_GET[ 'ID' ] )
@@ -344,7 +344,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 null,//Charge
                 null,//Amount
                 null,//GL
-                null,//GLRev 
+                null,//GLRev
                 null,//GandA
                 null,//OHLabor
                 null,//LastOH
@@ -381,10 +381,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 null,
                 null,
                 null,*/
-                null, null, null, null, null, 
-                null, null, null, null, null, 
-                null, null, null, null, null, 
-                null, null, null, null, null/*, 
+                null, null, null, null, null,
+                null, null, null, null, null,
+                null, null, null, null, null,
+                null, null, null, null, null/*,
                 ' ', ' ', ' ', ' ', ' '*/
               )
             );
@@ -431,9 +431,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <h5><?php \singleton\fontawesome::getInstance( )->Job( 1 );?><a href='jobs.php?<?php
                 echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] : array( ) );
               ?>'>Job</a>: <span><?php
-                echo is_null( $Job[ 'ID' ] )
+                echo is_null( $User[ 'ID' ] )
                   ? 'New'
-                  : $Job[ 'Name' ];
+                  : $User[ 'Email' ];
               ?></span></h5>
             </div>
             <div class='col-2'></div>
@@ -442,7 +442,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='col-4'>
                   <button
                     class='form-control rounded'
-                    onClick="document.location.href='employee.php';"
+                    onClick="document.location.href='job.php';"
                   >Create</button>
                 </div>
                 <div class='col-4'>
@@ -520,11 +520,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Type:</div>
                 <div class='col-8'><select class='form-control' name='Type'>
                   <option value=''>Select</option>
-                  <?php 
+                  <?php
                     $result = \singleton\database::getInstance( )->query(
                       null,
                       " SELECT  Job_Type.ID   AS ID,
-                                Job_Type.Type AS Type 
+                                Job_Type.Type AS Type
                         FROM    JobType AS Job_Type;"
                     );
                     if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){
@@ -571,7 +571,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       );
                     </script>
                   </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
                     if( in_array( $Job[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
                       echo "onClick=\"document.location.href='customers.php';\"";
                     } else {
@@ -618,7 +618,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       );
                     </script>
                   </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
                     if( in_array( $Job[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
                       echo "onClick=\"document.location.href='locations.php';\"";
                     } else {
@@ -666,7 +666,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       );
                     </script>
                   </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php 
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
                     if( in_array( $Job[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
                       echo "onClick=\"document.location.href='units.php';\"";
                     } else {

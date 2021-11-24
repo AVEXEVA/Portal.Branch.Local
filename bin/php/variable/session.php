@@ -10,6 +10,7 @@ $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] )
 				'Routes' => array( ),
 				'Employees' => array( ),
 				'Contacts' => array( ),
-				'Leads' => array( )
+				'Leads' => array( ),
+				'Users' => array( )
 			);
 ?>
