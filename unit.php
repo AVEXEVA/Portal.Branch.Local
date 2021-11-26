@@ -73,8 +73,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         || 	!check( privilege_read, level_group, $Privileges[ 'Unit' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
-        $r = $database->query(null,
-          " SELECT  TOP 1
+        $ID = isset( $_GET[ 'ID' ] )
+            ? $_GET[ 'ID' ]
+            : (
+            isset( $_POST[ 'ID' ] )
+                ? $_POST[ 'ID' ]
+                : null
+            );
+        $City_ID = isset( $_GET[ 'City_ID' ] )
+            ? $_GET[ 'City_ID' ]
+            : (
+            isset( $_POST[ 'City_ID' ] )
+                ? $_POST[ 'City_ID' ]
+                : null
+            );
+$r = $database->query(null,
+    " SELECT  TOP 1
                     Elev.ID,
                     Elev.Unit           AS Unit,
                     Elev.State          AS State,
@@ -111,20 +125,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     Rol.Address     AS Street,
                                     Rol.City        AS City,
                                     Rol.State       AS State,
+                                    Rol.Contact       AS Contact,
                                     Rol.Zip         AS Zip,
                                     Owner.Status    AS Status,
                                     Rol.Website     AS Website
                             FROM    Owner
                             LEFT JOIN Rol ON Owner.Rol          = Rol.ID
-                    ) AS Customer ON Location.Owner             = Customer.ID
+                    ) AS Customer ON Loc.Owner             = Customer.ID
                     LEFT JOIN Route ON Loc.Route = Route.ID
                     LEFT JOIN Emp ON Route.Mech = Emp.fWork
             WHERE      Elev.ID = ?
                     OR Elev.State = ?;",
-          array(
-            isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null,
-            isset( $_GET[ 'City_ID' ] ) ? $_GET[ 'City_ID' ] : null,
-          )
+            array(
+                isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null,
+                isset( $_GET[ 'City_ID' ] ) ? $_GET[ 'City_ID' ] : null,
+            )
         );
         $Unit = sqlsrv_fetch_array($r);
         $r = $database->query(
@@ -134,7 +149,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             WHERE   ElevTItem.ElevT    = 1
                     AND ElevTItem.Elev = ?;",
           array(
-            $_GET[ 'ID' ]
+              isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null
           )
         );
         if( $r ){while( $array = sqlsrv_fetch_array( $r ) ){ $Unit[ $array[ 'fDesc' ] ] = $array[ 'Value' ]; } }

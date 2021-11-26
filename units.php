@@ -114,8 +114,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID'  /></th>
               <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>
               <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null; ?>' placeholder='Customer' /></th>
-              <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null; ?>' placeholder='Location' /></th>
-              <th class='text-white border border-white' title='Type'><select class='redraw' name='Type'>
+              <th class='text-white border border-white' title='Location'><input class='redraw form-control form-control' type='text' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null; ?>' placeholder='Location' /></th>
+              <th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
                                 <option value=''>Select</option>
                                 <?php
                                   $result = \singleton\database::getInstance()->query(
@@ -127,7 +127,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   if( $result ){while ($row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){?><option value='<?php echo $row['Type'];?>'><?php echo $row['Type'];?></option><?php }}
                                 ?>
                             </select></th>
-              <th class='text-white border border-white' title='Status'><select class='redraw' name='Status'>
+              <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
                 <option value=''>Select</option>
                 <option value='0'>Active</option>
                 <option value='1'>Inactive</option>

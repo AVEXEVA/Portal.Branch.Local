@@ -73,60 +73,55 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
-      \singleton\database::getInstance( )->query(
-        null,
-        " INSERT INTO Activity([User], [Date], [Page] ) 
-          VALUES( ?, ?, ? );",
-        array(
-          $_SESSION[ 'Connection' ][ 'User' ],
-          date('Y-m-d H:i:s'),
-          'get/users.php'
-        )
-      );
-      $conditions = array( );
-      $search = array( );
-      $parameters = array( );
+    
+    $conditions = array( );
+    $search = array( );
+    $parameters = array( );
 
-    /*Filter $_GET Columns to SQL*/
-      if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['ID'];
-        $conditions[] = "[User].[ID] LIKE '%' + ? + '%'";
-      }
-      if( isset( $_GET[ 'Email' ] ) && !in_array( $_GET[ 'Email' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Email'];
-        $conditions[] = "[User].[Email] LIKE '%' + ? + '%'";
-      }
-        if( isset( $_GET[ 'Branch_Type' ] ) && !in_array( $_GET[ 'Branch_Type' ], array( '', ' ', null ) ) ){
-            $parameters[] = $_GET['Branch_Type'];
-            $conditions[] = "[User].[Branch_Type] LIKE '%' + ? + '%'";
-        }
+    if( isset( $_GET[ 'search'] ) ){
+     
+      $search[ ] = "[User].[Email]  LIKE '%' + ? + '%'";
+      $parameters[] = $_GET[ 'search' ];
+	 $search[ ] = "[User].[ID]  LIKE '%' + ? + '%'";
+	 $parameters[] = $_GET[ 'search' ];	
+   $search[ ] = "[User].[Branch_ID]  LIKE '%' + ? + '%'";
+   $parameters[] = $_GET[ 'search' ];
+      $search[ ] = "[User].[Branch]  LIKE '%' + ? + '%'";
+$parameters[] = $_GET[ 'search' ];
+      
+        $search[] = "[User].[Branch_Type] LIKE '%' + ? + '%'";
+        $parameters[] = $_GET[ 'search' ];
+    }
 
-
-
-        /*Search Filters*/
-    /*NONE*/
-
-    /*Concatenate Filters*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+   $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
     $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
-        $Columns = array(
-            0 =>  '[User].[ID]',
-            1 =>  '[User].[Email]',
-            2 =>'[User].[Branch_Type]'
-        );
-    $Order = isset( $Columns[ $_GET['order']['column'] ] )
-        ? $Columns[ $_GET['order']['column'] ]
-        : "[User].[ID]";
+  $parameters[] = $_GET[ 'search' ];   
+
+     $Columns = array(
+      0 =>  '[User].[ID]',
+      1 =>  '[User].[Email]',
+      2 =>'[User].[Branch_Type]'
+    );
+    
+    $Direction = 'ASC';
+$Order = isset( $_GET['order']['column'] ) ? $Columns[ $_GET['order']['column'] ] : "[User].[ID]";
+if(isset($_GET['order']['dir'])){
     $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
       ? $_GET['order']['dir']
       : 'ASC';
-
-        /*Perform Query*/
-        $sQuery =
-            " SELECT  *
+      }
+     $sQuery = " 
+      SELECT  Top 10
+              tbl.FieldName,
+              tbl.FieldValue
+      FROM    (
+                SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+                        attr.insRow.value('.', 'nvarchar(max)') as FieldValue
+                FROM    ( Select  convert(xml, (select i.* for xml raw)) as insRowCol
+                          FROM ( SELECT  *
       FROM  (
               SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                       [User].[ID],
@@ -139,55 +134,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               WHERE   ({$conditions}) AND ({$search})
             ) AS Tbl
       WHERE     Tbl.ROW_COUNT >= ?
-            AND Tbl.ROW_COUNT <= ?;";
-        //echo $sQuery;
-        $rResult = $database->query(
-            'Portal',
-            $sQuery,
-            $parameters
-        ) or die(print_r(sqlsrv_errors()));
+            AND Tbl.ROW_COUNT <= ?
+            )  as i
+                   ) as insRowTbl
+              CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
+            ) AS tbl
+      WHERE     tbl.FieldValue LIKE '%' + ? + '%'
+      GROUP BY  tbl.FieldName, tbl.FieldValue;";
+    $rResult = $database->query(
+      'Portal',
+      $sQuery,
+      $parameters
+    ) or die(print_r(sqlsrv_errors()));
 
-        $sQueryRow = "SELECT  [User].[ID]
-                  FROM    [User]
-                  WHERE   ({$conditions}) AND ({$search});";
-
-        $fResult = \singleton\database::getInstance( )->query(
-            'Portal',
-            $sQueryRow ,
-            $parameters
-        ) or die(print_r(sqlsrv_errors()));
-
-        $iFilteredTotal = 0;
-        $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
-        $_SESSION[ 'Tables' ][ 'Users' ] = isset( $_SESSION[ 'Tables' ][ 'Users' ]  ) ? $_SESSION[ 'Tables' ][ 'Users' ] : array( );
-        if( count( $_SESSION[ 'Tables' ][ 'Users' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Users' ] as &$Value ){ $Value = false; } }
-        $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] = $_GET;
-        while( $Row = sqlsrv_fetch_array( $fResult ) ){
-            $_SESSION[ 'Tables' ][ 'Users' ][ $Row[ 'ID' ] ] = true;
-            $iFilteredTotal++;
-        }
-
-        $parameters = array( );
-        $sQuery = " SELECT  COUNT( [User].[ID] )
-                FROM    [User];";
-        $rResultTotal = \singleton\database::getInstance( )->query(
-            'Portal',
-            $sQuery,
-            $parameters
-        ) or die(print_r(sqlsrv_errors()));
-        $aResultTotal = sqlsrv_fetch_array($rResultTotal);
-        $iTotal = $aResultTotal[0];
-
-        $output = array(
-            'sEcho'         =>  intval( $_GET[ 'draw' ] ),
-            'iTotalRecords'     =>  $iTotal,
-            'iTotalDisplayRecords'  =>  $iFilteredTotal,
-            'aaData'        =>  array()
-        );
-
-        while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-            $output['aaData'][]       = $Row;
-        }
-        echo json_encode( $output );
-    }}
-?>
+    $output = array( );
+      while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
+        $output[]       = $Row;
+      }
+      echo json_encode( $output );
+    }
+}?>

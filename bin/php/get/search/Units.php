@@ -1,10 +1,9 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-require('../index.php');
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
     $r = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  *
@@ -12,8 +11,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
           WHERE   Connection.Connector = ?
                   AND Connection.Hash = ?;",
         array(
-          $_SESSION[ 'User' ],
-          $_SESSION[ 'Hash' ]
+            $_SESSION[ 'Connection' ][ 'User' ],
+            $_SESSION[ 'Connection' ][ 'Hash' ]
         )
       );
     $Connection = sqlsrv_fetch_array( $r );
@@ -25,7 +24,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             FROM    Emp
             WHERE   Emp.ID = ?;",
         array(
-          $_SESSION[ 'User' ]
+            $_SESSION[ 'Connection' ][ 'User' ]
         )
     );
     $User = sqlsrv_fetch_array( $User );
@@ -38,7 +37,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
-          $_SESSION[ 'User' ]
+            $_SESSION[ 'Connection' ][ 'User' ]
         )
     );
     $Privileges = array();

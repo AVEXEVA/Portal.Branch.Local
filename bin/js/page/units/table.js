@@ -92,7 +92,21 @@ $( document ).ready( function( ){
 	    },
 		columns   : [
 			{
-				data : 'ID'
+				data : 'ID',
+
+				render : function( data, type, row, meta ){
+					switch( type ){
+						case 'display' :
+							return  row.ID !== null
+								?   "<div class='row'>" +
+								"<div class='col-12'><a href='unit.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Unit #" + row.ID + "</a></div>" +
+								"</div>"
+								:   null;
+						default :
+							return data;
+					}
+
+				}
 			},{
 				data : 'Name',
 				render : function ( data, type, row, meta ){
@@ -102,45 +116,46 @@ $( document ).ready( function( ){
 								return null;
 							} else {
 								return "<div class='row'>" +
-											( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
-											( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
-										"</div>";
+									( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
+									( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
+									"</div>";
 							}
 						default :
 							return data;
 					}
 				}
 			},{
-	            data : 'Customer_ID',
-	            render : function( data, type, row, meta ){
-	                switch( type ){
-	                    case 'display' :
-	                        return  row.Customer_ID !== null
-	                            ?   "<div class='row'>" +
-	                                    "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" +
-	                                "</div>"
-	                            :   null;
-	                    default :
-	                        return data;
-	                }
+				data : 'Customer_ID',
+				render : function( data, type, row, meta ){
 
-	            }
-	        },{
-	            data : 'Location_ID',
-	            render : function( data, type, row, meta ){
-	                switch( type ){
-	                    case 'display' :
-	                        return  row.Location_ID !== null
-	                            ?   "<div class='row'>" +
-	                                    "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'>" + row.Location_Name + "</a></div>" +
-	                                "</div>"
-	                            :   null;
-	                    default :
-	                        return data;
-	                }
+					switch( type ){
+						case 'display' :
+							return  row.Customer_ID !== null
+								?   "<div class='row'>" +
+								"<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
+								"</div>"
+								:   null;
+						default :
+							return data;
+					}
 
-	            }
-	        },{
+				}
+			},{
+				data : 'Location_ID',
+				render : function( data, type, row, meta ){
+					switch( type ){
+						case 'display' :
+							return  row.Location_ID !== null
+								?   "<div class='row'>" +
+								"<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
+								"</div>"
+								:   null;
+						default :
+							return data;
+					}
+
+				}
+			},{
 				data : 'Type'
 			},{
 				data : 'Status',
@@ -158,12 +173,12 @@ $( document ).ready( function( ){
 						case 'display' :
 							return row.Ticket_ID !== null
 								?	"<div class='row'>" +
-										"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'>Ticket #" + row.Ticket_ID + "</a></div>" +
-										"<div class='col-12'>" + row.Ticket_Date + "</div>" +
-									"</div>"
+								"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #" + row.Ticket_ID + "</a></div>" +
+								"<div class='col-12'>" + row.Ticket_Date + "</div>" +
+								"</div>"
 								: 	null;
-							default :
-								return data;
+						default :
+							return data;
 
 					}
 				}

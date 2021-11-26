@@ -1,3 +1,46 @@
+function search( link ){
+    var api = link.api();
+    $('input[name="Search"]', api.table().container())
+        .typeahead({
+                minLength : 4,
+                hint: true,
+                highlight: true,
+                limit : 5,
+                display : 'FieldValue',
+                source: function( query, result ){
+                    $.ajax({
+                        url : 'bin/php/get/search/Users.php',
+                        method : 'GET',
+                        data    : {
+                            search                :  $('input:visible[name="Search"]').val(),
+                            ID                    :  $('input:visible[name="ID"]').val( ),
+                            Email                :  $('input:visible[name="Email"]').val( ),
+                            Verified                :  $('input:visible[name="Verified"]').val( ),
+                            Branch                :  $('input:visible[name="Branch"]').val( ),
+                            Branch_Type                :  $('input:visible[name="Type"]').val( ),
+                            Branch_ID                :  $('input:visible[name="Branch_ID"]').val( ),
+
+                        },
+                        dataType : 'json',
+                        beforeSend : function( ){
+                            abort( );
+                        },
+                        success : function( data ){
+                            result( $.map( data, function( item ){
+                                return item.FieldName + ' => ' + item.FieldValue;
+                            } ) );
+                        }
+                    });
+                },
+                afterSelect: function( value ){
+                    var FieldName = value.split( ' => ' )[ 0 ];
+                    var FieldValue = value.split( ' => ' )[ 1 ];
+                    $( 'input[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
+                    $( 'input[name="Search"]').val( '' );
+                }
+            }
+        );
+}
 $(document).ready(function( ){
     var Editor_Users = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
@@ -26,7 +69,7 @@ $(document).ready(function( ){
                 data    : function(d){
                     d = {
                         draw : d.draw,
-                        start : d.start, 
+                        start : d.start,
                         length : d.length,
                         order : {
                             column : d.order[0].column,
@@ -35,30 +78,56 @@ $(document).ready(function( ){
                     };
                     d.ID = $('input[name="ID"]').val( );
                     d.Email = $('input[name="Email"]').val( );
+                    d.Branch_Type = $('input[name="Type"]').val( );
                     return d;
                 }
         },
         columns: [
             {
-              data    : 'ID',
-              className : 'ID'
+                data    : 'ID',
+                className : 'ID',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='user.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> User #" + row.ID + "</a></div>" +
+                                "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+
+                }
             },{
-              data : 'Email'
+                data : 'Email'
             },{
-              data : 'Verified'
+                data : 'Verified'
             },{
-              data : 'Branch'
+                data : 'Branch'
             },{
-              data : 'Branch_Type'
+                data : 'Branch_Type',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.Branch_Type == "Employee"
+                                ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='employee.php?ID=" + row.Branch_ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Branch_Type + "</a></div>" +
+                                "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
             },{
-              data : 'Branch_ID'
+                data : 'Branch_ID'
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-            //search( this );
+            search( this );
             $( '.redraw' ).bind( 'change', function(){ Table_Users.draw(); });
         },
         buttons : [
@@ -78,6 +147,10 @@ $(document).ready(function( ){
                   d = { }
                   d.ID = $('input[name="ID"]').val( );
                   d.Email = $('input[name="Email"]').val( );
+                  d.Verified = $('input[name="Verified"]').val( );
+                  d.Branch = $('input[name="Branch"]').val( );
+                  d.Branch_Type = $('input[name="Type"]').val( );
+                  d.Branch_ID = $('input[name="Reference"]').val( );
                   document.location.href = 'users.php?' + new URLSearchParams( d ).toString();
               }
             },{
