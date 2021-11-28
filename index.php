@@ -80,16 +80,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'index.php'
       )
     );
+    $userId= $_SESSION[ 'Connection' ][ 'User' ];
+ $query="SELECT Picture, Picture_Type AS Type FROM [User] WHERE ID = ?;"; 
     $image_result = $database->query(
       'Portal',
-      " SELECT  Picture,
-                Picture_Type AS Type
-        FROM    Portal.dbo.Portal
-        WHERE   Portal.Branch = ?
-                AND Portal.Branch_ID = ?;",
+      $query,
       array(
-        $_SESSION[ 'Connection' ][ 'Branch' ],
-        $_SESSION[ 'Connection' ][ 'User' ]
+        $userId
       )
     );
 ?><!DOCTYPE html>

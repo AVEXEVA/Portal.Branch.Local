@@ -1,12 +1,9 @@
 <?php
 if(session_id() == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+    session_start( );
     require('/var/www/html/Portal.Branch.Local/bin/php/index.php');
 }
-if(     !isset( null, $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
-    ||  !connection_privileged( null, $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] ) ){
-        header( 'Location: https://beta.nouveauelevator.com/login.php' );
-        exit; } 
+
 if(     isset($_FILES[ 'Profile' ] ) 
     &&  isset( $_FILES[ 'Profile' ][ 'tmp_name' ] ) 
     &&  strlen( $_FILES[ 'Profile' ][ 'tmp_name' ] ) > 0 )
@@ -16,9 +13,10 @@ if(     isset($_FILES[ 'Profile' ] )
   imagejpeg( $image, null, 50 );
   $image = ob_get_clean( );
   $image = base64_encode( $image );
+  $query="UPDATE [User] SET [Picture] = ?, [Picture_Type] = ? WHERE [ID] = ?;";
   $database->query( 
-    $Portal,
-    "UPDATE Portal.dbo.Portal SET [Picture] = ?, Picture_Type = ? WHERE Branch = ? AND Branch_ID = ?;",
+    'Portal',
+    $query,
     array( 
       array(
         $image, 
@@ -27,8 +25,8 @@ if(     isset($_FILES[ 'Profile' ] )
         SQLSRV_SQLTYPE_VARBINARY('max')
       ),
       $_FILES[ 'Profile' ][ 'type' ],
-      $_SESSION[ 'Connection' ][ 'Branch' ],
-      $_SESSION[ 'User' ]
+      $_SESSION[ 'Connection' ][ 'User' ],
+      
     )
   );
   echo 'success';

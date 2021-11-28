@@ -79,6 +79,9 @@ $(document).ready(function( ){
                     d.ID = $('input[name="ID"]').val( );
                     d.Email = $('input[name="Email"]').val( );
                     d.Branch_Type = $('input[name="Type"]').val( );
+                    d.Branch = $('input[name="Branch"]').val( );
+                     d.Branch_ID = $('input[name="ID"]').val( );
+                      d.Picture = $('input[name="Picture"]').val( );
                     return d;
                 }
         },
@@ -121,6 +124,21 @@ $(document).ready(function( ){
                 }
             },{
                 data : 'Branch_ID'
+            },
+             {
+            data:'Picture',
+              render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return   row.Picture_Type !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><img src=data:"+row.Picture_Type +";base64,"+row.Picture +" width='100px;' height='100px;'></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
             }
         ],
         initComplete : function( ){

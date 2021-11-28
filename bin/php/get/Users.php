@@ -134,7 +134,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       [User].[Verified],
                       [User].[Branch],
                       [User].[Branch_Type],
-                      [User].[Branch_ID]
+                      [User].[Branch_ID],
+                      [User].[Picture],
+                      [User].[Picture_Type]
               FROM    [User]
               WHERE   ({$conditions}) AND ({$search})
             ) AS Tbl
