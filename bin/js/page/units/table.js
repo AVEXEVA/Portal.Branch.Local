@@ -108,7 +108,7 @@ $( document ).ready( function( ){
 				render : function ( data, type, row, meta ){
 					switch ( type ) {
 						case 'display':
-							if( row.City_ID === null && row.State === null ){
+							if( row.City_ID === null && row.Building_ID === null ){
 								return null;
 							} else {
 								return "<div class='row'>" +
@@ -164,7 +164,7 @@ $( document ).ready( function( ){
 				}
 			},{
 				data : 'Ticket_ID',
-				render : function( data, type, row, meta ){
+			/*	render : function( data, type, row, meta ){
 					switch ( type ){
 						case 'display' :
 							return row.Ticket_ID !== null
@@ -177,7 +177,7 @@ $( document ).ready( function( ){
 							return data;
 
 					}
-				}
+				}*/
 			}
 		],
 	    initComplete : function( ){

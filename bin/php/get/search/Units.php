@@ -84,7 +84,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Name'];
-      $parameters[] = $_GET['Name'];
       $conditions[] = "( Unit.City_ID LIKE '%' + ? + '%' OR Unit.Building_ID LIKE '%' + ? + '%' )";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
@@ -112,11 +111,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     /*Search Filters*/
     if( isset( $_GET[ 'search' ] ) ){
 
-            $search[] = " Unit.City_ID LIKE '%' + ? + '%'";
-            $parameters[] = $_GET[ 'search' ];
+           $search[] = " Unit.City_ID LIKE '%' + ? + '%'";
+        $parameters[] = $_GET[ 'search' ];
 
             $search[] = " Unit.Building_ID LIKE '%' + ? + '%'";
-            $parameters[] = $_GET[ 'search' ];
+          $parameters[] = $_GET[ 'search' ];
 
             $search[] = "Customer.Name LIKE '%' + ? + '%'";
             $parameters[] = $_GET[ 'search' ];
@@ -132,8 +131,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
         $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-        $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
-        $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+    //    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+      //  $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
         $parameters[] = $_GET[ 'search' ];
         $Columns = array(
       0 =>  'Unit.ID',
@@ -191,15 +190,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                        TicketD.EDate AS Date
                              FROM      TicketD
                            ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
-                     WHERE   ({$conditions}) AND ({$search})
+                   /*  WHERE   ({$conditions}) AND ({$search}) */
         ) ) as i
         ) as insRowTbl
       CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
       ) AS tbl
       WHERE 		tbl.FieldValue LIKE '%' + ? + '%'
       GROUP BY 	tbl.FieldName, tbl.FieldValue;";
-    //echo $sQuery;
-    //var_dump( $parameters );
+//    echo $sQuery;
+  //  var_dump( $parameters );
         $rResult = $database->query(
       null,
       $sQuery,

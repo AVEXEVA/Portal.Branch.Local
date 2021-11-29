@@ -157,6 +157,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Tag AS Location_Name,
                           Unit.Building_ID AS Building_ID,
                           Unit.Type AS Type,
+                          Unit.fDesc AS Name,
+                         Ticket.ID AS Ticket_ID,  
                           Unit.Status AS Status
                          
                   FROM    Unit
@@ -170,7 +172,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                          LEFT JOIN (
                             SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                                       TicketD.Elev AS Unit,
-                                      TicketD.ID,
+                                      TicketD.ID ,
                                       TicketD.EDate AS Date
                             FROM      TicketD
                           ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
