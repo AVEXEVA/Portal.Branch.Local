@@ -150,18 +150,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Unit.ID AS ID,
-                          Unit.State + ' - ' + Unit.Unit AS Name,
-                          CASE WHEN Unit.State IN ( null, ' ', '  ' ) THEN 'Untitled' ELSE Unit.State END AS City_ID,
-                          Customer.ID AS Customer_ID,
+                          Unit.City_ID As City_ID,
+                         Customer.ID AS Customer_ID,
                           Customer.Name AS Customer_Name,
                           Location.Loc AS Location_ID,
                           Location.Tag AS Location_Name,
-                          Unit.Unit AS Building_ID,
+                          Unit.Building_ID AS Building_ID,
                           Unit.Type AS Type,
-                          Unit.Status AS Status,
-                          Ticket.ID AS Ticket_ID,
-                          Ticket.Date AS Ticket_Date
-                  FROM    Elev AS Unit
+                          Unit.Status AS Status
+                         
+                  FROM    Unit
                           LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                           LEFT JOIN (
                             SELECT  Owner.ID,
@@ -169,17 +167,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Unit.Owner = Customer.ID
-                        LEFT JOIN (
-                          SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
-                                    TicketD.Elev AS Unit,
-                                    TicketD.ID,
-                                    TicketD.EDate AS Date
-                          FROM      TicketD
-                        ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
+                         LEFT JOIN (
+                            SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
+                                      TicketD.Elev AS Unit,
+                                      TicketD.ID,
+                                      TicketD.EDate AS Date
+                            FROM      TicketD
+                          ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-    //echo $sQuery;
+
       $rResult = $database->query(
         null,
         $sQuery,
@@ -188,18 +186,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
       $sQueryRow = "SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                             Unit.ID AS ID,
-                            Unit.State + ' - ' + Unit.Unit AS Name,
-                            CASE WHEN Unit.State IN ( null, ' ', '  ' ) THEN 'Untitled' ELSE Unit.State END AS City_ID,
+                            Unit.City_ID AS City_ID,
                             Customer.ID AS Customer_ID,
                             Customer.Name AS Customer_Name,
                             Location.Loc AS Location_ID,
                             Location.Tag AS Location_Name,
-                            Unit.Unit AS Building_ID,
+                            Unit.Building_ID AS Building_ID,
                             Unit.Type AS Type,
-                            Unit.Status AS Status,
-                            Ticket.ID AS Ticket_ID,
-                            Ticket.Date AS Ticket_Date
-                    FROM    Elev AS Unit
+                            Unit.Status AS Status
+                            
+                    FROM    Unit
                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                             LEFT JOIN (
                               SELECT  Owner.ID,
@@ -207,7 +203,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               FROM    Owner
                                       LEFT JOIN Rol ON Rol.ID = Owner.Rol
                           ) AS Customer ON Unit.Owner = Customer.ID
-                          LEFT JOIN (
+                           LEFT JOIN (
                             SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                                       TicketD.Elev AS Unit,
                                       TicketD.ID,
@@ -243,8 +239,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       );
 
       while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-        $Row[ 'Ticket_Date' ] = !is_null( $Row[ 'Ticket_Date' ] ) ? date( 'm/d/Y h:i A', strtotime( $Row[ 'Ticket_Date' ] ) ) : null;
-        $output['aaData'][]       = $Row;
+          //$Row[ 'Ticket_Date' ] = !is_null( $Row[ 'Ticket_Date' ] ) ? date( 'm/d/Y h:i A', strtotime( $Row[ 'Ticket_Date' ] ) ) : null;
+          $output['aaData'][]       = $Row;
       }
       echo json_encode( $output );
 }}
