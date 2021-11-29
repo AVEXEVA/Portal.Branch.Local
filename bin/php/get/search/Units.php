@@ -3,19 +3,19 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-    $result = \singleton\database::getInstance( )->query(
-        'Portal',
-        " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
-        WHERE       [Connection].[User] = ?
-                AND [Connection].[Hash] = ?;",
+if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
+    $r = \singleton\database::getInstance( )->query(
+        null,
+        "   SELECT  *
+          FROM    Connection
+          WHERE   Connection.Connector = ?
+                  AND Connection.Hash = ?;",
         array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            $_SESSION[ 'Connection' ][ 'Hash' ]
+          $_SESSION[ 'User' ],
+          $_SESSION[ 'Hash' ]
         )
-    );
-    $Connection = sqlsrv_fetch_array($result);
+      );
+    $Connection = sqlsrv_fetch_array( $r );
     $User = \singleton\database::getInstance( )->query(
         null,
         "   SELECT  Emp.*,
@@ -24,7 +24,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             FROM    Emp
             WHERE   Emp.ID = ?;",
         array(
-            $_SESSION[ 'Connection' ][ 'User' ]
+          $_SESSION[ 'User' ]
         )
     );
     $User = sqlsrv_fetch_array( $User );
@@ -37,44 +37,79 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
-            $_SESSION[ 'Connection' ][ 'User' ]
+          $_SESSION[ 'User' ]
         )
     );
     $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-            dechex( $Privilege[ 'Owner' ] ),
-            dechex( $Privilege[ 'Group' ] ),
-            dechex( $Privilege[ 'Department' ] ),
-            dechex( $Privilege[ 'Database' ] ),
-            dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ),
-            dechex( $Privilege[ 'Token' ] ),
-            dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if(     !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Route' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
-    ){ ?><?php require('404.html');?><?php }
+    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
+    $Privileged = False;
+    if( isset( $Privileges[ 'Unit' ] )
+        && $Privileges[ 'Unit' ][ 'Owner' ]  >= 4
+    ){ $Privileged = True; }
+    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
-        $conditions = array( );
-        $search = array( );
-        $parameters = array( );
+
+      $output = array(
+          'sEcho'                 =>  intval( $_GET['draw' ] ),
+          'iTotalRecords'         =>  $iTotal,
+          'iTotalDisplayRecords'  =>  $iFilteredTotal,
+          'aaData'                =>  array( ),
+          'options'               =>  array( )
+      );
+
+    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
+    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '15';
+
+    $Start = $_GET['iDisplayStart'];
+    $Length = $_GET['iDisplayLength'];
+    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
+
+    $conditions = array( );
+    $search = array( );
+    $parameters = array( );
+
+    if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['ID'];
+      $conditions[] = "Unit.ID LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Name'];
+      $parameters[] = $_GET['Name'];
+      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.Unit LIKE '%' + ? + '%' )";
+    }
+    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer'];
+      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location'];
+      $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Type'];
+      $conditions[] = "Unit.Type LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Status'] ;
+      $conditions[] = "Unit.Status LIKE '%' + ? + '%'";
+    }
+
+    /*if( $Privileges[ 'Unit' ][ 'Other' ] < 4 ){
+        $parameters [] = $User[ 'fWork' ];
+        $conditions[] = "Unit.ID IN ( SELECT Ticket.Unit FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LElev AS Unit FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Elev AS Unit FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Unit)";
+    }*/
+
     /*Search Filters*/
     if( isset( $_GET[ 'search' ] ) ){
 
-			$search[] = " Unit.State LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
+            $search[] = " Unit.State LIKE '%' + ? + '%'";
+            $parameters[] = $_GET[ 'search' ];
 
-			$search[] = " Unit.Unit LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
+            $search[] = " Unit.Unit LIKE '%' + ? + '%'";
+            $parameters[] = $_GET[ 'search' ];
 
-			$search[] = "Customer.Name LIKE '%' + ? + '%'";
-			$parameters[] = $_GET[ 'search' ];
+            $search[] = "Customer.Name LIKE '%' + ? + '%'";
+            $parameters[] = $_GET[ 'search' ];
 
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];
@@ -82,7 +117,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $search[] = "Unit.Type LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];
 
-		}
+        }
 
     /*Concatenate Filters*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );

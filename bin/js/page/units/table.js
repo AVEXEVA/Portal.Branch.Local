@@ -2,32 +2,27 @@ function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
         .typeahead({
-            minLength : 4,
-            highlight : 1,
-            displayKey : 'FieldValue',
+            minLength : 2,
+            hint: true,
+                highlight: true,
+                limit : 5,
+                display : 'FieldValue',
             source: function( query, result ){
                 $.ajax({
                     url : 'bin/php/get/search/Units.php',
                     method : 'GET',
-					data : function( d ){
-			            d = {
-			                start : d.start,
-			                length : d.length,
-			                order : {
-			                    column : d.order[0].column,
-			                    dir : d.order[0].dir
-			                }
-			            };
-			            d.Search 		= $('input[name="Search"]').val();
-			            d.ID 			= $('input[name="ID"]').val( );
-			            d.Name 			= $('input[name="Name"]').val( );
-			            d.Customer 		= $('input[name="Customer"]').val( );
-			            d.Location 		= $('input[name="Location"]').val( );
-			            d.Building_ID 	= $('input[name="Building_ID"]').val( );
-			            d.Type 			= $('select[name="Type"]').val( );
-			            d.Status 		= $('select[name="Status"]').val( );
-			            return d;
-			        },
+                      data    : {
+                            search                :  $('input:visible[name="Search"]').val(),
+                            ID                    :  $('input:visible[name="ID"]').val( ),
+                            Name                :  $('input:visible[name="Name"]').val( ),
+                            Customer                :  $('input:visible[name="Customer"]').val( ),
+                            Location                :  $('input:visible[name="Location"]').val( ),
+                            Type                :  $('input:visible[name="Type"]').val( ),
+                            Ticket_ID                :  $('input:visible[name="Ticket_ID"]').val( ),
+                            Status                :  $('input:visible[name="Status"]').val( ),
+
+                        },
+				
                     dataType : 'json',
                     beforeSend : function( ){
                         abort( );
@@ -231,7 +226,7 @@ $( document ).ready( function( ){
                   data : dte
                 },
                 success : function(response){
-                  Table_Users.draw();
+                  Table_Units.draw();
                 }
               })
             }
