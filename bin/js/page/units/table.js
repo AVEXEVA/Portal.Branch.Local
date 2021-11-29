@@ -84,9 +84,10 @@ $( document ).ready( function( ){
 	            d.Name 			= $('input[name="Name"]').val( );
 	            d.Customer 		= $('input[name="Customer"]').val( );
 	            d.Location 		= $('input[name="Location"]').val( );
-	            d.Building_ID 	= $('input[name="Building_ID"]').val( );
+	        
 	            d.Type 			= $('select[name="Type"]').val( );
 	            d.Status 		= $('select[name="Status"]').val( );
+	                d.Ticket_ID 		= $('select[name="Ticket_ID"]').val( );
 	            return d;
 	        }
 	    },
@@ -161,9 +162,9 @@ $( document ).ready( function( ){
 				data : 'Status',
 				render:function(data){
 					switch(data){
-						case 0: return 'Active';
-						case 1: return 'Inactive';
-						case 2: return 'Demolished';
+						case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+						case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+						case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
 					}
 				}
 			},{
