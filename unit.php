@@ -112,10 +112,16 @@ $result = \singleton\database::getInstance( )->query(
                     Unit.Template           AS Template,
                     Unit.Status             AS Status,
                     Unit.TFMID              AS TFMID,
-                    Unit.TFMSource          AS TFMSource
+                    Unit.TFMSource          AS TFMSource,
+                    Customer.Name AS Customer_Name
             FROM    Unit
                     LEFT JOIN Loc           ON Unit.Loc = Loc.Loc
-                     LEFT JOIN Owner           ON Unit.Owner = Owner.ID    
+                    LEFT JOIN (
+                               SELECT  Owner.ID,
+                                       Rol.Name
+                               FROM    Owner
+                                       LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                           ) AS Customer ON Unit.Owner = Customer.ID  
             WHERE      Unit.ID = ?
                     OR Unit.City_ID = ?;",
             array(
@@ -151,7 +157,8 @@ $Unit =   (  empty( $ID )
     'Template' => null,
     'TFMID' => null,
     'TFMSource' => null,
-    'Status' => null
+    'Status' => null,
+    'Customer_Name' => null
 ) : sqlsrv_fetch_array($result);
 
 if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -359,306 +366,587 @@ if( $owners ) {
     <div id="wrapper">
         <?php require( bin_php . 'element/navigation.php'); ?>
 		<div id="page-wrapper" class='content'>
-            <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
-            <div class='card card-primary'>
-                <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                        <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5>
+            <div class="card card-primary">
+                <div class="card-heading">
+                    <div class="row g-0 px-3 py-2">
+                        <div class="col-6"><h5><i class="fa fa-link fa-fw fa-1x" aria-hidden="true"></i><a href="units.php?">Unit</a>: <span>New</span></h5></div>
+                        <div class="col-4"></div>
+                        <div class="col-2">
+                            <div class='row g-0'>
+                                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='unit.php';">Create</button></div>
+                                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='unit.php?ID=<?php echo $Unit[ 'ID' ];?>';">Refresh</button></div>
+                            </div>
                         </div>
-                        <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
-                    <div class='col-2'>
-                        <div class='row g-0'>
-                            <div class='col-4'><button class='form-control rounded' onClick="document.location.href='unit.php';">Create</button></div>
-                            <div class='col-4'><button class='form-control rounded' onClick="document.location.href='unit.php?ID=<?php echo $Unit[ 'ID' ];?>';">Refresh</button></div>
-                        </div>
-                    </div>
+
                     </div>
                 </div>
+                <div class="card-body bg-dark text-white">
+                    <div class="card-columns">
 
-                <div class='card-body bg-dark text-white'>
-<!--                    <input type='hidden' name='ID' value='--><?php //echo $Unit[ 'ID' ];?><!--' />-->
-
-
-                    <div class=" row col-md-12">
-                            <div class='row shadower col-md-6' style='padding-top:10px;padding-bottom:10px;'>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Description <label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                       <textarea class="form-control" name="fDesc" ><?php echo $Unit['Description'];  ?></textarea>
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Unit<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-
-                                        <select class="form-control" name="Building_ID" ><option value="">Select</option>
-                                            <option value="Elevator" <?php echo $Unit[ 'Units' ] == 'Elevator' ? 'selected' : null;?>>Elevator</option>
-                                        </select>
+                            <div class='card card-primary my-3'>
+                                <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
+                                <div class='card-heading'>
+                                    <div class='row g-0 px-3 py-2'>
+                                        <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5>
+                                        </div>
+                                        <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
 
                                     </div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> City<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="City_ID" >
-                                            <option value="">Select</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
-                                            <option <?php echo $Unit[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
 
-                                        </select>
-                                    </div>
+                                <div class='card-body bg-dark text-white'>
+                                    <!--                    <input type='hidden' name='ID' value='--><?php //echo $Unit[ 'ID' ];?><!--' />-->
+
+
+
+
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Description <label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <textarea class="form-control" name="fDesc" required><?php echo $Unit['Description'];  ?></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> City<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="City_ID" required>
+                                                        <option value="">Select</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
+                                                        <option <?php echo $Unit[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Type<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Type" required>
+                                                        <option value="">Select</option>
+                                                        <option value='General' <?php echo $Unit[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
+                                                        <option value='Bank' <?php echo $Unit[ 'Type' ] == 'Bank' ? 'selected' : null;?>>Bank</option>
+                                                        <option value='Churches' <?php echo $Unit[ 'Type' ] == 'Churches' ? 'selected' : null;?>>Churches</option>
+                                                        <option value='Commercial' <?php echo $Unit[ 'Type' ] == 'Commercial' ? 'selected' : null;?>>Commercial</option>
+                                                        <option value='Hospitals' <?php echo $Unit[ 'Type' ] == 'Hospitals' ? 'selected' : null;?>>General</option>
+                                                        <option value='Property Manage' <?php echo $Unit[ 'Type' ] == 'Property Manage' ? 'selected' : null;?>>Property Manage</option>
+                                                        <option value='Restaraunts' <?php echo $Unit[ 'Type' ] == 'General' ? 'selected' : null;?>>Restaraunts</option>
+                                                        <option value='Schools' <?php echo $Unit[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Manufacturer<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Manuf" value="<?php echo $Unit['Manufacturer'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Installer<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="InstallBy" value="<?php echo $Unit['Installer'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Maintained<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Last" value="<?php echo $Unit['Maintained'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Customer<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Owner" required><option value="">Select</option>
+                                                        <?php  foreach($finalOwner as $finalOwners){ ?>
+                                                            <option value="<?php echo $finalOwners['ID'];  ?>" <?php if($Unit['Customer'] == $finalOwners['ID']){ echo "selected"; }  ?>><?php echo $finalOwners['Name'];  ?></option>
+                                                        <?php  }  ?>
+                                                    </select>
+
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Serial<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Serial" value="<?php echo $Unit['Serial'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Status<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Status" required><option value="">Select</option>
+
+                                                        <option value='0' <?php echo $Unit[ 'Status' ] == 0 ? 'selected' : '';?>>Active</option>
+                                                        <option value='1' <?php echo $Unit[ 'Status' ] == 1 ? 'selected' : '';?>>Inactive</option>
+                                                        <option value='2' <?php echo $Unit[ 'Status' ] == 2 ? 'selected' : '';?>>Demolished</option>
+
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Unit<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+
+                                                    <select class="form-control" name="Building_ID" ><option value="">Select</option>
+                                                        <option value="Elevator" <?php echo $Unit[ 'Units' ] == 'Elevator' ? 'selected' : null;?>>Elevator</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> TFMID:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="TFMID" value="<?php echo $Unit['TFMID'];  ?>">
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Note<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <textarea class="form-control" name="Remarks" required><?php echo $Unit['Note'];  ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Location<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Loc" required >
+                                                        <option value="">Select</option>
+                                                        <?php  foreach($finalLoc as $locationList){ ?>
+                                                            <option value="<?php echo $locationList['ID'];  ?>" <?php if($Unit['Location'] == $locationList['ID']){ echo "selected"; }  ?>><?php echo $locationList['Tag'];  ?></option>
+                                                        <?php  }  ?>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Unit Category<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Cat" required><option value="">Select</option>
+                                                        <option value="Consultant" <?php echo $Unit[ 'Category' ] == 'Consultant' ? 'selected' : '';?>>Consultant</option>
+                                                        <option value="Other" <?php echo $Unit[ 'Category' ] == 'Other' ? 'selected' : '';?>>Other</option>
+                                                        <option value="Public" <?php echo $Unit[ 'Category' ] == 'Public' ? 'selected' : '';?>>Public</option>
+                                                        <option value="N/A" <?php echo $Unit[ 'Category' ] == 'N/A' ? 'selected' : '';?>>N/A</option>
+                                                        <option value="Service" <?php echo $Unit[ 'Category' ] == 'Service' ? 'selected' : '';?>>Service</option>
+                                                        <option value="Private" <?php echo $Unit[ 'Category' ] == 'Private' ? 'selected' : '';?>>Private</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Building<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Location_Category" required><option value="">Select</option>
+                                                        <option value="Government" <?php echo $Unit[ 'Building' ] == 'Government' ? 'selected' : '';?>>Government</option>
+                                                        <option value="Hospital" <?php echo $Unit[ 'Building' ] == 'Hospital' ? 'selected' : '';?>>Hospital</option>
+                                                        <option value="School" <?php echo $Unit[ 'Building' ] == 'School' ? 'selected' : '';?>>School</option>
+                                                        <option value="Commercial" <?php echo $Unit[ 'Building' ] == 'Commercial' ? 'selected' : '';?>>Commercial</option>
+                                                        <option value="Residence" <?php echo $Unit[ 'Building' ] == 'Residence' ? 'selected' : '';?>>Residence</option>
+                                                        <option value="Funeral Homes" <?php echo $Unit[ 'Building' ] == 'Funeral Homes' ? 'selected' : '';?>>Funeral Homes</option>
+                                                        <option value="Utility-Powerplants" <?php echo $Unit[ 'Building' ] == 'Utility-Powerplants' ? 'selected' : '';?>>Utility-Powerplants</option>
+                                                        <option value="Other" <?php echo $Unit[ 'Building' ] == 'Other' ? 'selected' : '';?>>Other</option>
+                                                        <option value="Catering Hall" <?php echo $Unit[ 'Building' ] == 'Catering Hall' ? 'selected' : '';?>>Catering Hall</option>
+                                                        <option value="Apartment / Residence" <?php echo $Unit[ 'Building' ] == 'Apartment / Residence' ? 'selected' : '';?>>Apartment / Residence</option>
+                                                        <option value="Office / Commercial" <?php echo $Unit[ 'Building' ] == 'Office / Commercial' ? 'selected' : '';?>>Office / Commercial</option>
+                                                        <option value="Warehouse" <?php echo $Unit[ 'Building' ] == 'Warehouse' ? 'selected' : '';?>>Warehouse</option>
+                                                        <option value="Store / Retail" <?php echo $Unit[ 'Building' ] == 'Store / Retail' ? 'selected' : '';?>>Store / Retail</option>
+                                                        <option value="Bank" <?php echo $Unit[ 'Building' ] == 'Bank' ? 'selected' : '';?>>Bank</option>
+                                                        <option value="Parking Structure" <?php echo $Unit[ 'Building' ] == 'Parking Structure' ? 'selected' : '';?>>Parking Structure
+                                                        </option>
+                                                        <option value="Club/Museum" <?php echo $Unit[ 'Building' ] == 'Club/Museum' ? 'selected' : '';?>>Club/Museum
+                                                        </option>
+                                                        <option value="Hospital" <?php echo $Unit[ 'Building' ] == 'Hospital' ? 'selected' : '';?>>Hospital
+                                                        </option>
+                                                        <option value="Nursing Home" <?php echo $Unit[ 'Building' ] == 'Nursing Home' ? 'selected' : '';?>>Nursing Home
+                                                        </option>
+                                                        <option value="Airport" <?php echo $Unit[ 'Building' ] == 'Airport' ? 'selected' : '';?>>Airport
+                                                        </option>
+                                                        <option value="Church" <?php echo $Unit[ 'Building' ] == 'Church' ? 'selected' : '';?>>Church
+                                                        </option>
+                                                        <option value="Hotel" <?php echo $Unit[ 'Building' ] == 'Hotel' ? 'selected' : '';?>>Hotel
+                                                        </option>
+                                                        <option value="Post Office" <?php echo $Unit[ 'Building' ] == 'Post Office' ? 'selected' : '';?>>Post Office
+                                                        </option>
+                                                        <option value="Mission" <?php echo $Unit[ 'Building' ] == 'Mission' ? 'selected' : '';?>>Mission
+                                                        </option>
+
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Installation<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Install" value="<?php echo $Unit['Installation'];  ?>" required >
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Created<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Since" value="<?php echo $Unit['Created'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Price<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Price"  value="<?php echo $Unit['Price'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Bank<label>*</label>:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="Bank" value="<?php echo $Unit['Bank'];  ?>" required>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> Template:</div>
+                                                <div class='col-xs-8'>
+                                                    <select class="form-control" name="Template"><option value="">Select</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            <div class='row g-0'>
+                                                <div class='col-4 my-auto'> TFMSource:</div>
+                                                <div class='col-xs-8'>
+                                                    <input type="text" class="form-control" name="TFMSource" value="<?php echo $Unit['TFMSource'];  ?>">
+
+                                                </div>
+                                            </div>
+
+
+
+
+
+
+
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Type<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Type" >
-                                            <option value="">Select</option>
-                                            <option value='General' <?php echo $Unit[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
-                                            <option value='Bank' <?php echo $Unit[ 'Type' ] == 'Bank' ? 'selected' : null;?>>Bank</option>
-                                            <option value='Churches' <?php echo $Unit[ 'Type' ] == 'Churches' ? 'selected' : null;?>>Churches</option>
-                                            <option value='Commercial' <?php echo $Unit[ 'Type' ] == 'Commercial' ? 'selected' : null;?>>Commercial</option>
-                                            <option value='Hospitals' <?php echo $Unit[ 'Type' ] == 'Hospitals' ? 'selected' : null;?>>General</option>
-                                            <option value='Property Manage' <?php echo $Unit[ 'Type' ] == 'Property Manage' ? 'selected' : null;?>>Property Manage</option>
-                                            <option value='Restaraunts' <?php echo $Unit[ 'Type' ] == 'General' ? 'selected' : null;?>>Restaraunts</option>
-                                            <option value='Schools' <?php echo $Unit[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
-
-                                        </select>
+                                    <div class="card-footer">
+                                        <div class="row">
+                                            <div class="col-12"><button class="form-control" type="submit">Save</button></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Manufacturer<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Manuf" value="<?php echo $Unit['Manufacturer'];  ?>" >
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Installer<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="InstallBy" value="<?php echo $Unit['Installer'];  ?>" >
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Maintained<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Last" value="<?php echo $Unit['Maintained'];  ?>" >
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Customer<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Owner" ><option value="">Select</option>
-                                            <?php  foreach($finalOwner as $finalOwners){ ?>
-                                                <option value="<?php echo $finalOwners['ID'];  ?>" <?php if($Unit['Customer'] == $finalOwners['ID']){ echo "selected"; }  ?>><?php echo $finalOwners['Name'];  ?></option>
-                                            <?php  }  ?>
-                                        </select>
-
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Serial<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Serial" value="<?php echo $Unit['Serial'];  ?>" >
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Status<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Status" ><option value="">Select</option>
-
-                                            <option value='0' <?php echo $Unit[ 'Status' ] == 1 ? 'selected' : '';?>>Inactive</option>
-                                            <option value='1' <?php echo $Unit[ 'Status' ] == 0 ? 'selected' : '';?>>Active</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> TFMID:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="TFMID" value="<?php echo $Unit['TFMID'];  ?>">
-
-                                    </div>
+                                </form>
+                            </div>
+                            <div class='card card-primary my-3'>
+                            <div class='card-heading'>
+                                <div class='row g-0 px-3 py-2'>
+                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+                                    <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
                             </div>
-                            <div class='row shadower col-md-6' style='padding-top:10px;padding-bottom:10px;'>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Note<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <textarea class="form-control" name="Remarks" ><?php echo $Unit['Note'];  ?></textarea>
-                                    </div>
+                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                                <div class='row g-0'>
+                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
+                                    <div class='col-6'>&nbsp;</div>
+                                    <div class='col-2'>&nbsp;</div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Location<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Loc" >
-                                            <option value="">Select</option>
-                                        <?php  foreach($finalLoc as $locationList){ ?>
-                                    <option value="<?php echo $locationList['ID'];  ?>" <?php if($Unit['Location'] == $locationList['ID']){ echo "selected"; }  ?>><?php echo $locationList['Tag'];  ?></option>
-                                      <?php  }  ?>
-
-                                        </select>
-                                    </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 0
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Open</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Unit Category<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Cat" ><option value="">Select</option>
-                                        <option value="Consultant" <?php echo $Unit[ 'Category' ] == 'Consultant' ? 'selected' : '';?>>Consultant</option>
-                                            <option value="Other" <?php echo $Unit[ 'Category' ] == 'Other' ? 'selected' : '';?>>Other</option>
-                                            <option value="Public" <?php echo $Unit[ 'Category' ] == 'Public' ? 'selected' : '';?>>Public</option>
-                                            <option value="N/A" <?php echo $Unit[ 'Category' ] == 'N/A' ? 'selected' : '';?>>N/A</option>
-                                            <option value="Service" <?php echo $Unit[ 'Category' ] == 'Service' ? 'selected' : '';?>>Service</option>
-                                            <option value="Private" <?php echo $Unit[ 'Category' ] == 'Private' ? 'selected' : '';?>>Private</option>
-                                        </select>
-                                    </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 1
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Building<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Location_Category" ><option value="">Select</option>
-                                            <option value="Government" <?php echo $Unit[ 'Building' ] == 'Government' ? 'selected' : '';?>>Government</option>
-                                            <option value="Hospital" <?php echo $Unit[ 'Building' ] == 'Hospital' ? 'selected' : '';?>>Hospital</option>
-                                            <option value="School" <?php echo $Unit[ 'Building' ] == 'School' ? 'selected' : '';?>>School</option>
-                                            <option value="Commercial" <?php echo $Unit[ 'Building' ] == 'Commercial' ? 'selected' : '';?>>Commercial</option>
-                                            <option value="Residence" <?php echo $Unit[ 'Building' ] == 'Residence' ? 'selected' : '';?>>Residence</option>
-                                            <option value="Funeral Homes" <?php echo $Unit[ 'Building' ] == 'Funeral Homes' ? 'selected' : '';?>>Funeral Homes</option>
-                                            <option value="Utility-Powerplants" <?php echo $Unit[ 'Building' ] == 'Utility-Powerplants' ? 'selected' : '';?>>Utility-Powerplants</option>
-                                            <option value="Other" <?php echo $Unit[ 'Building' ] == 'Other' ? 'selected' : '';?>>Other</option>
-                                            <option value="Catering Hall" <?php echo $Unit[ 'Building' ] == 'Catering Hall' ? 'selected' : '';?>>Catering Hall</option>
-                                            <option value="Apartment / Residence" <?php echo $Unit[ 'Building' ] == 'Apartment / Residence' ? 'selected' : '';?>>Apartment / Residence</option>
-                                            <option value="Office / Commercial" <?php echo $Unit[ 'Building' ] == 'Office / Commercial' ? 'selected' : '';?>>Office / Commercial</option>
-                                            <option value="Warehouse" <?php echo $Unit[ 'Building' ] == 'Warehouse' ? 'selected' : '';?>>Warehouse</option>
-                                            <option value="Store / Retail" <?php echo $Unit[ 'Building' ] == 'Store / Retail' ? 'selected' : '';?>>Store / Retail</option>
-                                            <option value="Bank" <?php echo $Unit[ 'Building' ] == 'Bank' ? 'selected' : '';?>>Bank</option>
-                                            <option value="Parking Structure" <?php echo $Unit[ 'Building' ] == 'Parking Structure' ? 'selected' : '';?>>Parking Structure
-                                            </option>
-                                            <option value="Club/Museum" <?php echo $Unit[ 'Building' ] == 'Club/Museum' ? 'selected' : '';?>>Club/Museum
-                                            </option>
-                                            <option value="Hospital" <?php echo $Unit[ 'Building' ] == 'Hospital' ? 'selected' : '';?>>Hospital
-                                            </option>
-                                            <option value="Nursing Home" <?php echo $Unit[ 'Building' ] == 'Nursing Home' ? 'selected' : '';?>>Nursing Home
-                                            </option>
-                                            <option value="Airport" <?php echo $Unit[ 'Building' ] == 'Airport' ? 'selected' : '';?>>Airport
-                                            </option>
-                                            <option value="Church" <?php echo $Unit[ 'Building' ] == 'Church' ? 'selected' : '';?>>Church
-                                            </option>
-                                            <option value="Hotel" <?php echo $Unit[ 'Building' ] == 'Hotel' ? 'selected' : '';?>>Hotel
-                                            </option>
-                                            <option value="Post Office" <?php echo $Unit[ 'Building' ] == 'Post Office' ? 'selected' : '';?>>Post Office
-                                            </option>
-                                            <option value="Mission" <?php echo $Unit[ 'Building' ] == 'Mission' ? 'selected' : '';?>>Mission
-                                            </option>
-
-
-                                        </select>
-                                    </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 2
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>En Route</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Installation<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Install" value="<?php echo $Unit['Installation'];  ?>" >
-
-                                    </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 3
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>On Site</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Created<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Since" value="<?php echo $Unit['Created'];  ?>" >
-
-                                    </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 6
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Review</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Price<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Price"  value="<?php echo $Unit['Price'];  ?>" >
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Bank<label>*</label>:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="Bank" value="<?php echo $Unit['Bank'];  ?>" >
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> Template:</div>
-                                    <div class='col-xs-8'>
-                                        <select class="form-control" name="Template"><option value="">Select</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-4 my-auto'> TFMSource:</div>
-                                    <div class='col-xs-8'>
-                                        <input type="text" class="form-control" name="TFMSource" value="<?php echo $Unit['TFMSource'];  ?>">
-
-                                    </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 4
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Complete</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row"></div>
+                            <div class='card card-primary my-3'>
+                            <div class='card-heading'>
+                                <div class='row g-0 px-3 py-2'>
+                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                                <div class='row g-0'>
+                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Violation(1);?><span>Violations</span></div>
+                                    <div class='col-6'>&nbsp;</div>
+                                    <div class='col-2'>&nbsp;</div>
+                                </div>
+                                <div class='row g-0'>
+                                    <div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Preliminary</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Violations' value='<?php
+                                        $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( Violation.ID ) AS Violations
+											FROM   Violation
+												   LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
+											WHERE  Location.Owner = ?
+													AND Violation.Status = 'Preliminary Report'
+										;",array($Unit[ 'Customer' ]));
+                                        echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=Preliminary Report';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'>
+                                    <div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Job Created</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Violations' value='<?php
+                                        $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( Violation.ID ) AS Violations
+											FROM   Violation
+												   LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
+											WHERE  Location.Owner = ?
+													AND Violation.Status = 'Job Created'
+										;",array($Unit[ 'Customer' ]));
+                                        echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=Preliminary Report';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class='card card-primary my-3'>
+                            <div class='card-heading'>
+                                <div class='row g-0 px-3 py-2'>
+                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+                                <div class='row g-0'>
+                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
+                                    <div class='col-6'>&nbsp;</div>
+                                    <div class='col-2'>&nbsp;</div>
+                                </div>
+                                <?php if(isset($Privileges['Invoice'])) {?>
+                                    <div class='row g-0'>
+                                        <div class='col-1'>&nbsp;</div>
+                                        <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
+                                        <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
+                                            $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( OpenAR.Ref ) AS Count
+											FROM   OpenAR
+												   LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+											WHERE  Location.Owner = ?
+										;",array($Unit[ 'Customer' ]));
+                                            $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                                            echo $Count
+                                            ?>' /></div>
+                                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                    </div>
+                                <?php }?>
+                                <?php if(isset($Privileges['Invoice']) ) {?>
+                                    <div class='row g-0'>
+                                        <div class='col-1'>&nbsp;</div>
+                                        <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
+                                        <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
+                                            $r = \singleton\database::getInstance( )->query(null,"
+											SELECT 	Count( Invoice.Ref ) AS Count
+											FROM   	Invoice
+												   	LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+											WHERE  		Location.Owner = ?
+													AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+
+										;",array($Unit[ 'Customer' ]));
+                                            $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                                            echo $Count
+                                            ?>' /></div>
+                                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                    </div>
+                                <?php }?>
+                            </div>
+                        </div>
+
                     </div>
-
-
-
-
-
                 </div>
             </div>
-            </form>
+
         </div>
 	</div>
 </body>
