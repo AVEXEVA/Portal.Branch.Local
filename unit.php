@@ -112,10 +112,16 @@ $result = \singleton\database::getInstance( )->query(
                     Unit.Template           AS Template,
                     Unit.Status             AS Status,
                     Unit.TFMID              AS TFMID,
-                    Unit.TFMSource          AS TFMSource
+                    Unit.TFMSource          AS TFMSource,
+                    Customer.Name AS Customer_Name
             FROM    Unit
                     LEFT JOIN Loc           ON Unit.Loc = Loc.Loc
-                     LEFT JOIN Owner           ON Unit.Owner = Owner.ID    
+                    LEFT JOIN (
+                               SELECT  Owner.ID,
+                                       Rol.Name
+                               FROM    Owner
+                                       LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                           ) AS Customer ON Unit.Owner = Customer.ID  
             WHERE      Unit.ID = ?
                     OR Unit.City_ID = ?;",
             array(
@@ -151,7 +157,8 @@ $Unit =   (  empty( $ID )
     'Template' => null,
     'TFMID' => null,
     'TFMSource' => null,
-    'Status' => null
+    'Status' => null,
+    'Customer_Name' => null
 ) : sqlsrv_fetch_array($result);
 
 if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -376,7 +383,7 @@ if( $owners ) {
                 <div class="card-body bg-dark text-white">
                     <div class="card-columns">
 
-                            <div class='card card-primary'>
+                            <div class='card card-primary my-3'>
                                 <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
                                 <div class='card-heading'>
                                     <div class='row g-0 px-3 py-2'>
@@ -522,8 +529,10 @@ if( $owners ) {
                                                 <div class='col-xs-8'>
                                                     <select class="form-control" name="Status" required><option value="">Select</option>
 
-                                                        <option value='0' <?php echo $Unit[ 'Status' ] == 1 ? 'selected' : '';?>>Inactive</option>
-                                                        <option value='1' <?php echo $Unit[ 'Status' ] == 0 ? 'selected' : '';?>>Active</option>
+                                                        <option value='0' <?php echo $Unit[ 'Status' ] == 0 ? 'selected' : '';?>>Active</option>
+                                                        <option value='1' <?php echo $Unit[ 'Status' ] == 1 ? 'selected' : '';?>>Inactive</option>
+                                                        <option value='2' <?php echo $Unit[ 'Status' ] == 2 ? 'selected' : '';?>>Demolished</option>
+
                                                     </select>
 
                                                 </div>
@@ -677,6 +686,262 @@ if( $owners ) {
                                     </div>
                                 </form>
                             </div>
+                            <div class='card card-primary my-3'>
+                            <div class='card-heading'>
+                                <div class='row g-0 px-3 py-2'>
+                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+                                    <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                                <div class='row g-0'>
+                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
+                                    <div class='col-6'>&nbsp;</div>
+                                    <div class='col-2'>&nbsp;</div>
+                                </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 0
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Open</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 1
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 2
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>En Route</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 3
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>On Site</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 6
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Review</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'><?php
+                                    $r = \singleton\database::getInstance( )->query(
+                                        null,
+                                        "	SELECT Count( Tickets.ID ) AS Tickets
+												FROM   (
+															(
+																SELECT 	TicketO.ID AS ID
+																FROM   	TicketO
+																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+																WHERE  		Location.Owner = ?
+																		AND TicketO.Assigned = 4
+															)
+														) AS Tickets;",
+                                        array(
+                                            $Unit[ 'Customer' ]
+                                        )
+                                    );
+                                    ?><div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Complete</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"></div>
+                            <div class='card card-primary my-3'>
+                            <div class='card-heading'>
+                                <div class='row g-0 px-3 py-2'>
+                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                                <div class='row g-0'>
+                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Violation(1);?><span>Violations</span></div>
+                                    <div class='col-6'>&nbsp;</div>
+                                    <div class='col-2'>&nbsp;</div>
+                                </div>
+                                <div class='row g-0'>
+                                    <div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Preliminary</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Violations' value='<?php
+                                        $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( Violation.ID ) AS Violations
+											FROM   Violation
+												   LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
+											WHERE  Location.Owner = ?
+													AND Violation.Status = 'Preliminary Report'
+										;",array($Unit[ 'Customer' ]));
+                                        echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=Preliminary Report';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                                <div class='row g-0'>
+                                    <div class='col-1'>&nbsp;</div>
+                                    <div class='col-3 border-bottom border-white my-auto'>Job Created</div>
+                                    <div class='col-6'><input class='form-control' type='text' readonly name='Violations' value='<?php
+                                        $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( Violation.ID ) AS Violations
+											FROM   Violation
+												   LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
+											WHERE  Location.Owner = ?
+													AND Violation.Status = 'Job Created'
+										;",array($Unit[ 'Customer' ]));
+                                        echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;
+                                        ?>' /></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>&Status=Preliminary Report';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class='card card-primary my-3'>
+                            <div class='card-heading'>
+                                <div class='row g-0 px-3 py-2'>
+                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                </div>
+                            </div>
+                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+                                <div class='row g-0'>
+                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
+                                    <div class='col-6'>&nbsp;</div>
+                                    <div class='col-2'>&nbsp;</div>
+                                </div>
+                                <?php if(isset($Privileges['Invoice'])) {?>
+                                    <div class='row g-0'>
+                                        <div class='col-1'>&nbsp;</div>
+                                        <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
+                                        <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
+                                            $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( OpenAR.Ref ) AS Count
+											FROM   OpenAR
+												   LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+											WHERE  Location.Owner = ?
+										;",array($Unit[ 'Customer' ]));
+                                            $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                                            echo $Count
+                                            ?>' /></div>
+                                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                    </div>
+                                <?php }?>
+                                <?php if(isset($Privileges['Invoice']) ) {?>
+                                    <div class='row g-0'>
+                                        <div class='col-1'>&nbsp;</div>
+                                        <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
+                                        <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
+                                            $r = \singleton\database::getInstance( )->query(null,"
+											SELECT 	Count( Invoice.Ref ) AS Count
+											FROM   	Invoice
+												   	LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+											WHERE  		Location.Owner = ?
+													AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+
+										;",array($Unit[ 'Customer' ]));
+                                            $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                                            echo $Count
+                                            ?>' /></div>
+                                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                    </div>
+                                <?php }?>
+                            </div>
+                        </div>
 
                     </div>
                 </div>

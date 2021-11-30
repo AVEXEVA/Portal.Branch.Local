@@ -1167,7 +1167,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								    <div class='col-6'>&nbsp;</div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Customer'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) ) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
@@ -1184,7 +1184,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
 								<?php }?>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Customer'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice'])) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
