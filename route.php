@@ -172,7 +172,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 $locations = \singleton\database::getInstance( )->query(
 
     null,
-    " SELECT  Loc,Tag,fLong,Latt FROM  Loc",[]
+    "
+	   SELECT Loc,Tag,fLong,Latt
+     FROM   Loc
+     WHERE  Loc.Route = ?
+	;",array($_GET['ID'])
 );
 $locationArr = array();
 $finalLoc= [];
@@ -318,7 +322,8 @@ if( $locations ) {
                       </div>
                   </div>
                   <div class='card-body bg-darker'>
-                     <script type="text/javascript">
+                      <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+                      <script type="text/javascript">
                           var map;
                           function initialize() {
                               map = new google.maps.Map(
@@ -347,11 +352,24 @@ if( $locations ) {
                                       title: '<?php echo $name; ?>',
                                   },
                                   map: map,
-                                  title: '<?php echo $name; ?>'
-
+                                  title: '<?php echo $name; ?>',
+                                  infoWindow: {
+                                      content: '<p><?php echo $name; ?></p>'
+                                  }
                               });
                               markers.push(markersNew);
-
+                              /* Set Bound Marker */
+                              var latlng = new google.maps.LatLng(<?php echo $map_lat; ?>, <?php echo $map_lng; ?>);
+                              bounds.push(latlng);
+                              /* Add Marker */
+                              map.addMarker({
+                                  lat: <?php echo $map_lat; ?>,
+                                  lng: <?php echo $map_lng; ?>,
+                                  title: '<?php echo $name; ?>',
+                                  infoWindow: {
+                                      content: '<p><?php echo $name; ?></p>'
+                                  }
+                              });
                               <?php } } //end foreach locations ?>
                           }
                           $(document).ready(function(){ initialize(); });
