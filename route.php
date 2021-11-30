@@ -539,6 +539,51 @@ if( $locations ) {
                       </div>
                   </div>
               </div>
+              <div class='card card-primary my-3'>
+                  <div class='card-heading'>
+                      <div class='row g-0 px-3 py-2'>
+                          <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
+                          <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Route=<?php echo $_GET['ID'];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                      </div>
+                  </div>
+                  <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                      <div class='row g-0'>
+                          <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Violation(1);?><span>Violations</span></div>
+                          <div class='col-6'>&nbsp;</div>
+                          <div class='col-2'>&nbsp;</div>
+                      </div>
+                      <div class='row g-0'>
+
+
+                              <?php
+                              $result = \singleton\database::getInstance()->query(
+                                  null,
+                                  " SELECT Violation.Status FROM Violation GROUP BY Status;",
+                              );
+                              if( $result ){ while ($row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){ ?>
+                                  <div class='col-1'>&nbsp;</div>
+                                  <div class='col-3 border-bottom border-white my-auto'><?php  echo $row['Status']; ?></div>
+                                  <div class='col-6'>
+                                      <?php
+                                  $r = \singleton\database::getInstance( )->query(null,"
+											SELECT Count( Violation.ID ) AS Violations
+											FROM   Violation
+												   LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
+											WHERE  Location.Route = ?
+													AND Violation.Status = ?
+										;",array($_GET['ID'],$row['Status']));
+                                  echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;
+                                  ?>
+
+                                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Route=<?php echo $_GET['ID'];?>&Status=<?php echo $row['Status'];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                              <?php } ?>
+                          </div>
+                             <?php } ?>
+
+                      </div>
+
+                  </div>
+              </div>
           </div>
         </div>
       </div>
