@@ -129,20 +129,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
       $sQuery = " SELECT *
                   FROM (
-                    SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                    SELECT  ROW_NUMBER() OVER (ORDER BY Route.Name asc) AS ROW_COUNT,
                             Route.ID      AS ID,
                             Route.Name      AS Name,
                             Employee.fFirst + ' ' + Employee.Last AS Person,
                             Locations.Count AS Locations,
-                            Units.Count AS Units
+                            Units.Count AS Units,
+                            Violation.Count As Violation,
+                            Ticket.Assigned,
+                            Attendance.[End] ,
+                            Attendance.[Start]
                     FROM    Route
                             LEFT JOIN Emp AS Employee ON Route.Mech = Employee.fWork
+                            LEFT JOIN TicketO AS Ticket ON Ticket.fWork = Employee.fWork
+                              LEFT JOIN Attendance ON Attendance.[User] = Employee.ID
                             LEFT JOIN (
                               SELECT    Loc.Route,
                                         Count( Loc.Loc ) AS Count,
                                         Sum( Units.Count ) AS Unit
                               FROM       Loc
-                                        LEFT JOIN (
+                              LEFT JOIN (
                                           SELECT    Elev.Loc,
                                                     Count( Elev.ID ) AS Count
                                           FROM      Elev
@@ -162,10 +168,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         ) AS Units ON Loc.Loc = Units.Loc
                               GROUP BY  Loc.Route
                             ) AS Units ON Route.ID = Locations.Route
-                    WHERE   ({$conditions}) AND ({$search})
-                  ) AS Tbl
-                  WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-      //echo $sQuery;
+                            LEFT JOIN (
+                             SELECT Loc.Route,  COUNT( Violation.ID ) AS Count 
+                  FROM Violation 
+              LEFT JOIN Loc ON Violation.Loc = Loc.ID GROUP BY Loc.Route
+                            ) AS Violation ON Route.ID = Locations.Route
+                          WHERE   ({$conditions}) AND ({$search})
+                               ) AS Tbl
+                          WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
+  //    echo $sQuery;
       $rResult = $database->query(
         null,
         $sQuery,
