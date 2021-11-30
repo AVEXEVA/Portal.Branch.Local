@@ -62,6 +62,10 @@ $( document ).ready( function( ){
 	    paging         : true,
 	    orderCellsTop  : true,
 	    autoWidth      : true,
+        select         : {
+            style : 'multi',
+            selector : 'td.ID'
+        },
 		ajax      : {
 	        url : 'bin/php/get/Units.php',
 	        data : function( d ){
@@ -89,7 +93,7 @@ $( document ).ready( function( ){
 		columns   : [
 			{
 				data : 'ID',
-
+                className : 'ID',
 				render : function( data, type, row, meta ){
 					switch( type ){
 						case 'display' :
@@ -195,7 +199,7 @@ $( document ).ready( function( ){
                 $( 'input:visible, select:visible' ).each( function( ){
                     $( this ).val( '' );
                 } );
-                Table_Users.draw( );
+				Table_Units.draw( );
             }
           },{
             text : 'Get URL',
@@ -213,24 +217,46 @@ $( document ).ready( function( ){
                 document.location.href='unit.php';
             }
           },{
-            text : 'Delete',
-            className : 'form-control',
-            action : function( e, dt, node, config ){
-              var rows = dt.rows( { selected : true } ).indexes( );
-              var dte = dt.cells( rows, 0 ).data( ).toArray( );
-              $.ajax ({
-                url    : 'bin/php/post/unit.php',
-                method : 'POST',
-                data   : {
-                  action : 'delete',
-                  data : dte
-                },
-                success : function(response){
-                  Table_Units.draw();
-                }
-              })
-            }
-          },{
+			  text : 'Delete',
+			  className : 'form-control',
+			  action : function( e, dt, node, config ){
+				  var rows = dt.rows( { selected : true } ).indexes( );
+
+				  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+
+				  $.ajax ({
+					  url    : 'bin/php/post/unit.php',
+					  method : 'POST',
+					  data   : {
+						  action : 'delete',
+						  data : dte
+					  },
+					  success : function(response){
+						  Table_Units.draw();
+					  }
+				  })
+			  }
+		  },{
+			  text : 'Duplicate',
+			  className : 'form-control',
+			  action : function( e, dt, node, config ){
+				  var rows = dt.rows( { selected : true } ).indexes( );
+
+				  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+
+				  $.ajax ({
+					  url    : 'bin/php/post/unit.php',
+					  method : 'POST',
+					  data   : {
+						  action : 'create',
+						  data : dte
+					  },
+					  success : function(response){
+						  Table_Units.draw();
+					  }
+				  })
+			  }
+		  },{
               extend : 'print',
               text : 'Print',
               className : 'form-control'
