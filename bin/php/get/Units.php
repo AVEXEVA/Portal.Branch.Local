@@ -95,7 +95,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Name'];
       $parameters[] = $_GET['Name'];
-      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.Unit LIKE '%' + ? + '%' )";
+      $conditions[] = "Unit.City_ID LIKE '%' + ? + '%' ";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -157,7 +157,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Tag AS Location_Name,
                           Unit.Building_ID AS Building_ID,
                           Unit.Type AS Type,
-                          Unit.fDesc AS Name,
+                          Customer.Name AS Name,
                          Ticket.ID AS Ticket_ID,  
                           Unit.Status AS Status
                          
@@ -194,7 +194,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Location.Loc AS Location_ID,
                             Location.Tag AS Location_Name,
                             Unit.Building_ID AS Building_ID,
-                            Unit.Type AS Type,
+                             Unit.Type AS Type,
+                            Customer.Name AS Name,
+                            Ticket.ID AS Ticket_ID,  
                             Unit.Status AS Status
                             
                     FROM    Unit

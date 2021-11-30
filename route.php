@@ -169,6 +169,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           );
         }
       }
+$locations = \singleton\database::getInstance( )->query(
+
+    null,
+    " SELECT  Loc,Tag,fLong,Latt FROM  Loc",[]
+);
+$locationArr = array();
+$finalLoc= [];
+if( $locations ) {
+    while ($locationArr = sqlsrv_fetch_array($locations, SQLSRV_FETCH_ASSOC)) {
+
+
+        $finalLoc[] = ['ID'=>$locationArr['Loc'],'Tag'=>$locationArr['Tag'],'Latitude'=>$locationArr['Latt'],'Longitude'=>$locationArr['fLong']];
+    }
+}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -227,7 +241,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div>
         <div class='card-body bg-dark text-white'>
           <div class='card-columns'>
-            <div class='card card-primary my-3'><form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
+            <div class='card card-primary my-3'>
+                <form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
               <input type='hidden' name='ID' value='<?php echo $Route[ 'ID' ];?>' />
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
@@ -291,7 +306,63 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
                   </div>
               </div>
-            </form></div>
+            </form>
+            </div>
+
+              <?php if( count($finalLoc)>0 ){
+                  ?><div class='card card-primary'>
+                  <div class='card-heading'>
+                      <div class='row g-0 px-3 py-2'>
+                          <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Map( 1 );?><span>Map</span></h5></div>
+                          <div class='col-2'>&nbsp;</div>
+                      </div>
+                  </div>
+                  <div class='card-body bg-darker'>
+                     <script type="text/javascript">
+                          var map;
+                          function initialize() {
+                              map = new google.maps.Map(
+                                  document.getElementById( 'location_map' ),
+                                  {
+                                      zoom: 1,
+                                      center: new google.maps.LatLng( 0, 0 ),
+                                      mapTypeId: google.maps.MapTypeId.ROADMAP
+                                  }
+                              );
+                              /* Map Bound */
+                              var markers = [];
+                              <?php /* For Each Location Create a Marker. */
+                              foreach( $finalLoc as $location ){
+                              $name = $location['Tag'];
+                              $addr = $location['Tag'];
+                              $map_lat = $location['Latitude'];
+                              $map_lng = $location['Longitude'];
+                              if( !in_array( $map_lat, array( null, 0 ) ) && !in_array( $map_lng, array( null, 0 ) ) ){
+                              ?>
+
+                              markersNew = new google.maps.Marker({
+                                  position: {
+                                      lat: <?php echo $map_lat; ?>,
+                                      lng: <?php echo $map_lng; ?>,
+                                      title: '<?php echo $name; ?>',
+                                  },
+                                  map: map,
+                                  title: '<?php echo $name; ?>'
+
+                              });
+                              markers.push(markersNew);
+
+                              <?php } } //end foreach locations ?>
+                          }
+                          $(document).ready(function(){ initialize(); });
+                      </script>
+                      <div class='card-body'>
+                          <div id='location_map' class='map'>&nbsp;</div>
+                      </div>
+                  </div>
+                  </div>
+              <?php }?>
+
           </div>
         </div>
       </div>
