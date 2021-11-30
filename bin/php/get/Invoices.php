@@ -215,6 +215,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
 
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+      $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
       $output['aaData'][]       = $Row;
     }
     echo json_encode( $output );

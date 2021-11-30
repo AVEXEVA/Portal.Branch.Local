@@ -1,24 +1,25 @@
 <?php
-if(session_id() == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
-    require('/var/www/html/Portal.Branch.Local/bin/php/index.php');
+
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(     !isset( null, $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] )
-    ||  !connection_privileged( null, $_SESSION[ 'User' ], $_SESSION[ 'Connection' ] ) ){
-        header( 'Location: https://beta.nouveauelevator.com/login.php' );
-        exit; } 
-if(     isset($_FILES[ 'Profile' ] ) 
-    &&  isset( $_FILES[ 'Profile' ][ 'tmp_name' ] ) 
-    &&  strlen( $_FILES[ 'Profile' ][ 'tmp_name' ] ) > 0 )
+
+print_r($_SESSION[ 'Connection' ]);
+print_r($_FILES[ 'Profile' ]);
+
+
+if( isset($_FILES[ 'Profile' ] ) &&  isset( $_FILES[ 'Profile' ][ 'tmp_name' ] ) &&  strlen( $_FILES[ 'Profile' ][ 'tmp_name' ] ) > 0 )
 {
   ob_start( );
   $image = imagecreatefromstring( file_get_contents( $_FILES[ 'Profile' ][ 'tmp_name' ] ) );
   imagejpeg( $image, null, 50 );
   $image = ob_get_clean( );
   $image = base64_encode( $image );
+  echo $query="UPDATE [User] SET [Picture] = ?, [Picture_Type] = ? WHERE [ID] = ?;";
   $database->query( 
-    $Portal,
-    "UPDATE Portal.dbo.Portal SET [Picture] = ?, Picture_Type = ? WHERE Branch = ? AND Branch_ID = ?;",
+    'Portal',
+    $query,
     array( 
       array(
         $image, 
@@ -27,8 +28,8 @@ if(     isset($_FILES[ 'Profile' ] )
         SQLSRV_SQLTYPE_VARBINARY('max')
       ),
       $_FILES[ 'Profile' ][ 'type' ],
-      $_SESSION[ 'Connection' ][ 'Branch' ],
-      $_SESSION[ 'User' ]
+      $_SESSION[ 'Connection' ][ 'User' ],
+      
     )
   );
   echo 'success';

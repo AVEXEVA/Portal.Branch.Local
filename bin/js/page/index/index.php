@@ -331,20 +331,25 @@ function redrawLocations( ){ Table_Locations.draw( ); }
 function hrefLocations(){hrefRow("Table_Locations","location");}
 $("Table#Table_Locations").on("draw.dt",function(){hrefLocations();});
 function browseProfilePicture( ){
-  $("body").append( "<div id='UploadProfilePicture' class='hidden' style='background-color:#1d1d1d;color:white !important;top:0;position:absolute;left:0;width:100%;height:100%;'><form><div class='panel panel-primary'><div class='panel-heading'><h3>Upload User Picture</h3></div><div class='panel-body'><div class='row'><div class='col-12'><input onChange='uploadProfilePicture( );' type='file' name='Profile' /></div></div></div></div></form></div>");
+  $("body").append( "<div id='UploadProfilePicture' class='hidden' style='background-color:#1d1d1d;color:white !important;top:0;position:absolute;left:0;width:100%;height:100%;'><form id='upload' enctype='multipart/form-data'><div class='panel panel-primary'><div class='panel-heading'><h3>Upload User Picture</h3></div><div class='panel-body'><div class='row'><div class='col-12'><input onChange='uploadProfilePicture( );' type='file' name='Profile' /></div></div></div></div></form></div>");
   $("#UploadProfilePicture input").click( );
 }
 function uploadProfilePicture( ){
-  var formData = new FormData( $( '#UploadProfilePicture form' ) [ 0 ] );
+	 var myform = document.getElementById("UploadProfilePicture");
+  //  var formData = new FormData(myform);
+  var formData = new FormData( $( '#upload' ) [ 0 ] );
+ 
   $.ajax({
     url : 'bin/php/post/uploadProfilePicture.php',
+	enctype: 'multipart/form-data',
     method : 'POST',
     cache: false,
     processData: false,
     contentType: false,
     data: formData,
     timeout:10000,
-    success: function( ){ document.location.href = 'home.php'; }
+    success: function( ){ document.location.href = 'index.php';
+	}
   });
   $("#UploadProfilePiocture").remove( );
 }

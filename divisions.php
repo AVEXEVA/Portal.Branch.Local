@@ -121,18 +121,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         <thead><tr class='text-center'>
                             <th class='text-white border border-white' title='ID'>ID</th>
                             <th class='text-white border border-white' title='Name'>Name</th>
-                            <th class='text-white border border-white' title='Customers'>Customers</th>
-                            <th class='text-white border border-white' title='Locations'>Locations</th>
+                            <th class='text-white border border-white' title='Location'>Location</th>
                             <th class='text-white border border-white' title='Units'>Units</th>
-                            <th class='text-white border border-white' title='Jobs'>Jobs</th>
+                            <th class='text-white border border-white' title='Violation'>Violation</th>
                             <th class='text-white border border-white' title='Tickets'>Tickets</th>
                         </tr><tr class='form-desktop'>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-                            <th class='text-white border border-white' title='Customers'><input class='redraw form-control' type='text' name='Customers' placeholder='Customers' value='<?php echo isset( $_GET[ 'Customers' ] ) ? $_GET[ 'Customers' ] : null;?>' /></th>
-                            <th class='text-white border border-white' title='Locations'><input class='redraw form-control' type='text' name='Locations' placeholder='Locations' value='<?php echo isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null;?>' /></th>
+                            <th class='text-white border border-white' title='Customers'><input class='redraw form-control' type='text' name='Customers' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+                            <th class='text-white border border-white' title='Locations'><input class='redraw form-control' type='text' name='Locations' placeholder='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Units'><input class='redraw form-control' type='text' name='Units' placeholder='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null;?>' /></th>
-                            <th class='text-white border border-white' title='Jobs'><input class='redraw form-control' type='text' name='Jobs' placeholder='Jobs' value='<?php echo isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null;?>' /></th>
+                            <th class='text-white border border-white' title='Jobs'><input class='redraw form-control' type='text' name='Jobs' placeholder='Violation' value='<?php echo isset( $_GET[ 'Violation' ] ) ? $_GET[ 'Violation' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Tickets'><input class='redraw form-control' type='text' name='Tickets' placeholder='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null;?>' /></th>
                         </tr></thead>
                     </table>

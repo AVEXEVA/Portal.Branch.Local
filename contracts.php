@@ -104,55 +104,55 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					<div class='row'><div class='col-12'>&nbsp;</div></div>
            <div class='row'>
                 <div class='col-4'>ID</div>
-    						<div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw' value='<?php echo $_GET['ID'];?>' /></div>
+    						<div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></div>
             </div>
               <div class='row'>
               <div class='col-4'>Customer</div>
-              <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw' value='<?php echo $_GET['Customer'];?>' /></div>
+              <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Location</div>
-              <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' vlaue='<?php echo $_GET['Location'];?>' /></div>
+              <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' vlaue='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Job</div>
-              <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw' value='<?php echo $_GET['Job'];?>' /></div>
+              <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Start Date</div>
-              <div class='col-8'><input type='text' name='Start_Date' placeholder='Start_Date' class='redraw' vlaue='<?php echo $_GET['Start_Date'];?>' /></div>
+              <div class='col-8'><input type='text' name='Start_Date' placeholder='Start_Date' class='redraw' vlaue='<?php echo isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>End Date</div>
-              <div class='col-8'><input type='text' name='End_Date' placeholder='End_Date' class='redraw' value='<?php echo $_GET['End_Date'];?>' /></div>
+              <div class='col-8'><input type='text' name='End_Date' placeholder='End_Date' class='redraw' value='<?php echo isset( $_GET['End_Date'] ) ? $_GET[ 'End_Date' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Amount</div>
-              <div class='col-8'><input type='text' name='Amount' placeholder='Amount' class='redraw' value='<?php echo $_GET['Amount'];?>' /></div>
+              <div class='col-8'><input type='text' name='Amount' placeholder='Amount' class='redraw' value='<?php echo isset( $_GET['Amount'] ) ? $_GET[ 'Amount' ] : null;;?>' /></div>
             </div>
             <Div class='row'>
               <div class='col-4'>Cycle</div>
-              <div class='col-8'><input type='text' name='Cycle' placeholder='Cycle' class='redraw' value='<?php echo $_GET['Cycle'];?>' /></div>
+              <div class='col-8'><input type='text' name='Cycle' placeholder='Cycle' class='redraw' value='<?php echo isset( $_GET['Cycle'] ) ? $_GET[ 'Cycle'] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Esc. Factor</div>
-              <div class='col-8'><input type='text' name='Esc. Factor' placeholder='Esc. Factor' class='redraw' value='<?php echo $_GET['Esc. Factor'];?>' /></div>
+              <div class='col-8'><input type='text' name='Esc. Factor' placeholder='Esc. Factor' class='redraw' value='<?php echo isset( $_GET['Esc. Factor'] ) ? $_GET[ 'Esc. Factor' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Esc. Date</div>
-              <div class='col-8'><input type='text' name='Esc. Date' placeholder='Esc. Date' class='redraw' value='<?php echo $_GET['Esc. Date'];?>' /></div>
+              <div class='col-8'><input type='text' name='Esc. Date' placeholder='Esc. Date' class='redraw' value='<?php echo isset( $_GET['Esc. Date'] ) ? $_GET[ 'Esc. Date' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Esc. Type</div>
-              <div class='col-8'><input type='text' name='Esc. Type' placeholder='Esc. Type' class='redraw' value='<?php echo $_GET['Esc. Type'];?>' /></div>
+              <div class='col-8'><input type='text' name='Esc. Type' placeholder='Esc. Type' class='redraw' value='<?php echo isset( $_GET['Esc. Type'] ) ? $_GET[ 'Esc. Type' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Esc. Cycle</div>
-              <div class='col-8'><input type='text' name='Esc. Cycle' placeholder='Esc. Cycle' class='redraw' value='<?php echo $_GET['Esc. Cycle'];?>' /></div>
+              <div class='col-8'><input type='text' name='Esc. Cycle' placeholder='Esc. Cycle' class='redraw' value='<?php echo isset( $_GET['Esc. Cycle'] ) ? $_GET[ 'Esc. Cycle' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Remarks</div>
-              <div class='col-8'><input type='text' name='Remarks' placeholder='Remarks' class='redraw' value='<?php echo $_GET['Remarks'];?>' /></div>
+              <div class='col-8'><input type='text' name='Remarks' placeholder='Remarks' class='redraw' value='<?php echo isset( $_GET['Remarks'] ) ? $_GET[ 'Remarks' ] : null;?>' /></div>
             </div>
           </form></div>
         <div class="card-body bg-dark">

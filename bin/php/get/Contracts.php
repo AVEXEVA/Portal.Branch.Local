@@ -88,23 +88,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $search = array( );
     $parameters = array( );
 
-    if( isset($_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'ID' ] ) && !empty(  $_GET[ 'ID' ] ) ){
       $parameters[] = $_GET['ID'];
       $conditions[] = "Contract.ID LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Customer' ] ) && !empty( $_GET[ 'Customer' ] ) ){
       $parameters[] = $_GET['Customer'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Location' ] ) && !empty( $_GET[ 'Location' ] ) ){
       $parameters[] = $_GET['Location'];
       $conditions[] = "Loc.Tag LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Job' ] ) && !empty( $_GET[ 'Job' ] ) ){
       $parameters[] = $_GET['Job'];
       $conditions[] = "Contract.Job LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Start_Date' ] ) && !in_array( $_GET[ 'Start_Date' ], array( '', ' ', null ) ) ){
+    if( isset( $_GET[ 'Start_Date' ] ) && !empty( $_GET[ 'Start_Date' ] ) ){
       $parameters[] = date('Y-m-d', strtotime( $_GET['Start_Date'] ) );
       $conditions[] = "Contract.BStart >= ?";
     }
@@ -112,7 +112,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = date('Y-m-d', strtotime( $_GET['End_Date'] ) );
       $conditions[] = "Contract.BFinish <= ?";
     }
-    if( isset($_GET[ 'Cycle' ] ) && !in_array( $_GET[ 'Cycle' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Cycle' ] ) && !empty( $_GET[ 'Cycle' ] ) ){
       $parameters[] = $_GET['Cycle'];
       $conditions[] = "Contract.BCycle LIKE '%' + ? + '%'";
     }
@@ -276,14 +276,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'aaData'        =>  array(),
         'options' => array( )
     );
-
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Start_Date' ]      = date( 'Y-m-d', strtotime( $Row[ 'Start_Date' ] ) );
       $Row[ 'End_Date' ]        = date( 'Y-m-d', strtotime( $Row[ 'End_Date' ] ) );
       $Row[ 'Escalation_Date' ] = date( 'Y-m-d', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
-      preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
-      $Row[ 'Link' ]            = $matches[ 0 ];
+      //preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
+      //$Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
     }
     $output[ 'options' ][ 'Cycle' ] = array(

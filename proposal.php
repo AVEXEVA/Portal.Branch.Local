@@ -92,12 +92,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	null,
             "   SELECT  TOP 1
                         Estimate.ID             AS  ID,
-                        Estimate.Name           AS  Contact,
                         Estimate.fDesc          AS  Name,
+                        Estimate.Name           AS  Contact,
                         Estimate.fDate          AS  Date,
                         Estimate.Type           AS  Type,
                         Estimate.Template       AS  Template,
-                        EStimate.Remarks        AS  Remarks,
+                        EStimate.Remarks        AS  Notes,
                         Estimate.Cost           AS  Cost,
                         Estimate.Hours          AS  Hours,
                         Estimate.Labor          AS  Labor,
@@ -106,8 +106,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Estimate.Profit         AS  Profit,
                         Estimate.SubTotal1      AS  SubTotal_1,
                         Estimate.SubTotal2      AS  SubTotal_2,
-                        Job.ID                  AS  Job,
-                        Job.fDesc                AS  Job,
+                        Job.ID                  AS  Job_ID,
+                        Job.fDesc               AS  Job_Name,
                         Estimate.EstTemplate    AS  EstTemplate,
                         Estimate.STaxRate       AS  Sales_Tax_Rate,
                         Estimate.STax           AS  Sales_Tax,
@@ -115,6 +115,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Estimate.Quoted         AS  Quoted,
                         Estimate.Phase          AS  Phase,
                         Estimate.Probability    AS  Probability,
+                        Loc.Loc                 AS  Location_ID,
+                        Loc.Tag                 AS  Location_Name,
                         Loc.Address             AS  Street,
                         Loc.State               AS  State,
                         Loc.City                AS  City,
@@ -141,7 +143,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $ID
             )
         );
-        $Estimate =   (       empty( $ID )
+        $Proposal =   (       empty( $ID )
                         &&    !empty( $Name )
                         &&    !$result
                       ) || (  empty( $ID )
@@ -149,12 +151,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       )
             ? array(
                 'ID' => null,
-                'Contact' => null,
                 'Name' => null,
+                'Contact' => null,
                 'Date' => null,
                 'Type' => null,
                 'Template' => null,
-                'Remarks' => null,
+                'Notes' => null,
                 'Cost' => null,
                 'Hours' => null,
                 'Labor' => null,
@@ -172,18 +174,134 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Quoted' => null,
                 'Phase' => null,
                 'Probability' => null,
+                'Location_ID' => nll,
+                'Location_Name' => null,
                 'Street' => null,
                 'State' => null,
                 'City' => null,
                 'Zip' => null,
                 'Customer_ID' => null,
                 'Customer_Name' => null,
-                'Contact' => null,
                 'Fax' => null,
                 'Phone' => null,
                 'Email' => null
             )
             : sqlsrv_fetch_array($result);
+
+        if( isset( $_POST ) && count( $_POST ) > 0 ){
+          $Proposal[ 'Name' ]             = isset( $_POST[ 'Name' ] )        ? $_POST[ 'Name' ]         : $Proposal[ 'Name' ];
+          $Proposal[ 'Contact' ]          = isset( $_POST[ 'Contact' ] )     ? $_POST[ 'Contact' ]      : $Proposal[ 'Contact' ];
+          $Proposal[ 'Job_Name' ]         = isset( $_POST[ 'Job' ] )         ? $_POST[ 'Job' ]          : $Proposal[ 'Job_Name' ];
+          $Proposal[ 'Location_Name' ]    = isset( $_POST[ 'Location' ] )    ? $_POST[ 'Location' ]     : $Proposal[ 'Location_Name' ];
+          $Proposal[ 'Date' ]             = isset( $_POST[ 'Date' ] )        ? $_POST[ 'Date' ]         : $Proposal[ 'Date' ];
+          $Proposal[ 'Type' ]             = isset( $_POST[ 'Type' ] )        ? $_POST[ 'Type' ]         : $Proposal[ 'Type' ];
+          $Proposal[ 'Notes' ]            = isset( $_POST[ 'Notes' ] )       ? $_POST[ 'Notes' ]        : $Proposal[ 'Notes' ];
+          $Proposal[ 'Probability' ]      = isset( $_POST[ 'Probability' ] ) ? $_POST[ 'Probability' ]  : $Proposal[ 'Probability' ];
+          $Proposal[ 'Cost' ]             = isset( $_POST[ 'Cost' ] )        ? $_POST[ 'Cost' ]         : $Proposal[ 'Cost' ];
+          $Proposal[ 'Hours' ]            = isset( $_POST[ 'Hours' ] )       ? $_POST[ 'Hours' ]        : $Proposal[ 'Hours' ];
+          $Proposal[ 'Labor' ]            = isset( $_POST[ 'Labor' ] )       ? $_POST[ 'Labor' ]        : $Proposal[ 'Labor' ];
+          $Proposal[ 'Overhead' ]         = isset( $_POST[ 'Overhead' ] )    ? $_POST[ 'Overhead' ]     : $Proposal[ 'Overhead' ];
+          $Proposal[ 'Price' ]            = isset( $_POST[ 'Price' ] )       ? $_POST[ 'Price' ]        : $Proposal[ 'Price' ];
+          $Proposal[ 'Profit' ]           = isset( $_POST[ 'Profit' ] )      ? $_POST[ 'Profit' ]       : $Proposal[ 'Profit' ];
+          /*$Proposal[ 'Sales_Tax_Rate' ]      = isset( $_POST[ 'Sales_Tax_Rate' ] )    ? $_POST[ 'Sales_Tax_Rate' ]    : $Proposal[ 'Sales_Tax_Rate' ];
+          $Proposal[ 'Sales_Tax' ]      = isset( $_POST[ 'Sales_Tax' ] )    ? $_POST[ 'Sales_Tax' ]    : $Proposal[ 'Sales_Tax' ];*/
+          
+          if( empty( $_POST[ 'ID' ] ) ){
+
+            $result = \singleton\database::getInstance( )->query(
+              null,
+              " DECLARE @MAXID INT;
+                DECLARE @Job INT;
+                DECLARE @Contact INT;
+                SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Estimate ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Estimate ) END ;
+                SET @Job = ( SELECT Top 1 Job.ID FROM Job WHERE Job.fDesc = ? );
+                SET @Contact = ( SELECT Top 1 Rol.ID FROM Rol WHERE Rol.Contact = ? );
+                SET @Location = ( SELECT Top 1 Loc.Loc FROM Loc WHERE Loc.Tag = ? );
+                INSERT INTO Estimate(
+                  ID,
+                  Job,
+                  RolID,
+                  LocID,
+                  fDesc,
+                  fDate,
+                  Type,
+                  Remarks,
+                  Cost,
+                  Hours,
+                  Labor,
+                  Overhead,
+                  Price,
+                  Profit
+                )
+                VALUES ( @MAXID + 1, @Job, @Contact, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+                SELECT @MAXID + 1;",
+              array(
+                $Proposal[ 'Job_Name' ],
+                $Proposal[ 'Contact' ],
+                $Proposal[ 'Location_Name' ],
+                $Proposal[ 'Name' ],
+                $Proposal[ 'Date' ],
+                $Proposal[ 'Type' ],
+                $Proposal[ 'Remarks' ],
+                $Proposal[ 'Notes' ],
+                $Proposal[ 'Cost' ],
+                $Proposal[ 'Hours' ],
+                $Proposal[ 'Labor' ],
+                $Proposal[ 'Overhead' ],
+                $Proposal[ 'Price' ],
+                $Proposal[ 'Profit' ]
+              )
+            );
+            sqlsrv_next_result( $result );
+            $Proposal[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+
+            header( 'Location: proposal.php?ID=' . $Proposal[ 'ID' ] );
+            exit;
+          } else {
+            \singleton\database::getInstance( )->query(
+              null,
+              " DECLARE @Job INT;
+                DECLARE @Contact INT;
+                DECLARE @Location INT;
+                SET @Job = ( SELECT Top 1 Job.ID FROM Job WHERE Job.fDesc = ? );
+                SET @Contact = ( SELECT Top 1 Rol.ID FROM Rol WHERE Rol.Contact = ? );
+                SET @Location = ( SELECT Top 1 Loc.Loc FROM Loc WHERE Loc.Tag = ? );
+                UPDATE  Estimate
+                SET     Estimate.Job = @Job,
+                        Estimate.RolID = @Contact,
+                        Estimate.LocID = @Location,
+                        Estimate.fDesc = ?,
+                        Estimate.Name = ?,
+                        Estimate.fDate = ?,
+                        Estimate.Type = ?,
+                        Estimate.Remarks = ?,
+                        Estimate.Cost = ?,
+                        Estimate.Hours = ?,
+                        Estimate.Labor = ?,
+                        Estimate.Overhead = ?,
+                        Estimate.Price = ?,
+                        Estimate.Profit = ?
+                WHERE   Estimate.ID = ?;",
+              array(
+                $Proposal[ 'Job_Name' ],
+                $Proposal[ 'Contact' ],
+                $Proposal[ 'Location_Name' ],
+                $Proposal[ 'Name' ],
+                $Proposal[ 'Contact' ],
+                $Proposal[ 'Date' ],
+                $Proposal[ 'Type' ],
+                $Proposal[ 'Notes' ],
+                $Proposal[ 'Cost' ],
+                $Proposal[ 'Hours' ],
+                $Proposal[ 'Labor' ],
+                $Proposal[ 'Overhead' ],
+                $Proposal[ 'Price' ],
+                $Proposal[ 'Profit' ],
+                $Proposal[ 'ID' ]
+              )
+            );
+          }
+        }
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,12 +321,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card-heading'>
                         <div class='row g-0 px-3 py-2'>
                             <div class='col-6'>
-                              <h5><?php \singleton\fontawesome::getInstance( )->proposal( 1 );?><a href='proposals.php?<?php
+                              <h5><?php \singleton\fontawesome::getInstance( )->Proposal( 1 );?><a href='proposals.php?<?php
                                 echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Proposals' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Proposals' ][ 0 ] : array( ) );
-                              ?>'>New Proposal</a>: <span><?php
-                                echo is_null( $Estimate[ 'ID' ] )
+                              ?>'>Proposal</a>: <span><?php
+                                echo is_null( $Proposal[ 'ID' ] )
                                   ? 'New'
-                                  : $Estimate[ 'Name' ];
+                                  : $Proposal[ 'Name' ];
                               ?></span></h5>
                             </div>
                             <div class='col-2'></div>
@@ -238,120 +356,226 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         </div>
                     </div>
                     <div class='card-body bg-dark text-white'>
-                        <div class='card-columns'>
-                            <div class='card card-primary my-3'><form action='proposal.php?ID=<?php echo $Estimate[ 'ID' ];?>' method='POST'>
-                              <input type='hidden' name='ID' value='<?php echo $Estimate[ 'ID' ];?>' />
-                              <div class='card-heading'>
-                                <div class='row g-0 px-3 py-2'>
-                                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                                  <div class='col-2'>&nbsp;</div>
-                                </div>
-                              </div>
-                              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                                <div class='row g-0'>
-                                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?>Name:</div>
-                                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Estimate['Name'];?>' /></div>
-                                </div>
-                                <div class='row g-0'>
-                                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
-                                  <div class='col-6'>
-                                    <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Estimate[ 'Job_Name' ];?>' />
-                                    <script>
-                                      $( 'input[name="Job"]' )
-                                          .typeahead({
-                                              minLength : 4,
-                                              hint: true,
-                                              highlight: true,
-                                              limit : 5,
-                                              display : 'FieldValue',
-                                              source: function( query, result ){
-                                                  $.ajax({
-                                                      url : 'bin/php/get/search/Jobs.php',
-                                                      method : 'GET',
-                                                      data    : {
-                                                          search :  $('input:visible[name="Job"]').val( )
-                                                      },
-                                                      dataType : 'json',
-                                                      beforeSend : function( ){
-                                                          abort( );
-                                                      },
-                                                      success : function( data ){
-                                                          result( $.map( data, function( item ){
-                                                              return item.FieldValue;
-                                                          } ) );
-                                                      }
-                                                  });
-                                              },
-                                              afterSelect: function( value ){
-                                                  $( 'input[name="Job"]').val( value );
-                                                  $( 'input[name="Job"]').closest( 'form' ).submit( );
-                                              }
+                      <div class='card-columns'>
+                        <div class='card card-primary my-3'><form action='proposal.php?ID=<?php echo $Proposal[ 'ID' ];?>' method='POST'>
+                          <input type='hidden' name='ID' value='<?php echo $Proposal[ 'ID' ];?>' />
+                          <div class='card-heading'>
+                            <div class='row g-0 px-3 py-2'>
+                              <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                              <div class='col-2'>&nbsp;</div>
+                            </div>
+                          </div>
+                          <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                            <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?>Name:</div>
+                              <div class='col-8'><input type='text' class='form-control edit' name='Name' value='<?php echo $Proposal['Name'];?>' /></div>
+                            </div>
+                            <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Type:</div>
+                              <div class='col-8'><select class='form-control edit' name='Type'>
+                                <option value=''>Select</option>
+                                <?php
+                                  $result = \singleton\database::getInstance( )->query(
+                                    null,
+                                    " SELECT  Job_Type.ID   AS ID,
+                                              Job_Type.Type AS Name
+                                      FROM    JobType AS Job_Type;"
+                                  );
+                                  if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){
+                                    ?><option value='<?php echo $row[ 'ID' ];?>' <?php echo $row[ 'ID' ] == $Proposal[ 'Type' ] ? 'selected' : null;?>><?php echo $row[ 'Name' ];?></option><?php
+                                  }}
+                                ?>
+                              </select></div>
+                            </div>
+                            <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?>Date:</div>
+                              <div class='col-8'><input type='text' autocomplete='off' class='form-control edit date' name='Date' value='<?php echo !is_null( $Proposal[ 'Date' ] ) ? date( 'm/d/Y', strtotime( $Proposal['Date'] ) ) : null;?>' /></div>
+                            </div>
+                            <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?>Description:</div>
+                              <div class='col-8'><textarea class='form-control edit' name='Description' rows='8' value='<?php echo $Proposal['Description'];?>'></textarea></div>
+                            </div>
+                            <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Contact:</div>
+                              <div class='col-6'>
+                                <input type='text' autocomplete='off' class='form-control edit' name='Contact' value='<?php echo $Proposal[ 'Contact' ];?>' />
+                                <script>
+                                  $( 'input[name="Contact"]' )
+                                      .typeahead({
+                                          minLength : 4,
+                                          hint: true,
+                                          highlight: true,
+                                          limit : 5,
+                                          display : 'FieldValue',
+                                          source: function( query, result ){
+                                              $.ajax({
+                                                  url : 'bin/php/get/search/Contacts.php',
+                                                  method : 'GET',
+                                                  data    : {
+                                                      search :  $('input:visible[name="Contact"]').val( )
+                                                  },
+                                                  dataType : 'json',
+                                                  beforeSend : function( ){
+                                                      abort( );
+                                                  },
+                                                  success : function( data ){
+                                                      result( $.map( data, function( item ){
+                                                          return item.FieldValue;
+                                                      } ) );
+                                                  }
+                                              });
+                                          },
+                                          afterSelect: function( value ){
+                                              $( 'input[name="Contact"]').val( value );
+                                              $( 'input[name="Contact"]').closest( 'form' ).submit( );
                                           }
-                                      );
-                                    </script>
-                                  </div>
-                                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                    if( in_array( $Estimate[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                                      echo "onClick=\"document.location.href='jobs.php';\"";
-                                    } else {
-                                      echo "onClick=\"document.location.href='job.php?Name=" . $Estimate[ 'Job_Name' ] . "';\"";
-                                    }
-                                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                      }
+                                  );
+                                </script>
                               </div>
-                              <div class='row g-0'>
-                                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposal:</div>
-                                  <div class='col-6'>
-                                    <input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Estimate[ 'Customer_Name' ];?>' />
-                                    <script>
-                                      $( 'input[name="Customer"]' )
-                                          .typeahead({
-                                              minLength : 4,
-                                              hint: true,
-                                              highlight: true,
-                                              limit : 5,
-                                              display : 'FieldValue',
-                                              source: function( query, result ){
-                                                  $.ajax({
-                                                      url : 'bin/php/get/search/Customers.php',
-                                                      method : 'GET',
-                                                      data    : {
-                                                          search :  $('input:visible[name="Customer"]').val( )
-                                                      },
-                                                      dataType : 'json',
-                                                      beforeSend : function( ){
-                                                          abort( );
-                                                      },
-                                                      success : function( data ){
-                                                          result( $.map( data, function( item ){
-                                                              return item.FieldValue;
-                                                          } ) );
-                                                      }
-                                                  });
-                                              },
-                                              afterSelect: function( value ){
-                                                  $( 'input[name="Customer"]').val( value );
-                                                  $( 'input[name="Customer"]').closest( 'form' ).submit( );
-                                              }
+                              <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                                if( in_array( $Proposal[ 'Contact' ], array( null, 0, '', ' ') ) ){
+                                  echo "onClick=\"document.location.href='contacts.php';\"";
+                                } else {
+                                  echo "onClick=\"document.location.href='contact.php?Contact=" . $Proposal[ 'Contact' ] . "';\"";
+                                }
+                              ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                            </div>
+                            <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
+                              <div class='col-6'>
+                                <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Proposal[ 'Job_Name' ];?>' />
+                                <script>
+                                  $( 'input[name="Job"]' )
+                                      .typeahead({
+                                          minLength : 4,
+                                          hint: true,
+                                          highlight: true,
+                                          limit : 5,
+                                          display : 'FieldValue',
+                                          source: function( query, result ){
+                                              $.ajax({
+                                                  url : 'bin/php/get/search/Jobs.php',
+                                                  method : 'GET',
+                                                  data    : {
+                                                      search :  $('input:visible[name="Job"]').val( )
+                                                  },
+                                                  dataType : 'json',
+                                                  beforeSend : function( ){
+                                                      abort( );
+                                                  },
+                                                  success : function( data ){
+                                                      result( $.map( data, function( item ){
+                                                          return item.FieldValue;
+                                                      } ) );
+                                                  }
+                                              });
+                                          },
+                                          afterSelect: function( value ){
+                                              $( 'input[name="Job"]').val( value );
+                                              $( 'input[name="Job"]').closest( 'form' ).submit( );
                                           }
-                                      );
-                                    </script>
-                                  </div>
-                                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                    if( in_array( $Estimate[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
-                                      echo "onClick=\"document.location.href='customers.php';\"";
-                                    } else {
-                                      echo "onClick=\"document.location.href='customer.php?Name=" . $Estimate[ 'Customer_Name' ] . "';\"";
-                                    }
-                                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                      }
+                                  );
+                                </script>
                               </div>
-                              <div class='card-footer'>
-                                  <div class='row'>
-                                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                                  </div>
+                              <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                                if( in_array( $Proposal[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
+                                  echo "onClick=\"document.location.href='jobs.php';\"";
+                                } else {
+                                  echo "onClick=\"document.location.href='job.php?Name=" . $Proposal[ 'Job_Name' ] . "';\"";
+                                }
+                              ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                          </div>
+                          <div class='row g-0'>
+                              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Location:</div>
+                              <div class='col-6'>
+                                <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Proposal[ 'Location_Name' ];?>' />
+                                <script>
+                                  $( 'input[name="Location"]' )
+                                      .typeahead({
+                                          minLength : 4,
+                                          hint: true,
+                                          highlight: true,
+                                          limit : 5,
+                                          display : 'FieldValue',
+                                          source: function( query, result ){
+                                              $.ajax({
+                                                  url : 'bin/php/get/search/Locations.php',
+                                                  method : 'GET',
+                                                  data    : {
+                                                      search :  $('input:visible[name="Location"]').val( )
+                                                  },
+                                                  dataType : 'json',
+                                                  beforeSend : function( ){
+                                                      abort( );
+                                                  },
+                                                  success : function( data ){
+                                                      result( $.map( data, function( item ){
+                                                          return item.FieldValue;
+                                                      } ) );
+                                                  }
+                                              });
+                                          },
+                                          afterSelect: function( value ){
+                                              $( 'input[name="Location"]').val( value );
+                                              $( 'input[name="Location"]').closest( 'form' ).submit( );
+                                          }
+                                      }
+                                  );
+                                </script>
                               </div>
-                            </form></div>
+                              <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                                if( in_array( $Proposal[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
+                                  echo "onClick=\"document.location.href='locations.php';\"";
+                                } else {
+                                  echo "onClick=\"document.location.href='location.php?Name=" . $Proposal[ 'Location_Name' ] . "';\"";
+                                }
+                              ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                          </div>
                         </div>
-                    </div>
+                        <div class='card-footer'>
+                          <div class='row'>
+                              <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                          </div>
+                        </div>
+                      </form></div>
+                      <div class='card card-primary my-3'><form action='proposal.php?ID=<?php echo $Proposal[ 'ID' ];?>' method='POST'>
+                        <input type='hidden' name='ID' value='<?php echo $Proposal[ 'ID' ];?>' />
+                        <div class='card-heading'>
+                          <div class='row g-0 px-3 py-2'>
+                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                            <div class='col-2'>&nbsp;</div>
+                          </div>
+                        </div>
+                        <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                          <div class='row g-0'>
+                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?>Cost:</div>
+                            <div class='col-8'><input type='text' class='form-control edit' rows='8' name='Cost' value='<?php echo $Proposal['Cost'];?>' /></div>
+                          </div>
+                          <div class='row g-0'>
+                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?>Hours:</div>
+                            <div class='col-8'><input type='text' class='form-control edit' rows='8' name='Hours' value='<?php echo $Proposal['Hours'];?>' /></div>
+                          </div>
+                          <div class='row g-0'>
+                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?>Labor:</div>
+                            <div class='col-8'><input type='text' class='form-control edit' rows='8' name='Labor' value='<?php echo $Proposal['Labor'];?>' /></div>
+                          </div>
+                          <div class='row g-0'>
+                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?>Overhead:</div>
+                            <div class='col-8'><input type='text' class='form-control edit' rows='8' name='Overhead' value='<?php echo $Proposal['Overhead'];?>' /></div>
+                          </div>
+                          <div class='row g-0'>
+                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?>Price:</div>
+                            <div class='col-8'><input type='text' class='form-control edit' rows='8' name='Price' value='<?php echo $Proposal['Price'];?>' /></div>
+                          </div>
+                        </div>
+                        <div class='card-footer'>
+                            <div class='row'>
+                                <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                            </div>
+                        </div>
+                      </form></div>
                 </div>
             </div>
             <div class='print'>
@@ -363,7 +587,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='row' style='border-top:1px solid black;margin-top:5px;margin-bottom:5px;height:5px;'>&nbsp;</div>
                 <div class='row'>
-                    <div class='col-12' style='b'><h3 style='text-align:center;margin:0px;padding:5px;'>Proposal #<?php echo $Estimate[ 'ID' ];?></h3></div>
+                    <div class='col-12' style='b'><h3 style='text-align:center;margin:0px;padding:5px;'>Proposal #<?php echo $Proposal[ 'ID' ];?></h3></div>
                 </div>
                 <div class='row' style='border-top:1px solid black;margin-top:5px;margin-bottom:5px;height:5px;'>&nbsp;</div>
                 <div class='row' style=''>
@@ -374,22 +598,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='row' style='border-top:1px solid black;margin-top:5px;margin-bottom:5px;height:5px;'>&nbsp;</div>
                 <div class='row'>
                     <div class='col-2'>ATTN:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Contact' ];?></div>
-                    <div class='col-6'>PROPOSAL #<?php echo $Estimate[ 'ID' ];?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Contact' ];?></div>
+                    <div class='col-6'>PROPOSAL #<?php echo $Proposal[ 'ID' ];?></div>
                 </div>
                 <div lcass='row'>
                     <div class='col-2'>PHONE:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Phone' ];?></div>
-                    <div class='col-6'><?PHP echo date( 'm/d/Y', strtotime( $Estimate[ 'Date' ] ) );?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Phone' ];?></div>
+                    <div class='col-6'><?PHP echo date( 'm/d/Y', strtotime( $Proposal[ 'Date' ] ) );?></div>
                 </div>
                 <div class='row'>
                     <div class='col-2'>FAX:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Fax' ];?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Fax' ];?></div>
                     <div class='col-6'>&nbsp;</div>
                 </div>
                 <div class='row'>
                     <div class='col-2'>EMAIL:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Email' ];?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Email' ];?></div>
                     <div class='col-6'>&nbsp;</div>
                 </div>
                 <div class='row'>
@@ -399,17 +623,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='row'>
                     <div class='col-2'>PREMISE:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Location' ];?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Location' ];?></div>
                     <div class='col-6'>&nbsp;</div>
                 </div>
                 <div class='row'>
                     <div class='col-2'>CUSTOMER:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Customer' ];?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Customer' ];?></div>
                     <div class='col-6'>&nbsp;</div>
                 </div>
                 <div class='row'>
                     <div class='col-2'>RE:</div>
-                    <div class='col-4'><?php echo $Estimate[ 'Title'];?></div>
+                    <div class='col-4'><?php echo $Proposal[ 'Title'];?></div>
                     <div class='col-6'>&nbsp;</div>
                 </div>
                 <div class='row' style='border-top:1px solid black;margin-top:5px;margin-bottom:5px;height:5px;'>&nbsp;</div>
@@ -417,11 +641,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='col-12' style='text-align:center;'><u>WORK DESCRIPTION</u></div>
                 </div>
                 <div class='row'>
-                    <div class='col-12'><pre style='padding:25px;font-size:18px;'><?php echo $Estimate[ 'Remarks' ];?></pre></div>
+                    <div class='col-12'><pre style='padding:25px;font-size:18px;'><?php echo $Proposal[ 'Remarks' ];?></pre></div>
                 </div>
                 <div class='row'>
                     <div class='col-3'>COST NOT TO EXCEED:</div>
-                    <div class='col-9'>$<?php echo number_format( $Estimate[ 'Price' ], 2 );?> - PLUS ANY APPlICABLE TAXES</div>
+                    <div class='col-9'>$<?php echo number_format( $Proposal[ 'Price' ], 2 );?> - PLUS ANY APPlICABLE TAXES</div>
                 </div>
                 <div class='row' style='border-top:1px solid black;margin-top:5px;margin-bottom:5px;height:5px;'>&nbsp;</div>
                 <div class='row'>
@@ -464,4 +688,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href="../login.php?Forward=proposal<?php echo (!isset($Estimate[ 'ID' ]) || !is_numeric($Estimate[ 'ID' ])) ? "s.php" : ".php?ID={$Estimate[ 'ID' ]}";?>";</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href="../login.php?Forward=proposal<?php echo (!isset($Proposal[ 'ID' ]) || !is_numeric($Proposal[ 'ID' ])) ? "s.php" : ".php?ID={$Proposal[ 'ID' ]}";?>";</script></head></html><?php }?>

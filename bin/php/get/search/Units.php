@@ -1,9 +1,8 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-require('../index.php');
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $r = \singleton\database::getInstance( )->query(
         null,

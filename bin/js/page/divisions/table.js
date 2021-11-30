@@ -34,36 +34,108 @@ data : function( d ){
               dir : d.order[0].dir
           }
       };
-      d.Search = $("input[name='Search']").val( );
-      d.Customer = $("input[name='Customer']").val( );
-      d.Location = $("input[name='Location']").val( );
-      d.Job = $("input[name='Job']").val( );
+      d.ID = $("input[name='ID']").val( );
+      d.Name = $("input[name='Name']").val( );
+      d.Locations = $("input[name='Locations']").val( );
+      d.Units = $("input[name='Units']").val( );
+      d.Violations = $("input[name='Violations']").val( );
+      d.Tickets = $("input[name='Tickets']").val( );
       return d;
       }
 },
 columns: [
-{
-  data : 'Search' ,
-},{
-  data   : 'Customer'
-},{
-  data    :  'Location'
-},{
-  data      : 'Job',
-},{
-  data      : 'Suggestion',
-},{
-  data      : 'Resolution',
-},{
-  data      : 'Fixed',
-},{
-]
-i nitComplete : function( ){
+  {
+    className : 'ID',
+    data : 'ID',
+    render : function( data, type, row, meta ){
+        switch( type ){
+            case 'display' :
+                return  row.ID !== null
+                    ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='divisions.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
+                        "</div>"
+                    :   null;
+            default :
+                return data;
+          }
+        }
+        },{
+        data : 'Name',
+        render : function( data, type, row, meta ){
+            switch( type ){
+                case 'display' :
+                    return  row.ID !== null
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='divisions.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                            "</div>"
+                        :   null;
+                default :
+                    return data;
+              }
+        }
+        },{
+        data : 'Locations',
+        render : function( data, type, row, meta ){
+            switch( type ){
+                case 'display' :
+                    return  row.Locations !== null
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='locations.php?Division=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                            "</div>"
+                        :   null;
+                default :
+                    return data;
+            }
+        }
+      },{
+        data : 'Units',
+        render : function( data, type, row, meta ){
+            switch( type ){
+                case 'display' :
+                    return  row.Units !== null
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='units.php?Division=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
+                            "</div>"
+                        :   null;
+                default :
+                    return data;
+            }
+        }
+      },{
+          data : 'Violations',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.Tickets !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='violations.php?Division=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
+        },{
+            data : 'Tickets',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Tickets !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='tickets.php?Division=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+            }
+          }
+],
+  initComplete : function( ){
     $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
     $('input.date').datepicker( { } );
     $('input.time').timepicker( {  timeFormat : 'h:i A' } );
     search( this );
-    $( '.redraw' ).bind( 'change', function(){ Table_Locations.draw(); });
+    $( '.redraw' ).bind( 'change', function(){ Table_Divisions.draw(); });
 },
 buttons: [
     {
@@ -72,14 +144,8 @@ buttons: [
             $( 'input, select' ).each( function( ){
                 $( this ).val( '' );
             } );
-            Table_Locations.draw( );
+            Table_Divisions.draw( );
         }
-    },
-    { extend: 'create', editor: Editor_Locations },
-    { extend: 'edit',   editor: Editor_Locations },
-    { extend: 'remove', editor: Editor_Locations },
-    'print',
-    'copy',
-    'csv'
+    }
 ]
 } );

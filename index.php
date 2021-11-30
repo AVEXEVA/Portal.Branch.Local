@@ -80,18 +80,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'index.php'
       )
     );
+	$userId= $_SESSION[ 'Connection' ][ 'User' ];
+ $query="SELECT Picture, Picture_Type AS Type FROM [User] WHERE ID = ?;";
     $image_result = $database->query(
       'Portal',
-      " SELECT  Picture,
-                Picture_Type AS Type
-        FROM    Portal.dbo.Portal
-        WHERE   Portal.Branch = ?
-                AND Portal.Branch_ID = ?;",
+      $query,
       array(
-        $_SESSION[ 'Connection' ][ 'Branch' ],
-        $_SESSION[ 'Connection' ][ 'User' ]
+        $userId
       )
     );
+	//print_r($image_result); die();
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
@@ -112,11 +110,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           if( $image_result ){
             $row = sqlsrv_fetch_array( $image_result );
             if( is_null( $row[ 'Picture' ] ) ){
-              ?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php
+              ?><div class='offset-3 col-6' id="image"><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php
             } else {
-              ?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;' /></button></div><?php
+              ?><div class='offset-3 col-6' id="image"><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;' /></button></div><?php
             }
-          } else {?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php }?>
+          } else {?><div class='offset-3 col-6' id="image"><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php }?>
         <div class='col-3'><button class='slim text-center text-white' onClick="document.location.href='settings.php';" style='text-align:right;'><i class="fas fa-user-cog fa-2x"></i></button></div>
       </div>
       <div style='height:5px;'>&nbsp;</div>

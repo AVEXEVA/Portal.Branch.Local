@@ -94,31 +94,73 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 FROM    dbo.[User]
                 WHERE   [User].[ID] = ?;",
           array(
-            $ID,
-            $Email
+            $ID
+           
           )
         );
-        $User =   (       empty( $ID )
-                        &&    !empty( $Name )
-                        &&    !$result
-                      ) || (  empty( $ID )
-                        &&    empty( $Name )
+      
+        $User =   ( empty( $ID )&&   !$result) || (  empty( $ID )
+                        &&    empty( $Email )
                       )  ? array(
             'ID' => null,
             'Email' => null,
             'Password' => null,
             'Branch' => null,
             'Branch_Type' => null,
-            'Branch_ID' => null
+            'Branch_ID' => null,
+            'Picture' => null,
+            'Picture_Type' => null
         ) : sqlsrv_fetch_array( $result );
+          
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
             $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
             $User[ 'Branch' ] = isset( $_POST[ 'Branch' ] ) ? $_POST[ 'Branch' ] : $User[ 'Branch' ];
             $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
             $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
+            $picture=empty( $_POST[ 'ID' ] )?0:$User[ 'Picture' ];
+            $picture_type=empty( $_POST[ 'ID' ] )?'':$User[ 'Picture_Type' ];;
+            
+             
+		    if(isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) )
+	{
+	ob_start( );
+  $image = imagecreatefromstring( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) );
+  imagejpeg( $image, null, 50 );
+  $image = ob_get_clean( );
+  $image = base64_encode( $image );	  
+	
+		  $picture=  array(
+        $image, 
+        SQLSRV_PARAM_IN,
+        SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
+        SQLSRV_SQLTYPE_VARBINARY('max')
+      );
+     
+		$picture_type=	$_FILES[ 'Picture' ][ 'type' ];
+		
+		if( ( $ID )>0 ){
+		  $sQueryRow = "UPDATE  [User]
+	                    SET     [User].[Picture] = ?,
+	                    		[User].[Picture_Type] = ?
+	                    		WHERE   [User].[ID] = ?
+                         ";
+		 $parameters= array(
+	            	$picture,
+                       $picture_type,
+                       $ID
+	                );
+		  
+	            $fResult = \singleton\database::getInstance( )->query( 
+      'Portal', 
+      $sQueryRow , 
+      $parameters 
+    ) or die(print_r(sqlsrv_errors()));
+	            
+		}
+	  }
             if( empty( $_POST[ 'ID' ] ) ){
-	            $result = \singleton\database::getInstance( )->query(
+ $result = \singleton\database::getInstance( )->query(
 	              'Portal',
 	              " INSERT INTO dbo.[User]( Email, Password, Verified, Branch, Branch_Type, Branch_ID )
 	                VALUES( ?, ?, 0, ?, ?, ? );
@@ -134,27 +176,50 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 	            sqlsrv_next_result( $result );
 	            $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+	            if(strlen( $picture_type )>1){
+	               $sQueryRow = "UPDATE  dbo.[User]
+	                    SET     [User].[Picture] = ?,
+	                    		[User].[Picture_Type] = ?
+	                    		WHERE   [User].[ID] = ?;
+                         ";
+		 $parameters= array(
+	            	$picture,
+                       $picture_type,
+                       $User[ 'ID' ]
+	                );
+		  
+	            $fResult = \singleton\database::getInstance( )->query( 
+			      'Portal', 
+			      $sQueryRow , 
+			      $parameters 
+			    ) or die(print_r(sqlsrv_errors()));
+	            }
 
 	            header( 'Location: user.php?ID=' . $User[ 'ID' ] );
 	            exit;
 	        } else {
-	            \singleton\database::getInstance( )->query(
-	                'Portal',
-	                "   UPDATE  dbo.[User]
+	       
+	               $sQueryRow = "UPDATE  [User]
 	                    SET     [User].[Email] = ?,
-	                    		[User].[Password] = ?
-                          [User].[Branch] = ?,
-                          [User].[Branch_Type] = ?,
-                          [User].[Branch_ID] = ?,
-	                    WHERE   [User].[ID] = ?;",
-	                array(
-	                    $User[ 'Email' ],
-	                    $User[ 'ID' ],
-                      $User[ 'Branch' ],
+	                    		[User].[Branch] = ?,
+	                    		[User].[Branch_Type] = ?,
+                          [User].[Branch_ID] = ?
+	                    		WHERE   [User].[ID] = ?;
+                         ";
+		 $parameters= array(
+	            	      $User[ 'Email' ],
+	                   $User[ 'Branch' ],
                       $User[ 'Branch_Type' ],
-                      $User[ 'Branch_ID' ]
-	                )
-	            );
+                      $User[ 'Branch_ID' ],
+                      $ID
+	                );
+		  
+	            $fResult = \singleton\database::getInstance( )->query( 
+			      'Portal', 
+			      $sQueryRow , 
+			      $parameters 
+			    ) or die(print_r(sqlsrv_errors()));
+	          
 	        }
 	    }
 ?><!DOCTYPE html>
@@ -214,7 +279,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div>
         <div class='card-body bg-dark text-white'>
             <div class='card-columns'>
-                <div class='card card-primary my-3'><form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST'>
+                <div class='card card-primary my-3'><form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST' enctype="multipart/form-data">
                     <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
                     <div class='card-heading'>
                       <div class='row g-0 px-3 py-2'>
@@ -243,6 +308,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>ID:</div>
                             <div class='col-8'><input type='text' name='Branch_ID' class='form-control edit' placeholder='ID' value='<?php echo $User[ 'Branch_ID' ];?>' /></div>
                         </div>
+                         <div class='row'>
+      <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Image:</div>
+      <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php
+        print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];
+      ?>" /><?php }?><input type='file' name='Picture' class='form-control edit' /></div><?php ?>
+    </div>
                     </div>
                     <div class='card-footer'>
 	                  	<div class='row'>

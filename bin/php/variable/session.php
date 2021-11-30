@@ -11,6 +11,7 @@ $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] )
 				'Employees' => array( ),
 				'Contacts' => array( ),
 				'Leads' => array( ),
-				'Users' => array( )
+				'Users' => array( ),
+				'Proposals' => array( )
 			);
 ?>

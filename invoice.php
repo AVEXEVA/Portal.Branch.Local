@@ -87,13 +87,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ? $_POST[ 'ID' ]
                     : null
             );
-            $Name = isset( $_GET[ 'Name' ] )
-                ? $_GET[ 'Name' ]
-                : (
-                    isset( $_POST[ 'Name' ] )
-                        ? $_POST[ 'Name' ]
-                        : null
-        );
         $result = \singleton\database::getInstance( )->query(
       		null,
             "SELECT TOP 1
@@ -108,8 +101,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Job.ID                 AS Job_ID,
                     JobType.Type           AS Job_Type,
                     Loc.Loc 				       AS Location_ID,
-                    Loc.ID 				         AS Location_Name,
-                    Loc.Tag 				       AS Location_Tag,
+                    Loc.Tag 				       AS Location_Name,
                     Loc.Address 		  	   AS Location_Street,
                     Loc.City 			         AS Location_City,
                     Loc.State 			   	   AS Location_State,
@@ -119,13 +111,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Route.ID 				       AS Route_ID,
                     Route_Mechanic.fFirst  AS Route_Mechanic_First_Name,
                     Route_Mechanic.Last 	 AS Route_Mechanic_Last_Name,
-                    Customer.ID        AS Customer_ID,
-                    Customer.Name      AS Customer_Name,
-                    Customer.Address   AS Customer_Street,
-                    Customer.City      AS Customer_City,
-                    Customer.State     AS Customer_State,
-                    Customer.Zip       AS Customer_Zip,
-                    Customer.Contact   AS Customer_Contact,
+                    Customer.ID            AS Customer_ID,
+                    Customer.Name          AS Customer_Name,
+                    Customer.Address       AS Customer_Street,
+                    Customer.City          AS Customer_City,
+                    Customer.State         AS Customer_State,
+                    Customer.Zip           AS Customer_Zip,
+                    Customer.Contact       AS Customer_Contact,
                     Job.ID AS Job_ID,
                     Job.fDesc AS Job_Name
             FROM    Invoice
@@ -146,19 +138,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ) AS Customer ON Loc.Owner = Customer.ID
                     LEFT JOIN Emp AS Route_Mechanic ON Route.Mech = Route_Mechanic.fWork
                     LEFT JOIN JobType               ON Job.Type = JobType.ID
-            WHERE   Invoice.fDate = ?
-                    OR Invoice.fDesc = ?;",
+            WHERE   Invoice.Ref = ?;",
             array(
-                $ID,
-                $Name
+                $ID
             )
         );
         $Invoice =   (  empty( $ID )
-                           &&  !empty( $Name )
                            &&  !$result
-                      )    || (empty( $ID )
-                           &&  empty( $Name )
-                      )    ? array(
+                      )    || (empty( $ID ) )    ? array(
                 'ID' => null,
                 'Description' => null,
                 'Amount' => null,
@@ -171,7 +158,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Job_Type' => null,
                 'Location_ID' => null,
                 'Location_Name' => null,
-                'Location_Tag' => null,
                 'Location_Street' => null,
                 'Location_City' => null,
                 'Location_State' => null,
@@ -192,11 +178,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Job_Name' => null
             ) : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
-          $Invoice[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Invoice[ 'ID' ];
           $Invoice[ 'Description' ] 	= isset( $_POST[ 'Description' ] ) ? $_POST[ 'Description' ] : $Invoice[ 'Description' ];
-          $Invoice[ 'Amount' ] 		= isset( $_POST[ 'Amount' ] ) 	 ? $_POST[ 'Amount' ] 	 : $Invoice[ 'Amount' ];
+          $Invoice[ 'Amount' ] 		    = isset( $_POST[ 'Amount' ] ) 	 ? $_POST[ 'Amount' ] 	 : $Invoice[ 'Amount' ];
           $Invoice[ 'Taxable' ] 		= isset( $_POST[ 'Taxable' ] ) 	 ? $_POST[ 'Taxable' ] 	 : $Invoice[ 'Taxable' ];
-          $Invoice[ 'Sales_Tax' ]            = isset( $_POST[ 'Sales_Tax' ] ) 	   ? $_POST[ 'Sales_Tax' ] 	   : $Invoice[ 'Sales_Tax' ];
+          $Invoice[ 'Sales_Tax' ]       = isset( $_POST[ 'Sales_Tax' ] ) 	   ? $_POST[ 'Sales_Tax' ] 	   : $Invoice[ 'Sales_Tax' ];
           $Invoice[ 'Total' ] 	        = isset( $_POST[ 'Total' ] ) 	 ? $_POST[ 'Total' ] 	 : $Invoice[ 'Total' ];
           $Invoice[ 'Date' ] 	        = isset( $_POST[ 'Date' ] ) 	 ? $_POST[ 'Date' ] 	 : $Invoice[ 'Date' ];
           $Invoice[ 'Job_Name' ] 		= isset( $_POST[ 'Job' ] ) 	 ? $_POST[ 'Job' ] 	 : $Invoice[ 'Job_Name' ];
@@ -206,38 +191,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $result = \singleton\database::getInstance( )->query(
               null,
               "	DECLARE @MAXID INT;
-                DECLARE @Job INT;
                 DECLARE @Loc INT;
+                DECLARE @Job INT;
                 SET @MAXID = CASE WHEN ( SELECT Max( Ref ) FROM Invoice ) IS NULL THEN 0 ELSE ( SELECT Max( Ref ) FROM Invoice ) END ;
-                SET @Job = ( SELECT Job.ID FROM Job WHERE Job.fDesc = ? );
-                SET @Loc = ( SELECT Loc.Loc FROM Loc WHERE Loc.Tag = ? );
-                INSERT INTO invoice(
+                SET @Loc = ( SELECT Top 1 Loc.Loc FROM Loc WHERE Loc.Tag = ? );
+                SET @Job = ( SELECT Top 1 Job.ID FROM Job WHERE Job.fDesc = ? );
+                INSERT INTO Invoice(
                     Ref,
-                    Job,
                     Loc,
+                    Job,
                     fDate,
                     fDesc,
                     Amount,
                     Taxable,
                     STax,
-                    fieldcollref,
                     TFMID,
                     TFMSource,
                     EMailStatus
                 )
-                VALUES( @MAXID + 1 , @Job, @Loc, ?, ?, ?, ?, ?, '', '', '', 0 );
+                VALUES( @MAXID + 1, @Loc, @Job, ?, ?, ?, ?, ?, '', '', 0 );
                 SELECT @MAXID + 1;",
               array(
-                $Invoice[ 'Job_Name' ],
                 $Invoice[ 'Location_Name' ],
+                $Invoice[ 'Job_Name' ],
                 !empty( $Invoice[ 'Date' ] ) ? $Invoice[ 'Date' ] : date( 'Y-m-d h:i:s' ),
                 $Invoice[ 'Description' ],
-                $Invoice[ 'Amount' ],
-                $Invoice[ 'Taxable' ],
-                $Invoice[ 'Sales_Tax']
+                !empty( $Invoice[ 'Amount' ] ) ? $Invoice[ 'Amount' ] : 0,
+                !empty( $Invoice[ 'Taxable' ] ) ? $Invoice[ 'Taxable' ] : 0,
+                !empty( $Invoice[ 'Sales_Tax' ] ) ? $Invoice[ 'Sales_Tax' ] : 0
               )
             );
-
             sqlsrv_next_result( $result );
             $Invoice[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
@@ -295,8 +278,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $Invoice[ 'Location_City' ],
                 $Invoice[ 'Location_State' ],
                 $Invoice[ 'Location_Zip' ],
-                $Invoice[ 'Location_ID' ],
-                $Invoice[ 'Location_Name' ],
                 $Invoice[ 'Route_ID' ],
                 $Invoice[ 'Route_Mechanic_First_Name' ],
                 $Invoice[ 'Route_Mechanic_last_Name' ],
@@ -348,140 +329,137 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     </div>
                 </div>
                 <div class='card-body bg-dark text-white'>
-                    <div class='card-columns'>
-                        <div class='card card-primary my-3'><form action='invoice.php?ID=<?php echo $Invoice[ 'ID' ];?>' method='POST'>
-                            <div class='card-heading'>
-                                <div class='row g-0 px-3 py-2'>
-                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                                    <div class='col-2'>&nbsp;</div>
-                                </div>
-                            </div>
-                            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                                <div class='row'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='ID'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> ID:</label>
-                                    <div class='col-8'><input readonly class='form-control' name='ID' value='<?php echo $Invoice[ 'ID' ];?>' /></div>
-                                </div>
-                                <div class='row'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Description'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Description:</label>
-                                    <div class='col-8'><textarea class='form-control' name='Description'><?php echo $Invoice[ 'Description' ];?></textarea></div>
-                                </div>
-                                <div class='row'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Date'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Date:</label>
-                                    <div class='col-8'><input class='form-control date' autocomplete='off' name='Date' value='<?php echo $Invoice[ 'Date' ];?>' /></div>
-                                </div>
-                                <div class='row'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Amount'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Amount:</label>
-                                    <div class='col-8'><input class='form-control' name='Amount' value='<?php echo $Invoice[ 'Amount' ];?>' /></div>
-                                </div>
-                                <div class='row'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Sales_Tax'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Sales Tax:</label>
-                                    <div class='col-8'><input class='form-control' name='Sales_Tax' value='<?php echo $Invoice[ 'Sales_Tax' ];?>' /></div>
-                                </div>
-                                <div class='row'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Total'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Total:</label>
-                                    <div class='col-8'><input readonly class='form-control' name='Total' value='<?php echo $Invoice[ 'Total' ];?>' /></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
-                                    <div class='col-6'>
-                                      <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Invoice[ 'Job_Name' ];?>' />
-                                      <script>
-                                        $( 'input[name="Job"]' )
-                                            .typeahead({
-                                                minLength : 4,
-                                                hint: true,
-                                                highlight: true,
-                                                limit : 5,
-                                                display : 'FieldValue',
-                                                source: function( query, result ){
-                                                    $.ajax({
-                                                        url : 'bin/php/get/search/Jobs.php',
-                                                        method : 'GET',
-                                                        data    : {
-                                                            search :  $('input:visible[name="Job"]').val( )
-                                                        },
-                                                        dataType : 'json',
-                                                        beforeSend : function( ){
-                                                            abort( );
-                                                        },
-                                                        success : function( data ){
-                                                            result( $.map( data, function( item ){
-                                                                return item.FieldValue;
-                                                            } ) );
-                                                        }
-                                                    });
-                                                },
-                                                afterSelect: function( value ){
-                                                    $( 'input[name="Job"]').val( value );
-                                                    $( 'input[name="Job"]').closest( 'form' ).submit( );
-                                                }
-                                            }
-                                        );
-                                      </script>
-                                    </div>
-                                    <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                      if( in_array( $Invoice[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                                        echo "onClick=\"document.location.href='jobs.php';\"";
-                                      } else {
-                                        echo "onClick=\"document.location.href='job.php?ID=" . $Invoice[ 'Job_ID' ] . "';\"";
+              <div class='card-columns'>
+              <div class='card card-primary my-3'><form action='invoice.php?ID=<?php echo $Invoice[ 'ID' ];?>' method='POST'>
+                  <input type='hidden' class='form-control' name='ID' value='<?php echo $Invoice[ 'ID' ];?>' />
+                  <div class='card-heading'>
+                      <div class='row g-0 px-3 py-2'>
+                          <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                          <div class='col-2'>&nbsp;</div>
+                      </div>
+                  </div>
+                  <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                      <div class='row g-0'>
+                          <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
+                          <div class='col-6'>
+                            <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Invoice[ 'Location_Name' ];?>' />
+                            <script>
+                              $( 'input[name="Location"]' )
+                                  .typeahead({
+                                      minLength : 4,
+                                      hint: true,
+                                      highlight: true,
+                                      limit : 5,
+                                      display : 'FieldValue',
+                                      source: function( query, result ){
+                                          $.ajax({
+                                              url : 'bin/php/get/search/Locations.php',
+                                              method : 'GET',
+                                              data    : {
+                                                  search :  $('input:visible[name="Location"]').val( )
+                                              },
+                                              dataType : 'json',
+                                              beforeSend : function( ){
+                                                  abort( );
+                                              },
+                                              success : function( data ){
+                                                  result( $.map( data, function( item ){
+                                                      return item.FieldValue;
+                                                  } ) );
+                                              }
+                                          });
+                                      },
+                                      afterSelect: function( value ){
+                                          $( 'input[name="Location"]').val( value );
+                                          $( 'input[name="Location"]').closest( 'form' ).submit( );
                                       }
-                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
-                                    <div class='col-6'>
-                                      <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Invoice[ 'Location_Name' ];?>' />
-                                      <script>
-                                        $( 'input[name="Location"]' )
-                                            .typeahead({
-                                                minLength : 4,
-                                                hint: true,
-                                                highlight: true,
-                                                limit : 5,
-                                                display : 'FieldValue',
-                                                source: function( query, result ){
-                                                    $.ajax({
-                                                        url : 'bin/php/get/search/Locations.php',
-                                                        method : 'GET',
-                                                        data    : {
-                                                            search :  $('input:visible[name="Location"]').val( )
-                                                        },
-                                                        dataType : 'json',
-                                                        beforeSend : function( ){
-                                                            abort( );
-                                                        },
-                                                        success : function( data ){
-                                                            result( $.map( data, function( item ){
-                                                                return item.FieldValue;
-                                                            } ) );
-                                                        }
-                                                    });
-                                                },
-                                                afterSelect: function( value ){
-                                                    $( 'input[name="Location"]').val( value );
-                                                    $( 'input[name="Location"]').closest( 'form' ).submit( );
-                                                }
-                                            }
-                                        );
-                                      </script>
-                                    </div>
-                                    <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                      if( in_array( $Invoice[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
-                                        echo "onClick=\"document.location.href='locations.php';\"";
-                                      } else {
-                                        echo "onClick=\"document.location.href='location.php?ID=" . $Invoice[ 'Location_ID' ] . "';\"";
+                                  }
+                              );
+                            </script>
+                          </div>
+                          <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                            if( in_array( $Invoice[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
+                              echo "onClick=\"document.location.href='locations.php';\"";
+                            } else {
+                              echo "onClick=\"document.location.href='location.php?ID=" . $Invoice[ 'Location_ID' ] . "';\"";
+                            }
+                          ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                      </div>
+                      <div class='row g-0'>
+                          <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
+                          <div class='col-6'>
+                            <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Invoice[ 'Job_Name' ];?>' />
+                            <script>
+                              $( 'input[name="Job"]' )
+                                  .typeahead({
+                                      minLength : 4,
+                                      hint: true,
+                                      highlight: true,
+                                      limit : 5,
+                                      display : 'FieldValue',
+                                      source: function( query, result ){
+                                          $.ajax({
+                                              url : 'bin/php/get/search/Jobs.php',
+                                              method : 'GET',
+                                              data    : {
+                                                  search :  $('input:visible[name="Job"]').val( )
+                                              },
+                                              dataType : 'json',
+                                              beforeSend : function( ){
+                                                  abort( );
+                                              },
+                                              success : function( data ){
+                                                  result( $.map( data, function( item ){
+                                                      return item.FieldValue;
+                                                  } ) );
+                                              }
+                                          });
+                                      },
+                                      afterSelect: function( value ){
+                                          $( 'input[name="Job"]').val( value );
+                                          $( 'input[name="Job"]').closest( 'form' ).submit( );
                                       }
-                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                                </div>
-                            </div>
-                            <div class='card-footer'>
-                                <div class='row'>
-                                    <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                                </div>
-                            </div>
-                        </form></div>
-                    </div>
-                </div>
+                                  }
+                              );
+                            </script>
+                          </div>
+                          <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                            if( in_array( $Invoice[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
+                              echo "onClick=\"document.location.href='jobs.php';\"";
+                            } else {
+                              echo "onClick=\"document.location.href='job.php?ID=" . $Invoice[ 'Job_ID' ] . "';\"";
+                            }
+                          ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                      </div>
+                      <div class='row g-0'>
+                          <label class='col-4 border-bottom border-white my-auto' for='Description'><?php \singleton\fontawesome::getInstance( )->Description( 1 );?> Description:</label>
+                          <div class='col-12'><textarea class='form-control' name='Description' rows='8'><?php echo $Invoice[ 'Description' ];?></textarea></div>
+                      </div>
+                      <div class='row g-0'>
+                          <label class='col-4 border-bottom border-white my-auto' for='Date'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Date:</label>
+                          <div class='col-8'><input class='form-control date' autocomplete='off' name='Date' value='<?php echo $Invoice[ 'Date' ];?>' /></div>
+                      </div>
+                      <div class='row g-0'>
+                          <label class='col-4 border-bottom border-white my-auto' for='Amount'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Amount:</label>
+                          <div class='col-8'><input class='form-control' name='Amount' value='<?php echo $Invoice[ 'Amount' ];?>' /></div>
+                      </div>
+                      <div class='row g-0'>
+                          <label class='col-4 border-bottom border-white my-auto' for='Sales_Tax'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Sales Tax:</label>
+                          <div class='col-8'><input class='form-control' name='Sales_Tax' value='<?php echo $Invoice[ 'Sales_Tax' ];?>' /></div>
+                      </div>
+                      <div class='row g-0'>
+                          <label class='col-4 border-bottom border-white my-auto' for='Total'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Total:</label>
+                          <div class='col-8'><input readonly class='form-control' name='Total' value='<?php echo $Invoice[ 'Total' ];?>' /></div>
+                      </div>
+                  </div>
+                  <div class='card-footer'>
+                      <div class='row'>
+                          <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                      </div>
+                  </div>
+              </form></div>
+              </div>
+            </div>
             </div>
             <div class='print'>
                 <div class='row'>

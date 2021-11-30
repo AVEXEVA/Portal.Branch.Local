@@ -1,10 +1,11 @@
 <?php
+// Session set for the root index page
 if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-  //Connection
+  //Connection for the user and the hash
     $result = \singleton\database::getInstance( )->query(
       'Portal',
       " SELECT  [Connection].[ID]
@@ -16,8 +17,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $_SESSION[ 'Connection' ][ 'Hash' ]
       )
     );
+  // This selects the User and Hash from the Dbo
     $Connection = sqlsrv_fetch_array($result);
-    //User
+    //Sets $result into $Connection
 	$result = \singleton\database::getInstance( )->query(
 		null,
 		" SELECT  Emp.fFirst  AS First_Name,
@@ -32,9 +34,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		)
 	);
 	$User   = sqlsrv_fetch_array( $result );
+// gets Employee first/last/employee ID/ Title/Field and sets to $User
 	//Privileges
 	$Access = 0;
 	$Hex = 0;
+  // Defaults Privileges to Zero
 	$result = \singleton\database::getInstance( )->query(
 		'Portal',
 		"   SELECT  [Privilege].[Access],
@@ -52,6 +56,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		  	$_SESSION[ 'Connection' ][ 'User' ],
 		)
 	);
+// Selects $User Privilege and appends to $_SESSION user array
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
@@ -67,11 +72,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	dechex( $Privilege[ 'Token' ] ),
         	dechex( $Privilege[ 'Internet' ] )
         ) );
+
     }}
+// Checks $User Privilege and appends to $_SESSION user array
     if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Customer' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Customer' ] )
     ){ ?><?php require('404.html');?><?php }
+    //If privleges dont check, 404s out
     else {
         \singleton\database::getInstance( )->query(
           null,
@@ -83,6 +91,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'customer.php'
         )
       );
+  // If privleges check, Timestamp $_SESSION user and show customer.php
     	$ID = isset( $_GET[ 'ID' ] )
 			? $_GET[ 'ID' ]
 			: (
@@ -97,6 +106,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				? $_POST[ 'Name' ]
         				: null
       	);
+  // sets $ID, $Name Variable and Posts ID and Name into $result
         $result = \singleton\database::getInstance( )->query(
         	null,
             "	SELECT 	Top 1
@@ -158,9 +168,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Phone' => null,
           'Email' => null
         ) : sqlsrv_fetch_array($result);
-
+//Binds $ID, $Name, $Customer and query values into the $result variable
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
+          // if the $_Post is set and the count is null, select if available
         	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
   	      $Customer[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Customer[ 'Contact' ];
         	$Customer[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Customer[ 'Phone' ];
@@ -212,8 +223,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         			)
         		);
         		sqlsrv_next_result( $result );
+    //Update query to fill values for $Customer and appends to $result for any updated colums
         		$Customer[ 'Rolodex' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
+// finds any result with the value of 0/ null
         		$result = \singleton\database::getInstance( )->query(
         			null,
         			"	DECLARE @MAXID INT;
@@ -258,10 +270,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				$Customer[ 'Internet' ]
         			)
         		);
-
+// query that inserts values into the $Customer [rolodex] variable datatable and appends it to the $result variable
         		sqlsrv_next_result( $result );
         		$Customer[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
+// Checks the $Customer[ID] for any fields that are null, if none exit,
         		header( 'Location: customer.php?ID=' . $Customer[ 'ID' ] );
         		exit;
         	} else {
@@ -314,6 +326,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        	);
         	}
         }
+    // if any fields are 0/null, attempt to update said colums from owner/rol ID
 ?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -325,6 +338,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php  require( bin_js   . 'index.php');?>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
+<!-- required files from other locations, such as css, js, bootstrap and, Entity files  -->
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
         <?php require( bin_php . 'element/navigation.php'); ?>
@@ -349,6 +363,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				</div>
         			</div>
         		</div>
+            <!-- Card hedding, that holds Create refresh and headder links back to customers.php  -->
         		<div class='card-body bg-dark text-white'>
 					<div class='card-columns'>
 						<?php if( !in_array( $Customer[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Customer['Longitude' ], array( null, 0 ) ) ){
@@ -386,6 +401,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						            </script>
 							</div><?php
 						}?>
+            <!-- Card that holds the google maps api with scripts that hold vanilla JS  -->
 						<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
@@ -393,6 +409,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-2'>&nbsp;</div>
 								</div>
 							</div>
+              <!-- Second card headding that holds Customer.php information and fontawesome icon, the POST call retrieves information from $Customer ID    -->
 						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
 						 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
 								<div class='row g-0'>
@@ -421,6 +438,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										<option value='1' <?php echo $Customer[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
 									</select></div>
 								</div>
+                <!-- Selector for status that has echos the Customer Status and checks the value 0/1 and assignes a color -Warning or -Success  -->
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
 									<div class='col-8'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Customer['Website']) > 0 ?  $Customer['Website'] : "&nbsp;";?>' /></div>
@@ -514,12 +532,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
 							</div>
-                             <div class='card-footer'>
-                                <div class='row'>
-                                    <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                                </div>
-                            </div>
-            			</form></div>
+               <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
+		      </form></div>
+          <!-- End of customer inforation card, ending with card-footer div class with a button for save  -->
             <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
                 <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
               <div class='card-heading'>
@@ -528,6 +547,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <div class='col-2'>&nbsp;</div>
                 </div>
               </div>
+              <!-- Card hedding, that holds customer contacts, with a post call that gets customer contact information based on $Customer ID  -->
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Contacts' ] ) && $_SESSION[ 'Cards' ][ 'Contacts' ] == 0 ? "style='display:none;'" : null;?>>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Name:</div>
@@ -549,6 +569,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </form>
             </div>
+                                <!-- End of customer contact information card, ending with customer card-footer and a submit button-->
             <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
@@ -556,6 +577,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-2'>&nbsp;</div>
 								</div>
 							</div>
+              <!-- Start of a new card Using a post method to fill data based on $Customer ID -->
 							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Portal' ] ) && $_SESSION[ 'Cards' ][ 'Portal' ] == 0 ? "style='display:none;'" : null;?>>
 						 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
 						 		<div class='row g-0'>
@@ -598,6 +620,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   </div>
               </div>
 						</form></div>
+            <!-- End of customer Portal information card, ending with customer card-footer and a Save button-->
             <?php
             $r = \singleton\database::getInstance( )->query(
                 null,
@@ -615,8 +638,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     $Customer[ 'ID' ]
                 )
             );
+
+            // Selecting the ticket count from TicketD, and joining Ticket Job and storing it with the date time into the $Customer ID variable
             $tResolutionCodes = array( );
             $total = 0;
+            // Sets the Variable $ticketResolutionCodes to an empty array, and the $total variable to = 0
             while( $rResolutionCodes = sqlsrv_fetch_array( $r ) ){
                 if( strpos( $rResolutionCodes['Codes'],  "\n" ) !== false ){
                     $eResolutionCodes = explode("\n", $rResolutionCodes[ 'Codes' ] );
@@ -632,6 +658,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             }
             $ttResolutionCodes = array();
             foreach( $tResolutionCodes as $key=>$value ){ $ttResolutionCodes[ explode( ' - ', $key )[ 0 ] ] = $value; }
+            //add $ttResolutionCodes with the key and emptystring starting at 0 to the $value variable, this is some type of graph I assume
             ?><div class='card card-primary my-3'>
                 <div class='card-heading'>
                     <div class='row g-0 px-3 py-2'>
@@ -691,6 +718,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 plotResolutionCodes( );
                             });
                         </script>
+                        <!-- javascript for plotting the Ticket resolution code to a chart of some kind, not sure how it works -->
                         <div id='ticket-resolution-codes-table' class='col-xs-12 action-rows' style='display:none;'>
                             <div class='row'>
                                 <div class='col-xs-6'>Type</div>
@@ -717,6 +745,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               ?>&Level=' + level;
                             }
                             </script>
+                  <!-- javascript for plotting the Ticket resolution code to a chart of some kind, not sure how it works -->
                         </div>
                     </div>
                 </div>
@@ -745,8 +774,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 											$Customer[ 'ID' ]
 										)
 									);
+                  // new card with sql select, getting Location ID, and Location Maintenance records and storing them in the $Customer[ID] array
 									$Locations = array( );
-									if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){ $Locations[ $row[ 'Maintenance' ] ] = $row[ 'Count' ]; } }
+                  // creats a new Variable called $Locations which is a blank array
+									if( $result ){
+                    while( $row = sqlsrv_fetch_array( $result ) ){
+                      $Locations[ $row[ 'Maintenance' ] ] = $row[ 'Count' ]; } }
+                  // not sure how this works exactly
 								?>
 								<div class='row g-0'>
 								    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Maintained</div>
@@ -808,6 +842,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 												WHERE  		Location.Owner = ?
 														AND Unit.Type = 'Elevator'
 										;",array($Customer[ 'ID' ]));
+                    //Selects the unit.ID as counts from Elev and adds it to $Customer[ID]
 										echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
 									?>' /></div>
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Customer[ 'Name' ];?>&Type=Elevator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
@@ -816,12 +851,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'>Escalators</div>
 								    <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
-										$r = \singleton\database::getInstance( )->query(null,"
-											SELECT 	Count( Unit.ID ) AS Units
-											FROM   	Elev AS Unit
+										$r = \singleton\database::getInstance( )->query(null,
+                      " SELECT 	Count( Unit.ID ) AS Units
+											  FROM   	Elev AS Unit
 												   	LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-											WHERE  		Location.Owner = ?
-													AND Unit.Type = 'Escalator'
+											  WHERE  		Location.Owner = ?
+											  AND Unit.Type = 'Escalator'
 										;",array($Customer[ 'ID' ]));
 										echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
 									?>' /></div>
@@ -831,19 +866,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'>Other</div>
 								    <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
-										$r = \singleton\database::getInstance( )->query(null,"
-											SELECT 	Count( Unit.ID ) AS Units
-											FROM   	Elev AS Unit
+										$r = \singleton\database::getInstance( )->query(null,
+                      " SELECT 	Count( Unit.ID ) AS Units
+											  FROM   	Elev AS Unit
 												   	LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-											WHERE  		Location.Owner = ?
+											  WHERE  		Location.Owner = ?
 													AND Unit.Type NOT IN ( 'Elevator', 'Escalator' )
 										;",array($Customer[ 'ID' ]));
 										echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
 									?>' /></div>
 									<div class='col-2'><button class='h-100 w-100' readonly onClick="document.location.href='units.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
 							</div>
 						</div>
+					</div>
 						<div class='card card-primary my-3'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
@@ -1157,7 +1192,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						<div class='card card-primary my-3'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
-									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoices( 1 );?><span>Invoices</span></h5></div>
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
 							</div>
@@ -1167,7 +1202,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								    <div class='col-6'>&nbsp;</div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Customer'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) ) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
@@ -1184,7 +1219,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 								</div>
 								<?php }?>
-								<?php if(isset($Privileges['Invoice']) && $Privileges['Invoice']['Customer'] >= 4) {?>
+								<?php if(isset($Privileges['Invoice']) ) {?>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 								    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>

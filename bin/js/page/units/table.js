@@ -2,32 +2,27 @@ function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
         .typeahead({
-            minLength : 4,
-            highlight : 1,
-            displayKey : 'FieldValue',
+            minLength : 2,
+            hint: true,
+                highlight: true,
+                limit : 5,
+                display : 'FieldValue',
             source: function( query, result ){
                 $.ajax({
                     url : 'bin/php/get/search/Units.php',
                     method : 'GET',
-					data : function( d ){
-			            d = {
-			                start : d.start,
-			                length : d.length,
-			                order : {
-			                    column : d.order[0].column,
-			                    dir : d.order[0].dir
-			                }
-			            };
-			            d.Search 		= $('input[name="Search"]').val();
-			            d.ID 			= $('input[name="ID"]').val( );
-			            d.Name 			= $('input[name="Name"]').val( );
-			            d.Customer 		= $('input[name="Customer"]').val( );
-			            d.Location 		= $('input[name="Location"]').val( );
-			            d.Building_ID 	= $('input[name="Building_ID"]').val( );
-			            d.Type 			= $('select[name="Type"]').val( );
-			            d.Status 		= $('select[name="Status"]').val( );
-			            return d;
-			        },
+                      data    : {
+                            search                :  $('input:visible[name="Search"]').val(),
+                            ID                    :  $('input:visible[name="ID"]').val( ),
+                            Name                :  $('input:visible[name="Name"]').val( ),
+                            Customer                :  $('input:visible[name="Customer"]').val( ),
+                            Location                :  $('input:visible[name="Location"]').val( ),
+                            Type                :  $('input:visible[name="Type"]').val( ),
+                            Ticket_ID                :  $('input:visible[name="Ticket_ID"]').val( ),
+                            Status                :  $('input:visible[name="Status"]').val( ),
+
+                        },
+				
                     dataType : 'json',
                     beforeSend : function( ){
                         abort( );
@@ -67,6 +62,10 @@ $( document ).ready( function( ){
 	    paging         : true,
 	    orderCellsTop  : true,
 	    autoWidth      : true,
+        select         : {
+            style : 'multi',
+            selector : 'td.ID'
+        },
 		ajax      : {
 	        url : 'bin/php/get/Units.php',
 	        data : function( d ){
@@ -84,89 +83,105 @@ $( document ).ready( function( ){
 	            d.Name 			= $('input[name="Name"]').val( );
 	            d.Customer 		= $('input[name="Customer"]').val( );
 	            d.Location 		= $('input[name="Location"]').val( );
-	            d.Building_ID 	= $('input[name="Building_ID"]').val( );
+	        
 	            d.Type 			= $('select[name="Type"]').val( );
 	            d.Status 		= $('select[name="Status"]').val( );
+	                d.Ticket_ID 		= $('select[name="Ticket_ID"]').val( );
 	            return d;
 	        }
 	    },
 		columns   : [
 			{
-				data : 'ID'
+				data : 'ID',
+                className : 'ID',
+				render : function( data, type, row, meta ){
+					switch( type ){
+						case 'display' :
+							return  row.ID !== null
+								?   "<div class='row'>" +
+								"<div class='col-12'><a href='unit.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Unit #" + row.ID + "</a></div>" +
+								"</div>"
+								:   null;
+						default :
+							return data;
+					}
+
+				}
 			},{
 				data : 'Name',
 				render : function ( data, type, row, meta ){
 					switch ( type ) {
 						case 'display':
-							if( row.City_ID === null && row.State === null ){
+							if( row.City_ID === null && row.Building_ID === null ){
 								return null;
 							} else {
 								return "<div class='row'>" +
-											( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
-											( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
-										"</div>";
+									( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
+									( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
+									"</div>";
 							}
 						default :
 							return data;
 					}
 				}
 			},{
-	            data : 'Customer_ID',
-	            render : function( data, type, row, meta ){
-	                switch( type ){
-	                    case 'display' :
-	                        return  row.Customer_ID !== null
-	                            ?   "<div class='row'>" +
-	                                    "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" +
-	                                "</div>"
-	                            :   null;
-	                    default :
-	                        return data;
-	                }
+				data : 'Customer_ID',
+				render : function( data, type, row, meta ){
 
-	            }
-	        },{
-	            data : 'Location_ID',
-	            render : function( data, type, row, meta ){
-	                switch( type ){
-	                    case 'display' :
-	                        return  row.Location_ID !== null
-	                            ?   "<div class='row'>" +
-	                                    "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'>" + row.Location_Name + "</a></div>" +
-	                                "</div>"
-	                            :   null;
-	                    default :
-	                        return data;
-	                }
+					switch( type ){
+						case 'display' :
+							return  row.Customer_ID !== null
+								?   "<div class='row'>" +
+								"<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
+								"</div>"
+								:   null;
+						default :
+							return data;
+					}
 
-	            }
-	        },{
+				}
+			},{
+				data : 'Location_ID',
+				render : function( data, type, row, meta ){
+					switch( type ){
+						case 'display' :
+							return  row.Location_ID !== null
+								?   "<div class='row'>" +
+								"<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
+								"</div>"
+								:   null;
+						default :
+							return data;
+					}
+
+				}
+			},{
 				data : 'Type'
 			},{
 				data : 'Status',
 				render:function(data){
 					switch(data){
-						case 0: return 'Active';
-						case 1: return 'Inactive';
-						case 2: return 'Demolished';
+						case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+						case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+						case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
 					}
 				}
 			},{
 				data : 'Ticket_ID',
-				render : function( data, type, row, meta ){
+			/*	render : function( data, type, row, meta ){
 					switch ( type ){
 						case 'display' :
 							return row.Ticket_ID !== null
 								?	"<div class='row'>" +
-										"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'>Ticket #" + row.Ticket_ID + "</a></div>" +
-										"<div class='col-12'>" + row.Ticket_Date + "</div>" +
-									"</div>"
+								"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #" + row.Ticket_ID + "</a></div>" +
+								"<div class='col-12'>" + row.Ticket_Date + "</div>" +
+								"</div>"
 								: 	null;
-							default :
-								return data;
+						default :
+							return data;
 
 					}
-				}
+				}*/
 			}
 		],
 	    initComplete : function( ){
@@ -184,7 +199,7 @@ $( document ).ready( function( ){
                 $( 'input:visible, select:visible' ).each( function( ){
                     $( this ).val( '' );
                 } );
-                Table_Users.draw( );
+				Table_Units.draw( );
             }
           },{
             text : 'Get URL',
@@ -202,24 +217,46 @@ $( document ).ready( function( ){
                 document.location.href='unit.php';
             }
           },{
-            text : 'Delete',
-            className : 'form-control',
-            action : function( e, dt, node, config ){
-              var rows = dt.rows( { selected : true } ).indexes( );
-              var dte = dt.cells( rows, 0 ).data( ).toArray( );
-              $.ajax ({
-                url    : 'bin/php/post/unit.php',
-                method : 'POST',
-                data   : {
-                  action : 'delete',
-                  data : dte
-                },
-                success : function(response){
-                  Table_Users.draw();
-                }
-              })
-            }
-          },{
+			  text : 'Delete',
+			  className : 'form-control',
+			  action : function( e, dt, node, config ){
+				  var rows = dt.rows( { selected : true } ).indexes( );
+
+				  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+
+				  $.ajax ({
+					  url    : 'bin/php/post/unit.php',
+					  method : 'POST',
+					  data   : {
+						  action : 'delete',
+						  data : dte
+					  },
+					  success : function(response){
+						  Table_Units.draw();
+					  }
+				  })
+			  }
+		  },{
+			  text : 'Duplicate',
+			  className : 'form-control',
+			  action : function( e, dt, node, config ){
+				  var rows = dt.rows( { selected : true } ).indexes( );
+
+				  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+
+				  $.ajax ({
+					  url    : 'bin/php/post/unit.php',
+					  method : 'POST',
+					  data   : {
+						  action : 'create',
+						  data : dte
+					  },
+					  success : function(response){
+						  Table_Units.draw();
+					  }
+				  })
+			  }
+		  },{
               extend : 'print',
               text : 'Print',
               className : 'form-control'

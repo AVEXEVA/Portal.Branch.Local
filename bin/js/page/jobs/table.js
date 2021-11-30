@@ -50,7 +50,7 @@ $( document ).ready( function( ){
                   case 'display' :
                       return  row.ID !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='job`.php?ID=" + row.ID + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> Job #" + row.ID + "</a></div>" +
+                                  "<div class='col-12'><a href='job.php?ID=" + row.ID + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> Job #" + row.ID + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
