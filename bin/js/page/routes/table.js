@@ -64,7 +64,30 @@ $( document ).ready( function( ){
             data : 'Locations'
           },{
             data : 'Units'
+          },
+          {
+           data : 'Violation' 
+         },
+         {
+          data : 'Assigned' ,
+          render : function( data, type, row, meta ){
+          switch(data){
+            case '2': return "<div class='row'><div class='col-12'><a href='ticket.php'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #En Route</a><div></div>";
+            case '3': return "<div class='row'><div class='col-12'><a href='ticket.php'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #OnSite</a><div></div>";
+           default :
+             switch ( type ){
+            case 'display' :
+              return (row.start !== null && row.end ===null)
+                ? "<div class='row'>" +
+                "<div class='col-12'></div>Active</div></div>"
+                :  "<div class='row'><div class='col-12'>Offline</div>"
+            default :
+              return data;
+
           }
+          }
+         }
+         }
       ],
       order : [ [ 1, 'asc' ] ],
       language : {

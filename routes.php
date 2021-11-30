@@ -122,12 +122,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th title='Person'>Person</th>
                             <th title='Locations'>Locations</th>
                             <th title='Units'>Units</th>
+                             <th title='Violation'>Violation</th>
+                              <th title='Mechanic'>Mechanic</th>
                         </tr><tr>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
                             <th title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>
                             <th title='Person'><input class='redraw form-control' type='text' name='Person' value='<?php echo isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null; ?>' placeholder='Person' /></th>
                             <th title='Locations'><input class='redraw form-control' type='text' name='Locations' value='<?php echo isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null; ?>' placeholder='Locations' /></th>
                             <th title='Units'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null; ?>' placeholder='Units' /></th>
+                            <th title='Violation'><input class='redraw form-control' type='text' name='Violation' value='<?php echo isset( $_GET[ 'Violation' ] ) ? $_GET[ 'Violation' ] : null; ?>' placeholder='Violation' /></th>
+                             <th title='Mech'><input class='redraw form-control' type='text' name='Mech' value='<?php echo isset( $_GET[ 'Mech' ] ) ? $_GET[ 'Mech' ] : null; ?>' placeholder='Mech' /></th>
                         </tr></thead>
                     </table>
                 </div>
