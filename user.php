@@ -87,6 +87,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ? $_POST[ 'Email' ]
                     : null
             );
+             $priv= '';
+                 $sQueryRow ="SELECT Privilege.* FROM   Privilege WHERE  User_ID=? AND Access_Table='User'";
+            $parameters= array(    
+                    $ID   
+                    ); 
+
+           $r = \singleton\database::getInstance( )->query(  
+                  null,     
+                  $sQueryRow ,  
+                  $parameters   
+                ) or die(print_r(sqlsrv_errors())); 
+     
+        $array = sqlsrv_fetch_array($r);
+  echo $priv= $array['User_Privilege']; 
         $result = $database->query(
             'Portal',
             "   SELECT  Top 1
@@ -220,7 +234,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   $sQueryRow ,  
                   $parameters   
                 ) or die(print_r(sqlsrv_errors())); 
-              
+
+                
+           
 	        }
 	    }
 ?><!DOCTYPE html>
@@ -322,6 +338,47 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	                  	</div>
 	              	</div>
                 </div>
+</form>
+
+                <div class="card card-primary my-3">
+        <form name ="privilege" action="privileges.php" method="POST">
+                <input type="hidden" name="UserID" value="<?php echo $User[ 'ID' ];?>">
+                <input type="hidden" name="Access_Table" value="User">
+                <input type="hidden" name="Group_Privilege" value="0">
+                <input type="hidden" name="Other_Privilege" value="0">
+              <div class="card-heading">
+                <div class="row g-0 px-3 py-2">
+                  <div class="col-10"><h5><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i><span>Privileges</span></h5></div>
+                  <div class="col-2">&nbsp;</div>
+                </div>
+              </div>
+              <div class="card-body bg-dark">
+                <div class="row">
+                  <div class="col-4"><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i> Permissions:</div>
+                  <div class="col-8"><select name="User_Privilege" class="form-control"  >
+                                    
+                    <option value="8" <?php if($priv == 8){echo 'selected' ;} ?>>Read</option>
+                    <option value="4" <?php if($priv == 4){echo 'selected';} ?>>Write</option>
+                     <option value="1" <?php if($priv == 1){echo 'selected';} ?>>Execute</option>
+                      <option value="2" <?php if($priv == 2){echo 'selected';} ?>>Delete</option>
+                                    </select></div>
+
+                  </div>
+             
+              </div>
+              <div class="card-footer">
+                  <div class="row">
+                      <div class="col-12"><button class="form-control" type="submit">Save</button></div>
+                  </div>
+              </div>
+            </form>
+            </div>
+
+                      </div>
+                      </div>
+                        </div>
+                          </div>
+
             </div>
         </div>
     </div>
