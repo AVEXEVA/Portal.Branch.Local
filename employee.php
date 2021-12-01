@@ -111,11 +111,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.fLong   AS Longitude,
         				Rolodex.Geolock AS Geofence,
         				Rolodex.ID 		AS Rolodex,
-        				tblWork.Super   AS Supervisor
+        				Rolodex.Name    AS Name,
+                Rolodex.Phone   AS Phone,
+                Rolodex.Email   AS Email,
+                Rolodex.Contact AS Contact,
+        				tblWork.Super   AS Supervisor,
+        				Users.Email 			AS UserEmail
         		FROM 	dbo.Emp AS Employee
         				LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
         				LEFT JOIN dbo.Rol AS Rolodex ON Employee.Rol = Rolodex.ID
-                LEFT JOIN dbo.Emp AS Employee ON Employee.Rol = Employeee.ID
+                LEFT JOIN Portal.dbo.[User] AS Users ON Users.Branch_Type = 'Employee' AND Users.Branch_ID = Employee.ID 
         		WHERE 	Employee.ID = ?
         				OR Employee.fFirst + ' ' + Employee.Last = ?;",
         	array(
@@ -147,6 +152,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Geofence' => null,
         	'Rolodex' => null,
         	'Supervisor' => null,
+        	'Name' => null,
+        	'Email' => null,
+        	'Phone' => null,
+        	'UserEmail' => null,
         ) : sqlsrv_fetch_array($result);
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -477,8 +486,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'User' ] ) && $_SESSION[ 'Cards' ][ 'User' ] == 0 ? "style='display:none;'" : null;?>>
             <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
             <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Username:</div>
-              <div class='col-8'><input type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['User'];?>' /></div>
+              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>UserEmail:</div>
+              <div class='col-8'><input type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['UserEmail'];?>' /></div>
             </div>
             <div class='row g-0'>
               <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Employee ID:</div>
@@ -487,6 +496,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           </div>
         </div></form>
       </div>
+
+       <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+                <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contacts</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark'>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Name:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Name' value='<?php echo $Employee[ 'Name' ];?>' /></div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Employee[ 'Phone' ];?>' /></div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Employee[ 'Email' ];?>' /></div>
+                </div>
+              </div>
+              <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
+            </form>
+            </div>
     </div>
   </div>
 </body>
