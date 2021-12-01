@@ -75,9 +75,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     ){ ?><?php require('404.html');?><?php }
   
     else {
-         $sQueryRow ="SELECT Privilege.*
-            FROM   Privilege
-            WHERE  User_ID=?";
+      //  print_r( $_POST); die();
+      echo   $sQueryRow ="Delete FROM   Privilege  WHERE  User_ID= ? And Access_Table='User'";
             $parameters= array(    
                     $_POST['UserID']   
                     ); 
@@ -88,26 +87,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   $parameters   
                 ) or die(print_r(sqlsrv_errors())); 
      
-        $array = sqlsrv_fetch_array($r);
-     
-         if(isset($array['ID']) && $array['ID'] > 0){
-            $r =  \singleton\database::getInstance( )->query(null,"
-                UPDATE Privilege
-                SET 
-                    Access_Table='{$_POST['Access_Table']}',
-                    Group_Privilege='{$_POST['Group_Privilege']}',
-                    Other_Privilege='{$_POST['Other_Privilege']}'
-                WHERE 
-                    User_ID=? ;",array($_POST['UserID'] ));
-        } else {
+     $permissionArray =array();
+     $permissionArray = $_POST['User_Privilege'];
+       foreach($permissionArray as $val){
             $query= "INSERT INTO Privilege(User_ID,Access_Table,User_Privilege,Group_Privilege,Other_Privilege)
-                VALUES({$_POST['UserID']},'{$_POST['Access_Table']}',{$_POST['User_Privilege']},{$_POST['Group_Privilege']},{$_POST['Other_Privilege']});";
+                VALUES({$_POST['UserID']},'{$_POST['Access_Table']}',$val,{$_POST['Group_Privilege']},{$_POST['Other_Privilege']});";
             $r =  \singleton\database::getInstance( )->query(null, $query             
             );
 
+       }
        
-        
-        }
            header( 'Location: user.php?ID=' . $_POST['UserID'] );
                 exit;
         }

@@ -87,8 +87,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ? $_POST[ 'Email' ]
                     : null
             );
-             $priv= '';
-                 $sQueryRow ="SELECT Privilege.* FROM   Privilege WHERE  User_ID=? AND Access_Table='User'";
+           $priv=array();
+                 $sQueryRow ="SELECT Privilege.User_Privilege FROM   Privilege WHERE  User_ID=? AND Access_Table='User'";
             $parameters= array(    
                     $ID   
                     ); 
@@ -98,9 +98,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   $sQueryRow ,  
                   $parameters   
                 ) or die(print_r(sqlsrv_errors())); 
+    
+        while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
+         $priv[]=   $array['User_Privilege'];
+        }
      
-        $array = sqlsrv_fetch_array($r);
-  echo $priv= $array['User_Privilege']; 
+  
         $result = $database->query(
             'Portal',
             "   SELECT  Top 1
@@ -355,12 +358,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class="card-body bg-dark">
                 <div class="row">
                   <div class="col-4"><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i> Permissions:</div>
-                  <div class="col-8"><select name="User_Privilege" class="form-control"  >
+                  <div class="col-8"><select name="User_Privilege[]" class="form-control"  multiple="mutilple">
                                     
-                    <option value="8" <?php if($priv == 8){echo 'selected' ;} ?>>Read</option>
-                    <option value="4" <?php if($priv == 4){echo 'selected';} ?>>Write</option>
-                     <option value="1" <?php if($priv == 1){echo 'selected';} ?>>Execute</option>
-                      <option value="2" <?php if($priv == 2){echo 'selected';} ?>>Delete</option>
+                    <option value="8" <?php if(in_array(8,$priv)){echo 'style="background-color: #da8d7096;" selected' ;} ?>>Read</option>
+                    <option value="4" <?php if(in_array(4,$priv)){echo 'style="background-color: #da8d7096;" selected';} ?>>Write</option>
+                     <option value="1" <?php if(in_array(1,$priv)){echo ' style="background-color: #da8d7096;" selected';} ?>>Execute</option>
+                      <option value="2" <?php if(in_array(2,$priv)){echo ' style="background-color: #da8d7096;" selected';} ?>>Delete</option>
                                     </select></div>
 
                   </div>
