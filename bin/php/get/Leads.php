@@ -36,8 +36,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	$result = \singleton\database::getInstance( )->query(
 		'Portal',
 		"   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -52,7 +52,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	);
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -61,7 +61,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	dechex( $Privilege[ 'Department' ] ),
         	dechex( $Privilege[ 'Database' ] ),
         	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ), 
+        	dechex( $Privilege[ 'Other' ] ),
         	dechex( $Privilege[ 'Token' ] ),
         	dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -83,6 +83,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			$parameters[] = $_GET['Customer'];
 			$conditions[] = "Customer.Name LIKE '%' + ? + '%'";
 		}
+    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Status'];
+      $conditions[] = "Lead.Status LIKE '%' + ? + '%'";
+    }
 		if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
 			$parameters[] = $_GET['Type'];
 			$conditions[] = "Lead.Type LIKE '%' + ? + '%'";
@@ -117,11 +121,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      0 =>  'Lead.ID',
 	      1 =>  'Lead.fDesc',
 	      2 =>  'Customer_Name',
-	      3 =>  'Lead.Type',
-	      4 =>  'Lead.Address',
-	      5 =>  'Lead.City',
-	      6 =>  'Lead.State',
-	      7 =>  'Lead.Zip',
+        3 =>  'Lead.Status',
+	      4 =>  'Lead.Type',
+	      5 =>  'Lead.Address',
+	      6 =>  'Lead.City',
+	      7 =>  'Lead.State',
+	      8 =>  'Lead.Zip',
 	    );
 	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
 	        ? $Columns[ $_GET['order']['column'] ]
@@ -137,7 +142,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								        Lead.fDesc        AS Name,
 								        Customer.ID       AS Customer_ID,
 								        Customer.Name 	  AS Customer_Name,
-								        Lead.Type 		  AS Type,
+                        Lead.Status 		  AS Status,
+								        Lead.Type 		    AS Type,
 								        Lead.Address      AS Street,
 								        Lead.City         AS City,
 								        Lead.State        AS State,
@@ -146,8 +152,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			                  			LEFT JOIN (
 					                        SELECT  Owner.ID,
 					                                Rol.Name,
-					                                Owner.Status 
-					                        FROM    Owner 
+					                                Owner.Status
+					                        FROM    Owner
 					                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
 					                    ) AS Customer ON Lead.Owner = Customer.ID
 			                  	WHERE   ({$conditions}) AND ({$search})
@@ -164,7 +170,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						        Lead.fDesc        AS Name,
 						        Customer.ID       AS Customer_ID,
 						        Customer.Name 	  AS Customer_Name,
-						        Lead.Type 		  AS Type,
+                    Lead.Status 		  AS Status,
+						        Lead.Type 		    AS Type,
 						        Lead.Address      AS Street,
 						        Lead.City         AS City,
 						        Lead.State        AS State,
@@ -173,8 +180,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	                  			LEFT JOIN (
 			                        SELECT  Owner.ID,
 			                                Rol.Name,
-			                                Owner.Status 
-			                        FROM    Owner 
+			                                Owner.Status
+			                        FROM    Owner
 			                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
 			                    ) AS Customer ON Lead.Owner = Customer.ID
 	                  WHERE   ({$conditions}) AND ({$search});";

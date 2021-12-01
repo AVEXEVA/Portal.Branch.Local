@@ -76,7 +76,7 @@ $( document ).ready( function( ){
               case 'display' :
                 return  row.ID !== null
                   ?   "<div class='row'>" +
-                          "<div class='col-12'><a href='route.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Route #" + row.ID + "</a></div>" +
+                          "<div class='col-12'><a href='violations.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Route #" + row.ID + "</a></div>" +
                       "</div>"
                   :   null;
               default :
@@ -84,9 +84,47 @@ $( document ).ready( function( ){
             }
           }
         },{
-            data : 'Name'
+          data : 'Name',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
         },{
-            data : 'Location'
+            data : 'Locations',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Locations !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='locations.php?Violation=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+          },{
+              data : 'Units',
+              render : function( data, type, row, meta ){
+                  switch( type ){
+                      case 'display' :
+                          return  row.Units !== null
+                              ?   "<div class='row'>" +
+                                      "<div class='col-12'><a href='units.php?Violations=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
+                                  "</div>"
+                              :   null;
+                      default :
+                          return data;
+                  }
+              }
         },{
             data : 'Customer'
         },{

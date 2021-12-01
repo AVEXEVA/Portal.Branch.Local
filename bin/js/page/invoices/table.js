@@ -206,25 +206,25 @@ $( document ).ready( function( ){
               extend : 'csv',
               text : 'CSV',
               className : 'form-control'
-          },{
-              text : 'Delete',
-              className: 'form-control',
-              action : function( e, dt, node, config ){
-                var rows = dt.rows( { selected : true } ).indexes( );
-                var dte = dt.cells( rows, 0 ).data( ).toArray( );
-                $.ajax ({
-                  url    : 'bin/php/post/invoice.php',
-                  method : 'POST',
-                  data   : {
-                    action : 'delete' ,
-                    data : dte
-                  },
-                  success : function(response){
-                    Table_Invoices.draw();
-                }
-              })
-            }
-          },
+            },{
+                text : 'Delete',
+                className: 'form-control',
+                action : function( e, dt, node, config ){
+                  var rows = dt.rows( { selected : true } ).indexes( );
+                  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                  $.ajax ({
+                    url    : 'bin/php/post/invoice.php',
+                    method : 'POST',
+                    data   : {
+                      action : 'delete' ,
+                      data : dte
+                    },
+                    success : function(response){
+                      Table_Invoices.draw();
+                  }
+                })
+              }
+            },
         ],
       });
     });

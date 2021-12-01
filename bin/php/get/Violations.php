@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   $result = \singleton\database::getInstance( )->query(
       'Portal',
       "   SELECT  [Privilege].[Access],
-                  [Privilege].[Owner], 
-                  [Privilege].[Group], 
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
                   [Privilege].[Department],
                   [Privilege].[Database],
                   [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   );
   $Privileges = array();
   if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-      
+
       $key = $Privilege['Access'];
       unset( $Privilege[ 'Access' ] );
       $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           dechex( $Privilege[ 'Department' ] ),
           dechex( $Privilege[ 'Database' ] ),
           dechex( $Privilege[ 'Server' ] ),
-          dechex( $Privilege[ 'Other' ] ), 
+          dechex( $Privilege[ 'Other' ] ),
           dechex( $Privilege[ 'Token' ] ),
           dechex( $Privilege[ 'Internet' ] )
       ) );
@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   else {
     \singleton\database::getInstance( )->query(
       null,
-      " INSERT INTO Activity([User], [Date], [Page] ) 
+      " INSERT INTO Activity([User], [Date], [Page] )
         VALUES( ?, ?, ? );",
       array(
         $_SESSION[ 'Connection' ][ 'User' ],
@@ -175,8 +175,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                           LEFT JOIN (
                             SELECT  Owner.ID,
-                                    Rol.Name 
-                            FROM    Owner 
+                                    Rol.Name
+                            FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Location.Owner = Customer.ID
                   WHERE   ({$conditions}) AND ({$search})
@@ -206,8 +206,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                             LEFT JOIN (
                               SELECT  Owner.ID,
-                                      Rol.Name 
-                              FROM    Owner 
+                                      Rol.Name
+                              FROM    Owner
                                       LEFT JOIN Rol ON Rol.ID = Owner.Rol
                           ) AS Customer ON Location.Owner = Customer.ID
                     WHERE   ({$conditions}) AND ({$search});";
@@ -244,4 +244,31 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       }
       echo json_encode( $output );
 }}
-?>
+$sQueryRow = "	SELECT 	Count( Violation.ID ) AS Count
+        FROM 	Violation AS Contact
+        WHERE 	({$conditions}) AND ({$search})";
+
+  $stmt = \singleton\database::getInstance( )->query(
+    null,
+    $sQueryRow,
+    $parameters
+  ) or die(print_r(sqlsrv_errors()));
+
+  $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+  sqlsrv_cancel( $stmt );
+
+  $sQuery = " SELECT  COUNT(Violation.ID)
+              FROM    Violation AS Contact;";
+  $rResultTotal = \singleton\database::getInstance( )->query(
+    null,
+    $sQuery,
+    array( )
+  ) or die(print_r(sqlsrv_errors()));
+  $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+  $iTotal = $aResultTotal[0];
+
+  $output[ 'iTotalRecords' ] = $iTotal;
+  $output[ 'iTotalDisplayRecords' ] = $iFilteredTotal;
+  echo json_encode( $output );
+}
+}?>

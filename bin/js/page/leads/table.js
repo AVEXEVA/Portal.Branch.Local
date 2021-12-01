@@ -52,18 +52,43 @@ var Table_Leads = $('#Table_Leads').DataTable( {
     }
   },
   columns: [
-  {
-    data : 'ID' ,
-  },{
-    data   : 'Name'
-  },{
+    {
+          className : 'ID',
+          data : 'ID',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
+        },{
+          data : 'Name',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
+      },{
       data : 'Customer_ID',
       render : function( data, type, row, meta ){
           switch( type ){
               case 'display' :
-                  return  row.Customer_ID !== null 
-                      ?   "<div class='row'>" + 
-                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
+                  return  row.Customer_ID !== null
+                      ?   "<div class='row'>" +
+                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -74,13 +99,22 @@ var Table_Leads = $('#Table_Leads').DataTable( {
   },{
     data    :  'Type'
   },{
-    data    :  'Street'
-  },{
-    data      : 'City',
-  },{
-    data      : 'State',
-  },{
-    data      : 'Zip',
+      data : 'Street',
+      render : function( data, type, row, meta ){
+          switch( type ){
+              case 'display' :
+                  return  "<div class='row'>" +
+                              "<div class='col-12'>" +
+                                  "<div class='row'>" +
+                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
+                                      "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
+                                  "</div>" +
+                              "</div>" +
+                          "</div>"
+              default :
+                  return data;
+          }
+      }
   }
   ],
   initComplete : function( ){
