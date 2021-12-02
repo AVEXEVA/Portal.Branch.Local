@@ -612,51 +612,41 @@ if( $locations ) {
                             $currentMonth = date('Y-m').'-01';
                             $r = \singleton\database::getInstance( )->query(
                                 null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID,TicketO.CDate
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.CDate = ?
-															)
-														) AS Tickets;",
+                                "SELECT Loc
+                                FROM Loc
+                                LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) AS LastTicket
+                                WHERE LastTicket  < = ? ;",
                                 array(
-                                    $Route[ 'ID' ],$currentMonth
+                                    date( 'Y-m-01', strtotime( 'this month' ))
                                 )
                             );
                             ?>
                             <div class='col-1'>&nbsp;</div>
                             <div class='col-3 border-bottom border-white my-auto'>Visited</div>
                             <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
                                 ?>' /></div>
                             <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                         </div>
                         <div class='row g-0'>
                             <?php
+
                             $lastDayMonth = date('Y-m-d', strtotime( 'last day of last month' ));
                             $r = \singleton\database::getInstance( )->query(
                                 null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID,TicketO.EDate
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.EDate = ?
-															)
-														) AS Tickets;",
+                                "SELECT Loc
+                                FROM Loc
+                                LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) AS LastTicket
+                                WHERE LastTicket < = ?;",
                                 array(
-                                    $Route[ 'ID' ],$lastDayMonth
+                                    $lastDayMonth
                                 )
                             );
+
                             ?><div class='col-1'>&nbsp;</div>
                             <div class='col-3 border-bottom border-white my-auto'>To Do</div>
                             <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                                echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
                                 ?>' /></div>
                             <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                         </div>
