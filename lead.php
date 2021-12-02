@@ -387,34 +387,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <option value='Schools' <?php echo $Lead[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
                   </select></div>
                 </div>
-                <div class='row g-0'>
-									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
-									<div class='col-6'></div>
-									<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Lead=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-                <div class='row g-0'>
-                  <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Street' value='<?php echo $Lead['Street'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='City' value='<?php echo $Lead['City'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
-                  <div class='col-8'><select name='Status' class='form-control edit' name='Status' value='<?php echo $Lead['City'];?>' />
-                    <option value=''>Select</option>
-                    <option value='0' <?php echo $Lead[ 'Status' ] == 0 ? 'selected' : null;?>>Open</option>
-                    <option value='1' <?php echo $Lead[ 'Status' ] == 1 ? 'selected' : null;?>>Canceled</option>
-                    <option value='2' <?php echo $Lead[ 'Status' ] == 2 ? 'selected' : null;?>>Withdrawn</option>
-                    <option value='3' <?php echo $Lead[ 'Status' ] == 3 ? 'selected' : null;?>>Disqualified</option>
-                    <option value='4' <?php echo $Lead[ 'Status' ] == 4 ? 'selected' : null;?>>Award Successful</option>
-                    <option value='5' <?php echo $Lead[ 'Status' ] == 5 ? 'selected' : null;?>>Award Competitor</option>
-                  </select></div>
-                </div>
+        
                 <div class='row g-0'>
                   <div class='col-1'>&nbsp;</div>
                   <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> State:</div>
