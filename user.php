@@ -89,21 +89,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             );
            $priv=array();
                  $sQueryRow ="SELECT Privilege.User_Privilege FROM   Privilege WHERE  User_ID=? AND Access_Table='User'";
-            $parameters= array(    
-                    $ID   
-                    ); 
+            $parameters= array(
+                    $ID
+                    );
 
-           $r = \singleton\database::getInstance( )->query(  
-                  null,     
-                  $sQueryRow ,  
-                  $parameters   
-                ) or die(print_r(sqlsrv_errors())); 
-    
+           $r = \singleton\database::getInstance( )->query(
+                  null,
+                  $sQueryRow ,
+                  $parameters
+                ) or die(print_r(sqlsrv_errors()));
+
         while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
          $priv[]=   $array['User_Privilege'];
         }
-     
-  
+
+
         $result = $database->query(
             'Portal',
             "   SELECT  Top 1
@@ -126,8 +126,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'Password' => null,
             'Branch' => null,
             'Branch_Type' => null,
-            'Branch_ID' => null, 
-            'Picture' => null,  
+            'Branch_ID' => null,
+            'Picture' => null,
             'Picture_Type' => null
         ) : sqlsrv_fetch_array( $result );
         if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -136,46 +136,46 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $User[ 'Branch' ] = isset( $_POST[ 'Branch' ] ) ? $_POST[ 'Branch' ] : $User[ 'Branch' ];
             $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
             $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
-                        $picture=empty( $_POST[ 'ID' ] )?0:$User[ 'Picture' ];  
-            $picture_type=empty( $_POST[ 'ID' ] )?'':$User[ 'Picture_Type' ];;  
-                
-                
-            if(isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ) 
-    {   
-    ob_start( );    
-  $image = imagecreatefromstring( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) );    
-  imagejpeg( $image, null, 50 );    
-  $image = ob_get_clean( ); 
-  $image = base64_encode( $image );     
-        
-          $picture=  array( 
-        $image,     
-        SQLSRV_PARAM_IN,    
-        SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),   
-        SQLSRV_SQLTYPE_VARBINARY('max') 
-      );    
-        
-        $picture_type=  $_FILES[ 'Picture' ][ 'type' ]; 
-            
-        if( ( $ID )>0 ){    
-          $sQueryRow = "UPDATE  [User]  
-                        SET     [User].[Picture] = ?,   
-                                [User].[Picture_Type] = ?   
-                                WHERE   [User].[ID] = ? 
-                         "; 
-         $parameters= array(    
-                    $picture,   
-                       $picture_type,   
-                       $ID  
-                    );  
-            
-                $fResult = \singleton\database::getInstance( )->query(  
-      'Portal',     
-      $sQueryRow ,  
-      $parameters   
-    ) or die(print_r(sqlsrv_errors())); 
-                    
-        }   
+                        $picture=empty( $_POST[ 'ID' ] )?0:$User[ 'Picture' ];
+            $picture_type=empty( $_POST[ 'ID' ] )?'':$User[ 'Picture_Type' ];;
+
+
+            if(isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) )
+    {
+    ob_start( );
+  $image = imagecreatefromstring( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) );
+  imagejpeg( $image, null, 50 );
+  $image = ob_get_clean( );
+  $image = base64_encode( $image );
+
+          $picture=  array(
+        $image,
+        SQLSRV_PARAM_IN,
+        SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
+        SQLSRV_SQLTYPE_VARBINARY('max')
+      );
+
+        $picture_type=  $_FILES[ 'Picture' ][ 'type' ];
+
+        if( ( $ID )>0 ){
+          $sQueryRow = "UPDATE  [User]
+                        SET     [User].[Picture] = ?,
+                                [User].[Picture_Type] = ?
+                                WHERE   [User].[ID] = ?
+                         ";
+         $parameters= array(
+                    $picture,
+                       $picture_type,
+                       $ID
+                    );
+
+                $fResult = \singleton\database::getInstance( )->query(
+      'Portal',
+      $sQueryRow ,
+      $parameters
+    ) or die(print_r(sqlsrv_errors()));
+
+        }
       }
             if( empty( $_POST[ 'ID' ] ) ){
 	            $result = \singleton\database::getInstance( )->query(
@@ -194,52 +194,52 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 	            sqlsrv_next_result( $result );
 	            $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-                if(strlen( $picture_type )>1){  
-                   $sQueryRow = "UPDATE  dbo.[User] 
-                        SET     [User].[Picture] = ?,   
-                                [User].[Picture_Type] = ?   
-                                WHERE   [User].[ID] = ?;    
-                         "; 
-         $parameters= array(    
-                    $picture,   
-                       $picture_type,   
-                       $User[ 'ID' ]    
-                    );  
-            
-                $fResult = \singleton\database::getInstance( )->query(  
-                  'Portal',     
-                  $sQueryRow ,  
-                  $parameters   
-                ) or die(print_r(sqlsrv_errors())); 
+                if(strlen( $picture_type )>1){
+                   $sQueryRow = "UPDATE  dbo.[User]
+                        SET     [User].[Picture] = ?,
+                                [User].[Picture_Type] = ?
+                                WHERE   [User].[ID] = ?;
+                         ";
+         $parameters= array(
+                    $picture,
+                       $picture_type,
+                       $User[ 'ID' ]
+                    );
+
+                $fResult = \singleton\database::getInstance( )->query(
+                  'Portal',
+                  $sQueryRow ,
+                  $parameters
+                ) or die(print_r(sqlsrv_errors()));
                 }
 
 	            header( 'Location: user.php?ID=' . $User[ 'ID' ] );
 	            exit;
 	        } else {
-	               
-                   $sQueryRow = "UPDATE  [User] 
-                        SET     [User].[Email] = ?, 
-                                [User].[Branch] = ?,    
-                                [User].[Branch_Type] = ?,   
-                          [User].[Branch_ID] = ?    
-                                WHERE   [User].[ID] = ?;    
-                         "; 
-         $parameters= array(    
-                          $User[ 'Email' ], 
-                       $User[ 'Branch' ],   
-                      $User[ 'Branch_Type' ],   
-                      $User[ 'Branch_ID' ], 
-                      $ID   
-                    );  
-            
-                $fResult = \singleton\database::getInstance( )->query(  
-                  'Portal',     
-                  $sQueryRow ,  
-                  $parameters   
-                ) or die(print_r(sqlsrv_errors())); 
 
-                
-           
+                   $sQueryRow = "UPDATE  [User]
+                        SET     [User].[Email] = ?,
+                                [User].[Branch] = ?,
+                                [User].[Branch_Type] = ?,
+                          [User].[Branch_ID] = ?
+                                WHERE   [User].[ID] = ?;
+                         ";
+         $parameters= array(
+                          $User[ 'Email' ],
+                       $User[ 'Branch' ],
+                      $User[ 'Branch_Type' ],
+                      $User[ 'Branch_ID' ],
+                      $ID
+                    );
+
+                $fResult = \singleton\database::getInstance( )->query(
+                  'Portal',
+                  $sQueryRow ,
+                  $parameters
+                ) or die(print_r(sqlsrv_errors()));
+
+
+
 	        }
 	    }
 ?><!DOCTYPE html>
@@ -328,11 +328,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>ID:</div>
                             <div class='col-8'><input type='text' name='Branch_ID' class='form-control edit' placeholder='ID' value='<?php echo $User[ 'Branch_ID' ];?>' /></div>
                         </div>
-                                                 <div class='row'>  
-                              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Image:</div>  
-                              <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php   
-                                print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture']; 
-                              ?>" /><?php }?><input type='file' name='Picture' class='form-control edit' /></div><?php ?>   
+                                                 <div class='row'>
+                              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Image:</div>
+                              <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php
+                                print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];
+                              ?>" /><?php }?><input type='file' name='Picture' class='form-control edit' /></div><?php ?>
                             </div>
                     </div>
                     <div class='card-footer'>
@@ -352,29 +352,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class="card-heading">
                 <div class="row g-0 px-3 py-2">
                   <div class="col-10"><h5><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i><span>Privileges</span></h5></div>
-                  <div class="col-2">&nbsp;</div>
+
+                  <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='privileges.php?UserID=<?php echo $User[ 'ID' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
                 </div>
               </div>
+              <?php if ($User[ 'ID' ]>0) { ?>
               <div class="card-body bg-dark">
                 <div class="row">
                   <div class="col-4"><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i> Permissions:</div>
                   <div class="col-8"><select name="User_Privilege[]" class="form-control"  multiple="mutilple">
-                                    
-                    <option value="8" <?php if(in_array(8,$priv)){echo 'style="background-color: #da8d7096;" selected' ;} ?>>Read</option>
-                    <option value="4" <?php if(in_array(4,$priv)){echo 'style="background-color: #da8d7096;" selected';} ?>>Write</option>
-                     <option value="1" <?php if(in_array(1,$priv)){echo ' style="background-color: #da8d7096;" selected';} ?>>Execute</option>
-                      <option value="2" <?php if(in_array(2,$priv)){echo ' style="background-color: #da8d7096;" selected';} ?>>Delete</option>
+
+                <?php if(in_array(8,$priv)){ echo '<option value="8" >Read</option>'; }?>
+                 <?php if(in_array(4,$priv)){echo '<option value="4"  >Write</option>';} ?>
+                  <?php if(in_array(1,$priv)){echo '<option value="1"  >Execute</option>';} ?>
+                    <?php if(in_array(2,$priv)){echo '<option value="2"  >Delete</option>';} ?>
                                     </select></div>
 
                   </div>
-             
+
               </div>
-              <div class="card-footer">
-                  <div class="row">
-                      <div class="col-12"><button class="form-control" type="submit">Save</button></div>
-                  </div>
-              </div>
-            </form>
+             <?php } ?>
+
             </div>
 
                       </div>

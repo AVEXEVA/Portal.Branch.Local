@@ -334,20 +334,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Lead['Name'];?>' /></div>
                 </div>
                 <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Contact:</div>
                   <div class='col-6'>
                     <input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Lead[ 'Customer_Name' ];?>' />
                     <script>
                       $( 'input[name="Customer"]' )
                           .typeahead({
-                              minLength : 4,
+                              minLength : 3,
                               hint: true,
                               highlight: true,
                               limit : 5,
                               display : 'FieldValue',
                               source: function( query, result ){
                                   $.ajax({
-                                      url : 'bin/php/get/search/Locations.php',
+                                      url : 'bin/php/get/search/Customers.php',
                                       method : 'GET',
                                       data    : {
                                           search :  $('input:visible[name="Customer"]').val( )

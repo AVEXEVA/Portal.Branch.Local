@@ -121,7 +121,7 @@ $result = \singleton\database::getInstance( )->query(
                                        Rol.Name
                                FROM    Owner
                                        LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                           ) AS Customer ON Unit.Owner = Customer.ID  
+                           ) AS Customer ON Unit.Owner = Customer.ID
             WHERE      Unit.ID = ?
                     OR Unit.City_ID = ?;",
             array(
@@ -257,7 +257,7 @@ if( isset( $_POST ) && count( $_POST ) > 0 ){
         \singleton\database::getInstance( )->query(
             null,
             "	UPDATE 	Unit
-	        			SET 	
+	        			SET
 	        					Unit.fDesc  = ?,
         					Unit.Remarks = ?,
         					Unit.Building_ID = ?,
@@ -382,27 +382,27 @@ if( $owners ) {
                 </div>
                 <div class="card-body bg-dark text-white">
                     <div class="card-columns">
-                        <div class='card card-primary my-3'>
-                            <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
-                                <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
+
+                            <div class='card card-primary my-3'>
+                                <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
                                 <div class='card-heading'>
                                     <div class='row g-0 px-3 py-2'>
                                         <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5>
                                         </div>
-                                        
+                                        <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
                                     </div>
                                 </div>
                                 <div class='card-body bg-dark text-white'>
-                                    <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
                                             <div class='row g-0'>
-                                                <div class='col-4 my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Description:</div>
-                                                <div class='col-8'>
+                                                <div class='col-4 my-auto'> Description <label>*</label>:</div>
+                                                <div class='col-xs-8'>
                                                     <textarea class="form-control" name="fDesc" required><?php echo $Unit['Description'];  ?></textarea>
                                                 </div>
                                             </div>
+
                                             <div class='row g-0'>
-                                                <div class='col-4 my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> City ID:</div>
-                                                <div class='col-8'>
+                                                <div class='col-4 my-auto'> City<label>*</label>:</div>
+                                                <div class='col-xs-8'>
                                                     <select class="form-control" name="City_ID" required>
                                                         <option value="">Select</option>
                                                         <option <?php echo $Unit[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>

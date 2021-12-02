@@ -447,12 +447,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Work</div>
         </div>
       </div>
+
       <div class='link-page text-white col-xl-1 col-3'>
-            <div class='p-1 border'>
-                <div class='nav-icon'><i class="fa fa-file fa-3x fa-fw" aria-hidden="true"></i></div>
-                <div class ='nav-text'>Reports</div>
-            </div>
-        </div>
+          <div class='p-1 border'>
+              <div class='nav-icon'><i class="fa fa-file fa-3x fa-fw" aria-hidden="true"></i></div>
+              <div class ='nav-text'>Reports</div>
+          </div>
+      </div>
       <?php if( check( privilege_read, level_group, $Privileges[ 'Division' ] ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='divisions.php'">
         <div class='p-1 border'>
