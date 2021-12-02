@@ -377,7 +377,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
 									<div class='<?php echo $Contact[ 'ID' ] == '' ? 'col-8' : 'col-6';?>'></div>
                                     <?php if($Contact[ 'ID' ] != ''){ ?>
-                                    <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?contact=<?php echo $Contact[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                                    <div class='col-2'><a href="http://maps.google.com/?q=<?php echo $Contact['Street'].' '.$Contact['City'].' '.$Contact[ 'State' ].' '.$Contact[ 'Zip' ];  ?>"><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
 								    <?php  } ?>
                                 </div>
 								<div class='row g-0'>
