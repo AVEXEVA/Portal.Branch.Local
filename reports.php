@@ -18,7 +18,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
 		null,
 		" SELECT  Emp.fFirst  AS First_Name,
 		          Emp.Last    AS Last_Name,
