@@ -95,10 +95,22 @@ $(document).ready(function( ){
                 }
         },
         columns: [
-            {
+          {
                 className : 'ID',
-                data : 'ID'
-              },{
+                data : 'ID',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='contract.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Contract #" + row.ID + "</a></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
+            },{
                 data : 'Name',
                 render : function( data, type, row, meta ){
                     switch( type ){

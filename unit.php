@@ -382,34 +382,27 @@ if( $owners ) {
                 </div>
                 <div class="card-body bg-dark text-white">
                     <div class="card-columns">
-
-                            <div class='card card-primary my-3'>
-                                <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
+                        <div class='card card-primary my-3'>
+                            <form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
+                                <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
                                 <div class='card-heading'>
                                     <div class='row g-0 px-3 py-2'>
                                         <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5>
                                         </div>
-                                        <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
-
+                                        
                                     </div>
                                 </div>
-
                                 <div class='card-body bg-dark text-white'>
-                                    <!--                    <input type='hidden' name='ID' value='--><?php //echo $Unit[ 'ID' ];?><!--' />-->
-
-
-
-
+                                    <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
                                             <div class='row g-0'>
-                                                <div class='col-4 my-auto'> Description <label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-4 my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Description:</div>
+                                                <div class='col-8'>
                                                     <textarea class="form-control" name="fDesc" required><?php echo $Unit['Description'];  ?></textarea>
                                                 </div>
                                             </div>
-
                                             <div class='row g-0'>
-                                                <div class='col-4 my-auto'> City<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-4 my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> City ID:</div>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="City_ID" required>
                                                         <option value="">Select</option>
                                                         <option <?php echo $Unit[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
@@ -469,7 +462,7 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Type<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Type" required>
                                                         <option value="">Select</option>
                                                         <option value='General' <?php echo $Unit[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
@@ -486,28 +479,28 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Manufacturer<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Manuf" value="<?php echo $Unit['Manufacturer'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Installer<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="InstallBy" value="<?php echo $Unit['Installer'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Maintained<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Last" value="<?php echo $Unit['Maintained'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Customer<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Owner" required><option value="">Select</option>
                                                         <?php  foreach($finalOwner as $finalOwners){ ?>
                                                             <option value="<?php echo $finalOwners['ID'];  ?>" <?php if($Unit['Customer'] == $finalOwners['ID']){ echo "selected"; }  ?>><?php echo $finalOwners['Name'];  ?></option>
@@ -519,14 +512,14 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Serial<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Serial" value="<?php echo $Unit['Serial'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Status<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Status" required><option value="">Select</option>
 
                                                         <option value='0' <?php echo $Unit[ 'Status' ] == 0 ? 'selected' : '';?>>Active</option>
@@ -539,7 +532,7 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Unit<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
 
                                                     <select class="form-control" name="Building_ID" ><option value="">Select</option>
                                                         <option value="Elevator" <?php echo $Unit[ 'Units' ] == 'Elevator' ? 'selected' : null;?>>Elevator</option>
@@ -549,7 +542,7 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> TFMID:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="TFMID" value="<?php echo $Unit['TFMID'];  ?>">
 
                                                 </div>
@@ -558,13 +551,13 @@ if( $owners ) {
 
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Note<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <textarea class="form-control" name="Remarks" required><?php echo $Unit['Note'];  ?></textarea>
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Location<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Loc" required >
                                                         <option value="">Select</option>
                                                         <?php  foreach($finalLoc as $locationList){ ?>
@@ -576,7 +569,7 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Unit Category<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Cat" required><option value="">Select</option>
                                                         <option value="Consultant" <?php echo $Unit[ 'Category' ] == 'Consultant' ? 'selected' : '';?>>Consultant</option>
                                                         <option value="Other" <?php echo $Unit[ 'Category' ] == 'Other' ? 'selected' : '';?>>Other</option>
@@ -589,7 +582,7 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Building<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Location_Category" required><option value="">Select</option>
                                                         <option value="Government" <?php echo $Unit[ 'Building' ] == 'Government' ? 'selected' : '';?>>Government</option>
                                                         <option value="Hospital" <?php echo $Unit[ 'Building' ] == 'Hospital' ? 'selected' : '';?>>Hospital</option>
@@ -630,35 +623,35 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Installation<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Install" value="<?php echo $Unit['Installation'];  ?>" required >
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Created<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Since" value="<?php echo $Unit['Created'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Price<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Price"  value="<?php echo $Unit['Price'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Bank<label>*</label>:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="Bank" value="<?php echo $Unit['Bank'];  ?>" required>
 
                                                 </div>
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> Template:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <select class="form-control" name="Template"><option value="">Select</option>
                                                     </select>
 
@@ -666,7 +659,7 @@ if( $owners ) {
                                             </div>
                                             <div class='row g-0'>
                                                 <div class='col-4 my-auto'> TFMSource:</div>
-                                                <div class='col-xs-8'>
+                                                <div class='col-8'>
                                                     <input type="text" class="form-control" name="TFMSource" value="<?php echo $Unit['TFMSource'];  ?>">
 
                                                 </div>

@@ -109,7 +109,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         [Lead].Labor  		   AS Labor,
                         [Lead].Profit        AS Profit,
                         [Lead].Ratio         AS Ratio,
-                        [Lead].Remarks  	   AS Remarks,
+                        [Lead].Remarks  	   AS Notes,
                         [Lead].Latt          AS Latitude,
                         [Lead].fLong         AS Longitude,
                         [Lead].GeoLock       AS GeoLock,
@@ -146,7 +146,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Labor' => null,
         	'Profit' => null,
         	'Ratio' => null,
-        	'Remarks' => null,
+        	'Notes' => null,
         	'Latitude' => null,
         	'Longitude' => null,
         	'GeoLock' => null,
@@ -173,7 +173,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Lead[ 'Labor' ] 	= isset( $_POST[ 'Labor' ] ) 		? $_POST[ 'Labor' ] 			: $Lead[ 'Labor' ];
         	$Lead[ 'Profit' ] 	= isset( $_POST[ 'Profit' ] ) 		? $_POST[ 'Profit' ] 		: $Lead[ 'Profit' ];
         	$Lead[ 'Ratio' ] 	= isset( $_POST[ 'Ratio' ] ) 		? $_POST[ 'Ratio' ] 		: $Lead[ 'Ratio' ];
-        	$Lead[ 'Remarks' ] 	= isset( $_POST[ 'Remarks' ] ) 		? $_POST[ 'Remarks' ] 			: $Lead[ 'Remarks' ];
+        	$Lead[ 'Notes' ] 	= isset( $_POST[ 'Notes' ] ) 		? $_POST[ 'Notes' ] 			: $Lead[ 'Notes' ];
         	$Lead[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] ) 		? $_POST[ 'Latitude' ] 		: $Lead[ 'Latitude' ];
         	$Lead[ 'Longitude' ] 		= isset( $_POST[ 'Longitude' ] ) 			? $_POST[ 'Longitude' ] 			: $Lead[ 'Longitude' ];
         	$Lead[ 'GeoLock'] 	= isset( $_POST[ 'GeoLock' ] )		? $_POST[ 'GeoLock' ]  	: $Lead[ 'GeoLock' ];
@@ -207,7 +207,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    			$Lead[ 'Labor' ],
                 $Lead[ 'Profit' ],
                 $Lead[ 'Ratio' ],
-                $Lead[ 'Remarks' ],
+                $Lead[ 'Notes' ],
                 $Lead[ 'Latitude' ],
                 $Lead[ 'Longitude' ],
                 $Lead[ 'Country' ],
@@ -273,7 +273,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $Lead[ 'Labor' ],
                 $Lead[ 'Profit' ],
                 $Lead[ 'Ratio' ],
-                $Lead[ 'Remarks' ],
+                $Lead[ 'Notes' ],
                 $Lead[ 'Latitude' ],
                 $Lead[ 'Longitude' ],
                 !empty( $Lead[ 'GeoLock' ] ) ? $Lead[ 'GeoLock' ] : 0,
@@ -371,116 +371,135 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       );
                     </script>
                   </div>
-                  <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Type:</div>
-                    <div class='col-8'><select name='Type' class='form-control edit'>
-                      <option value=''>Select</option>
-                      <option value='General' <?php echo $Lead[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
-                      <option value='Bank' <?php echo $Lead[ 'Type' ] == 'Bank' ? 'selected' : null;?>>Bank</option>
-                      <option value='Churches' <?php echo $Lead[ 'Type' ] == 'Churches' ? 'selected' : null;?>>Churches</option>
-                      <option value='Commercial' <?php echo $Lead[ 'Type' ] == 'Commercial' ? 'selected' : null;?>>Commercial</option>
-                      <option value='Hospitals' <?php echo $Lead[ 'Type' ] == 'Hospitals' ? 'selected' : null;?>>General</option>
-                      <option value='Property Manage' <?php echo $Lead[ 'Type' ] == 'Property Manage' ? 'selected' : null;?>>Property Manage</option>
-                      <option value='Restaraunts' <?php echo $Lead[ 'Type' ] == 'General' ? 'selected' : null;?>>Restaraunts</option>
-                      <option value='Schools' <?php echo $Lead[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
-                    </select></div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
-                    <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Street' value='<?php echo $Lead['Street'];?>' /></div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
-                    <div class='col-8'><input type='text' class='form-control edit animation-focus' name='City' value='<?php echo $Lead['City'];?>' /></div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
-                    <div class='col-8'><select name='Status' class='form-control edit' name='Status' value='<?php echo $Lead['City'];?>' /></div>
-                      <option value=''>Select</option>
-                      <option value='0' <?php echo $Lead[ 'Status' ] == 0 ? 'selected' : null;?>>Open</option>
-                      <option value='1' <?php echo $Lead[ 'Status' ] == 1 ? 'selected' : null;?>>Canceled</option>
-                      <option value='2' <?php echo $Lead[ 'Status' ] == 2 ? 'selected' : null;?>>Withdrawn</option>
-                      <option value='3' <?php echo $Lead[ 'Status' ] == 3 ? 'selected' : null;?>>Disqualified</option>
-                      <option value='4' <?php echo $Lead[ 'Status' ] == 4 ? 'selected' : null;?>>Award Successful</option>
-                      <option value='5' <?php echo $Lead[ 'Status' ] == 5 ? 'selected' : null;?>>Award Competitor</option>
-                    </select></div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='col-1'>&nbsp;</div>
-                    <div class='col-3 border-bottom border-white my-auto'>State:</div>
-                    <div class='col-8'><select class='form-control edit' name='State'>
-                      <option <?php echo $Lead[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
-                      <option <?php echo $Lead[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
-                      <option <?php echo $Lead[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
-                      <option <?php echo $Lead[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
-                      <option <?php echo $Lead[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
-                      <option <?php echo $Lead[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
-                      <option <?php echo $Lead[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
-                      <option <?php echo $Lead[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
-                      <option <?php echo $Lead[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
-                      <option <?php echo $Lead[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
-                      <option <?php echo $Lead[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
-                      <option <?php echo $Lead[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
-                      <option <?php echo $Lead[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
-                      <option <?php echo $Lead[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
-                      <option <?php echo $Lead[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
-                      <option <?php echo $Lead[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
-                      <option <?php echo $Lead[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
-                      <option <?php echo $Lead[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
-                      <option <?php echo $Lead[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
-                      <option <?php echo $Lead[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
-                      <option <?php echo $Lead[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
-                      <option <?php echo $Lead[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
-                      <option <?php echo $Lead[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
-                      <option <?php echo $Lead[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
-                      <option <?php echo $Lead[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
-                      <option <?php echo $Lead[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
-                      <option <?php echo $Lead[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
-                      <option <?php echo $Lead[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
-                      <option <?php echo $Lead[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
-                      <option <?php echo $Lead[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
-                      <option <?php echo $Lead[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
-                      <option <?php echo $Lead[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
-                      <option <?php echo $Lead[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
-                      <option <?php echo $Lead[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
-                      <option <?php echo $Lead[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
-                      <option <?php echo $Lead[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
-                      <option <?php echo $Lead[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
-                      <option <?php echo $Lead[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
-                      <option <?php echo $Lead[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
-                    </select></div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
-                    <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Zip' value='<?php echo $Lead['Zip'];?>' /></div>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Lead[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='customers.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='customer.php?ID=" . $Lead[ 'Customer_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                <div class='card-footer'>
-                    <div class='row'>
-                        <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                    </div>
-                  </div>
+                  <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='customer.php?ID=<?php echo $Location[ 'Customer_ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Type:</div>
+                  <div class='col-8'><select name='Type' class='form-control edit'>
+                    <option value=''>Select</option>
+                    <option value='General' <?php echo $Lead[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
+                    <option value='Bank' <?php echo $Lead[ 'Type' ] == 'Bank' ? 'selected' : null;?>>Bank</option>
+                    <option value='Churches' <?php echo $Lead[ 'Type' ] == 'Churches' ? 'selected' : null;?>>Churches</option>
+                    <option value='Commercial' <?php echo $Lead[ 'Type' ] == 'Commercial' ? 'selected' : null;?>>Commercial</option>
+                    <option value='Hospitals' <?php echo $Lead[ 'Type' ] == 'Hospitals' ? 'selected' : null;?>>General</option>
+                    <option value='Property Manage' <?php echo $Lead[ 'Type' ] == 'Property Manage' ? 'selected' : null;?>>Property Manage</option>
+                    <option value='Restaraunts' <?php echo $Lead[ 'Type' ] == 'General' ? 'selected' : null;?>>Restaraunts</option>
+                    <option value='Schools' <?php echo $Lead[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
+                  </select></div>
+                </div>
+                <div class='row g-0'>
+									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
+									<div class='col-6'></div>
+									<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Lead=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+								</div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Street' value='<?php echo $Lead['Street'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='City' value='<?php echo $Lead['City'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
+                  <div class='col-8'><select name='Status' class='form-control edit' name='Status' value='<?php echo $Lead['City'];?>' />
+                    <option value=''>Select</option>
+                    <option value='0' <?php echo $Lead[ 'Status' ] == 0 ? 'selected' : null;?>>Open</option>
+                    <option value='1' <?php echo $Lead[ 'Status' ] == 1 ? 'selected' : null;?>>Canceled</option>
+                    <option value='2' <?php echo $Lead[ 'Status' ] == 2 ? 'selected' : null;?>>Withdrawn</option>
+                    <option value='3' <?php echo $Lead[ 'Status' ] == 3 ? 'selected' : null;?>>Disqualified</option>
+                    <option value='4' <?php echo $Lead[ 'Status' ] == 4 ? 'selected' : null;?>>Award Successful</option>
+                    <option value='5' <?php echo $Lead[ 'Status' ] == 5 ? 'selected' : null;?>>Award Competitor</option>
+                  </select></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> State:</div>
+                  <div class='col-8'><select class='form-control edit' name='State'>
+                    <option <?php echo $Lead[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
+                    <option <?php echo $Lead[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
+                    <option <?php echo $Lead[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
+                    <option <?php echo $Lead[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
+                    <option <?php echo $Lead[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
+                    <option <?php echo $Lead[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
+                    <option <?php echo $Lead[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
+                    <option <?php echo $Lead[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
+                    <option <?php echo $Lead[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
+                    <option <?php echo $Lead[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
+                    <option <?php echo $Lead[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
+                    <option <?php echo $Lead[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
+                    <option <?php echo $Lead[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
+                    <option <?php echo $Lead[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
+                    <option <?php echo $Lead[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
+                    <option <?php echo $Lead[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
+                    <option <?php echo $Lead[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
+                    <option <?php echo $Lead[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
+                    <option <?php echo $Lead[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
+                    <option <?php echo $Lead[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
+                    <option <?php echo $Lead[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
+                    <option <?php echo $Lead[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
+                    <option <?php echo $Lead[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
+                    <option <?php echo $Lead[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
+                    <option <?php echo $Lead[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
+                    <option <?php echo $Lead[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
+                    <option <?php echo $Lead[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
+                    <option <?php echo $Lead[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
+                    <option <?php echo $Lead[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
+                    <option <?php echo $Lead[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
+                    <option <?php echo $Lead[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
+                    <option <?php echo $Lead[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
+                    <option <?php echo $Lead[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
+                    <option <?php echo $Lead[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
+                    <option <?php echo $Lead[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
+                    <option <?php echo $Lead[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
+                    <option <?php echo $Lead[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
+                    <option <?php echo $Lead[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
+                    <option <?php echo $Lead[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
+                  </select></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Lead['Zip'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Revenue:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Revenue' value='<?php echo $Lead['Revenue'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Cost:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Cost' value='<?php echo $Lead['Cost'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Labor:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Labor' value='<?php echo $Lead['Labor'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Profit:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Profit' value='<?php echo $Lead['Profit'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Note(1);?> Notes:</div>
+                  <div class='col-8'><textarea rows='8' type='text' class='form-control edit animation-focus' name='Notes'><?php echo $Lead['Notes'];?></textarea></div>
+                </div>
               </div>
-        			</div>
-        		</form></div>
+              <div class='card-footer'><button class='form-control' type='submit'>Save</button></div>
+            </form></div>
         	</div>
         </div>
       </div>

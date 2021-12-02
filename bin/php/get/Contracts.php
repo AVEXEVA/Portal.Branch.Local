@@ -207,6 +207,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Customer.Name       AS Customer_Name,
                             Loc.Loc             AS Location_ID,
                             Loc.Tag             AS Location_Name,
+                            Loc.Address         AS Location_Street,
+                            Loc.City            AS Location_City,
+                            Loc.State           AS Location_State,
+                            Loc.Zip             AS Location_Zip,
                             Job.fDesc           AS Job,
                             Contract.BStart     AS Start_Date,
                             Contract.BFinish    AS End_Date,
@@ -277,9 +281,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'options' => array( )
     );
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Start_Date' ]      = date( 'Y-m-d', strtotime( $Row[ 'Start_Date' ] ) );
-      $Row[ 'End_Date' ]        = date( 'Y-m-d', strtotime( $Row[ 'End_Date' ] ) );
-      $Row[ 'Escalation_Date' ] = date( 'Y-m-d', strtotime( $Row[ 'Escalation_Date' ] ) );
+      $Row[ 'Start_Date' ]      = date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
+      $Row[ 'End_Date' ]        = date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
+      $Row[ 'Escalation_Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
       //preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
       //$Row[ 'Link' ]            = $matches[ 0 ];

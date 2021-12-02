@@ -83,6 +83,51 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'division.php'
         )
       );
+
+      $result = \singleton\database::getInstance( )->query(
+    		null,
+    		" SELECT  Zone.ID         AS ID,
+                  Zone.Name       AS Name,
+                  Zone.Bonus      AS Bonus,
+                  Zone.Count      AS Count,
+                  Zone.Remarks    AS Remarks,
+                  Zone.fDesc      AS Description
+                  zone.TFMID      AS TFMID
+                  zone.TFMSource  AS TFMsource
+          FROM Zone
+                 LEFT JOIN Loc    ON Zone.ID = Loc.Zone
+                 LEFT JOIN Unit   ON
+          WHERE Zone.ID =?;",
+      array(
+        $ID,
+        $Name
+            )
+        );
+        $Division =   (  empty( $ID )
+                     &&  !empty( $Name )
+                     &&  !$result
+                )    || (empty( $ID )
+                     &&  empty( $Name )
+                )    ? array(
+
+    'ID' => null,
+    'Name' => null,
+    'Bonus' => null,
+    'Count' => null,
+    'Remarks' => null,
+    'Price1' => null,
+    'Price2' => null,
+    'Price3' => null,
+    'Price4' => null,
+    'Price5' => null,
+    'IDistance' => null,
+    'ODistance' => null,
+    'Color' => null,
+    'fDesc' => null,
+    'Tax' => null,
+      ) : sqlsrv_fetch_array($result);
+
+
       ?><!DOCTYPE html>
       <html lang="en">
       <head>

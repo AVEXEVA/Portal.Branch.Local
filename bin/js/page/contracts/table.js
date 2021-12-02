@@ -180,13 +180,18 @@ $( document ).ready( function() {
                   case 'display' :
                       return  row.Location_ID !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'>" + row.Location_Name + "</a></div>" +
+                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
+                                  "<div class='col-12'>" +
+                                      "<div class='row'>" +
+                                          "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
+                                          "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
+                                      "</div>" +
+                                  "</div>" +
                               "</div>"
                           :   null;
                   default :
                       return data;
               }
-
           }
       },{
         data 	: 'Job'

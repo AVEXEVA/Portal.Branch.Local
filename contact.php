@@ -1,5 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
+
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
@@ -68,6 +69,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	dechex( $Privilege[ 'Internet' ] )
         ) );
     }}
+
+    //function for get the next and previous button max and min value.
+    $unitPagination = \singleton\database::getInstance( )->query(
+        null,
+        "SELECT MIN(ID), MAX(ID)
+                    FROM      Rol
+                         AS Contact;",
+       []
+
+    );
+    $finalResult = sqlsrv_fetch_array($unitPagination);
+    $previous = 1;
+    $next = 2;
+
+    if($finalResult && isset( $_GET[ 'ID' ] )){
+        $previous = ($_GET[ 'ID' ]==1? 1  : $_GET[ 'ID' ]-1);
+        $next = $_GET[ 'ID' ]+1;
+    }
+    //end
+
     if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Contact' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Contact' ] )
@@ -166,6 +187,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Contact[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Contact[ 'Zip' ];
         $Contact[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Contact[ 'Latitude' ];
         $Contact[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Contact[ 'Longitude' ];
+          $date = date("Y-m-d H:i:s");
 
         if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
           $result = \singleton\database::getInstance( )->query(
@@ -186,9 +208,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Zip,
                 Latt,
                 fLong,
-                Geolock
+                Geolock,
+                Since,
+                Last
               )
-              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ? );
               SELECT @MAXID + 1;",
             array(
               $Contact[ 'Type' ],
@@ -203,7 +227,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Contact[ 'Zip' ],
               $Contact[ 'Latitude' ],
               $Contact[ 'Longitude' ],
-              !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0
+              !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0,
+                $date,$date,
             )
           );
           sqlsrv_next_result( $result );
@@ -226,7 +251,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Rol.Latt = ?,
                   Rol.fLong = ?,
                   Rol.Phone = ?,
-                  Rol.EMail = ?
+                  Rol.EMail = ?,
+                  Rol.Last = ?
+                  
 
               WHERE 	Rol.ID = ?;",
             array(
@@ -242,6 +269,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Contact[ 'Longitude' ],
               $Contact[ 'Phone' ],
               $Contact[ 'Email' ],
+              $date,
               $Contact[ 'ID' ]
             )
           );
@@ -274,9 +302,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				</div>
         				<div class='col-2'>
         					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contact.php?ID=<?php echo !is_null( $Contact[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true )[ array_search( $Contact[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contact.php?ID=<?php echo $previous;?>';">Previous</button></div>
         						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contacts.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] : array( ) );?>';">Table</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contact.php?ID=<?php echo !is_null( $Contact[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true )[ array_search( $Contact[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contact.php?ID=<?php echo $next; ?>';">Next</button></div>
         					</div>
         				</div>
         			</div>
@@ -298,13 +326,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Type:</div>
-									<div class='col-8'><select name='Type' class='form-control edit'>
+									<div class='<?php echo $Contact[ 'ID' ] == '' ? 'col-8' : 'col-6';?>'><select name='Type' class='form-control edit'>
 										<option value=''>Select</option>
 										<option value='0' <?php echo $Contact[ 'Type' ] == 0 ? 'selected' : null;?>>Customer</option>
 										<option value='4' <?php echo $Contact[ 'Type' ] == 4 ? 'selected' : null;?>>Location</option>
                     					<option value='5' <?php echo $Contact[ 'Type' ] == 5 ? 'selected' : null;?>>Employee</option>
 									</select></div>
-								</div>
+                                    <?php if($Contact[ 'ID' ] != ''){ ?>
+                                    <div class='col-2'>
+                                        <?php $customUrl = ($Contact[ 'Type' ]==0? "customer" : ($Contact[ 'Type' ]==4? "location":($Contact[ 'Type' ]==5? "employee" : ""))); ?>
+                                        <button class='h-100 w-100' type='button' onClick="document.location.href='<?php echo $customUrl; ?>.php?Rol=<?php echo $Contact[ 'ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button>
+                                    </div>
+                                    <?php } ?>
+
+                                </div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
 									<div class='col-8'><select name='Status' class='form-control edit <?php echo $Contact[ 'Status' ] == 1 ? 'bg-warning' : 'bg-success';?>'>
@@ -315,25 +350,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
-									<div class='col-8'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website'] : "&nbsp;";?>' /></div>
-								</div>
+									<div class='<?php echo $Contact[ 'ID' ] == '' ? 'col-8' : 'col-6';?>'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website'] : "&nbsp;";?>' /></div>
+                                    <?php if($Contact[ 'ID' ] != ''){ ?>
+                                    <div class='col-2'><a target="_blank" href='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website']: "";?>'><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
+                                    <?php  } ?>
+                                </div>
 				                <div class='row'>
 				                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Contact:</div>
 				                  <div class='col-8'><input type='text' class='form-control edit' name='Contact' value='<?php echo $Contact[ 'Contact' ];?>' /></div>
 				                </div>
 				                <div class='row'>
 				                  <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
-				                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Contact[ 'Phone' ];?>' /></div>
-				                </div>
+				                  <div class='<?php echo $Contact[ 'ID' ] == '' ? 'col-8' : 'col-6';?>'><input type='text' class='form-control edit <?php echo $Contact[ 'ID' ] != '' ? 'custom-width' : '';?>' name='Phone' value='<?php echo $Contact[ 'Phone' ];?>' /></div>
+                                    <?php if($Contact[ 'ID' ] != ''){ ?>
+                                    <div class='col-2'><a target="_blank" href='tel:<?php echo strlen($Contact['Phone']) > 0 ?  $Contact['Phone']: "";?>'><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
+				                    <?php  } ?>
+                                </div>
 				                <div class='row'>
 				                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-				                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Contact[ 'Email' ];?>' /></div>
-				                </div>
+				                  <div class='<?php echo $Contact[ 'ID' ] == '' ? 'col-8' : 'col-6';?>'><input type='text' class='form-control edit <?php echo $Contact[ 'ID' ] != '' ? 'custom-width' : '';?>' name='Email' value='<?php echo $Contact[ 'Email' ];?>' /></div>
+                                    <?php if($Contact[ 'ID' ] != ''){ ?>
+                                    <div class='col-2'><a target="_blank" href='mailto:<?php echo strlen($Contact['Email']) > 0 ?  $Contact['Email']: "";?>'><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
+                                    <?php } ?>
+                                </div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
-									<div class='col-6'></div>
-									<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?contact=<?php echo $Contact[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
+									<div class='<?php echo $Contact[ 'ID' ] == '' ? 'col-8' : 'col-6';?>'></div>
+                                    <?php if($Contact[ 'ID' ] != ''){ ?>
+                                    <div class='col-2'><a href="http://maps.google.com/?q=<?php echo $Contact['Street'].' '.$Contact['City'].' '.$Contact[ 'State' ].' '.$Contact[ 'Zip' ];  ?>"><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
+								    <?php  } ?>
+                                </div>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 									<div class='col-3 border-bottom border-white my-auto'>Street:</div>

@@ -47,23 +47,124 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $data = array();
         $result = \singleton\database::getInstance( )->query(
             null,
-          " SELECT
-                Job.ID            AS  ID,
-                Job.fDesc         AS  Name,
-                JobType.Type      AS  Type,
-                Job.fDate         AS  Finished_Date,
-                Job_Status.Status AS  Status,
-                Loc.Tag           AS  Location
-            FROM
-                Job
-                LEFT JOIN JobType    ON  Job.Type       = JobType.ID
-                LEFT JOIN Loc        ON  Job.Loc        = Loc.Loc
-                LEFT JOIN Job_Status ON  Job.Status + 1 = Job_Status.ID
-            WHERE
-                Job.Type 	= 9
-                OR Job.Type = 12
-        ;");
-        if($result){while($array = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){$data[] = $array;}}
-        print json_encode(array('data'=>$data));
-    }
-}?>
+          " SELECT *
+            FROM (
+                SELECT ROW_NUMBER() OVER ($Order) ($Direction) AS ROW_COUNT,
+                Zone.ID,
+                Zone.Name,
+                Locations.Count  AS Location,
+                Units.Count     AS Units,
+                Violation.Count AS Violation,
+                Tickets.Count   AS tickets
+            FROM (
+                 SELECT  Zone.ID
+                         Rol.Name,
+                 FROM    Zone
+                         LEFT JOIN
+           ) AS Zone
+            LEFT JOIN (
+              SELECT     Location.Zone AS Zone,
+                         COUNT( Location.Loc ) AS Count
+              FROM       Loc AS Location
+              GROUP BY   Location.Zone
+          ) AS Locations ON Locations.Zone = Zone.ID
+            LEFT JOIN (
+              SELECT     Loc.Zone AS Zone,
+                        COUNT ( Unit.ID ) AS Count
+              FROM       Elev AS Unit
+                         LEFT JOIN Loc ON Elev.Loc = Loc.Loc
+              GROUP BY   Loc.Zone
+          ) AS    Units ON Units.Zone = Zone.ID
+            LEFT JOIN (
+              SELECT     Loc.Zone      AS Zone,
+                         COUNT ( Violation.ID ) AS Count
+              FROM       Violation AS Violation
+                         LEFT JOIN Job ON Violation.Job = Job.ID
+                         LEFT JOIN Loc ON Loc.Loc = Job.Loc
+              GROUP BY   Loc.Zone
+          ) AS Violations ON Violations.Zone = Zone.ID
+            LEFT JOIN (
+              SELECT     Loc.Zone      AS Zone,
+                         COUNT ( Tickets.ID ) AS Count
+              FROM       Tickets AS Tickets
+                         LEFT JOIN Job ON Violation.Job = Job.ID
+                         LEFT JOIN Loc ON Loc.Loc = Job.Loc
+              GROUP BY   Loc.Zone
+          ) AS Tickets ON Tickets.Zone = Zone.ID
+      WHERE {$conditions}
+   ) AS Tbl
+   WHERE tbl.ROW_COUNT BETWEEN ? AND ?;";
+
+   $sQueryRow =
+     " SELECT Zone.ID
+       FROM (
+            SELECT  Zone.ID
+                    Rol.Name,
+            FROM    Zone
+                    LEFT JOIN
+      ) AS Zone
+       LEFT JOIN (
+         SELECT     Location.Zone AS Zone,
+                    COUNT( Location.Loc ) AS Count
+         FROM       Loc AS Location
+         GROUP BY   Location.Zone
+     ) AS Locations ON Locations.Zone = Zone.ID
+       LEFT JOIN (
+         SELECT     Loc.Zone AS Zone,
+                   COUNT ( Unit.ID ) AS Count
+         FROM       Elev AS Unit
+                    LEFT JOIN Loc ON Elev.Loc = Loc.Loc
+         GROUP BY   Loc.Zone
+     ) AS    Units ON Units.Zone = Zone.ID
+       LEFT JOIN (
+         SELECT     Loc.Zone      AS Zone,
+                    COUNT ( Violation.ID ) AS Count
+         FROM       Violation AS Violation
+                    LEFT JOIN Job ON Violation.Job = Job.ID
+                    LEFT JOIN Loc ON Loc.Loc = Job.Loc
+         GROUP BY   Loc.Zone
+     ) AS Violations ON Violations.Zone = Zone.ID
+       LEFT JOIN (
+         SELECT     Loc.Zone      AS Zone,
+                    COUNT ( Tickets.ID ) AS Count
+         FROM       Tickets AS Tickets
+                    LEFT JOIN Job ON Violation.Job = Job.ID
+                    LEFT JOIN Loc ON Loc.Loc = Job.Loc
+         GROUP BY   Loc.Zone
+     ) AS Tickets ON Tickets.Zone = Zone.ID
+ WHERE {$conditions};";
+
+ $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+
+
+ $iFilteredTotal = 0;
+ $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+ $_SESSION[ 'Tables' ][ 'Divisions' ] = isset( $_SESSION[ 'Tables' ][ 'Divisions' ]  ) ? $_SESSION[ 'Tables' ][ 'Divisions' ] : array( );
+ if( count( $_SESSION[ 'Tables' ][ 'Divisions' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Divisions' ] as &$Value ){ $Value = false; } }
+ $_SESSION[ 'Tables' ][ 'Divisions' ][ 0 ] = $_GET;
+ while( $Row = sqlsrv_fetch_array( $fResult ) ){
+     $_SESSION[ 'Tables' ][ 'Divisions' ][ $Row[ 'ID' ] ] = true;
+     $iFilteredTotal++;
+ }
+
+ $parameters = array( );
+ $sQuery = " SELECT  COUNT(Zone.ID)
+             FROM    Zone;";
+ $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+ $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+ $iTotal = $aResultTotal[0];
+
+ $output = array(
+     'sEcho'         =>  intval( $_GET[ 'draw' ] ),
+     'iTotalRecords'     =>  $iTotal,
+     'iTotalDisplayRecords'  =>  $iFilteredTotal,
+     'aaData'        =>  array()
+ );
+
+ while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+   $output['aaData'][]       = $Row;
+ }
+ echo json_encode( $output );
+}
+}
+?>

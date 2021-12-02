@@ -112,7 +112,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Status'];
       $conditions[] = "Job.Status LIKE '%' + ? + '%'";
     }
-    $conditions[] = "Job.Type <> 9";
 
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
@@ -200,7 +199,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-    //echo $sQuery;
+
     $rResult = \singleton\database::getInstance( )->query(
       null,
       $sQuery,
@@ -218,6 +217,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             LEFT JOIN Rol ON Rol.ID = Owner.Rol
                 ) AS Customer ON Job.Owner = Customer.ID
                 LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
+                LEFT JOIN (
+                  SELECT    TicketD.Job,
+                            Count( TicketD.ID ) AS Count
+                  FROM      TicketD
+                  GROUP BY  TicketD.Job
+                ) AS Job_Tickets ON Job_Tickets.Job = Job.ID
+                LEFT JOIN (
+                  SELECT    Invoice.Job,
+                            Count( Invoice.Ref ) AS Count
+                  FROM      Invoice
+                  GROUP BY  Invoice.Job
+                ) AS Job_Invoices ON Job_Invoices.Job = Job.ID
         WHERE   ({$conditions}) AND ({$search})";
 
     $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
@@ -238,7 +249,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
-      $output['aaData'][]   = $Row;
+      $output['aaData'][] = $Row;
     }
     echo json_encode( $output );
   }

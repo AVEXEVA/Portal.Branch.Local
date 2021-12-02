@@ -107,15 +107,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     						<div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></div>
             </div>
               <div class='row'>
-              <div class='col-4'>Customer</div>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</div>
               <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
             </div>
             <div class='row'>
-              <div class='col-4'>Location</div>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</div>
               <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' vlaue='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></div>
             </div>
             <div class='row'>
-              <div class='col-4'>Job</div>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job();?>Job</div>
               <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></div>
             </div>
             <div class='row'>

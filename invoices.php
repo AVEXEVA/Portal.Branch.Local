@@ -162,7 +162,39 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         </tr>
                         <tr class='form-desktop'>
                           <th><input class='redraw form-control' type='text' name='Invoice #' placeholder='Invoice #' value='<?php echo isset( $_GET[ 'Invoice #' ] ) ? $_GET[ 'Invoice #' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
+                          <th class='text-white border border-white' title='Customer'><div><input type='text' autocomplete='off' class='redraw form-control' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
+                          <script>
+                            $( 'input:visible[name="Customer"]' )
+                                .typeahead({
+                                    minLength : 4,
+                                    hint: true,
+                                    highlight: true,
+                                    limit : 5,
+                                    display : 'FieldValue',
+                                    source: function( query, result ){
+                                        $.ajax({
+                                            url : 'bin/php/get/search/Customers.php',
+                                            method : 'GET',
+                                            data    : {
+                                                search :  $('input:visible[name="Customer"]').val( )
+                                            },
+                                            dataType : 'json',
+                                            beforeSend : function( ){
+                                                abort( );
+                                            },
+                                            success : function( data ){
+                                                result( $.map( data, function( item ){
+                                                    return item.FieldValue;
+                                                } ) );
+                                            }
+                                        });
+                                    },
+                                    afterSelect: function( value ){
+                                        $( 'input:visible[name="Customer"]').val( value );
+                                    }
+                                }
+                            );
+                          </script></th>
                           <th><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                           <th><input class='redraw form-control' type='text' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
                           <th><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>

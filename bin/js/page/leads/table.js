@@ -60,7 +60,7 @@ var Table_Leads = $('#Table_Leads').DataTable( {
                   case 'display' :
                       return  row.ID !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
+                                  "<div class='col-12'><a href='lead.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Lead #" + row.ID + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -74,13 +74,15 @@ var Table_Leads = $('#Table_Leads').DataTable( {
                   case 'display' :
                       return  row.ID !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                  "<div class='col-12'><a href='lead.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
                       return data;
               }
           }
+      },{
+      data : 'Type'
       },{
       data : 'Customer_ID',
       render : function( data, type, row, meta ){
@@ -94,10 +96,7 @@ var Table_Leads = $('#Table_Leads').DataTable( {
               default :
                   return data;
           }
-
       }
-  },{
-    data    :  'Type'
   },{
       data : 'Street',
       render : function( data, type, row, meta ){
@@ -115,7 +114,27 @@ var Table_Leads = $('#Table_Leads').DataTable( {
                   return data;
           }
       }
-  }
+ },{
+   data : 'Contact_ID',
+   render : function( data, type, row, meta ){
+       switch( type ){
+           case 'display' :
+               return  row.Customer_ID !== null
+                   ?   "<div class='row'>" +
+                           "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Contact_Name + "</a></div>" +
+                       "</div>"
+                   :   null;
+           default :
+               return data;
+       }
+   }
+ },{
+   data : 'Probability'
+ },{
+   data : 'Level'
+ },{
+   data : 'Status'
+ }
   ],
   initComplete : function( ){
       $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'

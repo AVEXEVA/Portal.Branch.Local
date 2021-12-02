@@ -80,8 +80,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'index.php'
       )
     );
-	$userId= $_SESSION[ 'Connection' ][ 'User' ];
- $query="SELECT Picture, Picture_Type AS Type FROM [User] WHERE ID = ?;";
+    $userId= $_SESSION[ 'Connection' ][ 'User' ];
+ $query="SELECT Picture, Picture_Type AS Type,email FROM [User] WHERE ID = ?;";
     $image_result = $database->query(
       'Portal',
       $query,
@@ -89,7 +89,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $userId
       )
     );
-	//print_r($image_result); die();
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
@@ -110,11 +109,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           if( $image_result ){
             $row = sqlsrv_fetch_array( $image_result );
             if( is_null( $row[ 'Picture' ] ) ){
-              ?><div class='offset-3 col-6' id="image"><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php
+              ?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /><div class="text-white"><?php echo $row['email'];  ?></div></button></div><?php
             } else {
-              ?><div class='offset-3 col-6' id="image"><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;' /></button></div><?php
+              ?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;' /><div class="text-white"><?php echo $row['email'];  ?></div></button></div><?php
             }
-          } else {?><div class='offset-3 col-6' id="image"><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button></div><?php }?>
+          } else {?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button><div class="text-white"><?php echo $row['email'];  ?></div></div><?php }?>
         <div class='col-3'><button class='slim text-center text-white' onClick="document.location.href='settings.php';" style='text-align:right;'><i class="fas fa-user-cog fa-2x"></i></button></div>
       </div>
       <div style='height:5px;'>&nbsp;</div>
@@ -322,12 +321,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Payroll</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Code' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='batch_process_deficiencies2.php'">
-        <div class='p-1 border'>
-          <div class='nav-icon'><i class="fa fa-clipboard fa-3x fa-fw" aria-hidden="true"></i></div>
-          <div class ='nav-text'>Processing</div>
-        </div>
-      </div><?php }?>
+
       <div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='users.php?ID=<?php echo $_SESSION[ 'Connection' ][ 'User' ];?>';">
           <div class='p-1 border'>
             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
@@ -416,13 +410,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Tests</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Testing' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='testing.php'">
-        <div class='p-1 border'>
-          <div class='nav-icon'><i class="fa fa-clipboard fa-3x fa-fw" aria-hidden="true"></i></div>
-          <div class ='nav-text'>Testing</div>
-        </div>
-      </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Time' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='timesheet.php'">
+
+      <?php if( check( privilege_read, level_group, $Privileges[ 'Time' ] ) && $_SESSION[ 'Connection' ][ 'Branch_Type' ] == 'User'  ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='Tickets.php?Person=<?php echo $User[ 'Name' ];  ?>'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Timesheet(3);?></div>
           <div class ='nav-text'>Timesheet</div>
@@ -458,12 +447,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Work</div>
         </div>
       </div>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Admin' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='interface.php'">
-        <div class='p-1 border'>
-          <div class='nav-icon'><i class="fa fa-user-secret fa-3x fa-fw" aria-hidden="true"></i></div>
-          <div class ='nav-text'>Beta</div>
+      <div class='link-page text-white col-xl-1 col-3'>
+            <div class='p-1 border'>
+                <div class='nav-icon'><i class="fa fa-file fa-3x fa-fw" aria-hidden="true"></i></div>
+                <div class ='nav-text'>Reports</div>
+            </div>
         </div>
-      </div><?php }?>
+      <?php if( check( privilege_read, level_group, $Privileges[ 'Division' ] ) ){
+        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='divisions.php'">
+        <div class='p-1 border'>
+          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Web(3);?></div>
+          <div class ='nav-text'>Division</div>
+        </div>
+      </div><?php } ?>
       <?php if( check( privilege_read, level_group, $Privileges[ 'Legacy' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='../portal2/'">
         <div class='p-1 border'>
           <div class='nav-icon'><i class="fa fa-user-secret fa-3x fa-fw" aria-hidden="true"></i></div>

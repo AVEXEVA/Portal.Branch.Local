@@ -105,15 +105,55 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						<thead><tr>
               <th class='text-white border border-white' title='ID'>ID</th>
               <th class='text-white border border-white' title='Name'>Name</th>
-              <th class='text-white border border-white' title='Customer'>Status</th>
               <th class='text-white border border-white' title='Type'>Type</th>
-              <th class='text-white border border-white' title='Street'>Address</th>
-            </tr><tr>
+              <th class='text-white border border-white' title='Customer'>Customer</th>
+              <th class='text-white border border-white' title='Address'>Address</th>
+              <th class='text-white border border-white' title='Contact'>Contact</th>
+              <th class='text-white border border-white' title='Probability'>Probability</th>
+              <th class='text-white border border-white' title='Level'>Level</th>
+              <th class='text-white border border-white' title='Status'>Status</th>
+            </tr><tr class='desktop'>
               <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-              <th class='text-white border border-white' title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Type'><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
-              <th class='text-white border border-white' title='Street'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Customer'><div><input type='text' autocomplete='off' class='redraw form-control' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
+              <script>
+                $( 'input:visible[name="Customer"]' )
+                    .typeahead({
+                        minLength : 4,
+                        hint: true,
+                        highlight: true,
+                        limit : 5,
+                        display : 'FieldValue',
+                        source: function( query, result ){
+                            $.ajax({
+                                url : 'bin/php/get/search/Customers.php',
+                                method : 'GET',
+                                data    : {
+                                    search :  $('input:visible[name="Customer"]').val( )
+                                },
+                                dataType : 'json',
+                                beforeSend : function( ){
+                                    abort( );
+                                },
+                                success : function( data ){
+                                    result( $.map( data, function( item ){
+                                        return item.FieldValue;
+                                    } ) );
+                                }
+                            });
+                        },
+                        afterSelect: function( value ){
+                            $( 'input:visible[name="Customer"]').val( value );
+                        }
+                    }
+                );
+              </script></th>
+              <th class='text-white border border-white' title='Address'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Contact'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Probability'><input class='redraw form-control' type='text' name='Probability' placeholder='Probability' value='<?php echo isset( $_GET[ 'Probability' ] ) ? $_GET[ 'Probability' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Level'><input class='redraw form-control' type='text' name='Level' placeholder='Level' value='<?php echo isset( $_GET[ 'Level' ] ) ? $_GET[ 'Level' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
             </tr></thead>
 					</table>
 				</div>
@@ -124,4 +164,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </html>
 <?php
   }
-} else {?><html><head><script>document.location.href='../login.php?Forward=customers.php';</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href='../login.php?Forward=leads.php';</script></head></html><?php }?>

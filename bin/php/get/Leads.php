@@ -139,15 +139,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		            FROM 	(
 			                 	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 			            	            Lead.ID           AS ID,
-								        Lead.fDesc        AS Name,
-								        Customer.ID       AS Customer_ID,
-								        Customer.Name 	  AS Customer_Name,
-                        Lead.Status 		  AS Status,
-								        Lead.Type 		    AS Type,
-								        Lead.Address      AS Street,
-								        Lead.City         AS City,
-								        Lead.State        AS State,
-								        Lead.Zip          AS Zip
+        								        Lead.fDesc        AS Name,
+                                Rolodex.ID        AS Contact_ID,
+                                Rolodex.Contact   AS Contact_Name,
+        								        Customer.ID       AS Customer_ID,
+        								        Customer.Name 	  AS Customer_Name,
+                                Lead.Probability  AS Probability,
+                                Lead.Level        AS Level,
+                                Lead.Status 		  AS Status,
+        								        Lead.Type 		    AS Type,
+        								        Lead.Address      AS Street,
+        								        Lead.City         AS City,
+        								        Lead.State        AS State,
+        								        Lead.Zip          AS Zip
 			                  	FROM    Lead
 			                  			LEFT JOIN (
 					                        SELECT  Owner.ID,
@@ -156,6 +160,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					                        FROM    Owner
 					                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
 					                    ) AS Customer ON Lead.Owner = Customer.ID
+                              LEFT JOIN Rol AS Rolodex ON Lead.Rol = Rolodex.ID
 			                  	WHERE   ({$conditions}) AND ({$search})
 		             		) AS Tbl
 		            WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
