@@ -12,3 +12,6 @@ button.dt-button.form-control {
 	width : auto;
 	display : inline-block;
 }
+.custom-width{
+	width:180px;
+}

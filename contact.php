@@ -166,6 +166,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Contact[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Contact[ 'Zip' ];
         $Contact[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Contact[ 'Latitude' ];
         $Contact[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Contact[ 'Longitude' ];
+          $date = date("Y-m-d H:i:s");
 
         if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
           $result = \singleton\database::getInstance( )->query(
@@ -186,9 +187,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Zip,
                 Latt,
                 fLong,
-                Geolock
+                Geolock,
+                Since,
+                Last
               )
-              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ? );
               SELECT @MAXID + 1;",
             array(
               $Contact[ 'Type' ],
@@ -203,7 +206,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Contact[ 'Zip' ],
               $Contact[ 'Latitude' ],
               $Contact[ 'Longitude' ],
-              !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0
+              !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0,
+                $date,$date,
             )
           );
           sqlsrv_next_result( $result );
@@ -226,7 +230,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Rol.Latt = ?,
                   Rol.fLong = ?,
                   Rol.Phone = ?,
-                  Rol.EMail = ?
+                  Rol.EMail = ?,
+                  Rol.Last = ?
+                  
 
               WHERE 	Rol.ID = ?;",
             array(
@@ -242,6 +248,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Contact[ 'Longitude' ],
               $Contact[ 'Phone' ],
               $Contact[ 'Email' ],
+              $date,
               $Contact[ 'ID' ]
             )
           );
@@ -315,20 +322,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
-									<div class='col-8'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website'] : "&nbsp;";?>' /></div>
-								</div>
+									<div class='col-6'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website'] : "&nbsp;";?>' /></div>
+                                    <div class='col-2'><a target="_blank" href='<?php echo strlen($Contact['Website']) > 0 ?  $Contact['Website']: "";?>'><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
+                                </div>
 				                <div class='row'>
 				                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Contact:</div>
 				                  <div class='col-8'><input type='text' class='form-control edit' name='Contact' value='<?php echo $Contact[ 'Contact' ];?>' /></div>
 				                </div>
 				                <div class='row'>
 				                  <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
-				                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Contact[ 'Phone' ];?>' /></div>
+				                  <div class='col-6'><input type='text' class='form-control edit custom-width' name='Phone' value='<?php echo $Contact[ 'Phone' ];?>' /></div>
+                                    <div class='col-2'><a target="_blank" href='tel:<?php echo strlen($Contact['Phone']) > 0 ?  $Contact['Phone']: "";?>'><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
 				                </div>
 				                <div class='row'>
 				                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-				                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Contact[ 'Email' ];?>' /></div>
-				                </div>
+				                  <div class='col-6'><input type='text' class='form-control edit custom-width' name='Email' value='<?php echo $Contact[ 'Email' ];?>' /></div>
+                                    <div class='col-2'><a target="_blank" href='mailto:<?php echo strlen($Contact['Email']) > 0 ?  $Contact['Email']: "";?>'><button class='h-100 w-100' type='button'><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></a></div>
+                                </div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
 									<div class='col-6'></div>
