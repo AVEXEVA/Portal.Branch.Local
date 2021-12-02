@@ -11,15 +11,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $My_User = sqlsrv_fetch_array($r);
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
         $r = $database->query(null,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
         $My_Privileges = array();
-        while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}
+        while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}
         $Privileged = FALSE;
-        if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4 && $My_Privileges['Unit']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-        elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 4 && $My_Privileges['Unit']['Group_Privilege'] >= 4){
+        if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Owner'] >= 4 && $My_Privileges['Unit']['Group'] >= 4 && $My_Privileges['Unit']['Other'] >= 4){$Privileged = TRUE;}
+        elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Owner'] >= 4 && $My_Privileges['Unit']['Group'] >= 4){
 			$r = $database->query(null,"
 				SELECT Elev.Loc AS Location_ID
 				FROM   Elev
@@ -148,7 +148,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						<div class='col-xs-8'><?php echo strlen($Unit['Unit'])>0 ? $Unit['Unit'] : "&nbsp;";?></div>
 						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Type:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Type'])>0 ? $Unit['Type'] : "&nbsp;";?></div>
-						<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other_Privilege'] >= 4){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Price:</div>
+						<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Other'] >= 4){?><div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Collection(1);?> Price:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Price'])>0 ? money_format('%.2n',$Unit['Price']): "&nbsp;";?></div><?php }?>
 						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Note(1);?> Notes:</div>
 						<div class='col-xs-8'><?php echo strlen($Unit['Description'])>0 ? $Unit['Description'] : "&nbsp;";?></div>

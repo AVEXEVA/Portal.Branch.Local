@@ -40,14 +40,18 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         array($_SESSION['User']));
       $User = sqlsrv_fetch_array($r);
       $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-      $r = \singleton\database::getInstance( )->query(null,
-        " SELECT Access_Table,
-                 User_Privilege,
-                 Group_Privilege,
-                 Other_Privilege
-          FROM   Privilege
-          WHERE  User_ID = ?
-      ;",array($_SESSION['User']));
+      $result = \singleton\database::getInstance( )->query(
+        'Portal',
+        "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Other]
+          FROM      dbo.[Privilege]
+          WHERE     Privilege.[User] = ?;",
+        array(
+          $_SESSION[ 'Connection' ][ 'User' ]
+        )
+      );
       $Privileges = array();
       while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
       $Privileged = FALSE;

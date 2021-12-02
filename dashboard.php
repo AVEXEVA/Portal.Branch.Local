@@ -1,58 +1,97 @@
-<?php 
-if(session_id() == '' || !isset($_SESSION)) {
-	session_start( [ 'read_and_close' => true ] );
-	require('bin/php/index.php');
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) ){?><?php require('../404.html');?><?php }
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Dashboard' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Dashboard' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "dashboard.php"));
-		$r = $database->query(null,"
-			SELECT 
-				Emp.*, 
-				Emp.Last as Last_Name, 
-				Emp.Last AS Last,
-				Rol.*, 
-				PRWage.Reg as Wage_Regular, 
-				PRWage.OT1 as Wage_Overtime, 
-				PRWage.OT2 as Wage_Double_Time 
-			FROM 
-				(Emp LEFT JOIN PRWage ON Emp.WageCat = PRWage.ID) 
-				LEFT JOIN Rol ON Emp.Rol = Rol.ID 
-			WHERE Emp.ID = " . $_SESSION['User']);
-		$User = sqlsrv_fetch_array($r);
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'dashboard.php'
+        )
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>    
-    <title>Nouveau Texas | Portal</title>    
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -65,16 +104,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		</style>
         <?php if(!isMobile()){?><div id="page-wrapper" class='content'>
             <div class="panel panel-primary" style='margin-bottom:0px;'>
-				<div class="panel-heading"><?php 
+				<div class="panel-heading"><?php
 				$_GET['Mechanic'] = isset($_GET['Mechanic']) ? $_GET['Mechanic'] : $_SESSION['User'];
-				if(is_numeric($_GET['Mechanic'])){$r = $database->query(null,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;} 
+				if(is_numeric($_GET['Mechanic'])){$r = $database->query(null,"SELECT Emp.* FROM Emp WHERE Emp.ID='" . $_GET['Mechanic']. "';");$r = sqlsrv_fetch_array($r);$Mechanic = $r;}
 						else {$Mechanic = $User;}?><h3><?php \singleton\fontawesome::getInstance( )->Dashboard();?>My Dashboard</h3></div>
                 <div class="row">
 					<div class='col-md-6'>
 						<div class="panel panel-primary">
 							<?php if(!$Mobile){?><div class="panel-heading">Attendance</div><?php }?>
 							<div class='panel-body' style='<?php if(isMobile()){?>margin-top:6px;<?php }?>'>
-								<?php 
+								<?php
 								$Date = date('Y-m-d');
 								$Today = date('l');
 								if($Today == 'Thursday'){$Thursday = date('Y-m-d');}
@@ -84,7 +123,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								elseif($Today == 'Monday'){$Thursday = date('Y-m-d', strtotime($Date . ' -4 days'));}
 								elseif($Today == 'Tuesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -5 days'));}
 								elseif($Today == 'Wednesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -6 days'));}
-								if($Today == 'Wednesday'){$Wednesday = date('Y-m-d');}  
+								if($Today == 'Wednesday'){$Wednesday = date('Y-m-d');}
 								elseif($Today == 'Thursday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +6 days'));}
 								elseif($Today == 'Friday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +5 days'));}
 								elseif($Today == 'Saturday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +4 days'));}
@@ -95,7 +134,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 								$Wedn = date("m/d/Y",strtotime($Wednesday));
 								$Thursday = $Thursday . " 00:00:00.000";
 								$Wednesday = $Wednesday . " 23:59:59.999";
-								?>									
+								?>
 								<div class="col-lg-4 col-md-4 col-xs-4" onClick="document.location.href='tickets.php?Start_Date=<?php echo $Thurs;?>&End_Date=<?php echo $Wedn;?>';">
 									<div class="panel panel-primary"><div class="panel-heading">
 										<div class="row">
@@ -104,9 +143,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div><?php }?>
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
-													
+
 													$r = $database->query(null,"
-														SELECT 
+														SELECT
 															(SELECT Count(*) AS Counts
 															 FROM   TicketD
 																	LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -142,7 +181,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														$r = $database->query(null,"
 															SELECT Sum(Total) AS Summed
 															FROM   (SELECT Total, fWork, EDate FROM TicketD
-																	UNION ALL 
+																	UNION ALL
 																	SELECT Total, fWork, EDate FROM TicketDArchive) AS Tickets
 																	LEFT JOIN Emp ON Tickets.fWork = Emp.fWork
 															WHERE   Emp.ID        =  ?
@@ -176,7 +215,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										</div>
 									</div>
 								</div>
-								<?php 
+								<?php
 								$serverName = "172.16.12.45";
 								nullectionOptions = array(
 									"Database" => "ATTENDANCE",
@@ -265,9 +304,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						<div class="panel panel-primary">
 							<?php if(!$Mobile){?><div class="panel-heading">Main</div><?php }?>
 							<div class='panel-body' style='<?php if(isMobile()){?>margin-top:6px;<?php }?>'><?php }?>
-								<?php 
+								<?php
 								$r = $database->query(null,"
-									SELECT Top 1 
+									SELECT Top 1
 										   TicketO.ID AS ID
 									FROM   nei.dbo.TicketO
 										   LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
@@ -296,24 +335,24 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									</div></div>
 								</div>
 								<?php }?>
-								<?php 
+								<?php
 								$r = $database->query(null,"
-									SELECT Top 1 
+									SELECT Top 1
 										   Tickets.Date AS Date,
 										   Tickets.Unit AS Unit
 									FROM
 										(
-											(SELECT 
+											(SELECT
 													EDate AS Date,
 													LElev AS Unit
 											 FROM   nei.dbo.TicketO
 													LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 											 WHERE  Emp.ID = ?
-											        AND (  TicketO.Assigned = 2 
+											        AND (  TicketO.Assigned = 2
 														OR TicketO.Assigned = 3)
 											)
 											UNION ALL
-											(SELECT EDate AS Date, 
+											(SELECT EDate AS Date,
 													Elev AS Unit
 											 FROM   nei.dbo.TicketD
 													LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -340,7 +379,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div><?php }?>
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>small<?php } else {?>medium<?php }?>">
-													<?php 
+													<?php
 													$r = $database->query(null,"SELECT * FROM Elev WHERE Elev.ID = ?;",array($Unit));
 													$Unit = sqlsrv_fetch_array($r);
 													echo strlen($Unit['State']) > 0 ? $Unit['State'] : $Unit['Unit'];;
@@ -351,27 +390,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										</div>
 									</div></div>
 								</div>
-								<?php 
+								<?php
 								$r = $database->query(null,"
-									SELECT Top 1 
+									SELECT Top 1
 										   Tickets.Date 	AS Date,
 										   Tickets.Location AS Location
 									FROM
 										(
-											(SELECT 
-													CASE WHEN TicketO.Assigned = 2 OR TicketO.Assigned = 3 
-														 THEN '2099-01-01 00:00:00.000' 
-														 ELSE EDate 
+											(SELECT
+													CASE WHEN TicketO.Assigned = 2 OR TicketO.Assigned = 3
+														 THEN '2099-01-01 00:00:00.000'
+														 ELSE EDate
 													END AS Date,
 													LID AS Location
 											 FROM   nei.dbo.TicketO
 													LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 											 WHERE  Emp.ID = ?
-											        AND (  TicketO.Assigned = 2 
+											        AND (  TicketO.Assigned = 2
 														OR TicketO.Assigned = 3)
 											)
 											UNION ALL
-											(SELECT EDate AS Date, 
+											(SELECT EDate AS Date,
 													Loc AS Location
 											 FROM   nei.dbo.TicketD
 													LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -409,27 +448,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										</div>
 									</div></div>
 								</div>
-								<?php 
+								<?php
 								$r = $database->query(null,"
 									SELECT Top 1
 										   Tickets.Date AS Date,
 										   Tickets.Job AS Job
 									FROM
 										(
-											(SELECT 
-													CASE WHEN TicketO.Assigned = 2 OR TicketO.Assigned = 3 
-														 THEN '2099-01-01 00:00:00.000' 
-														 ELSE EDate 
+											(SELECT
+													CASE WHEN TicketO.Assigned = 2 OR TicketO.Assigned = 3
+														 THEN '2099-01-01 00:00:00.000'
+														 ELSE EDate
 													END AS Date,
 													Job AS Job
 											 FROM   nei.dbo.TicketO
 													LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 											 WHERE  Emp.ID = ?
-											        AND (  TicketO.Assigned = 2 
+											        AND (  TicketO.Assigned = 2
 														OR TicketO.Assigned = 3)
 											)
 											UNION ALL
-											(SELECT EDate AS Date, 
+											(SELECT EDate AS Date,
 													Job AS Job
 											 FROM   nei.dbo.TicketD
 													LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -456,7 +495,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div><?php }?>
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>small<?php } else {?>medium<?php }?>">
-													<?php 
+													<?php
 													$r = $database->query(null,"SELECT * FROM Job WHERE Job.ID = ?;",array($Job));
 													$Job = sqlsrv_fetch_array($r);
 													echo strlen($Job['fDesc']) > 0 ? $Job['fDesc'] : $Job['fDesc'];;
@@ -491,9 +530,9 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 											</div><?php }?>
 											<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>">
-													<?php 
+													<?php
 													$r = $database->query(null,"
-														SELECT 
+														SELECT
 															(SELECT Count(*) AS Counts
 															 FROM   TicketD
 																	LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -529,7 +568,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														$r = $database->query(null,"
 															SELECT Sum(Total) AS Summed
 															FROM   (SELECT Total, fWork, EDate FROM TicketD
-																	UNION ALL 
+																	UNION ALL
 																	SELECT Total, fWork, EDate FROM TicketDArchive) AS Tickets
 																	LEFT JOIN Emp ON Tickets.fWork = Emp.fWork
 															WHERE   Emp.ID        =  ?
@@ -573,7 +612,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
-															SELECT 
+															SELECT
 																(SELECT Count(*) AS Counts
 																 FROM   TicketD
 																		LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
@@ -606,7 +645,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 														$r = $database->query(null,"
 															SELECT Sum(Total) AS Summed
 															FROM   (SELECT Total, fWork FROM TicketD
-																	UNION ALL 
+																	UNION ALL
 																	SELECT Total, fWork FROM TicketDArchive) AS Tickets
 																	LEFT JOIN Emp ON Tickets.fWork = Emp.fWork
 															WHERE   Emp.ID = ?
@@ -635,7 +674,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<i class="fa fa-clock-o fa-5x"></i>
 												</div><?php }?>
 												<div class="col-xs-<?php if(isMobile()){?>12 text-center<?php } else {?>9 text-right<?php }?> " style='min-height:75px;'>
-													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php 
+													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$ratio = $Sum_of_Ticket_Hours / $Count_of_Tickets;
 														echo $ratio >= 0 ? round($ratio,1) : 0;
 													?></div>
@@ -656,28 +695,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Counter
-															FROM   
+															FROM
 																(
 																	(
 																		SELECT   TicketO.Job AS Job
-																		FROM     nei.dbo.TicketO 
-																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketO
+																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketO.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketD.Job AS Job
-																		FROM     nei.dbo.TicketD 
-																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketD
+																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketD.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketDArchive.Job AS Job
-																		FROM     nei.dbo.TicketDArchive 
-																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketDArchive
+																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketDArchive.Job
 																	)
@@ -758,28 +797,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
 															SELECT Count(Tickets.Loc) AS Counter
-															FROM   
+															FROM
 																(
 																	(
 																		SELECT   TicketO.LID AS Loc
-																		FROM     nei.dbo.TicketO 
-																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketO
+																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketO.LID
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketD.Loc AS Loc
-																		FROM     nei.dbo.TicketD 
-																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketD
+																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketD.Loc
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketDArchive.Loc AS Loc
-																		FROM     nei.dbo.TicketDArchive 
-																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketDArchive
+																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketDArchive.Loc
 																	)
@@ -806,28 +845,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
 															SELECT Count(Tickets.Unit) AS Counter
-															FROM   
+															FROM
 																(
 																	(
 																		SELECT   TicketO.LElev AS Unit
-																		FROM     nei.dbo.TicketO 
-																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketO
+																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketO.LElev
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketD.Elev AS Unit
-																		FROM     nei.dbo.TicketD 
-																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketD
+																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketD.Elev
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketDArchive.Elev AS Unit
-																		FROM     nei.dbo.TicketDArchive 
-																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketDArchive
+																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																		WHERE    Emp.ID = ?
 																		GROUP BY TicketDArchive.Elev
 																	)
@@ -854,31 +893,31 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Maintenances
-															FROM   
+															FROM
 																(
 																	(
 																		SELECT   TicketO.Job AS Job
-																		FROM     nei.dbo.TicketO 
-																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketO
+																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketO.Job   = Job.ID
 																		WHERE    Emp.ID = ?
 																				 AND Job.Type = 0
 																		GROUP BY TicketO.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketD.Job AS Job
-																		FROM     nei.dbo.TicketD 
-																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketD
+																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketD.Job   = Job.ID
 																		WHERE    Emp.ID = ?
 																				 AND Job.Type = 0
 																		GROUP BY TicketD.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketDArchive.Job AS Job
-																		FROM     nei.dbo.TicketDArchive 
+																		FROM     nei.dbo.TicketDArchive
 																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketDArchive.Job   = Job.ID
 																		WHERE    Emp.ID = ?
@@ -907,31 +946,31 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Modernizations
-															FROM   
+															FROM
 																(
 																	(
 																		SELECT   TicketO.Job AS Job
-																		FROM     nei.dbo.TicketO 
-																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketO
+																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketO.Job   = Job.ID
 																		WHERE    Emp.ID = ?
 																				 AND Job.Type = 2
 																		GROUP BY TicketO.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketD.Job AS Job
-																		FROM     nei.dbo.TicketD 
-																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketD
+																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketD.Job   = Job.ID
 																		WHERE    Emp.ID = ?
 																				 AND Job.Type = 2
 																		GROUP BY TicketD.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketDArchive.Job AS Job
-																		FROM     nei.dbo.TicketDArchive 
+																		FROM     nei.dbo.TicketDArchive
 																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketDArchive.Job   = Job.ID
 																		WHERE    Emp.ID = ?
@@ -960,31 +999,31 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 													<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 														$r = $database->query(null,"
 															SELECT Count(Tickets.Job) AS Maintenances
-															FROM   
+															FROM
 																(
 																	(
 																		SELECT   TicketO.Job AS Job
-																		FROM     nei.dbo.TicketO 
-																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketO
+																				 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketO.Job   = Job.ID
 																		WHERE    Emp.ID = ?
 																				 AND Job.Type = 6
 																		GROUP BY TicketO.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketD.Job AS Job
-																		FROM     nei.dbo.TicketD 
-																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																		FROM     nei.dbo.TicketD
+																				 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketD.Job   = Job.ID
 																		WHERE    Emp.ID = ?
 																				 AND Job.Type = 6
 																		GROUP BY TicketD.Job
 																	)
-																	UNION 
+																	UNION
 																	(
 																		SELECT   TicketDArchive.Job AS Job
-																		FROM     nei.dbo.TicketDArchive 
+																		FROM     nei.dbo.TicketDArchive
 																				 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																				 LEFT JOIN nei.dbo.Job ON TicketDArchive.Job   = Job.ID
 																		WHERE    Emp.ID = ?
@@ -1013,29 +1052,29 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												<div class="<?php if(isMobile()){?>medium<?php } else {?>huge<?php }?>"><?php
 													$r = $database->query(null,"
 														SELECT Tickets.Date
-														FROM   
+														FROM
 															(
 																(
 																	SELECT   TicketO.EDate AS Date
-																	FROM     nei.dbo.TicketO 
-																			 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
+																	FROM     nei.dbo.TicketO
+																			 LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 																	WHERE    Emp.ID = ?
 																			 AND (TicketO.Assigned    = 2
 																				  OR TicketO.Assigned = 3
 																				  OR TicketO.Assigned = 4)
 																)
-																UNION ALL 
+																UNION ALL
 																(
 																	SELECT   TicketD.EDate AS Date
-																	FROM     nei.dbo.TicketD 
-																			 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork 
+																	FROM     nei.dbo.TicketD
+																			 LEFT JOIN Emp ON TicketD.fWork = Emp.fWork
 																	WHERE    Emp.ID = ?
 																)
-																UNION ALL 
+																UNION ALL
 																(
 																	SELECT   TicketDArchive.EDate AS Date
-																	FROM     nei.dbo.TicketDArchive 
-																			 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork 
+																	FROM     nei.dbo.TicketDArchive
+																			 LEFT JOIN Emp ON TicketDArchive.fWork = Emp.fWork
 																	WHERE    Emp.ID = ?
 																)
 
@@ -1067,7 +1106,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         <div class="panel-body">
                             <div class="flot-chart"><div class="flot-chart-content" id="flot-placeholder"></div></div>
                         </div>
-                    </div>	
+                    </div>
                 </div></div><?php }?>
             </div>
         </div><?php } else {?><div id="page-wrapper" class='content'>
@@ -1106,7 +1145,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					<div class='dashboard-option' onClick="activateContent('my-tickets');">
 						<i class='fa fa-2x fa-flag'></i>
 					</div>
-					<?php 
+					<?php
 					$r = $database->query(null,"SELECT * FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
 					if($r){if(is_array(sqlsrv_fetch_array($r))){?>
 					<div class='dashboard-option' onClick="activateContent('my-maintenance');">
@@ -1168,7 +1207,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         $WeekOf = date('Y-m-d',strtotime($WeekOf . ' +6 days'));?>
                                         <td class='WeekOf' rel='<?php echo $WeekOf;?>' onClick="refresh_this(this);"><?php
                                             echo date("m/d",strtotime($WeekOf));
-                                        ?></td><?php 
+                                        ?></td><?php
                                         $Today = date('l');
                                         if($Today == 'Thursday'){$Thursday = date('Y-m-d');}
                                         elseif($Today == 'Friday'){$Thursday = date('Y-m-d', strtotime($Date . ' -1 days'));}
@@ -1178,13 +1217,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Tuesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -5 days'));}
                                         elseif($Today == 'Wednesday'){$Thursday = date('Y-m-d', strtotime($Date . ' -6 days'));}
                                         $r = $database->query(null,"
-                                            SELECT Sum(Total) as Summed 
-                                            FROM nei.dbo.TicketD 
+                                            SELECT Sum(Total) as Summed
+                                            FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
                                         <td class='Thursday' rel='<?php echo $Thursday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
-                                        <?php 
+                                        <?php
                                         if($Today == 'Friday'){$Friday = date('Y-m-d');}
                                         elseif($Today == 'Saturday'){$Friday = date('Y-m-d', strtotime($Date . ' -1 days'));}
                                         elseif($Today == 'Sunday'){$Friday = date('Y-m-d', strtotime($Date . ' -2 days'));}
@@ -1193,7 +1232,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Wednesday'){$Friday = date('Y-m-d', strtotime($Date . ' -5 days'));}
                                         elseif($Today == 'Thursday'){$Friday = date('Y-m-d', strtotime($Date . ' +1 days'));}
                                         $r = $database->query(null,"
-                                            SELECT Sum(Total) AS Summed 
+                                            SELECT Sum(Total) AS Summed
                                             FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
                                         <td class='Friday' rel='<?php echo $Friday;?>' onClick="refresh_this(this);"><?php
@@ -1214,7 +1253,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <td class='Saturday' rel='<?php echo $Saturday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
-                                        <?php 
+                                        <?php
                                         if($Today == 'Sunday'){$Sunday = date('Y-m-d');}
                                         elseif($Today == 'Monday'){$Sunday = date('Y-m-d', strtotime($Date . ' -1 days'));}
                                         elseif($Today == 'Tuesday'){$Sunday = date('Y-m-d', strtotime($Date . ' -2 days'));}
@@ -1223,8 +1262,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Friday'){$Sunday = date('Y-m-d', strtotime($Date . ' +2 days'));}
                                         elseif($Today == 'Saturday'){$Sunday = date('Y-m-d', strtotime($Date . ' +1 days'));}
                                         $r = $database->query(null,"
-                                            SELECT Sum(Total) AS Summed 
-                                            FROM nei.dbo.TicketD 
+                                            SELECT Sum(Total) AS Summed
+                                            FROM nei.dbo.TicketD
 
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
                                         <td class='Sunday' rel='<?php echo $Sunday;?>' onClick="refresh_this(this);"><?php
@@ -1245,7 +1284,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <td class='Monday' rel='<?php echo $Monday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
-                                        <?php 
+                                        <?php
                                         if($Today == 'Tuesday'){$Tuesday = date('Y-m-d');}
                                         elseif($Today == 'Wednesday'){$Tuesday = date('Y-m-d', strtotime($Date . ' -1 days'));}
                                         elseif($Today == 'Thursday'){$Tuesday = date('Y-m-d', strtotime($Date . ' +5 days'));}
@@ -1260,8 +1299,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         <td class='Tuesday' rel='<?php echo $Tuesday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
-                                        <?php 
-                                        if($Today == 'Wednesday'){$Wednesday = date('Y-m-d');}	
+                                        <?php
+                                        if($Today == 'Wednesday'){$Wednesday = date('Y-m-d');}
                                         elseif($Today == 'Thursday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +6 days'));}
                                         elseif($Today == 'Friday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +5 days'));}
                                         elseif($Today == 'Saturday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +4 days'));}
@@ -1270,7 +1309,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                         elseif($Today == 'Tuesday'){$Wednesday = date('Y-m-d', strtotime($Date . ' +1 days'));}
                                         $r = $database->query(null,"
                                             SELECT Sum(Total) AS Summed
-                                            FROM nei.dbo.TicketD 
+                                            FROM nei.dbo.TicketD
                                             WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");?>
                                         <td class='Wednesday' rel='<?php echo $Wednesday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
@@ -1286,38 +1325,38 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                     </tr>
                                     <?php while($WeekOf > "2017-03-08 00:00:00.000"){?><tr style='cursor:pointer;' class="odd gradeX hoverGray">
                                         <?php $WeekOf = date('Y-m-d',strtotime($WeekOf . '-7 days')); ?>
-                                        <td class='WeekOf' rel='<?php echo $WeekOf;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='WeekOf' rel='<?php echo $WeekOf;?>' onClick="refresh_this(this);"><?php
                                             echo date("m/d",strtotime($WeekOf));
                                         ?></td>
-                                        <?php 
+                                        <?php
                                         $Thursday = date('Y-m-d',strtotime($Thursday . '-7 days'));
                                             $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Thursday . " 00:00:00.000' AND EDate <= '" . $Thursday . " 23:59:59.999'");?>
-                                        <td class='Thursday' rel='<?php echo $Thursday;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='Thursday' rel='<?php echo $Thursday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Friday = date('Y-m-d',strtotime($Friday . '-7 days'));
                                             $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");?>
-                                        <td class='Friday' rel='<?php echo $Friday;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='Friday' rel='<?php echo $Friday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Saturday = date('Y-m-d',strtotime($Saturday . '-7 days'));
                                             $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");?>
-                                        <td class='Saturday' rel='<?php echo $Saturday;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='Saturday' rel='<?php echo $Saturday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Sunday = date('Y-m-d',strtotime($Sunday . '-7 days'));
                                             $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");?>
-                                        <td class='Sunday' rel='<?php echo $Sunday;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='Sunday' rel='<?php echo $Sunday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Monday = date('Y-m-d',strtotime($Monday . '-7 days'));
                                             $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");?>
-                                        <td class='Monday' rel='<?php echo $Monday;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='Monday' rel='<?php echo $Monday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Tuesday = date('Y-m-d',strtotime($Tuesday . '-7 days'));
                                             $r = $database->query(null,"SELECT Sum(Total) AS Summed FROM nei.dbo.TicketD WHERE fWork='" . $Employee_ID . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");?>
-                                        <td class='Tuesday' rel='<?php echo $Tuesday;?>' onClick="refresh_this(this);"><?php 
+                                        <td class='Tuesday' rel='<?php echo $Tuesday;?>' onClick="refresh_this(this);"><?php
                                             echo sqlsrv_fetch_array($r)['Summed'];
                                         ?></td>
                                         <?php $Wednesday = date('Y-m-d',strtotime($Wednesday . '-7 days'));
@@ -1339,7 +1378,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 					</div>
 					<div id='my-ticket' class='subcontent col-xs-12' style='margin:0px !important;padding:0px !important;display:none;'>
 						<h4 style='text-align:center;background-color:whitesmoke;color:black;margin:0px;padding:10px;'>My Ticket</h4>
-						<?php 
+						<?php
 							$r = $database->query(null,"
 								SELECT Top 1
 									   Tickets.*,
@@ -1368,10 +1407,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									   JobType.Type                AS Job_Type
 								FROM
 									(
-										(SELECT 
-												CASE WHEN TicketO.Assigned = 2 OR TicketO.Assigned = 3 
-													 THEN '2099-01-01 00:00:00.000' 
-													 ELSE EDate 
+										(SELECT
+												CASE WHEN TicketO.Assigned = 2 OR TicketO.Assigned = 3
+													 THEN '2099-01-01 00:00:00.000'
+													 ELSE EDate
 												END 			 AS Order_Date,
 												TicketO.ID       AS ID,
 												TicketO.fDesc    AS Description,
@@ -1398,11 +1437,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 												LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
 												LEFT JOIN TickOStatus ON TicketO.Assigned = TickOStatus.Ref
 										 WHERE  Emp.ID = ?
-												AND (  TicketO.Assigned = 2 
+												AND (  TicketO.Assigned = 2
 													OR TicketO.Assigned = 3)
 										)
 										UNION ALL
-										(SELECT TicketD.EDate    AS Order_Date, 
+										(SELECT TicketD.EDate    AS Order_Date,
 												TicketD.ID       AS ID,
 												TicketD.fDesc    AS Description,
 												TicketD.DescRes  AS Resolution,
@@ -1476,7 +1515,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							<div class='col-xs-12'><pre><?php echo "---Scope of Work---\n" . $Ticket['Description'];?></pre></div>
 						</div>
 					</div>
-					<?php 
+					<?php
 					$r = $database->query(null,"SELECT * FROM nei.dbo.Route LEFT JOIN Emp ON Route.Mech = Emp.fWork WHERE Emp.ID = ?",array($_SESSION['User']));
 					if($r){if(is_array(sqlsrv_fetch_array($r))){?>
 					<div id='my-maintenance' class='subcontent col-xs-12' style='margin:0px !important;padding:0px !important;display:none;'>
@@ -1503,16 +1542,16 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									{
 										"data" : "ID",
 										"className":"hidden"
-									},{ 
-										"data": "Location" 
-									},{ 
+									},{
+										"data": "Location"
+									},{
 										"data": "Unit"
 									},{
 										"data": "State"
-									},{ 
+									},{
 										"data": "Last_Date",
 										"render": function(data){
-											if(data === null || typeof data === 'undefined'){return '';} 
+											if(data === null || typeof data === 'undefined'){return '';}
 											else {return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}}
 									}
 								],
@@ -1531,7 +1570,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 							} );<?php }?>
 						});
 						</script>
-						
+
 					</div>
 					<div id='my-violations' class='subcontent col-xs-12' style='margin:0px !important;padding:0px !important;display:none;'>
 						<h4 style='text-align:center;background-color:whitesmoke;color:black;margin:0px;padding:10px;'>Route Violations</h4>
@@ -1557,26 +1596,26 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										return json.data;}
 								},
 								"columns": [
-									{ 
+									{
 										"data": "ID",
 										"className":"hidden"
 									},{
 										"data": "Job",
 										"visible":false,
 										render:function(data){if(data === undefined){return '';}else{return data;}}
-									},{ 
+									},{
 										"data": "Name"
-									},{ 
+									},{
 										"data": "Location"
-									},{ 
+									},{
 										"data": "Unit"
-									},{ 
+									},{
 										"data": "fDate",
 									  	render: function(data){
-											if(data === null || typeof data === 'undefined'){return '';} 
+											if(data === null || typeof data === 'undefined'){return '';}
 											else {return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}
 										}
-									},{ 
+									},{
 										"data": "Status"
 									}
 								],
@@ -1617,7 +1656,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 										return json.data;}
 								},
 								"columns": [
-									{ 
+									{
 										"data": "ID",
 										"className":"hidden"
 									},{
@@ -1649,11 +1688,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			</div>
 		</div><?php }?>
     </div>
-    
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
+
 </body>
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=dashboard.php';</script></head></html><?php }?> 
+} else {?><html><head><script>document.location.href='../login.php?Forward=dashboard.php';</script></head></html><?php }?>

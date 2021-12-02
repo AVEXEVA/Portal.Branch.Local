@@ -51,10 +51,10 @@ function privileges( $db, $dataserver, $User_ID ){
     /*GET Privleges*/
     $result = $dataserver->query(
         $db,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -62,7 +62,7 @@ function privileges( $db, $dataserver, $User_ID ){
         )
     );
     $Privileges = array( );
-    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
     return is_array( $Privileges ) ? $Privileges : False;
 }
 function activity( $Database, $Server, $Connection ){
@@ -97,7 +97,7 @@ function isMobile() {
 }
 function createHomeScreenOption($Icons = null,$My_Privileges,$From_Page,$To_Page,$Parameters = NULL,$Icon = NULL){
 	$Icon = is_null($Icon) ? $To_Page : $Icon;
-	if(isset($My_Privileges[proper($To_Page)]) && $My_Privileges[proper($To_Page)]['User_Privilege'] >= 4){
+	if(isset($My_Privileges[proper($To_Page)]) && $My_Privileges[proper($To_Page)]['Owner'] >= 4){
 	?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='<?php echo $From_Page;?>-<?php echo strtolower($To_Page);?>.php?ID=<?php echo is_null($Parameters) ? $_GET['ID'] : $Parameters;?>'">
 		<div class='nav-icon'><?php call_user_func_array(array(\singleton\fontawesome::getInstance( ), str_replace("-","_",$Icon)), array(3));?></div>
 			<div class ='nav-text'><?php echo proper($To_Page);?></div> 

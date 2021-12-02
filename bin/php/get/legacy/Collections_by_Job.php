@@ -20,19 +20,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
-               Privilege.Other_Privilege
+        SELECT Privilege.Access, 
+               Privilege.Owner, 
+               Privilege.Group, 
+               Privilege.Other
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Job'],$My_Privileges['Invoice']) 
-        && $My_Privileges['Job']['Other_Privilege'] >= 4
-	  	&& $My_Privileges['Invoice']['Other_Privilege'] >= 4){
+        && $My_Privileges['Job']['Other'] >= 4
+	  	&& $My_Privileges['Invoice']['Other'] >= 4){
             $Privileged = True;}
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {

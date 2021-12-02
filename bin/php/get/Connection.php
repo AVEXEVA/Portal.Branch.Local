@@ -1,48 +1,52 @@
-<?php 
+<?php
 session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-        SELECT * 
-        FROM   Connection 
-        WHERE  Connection.Connector = ? 
+    $result = $database->query(null,"
+        SELECT *
+        FROM   Connection
+        WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r);
-    $My_User    = $database->query(null,"
-        SELECT Emp.*, 
-               Emp.fFirst AS First_Name, 
-               Emp.Last   AS Last_Name 
+    $Connection = sqlsrv_fetch_array($result);
+    $User    = $database->query(null,"
+        SELECT Emp.*,
+               Emp.fFirst AS First_Name,
+               Emp.Last   AS Last_Name
         FROM   Emp
         WHERE  Emp.ID = ?
     ;", array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($My_User); 
-    $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-    $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
-               Privilege.Other_Privilege
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION['User']));
-    $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    $User = sqlsrv_fetch_array($User);
+    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Other]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+      )
+    );
+    $Privileges = array();
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
-    if( isset($My_Privileges['Connection']) 
-        && $My_Privileges['Connection']['Other_Privilege'] >= 4){
+    if( isset($Privileges['Connection'])
+        && $Privileges['Connection']['Other_Privilege'] >= 4){
             $Privileged = True;}
     if(!isset($Connection['ID'])  || !$Privileged){print json_encode(array('data'=>array()));}
     else {
         $data = array();
-        $r = $database->query($Portal,
+        $result = $database->query($Portal,
             "SELECT Activity.*
             FROM    Portal.dbo.Activity
             WHERE   Activity.[User] = ?
         ;",array($_GET['ID']));
 
-        if($r){while($array = sqlsrv_fetch_array($r)){$data[] = $array;}}
-        print json_encode(array('data'=>$data));    
+        if($result){while($array = sqlsrv_fetch_array($result)){$data[] = $array;}}
+        print json_encode(array('data'=>$data));
     }
 }?>

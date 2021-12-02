@@ -1,47 +1,95 @@
-<?php 
-session_start( [ 'read_and_close' => true ] );
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT * 
-		FROM   Connection 
-		WHERE  Connection.Connector = ? 
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp 
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT * 
-		FROM   Privilege 
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID']) 
-	   	|| !isset($My_Privileges['Job'])
-	  		|| $My_Privileges['Job']['User_Privilege']  < 4
-	  		|| $My_Privileges['Job']['Group_Privilege'] < 4
-	  		|| $My_Privileges['Job']['Other_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Job' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page]) 
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "customers.php"));
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'rmas.php'
+        )
+      );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
     <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Texas | Portal</title>    <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
-	
+
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -110,13 +158,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									</div>
 								</div>
 							</div>
-                            <table id='Table_RMAs' class='display' cellspacing='0' width='100%'>
-                                <thead>
-                                    <th>ID</th>
-                                    <th>Name</th>
+          <table id='Table_RMAs' class='display' cellspacing='0' width='100%'>
+              <thead>
+                  <th>ID</th>
+                  <th>Name</th>
 									<th>Date</th>
-                                    <th>Location</th>
-                                    <th>RMA</th>
+                  <th>Location</th>
+                  <th>RMA</th>
 									<th>Received</th>
 									<th>Returned</th>
 									<th>Tracking</th>
@@ -124,23 +172,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 									<th>Link</th>
 									<th>Status</th>
 									<th>Description</th>
-                                </thead>
+              </thead>
 							</table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+</div>
+
+
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
-    
-    
-    
+
+
+
 
     <!-- Custom Date Filters-->
-    
+
     <script>
         var Editor_RMAs = new $.fn.dataTable.Editor({
 			ajax: "php/post/RMA.php",
@@ -153,17 +201,17 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			},
 			idSrc: "ID",
 			fields : [
-				{ 
+				{
 					label: "ID",
 					name:"ID"
-				},{ 
+				},{
 					label: "Name",
 					name:"Name"
-				},{ 
+				},{
 					label: "Date",
 					name:"Date",
 					type:"datetime"
-				},{ 
+				},{
 					label: "Location",
 					name:"Location",
 					type:"select",
@@ -181,27 +229,27 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						}}
 						echo implode(",",$Locations);
 					?>]
-				},{ 
+				},{
 					label: "RMA",
 					name:"RMA"
-				},{ 
+				},{
 					label: "Received",
 					name:"Received",
 					type:"datetime"
-				},{ 
+				},{
 					label: "Returned",
 					name:"Returned",
 					type:"datetime"
-				},{ 
+				},{
 					label: "Tracking",
 					name:"Tracking"
-				},{ 
+				},{
 					label: "PO",
 					name:"PO"
-				},{ 
+				},{
 					label: "Link",
 					name:"Link"
-				},{ 
+				},{
 					label: "Status",
 					name:"Status",
 					type:"radio",
@@ -209,7 +257,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 						{label: "Complete", value:'Complete'},
 						{label: "Open", value:'Open'}
 					]
-				},{ 
+				},{
 					label: "Description",
 					name:"Description",
 					type:"textarea"
@@ -227,19 +275,19 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				"dataSrc":function(json){if(!json.data){json.data = [];}return json.data;}
 			},
 			"columns": [
-				{ 
+				{
 					"data": "ID" ,
 					"visible":false
-				},{ 
+				},{
 					"data": "Name"
-				},{ 	
+				},{
 					"data": "Date",
 					render: function(data){if(data != '1900-01-01 00:00:00.000'){return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}else{return null;}}
 				},{
 					"data": "Location"
-				},{ 
+				},{
 					"data": "RMA"
-				},{ 
+				},{
 					"data": "Received",
 					render: function(data){if(data != '1900-01-01 00:00:00.000'){return data.substr(5,2) + "/" + data.substr(8,2) + "/" + data.substr(0,4);}else{return null;}}
 				},{
@@ -271,10 +319,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				},
 				{ extend: "create", editor: Editor_RMAs },
 				{ extend: "edit",   editor: Editor_RMAs },
-				{ 
+				{
 
-					extend: "remove", 
-					editor: Editor_RMAs, 
+					extend: "remove",
+					editor: Editor_RMAs,
 					formButtons: [
 						'Delete',
 						{ text: 'Cancel', action: function () { this.close(); } }
@@ -288,7 +336,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			],
 			<?php require('bin/js/datatableOptions.php');?>
 		} );
-		
+
     </script>
 </body>
 </html>

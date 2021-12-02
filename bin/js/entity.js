@@ -7,6 +7,9 @@ $( document ).ready( function( ){
 	$( 'select.edit' ).bind( 'change', function( event ){
 		$( this ).closest( 'form' ).submit( );
 	});
+	$( 'input.date' ).each( function( ){
+		$( this ).datepicker( { } );
+	} );
 	$( '.card-columns .card-heading h5' ).bind( 'click', function( ){
 		$( this ).closest( '.card-heading' ).next( ).toggle( );
 		$.ajax({

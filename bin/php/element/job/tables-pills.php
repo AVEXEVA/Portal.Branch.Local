@@ -10,15 +10,15 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         $My_User = sqlsrv_fetch_array($My_User); 
         $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
         $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
         $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
         $Privileged = FALSE;
-        if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && $My_Privileges['Job']['Group_Privilege'] >= 4 && $My_Privileges['Job']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-        elseif($My_Privileges['Job']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+        if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >= 4 && $My_Privileges['Job']['Group'] >= 4 && $My_Privileges['Job']['Other'] >= 4){$Privileged = TRUE;}
+        elseif($My_Privileges['Job']['Owner'] >= 4 && is_numeric($_GET['ID'])){
             $r = $database->query(  null,"SELECT * FROM nei.dbo.TicketO WHERE TicketO.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
             $r2 = $database->query( null,"SELECT * FROM nei.dbo.TicketD WHERE TicketD.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
             $r3 = $database->query( null,"SELECT * FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Job='{$_GET['ID']}' AND fWork='{$My_User['fWork']}'");
@@ -91,7 +91,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		<li class=""><a href="#" onClick="asyncSubPage(this);" tab='tables-units-pills' main='tables-pills' >Units</a></li>
 		<li class=""><a href="#" onClick="asyncSubPage(this);" tab='tables-tickets-pills' main='tables-pills' >Tickets</a></li>
 		<li class=""><a href="#" onClick="asyncSubPage(this);" tab='tables-violations-pills' main='tables-pills' >Violations</a></li>
-		<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege'] >= 4){?>
+		<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other'] >= 4){?>
 			<li class=""><a href="#" onClick="asyncSubPage(this);" tab='tables-contracts-pills' main='tables-pills' >Contracts</a></li>
 			<li class=""><a href="#" onClick="asyncSubPage(this);" tab='tables-invoices-pills' main='tables-pills' >Invoices</a></li>
 			<li class=""><a href="#" onClick="asyncSubPage(this);" tab='tables-proposals-pills' main='tables-pills' >Proposals</a></li>

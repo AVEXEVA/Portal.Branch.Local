@@ -11,14 +11,14 @@ if( isset(
     $My_User = sqlsrv_fetch_array($r);
     $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query(null,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   dbo.Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Time']) && $My_Privileges['Time']['User_Privilege'] >= 4 && $My_Privileges['Time']['Group_Privilege'] >= 4 && $My_Privileges['Time']['Other_Privilege'] >= 0){$Privileged = TRUE;}
+    if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Owner'] >= 4 && $My_Privileges['Time']['Group'] >= 4 && $My_Privileges['Time']['Other'] >= 0){$Privileged = TRUE;}
     $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "time_sheet2.php"));
     if(!isset($My_Connection['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=time_sheet2.php';</script></head></html><?php }
     else {

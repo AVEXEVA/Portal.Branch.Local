@@ -1,62 +1,88 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
-    //Connection
-    $result = $database->query(null,
-        "   SELECT  *
-		    FROM    Connection
-            WHERE   Connection.Connector = ?
-                    AND Connection.Hash  = ?;",
-        array( 
-            $_SESSION['User'],
-            $_SESSION['Hash']
-        )
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
-    $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-    //Employee
-    $result = $database->query(null,
-        "   SELECT  *,
-		            Emp.fFirst AS First_Name,
-                    Emp.Last   AS Last_Name
-            FROM    Emp
-            WHERE   Emp.ID = ?;",
-        array(
-            $_SESSION[ 'User' ]
-        )
-    );
-    $User = sqlsrv_fetch_array( $result );
-    //Privileges
-	$result = $database->query(
-        null,
-        "   SELECT  *
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array(
-            $_SESSION[ 'User' ]
-        )
-    );
-	$Privileges = array();
-	if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
-    if(	!isset( $Connection[ 'ID' ] )
-	   	|| !isset($Privileges[ 'Time' ] )
-	  		|| $Privileges[ 'Time' ][ 'User_Privilege' ]  < 4
-	  		|| $Privileges[ 'Time' ][ 'Group_Privilege' ] < 4
-	  	    || $Privileges[ 'Time' ][ 'Other_Privilege' ] < 4){
-				?><?php require( '../404.html' );?><?php }
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Time' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Time' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		$database->query(
-            null,
-            "   INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
-                VALUES( ?, ?, ? );",
-            array(
-                $_SESSION[ 'User' ],
-                date( 'Y-m-d H:i:s' ), 
-                'review.php'
-            )
-        );
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'review.php'
+        )
+      );
         //GET FIELD MEHCANICS
         $Selected_Supervisors = explode(',',$_GET['Supervisors']);
         if(count($Selected_Supervisors) == 0 || !isset($_GET['Supervisors']) || $_GET['Supervisors'] == '' || $_GET['Supervisors'] == 'All'){$SQL_Supervisors = "'1' = '1'";}
@@ -75,14 +101,14 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
             foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
             $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
         }
-        $r = $database->query(null,"
-        	SELECT Emp.*,
-        	       tblWork.Super
-        	FROM   Emp
-        		   LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-        	WHERE  Emp.Field = 1
-        		   AND Emp.Status = 0
-          ORDER BY Last ASC
+        $r = $database->query(null,
+          " SELECT Emp.*,
+          	       tblWork.Super
+          	FROM   Emp
+          		     LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+          	WHERE  Emp.Field = 1
+          		 AND Emp.Status = 0
+            ORDER BY Last ASC
         ;",array(),array("Scrollable"=>SQLSRV_CURSOR_KEYSET));
         $Mechanics = array();
         $row_count = sqlsrv_num_rows( $r );
@@ -95,28 +121,27 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
         		}
         		$i++;
         	}
-        }
+      }
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/php/meta.php' );?>
-	<title>Nouveau Texas | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/css/index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
     <style>
         .form-group>label:first-child {
             min-width  : 175px;
             text-align : right;
         }
     </style>
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/js/index.php' );?>
-    
-    <?php require( 'var/www/html/Portal.Branch.Local/bin/js/datatables.php' );?>
 </head>
 <body onload='finishLoadingPage();'>
     <div id="wrapper">
-        <?php require( 'var/www/html/Portal.Branch.Local/bin/php/element/navigation.php' );?>
-        <?php require( 'var/www/html/Portal.Branch.Local/bin/php/element/loading.php' );?>
+      <?php require(bin_php  . 'element/navigation.php');?>
+      <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
             <div class='panel panel-primary'>
                 <div class='panel-heading' style='background-color:#1e1e1e;color:white;padding:20px;text-align:center;' ><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Review Timesheets</div>
@@ -126,13 +151,13 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                         <label for='Supers' class='col-auto'>Supervisor:</label>
                         <div class='col-auto'>
                             <select class='form-control' name='Supervisors' onChange='refresh_get( );'>
-                                <option value='All' <?php if($_GET['Supervisors'] == "All"){?>selected='selected'<?php }?>>All</option>
+                                <option value='All' <?php if($_GET['Supervisors'] == "All"){?>selected='selected'<?php }?> >All</option>
                                 <?php $Supervisors = array();
                                 foreach($Mechanics as $Mechanic){
                                     $Mechanic['Super'] = ucfirst(strtolower($Mechanic['Super']));
                                     if(!in_array($Mechanic['Super'],$Supervisors) && !in_array($Mechanic['Super'],['Office','Warehouse','firemen','Dean','Office','Firemen','',' ','  '])){
                                         array_push($Supervisors,$Mechanic['Super']);
-                                        ?><option value="<?php echo $Mechanic['Super'];?>" <?php if(in_array($Mechanic['Super'],$Selected_Supervisors)){?>selected='selected'<?php }?>><?php echo $Mechanic['Super'];?></option>
+                                        ?><option value="<?php echo $Mechanic['Super'];?>" <?php if(in_array($Mechanic['Super'],$Selected_Supervisors)){?>selected='selected'<?php }?> ><?php echo $Mechanic['Super'];?></option>
                                         <?php
                                     }
                                 }?>
@@ -142,7 +167,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                     <div class='form-group row'>
                         <label class='date col-auto' for="filter_start_date">Week Ending:</label>
                         <?php
-                            switch( $Today ){
+                            switch( date('N') ){
                                 case 'Wednesday' : $Wednesday = date('m/d/Y', strtotime( $Wednesday . ' +0 days')); break;
                                 case 'Thursday'  : $Wednesday = date('m/d/Y', strtotime( $Wednesday . ' +6 days')); break;
                                 case 'Friday'    : $Wednesday = date('m/d/Y', strtotime( $Wednesday . ' +5 days')); break;
@@ -210,7 +235,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                 <th colspan='2'>Wen</th>
                                 <th colspan='2'>Total</th>
                                 <th colspan='5'>Expenses</th>
-                                
+
                             </tr>
                             <tr>
                               <th>&nbsp;</th>
@@ -236,7 +261,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                               <th colspan='3'>Pictures</th>
                             </tr>
                         </thead>
-                        
+
                         <tbody style=' background-color : white; color : black; '><?php if(!isset($_GET['Preload']) || true){foreach($Mechanics as $Mechanic){
                             $Mechanic['fFirst'] = ucfirst(strtolower($Mechanic['fFirst']));
                             $Mechanic['Last'] = ucfirst(strtolower($Mechanic['Last']));
@@ -258,7 +283,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Friday = date('Y-m-d',strtotime($_GET['Date'] . ' -5 days'));?>
                                 <td class='day Friday' style='font-weight:bold;' rel='<?php echo $Friday;?>'><?php
-                                    
+
                                     $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Saturday = date('Y-m-d',strtotime($_GET['Date'] . ' -4 days'));?>
@@ -267,7 +292,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                     $r = $database->query(null,"SELECT Sum(OT) + Sum(DT) AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Friday . " 00:00:00.000' AND EDate <= '" . $Friday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Saturday' style='font-weight:bold;' rel='<?php echo $Saturday;?>'><?php
-                                    
+
                                     $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Saturday . " 00:00:00.000' AND EDate <= '" . $Saturday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Saturday' rel='<?php echo $Saturday;?>'><?php
@@ -276,7 +301,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Sunday = date('Y-m-d',strtotime($_GET['Date'] . ' -3 days'));?>
                                 <td class='day Sunday' style='font-weight:bold;' rel='<?php echo $Sunday;?>'><?php
-                                    
+
                                     $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Sunday . " 00:00:00.000' AND EDate <= '" . $Sunday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Sunday' rel='<?php echo $Sunday;?>'><?php
@@ -285,7 +310,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Monday = date('Y-m-d',strtotime($_GET['Date'] . ' -2 days'));?>
                                 <td class='day Monday' style='font-weight:bold;' rel='<?php echo $Monday;?>'><?php
-                                    
+
                                     $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Monday . " 00:00:00.000' AND EDate <= '" . $Monday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Monday' rel='<?php echo $Monday;?>'><?php
@@ -294,7 +319,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Tuesday = date('Y-m-d',strtotime($_GET['Date'] . ' -1 days'));?>
                                 <td class='day Tuesday' style='font-weight:bold;' rel='<?php echo $Tuesday;?>'><?php
-                                    
+
                                     $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Tuesday . " 00:00:00.000' AND EDate <= '" . $Tuesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Tuesday' rel='<?php echo $Tuesday;?>'><?php
@@ -303,7 +328,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                     <?php $Wednesday = date('Y-m-d',strtotime($_GET['Date']));?>
                                 <td class='day Wednesday' style='font-weight:bold;' rel='<?php echo $Wednesday;?>'><?php
-                                    
+
                                     $r = $database->query(null,"SELECT Sum(Reg) + Sum(NT) + Sum(TT)  AS Summed FROM TicketD WHERE fWork='" . $Mechanic['fWork'] . "' and EDate >= '" . $Wednesday . " 00:00:00.000' AND EDate <= '" . $Wednesday . " 23:59:59.999'");
                                     echo sqlsrv_fetch_array($r)['Summed'];?></td>
                                 <td class='day Wednesday' rel='<?php echo $Wednesday;?>'><?php
@@ -340,7 +365,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                         <?php }}}?>
                         </tbody>
                     </table>
-                </div> 
+                </div>
             </div>
         </div>
         <script>
@@ -349,7 +374,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                 var Mechanics   = $("select[name='Mechanics']").val();
                 var Week_Ending = $("input[name='Week_Ending']").val();
                 document.location.href='review.php?Supervisors=' + Supervisors + '&Mechanics=' + Mechanics + "&Date=" + Week_Ending;
-            } 
+            }
             $( "input[name='Week_Ending']" ).datepicker({
                 beforeShowDay: function( date ){
                   return [ ( date.getDay( ) == 3 ), '' ]; },
@@ -371,7 +396,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                             Date : link.getAttribute( 'rel' ),
                         },
                         method : 'GET',
-                        success : function( response ){ 
+                        success : function( response ){
                             $( link ).parent().after( response );
                         }
                     });
@@ -389,7 +414,7 @@ if( isset( $_SESSION[ 'User' ] ,$_SESSION[ 'Hash' ] ) ){
                             Date : link.getAttribute( 'rel' ),
                         },
                         method : 'GET',
-                        success : function( response ){ 
+                        success : function( response ){
                             $( link ).parent().after( response );
                         }
                     });

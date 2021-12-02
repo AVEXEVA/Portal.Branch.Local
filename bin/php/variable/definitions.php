@@ -25,12 +25,16 @@ define(
 	'bin_library',
 	bin . 'library/'
 );
-
-define( 'privilege_read', 4 );
+define( 'privilege_read', 8 );
 define( 'privilege_write', 4 );
-define( 'privilege_exec', 4 );
-define( 'level_world', 0 );
-define( 'level_group', 3 );
-define( 'level_user', 6 );
-
+define( 'privilege_delete', 2 );
+define( 'privilege_exec', 1 );
+define( 'level_internet', 0 );
+define( 'level_token', ( 4 * 1 ) );
+define( 'level_other', ( 4 * 2 ) );
+define( 'level_server', ( 4 * 3 ) );
+define( 'level_database', ( 4 * 4 ) );
+define( 'level_department', ( 4 * 5 ) );
+define( 'level_group', ( 4 * 6 ) );
+define( 'level_owner', ( 4 * 7 ) );
 ?>

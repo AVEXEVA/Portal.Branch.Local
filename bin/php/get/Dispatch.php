@@ -3,14 +3,14 @@ session_start( [ 'read_and_close' => true ] );
 require('index.php');
 setlocale(LC_MONETARY, 'en_US');
 if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         null,
       " SELECT *
         FROM   Connection
         WHERE  Connection.Connector = ?
                AND Connection.Hash = ?
     ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r);
+    $Connection = sqlsrv_fetch_array($result);
     $User    = \singleton\database::getInstance( )->query(
         null,
       " SELECT Emp.*,
@@ -21,17 +21,20 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     ;", array($_SESSION['User']));
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
-    $r = \singleton\database::getInstance( )->query(
-        null,
-      " SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
-        FROM   Privilege
-        WHERE  Privilege.User_ID = ?
-    ;",array($_SESSION['User']));
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Other]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+      )
+    );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
     $Privileged = False;
     if( isset($Privleges['Ticket'])
 	  	&& $Privileges['Ticket']['User_Privilege'] >= 4){
@@ -57,7 +60,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketO.fWork = '" . $Selected_Mechanic . "'";}
 		    $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 		}
-		$r = \singleton\database::getInstance( )->query(
+		$result = \singleton\database::getInstance( )->query(
         null,
       " SELECT Emp.*,
 				   tblWork.Super
@@ -67,8 +70,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				   AND Emp.Status = 0
 		;");
 		$Mechanics = array();
-		if($r){
-			while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$Mechanics[] = $array;}
+		if($result){
+			while($array = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){$Mechanics[] = $array;}
 		}
 		//GET TICKETS
 		if($_GET['Start_Date'] > 0){$Start_Date = DateTime::createFromFormat('m/d/Y', $_GET['Start_Date'])->format("Y-m-d 00:00:00.000");}
@@ -90,7 +93,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		if($End_Date < date('Y-m-d 00:00:00.000')){$Closeout = " AND TickOStatus.Type='Completed'";}
 		else {$Clouseout = '';}
 
-		$r = \singleton\database::getInstance( )->query(
+		$result = \singleton\database::getInstance( )->query(
         null,
       "    SELECT TicketO.  *,
 				   Loc.Tag 			 AS Tag,
@@ -128,8 +131,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 				AND Emp.Status = 0
 		;",array($Start_Date,$End_Date));
 		$Tickets = array();
-		if($r){
-			while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
+		if($result){
+			while($array = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){
 			    $Tickets[$array['ID']] = $array;
 			}
 		}
@@ -142,7 +145,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		    foreach($Selected_Mechanics as $key=>$Selected_Mechanic){$Selected_Mechanics_SQL[$key] = "TicketD.fWork = '" . $Selected_Mechanic . "'";}
 		    $SQL_Selected_Mechanics = "(" . implode(" OR ",$Selected_Mechanics_SQL) . ")";
 		}
-	    $r = \singleton\database::getInstance( )->query(
+	    $result = \singleton\database::getInstance( )->query(
           null,
         " SELECT
 	    		TicketD.CDate 	  AS CDate,
@@ -186,13 +189,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    		AND (Tag 	   =  '{$Location_Tag}')
 	    		AND Emp.Status =  0
 		;",array($Start_Date,$End_Date));
-	    if($r){
-		    while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
+	    if($result){
+		    while($array = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){
 		        $Tickets[$array['ID']] = $array;
 		        $Tickets[$array['ID']]['Status'] = "Completed";
 		    }
 		}
-		$r = \singleton\database::getInstance( )->query(
+		$result = \singleton\database::getInstance( )->query(
         null,
       "   SELECT
 	    		TicketDArchive.CDate 	AS CDate,
@@ -237,8 +240,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	    		AND (Tag       =  '{$Location_Tag}')
 	    		AND Emp.Status =  0
 		;",array($Start_Date,$End_Date));
-	    if($r){
-		    while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
+	    if($result){
+		    while($array = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){
 		        $Tickets[$array['ID']] = $array;
 		    }
 		}

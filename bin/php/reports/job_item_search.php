@@ -8,14 +8,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Portal.dbo.Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4 && $My_Privileges['Job']['Group_Privilege'] >= 4 && $My_Privileges['Job']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+    if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >= 4 && $My_Privileges['Job']['Group'] >= 4 && $My_Privileges['Job']['Other'] >= 4){$Privileged = TRUE;}
     $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "purchasing.php"));
     if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href='../login.php?Forward=modernizations.php';</script></head></html><?php }
     else {
@@ -43,7 +43,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                                 <span onClick="document.location.href='purchasing.php'" style='cursor:pointer;'><?php \singleton\fontawesome::getInstance( )->Unit();?>Equipment List</span>
                                 <span class='hidden' onClick="modernizationTracker('modernization_equipment');" style='cursor:pointer;'><span id='modernization_equipment'> > Equipment Entity</span></span>
                             </div>
-                            <?php if(isset($My_Privileges['Admin']['User_Privilege']) && $My_Privileges['Admin']['User_Privilege'] > 4){?>
+                            <?php if(isset($My_Privileges['Admin']['Owner']) && $My_Privileges['Admin']['Owner'] > 4){?>
                             <div class='delete' style='cursor:pointer;float:right;margin-left:25px;' onClick="deleteRow();"><?php \singleton\fontawesome::getInstance( )->Edit();?> Delete</div><?php }?>
                             <div class='add' style='float:right;margin-left:25px;cursor:pointer;' onClick="popupAddEquipment();"><?php \singleton\fontawesome::getInstance( )->Add();?> Add</div>
                             <div style='clear:both;'></div>

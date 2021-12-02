@@ -3,75 +3,95 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ) {
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
     $result = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  *
-    		FROM    Connection
-    		WHERE       Connection.Connector = ?
-    		            AND Connection.Hash  = ?;",
-        array(
-            $_SESSION[ 'User' ],
-            $_SESSION[ 'Hash' ]
-        )
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
-    $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
-
+    $Connection = sqlsrv_fetch_array($result);
     //User
-    $result = \singleton\database::getInstance( )->query(
-          null,
-        "   SELECT    *,
-    		           Emp.fFirst AS First_Name,
-    			         Emp.Last   AS Last_Name
-    		    FROM   Emp
-    		    WHERE  Emp.ID = ?;",
-        array(
-            $_SESSION[ 'User' ]
-        )
-    );
-    $User = sqlsrv_fetch_array($result);
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
-    //Privileges
-    $result = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
-                    Privilege.Group_Privilege,
-                    Privilege.Other_Privilege
-    		FROM    Privilege
-    		WHERE   Privilege.User_ID = ?;",
-        array(
-            $_SESSION[ 'User' ]
-        )
-    );
-	$Privileges = array();
-	if( $result ){while($Privilege = sqlsrv_fetch_array( $result ) ){$Privileges[$Privilege[ 'Access_Table' ]] = $Privilege;}}
-    if(	!isset($Connection[ 'ID' ])
-	   	|| !isset($Privileges[ 'Job' ])
-	  		|| $Privileges[ 'Job' ][ 'User_Privilege' ]  < 4
-	  		|| $Privileges[ 'Job' ][ 'Group_Privilege' ] < 4){
-				?><?php require('../404.html');?><?php }
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(   !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Job' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		\singleton\database::getInstance( )->query(
-            null,
-            "   INSERT INTO Activity([User], [Date], [Page])
-			    VALUES(?, ?, ?);",
-            array($_SESSION[ 'User' ],
-                date('Y-m-d H:i:s'),
-                'jobs.php'
-            )
-        );
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'jobs.php'
+        )
+      );
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-	<?php
-		$_GET[ 'Bootstrap' ] = '5.1';
-		$_GET[ 'Entity_CSS' ] = 1;
-	?>
-	<?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css  . 'index.php' );?>
-    <?php require( bin_js   . 'index.php' );?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
 <body onload='finishLoadingPage();'>
@@ -96,8 +116,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ) {
                       <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                       <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text'name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
                       <th class='border border-white'><div class='row g-0'>
-                          <div class='col-12'><input class='redraw date' type='text' name='Date_Start' placeholder='Date Start' value='<?php echo isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null;?>' /></div>
-                          <div class='col-12'><input class='redraw date' type='text' name='Date_End' placeholder='Date End' value='<?php echo isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null;?>' /></div>
+                          <div class='col-12'><input class='redraw date form-control' type='text' name='Date_Start' placeholder='Date Start' value='<?php echo isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null;?>' /></div>
+                          <div class='col-12'><input class='redraw date form-control' type='text' name='Date_End' placeholder='Date End' value='<?php echo isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null;?>' /></div>
                       </div></th>
                       <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text'name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                       <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text'name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>

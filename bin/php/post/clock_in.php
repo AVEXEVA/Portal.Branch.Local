@@ -33,10 +33,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Privileges
   $result = $database->query(
     null,
-    " SELECT  Access_Table, 
-              User_Privilege, 
-              Group_Privilege, 
-              Other_Privilege
+    " SELECT  Access, 
+              Owner, 
+              Group, 
+              Other
       FROM    Privilege
       WHERE   User_ID = ?;",
     array( 
@@ -44,7 +44,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     ) 
   );
   $Privileges = array( );
-  if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result )){ $Privilege[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
+  if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result )){ $Privilege[ $Privilege[ 'Access' ] ] = $Privilege; } }
   if(!isset($Connection['ID'])){?><html><head></head></html><?php }
   else {
     $database->query(

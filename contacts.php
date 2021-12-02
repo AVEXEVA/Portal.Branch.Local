@@ -1,71 +1,97 @@
 <?php
-if( session_id( ) == '' || !isset( $_SESSION ) ) {
+if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $result = $database->query(
-        null,
-        "   SELECT  *
-		        FROM    Connection
-		        WHERE       Connection.Connector = ?
-                    AND Connection.Hash  = ?;",
-        array(
-            $_SESSION[ 'User' ],
-            $_SESSION[ 'Hash' ]
-        )
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
-    $Connection = sqlsrv_fetch_array( $result );
+    $Connection = sqlsrv_fetch_array($result);
     //User
-    $result = $database->query(
-        null,
-        "   SELECT  *,
-                    Emp.fFirst AS First_Name,
-                    Emp.Last   AS Last_Name
-            FROM    Emp
-            WHERE   Emp.ID = ?;",
-        array(
-            $_SESSION[ 'User' ]
-        )
-    );
-    $User = sqlsrv_fetch_array( $result );
-    //Privileges
-	$result = $database->query(
-        null,
-        "   SELECT  *
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array(
-            $_SESSION['User']
-        )
-    );
-	$Privileges = array();
-	if( $result ){while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
-    if(	!isset( $Connection[ 'ID' ] )
-	   	|| !isset($Privileges[ 'Customer' ])
-	  		|| $Privileges[ 'Customer' ][ 'User_Privilege' ]  < 4
-	  		|| $Privileges[ 'Customer' ][ 'Group_Privilege' ] < 4
-        	|| $Privileges[ 'Customer' ][ 'Other_Privilege' ] < 4){
-				?><?php require( '../404.html' );?><?php }
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Contact' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Contact' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-  		$database->query(
+        \singleton\database::getInstance( )->query(
           null,
-          "   INSERT INTO Activity([User], [Date], [Page])
-              VALUES( ?, ?, ? );",
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
           array(
-              $_SESSION['User'],
-              date( 'Y-m-d H:i:s' ),
-              'contacts.php'
-          )
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'contacts.php'
+        )
       );
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta . 'index.php');?>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js  . 'index.php');?>
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+     <?php $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
   	<div id='wrapper'>
@@ -179,13 +205,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Position' placeholder='Position' value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Street' placeholder='Street' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
-			            </tr></thead>
+							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
+			     </tr></thead>
 					</table>
 				</div>
-      		</div>
     	</div>
-  	</div>
+    </div>
+  </div>
 </body>
 </html>
 <?php

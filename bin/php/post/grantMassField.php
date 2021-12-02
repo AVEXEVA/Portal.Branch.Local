@@ -12,10 +12,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
         FROM   Privilege
         WHERE 
             User_ID='{$_SESSION['User']}'
-            AND Access_Table='Admin'
-            AND User_Privilege='7'
-            AND Group_Privilege='7'
-            AND Other_Privilege='7'
+            AND Access='Admin'
+            AND Owner='7'
+            AND Group='7'
+            AND Other='7'
     ;");
     $Admin = sqlsrv_fetch_array($r);
     if(!isset($array['ID'])  || !is_array($Admin)){?><html><head><script>document.location.href='../login.php';</script></head></html><?php }
@@ -36,23 +36,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 FROM   Privileges
                 WHERE
                     User_ID='{$User['ID']}'
-                    AND User_Privilege <> 7
-                    AND Group_Privilege <> 7
-                    AND Other_Privilege <> 7
+                    AND Owner <> 7
+                    AND Group <> 7
+                    AND Other <> 7
             ;");
             
             $Update_Privileges = array();
             while($array = sqlsrv_fetch_array($r1)){
-                if(in_array($array['Access_Table'],$My_Privileges)){
-                    if(($key = array_search($array['Access_Table'], $My_Privileges)) !== false) {
+                if(in_array($array['Access'],$My_Privileges)){
+                    if(($key = array_search($array['Access'], $My_Privileges)) !== false) {
                         unset($My_Privileges[$key]);
-                        $Update_Privileges[] = $array['Access_Table'];
+                        $Update_Privileges[] = $array['Access'];
                     }
                 }
             }
             foreach($My_Privileges as $Privilege){
                 $database->query(null,"
-                    INSERT INTO Privilege(User_ID,Access_Table,User_Privilege,Group_Privilege,Other_Privilege)
+                    INSERT INTO Privilege(User_ID,Access,Owner,Group,Other)
                     VALUES({$User['ID']},'{$Privilege}',6,4,0)
                 ;");
             }
@@ -60,12 +60,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 $database->query(null,"
                     UPDATE Privileges
                     SET 
-                        User_Privilege='6',
-                        Group_Privilege='4',
-                        Other_Privilege='0'
+                        Owner='6',
+                        Group='4',
+                        Other='0'
                     WHERE 
                         User_ID='{$User['ID']}'
-                        AND Access_Table='{$Privilege}'
+                        AND Access='{$Privilege}'
                 ;");
             }
             unset($My_Privileges);

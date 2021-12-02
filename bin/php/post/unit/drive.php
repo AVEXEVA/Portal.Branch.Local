@@ -11,14 +11,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       $My_User = sqlsrv_fetch_array($r);
       $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
       $r = $database->query($Portal,"
-          SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+          SELECT Access, Owner, Group, Other
           FROM   Portal.dbo.Privilege
           WHERE  User_ID = ?
       ;",array($_SESSION['User']));
       $My_Privileges = array();
-      while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}
+      while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}
       $Privileged = FALSE;
-      if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['User_Privilege'] >= 6 && $My_Privileges['Unit']['Group_Privilege'] >= 4){$Privileged = TRUE;}
+      if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Owner'] >= 6 && $My_Privileges['Unit']['Group'] >= 4){$Privileged = TRUE;}
   }
   if(!isset($array['ID'])  || !$Privileged){?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html>
   <?php } else {

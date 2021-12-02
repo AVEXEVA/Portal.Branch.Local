@@ -8,14 +8,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $User = sqlsrv_fetch_array($User);
     $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-            SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+            SELECT Access, Owner, Group, Other
             FROM   Privilege
             WHERE  User_ID = ?
         ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
-    if(isset($My_Privileges['Financials']) && $My_Privileges['Financials']['User_Privilege'] >= 4 && $My_Privileges['Financials']['Group_Privilege'] >= 4 && $My_Privileges['Financials']['Other_Privilege'] >= 4){$Privileged = TRUE;}
+    if(isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Owner'] >= 4 && $My_Privileges['Financials']['Group'] >= 4 && $My_Privileges['Financials']['Other'] >= 4){$Privileged = TRUE;}
     if(!isset($array['ID'])  || !$Privileged || count($_GET) == 0){?><html><head><script>document.location.href='../login.php?Forward=modernizations.php';</script></head></html><?php }
     else {
         if(!isset($_SESSION['Financials'])){

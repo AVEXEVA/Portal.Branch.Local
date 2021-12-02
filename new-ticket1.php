@@ -1,15 +1,15 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Connection
   $result = $database->query(
     null,
-    " SELECT  Connection.* 
-      FROM    Connection 
-      WHERE       Connection.Connector = ? 
+    " SELECT  Connection.*
+      FROM    Connection
+      WHERE       Connection.Connector = ?
               AND Connection.Hash = ?;",
     array(
       $_SESSION[ 'User' ],
@@ -20,10 +20,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //User
   $result = $database->query(
     null,
-    " SELECT  Emp.*, 
-              Emp.fFirst AS First_Name, 
-              Emp.Last as Last_Name 
-      FROM    Emp 
+    " SELECT  Emp.*,
+              Emp.fFirst AS First_Name,
+              Emp.Last as Last_Name
+      FROM    Emp
       WHERE   Emp.ID = ?;",
     array(
       $_SESSION[ 'User' ]
@@ -33,21 +33,21 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
   //Privileges
   $Privileges = array( );
   $Privileged = false;
-  $result = $database->query(
-    null,
-    " SELECT  Privilege.Access_Table, 
-              Privilege.User_Privilege, 
-              Privilege.Group_Privilege, 
-              Privilege.Other_Privilege 
-      FROM    Privilege 
-      WHERE   Privilege.User_ID = ?;",
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Other]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
     array(
-      $_SESSION[ 'User' ]
+      $_SESSION[ 'Connection' ][ 'User' ]
     )
   );
-  if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; } }
-  
-  if( isset( $Privileges[ 'Ticket' ] ) && $Privileges[ 'Ticket' ][ 'User_Privilege' ] >= 6){ $Privileged = TRUE; }
+  if( $result ){ while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; } }
+
+  if( isset( $Privileges[ 'Ticket' ] ) && $Privileges[ 'Ticket' ][ 'Owner' ] >= 6){ $Privileged = TRUE; }
   if( !isset($Connection['ID'])  || !$Privileged ){require("401.html");}
   else {
     $database->query(null,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php?ID=New"));
@@ -263,15 +263,15 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	  }
 	  </style>
 	  <!-- Bootstrap Core JavaScript -->
-    
+
 
     <?php require(PROJECT_ROOT.'js/datatables.php');?>
 
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 
 	<script>
 	$(document).ready(function(){$("input[name='Date']").datepicker();});

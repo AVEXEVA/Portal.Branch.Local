@@ -1,46 +1,97 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('bin/php/index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"
-		SELECT *
-		FROM   Connection
-		WHERE  Connection.Connector = ?
-		       AND Connection.Hash  = ?
-	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
-		SELECT *,
-		       Emp.fFirst AS First_Name,
-			   Emp.Last   AS Last_Name
-		FROM   Emp
-		WHERE  Emp.ID = ?
-	;",array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT *
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$Privileges = array();
-	if($r){while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
-    if(	!isset($Connection['ID'])){?><?php require('../404.html');?><?php }
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Admin' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Admin' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-		$database->query(null,"
-			INSERT INTO Portal.dbo.Activity([User], [Date], [Page])
-			VALUES(?,?,?)
-		;",array($_SESSION['User'],date("Y-m-d H:i:s"), "payroll.php"));
-
-$Mechanic = is_numeric($_SESSION['User']) ? $_SESSION['User'] : -1;
-
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'payroll.php'
+        )
+      );
+$Mechanic = is_numeric($_SESSION['Connection']['User']) ? $_SESSION['Connection']['User'] : -1;
 if($Mechanic > 0){
     $Call_Sign = "";
-    $r = $database->query(null,"select * from Emp where ID = " . $_SESSION['User']);
-    $array = sqlsrv_fetch_array($r);
+    $result = $database->query(null,"select * from Emp where ID = " . $_SESSION['Connection']['User']);
+    $array = sqlsrv_fetch_array($result);
     $Call_Sign = $array['CallSign'];
     $Alias = $array['fFirst'][0] . $array['Last'];
     $Employee_ID = $array['fWork'];
-    while($array = sqlsrv_fetch_array($r)){}
+    while($array = sqlsrv_fetch_array($result)){}
 
     //GET TICKETS
     if($_GET['Start_Date'] > 0){$Start_Date = DateTime::createFromFormat('m/d/Y', $_GET['Start_Date'])->format("Y-m-d 00:00:00.000");}
@@ -55,17 +106,17 @@ if($Mechanic > 0){
     if(!isset($_GET['Status']) || $_GET['Status'] == 'All' || $_GET['Status'] == ""){$Status = "' OR '1'='1";}
     else{$Status = $_GET['Status'];}
     //$prepared = odbc_prepare($c,"select TicketO.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State, TickOStatus.Type as Status from (((((TicketO LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketO.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON TicketO.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketO.LElev = Elev.ID) LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref where TicketO.DWork='" . $Call_Sign . "' AND CDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "' AND Loc.Loc = ?");
-    //$r = odbc_exec($prepared,$Location_Tag);
+    //$result = odbc_exec($prepared,$Location_Tag);
 
-    $r = $database->query(null,"select TicketO.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State, TickOStatus.Type as Status from (((((TicketO LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketO.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON TicketO.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketO.LElev = Elev.ID) LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref where TicketO.fWork='" . $Employee_ID . "' AND ((EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "') OR Assigned=3 OR Assigned=1) AND (Tag = '" . $Location_Tag . "') AND (Assigned = '" . $Status .  "');");
+    $result = $database->query(null,"select TicketO.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State, TickOStatus.Type as Status from (((((TicketO LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketO.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON TicketO.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketO.LElev = Elev.ID) LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref where TicketO.fWork='" . $Employee_ID . "' AND ((EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "') OR Assigned=3 OR Assigned=1) AND (Tag = '" . $Location_Tag . "') AND (Assigned = '" . $Status .  "');");
     $Tickets = array();
-    while($array = sqlsrv_fetch_array($r)){
+    while($array = sqlsrv_fetch_array($result)){
         $Tickets[$array['ID']] = $array;
     }
 
     if($Status == "4" || $_GET['Status'] == "" || !isset($_GET['Status'])){
-        $r = $database->query(null,"select TicketD.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State from ((((TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON Loc.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketD.Elev = Elev.ID where TicketD.fWork='" . $Employee_ID . "' AND EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "' AND (Tag = '" . $Location_Tag . "');");
-        while($array = sqlsrv_fetch_array($r)){
+        $result = $database->query(null,"select TicketD.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State from ((((TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON Loc.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketD.Elev = Elev.ID where TicketD.fWork='" . $Employee_ID . "' AND EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "' AND (Tag = '" . $Location_Tag . "');");
+        while($array = sqlsrv_fetch_array($result)){
             $Tickets[$array['ID']] = $array;
             $Tickets[$array['ID']]['Status'] = "Completed";
         }
@@ -81,9 +132,13 @@ if($Mechanic > 0){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="">    <title>Nouveau Texas | Portal</title>
-    <?php require( bin_css . 'index.php');?>
-    <?php require( bin_js . 'index.php');?>
+    <meta name="author" content="">
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+       <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+       <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+       <?php	require( bin_meta . 'index.php');?>
+       <?php	require( bin_css  . 'index.php');?>
+       <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload="finishLoadingPage();">
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
@@ -189,101 +244,101 @@ if($Mechanic > 0){
                                         ?></td>
                                         <?php
                                         $Thursday = date('Y-m-d',strtotime($Thursday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Thursday . " 00:00:00.000'
                                                     AND EDate <= '" . $Thursday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Thursday' rel='<?php echo $Thursday;?>' onClick="refresh_this(this);"><?php
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <?php $Friday = date('Y-m-d',strtotime($Friday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Friday . " 00:00:00.000'
                                                     AND EDate <= '" . $Friday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Friday' rel='<?php echo $Friday;?>' onClick="refresh_this(this);"><?php
-                                           echo sqlsrv_fetch_array($r)['Summed'];
+                                           echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <?php $Saturday = date('Y-m-d',strtotime($Saturday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Saturday . " 00:00:00.000'
                                                     AND EDate <= '" . $Saturday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Saturday' rel='<?php echo $Saturday;?>' onClick="refresh_this(this);"><?php
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <?php $Sunday = date('Y-m-d',strtotime($Sunday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Sunday . " 00:00:00.000'
                                                     AND EDate <= '" . $Sunday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Sunday' rel='<?php echo $Sunday;?>' onClick="refresh_this(this);"><?php
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <?php $Monday = date('Y-m-d',strtotime($Monday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Monday . " 00:00:00.000'
                                                     AND EDate <= '" . $Monday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Monday' rel='<?php echo $Monday;?>' onClick="refresh_this(this);"><?php
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <?php $Tuesday = date('Y-m-d',strtotime($Tuesday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Tuesday . " 00:00:00.000'
                                                     AND EDate <= '" . $Tuesday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Tuesday' rel='<?php echo $Tuesday;?>' onClick="refresh_this(this);"><?php
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <?php $Wednesday = date('Y-m-d',strtotime($Wednesday . ' -7 days'));
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Wednesday . " 00:00:00.000'
                                                     AND EDate <= '" . $Wednesday . " 23:59:59.999' AND ClearPR='1'");?>
                                         <td class='Wednesday' rel='<?php echo $Wednesday;?>' onClick="refresh_this(this);"><?php
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <td><?php
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Total) as Summed
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Thursday . " 00:00:00.000'
                                                     AND EDate <= '" . $Wednesday . " 23:59:59.999' AND ClearPR='1'");
                                             $Hours = 0;
-                                            echo sqlsrv_fetch_array($r)['Summed'];
+                                            echo sqlsrv_fetch_array($result)['Summed'];
                                         ?></td>
                                         <td>$<?php
-                                            $r = $database->query(null,"
+                                            $result = $database->query(null,"
                                                 SELECT Sum(Zone) + 0 as Zone_Sum, Sum(OtherE) + 0 as Other_Sum
-                                                FROM nei.dbo.TicketD
+                                                FROM dbo.TicketD
                                                 WHERE
                                                     fWork='" . $Employee_ID . "'
                                                     AND EDate >= '" . $Thursday . " 00:00:00.000'
                                                     AND EDate <= '" . $Wednesday . " 23:59:59.999' AND ClearPR='1'");
-                                            $array =  sqlsrv_fetch_array($r);
+                                            $array =  sqlsrv_fetch_array($result);
                                             echo $array['Zone_Sum'] + $array['Other_Sum'];
                                         ?></td>
                                     </tr><?php }?>

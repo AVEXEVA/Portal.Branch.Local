@@ -21,21 +21,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	$My_User = sqlsrv_fetch_array($My_User);
 	$My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
 	$r = $database->query(null,"
-		SELECT Privilege.Access_Table,
-			   Privilege.User_Privilege,
-			   Privilege.Group_Privilege,
-			   Privilege.Other_Privilege
+		SELECT Privilege.Access,
+			   Privilege.Owner,
+			   Privilege.Group,
+			   Privilege.Other
 		FROM   Privilege
 		WHERE  Privilege.User_ID = ?
 	;",array($_SESSION['User']));
 	$My_Privileges = array();
-	while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+	while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
 	$Privileged = False;
 	if( isset($My_Privileges['Job'])
-	  	&& $My_Privileges['Job']['Other_Privilege'] >= 4){
+	  	&& $My_Privileges['Job']['Other'] >= 4){
             $Privileged = True;}
 	if(isset($My_Privileges['Job'])
-		&& $My_Privileges['Job']['Group_Privilege'] >= 4){
+		&& $My_Privileges['Job']['Group'] >= 4){
 			$r = $database->query(null,"
 				SELECT Job.Loc AS Location_ID
 				FROM   Job
@@ -63,7 +63,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			;", array($Location_ID, $My_User['fWork'],$Location_ID, $My_User['fWork'],$Location_ID, $My_User['fWork']));
 			if(is_array(sqlsrv_fetch_array($r))){$Privileged = True;}}
 	if(isset($My_Privileges['Job'])
-		&& $My_Privileges['Job']['User_Privilege'] >= 4
+		&& $My_Privileges['Job']['Owner'] >= 4
 		&& is_numeric($_GET['ID'])){
 			$r = $database->query(null,"
 				SELECT Tickets.ID
@@ -210,8 +210,8 @@ if(isMobile() || true ){?><!DOCTYPE html>
 				<li class=""><a href="#" tab="overview-pills" 	onClick="asyncPage(this);" ><?php \singleton\fontawesome::getInstance( )->Info();?>Overview</a></li>
 				<li class=''><a href='#' tab='operations-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Operations();?>Operations</a>
 				</li>
-				<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other_Privilege'] >= 4){?><li class=''><a href='#' tab='sales-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Sales();?>Sales</a></li><?php }?>
-				<?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other_Privilege'] >= 4)){?><li class=''><a href='#' tab='accounting-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Collection();?>Accounting</a></li><?php }?>
+				<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Other'] >= 4){?><li class=''><a href='#' tab='sales-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Sales();?>Sales</a></li><?php }?>
+				<?php if((!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator') && (isset($My_Privileges['Financials']) && $My_Privileges['Financials']['Other'] >= 4)){?><li class=''><a href='#' tab='accounting-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Collection();?>Accounting</a></li><?php }?>
 				<li class=''><a href='#' tab='tables-pills' onClick='asyncPage(this);'><?php \singleton\fontawesome::getInstance( )->Operations();?>Tables</a></li>
 			</ul>
 			<div class="tab-content" id="main-tab-content">
@@ -268,22 +268,22 @@ if(isMobile() || true ){?><!DOCTYPE html>
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
 						<div class ='nav-text'>Information</div>
 				</div>
-				<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Customer']) && $My_Privileges['Customer']['Owner'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='customer.php?ID=<?php echo $Job['Customer_ID'];?>'">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 							<div class ='nav-text'>Customer</div>
 					</div><?php }?>
-				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-code.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 						<div class ='nav-text'>Code</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Collection']) && $My_Privileges['Collection']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Collection']) && $My_Privileges['Collection']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-collections.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
 						<div class ='nav-text'>Collections</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Contract']) && $My_Privileges['Contract']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Contract']) && $My_Privileges['Contract']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-contracts.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract(3);?></div>
 						<div class ='nav-text'>Contracts</div>
@@ -292,81 +292,81 @@ if(isMobile() || true ){?><!DOCTYPE html>
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Activities(3);?></div>
 						<div class ='nav-text'>Feed</div>
 				</div>
-				<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Group_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Group'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-hours.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Payroll(3);?></div>
 						<div class ='nav-text'>Hours</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Invoice']) && $My_Privileges['Invoice']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-invoices.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
 						<div class ='nav-text'>Invoices</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['User_Privilege'] >= 4 && false){
+				<?php if(isset($My_Privileges['Legal']) && $My_Privileges['Legal']['Owner'] >= 4 && false){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-legal.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Legal(3);?></div>
 						<div class ='nav-text'>Legal</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Location']) && $My_Privileges['Location']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href ='location.php?ID=<?php echo $Job['Location_ID'];?>';">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
 						<div class ='nav-text'>Location</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Log']) && $My_Privileges['Log']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Log']) && $My_Privileges['Log']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-log.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
 						<div class ='nav-text'>Log</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-maintenance.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Maintenance(3);?></div>
 						<div class ='nav-text'>Maintenance</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Map']) && $My_Privileges['Map']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Map']) && $My_Privileges['Map']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-map.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
 						<div class ='nav-text'>Map</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-modernization.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Modernization(3);?></div>
 						<div class ='nav-text'>Modernization</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Finances']) && $My_Privileges['Finances']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Finances']) && $My_Privileges['Finances']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-pnl.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
 						<div class ='nav-text'>P&L</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Proposal']) && $My_Privileges['Proposal']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Proposal']) && $My_Privileges['Proposal']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-proposals.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
 						<div class ='nav-text'>Proposals</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Repair']) && $My_Privileges['Repair']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Repair']) && $My_Privileges['Repair']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-repair.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Repair(3);?></div>
 						<div class ='nav-text'>Repair</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Job']) && $My_Privileges['Job']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-testing.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Testing(3);?></div>
 						<div class ='nav-text'>Testing</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-tickets.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
 						<div class ='nav-text'>Tickets</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Group_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['Time']) && $My_Privileges['Time']['Group'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-timeline.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->History(3);?></div>
 						<div class ='nav-text'>Timeline</div>
 				</div><?php }?>
-				<?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Group_Privilege'] >= 4 && is_numeric($Job['Unit_ID']) && $Job['Unit_ID'] > 0){
+				<?php if(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Group'] >= 4 && is_numeric($Job['Unit_ID']) && $Job['Unit_ID'] > 0){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='unit.php?ID=<?php echo $Job['Unit_ID'];?>';">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 						<div class ='nav-text'>Unit</div>
-				</div><?php } elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Group_Privilege'] >= 4){
+				</div><?php } elseif(isset($My_Privileges['Unit']) && $My_Privileges['Unit']['Group'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-units.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
 						<div class ='nav-text'>Units</div>
@@ -376,7 +376,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 				if($r){
 					$Violation = sqlsrv_fetch_array($r)['ID'];
 					if($Violation && $Violation > 0){
-						if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['User_Privilege'] >= 4){
+						if(isset($My_Privileges['Violation']) && $My_Privileges['Violation']['Owner'] >= 4){
 					?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='violation.php?ID=<?php echo $Violation;?>';">
 							<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
 							<div class ='nav-text'>Violation</div>
@@ -384,7 +384,7 @@ if(isMobile() || true ){?><!DOCTYPE html>
 						}
 					}
 				}?>
-				<?php if(isset($My_Privileges['User']) && $My_Privileges['User']['User_Privilege'] >= 4){
+				<?php if(isset($My_Privileges['User']) && $My_Privileges['User']['Owner'] >= 4){
 				?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="someFunction(this,'job-workers.php?ID=<?php echo $_GET['ID'];?>');">
 						<div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
 						<div class ='nav-text'>Workers</div>

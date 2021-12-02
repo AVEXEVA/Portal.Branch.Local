@@ -3,81 +3,108 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  *
-          FROM    Connection
-          WHERE   Connection.Connector = ?
-                  AND Connection.Hash = ?;",
-        array(
-          $_SESSION[ 'User' ],
-          $_SESSION[ 'Hash' ]
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(   !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Collection' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Collection' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'contracts.php'
         )
       );
-    $Connection = sqlsrv_fetch_array( $r );
-    $User = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Emp.*,
-                  Emp.fFirst AS First_Name,
-                  Emp.Last   AS Last_Name
-          FROM    Emp
-          WHERE   Emp.ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
-        )
-    );
-    $User = sqlsrv_fetch_array( $User );
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
-                    Privilege.Group_Privilege,
-                    Privilege.Other_Privilege
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
-        )
-    );
-    $Privleges = array();
-    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privleges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
-    $Privileged = False;
-    if( isset( $Privleges[ 'Contract' ] )
-        && (
-            $Privleges[ 'Contract' ][ 'Other_Privilege' ] >= 4
-        ||  $Privleges[ 'Contract' ][ 'Group_Privilege' ] >= 4
-        ||  $Privleges[ 'Contract' ][ 'User_Privilege' ]  >= 4
-      )
-    ){ $Privileged = True; }
-    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
-    else {
-    $conn = null;
 
-    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '-1';
-    $Start = $_GET['iDisplayStart'];
-    $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length) + 5;
+    $conditions = array( );
+    $search = array( );
+    $parameters = array( );
 
-    $conditions = array();
-    if( isset($_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ] ) ){
+    if( isset($_GET[ 'ID' ] ) && !empty(  $_GET[ 'ID' ] ) ){
       $parameters[] = $_GET['ID'];
       $conditions[] = "Contract.ID LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Customer' ] ) && !empty( $_GET[ 'Customer' ] ) ){
       $parameters[] = $_GET['Customer'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Location' ] ) && !empty( $_GET[ 'Location' ] ) ){
       $parameters[] = $_GET['Location'];
       $conditions[] = "Loc.Tag LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Job' ] ) && !empty( $_GET[ 'Job' ] ) ){
       $parameters[] = $_GET['Job'];
       $conditions[] = "Contract.Job LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Start_Date' ] ) && !in_array( $_GET[ 'Start_Date' ], array( '', ' ', null ) ) ){
+    if( isset( $_GET[ 'Start_Date' ] ) && !empty( $_GET[ 'Start_Date' ] ) ){
       $parameters[] = date('Y-m-d', strtotime( $_GET['Start_Date'] ) );
       $conditions[] = "Contract.BStart >= ?";
     }
@@ -85,7 +112,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $parameters[] = date('Y-m-d', strtotime( $_GET['End_Date'] ) );
       $conditions[] = "Contract.BFinish <= ?";
     }
-    if( isset($_GET[ 'Cycle' ] ) && !in_array( $_GET[ 'Cycle' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Cycle' ] ) && !empty( $_GET[ 'Cycle' ] ) ){
       $parameters[] = $_GET['Cycle'];
       $conditions[] = "Contract.BCycle LIKE '%' + ? + '%'";
     }
@@ -144,8 +171,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    $parameters[] = $Start;
-    $parameters[] = $End;
+
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+
     $Columns = array(
       0 =>  'Contract.ID',
       1 =>  'Customer.Name',
@@ -178,6 +207,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             Customer.Name       AS Customer_Name,
                             Loc.Loc             AS Location_ID,
                             Loc.Tag             AS Location_Name,
+                            Loc.Address         AS Location_Street,
+                            Loc.City            AS Location_City,
+                            Loc.State           AS Location_State,
+                            Loc.Zip             AS Location_Zip,
                             Job.fDesc           AS Job,
                             Contract.BStart     AS Start_Date,
                             Contract.BFinish    AS End_Date,
@@ -241,20 +274,19 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $iTotal = $aResultTotal[0];
 
     $output = array(
-        'sEcho'         =>  intval($_GET['sEcho']),
+        'sEcho'         =>  intval( $_GET['draw'] ),
         'iTotalRecords'     =>  $iTotal,
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array(),
         'options' => array( )
     );
-
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Start_Date' ]      = date( 'Y-m-d', strtotime( $Row[ 'Start_Date' ] ) );
-      $Row[ 'End_Date' ]        = date( 'Y-m-d', strtotime( $Row[ 'End_Date' ] ) );
-      $Row[ 'Escalation_Date' ] = date( 'Y-m-d', strtotime( $Row[ 'Escalation_Date' ] ) );
+      $Row[ 'Start_Date' ]      = date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
+      $Row[ 'End_Date' ]        = date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
+      $Row[ 'Escalation_Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
-      preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
-      $Row[ 'Link' ]            = $matches[ 0 ];
+      //preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
+      //$Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
     }
     $output[ 'options' ][ 'Cycle' ] = array(

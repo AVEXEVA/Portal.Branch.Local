@@ -1,58 +1,75 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('../index.php');
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        " SELECT  *
-          FROM    Connection
-          WHERE   Connection.Connector = ?
-                  AND Connection.Hash = ?;",
-        array(
-          $_SESSION[ 'User' ],
-          $_SESSION[ 'Hash' ]
-        )
-      );
-    $Connection = sqlsrv_fetch_array( $r );
-    $User = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Emp.*,
-                    Emp.fFirst AS First_Name,
-                    Emp.Last   AS Last_Name
-            FROM    Emp
-            WHERE   Emp.ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
-        )
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
     );
-    $User = sqlsrv_fetch_array( $User );
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
-                    Privilege.Group_Privilege,
-                    Privilege.Other_Privilege
-            FROM    Portal.dbo.Privilege
-            WHERE   Privilege.User_ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
-        )
-    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
     $Privileges = array();
-    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
-    $Privileged = False;
-    if( isset( $Privileges[ 'User' ] )
-        && $Privileges[ 'User' ][ 'Group_Privilege' ]  >= 4
-    ){ $Privileged = True; }
-    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
-    else {
-    $conn = null;
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
-    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '15';
-    $Start = $_GET['iDisplayStart'];
-    $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php require('404.html');?><?php }
+    else {
 
     $conditions = array( );
     $search = array( );
@@ -84,8 +101,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    $params[] = $Start;
-    $params[] = $End;
+
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+    
     $Columns = array(
       0 =>  'Emp.ID',
       1 =>  'Emp.fFirst',

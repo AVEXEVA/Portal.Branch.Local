@@ -27,10 +27,10 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 	$User = sqlsrv_fetch_array( $User );
 	$r = $database->query(
 		null,
-		"	SELECT Privilege.Access_Table,
-				   Privilege.User_Privilege,
-				   Privilege.Group_Privilege,
-				   Privilege.Other_Privilege
+		"	SELECT Privilege.Access,
+				   Privilege.Owner,
+				   Privilege.Group,
+				   Privilege.Other
 			FROM   Privilege
 			WHERE  Privilege.User_ID = ?;", 
 		array(
@@ -38,15 +38,15 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 		)
 	);
 	$Privileges = array( );
-	while($Privilege = sqlsrv_fetch_array( $r ) ){$Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege;}
+	while($Privilege = sqlsrv_fetch_array( $r ) ){$Privileges[ $Privilege[ 'Access' ] ] = $Privilege;}
 	$Privileged = False;
 	if( isset( $Privileges[ 'Location' ], $Privileges[ 'Unit' ] )
-	   	&& $Privileges[ 'Unit' ][ 'Other_Privilege' ] >= 4
-	  	&& $Privileges[ 'Location' ][ 'Other_Privilege' ] >= 4){
+	   	&& $Privileges[ 'Unit' ][ 'Other' ] >= 4
+	  	&& $Privileges[ 'Location' ][ 'Other' ] >= 4){
 			$Privileged = True; }
 	elseif( isset($Privileges[ 'Location' ], $Privileges[ 'Unit' ] )
-		&& $Privileges[ 'Unit' ][ 'Group_Privilege' ] >= 4
-		&& $Privileges[ 'Location' ][ 'Group_Privilege' ] >= 4
+		&& $Privileges[ 'Unit' ][ 'Group' ] >= 4
+		&& $Privileges[ 'Location' ][ 'Group' ] >= 4
 		&& is_numeric( $_GET[ 'Location' ] ) ){
 			$Location_ID = $_GET[ 'Location' ];
 			$r = $database->query(
@@ -79,8 +79,8 @@ if( isset($_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			);
 			$Privileged = is_array(sqlsrv_fetch_array($r)) ? True : False;}
 	elseif(isset($Privileges['Location'], $Privileges['Unit'])
-		&& $Privileges['Unit']['User_Privilege'] >= 4
-		&& $Privileges['Location']['User_Privilege'] >= 4
+		&& $Privileges['Unit']['Owner'] >= 4
+		&& $Privileges['Location']['Owner'] >= 4
 		&& is_numeric($_GET['ID'])){
 			$Location_ID = $_GET['ID'];
 			$r = $database->query(null,"

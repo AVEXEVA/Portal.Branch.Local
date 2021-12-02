@@ -20,21 +20,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
-               Privilege.Other_Privilege
+        SELECT Privilege.Access, 
+               Privilege.Owner, 
+               Privilege.Group, 
+               Privilege.Other
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Location']) 
         && (
-				$My_Privileges['Location']['Other_Privilege'] >= 4
+				$My_Privileges['Location']['Other'] >= 4
 			||	$My_Privileges['Location']['Group_Privlege'] >= 4
-			||  $My_Privileges['Location']['User_Privilege'] >= 4
+			||  $My_Privileges['Location']['Owner'] >= 4
 		)
 	 ){
             $Privileged = True;}
@@ -42,7 +42,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     else {
         $data = array();
         $Keyword = addslashes($_GET['Keyword']);
-        if($My_Privileges['User_Privilege'] > 4 && $My_Privileges['Group_Privilege'] > 4 && $My_Privileges['Other_Privilege'] > 4){
+        if($My_Privileges['Owner'] > 4 && $My_Privileges['Group'] > 4 && $My_Privileges['Other'] > 4){
             $r = $database->query(null,"
                 SELECT DISTINCT
                     Loc.Loc     AS ID,
@@ -73,7 +73,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             }
         } else {
             $SQL_Locations = array();
-            if($My_Privileges['Group_Privilege'] >= 4){
+            if($My_Privileges['Group'] >= 4){
                 $r = $database->query(null,"
                     SELECT LID AS Location
                     FROM   nei.dbo.TicketO
@@ -91,7 +91,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 
                 while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Locations[] = "Loc.Loc='{$array['Location']}'";}
             }
-            if($My_Privileges['User_Privilege'] >= 4){
+            if($My_Privileges['Owner'] >= 4){
                 $r = $database->query(null,"
                     SELECT Loc.Loc          AS Location
                     FROM   nei.dbo.Loc

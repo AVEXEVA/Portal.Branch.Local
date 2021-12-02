@@ -41,11 +41,11 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 	);
 	$Privileges = array();
 	$Privileged = false;
-	while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+	while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
 	if(		isset($Privileges['Customer']) 
-		&& 	$Privileges[ 'Customer' ][ 'User_Privilege' ]  >= 4 
-		&& 	$Privileges[ 'Customer' ][ 'Group_Privilege' ] >= 4 
-		&& 	$Privileges[ 'Customer' ][ 'Other_Privilege' ] >= 4){
+		&& 	$Privileges[ 'Customer' ][ 'Owner' ]  >= 4 
+		&& 	$Privileges[ 'Customer' ][ 'Group' ] >= 4 
+		&& 	$Privileges[ 'Customer' ][ 'Other' ] >= 4){
 				$Privileged = true;}
     if(		!isset($Connection['ID'])  
     	|| 	!is_numeric($_GET['ID']) 
@@ -221,7 +221,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		echo $r ? sqlsrv_fetch_array($r)['Count_of_Lawsuits'] : 0;?>
 	</div>
 </div>
-<?php if(isset($Privileges['Finances']) && $Privileges['Finances']['User_Privilege'] >= 4) {?>
+<?php if(isset($Privileges['Finances']) && $Privileges['Finances']['Owner'] >= 4) {?>
 <div class='row' style='padding-top:10px;padding-bottom:10px;'>
     <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Payroll(1);?> Balance</div>
     <div class='col-8'><?php

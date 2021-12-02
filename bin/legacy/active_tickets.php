@@ -37,11 +37,11 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       )
   );
 	$Privileges = array();
-	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege['Access']] = $Privilege;}}
     if(	!isset($Connection['ID'])
 	   	|| !isset($Privileges['Ticket'])
-	  		|| $Privileges['Ticket']['User_Privilege']  < 4
-	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
+	  		|| $Privileges['Ticket']['Owner']  < 4
+	  		|| $Privileges['Ticket']['Group'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
   		$database->query(

@@ -1,5 +1,0 @@
-<?PHP
-NAMESPACE \DATA\VAR;
-CLASS TIME {
-
-}?>

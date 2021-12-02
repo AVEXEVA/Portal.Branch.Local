@@ -1,14 +1,14 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [ 'read_and_close' => true ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if(isset( $_SESSION['User'], $_SESSION['Hash' ] ) ){
     $result = \singleton\database::getInstance( )->query(
         null,
-        "   SELECT  * 
-            FROM    Connection 
-            WHERE       Connector = ? 
+        "   SELECT  *
+            FROM    Connection
+            WHERE       Connector = ?
                     AND Hash = ?;",
         array(
             $_SESSION[ 'User' ],
@@ -20,10 +20,10 @@ if(isset( $_SESSION['User'], $_SESSION['Hash' ] ) ){
     //User
     $r = \singleton\database::getInstance( )->query(
         null,
-        "   SELECT  Employee.*, 
-                    Employee.fFirst AS First_Name, 
-                    Employee.Last AS Last_Name 
-            FROM    Emp AS Employee 
+        "   SELECT  Employee.*,
+                    Employee.fFirst AS First_Name,
+                    Employee.Last AS Last_Name
+            FROM    Emp AS Employee
             WHERE   Employee.ID = ?;",
         array(
             $_SESSION[ 'User' ]
@@ -32,17 +32,17 @@ if(isset( $_SESSION['User'], $_SESSION['Hash' ] ) ){
     $User = sqlsrv_fetch_array($r);
 
     //Privileges
-    $r = \singleton\database::getInstance( )->query(null,"
-        SELECT Access_Table, User_Privilege, Group_Privilege, Other_Privilege
+    $r = \singleton\database::getInstance( )->query('Portal',"
+        SELECT Access, Owner, Group, Other
         FROM   Privilege
         WHERE  User_ID = ?
     ;",array($_SESSION['User']));
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
-    if(isset($Privileges['Ticket']) && $Privileges['Ticket']['User_Privilege'] >= 4 && $Privileges['Ticket']['Group_Privilege'] >= 4 && $Privileges['Location']['Other_Privilege'] >= 4){$Privileged = TRUE;}
-    elseif($Privileges['Ticket']['User_Privilege'] >= 6 && !isset($_GET['ID'])){$Privileged = TRUE;}
-    elseif($Privileges['Ticket']['Group_Privilege'] >= 4){
+    if(isset($Privileges['Ticket']) && $Privileges['Ticket']['Owner'] >= 4 && $Privileges['Ticket']['Group'] >= 4 && $Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
+    elseif($Privileges['Ticket']['Owner'] >= 6 && !isset($_GET['ID'])){$Privileged = TRUE;}
+    elseif($Privileges['Ticket']['Group'] >= 4){
         $r = \singleton\database::getInstance( )->query(  null,"SELECT LID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}'");
         $r2 = \singleton\database::getInstance( )->query( null,"SELECT Loc FROM TicketD WHERE TicketD.ID='{$_GET['ID']}'");
         $r3 = \singleton\database::getInstance( )->query( null,"SELECT Loc FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}'");
@@ -67,7 +67,7 @@ if(isset( $_SESSION['User'], $_SESSION['Hash' ] ) ){
             }
         }
         if(!$Privileged){
-            if($Privileges['Ticket']['User_Privilege'] >= 4 && is_numeric($_GET['ID'])){
+            if($Privileges['Ticket']['Owner'] >= 4 && is_numeric($_GET['ID'])){
                 $r = \singleton\database::getInstance( )->query(  null,"SELECT ID FROM TicketO WHERE TicketO.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
                 $r2 = \singleton\database::getInstance( )->query( null,"SELECT ID FROM TicketD WHERE TicketD.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
                 $r3 = \singleton\database::getInstance( )->query( null,"SELECT ID FROM TicketDArchive WHERE TicketDArchive.ID='{$_GET['ID']}' AND fWork='{$User['fWork']}'");
@@ -650,17 +650,17 @@ white-space: normal !important;
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Information(3);?></div>
                             <div class ='nav-text'>Information</div>
                     </div>
-                    <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['User_Privilege'] >= 4){
+                    <?php if(isset($Privileges['Customer']) && $Privileges['Customer']['Owner'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='customer.php?ID=<?php echo $Ticket['Customer_ID'];?>';">
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
                             <div class ='nav-text'>Customer</div>
                     </div><?php }?>
-                    <?php if(isset($Privileges['Location']) && $Privileges['Location']['User_Privilege'] >= 4){
+                    <?php if(isset($Privileges['Location']) && $Privileges['Location']['Owner'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='location.php?ID=<?php echo $Ticket['Location_ID'];?>';">
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
                             <div class ='nav-text'>Location</div>
                     </div><?php }?>
-                    <?php if(isset($Privileges['Job']) && $Privileges['Job']['User_Privilege'] >= 4){
+                    <?php if(isset($Privileges['Job']) && $Privileges['Job']['Owner'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='job.php?ID=<?php echo $Ticket['Job_ID'];?>';">
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
                             <div class ='nav-text'>Job</div>
@@ -669,12 +669,12 @@ white-space: normal !important;
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
                             <div class ='nav-text'>Map</div>
                     </div>
-                    <?php if(isset($Privileges['Unit']) && $Privileges['Unit']['User_Privilege'] >= 4){
+                    <?php if(isset($Privileges['Unit']) && $Privileges['Unit']['Owner'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='unit.php?ID=<?php echo $Ticket['Unit_ID'];?>';">
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
                             <div class ='nav-text'>Unit</div>
                     </div><?php }?>
-                    <?php if(isset($Privileges['User']) && $Privileges['User']['User_Privilege'] >= 4){
+                    <?php if(isset($Privileges['User']) && $Privileges['User']['Owner'] >= 4){
                     ?><div class='Home-Screen-Option col-lg-1 col-md-2 col-xs-3' onClick="document.location.href='user.php?ID=<?php echo $Ticket['Employee_ID'];?>';">
                             <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->User(3);?></div>
                             <div class ='nav-text'>User</div>
@@ -691,16 +691,16 @@ white-space: normal !important;
 
 
     <!-- Bootstrap Core JavaScript -->
-    
+
 
     <!-- Metis Menu Plugin JavaScript -->
-    
+
 
     <!-- Custom Theme JavaScript -->
-    
+
 
     <!-- JQUERY UI Javascript -->
-    
+
 <?php if(!isMobile()){?>
     <script type="text/javascript">
   function initialize() {

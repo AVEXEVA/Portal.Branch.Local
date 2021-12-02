@@ -1,4 +1,4 @@
-function search( link ){
+$( document ).ready( function( ){
   function search( link ){
       var api = link.api();
       $('input[name="Search"]', api.table().container())
@@ -68,152 +68,156 @@ function search( link ){
       autoWidth      : true,
       responsive     : true,
       columns    : [
-          {
-          },{
-              data : 'Search',
-              render : function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display' :
-                          return  row.Search !== null
-                              ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='search.php?ID=" + row.Search + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Search + "</a></div>" +
-                                  "</div>"
+        {
+          className : 'ID',
+          data : 'ID',
+          render : function( data, type, row, meta ){
+            switch( type ){
+              case 'display' :
+                return  row.ID !== null
+                  ?   "<div class='row'>" +
+                          "<div class='col-12'><a href='violations.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Route #" + row.ID + "</a></div>" +
+                      "</div>"
+                  :   null;
+              default :
+                return data;
+            }
+          }
+        },{
+          data : 'Name',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
+        },{
+            data : 'Locations',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Locations !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='locations.php?Violation=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                                "</div>"
                             :   null;
                     default :
                         return data;
                 }
-
-              }
+            }
           },{
-              data : 'Name',
+              data : 'Units',
               render : function( data, type, row, meta ){
                   switch( type ){
                       case 'display' :
-                          return  row.Name !== null
+                          return  row.Units !== null
                               ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='name.php?ID=" + row.Name + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
-                                  "</div?
-                            :   null;
-                    default :
-                        return data;
-                }
-
-              }
-          },{
-              data : 'Date',
-              render: function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display':
-                          return row.Date !== null
-                              ?   "<div class='row'>" +
-                                      "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" +
+                                      "<div class='col-12'><a href='units.php?Violations=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
                                   "</div>"
-                            :   null;
-                        default :
-                            return data;
-
-                }
-              }
-
-          },{
-              data : 'Location'
-          },{
-              data : 'Select'
-          },{
-
-
-              data      : 'ID',
-              render : function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display' :
-                          return  row.ID !== null
-                              ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> Violation #" + row.ID + "</a></div>" +
-                                      "<div class='col-12'>" + ( row.Name !== null && row.Name != '' ? row.Name : 'Misisng Name' )+ "</a></div>" +
-                                  "</div>"
-                              :   'Missing Name';
+                              :   null;
                       default :
                           return data;
                   }
-
-          {
-              data : 'Customer'
-            },{
-              data : 'Status',
-              render : function( data, type, row, meta ){
-                switch( type ){
-                  case 'display' :
-                    switch( data ){
-                      case 0: return 'Open';
-                      case 1: return 'Closed';
-                      case 2: return 'On Hold';
-                    }
-                  default :
-                    return data;
-                }
               }
-          }
-      ],
-      ajax : {
-          data : function( d ){
-              d = {
-                  start : d.start,
-                  length : d.length,
-                  order : {
-                      column : d.order[0].column,
-                      dir : d.order[0].dir
-                  }
-              };
-              d.Search = $("input[name='Search']").val( );
-              d.Name = $("input[name='Name']").val( );
-              d.Date_Start = $("input[name='Date_Start']").val( );
-              d.Date_End = $("input[name='Date_End']").val( );
-              d.Location = $("input[name='Location']").val( );
-              d.Select = $("select[name='Select']").val( );
-              d.ID = $("input[name='ID']").val( );
-              d.Customer = $("input[name='Customer']").val( );
-              d.Status = $("input[name='Status']").val( );
-              return d;
-          },
-          url : 'bin/php/get/violations.php'
-      },
-      initComplete : function( ){
+        },{
+            data : 'Customer'
+        },{
+            data : 'Status'
+        }
+    ],
+    ajax : {
+        data : function( d ){
+            d = {
+              draw : d.draw,
+                start : d.start,
+                length : d.length,
+                order : {
+                    column : d.order[0].column,
+                    dir : d.order[0].dir
+                }
+            };
+            d.Search = $("input[name='Search']").val( );
+            d.Name = $("input[name='Name']").val( );
+            d.Date_Start = $("input[name='Date_Start']").val( );
+            d.Date_End = $("input[name='Date_End']").val( );
+            d.Location = $("input[name='Location']").val( );
+            d.Select = $("select[name='Select']").val( );
+            d.ID = $("input[name='ID']").val( );
+            d.Customer = $("input[name='Customer']").val( );
+            d.Status = $("input[name='Status']").val( );
+            return d;
+        },
+        url : 'bin/php/get/Violations.php'
+    },
+    initComplete : function( ){
       $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
       $('input.date').datepicker( { } );
       $('input.time').timepicker( {  timeFormat : 'h:i A' } );
       //search( this );
       $( '.redraw' ).bind( 'change', function(){ Table_Violations.draw(); });
-  },
-  buttons: [
+    },
+    buttons : [
       {
-          text: 'Reset Search',
-          action: function ( e, dt, node, config ) {
-              $( 'input, select' ).each( function( ){
-                  $( this ).val( '' );
-              } );
-              Table_Violations.draw( );
-          }
+        text: 'Reset Search',
+        className : 'form-control',
+        action: function ( e, dt, node, config ) {
+            $( 'input, select' ).each( function( ){
+                $( this ).val( '' );
+            } );
+            Table_Violations.draw( );
+        }
       },{
-          text : 'Get URL',
-          action : function( e, dt, node, config ){
-              var d = { };
-              d.Search = $("input[name='Search']").val( );
-              d.Name = $("input[name='Name']").val( );
-              d.Date_Start = $("input[name='Date_Start']").val( );
-              d.Date_End = $("input[name='Date_End']").val( );
-              d.Location = $("input[name='Location']").val( );
-              d.Select = $("select[name='Select']").val( );
-              d.ID = $("input[name='ID']").val( );
-              d.Customer = $("input[name='Customer']").val( );
-              d.Status = $("select[name='Status']").val( );
-              document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
-          }
-      },
-      { extend: 'create', editor: Editor_Violations },
-      { extend: 'edit',   editor: Editor_Violations },
-      { extend: 'remove', editor: Editor_Violations },
-      'copy',
-      'csv'
-  ]
+        text : 'Get URL',
+        className : 'form-control',
+        action : function( e, dt, node, config ){
+            d = { }
+            d.Name = $('input[name="Name"]').val( );
+            d.Person = $('select[name="Person"]').val( );
+            document.location.href = 'violations.php?' + new URLSearchParams( d ).toString();
+        }
+      },{
+        text : 'Create',
+        className : 'form-control',
+        action : function( e, dt, node, config ){
+            document.location.href='violation.php';
+        }
+      },{
+        text : 'Delete',
+        className : 'form-control',
+        action : function( e, dt, node, config ){
+          var rows = dt.rows( { selected : true } ).indexes( );
+          var dte = dt.cells( rows, 0 ).data( ).toArray( );
+          $.ajax ({
+            url    : 'bin/php/post/violation.php',
+            method : 'POST',
+            data   : {
+              action : 'delete',
+              data : dte
+            },
+            success : function(response){
+              Table_Violations.draw();
+            }
+          })
+        }
+      },{
+          extend : 'print',
+          text : 'Print',
+          className : 'form-control'
+      },{
+          extend : 'copy',
+          text : 'Copy',
+          className : 'form-control'
+      },{
+          extend : 'csv',
+          text : 'CSV',
+          className : 'form-control'
+      }
+    ]
   } );
-} );
+});

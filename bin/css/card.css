@@ -20,7 +20,7 @@
       display : none;
     }
 }
-.card.card-primary>.card-heading {
+.card.card-primary .card-heading {
   background-color : white;
   color : black;
 }

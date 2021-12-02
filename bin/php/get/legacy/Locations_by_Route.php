@@ -19,23 +19,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query(null,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
-               Privilege.Other_Privilege
+        SELECT Privilege.Access, 
+               Privilege.Owner, 
+               Privilege.Group, 
+               Privilege.Other
         FROM   Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Route'], $My_Privileges['Location']) 
-        && $My_Privileges['Route']['Other_Privilege'] >= 4
-	  	&& $My_Privileges['Location']['Other_Privilege'] >= 4){
+        && $My_Privileges['Route']['Other'] >= 4
+	  	&& $My_Privileges['Location']['Other'] >= 4){
             $Privileged = True;} 
     elseif(isset($My_Privileges['Route'], $My_Privileges['Location']) 
-        && $My_Privileges['Route']['Group_Privilege'] >= 4
-		&& $My_Privileges['Location']['Group_Privilege'] >= 4
+        && $My_Privileges['Route']['Group'] >= 4
+		&& $My_Privileges['Location']['Group'] >= 4
         && is_numeric($_GET['ID'])){
             $r = $database->query(null,"
             	SELECT Locations.*
@@ -63,8 +63,8 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			;",array($_SESSION['User'], $_GET['ID'], $_SESSION['User'], $_GET['ID'], $_SESSION['User'], $_GET['ID']));
 			if($r){if(is_array(sqlsrv_fetch_array($r))){$Privileged = True;}}}
 	elseif(isset($My_Privileges['Route'], $My_Privileges['Location']) 
-        && $My_Privileges['Route']['User_Privilege'] >= 4
-		&& $My_Privileges['Location']['User_Privilege'] >= 4
+        && $My_Privileges['Route']['Owner'] >= 4
+		&& $My_Privileges['Location']['Owner'] >= 4
         && is_numeric($_GET['ID'])){
             $r = $database->query(null,"
 				SELECT Route.ID AS Route_ID

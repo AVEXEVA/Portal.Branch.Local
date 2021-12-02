@@ -13,6 +13,7 @@ function search( link ){
                     data    : {
                         search : $('input:visible[name="Search"]').val(),
                         ID :  $('input:visible[name="ID"]').val( ),
+                        Phone : $('input:visible[name="Phone"]').val( ),
                         Customer :  $('input:visible[name="Customer"]').val( ),
                         Name :  $('input:visible[name="Name"]:visible').val( ),
                         Type : $('select:visible[name="Type"]').val( ),
@@ -84,19 +85,45 @@ $(document).ready(function( ){
                         Entity :  $('input:visible[name="Entity"]').val( ),
                         Customer :  $('input:visible[name="Customer"]').val( ),
                         Type : $('select:visible[name="Type"]').val( ),
-                        Name : $('select:visible[name="Division"]').val( ),
-                        Positon : $('select:visible[name="Route"]').val( ),
-                        Phone : $('input:visible[name="Street"]').val( ),
-                        Email :  $('input:visible[name="City"]').val( ),
+                        Name : $('input:visible[name="Name"]').val( ),
+                        Positon : $('select:visible[name="Position"]').val( ),
+                        Phone : $('input:visible[name="Phone"]').val( ),
+                        Email :  $('input:visible[name="Email"]').val( ),
                         Address :  $('input:visible[name="Address"]').val( ),
                     };
                     return d;
                 }
         },
         columns: [
-            {
+          {
                 className : 'ID',
-                data : 'ID'
+                data : 'ID',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='contract.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Contract #" + row.ID + "</a></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
+            },{
+                data : 'Name',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
             },{
                 data : 'Type'
             },{
@@ -108,14 +135,20 @@ $(document).ready(function( ){
                             ?   (
                                     row.Type == 'Customer'
                                         ?   "<div class='row'>" +
-                                                "<div class='col-12'><a href='contact.php?Name=" + row.ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
                                             "</div>"
                                         :   (
                                                 row.Type == 'Location'
                                                     ?   "<div class='row'>" +
                                                             "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
                                                         "</div>"
-                                                    :   null
+                                                    :   (
+                                                            row.Type == 'Employee'
+                                                                ?   "<div class='row'>" +
+                                                                        "<div class='col-12'><a href='employee.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
+                                                                    "</div>"
+                                                                : null
+                                                        )
                                             )
                                 )
                             :   null;
@@ -124,36 +157,6 @@ $(document).ready(function( ){
                   }
 
               }
-            },{
-                data : 'Name'
-            },{
-                data : 'Position'
-            },{
-                data : 'Type'
-            },{
-                data : 'Entity',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                          return row.Entity !== null
-                              ?   (
-                                      row.Type == 'Customer'
-                                          ?   "<div class='row'>" +
-                                                  "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
-                                              "</div>"
-                                          :   (
-                                                  row.Type == 'Location'
-                                                      ?   "<div class='row'>" +
-                                                              "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
-                                                          "</div>"
-                                                      :   null
-                                              )
-                                  )
-                              :   null;
-                        default :
-                            return data;
-                    }
-                }
             },{
                 data : 'Position'
             },{
@@ -181,7 +184,7 @@ $(document).ready(function( ){
                     }
                 }
             },{
-                data : 'Address',
+                data : 'Street',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
@@ -209,20 +212,42 @@ $(document).ready(function( ){
         buttons: [
             {
                 text: 'Reset Search',
+                className: 'form-control',
                 action: function ( e, dt, node, config ) {
-                    $( 'input, select' ).each( function( ){
+                    $( 'input:visible, select:visible' ).each( function( ){
                         $( this ).val( '' );
                     } );
                     Table_Contacts.draw( );
                 }
-            },
-            { extend: 'create', editor: Editor_Contacts },
-            { extend: 'edit',   editor: Editor_Contacts },
-            { extend: 'remove', editor: Editor_Contacts },
-            'print',
-            'copy',
-            'csv'
+            },{
+            text : 'Create',
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+                document.location.href='contact.php';}
+
+            },{ extend: 'edit',
+                editor: Editor_Contacts,
+                className: 'form-control',
+            },{
+                text : 'Delete',
+                className: 'form-control',
+                action : function( e, dt, node, config ){
+                  var rows = dt.rows( { selected : true } ).indexes( );
+                  var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                  $.ajax ({
+                    url    : 'bin/php/post/contact.php',
+                    method : 'POST',
+                    data   : {
+                      action : 'delete' ,
+                      data : dte
+                    },
+                    success : function(response){
+                      Table_Contacts.draw();
+                    }
+                  })
+                }
+              },
         ]
-    } );
-} );
-}
+    });
+  });
+});

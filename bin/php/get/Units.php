@@ -1,69 +1,88 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-require('../index.php');
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-    $r = \singleton\database::getInstance( )->query(
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start();
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+    $result = \singleton\database::getInstance( )->query(
         null,
-        "   SELECT  *
-          FROM    Connection
-          WHERE   Connection.Connector = ?
-                  AND Connection.Hash = ?;",
+        " SELECT  Emp.fFirst  AS First_Name,
+                  Emp.Last    AS Last_Name,
+                  Emp.fFirst + ' ' + Emp.Last AS Name,
+                  Emp.Title AS Title,
+                  Emp.Field   AS Field
+          FROM  Emp
+          WHERE   Emp.ID = ?;",
         array(
-          $_SESSION[ 'User' ],
-          $_SESSION[ 'Hash' ]
-        )
-      );
-    $Connection = sqlsrv_fetch_array( $r );
-    $User = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Emp.*,
-                    Emp.fFirst AS First_Name,
-                    Emp.Last   AS Last_Name
-            FROM    Emp
-            WHERE   Emp.ID = ?;",
-        array(
-          $_SESSION[ 'User' ]
+            $_SESSION[ 'Connection' ][ 'User' ]
         )
     );
-    $User = sqlsrv_fetch_array( $User );
-    $r = \singleton\database::getInstance( )->query(
-        null,
-        "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
-                    Privilege.Group_Privilege,
-                    Privilege.Other_Privilege
-            FROM    Privilege
-            WHERE   Privilege.User_ID = ?;",
+    $User   = sqlsrv_fetch_array( $result );
+    //Privileges
+    $Access = 0;
+    $Hex = 0;
+    $result = \singleton\database::getInstance( )->query(
+        'Portal',
+        "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner], 
+                    [Privilege].[Group], 
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+          FROM      dbo.[Privilege]
+          WHERE     Privilege.[User] = ?;",
         array(
-          $_SESSION[ 'User' ]
+            $_SESSION[ 'Connection' ][ 'User' ],
         )
     );
     $Privileges = array();
-    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
-    $Privileged = False;
-    if( isset( $Privileges[ 'Unit' ] )
-        && $Privileges[ 'Unit' ][ 'User_Privilege' ]  >= 4
-    ){ $Privileged = True; }
-    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+        
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+            dechex( $Privilege[ 'Owner' ] ),
+            dechex( $Privilege[ 'Group' ] ),
+            dechex( $Privilege[ 'Department' ] ),
+            dechex( $Privilege[ 'Database' ] ),
+            dechex( $Privilege[ 'Server' ] ),
+            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Token' ] ),
+            dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(     !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Route' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-
-      $output = array(
-          'sEcho'                 =>  intval( $_GET['draw' ] ),
-          'iTotalRecords'         =>  $iTotal,
-          'iTotalDisplayRecords'  =>  $iFilteredTotal,
-          'aaData'                =>  array( ),
-          'options'               =>  array( )
+      \singleton\database::getInstance( )->query(
+        null,
+        " INSERT INTO Activity([User], [Date], [Page] ) 
+          VALUES( ?, ?, ? );",
+        array(
+          $_SESSION[ 'Connection' ][ 'User' ],
+          date('Y-m-d H:i:s'),
+          'customers.php'
+        )
       );
-
-    $_GET['iDisplayStart'] = isset($_GET['start']) ? $_GET['start'] : 0;
-    $_GET['iDisplayLength'] = isset($_GET['length']) ? $_GET['length'] : '15';
-
-    $Start = $_GET['iDisplayStart'];
-    $Length = $_GET['iDisplayLength'];
-    $End = $Length == '-1' ? 999999 : intval($Start) + intval($Length);
 
     $conditions = array( );
     $search = array( );
@@ -95,7 +114,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
       $conditions[] = "Unit.Status LIKE '%' + ? + '%'";
     }
 
-    /*if( $Privileges[ 'Unit' ][ 'Other_Privilege' ] < 4 ){
+    /*if( $Privileges[ 'Unit' ][ 'Other' ] < 4 ){
         $parameters [] = $User[ 'fWork' ];
         $conditions[] = "Unit.ID IN ( SELECT Ticket.Unit FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LElev AS Unit FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Elev AS Unit FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Unit)";
     }*/
@@ -108,11 +127,9 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-    /*ROW NUMBER*/
     $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
     $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
 
-    $parameters[] = $End;
     $Columns = array(
       0 =>  'Unit.ID',
       1 =>  'Unit.State',
@@ -133,18 +150,18 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Unit.ID AS ID,
-                          Unit.State + ' - ' + Unit.Unit AS Name,
-                          CASE WHEN Unit.State IN ( null, ' ', '  ' ) THEN 'Untitled' ELSE Unit.State END AS City_ID,
-                          Customer.ID AS Customer_ID,
+                          Unit.City_ID As City_ID,
+                         Customer.ID AS Customer_ID,
                           Customer.Name AS Customer_Name,
                           Location.Loc AS Location_ID,
                           Location.Tag AS Location_Name,
-                          Unit.Unit AS Building_ID,
+                          Unit.Building_ID AS Building_ID,
                           Unit.Type AS Type,
-                          Unit.Status AS Status,
-                          Ticket.ID AS Ticket_ID,
-                          Ticket.Date AS Ticket_Date
-                  FROM    Elev AS Unit
+                          Unit.fDesc AS Name,
+                         Ticket.ID AS Ticket_ID,  
+                          Unit.Status AS Status
+                         
+                  FROM    Unit
                           LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                           LEFT JOIN (
                             SELECT  Owner.ID,
@@ -152,62 +169,81 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                             FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Unit.Owner = Customer.ID
-                        LEFT JOIN (
-                          SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
-                                    TicketD.Elev AS Unit,
-                                    TicketD.ID,
-                                    TicketD.EDate AS Date
-                          FROM      TicketD
-                        ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
+                         LEFT JOIN (
+                            SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
+                                      TicketD.Elev AS Unit,
+                                      TicketD.ID ,
+                                      TicketD.EDate AS Date
+                            FROM      TicketD
+                          ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-    //echo $sQuery;
-    //var_dump( $parameters );
-    $rResult = $database->query(
-      $conn,
-      $sQuery,
-      $parameters
-    ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow =
-      " SELECT  Count( Unit.ID ) AS Count
-        FROM    Elev AS Unit
-                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                LEFT JOIN (
-                  SELECT  Owner.ID,
-                          Rol.Name
-                  FROM    Owner
-                          LEFT JOIN Rol ON Rol.ID = Owner.Rol
-              ) AS Customer ON Unit.Owner = Customer.ID
-              LEFT JOIN (
-                SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
-                          TicketD.Elev AS Unit,
-                          TicketD.ID,
-                          TicketD.EDate AS Date
-                FROM      TicketD
-              ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
-        WHERE   ({$conditions}) AND ({$search});";
+      $rResult = $database->query(
+        null,
+        $sQuery,
+        $parameters
+      ) or die(print_r(sqlsrv_errors()));
 
-    $stmt = $database->query( $conn, $sQueryRow , $parameters, $options ) or die(print_r(sqlsrv_errors()));
-    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+      $sQueryRow = "SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                            Unit.ID AS ID,
+                            Unit.City_ID AS City_ID,
+                            Customer.ID AS Customer_ID,
+                            Customer.Name AS Customer_Name,
+                            Location.Loc AS Location_ID,
+                            Location.Tag AS Location_Name,
+                            Unit.Building_ID AS Building_ID,
+                            Unit.Type AS Type,
+                            Unit.Status AS Status
+                            
+                    FROM    Unit
+                            LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                            LEFT JOIN (
+                              SELECT  Owner.ID,
+                                      Rol.Name
+                              FROM    Owner
+                                      LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                          ) AS Customer ON Unit.Owner = Customer.ID
+                           LEFT JOIN (
+                            SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
+                                      TicketD.Elev AS Unit,
+                                      TicketD.ID,
+                                      TicketD.EDate AS Date
+                            FROM      TicketD
+                          ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
+                    WHERE   ({$conditions}) AND ({$search});";
 
-    $parameters = array(
-      $DateStart,
-      $DateEnd
-    );
-    $sQuery = " SELECT  COUNT( Unit.ID )
-                FROM    Elev AS Unit;";
-    $rResultTotal = $database->query($conn,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
-    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
-    $iTotal = $aResultTotal[0];
+      $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
+      $iFilteredTotal = 0;
+      $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+      $_SESSION[ 'Tables' ][ 'Units' ] = isset( $_SESSION[ 'Tables' ][ 'Units' ]  ) ? $_SESSION[ 'Tables' ][ 'Units' ] : array( );
+      if( count( $_SESSION[ 'Tables' ][ 'Units' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Units' ] as &$Value ){ $Value = false; } }
+      $_SESSION[ 'Tables' ][ 'Units' ][ 0 ] = $_GET;
+      while( $Row = sqlsrv_fetch_array( $fResult ) ){
+          $_SESSION[ 'Tables' ][ 'Units' ][ $Row[ 'ID' ] ] = true;
+          $iFilteredTotal++;
+      }
 
+      $parameters = array( );
+      $sQuery = " SELECT  COUNT(Route.ID)
+                  FROM    Route;";
+      $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+      $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+      $iTotal = $aResultTotal[0];
 
-    while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Ticket_Date' ] = date( 'm/d/Y h:i A', strtotime( $Row[ 'Ticket_Date' ] ) );
-      $output['aaData'][]   = $Row;
-    }
-    echo json_encode( $output );
+      $output = array(
+          'sEcho'         =>  intval( $_GET[ 'draw' ] ),
+          'iTotalRecords'     =>  $iTotal,
+          'iTotalDisplayRecords'  =>  $iFilteredTotal,
+          'aaData'        =>  array()
+      );
+
+      while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+          //$Row[ 'Ticket_Date' ] = !is_null( $Row[ 'Ticket_Date' ] ) ? date( 'm/d/Y h:i A', strtotime( $Row[ 'Ticket_Date' ] ) ) : null;
+          $output['aaData'][]       = $Row;
+      }
+      echo json_encode( $output );
 }}
 ?>

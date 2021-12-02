@@ -8,27 +8,34 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 		WHERE  Connection.Connector = ?
 		       AND Connection.Hash  = ?
 	;",array($_SESSION['User'],$_SESSION['Hash']));
-    $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-    $r = $database->query(null,"
+    $Connection = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+    $result = $database->query(null,"
 		SELECT *,
 		       Emp.fFirst AS First_Name,
 			   Emp.Last   AS Last_Name
 		FROM   Emp
 		WHERE  Emp.ID = ?
 	;",array($_SESSION['User']));
-    $My_User = sqlsrv_fetch_array($r);
-	$r = $database->query(null,"
-		SELECT *
-		FROM   Privilege
-		WHERE  Privilege.User_ID = ?
-	;",array($_SESSION['User']));
-	$My_Privileges = array();
-	if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-    if(	!isset($My_Connection['ID'])
-	   	|| !isset($My_Privileges['Admin'])
-	  		|| $My_Privileges['Admin']['User_Privilege']  < 4
-	  		|| $My_Privileges['Admin']['Group_Privilege'] < 4
-	  	    || $My_Privileges['Admin']['Other_Privilege'] < 4){
+    $User = sqlsrv_fetch_array($result);
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Other]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+      )
+    );
+	$Privileges = array();
+	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
+    if(	!isset($Connection['ID'])
+	   	|| !isset($Privileges['Admin'])
+	  		|| $Privileges['Admin']['User_Privilege']  < 4
+	  		|| $Privileges['Admin']['Group_Privilege'] < 4
+	  	    || $Privileges['Admin']['Other_Privilege'] < 4){
 				?><?php require('../404.html');?><?php }
     else {
 		$database->query(null,"

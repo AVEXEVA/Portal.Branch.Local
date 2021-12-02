@@ -20,23 +20,23 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User); 
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table, 
-               Privilege.User_Privilege, 
-               Privilege.Group_Privilege, 
-               Privilege.Other_Privilege
+        SELECT Privilege.Access, 
+               Privilege.Owner, 
+               Privilege.Group, 
+               Privilege.Other
         FROM   Portal.dbo.Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Location']) 
-        && $My_Privileges['Location']['Other_Privilege'] >= 4
-	  	&& $My_Privileges['Violation']['Other_Privilege'] >= 4){
+        && $My_Privileges['Location']['Other'] >= 4
+	  	&& $My_Privileges['Violation']['Other'] >= 4){
             $Privileged = True;} 
     elseif(isset($My_Privileges['Location']) 
-        && $My_Privileges['Location']['Group_Privilege'] >= 4
-		&& $My_Privleges['Violation']['Group_Privilege'] >= 4
+        && $My_Privileges['Location']['Group'] >= 4
+		&& $My_Privleges['Violation']['Group'] >= 4
         && is_numeric($_GET['ID'])){
             $r = $database->query(null,"
                 SELECT Tickets.ID
@@ -66,7 +66,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
             ;", array($_GET['ID'], $My_User['fWork'], $_GET['ID'], $My_User['fWork'], $_GET['ID'], $My_User['fWork']));
             $Privileged = is_array(sqlsrv_fetch_array($r)) ? True : False;}
     elseif(isset($My_Privileges['Location'])
-        && $My_Privileges['Location']['User_Privilege'] >= 4
+        && $My_Privileges['Location']['Owner'] >= 4
         && is_numeric($_GET['ID'])){
             $r = $database->query(null,"
                 SELECT Tickets.ID
@@ -98,7 +98,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     if(!isset($Connection['ID'])  || !is_numeric($_GET['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
     else {
         $data = array();
-        if($My_Privileges['User_Privilege'] >= 4 && $My_Privileges['Group_Privilege'] >= 4 && $My_Privileges['Other_Privilege'] >= 4){
+        if($My_Privileges['Owner'] >= 4 && $My_Privileges['Group'] >= 4 && $My_Privileges['Other'] >= 4){
             $r = $database->query(null,"
 				SELECT *
 				FROM
@@ -176,13 +176,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
 			}
         } else {
             $SQL_Units = array();
-            if($My_Privileges['Group_Privilege'] >= 4){
+            if($My_Privileges['Group'] >= 4){
                 $r = $database->query(null,"SELECT LElev AS Unit FROM nei.dbo.TicketO LEFT JOIN nei.dbo.Emp ON TicketO.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Violation.Elev='{$array['Unit']}'";}}
                 $r = $database->query(null,"SELECT Elev AS Unit FROM nei.dbo.TicketD LEFT JOIN nei.dbo.Emp ON TicketD.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Violation.Elev='{$array['Unit']}'";}}
             }
-            if($My_Privileges['User_Privilege'] >= 4){
+            if($My_Privileges['Owner'] >= 4){
                 $r = $database->query(null,"
                     SELECT Elev.ID AS Unit
                     FROM   nei.dbo.Elev

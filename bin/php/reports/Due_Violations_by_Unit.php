@@ -33,10 +33,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     //Establish Privileges
     $result = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table, 
-                    Privilege.User_Privilege, 
-                    Privilege.Group_Privilege, 
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access, 
+                    Privilege.Owner, 
+                    Privilege.Group, 
+                    Privilege.Other
             FROM    Privilege
             WHERE   Privilege.User_ID = ?;",
         array(
@@ -44,15 +44,15 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         )
     );
     $Privileges = array();
-    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+    while( $Privilege = sqlsrv_fetch_array( $result ) ){ $Privileges[ $Privilege[ 'Access' ] ] = $Privilege; }
     $Privileged = False;
     if(     isset( $Privileges[ 'Location' ] ) 
-        &&  $Privileges[ 'Location' ][ 'Other_Privilege' ]  >= 4
-	  	&&  $Privileges[ 'Violation' ][ 'Other_Privilege' ] >= 4){
+        &&  $Privileges[ 'Location' ][ 'Other' ]  >= 4
+	  	&&  $Privileges[ 'Violation' ][ 'Other' ] >= 4){
                 $Privileged = True;} 
     elseif( isset($Privileges[ 'Location']) 
-        &&  $Privileges[ 'Location' ][ 'Group_Privilege']  >= 4
-		&&  $Privileges[ 'Violation' ][ 'Group_Privilege'] >= 4
+        &&  $Privileges[ 'Location' ][ 'Group']  >= 4
+		&&  $Privileges[ 'Violation' ][ 'Group'] >= 4
         &&  is_numeric( $_GET[ 'ID' ] ) ){
             $result = $database->query(
                 null,
@@ -95,7 +95,7 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                 );
     } else {
         $data = array();
-        if($Privileges['User_Privilege'] >= 4 && $Privileges['Group_Privilege'] >= 4 && $Privileges['Other_Privilege'] >= 4){
+        if($Privileges['Owner'] >= 4 && $Privileges['Group'] >= 4 && $Privileges['Other'] >= 4){
             $r = $database->query(null,"
 				SELECT *
 				FROM
@@ -173,13 +173,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
 			}
         } else {
             $SQL_Units = array();
-            if($Privileges['Group_Privilege'] >= 4){
+            if($Privileges['Group'] >= 4){
                 $r = $database->query(null,"SELECT LElev AS Unit FROM TicketO LEFT JOIN Emp ON TicketO.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Violation.Elev='{$array['Unit']}'";}}
                 $r = $database->query(null,"SELECT Elev AS Unit FROM TicketD LEFT JOIN Emp ON TicketD.fWork = Emp.fWork WHERE Emp.ID = ?;",array($_SESSION['User']));
                 if($r){while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){$SQL_Units[] = "Violation.Elev='{$array['Unit']}'";}}
             }
-            if($Privileges['User_Privilege'] >= 4){
+            if($Privileges['Owner'] >= 4){
                 $r = $database->query(null,"
                     SELECT Elev.ID AS Unit
                     FROM   Elev

@@ -32,10 +32,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
   //Establish Privileges
   $r = \singleton\database::getInstance( )->query(
       null,
-    " SELECT  Privilege.Access_Table,
-              Privilege.User_Privilege,
-              Privilege.Group_Privilege,
-              Privilege.Other_Privilege
+    " SELECT  Privilege.Access,
+              Privilege.Owner,
+              Privilege.Group,
+              Privilege.Other
       FROM    Privilege
       WHERE   Privilege.User_ID = ?;",
     array(
@@ -43,13 +43,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     )
   );
   $Privileges = array();
-  while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access_Table']] = $Privilege;}
+  while($Privilege = sqlsrv_fetch_array($r)){$Privileges[$Privilege['Access']] = $Privilege;}
   $Privileged = False;
    if( isset($Privileges['Ticket'])
         && (
-          $Privileges['Ticket']['User_Privilege'] >= 4
-      ||  $Privileges['Ticket']['Group_Privilege'] >= 4
-      ||  $Privileges['Ticket']['Other_Privilege'] >= 4)){ $Privileged = True; }
+          $Privileges['Ticket']['Owner'] >= 4
+      ||  $Privileges['Ticket']['Group'] >= 4
+      ||  $Privileges['Ticket']['Other'] >= 4)){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){ print json_encode( array( 'data' => array( ) ) ); }
   else {
       $r = \singleton\database::getInstance( )->query(

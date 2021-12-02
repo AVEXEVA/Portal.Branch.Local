@@ -43,14 +43,14 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
      WHERE  Emp.ID = ?
     ;",array($_SESSION['User']));
   $My_User = sqlsrv_fetch_array($r);
-  $r = $database->query(null,
+  $r = $database->query('Portal',
     " SELECT *
 	    FROM   Privilege
 	      WHERE  Privilege.User_ID = ?
      ;",array($_SESSION['User']));
   $My_Privileges = array();
-  if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access_Table']] = $My_Privilege;}}
-  if(!isset($My_Connection['ID']) || !isset($My_Privileges['Map']) || $My_Privileges['Map']['User_Privilege']  < 4 || $My_Privileges['Map']['Group_Privilege'] < 4 || $My_Privileges['Map']['Other_Privilege'] < 4){require('../404.html');}
+  if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
+  if(!isset($My_Connection['ID']) || !isset($My_Privileges['Map']) || $My_Privileges['Map']['Owner']  < 4 || $My_Privileges['Map']['Group'] < 4 || $My_Privileges['Map']['Other'] < 4){require('../404.html');}
   else {
   	$database->query(null,
       "   INSERT INTO Activity([User], [Date], [Page])

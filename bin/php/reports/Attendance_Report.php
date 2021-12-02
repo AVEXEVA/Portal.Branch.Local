@@ -20,21 +20,21 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $My_User = sqlsrv_fetch_array($My_User);
     $My_Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
     $r = $database->query($Portal,"
-        SELECT Privilege.Access_Table,
-               Privilege.User_Privilege,
-               Privilege.Group_Privilege,
-               Privilege.Other_Privilege
+        SELECT Privilege.Access,
+               Privilege.Owner,
+               Privilege.Group,
+               Privilege.Other
         FROM   Portal.dbo.Privilege
         WHERE  Privilege.User_ID = ?
     ;",array($_SESSION['User']));
     $My_Privileges = array();
-    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
     $Privileged = False;
     if( isset($My_Privileges['Time'])
         && (
-				$My_Privileges['Time']['Other_Privilege'] >= 4
-			&&	$My_Privileges['Time']['Group_Privilege'] >= 4
-			&&  $My_Privileges['Time']['User_Privilege'] >= 4
+				$My_Privileges['Time']['Other'] >= 4
+			&&	$My_Privileges['Time']['Group'] >= 4
+			&&  $My_Privileges['Time']['Owner'] >= 4
 		)
 	 ){
             $Privileged = True;}
@@ -165,7 +165,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
     $sWhere = !isset($sWhere) || $sWhere == '' ? "WHERE '1'='1'" : $sWhere;
     $params = isset($_GET['Supervisor']) && strlen($_GET['Supervisor']) > 0 ? array($_GET['Supervisor']) : array();
     $Supervisor = isset($_GET['Supervisor']) && strlen($_GET['Supervisor']) > 0 ? " AND tblWork.Super = ? " : " AND '1' = '1' ";
-	if($My_Privileges['Time']['Other_Privilege'] >= 4){
+	if($My_Privileges['Time']['Other'] >= 4){
 		$sQuery = "
 			SELECT *
 			FROM
@@ -182,7 +182,7 @@ $conn = sqlsrv_connect( $serverName, $connectionInfo);
     $rResult = $database->query($conn,  $sQuery, $params ) or die(print_r(sqlsrv_errors()));
 
     /* Data set length after filtering */
-	if($My_Privileges['Time']['Other_Privilege'] >= 4){
+	if($My_Privileges['Time']['Other'] >= 4){
 		$sQueryRow = "
 			SELECT ".str_replace(" , ", " ", implode(", ", $aColumns)).", Emp.fFirst AS First_Name, Emp.Last AS Last_Name, Start_Notes, End_Notes,
 			FROM   $sTable LEFT JOIN nei.dbo.Emp ON Emp.ID = Attendance.[User] LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members

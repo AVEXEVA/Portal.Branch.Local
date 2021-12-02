@@ -24,10 +24,10 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
     $User = sqlsrv_fetch_array($User);
     $result = \singleton\database::getInstance( )->query(
     	null,
-    	"	SELECT 	  Access_Table,
-        			    User_Privilege,
-        			    Group_Privilege,
-        			    Other_Privilege
+    	"	SELECT 	  Access,
+        			    Owner,
+        			    Group,
+        			    Other
         	FROM   	Privilege
         	WHERE  	User_ID = ?;",
         array(
@@ -35,12 +35,12 @@ if(isset($_SESSION[ 'User' ],$_SESSION[ 'Hash' ] ) ) {
         )
     );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
+    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access']] = $array2;}
     $Privileged = FALSE;
     if(isset($Privileges[ 'Maintenance' ] )
-        && $Privileges[ 'Maintenance' ][ 'User_Privilege' ] >= 4
-        && $Privileges[ 'Maintenance' ][ 'Group_Privilege' ] >= 4
-        && $Privileges[ 'Maintenance' ][ 'Other_Privilege' ] >= 4){$Privileged = TRUE;}
+        && $Privileges[ 'Maintenance' ][ 'Owner' ] >= 4
+        && $Privileges[ 'Maintenance' ][ 'Group' ] >= 4
+        && $Privileges[ 'Maintenance' ][ 'Other' ] >= 4){$Privileged = TRUE;}
     if(		!isset($Connection[ 'ID' ])
     	|| 	!$Privileged
     ){ require( '401.php' ); }

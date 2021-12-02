@@ -1,51 +1,88 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('../index.php');
-if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
-  $r = \singleton\database::getInstance( )->query(
-      null,
-    "   SELECT  *
-      FROM    Connection
-      WHERE   Connection.Connector = ?
-              AND Connection.Hash = ?;",
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    " SELECT  [Connection].[ID]
+      FROM    dbo.[Connection]
+      WHERE       [Connection].[User] = ?
+              AND [Connection].[Hash] = ?;",
     array(
-      $_SESSION[ 'User' ],
-      $_SESSION[ 'Hash' ]
+      $_SESSION[ 'Connection' ][ 'User' ],
+      $_SESSION[ 'Connection' ][ 'Hash' ]
     )
   );
-  $Connection = sqlsrv_fetch_array( $r );
-  $User = \singleton\database::getInstance( )->query(
+  $Connection = sqlsrv_fetch_array($result);
+  //User
+  $result = \singleton\database::getInstance( )->query(
       null,
-      "   SELECT  Emp.*,
-                  Emp.fFirst AS First_Name,
-                  Emp.Last   AS Last_Name
-          FROM    Emp
-          WHERE   Emp.ID = ?;",
+      " SELECT  Emp.fFirst  AS First_Name,
+                Emp.Last    AS Last_Name,
+                Emp.fFirst + ' ' + Emp.Last AS Name,
+                Emp.Title AS Title,
+                Emp.Field   AS Field
+        FROM  Emp
+        WHERE   Emp.ID = ?;",
       array(
-        $_SESSION[ 'User' ]
+          $_SESSION[ 'Connection' ][ 'User' ]
       )
   );
-  $User = sqlsrv_fetch_array( $User );
-  $r = \singleton\database::getInstance( )->query(
-      null,
-      "   SELECT  Privilege.Access_Table,
-                  Privilege.User_Privilege,
-                  Privilege.Group_Privilege,
-                  Privilege.Other_Privilege
-          FROM    Privilege
-          WHERE   Privilege.User_ID = ?;",
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Department],
+                  [Privilege].[Database],
+                  [Privilege].[Server],
+                  [Privilege].[Other],
+                  [Privilege].[Token],
+                  [Privilege].[Internet]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
       array(
-        $_SESSION[ 'User' ]
+          $_SESSION[ 'Connection' ][ 'User' ],
       )
   );
   $Privileges = array();
-  while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privileges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
-  $Privileged = False;
-  if( isset( $Privileges[ 'Violation' ] )
-      && $Privileges[ 'Violation' ][ 'User_Privilege' ]  >= 4
-  ){ $Privileged = True; }
-  if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+      $key = $Privilege['Access'];
+      unset( $Privilege[ 'Access' ] );
+      $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+      ) );
+  }}
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset( $Privileges[ 'Violation' ] )
+      ||  !check( privilege_read, level_group, $Privileges[ 'Violation' ] )
+  ){ ?><?php require('404.html');?><?php }
   else {
+    \singleton\database::getInstance( )->query(
+      null,
+      " INSERT INTO Activity([User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        date('Y-m-d H:i:s'),
+        'customers.php'
+      )
+    );
 
     $conditions = array( );
     $search = array( );
@@ -85,12 +122,6 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         'Completed'
       )
     ) . "'";
-    $conditions[] = "Violation.Status NOT IN ({$notStatuses})";
-
-    if( $Privileges[ 'Violation' ][ 'Other_Privilege' ] < 4 ){
-        $parameters [] = $User[ 'fWork' ];
-        $conditions[] = "Violation.Loc IN ( SELECT Ticket.Location FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LID AS Location FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Loc AS Location FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Location)";
-    }
 
     if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
@@ -108,9 +139,8 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-    /*ROW NUMBER*/
-    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
-    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 25;
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
 
     $Columns = array(
       0 =>  'Violation.ID',
@@ -145,53 +175,100 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                           LEFT JOIN (
                             SELECT  Owner.ID,
-                                    Rol.Name 
-                            FROM    Owner 
+                                    Rol.Name
+                            FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Location.Owner = Customer.ID
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
     //echo $sQuery;
-    $rResult = $database->query(
-      null,
-      $sQuery,
-      $parameters
-    ) or die(print_r(sqlsrv_errors()));
+      $rResult = $database->query(
+        null,
+        $sQuery,
+        $parameters
+      ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow =
-      " SELECT  Count( Violation.ID ) AS Count
-        FROM    Violation
-                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-        WHERE   ({$conditions}) AND ({$search});";
+      $sQueryRow = "SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                            Violation.ID        AS ID,
+                            Violation.Name      AS Name,
+                            Violation.fDate     AS Date,
+                            Customer.ID         AS Customer_ID,
+                            Customer.Name       AS Customer_Name,
+                            Location.Loc        AS Location_ID,
+                            Location.Tag        AS Location_Name,
+                            Location.Address    AS Location_Street,
+                            Location.City       AS Location_City,
+                            Location.State      AS Location_State,
+                            Location.Zip        AS Location_Zip,
+                            Violation.Status    AS Status
+                    FROM    Violation
+                            LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                            LEFT JOIN (
+                              SELECT  Owner.ID,
+                                      Rol.Name
+                              FROM    Owner
+                                      LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                          ) AS Customer ON Location.Owner = Customer.ID
+                    WHERE   ({$conditions}) AND ({$search});";
 
-    $stmt = $database->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+      $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
-    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+      $iFilteredTotal = 0;
+      $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+      $_SESSION[ 'Tables' ][ 'Violations' ] = isset( $_SESSION[ 'Tables' ][ 'Violations' ]  ) ? $_SESSION[ 'Tables' ][ 'Violations' ] : array( );
+      if( count( $_SESSION[ 'Tables' ][ 'Violations' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Violations' ] as &$Value ){ $Value = false; } }
+      $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] = $_GET;
+      while( $Row = sqlsrv_fetch_array( $fResult ) ){
+          $_SESSION[ 'Tables' ][ 'Violations' ][ $Row[ 'ID' ] ] = true;
+          $iFilteredTotal++;
+      }
 
-    $parameters = array(
-      $DateStart,
-      $DateEnd
-    );
-    $sQuery = " SELECT  COUNT(Violation.ID)
-                FROM    Violation;";
-    $rResultTotal = $database->query( null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
-    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
-    $iTotal = $aResultTotal[0];
+      $parameters = array( );
+      $sQuery = " SELECT  COUNT(Route.ID)
+                  FROM    Route;";
+      $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+      $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+      $iTotal = $aResultTotal[0];
 
-    $output = array(
-        'sEcho'         =>  intval($_GET['draw']),
-        'iTotalRecords'     =>  $iTotal,
-        'iTotalDisplayRecords'  =>  $iFilteredTotal,
-        'aaData'        =>  array()
-    );
+      $output = array(
+          'sEcho'         =>  intval( $_GET[ 'draw' ] ),
+          'iTotalRecords'     =>  $iTotal,
+          'iTotalDisplayRecords'  =>  $iFilteredTotal,
+          'aaData'        =>  array()
+      );
 
-    while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row['Date'] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
-      $output['aaData'][] = $Row;
-    }
+      while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+        $Row['Date'] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
+        $output['aaData'][]       = $Row;
+      }
+      echo json_encode( $output );
+}}
+$sQueryRow = "	SELECT 	Count( Violation.ID ) AS Count
+        FROM 	Violation AS Contact
+        WHERE 	({$conditions}) AND ({$search})";
 
-    echo json_encode( $output );
-  }
+  $stmt = \singleton\database::getInstance( )->query(
+    null,
+    $sQueryRow,
+    $parameters
+  ) or die(print_r(sqlsrv_errors()));
+
+  $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+  sqlsrv_cancel( $stmt );
+
+  $sQuery = " SELECT  COUNT(Violation.ID)
+              FROM    Violation AS Contact;";
+  $rResultTotal = \singleton\database::getInstance( )->query(
+    null,
+    $sQuery,
+    array( )
+  ) or die(print_r(sqlsrv_errors()));
+  $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+  $iTotal = $aResultTotal[0];
+
+  $output[ 'iTotalRecords' ] = $iTotal;
+  $output[ 'iTotalDisplayRecords' ] = $iFilteredTotal;
+  echo json_encode( $output );
 }
-?>
+}?>

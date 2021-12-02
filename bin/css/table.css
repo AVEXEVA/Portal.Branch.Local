@@ -66,3 +66,11 @@ table.dataTable tbody tr td a {
 table.dataTable tbody tr:hover, table.dataTable tbody tr.even:hover, table.dataTable tbody tr td:hover {
 	background-color : rgba( 255, 255, 255, .25 );
 }
+div.dataTables_scrollHead {
+	overflow : visible !important;
+}
+table.dataTable thead tr th ul.typeahead.dropdown-menu[role='listbox']{
+	position : absolute;
+	z-index: 10;
+	top : 65px !important;
+}

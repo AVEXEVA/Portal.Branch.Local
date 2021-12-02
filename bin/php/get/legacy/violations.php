@@ -31,10 +31,10 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
     $User = sqlsrv_fetch_array( $User );
     $r = $database->query(
         null,
-        "   SELECT  Privilege.Access_Table,
-                    Privilege.User_Privilege,
-                    Privilege.Group_Privilege,
-                    Privilege.Other_Privilege
+        "   SELECT  Privilege.Access,
+                    Privilege.Owner,
+                    Privilege.Group,
+                    Privilege.Other
             FROM    Portal.dbo.Privilege
             WHERE   Privilege.User_ID = ?;",
         array( 
@@ -42,13 +42,13 @@ if( isset( $_SESSION[ 'User' ], $_SESSION[ 'Hash' ] ) ){
         ) 
     );
     $Privleges = array();
-    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privleges[ $Privilege[ 'Access_Table' ] ] = $Privilege; }
+    while( $Privilege = sqlsrv_fetch_array( $r ) ){ $Privleges[ $Privilege[ 'Access' ] ] = $Privilege; }
     $Privileged = False;
     if( isset( $Privleges[ 'Violation' ] )
         && (
-            $Privleges[ 'Violation' ][ 'Other_Privilege' ] >= 4
-        ||  $Privleges[ 'Violation' ][ 'Group_Privilege' ] >= 4
-        ||  $Privleges[ 'Violation' ][ 'User_Privilege' ]  >= 4
+            $Privleges[ 'Violation' ][ 'Other' ] >= 4
+        ||  $Privleges[ 'Violation' ][ 'Group' ] >= 4
+        ||  $Privleges[ 'Violation' ][ 'Owner' ]  >= 4
       )
     ){ $Privileged = True; }
     if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}

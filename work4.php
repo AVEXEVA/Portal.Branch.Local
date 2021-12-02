@@ -1,57 +1,86 @@
 <?php
-if( session_id( ) == '' || !isset($_SESSION)) { 
-    session_start( [
-    'read_and_close' => true
-  ] ); 
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $result = $database->query(
-    null,
-    " SELECT *
-		  FROM   Connection
-		  WHERE  Connection.Connector = ?
-		         AND Connection.Hash  = ?;",
-    array(
-      $_SESSION['User'],
-      $_SESSION['Hash']
-    )
-  );
-  $Connection = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC );
-  $result = $database->query(
-    null,
-    " SELECT  *,
-  		        Emp.fFirst AS First_Name,
-  			      Emp.Last   AS Last_Name
-  		FROM    Emp
-  		WHERE   Emp.ID = ?;",
-    array(
-      $_SESSION['User']
-    )
-  );
-  $User = sqlsrv_fetch_array($result);
-	$result = $database->query(
-    null,
-    " SELECT *
-		  FROM   Privilege
-		  WHERE  Privilege.User_ID = ?;",
-    array( $_SESSION['User'] ) 
-  );
-  $Privileges = array();
-	if($result){while($Privilege = sqlsrv_fetch_array($result)){$Privileges[$Privilege['Access_Table']] = $Privilege;}}
-    if(	!isset($Connection['ID'])
-	   	|| !isset($Privileges['Ticket'])
-	  		|| $Privileges['Ticket']['User_Privilege']  < 4
-	  		|| $Privileges['Ticket']['Group_Privilege'] < 4){
-				?><?php require('../404.html');?><?php }
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+	$result = \singleton\database::getInstance( )->query(
+		null,
+		" SELECT  Emp.fFirst  AS First_Name,
+		          Emp.Last    AS Last_Name,
+		          Emp.fFirst + ' ' + Emp.Last AS Name,
+		          Emp.Title AS Title,
+		          Emp.Field   AS Field
+		  FROM  Emp
+		  WHERE   Emp.ID = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ]
+		)
+	);
+	$User   = sqlsrv_fetch_array( $result );
+	//Privileges
+	$Access = 0;
+	$Hex = 0;
+	$result = \singleton\database::getInstance( )->query(
+		'Portal',
+		"   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+		  FROM      dbo.[Privilege]
+		  WHERE     Privilege.[User] = ?;",
+		array(
+		  	$_SESSION[ 'Connection' ][ 'User' ],
+		)
+	);
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if( 	!isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'User' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'User' ] )
+    ){ ?><?php require('404.html');?><?php }
     else {
-  		$database->query(
-        null,
-        " INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",
-        array(
-          $_SESSION['User'],
-          date("Y-m-d H:i:s"), 
-          'tickets.php'
+        \singleton\database::getInstance( )->query(
+          null,
+          " INSERT INTO Activity([User], [Date], [Page] )
+            VALUES( ?, ?, ? );",
+          array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+            date('Y-m-d H:i:s'),
+            'work4.php'
         )
       );
 ?><!DOCTYPE html>
@@ -76,10 +105,12 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     table.dataTable tr.dtrg-group.dtrg-level-1 td,table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#5d5d5d;color:white;padding-top:0.25em;padding-bottom:0.25em;padding-left:2em;font-size:0.9em}
     /*table.dataTable tr.dtrg-group.dtrg-level-2 td{background-color:#1d1d1d;color:white;}*/
     </style>
-    <?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css . 'index.php' );?>
-    <?php require( bin_js  . 'index.php' );?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+       <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+       <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+       <?php	require( bin_meta . 'index.php');?>
+       <?php	require( bin_css  . 'index.php');?>
+       <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();'>
   <div id='wrapper'>
@@ -173,13 +204,13 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
       initComplete : function(){ },
       paging : false,
       createdRow : function( row, data, dataIndex ) {
-        if ( data['Status'] == 'On Site' || data['Status'] == 'En Route') { $(row).addClass('gold'); } 
-        else if( data['Priority'] == 1 && data['Status'] != 'Reviewing' && data['Status'] != 'Completed'){ $(row).addClass('red'); } 
-        else if ( data['Level'] == 'Service Call' && data['Status'] != 'Reviewing' && data['Status'] != 'Completed' && data['Status'] != 'Signed' ){ $(row).addClass('blue'); } 
-        else if( data['Status'] == 'Signed' ){ $(row).addClass('green'); } 
+        if ( data['Status'] == 'On Site' || data['Status'] == 'En Route') { $(row).addClass('gold'); }
+        else if( data['Priority'] == 1 && data['Status'] != 'Reviewing' && data['Status'] != 'Completed'){ $(row).addClass('red'); }
+        else if ( data['Level'] == 'Service Call' && data['Status'] != 'Reviewing' && data['Status'] != 'Completed' && data['Status'] != 'Signed' ){ $(row).addClass('blue'); }
+        else if( data['Status'] == 'Signed' ){ $(row).addClass('green'); }
         else if (data['Status'] != 'Reviewing' && data['Status'] != 'Completed' ){ $(row).addClass('light'); }
       },
-      rowGroup: { 
+      rowGroup: {
         // Uses the 'row group' plugin
         dataSrc: [
           'Level',
@@ -247,7 +278,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 d.Unit           = $('input[name="Unit"]').val( );
                 d.Job            = $('input[name="Job"]').val( );
                 d.Type           = $('select[name="Type"]').val( );
-                d.Level          = $('select[name="Level"]').val( ); 
+                d.Level          = $('select[name="Level"]').val( );
                 d.Status         = $('select[name="Status"]').val( );
                 d.Start_Date     = $('input[name="Start_Date"]').val( );
                 d.End_Date       = $('input[name="End_Date"]').val( );
@@ -261,7 +292,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                 document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
             }
         },
-        { 
+        {
           text: 'create',
           action : function( e, dt, node, config ){ document.location.href = 'ticket.php'; }
         },

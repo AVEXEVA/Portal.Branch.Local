@@ -222,10 +222,16 @@ $(document).ready(function( ){
                     } );
                     Table_Locations.draw( );
                 } 
+            },{
+                text : 'Create',
+                action : function( e, dt, node, config ){
+                    document.location.href='location.php';
+                }
+            },{ 
+                extend: 'edit',   editor: Editor_Locations 
+            },{ 
+                extend: 'remove', editor: Editor_Locations 
             },
-            { extend: 'create', editor: Editor_Locations },
-            { extend: 'edit',   editor: Editor_Locations },
-            { extend: 'remove', editor: Editor_Locations },
             'print',
             'copy',
             'csv'

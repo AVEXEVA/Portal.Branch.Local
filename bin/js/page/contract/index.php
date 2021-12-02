@@ -1,0 +1,1 @@
+<script src='bin/js/entity.js?<?php echo rand( 0, 9999999 );?>'></script>
