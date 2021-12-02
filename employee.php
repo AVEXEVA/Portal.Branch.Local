@@ -116,6 +116,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Rolodex.Email   AS Email,
                 Rolodex.Contact AS Contact,
         				tblWork.Super   AS Supervisor,
+        				Users.ID   AS User_ID,
         				Users.Email 			AS UserEmail
         		FROM 	dbo.Emp AS Employee
         				LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
@@ -325,6 +326,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='col-4'><button class='form-control rounded' onClick="document.location.href='employee.php?ID=<?php echo !is_null( $Employee[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true )[ array_search( $Employee[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
                 <div class='col-4'><button class='form-control rounded' onClick="document.location.href='employees.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Employees' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Employees' ][ 0 ] : array( ) );?>';">Table</button></div>
                 <div class='col-4'><button class='form-control rounded' onClick="document.location.href='employee.php?ID=<?php echo !is_null( $Employee[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true )[ array_search( $Employee[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+
               </div>
             </div>
           </div>
@@ -366,7 +368,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			            </script>
 				</div><?php
 			}?>
-            <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+            <div class='card card-primary my-3'>
+            	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
                   <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
@@ -471,22 +474,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
 					<div class='col-8'><input type='text' class='form-control edit <?php echo $Employee[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Employee['Longitude'];?>' /></div>
 				</div>
+				</div>
               <div class='card-footer'>
                   <div class='row'>
                       <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
                   </div>
               </div>
         </form></div>
+       
         <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
-          <div class='card-heading'>
-            <div class='row g-0 px-3 py-2'>
-              <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>User</span></h5></div>
-            </div>
-          </div>
+        
+           <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>User</span></h5></div>
+                   <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='user.php?ID=<?php echo $Employee[ 'User_ID' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
+                </div>
+              </div>
           <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'User' ] ) && $_SESSION[ 'Cards' ][ 'User' ] == 0 ? "style='display:none;'" : null;?>>
             <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
             <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>UserEmail:</div>
+              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Email:</div>
               <div class='col-8'><input type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['UserEmail'];?>' /></div>
             </div>
             <div class='row g-0'>
@@ -494,15 +501,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='col-8'><input type='text' class='form-control edit animation-focus' name='ID' value='<?php echo $Employee['ID'];?>' /></div>
             </div>
           </div>
-        </div></form>
+           <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
+        </form>
       </div>
 
-       <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+       <div class='card card-primary my-3'>
+       	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
                 <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contacts</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contact</span></h5></div>
+                   <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='contact.php?ID=<?php echo $Employee[ 'Rolodex' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
                 </div>
               </div>
               <div class='card-body bg-dark'>
@@ -526,6 +539,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </form>
             </div>
+
+            <div class='card card-primary my-3'>
+       	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+                <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Paid Time Off</span></h5></div>
+                   <div class="col-2"></div>
+                </div>
+              </div>
+            </form>
+          </div>
     </div>
   </div>
 </body>
