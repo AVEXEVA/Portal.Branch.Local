@@ -156,6 +156,8 @@ $( document ).ready( function( ){
             case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
             case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
             case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
+            default :
+            return "<div class='row'><div class='col-12'><div></div>";
           }
         }
       }
