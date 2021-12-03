@@ -84,7 +84,7 @@ $( document ).ready( function( ){
             d.Location = $("input[name='Location']").val( );
             d.Units = $("input[name='Units']").val( );
             d.Date = $("input[name='Date']").val( );
-           d.Status = $("input[name='Status']").val( );
+           d.Status = $("select[name='Status']").val( );
             return d;
         }
         
@@ -188,7 +188,7 @@ $( document ).ready( function( ){
              d.Location = $('input[name="Location"]').val( );
              d.Date = $('input[name="Date"]').val( );
               d.Units = $('input[name="Units"]').val( );
-            d.Status = $('input[name="Status"]').val( );
+            d.Status = $('select[name="Status"]').val( );
             document.location.href = 'violations.php?' + new URLSearchParams( d ).toString();
         }
       },{

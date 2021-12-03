@@ -113,10 +113,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th title='Location'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                             <th title="Date"><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
                                <th title="Units"><input class='redraw form-control' type='text' name='Units' placeholder='Unit' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null;?>' /></th>
-                            <th title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' />
+                            <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
+                            <option value=''>Select</option>
+                            <option value='0'>Active</option>
+                            <option value='1'>Inactive</option>
+                            <option value='2'>Demolished</option>
+                          </select></th>
 
 
-                            </th>
+                            
                         </tr>
 
 
