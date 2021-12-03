@@ -92,9 +92,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['ID'];
       $conditions[] = "Violation.ID LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Name'];
-      $conditions[] = "Violation.Name LIKE '%' + ? + '%'";
+    if( isset($_GET[ 'Units' ] ) && !in_array( $_GET[ 'Units' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Units'];
+      $conditions[] = "Units.fDesc LIKE '%' + ? + '%'";
     }
     if( isset( $_GET[ 'Date_Start' ] ) && !in_array( $_GET[ 'Date_Start' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET[ 'Date_Start' ];
@@ -112,6 +112,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Status'];
       $conditions[] = "Violation.Status LIKE '%' + ? + '%'";
     }
+      if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer'];
+      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+    }
 
 
     $notStatuses = "'" . implode("', '" , array(
@@ -122,21 +126,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       )
     ) . "'";
 
-    if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
+  
 
-      $parameters[] = $_GET['Search'];
-      $search[] = "Violation.ID LIKE '%' + ? + '%'";
-
-      $parameters[] = $_GET['Search'];
-      $search[] = "Violation.Name LIKE '%' + ? + '%'";
-
-      $parameters[] = $_GET['Search'];
-      $search[] = "Location.Tag LIKE '%' + ? + '%'";
-
-    }
+    
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
-    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+    $search = $search == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
       $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
     $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && ($_GET[ 'length' ] != -1) ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
@@ -168,10 +163,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Loc        AS Location_ID,
                           Location.Tag        AS Location_Name,
                           Location.Tag        AS Locations,
-                          Location.Address    AS Location_Street,
-                          Location.City       AS Location_City,
-                          Location.State      AS Location_State,
-                          Location.Zip        AS Units,
+                          Units.ID        AS Unit_ID,
+                          Units.fDesc        AS Units,
                           Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
@@ -192,12 +185,32 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters
       ) or die(print_r(sqlsrv_errors()));
 
+        $sQueryRow="SELECT 
+                        Violation.ID        AS ID,                   
+                        Units.fDesc        AS Units
+                  FROM    Violation
+                          LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                          LEFT JOIN Unit AS Units ON Units.ID = Violation.Elev
+                          LEFT JOIN (
+                            SELECT  Owner.ID,
+                                    Rol.Name
+                            FROM    Owner
+                                    LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                        ) AS Customer ON Location.Owner = Customer.ID
+                  WHERE   ({$conditions}) AND ({$search})  "; 
+
+        $fResult = \singleton\database::getInstance( )->query(
+            null,
+            $sQueryRow,
+            $parameters
+        ) or die(print_r(sqlsrv_errors()));
+
        $iFilteredTotal = 0;
       $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
       $_SESSION[ 'Tables' ][ 'Violations' ] = isset( $_SESSION[ 'Tables' ][ 'Violations' ]  ) ? $_SESSION[ 'Tables' ][ 'Violations' ] : array( );
       if( count( $_SESSION[ 'Tables' ][ 'Violations' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Violations' ] as &$Value ){ $Value = false; } }
       $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] = $_GET;
-      while( $Row = sqlsrv_fetch_array( $rResult ) ){
+      while( $Row = sqlsrv_fetch_array( $fResult ) ){
           $_SESSION[ 'Tables' ][ 'Violations' ][ $Row[ 'ID' ] ] = true;
           $iFilteredTotal++;
       }
@@ -217,6 +230,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       );
 
       while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+      	
         $Row['Date'] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
         $output['aaData'][]       = $Row;
       }

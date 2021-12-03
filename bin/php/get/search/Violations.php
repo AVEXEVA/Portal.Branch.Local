@@ -81,7 +81,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       array(
         $_SESSION[ 'Connection' ][ 'User' ],
         date('Y-m-d H:i:s'),
-        'customers.php'
+        'Violations.php'
       )
     );
 
@@ -97,14 +97,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Name'];
       $conditions[] = "Violation.Name LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Date_Start' ] ) && !in_array( $_GET[ 'Date_Start' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET[ 'Date_Start' ];
+    if( isset( $_GET[ 'Date' ] ) && !in_array( $_GET[ 'Date' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET[ 'Date' ];
       $conditions[] = "Violation.fDate Like >= ?";
     }
-    if( isset( $_GET[ 'Date_End' ] ) && !in_array( $_GET[ 'Date_End' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET[ 'Date_End' ];
-      $conditions[] = "Violation.fDate Like <= ?";
-    }
+    
     if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Location'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
@@ -134,6 +131,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
       $parameters[] = $_GET['search'];
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
+
+      $parameters[] = $_GET['search'];
+      $search[] = "Units.fDesc LIKE '%' + ? + '%'";
      
 
     }
@@ -179,9 +179,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Customer.Name       AS Customer,
                         Location.Tag        AS Locations,
                         Customer.ID         AS Customer_ID,
-                          Customer.Name       AS Customer_Name,
                           Units.ID        AS Unit_ID,
-                        Units.fDesc        AS Units
+                        Units.fDesc        AS Units,
+                        Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                           LEFT JOIN Unit AS Units ON Units.ID = Violation.Elev

@@ -14,23 +14,12 @@ function search( link ){
                       data    : {
                           search                :  $('input:visible[name="Search"]').val(),
                           ID                    :  $('input:visible[name="ID"]').val( ),
-                          Person                :  $('input:visible[name="Person"]').val( ),
                           Customer              :  $('input:visible[name="Customer"]').val( ),
                           Location              :  $('input:visible[name="Location"]').val( ),
-                          Unit                  :  $('input:visible[name="Unit"]').val( ),
-                          Job                   :  $('input:visible[name="Job"]').val( ),
-                          Type                  :  $('select:visible[name="Type"]').val( ),
-                          Level                 :  $('select:visible[name="Level"]').val( ),
+                          Units                  :  $('input:visible[name="Units"]').val( ),
                           Status                :  $('select:visible[name="Status"]').val( ),
-                          Start_Date            :  $('input:visible[name="Start_Date"]').val( ),
-                          End_Date              :  $('input:visible[name="End_Date"]').val( ),
-                          Time_Route_Start      :  $('input:visible[name="Time_Route_Start"]').val( ),
-                          Time_Route_End        :  $('input:visible[name="Time_Route_End"]').val( ),
-                          Time_Site_Start       :  $('input:visible[name="Time_Site_Start"]').val( ),
-                          Time_Site_End         :  $('input:visible[name="Time_Site_End"]').val( ),
-                          Time_Completed_Start  :  $('input:visible[name="Time_Completed_Start"]').val( ),
-                          Time_Completed_End    :  $('input:visible[name="Time_Completed_End"]').val( ),
-                          LSD                   :  $('select:visible[name="LSD"]').val( )
+                          Date                  :  $('input:visible[name="Date"]').val( )
+                        
                       },
                       dataType : 'json',
                       beforeSend : function( ){
@@ -74,7 +63,12 @@ $( document ).ready( function( ){
       orderCellsTop  : true,
       autoWidth      : true,
       responsive     : true,
+        select         : {
+            style : 'multi',
+            selector : 'td.ID'
+        },
       ajax : {
+        url : 'bin/php/get/Violations.php',
         data : function( d ){
             d = {
               draw : d.draw,
@@ -85,16 +79,15 @@ $( document ).ready( function( ){
                     dir : d.order[0].dir
                 }
             };
-            d.Search = $("input[name='Search']").val( );
-            d.Name = $("input[name='Customer']").val( );
+             d.ID = $("input[name='ID']").val( );
+            d.Customer = $("input[name='Customer']").val( );
             d.Location = $("input[name='Location']").val( );
+            d.Units = $("input[name='Units']").val( );
             d.Date = $("input[name='Date']").val( );
-            d.ID = $("input[name='ID']").val( );
-              d.Units = $("input[name='Units']").val( );
-            d.Status = $("input[name='Status']").val( );
+           d.Status = $("input[name='Status']").val( );
             return d;
-        },
-        url : 'bin/php/get/Violations.php'
+        }
+        
     },
       columns    : [
         {
@@ -113,19 +106,19 @@ $( document ).ready( function( ){
             }
           }
         },{
-          data : 'Name',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-          }
+            data : 'Customer',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Customer !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Customer + " </a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
         },{
             data : 'Locations',
             render : function( data, type, row, meta ){
@@ -141,13 +134,15 @@ $( document ).ready( function( ){
                 }
             }
           },{
+            data : 'Date'
+        },{
               data : 'Units',
               render : function( data, type, row, meta ){
                   switch( type ){
                       case 'display' :
                           return  row.Units !== null
                               ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
+                                      "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " </a></div>" +
                                   "</div>"
                               :   null;
                       default :
@@ -155,22 +150,15 @@ $( document ).ready( function( ){
                   }
               }
         },{
-            data : 'Customer',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Customer !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-                }
-            }
-        },{
-            data : 'Date'
+        data : 'Status',
+        render:function(data){
+          switch(data){
+            case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+            case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+            case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
+          }
         }
+      }
     ],
     
     initComplete : function( ){
@@ -195,8 +183,12 @@ $( document ).ready( function( ){
         className : 'form-control',
         action : function( e, dt, node, config ){
             d = { }
-            d.Name = $('input[name="Name"]').val( );
-            d.Person = $('select[name="Person"]').val( );
+             d.ID = $('input[name="ID"]').val( );
+            d.Customer = $('input[name="Customer"]').val( );
+             d.Location = $('input[name="Location"]').val( );
+             d.Date = $('input[name="Date"]').val( );
+              d.Units = $('input[name="Units"]').val( );
+            d.Status = $('input[name="Status"]').val( );
             document.location.href = 'violations.php?' + new URLSearchParams( d ).toString();
         }
       },{

@@ -79,14 +79,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'post/customer.php'
+            'post/violation.php'
         )
       );
 		if(isset($_POST['action']) && $_POST['action'] == 'delete'){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID){
 					$database->query(
-						'Portal',
+						null,
 						"	DELETE FROM dbo.[Violation] 
 							WHERE 		[Violation].[ID] = ?;",
 						array(
