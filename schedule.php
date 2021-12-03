@@ -193,8 +193,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           )
                         );
                       } else {
-                        $_GET[ 'Start' ] = date( 'Y-m-d H:i:s', strtotime( $_GET[ 'Start' ] ) );
-                        $_GET[ 'End' ]   = date( 'Y-m-d H:i:s', strtotime( $_GET[ 'End' ] ) );
+                           $startDate = date('Y-m-01');
+                           $endDate = date('Y-m-d');
+                           if(isset($_GET[ 'Start' ])){$startDate = $_GET[ 'Start' ];$endDate = $_GET[ 'End' ];}
+                            $_GET[ 'Start' ] = date( 'Y-m-d H:i:s', strtotime( $startDate ) );
+                            $_GET[ 'End' ]   = date( 'Y-m-d H:i:s', strtotime( $endDate ) );
                         $result = $database->query(
                           null,
                           " SELECT    Top 25
@@ -215,15 +218,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   ORDER BY  Attendance.[ID] DESC;";
                       if( $result ){ while($row = sqlsrv_fetch_array( $result ) ){
                         $r2 = $database->query(null, $sQuery, array( $row[ 'ID' ]));
+
                         if($r2){
                           $row2 = sqlsrv_fetch_array($r2);
+
                           $row2 = is_array($row2) ? $row2 : array('Start'=>'1899-12-30 00:00:00.000', 'End'=>'1899-12-30 00:00:00.000');
                         }
                         $row['Start'] = $row2['Start'] == '1899-12-30 00:00:00.000' ? '' : date("m/d/Y H:i A",strtotime($row2['Start']));
                         $row['End'] = $row2['End'] == '1899-12-30 00:00:00.000' ? '' : date("m/d/Y H:i A",strtotime($row2['End']));
                         $data[] = $row;
                       }}
-                      foreach($data as $user){?><tr>
+
+
+
+                      foreach($data as $user){ ?>
+                      <tr>
                         <td style='border:1px solid black;text-align:right;'><a href='user.php?ID=<?php echo $user['ID'];?>'><?php echo $user['Last'] . ", " . $user['fFirst'];?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></td><?php
                         $i = 1;
                         while($i <= cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'))){
@@ -266,10 +275,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               $tomorrow = date("Y-m-{$i2} 00:00:00.000");
                             }
                           }
+
                           $Type = Null;
+                          $row5 = "";
                           $r = $database->query(null,"SELECT Top 1 * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[Start] >= ? AND Attendance.[Start] < ? AND (Attendance.[End] < ? OR Attendance.[End] < ? OR Attendance.[End] IS NULL) ORDER BY DATEDIFF(MINUTE, Attendance.[Start], Attendance.[End]) DESC;",array($user['ID'],$today, $tomorrow, $tomorrow,date("Y-m-d H:i:s",strtotime("tomorrow",strtotime($tomorrow)))));
                           if($r){$row = sqlsrv_fetch_array($r);}
                           if(is_array($row)){
+
                             $Type = 'Ticket';
                             if(isset($row['End']) && !is_null($row['End']) && date("N",strtotime($today)) >= 6){
                               $t1 = strtotime($row['Start']);
@@ -336,6 +348,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                               AND Employee_Schedule.Start < ?
                                     ;",array($user['ID'], $today, $tomorrow));
                                   if($r){$row5 = sqlsrv_fetch_array($r);}
+
                                   if(is_array($row5)){
                                     $color = 'blue';
                                   } else {
@@ -352,7 +365,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           $i++;
                         }
                       }
-                      ?></tr>
+                      ?>
+                      </tr>
                     </tbody>
                 </table>
               </div>
