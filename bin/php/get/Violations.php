@@ -72,23 +72,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       ||  !isset( $Privileges[ 'Violation' ] )
       ||  !check( privilege_read, level_group, $Privileges[ 'Violation' ] )
   ){ ?><?php require('404.html');?><?php }
-  else {
-    \singleton\database::getInstance( )->query(
+  else{
+
+  	\singleton\database::getInstance( )->query(
       null,
       " INSERT INTO Activity([User], [Date], [Page] )
         VALUES( ?, ?, ? );",
       array(
         $_SESSION[ 'Connection' ][ 'User' ],
         date('Y-m-d H:i:s'),
-        'customers.php'
+        'Violations.php'
       )
     );
 
     $conditions = array( );
     $search = array( );
     $parameters = array( );
-
-    if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+        if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['ID'];
       $conditions[] = "Violation.ID LIKE '%' + ? + '%'";
     }
@@ -113,9 +113,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $conditions[] = "Violation.Status LIKE '%' + ? + '%'";
     }
 
-    $notStatuses = "'" . implode(
-      "', '",
-      array(
+
+    $notStatuses = "'" . implode("', '" , array(
         'Dismissed',
         'Rejected',
         'Expired',
@@ -139,8 +138,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
-    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
-    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+      $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && ($_GET[ 'length' ] != -1) ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
 
     $Columns = array(
       0 =>  'Violation.ID',
@@ -156,7 +155,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       ? $_GET['order']['dir']
       : 'ASC';
 
-    $sQuery = " SELECT *
+
+ $sQuery = " SELECT *
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Violation.ID        AS ID,
@@ -164,15 +164,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Violation.fDate     AS Date,
                           Customer.ID         AS Customer_ID,
                           Customer.Name       AS Customer_Name,
+                          Customer.Name       AS Customer,
                           Location.Loc        AS Location_ID,
                           Location.Tag        AS Location_Name,
+                          Location.Tag        AS Locations,
                           Location.Address    AS Location_Street,
                           Location.City       AS Location_City,
                           Location.State      AS Location_State,
-                          Location.Zip        AS Location_Zip,
+                          Location.Zip        AS Units,
                           Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                          LEFT JOIN Unit AS Units ON Units.ID = Violation.Elev
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name
@@ -182,51 +185,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-    //echo $sQuery;
+  
       $rResult = $database->query(
         null,
         $sQuery,
         $parameters
       ) or die(print_r(sqlsrv_errors()));
 
-      $sQueryRow = "SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                            Violation.ID        AS ID,
-                            Violation.Name      AS Name,
-                            Violation.fDate     AS Date,
-                            Customer.ID         AS Customer_ID,
-                            Customer.Name       AS Customer_Name,
-                            Location.Loc        AS Location_ID,
-                            Location.Tag        AS Location_Name,
-                            Location.Address    AS Location_Street,
-                            Location.City       AS Location_City,
-                            Location.State      AS Location_State,
-                            Location.Zip        AS Location_Zip,
-                            Violation.Status    AS Status
-                    FROM    Violation
-                            LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                            LEFT JOIN (
-                              SELECT  Owner.ID,
-                                      Rol.Name
-                              FROM    Owner
-                                      LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                          ) AS Customer ON Location.Owner = Customer.ID
-                    WHERE   ({$conditions}) AND ({$search});";
-
-      $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
-
-      $iFilteredTotal = 0;
+       $iFilteredTotal = 0;
       $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
       $_SESSION[ 'Tables' ][ 'Violations' ] = isset( $_SESSION[ 'Tables' ][ 'Violations' ]  ) ? $_SESSION[ 'Tables' ][ 'Violations' ] : array( );
       if( count( $_SESSION[ 'Tables' ][ 'Violations' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Violations' ] as &$Value ){ $Value = false; } }
       $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] = $_GET;
-      while( $Row = sqlsrv_fetch_array( $fResult ) ){
+      while( $Row = sqlsrv_fetch_array( $rResult ) ){
           $_SESSION[ 'Tables' ][ 'Violations' ][ $Row[ 'ID' ] ] = true;
           $iFilteredTotal++;
       }
 
       $parameters = array( );
-      $sQuery = " SELECT  COUNT(Route.ID)
-                  FROM    Route;";
+      $sQuery = " SELECT  COUNT(Violation.ID)
+                  FROM    Violation;";
       $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
       $aResultTotal = sqlsrv_fetch_array($rResultTotal);
       $iTotal = $aResultTotal[0];
@@ -243,32 +221,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $output['aaData'][]       = $Row;
       }
       echo json_encode( $output );
-}}
-$sQueryRow = "	SELECT 	Count( Violation.ID ) AS Count
-        FROM 	Violation AS Contact
-        WHERE 	({$conditions}) AND ({$search})";
-
-  $stmt = \singleton\database::getInstance( )->query(
-    null,
-    $sQueryRow,
-    $parameters
-  ) or die(print_r(sqlsrv_errors()));
-
-  $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
-  sqlsrv_cancel( $stmt );
-
-  $sQuery = " SELECT  COUNT(Violation.ID)
-              FROM    Violation AS Contact;";
-  $rResultTotal = \singleton\database::getInstance( )->query(
-    null,
-    $sQuery,
-    array( )
-  ) or die(print_r(sqlsrv_errors()));
-  $aResultTotal = sqlsrv_fetch_array($rResultTotal);
-  $iTotal = $aResultTotal[0];
-
-  $output[ 'iTotalRecords' ] = $iTotal;
-  $output[ 'iTotalDisplayRecords' ] = $iFilteredTotal;
-  echo json_encode( $output );
-}
+   
+  }
 }?>
