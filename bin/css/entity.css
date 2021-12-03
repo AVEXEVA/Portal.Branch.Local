@@ -52,3 +52,4 @@
 	width : 100%;
 	position : relative;
 }
+#page-wrapper>div.card, #page-wrapper>div.card>form, #page-wrapper>div.card>form>div.card-body, #page-wrapper>div.card>form>div.card-body>div.card-columns { height : inherit; }
