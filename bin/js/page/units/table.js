@@ -204,12 +204,17 @@ $( document ).ready( function( ){
           },{
             text : 'Get URL',
             className : 'form-control',
-            action : function( e, dt, node, config ){
-                d = { }
-                d.ID = $('input[name="ID"]').val( );
-                d.Email = $('input[name="Email"]').val( );
-                document.location.href = 'unit.php?' + new URLSearchParams( d ).toString();
-            }
+			  action : function( e, dt, node, config ){
+				  d = { }
+				  d.ID = $('input[name="ID"]').val( );
+				  d.Name = $('input[name="Name"]').val( );
+				  d.Customer = $('input[name="Customer"]').val( );
+				  d.Location = $('input[name="Location"]').val( );
+				  d.Type = $('input[name="Type"]').val( )=== undefined ? '' : $('input[name="Type"]').val( );
+				  d.Status = $('input[name="Status"]').val( )=== undefined ? '' : $('input[name="Status"]').val( );
+				  d.Ticket_ID = $('input[name="Ticket_ID"]').val( );
+				  document.location.href = 'unit.php?' + new URLSearchParams( d ).toString();
+			  }
           },{
             text : 'Create',
             className : 'form-control',
