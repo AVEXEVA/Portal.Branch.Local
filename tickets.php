@@ -104,28 +104,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <div class='row'><div class='col-12'>&nbsp;</div></div>
                   <div class='row'>
                       <div class='col-4'>Search:</div>
-                      <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw' /></div>
+                      <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw form-input' /></div>
                   </div>
                   <div class='row'><div class='col-12'>&nbsp;</div></div>
                   <div class='row'>
                     <div class='col-4'>Person:</div>
-                    <div class='col-8'><input type='text' name='Person' placeholder='Person' class='redraw' value='<?php echo $_GET[ 'Person' ];?>' /></div>
+                    <div class='col-8'><input type='text' name='Person' placeholder='Person' class='redraw form-input' value='<?php echo $_GET[ 'Person' ];?>' /></div>
                   </div>
                   <div class='row'>
                     <div class='col-4'>Customer:</div>
-                    <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw' value='<?php echo $_GET[ 'Customer' ];?>' /></div>
+                    <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw form-input' value='<?php echo $_GET[ 'Customer' ];?>' /></div>
                   </div>
                   <div class='row'>
                     <div class='col-4'>Location:</div>
-                    <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' value='<?php echo $_GET[ 'Location' ];?>' /></div>
+                    <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw form-input' value='<?php echo $_GET[ 'Location' ];?>' /></div>
                   </div>
                   <div class='row'>
                     <div class='col-4'>Unit:</div>
-                    <div class='col-8'><input type='text' name='Unit' placeholder='Unit' class='redraw' value='<?php echo $_GET[ 'Unit' ];?>' /></div>
+                    <div class='col-8'><input type='text' name='Unit' placeholder='Unit' class='redraw form-input' value='<?php echo $_GET[ 'Unit' ];?>' /></div>
                   </div>
                   <div class='row'>
                     <div class='col-4'>Job:</div>
-                    <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw' value='<?php echo $_GET[ 'Job' ];?>' /></div>
+                    <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw form-input' value='<?php echo $_GET[ 'Job' ];?>' /></div>
                   </div>
                 </form></div>
                 <div class="card-body bg-dark">
@@ -147,15 +147,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th class='text-white border border-white' title='LSD'>LSD</th>
 
                         </tr><tr class='form-desktop'>
-                            <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Person'><input class='redraw form-control' type='text' name='Person' value='<?php echo isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Unit'><input class='redraw form-control' type='text' name='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Job'><input class='redraw form-control' type='text' name='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='Person'><input class='redraw form-control' type='text' placeholder='Person' name='Person' value='<?php echo isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' placeholder='Customer' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text'  placeholder='Location ' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='Unit'><input class='redraw form-control' type='text' placeholder='Unit'  name='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null; ?>' /></th>
+                            <th class='text-white border border-white' title='Job'><input class='redraw form-control' type='text' name='Job'  placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null; ?>' /></th>
                             <th class='text-white border border-white' title='Type'>
                                 <div class='row'>
-                                    <div class='col-12'><select class='redraw' name='Type'>
+                                    <div class='col-12'><select class='redraw form-control' name='Type'>
                                         <option value=''>Select</option><?php
                                         $Types = array( );
                                         $result = $database->query(
@@ -168,7 +168,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             ?><option value='<?php echo $row[ 'ID' ];?>' <?php echo isset( $_GET[ 'Type' ] ) && !empty( $_GET[ 'Type' ] )  && $_GET[ 'Type' ] == $row[ 'ID' ] ? "selected='selected'" : null;?>><?php echo $row[ 'Type' ];?></option><?php
                                         }}
                                     ?></select></div>
-                                    <div class='col-12'><select class='redraw' name='Level'>
+                                    <div class='col-12'><select class='redraw form-control' name='Level'>
                                         <option value=''>Select</option><?php
                                         $Levels = array(
                                             1  => 'Service Call',
@@ -190,7 +190,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     ?></select></div>
                                 </div>
                             </th>
-                            <th class='text-white border border-white' title='Status'><select class='redraw' name='Status'>
+                            <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
                                 <option value=''>Select</option>
                                 <option value='0' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 0 ? "selected='selected'" : null;?>>Unassigned</option>
                                 <option value='1' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 1 ? "selected='selected'" : null;?>>Assigned</option>
@@ -202,30 +202,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             </select></th>
                             <th class='text-white border border-white' title='Date'>
                                 <div class='row g-0'>
-                                    <input class='col-12 date redraw' type='text' name='Start_Date' value='<?php echo isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null;?>' />
-                                    <input class='col-12 date redraw' type='text' name='End_Date' value='<?php echo isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null;?>' />
+                                    <input class='col-12 date redraw form-control' type='text' placeholder='Start Date' name='Start_Date' value='<?php echo isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null;?>' />
+                                    <input class='col-12 date redraw form-control' type='text' placeholder='End Date' name='End_Date' value='<?php echo isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null;?>' />
                                 </div>
                             </th>
                             <th class='text-white border border-white' title='Time Route'>
                                 <div class='row g-0'>
-                                    <div class='col-12'><input class='redraw time' type='text' name='Time_Route_Start' value='<?php echo isset( $_GET[ 'Time_Route_Start' ] ) ? $_GET[ 'Time_Route_Start' ] : null;?>' /></div>
-                                    <div class='col-12'><input class='redraw time' type='text' name='Time_Route_End' value='<?php echo isset( $_GET[ 'Time_Route_End' ] ) ? $_GET[ 'Time_Route_End' ] : null;?>' /></div>
+                                    <div class='col-12'><input class='redraw time form-control' placeholder='Start Route Time' type='text' name='Time_Route_Start' value='<?php echo isset( $_GET[ 'Time_Route_Start' ] ) ? $_GET[ 'Time_Route_Start' ] : null;?>' /></div>
+                                    <div class='col-12'><input class='redraw time form-control' placeholder='End Route Time' type='text' name='Time_Route_End' value='<?php echo isset( $_GET[ 'Time_Route_End' ] ) ? $_GET[ 'Time_Route_End' ] : null;?>' /></div>
                                 </div>
                             </th>
                             <th class='text-white border border-white' title='Time Site'>
                                 <div class='row g-0'>
-                                    <div class='col-12'><input class='redraw time' type='text' name='Time_Site_Start' value='<?php echo isset( $_GET[ 'Time_Site_Start' ] ) ? $_GET[ 'Time_Site_Start' ] : null;?>' /></div>
-                                    <div class='col-12'><input class='redraw time' type='text' name='Time_Site_End' value='<?php echo isset( $_GET[ 'Time_Site_End' ] ) ? $_GET[ 'Time_Site_End' ] : null;?>' /></div>
+                                    <div class='col-12'><input class='redraw time form-control' placeholder='Start Site Time' type='text' name='Time_Site_Start' value='<?php echo isset( $_GET[ 'Time_Site_Start' ] ) ? $_GET[ 'Time_Site_Start' ] : null;?>' /></div>
+                                    <div class='col-12'><input class='redraw time form-control' placeholder='End Site Time' type='text' name='Time_Site_End' value='<?php echo isset( $_GET[ 'Time_Site_End' ] ) ? $_GET[ 'Time_Site_End' ] : null;?>' /></div>
                                 </div>
                             </th>
                             <th class='text-white border border-white' title='Time Completed'>
                                 <div class='row g-0'>
-                                    <div class='col-12'><input class='redraw time' type='text' name='Time_Completed_Start' value='<?php echo isset( $_GET[ 'Time_Completed_Start' ] ) ? $_GET[ 'Time_Completed_Start' ] : null;?>' /></div>
-                                    <div class='col-12'><input class='redraw time' type='text' name='Time_Completed_End' value='<?php echo isset( $_GET[ 'Time_Completed_End' ] ) ? $_GET[ 'Time_Completed_End' ] : null;?>' /></div>
+                                    <div class='col-12'><input class='redraw time form-control' placeholder='Start Completed Time' type='text' name='Time_Completed_Start' value='<?php echo isset( $_GET[ 'Time_Completed_Start' ] ) ? $_GET[ 'Time_Completed_Start' ] : null;?>' /></div>
+                                    <div class='col-12'><input class='redraw time form-control' placeholder='End Completed Time' type='text' name='Time_Completed_End' value='<?php echo isset( $_GET[ 'Time_Completed_End' ] ) ? $_GET[ 'Time_Completed_End' ] : null;?>' /></div>
                                 </div>
                             </th>
-                            <th class='text-white border border-white' title='Hours'><input class='redraw form-control ' type='text' name='Hours' /></th>
-                            <th class='text-white border border-white' title='Hours'><select class='redraw' name='LSD'>
+                            <th class='text-white border border-white' title='Hours'><input class='redraw form-control ' placeholder='Hours' type='text' name='Hours' /></th>
+                            <th class='text-white border border-white' title='Hours'><select class='redraw form-control' name='LSD'>
                                 <option value=''>Select</option>
                                 <option value='0' <?php echo isset( $_GET[ 'LSD' ] ) && $_GET[ 'LSD' ] && $_GET[ 'LSD' ] == 0 ? "selected='selected'" : null;?>>Running</option>
                                 <option value='1' <?php echo isset( $_GET[ 'LSD' ] ) && $_GET[ 'LSD' ] && $_GET[ 'LSD' ] == 0 ? "selected='selected'" : null;?>>Left Shutdown</option>
