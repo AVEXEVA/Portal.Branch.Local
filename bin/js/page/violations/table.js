@@ -1,5 +1,4 @@
-$( document ).ready( function( ){
-  function search( link ){
+function search( link ){
       var api = link.api();
       $('input[name="Search"]', api.table().container())
           .typeahead({
@@ -10,28 +9,17 @@ $( document ).ready( function( ){
               display : 'FieldValue',
               source: function( query, result ){
                   $.ajax({
-                      url : 'bin/php/get/search/violations.php',
+                      url : 'bin/php/get/search/Violations.php',
                       method : 'GET',
                       data    : {
                           search                :  $('input:visible[name="Search"]').val(),
                           ID                    :  $('input:visible[name="ID"]').val( ),
-                          Person                :  $('input:visible[name="Person"]').val( ),
                           Customer              :  $('input:visible[name="Customer"]').val( ),
                           Location              :  $('input:visible[name="Location"]').val( ),
-                          Unit                  :  $('input:visible[name="Unit"]').val( ),
-                          Job                   :  $('input:visible[name="Job"]').val( ),
-                          Type                  :  $('select:visible[name="Type"]').val( ),
-                          Level                 :  $('select:visible[name="Level"]').val( ),
+                          Units                  :  $('input:visible[name="Units"]').val( ),
                           Status                :  $('select:visible[name="Status"]').val( ),
-                          Start_Date            :  $('input:visible[name="Start_Date"]').val( ),
-                          End_Date              :  $('input:visible[name="End_Date"]').val( ),
-                          Time_Route_Start      :  $('input:visible[name="Time_Route_Start"]').val( ),
-                          Time_Route_End        :  $('input:visible[name="Time_Route_End"]').val( ),
-                          Time_Site_Start       :  $('input:visible[name="Time_Site_Start"]').val( ),
-                          Time_Site_End         :  $('input:visible[name="Time_Site_End"]').val( ),
-                          Time_Completed_Start  :  $('input:visible[name="Time_Completed_Start"]').val( ),
-                          Time_Completed_End    :  $('input:visible[name="Time_Completed_End"]').val( ),
-                          LSD                   :  $('select:visible[name="LSD"]').val( )
+                          Date                  :  $('input:visible[name="Date"]').val( )
+                        
                       },
                       dataType : 'json',
                       beforeSend : function( ){
@@ -53,6 +41,14 @@ $( document ).ready( function( ){
           }
       );
   }
+$( document ).ready( function( ){
+  
+     var Editor_Users = new $.fn.dataTable.Editor( {
+        idSrc    : 'ID',
+        ajax     : 'index.php',
+        table    : '#Table_Violations'
+    } );
+    
   var Table_Violations = $('#Table_Violations').DataTable( {
       dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
       processing     : true,
@@ -67,6 +63,32 @@ $( document ).ready( function( ){
       orderCellsTop  : true,
       autoWidth      : true,
       responsive     : true,
+        select         : {
+            style : 'multi',
+            selector : 'td.ID'
+        },
+      ajax : {
+        url : 'bin/php/get/Violations.php',
+        data : function( d ){
+            d = {
+              draw : d.draw,
+                start : d.start,
+                length : d.length,
+                order : {
+                    column : d.order[0].column,
+                    dir : d.order[0].dir
+                }
+            };
+             d.ID = $("input[name='ID']").val( );
+            d.Customer = $("input[name='Customer']").val( );
+            d.Location = $("input[name='Location']").val( );
+            d.Units = $("input[name='Units']").val( );
+            d.Date = $("input[name='Date']").val( );
+           d.Status = $("select[name='Status']").val( );
+            return d;
+        }
+        
+    },
       columns    : [
         {
           className : 'ID',
@@ -84,19 +106,19 @@ $( document ).ready( function( ){
             }
           }
         },{
-          data : 'Name',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-          }
+            data : 'Customer',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Customer !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Customer + " </a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
         },{
             data : 'Locations',
             render : function( data, type, row, meta ){
@@ -104,7 +126,7 @@ $( document ).ready( function( ){
                     case 'display' :
                         return  row.Locations !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='locations.php?Violation=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                                    "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -112,13 +134,15 @@ $( document ).ready( function( ){
                 }
             }
           },{
+            data : 'Date'
+        },{
               data : 'Units',
               render : function( data, type, row, meta ){
                   switch( type ){
                       case 'display' :
                           return  row.Units !== null
                               ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='units.php?Violations=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
+                                      "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " </a></div>" +
                                   "</div>"
                               :   null;
                       default :
@@ -126,40 +150,24 @@ $( document ).ready( function( ){
                   }
               }
         },{
-            data : 'Customer'
-        },{
-            data : 'Status'
+        data : 'Status',
+        render:function(data){
+          switch(data){
+            case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+            case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+            case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
+            default :
+            return "<div class='row'><div class='col-12'><div></div>";
+          }
         }
+      }
     ],
-    ajax : {
-        data : function( d ){
-            d = {
-              draw : d.draw,
-                start : d.start,
-                length : d.length,
-                order : {
-                    column : d.order[0].column,
-                    dir : d.order[0].dir
-                }
-            };
-            d.Search = $("input[name='Search']").val( );
-            d.Name = $("input[name='Name']").val( );
-            d.Date_Start = $("input[name='Date_Start']").val( );
-            d.Date_End = $("input[name='Date_End']").val( );
-            d.Location = $("input[name='Location']").val( );
-            d.Select = $("select[name='Select']").val( );
-            d.ID = $("input[name='ID']").val( );
-            d.Customer = $("input[name='Customer']").val( );
-            d.Status = $("input[name='Status']").val( );
-            return d;
-        },
-        url : 'bin/php/get/Violations.php'
-    },
+    
     initComplete : function( ){
       $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
       $('input.date').datepicker( { } );
       $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-      //search( this );
+      search( this );
       $( '.redraw' ).bind( 'change', function(){ Table_Violations.draw(); });
     },
     buttons : [
@@ -177,8 +185,12 @@ $( document ).ready( function( ){
         className : 'form-control',
         action : function( e, dt, node, config ){
             d = { }
-            d.Name = $('input[name="Name"]').val( );
-            d.Person = $('select[name="Person"]').val( );
+             d.ID = $('input[name="ID"]').val( );
+            d.Customer = $('input[name="Customer"]').val( );
+             d.Location = $('input[name="Location"]').val( );
+             d.Date = $('input[name="Date"]').val( );
+              d.Units = $('input[name="Units"]').val( );
+            d.Status = $('select[name="Status"]').val( );
             document.location.href = 'violations.php?' + new URLSearchParams( d ).toString();
         }
       },{
