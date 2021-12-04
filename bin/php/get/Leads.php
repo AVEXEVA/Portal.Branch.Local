@@ -127,6 +127,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      6 =>  'Lead.City',
 	      7 =>  'Lead.State',
 	      8 =>  'Lead.Zip',
+        9 =>  'Lead.Contact',
+        10 =>  'Lead.Probability',
+        11 =>  'Lead.Level',
 	    );
 	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
 	        ? $Columns[ $_GET['order']['column'] ]
@@ -180,7 +183,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						        Lead.Address      AS Street,
 						        Lead.City         AS City,
 						        Lead.State        AS State,
-						        Lead.Zip          AS Zip
+						        Lead.Contact      AS Contact,
+                    Lead.Probability  AS Probability,
+                    Lead.level        AS Level,
+                    Lead.Zip          AS Zip
 	                  	FROM    Lead
 	                  			LEFT JOIN (
 			                        SELECT  Owner.ID,
