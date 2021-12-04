@@ -71,7 +71,7 @@ $(document).ready(function( ){
                 data    : function(d){
                     d = {
                         draw : d.draw,
-                        start : d.start, 
+                        start : d.start,
                         length : d.length,
                         order : {
                             column : d.order[0].column,
@@ -81,10 +81,9 @@ $(document).ready(function( ){
                     d.ID = $('input[name="ID"]').val( );
                     d.Email = $('input[name="Email"]').val( );
                     d.Branch_Type = $('input[name="Type"]').val( );
-                   d.Branch_Type = $('input[name="Type"]').val( );
                     d.Branch = $('input[name="Branch"]').val( );
-                     d.Branch_ID = $('input[name="ID"]').val( );
-                      d.Picture = $('input[name="Picture"]').val( );
+                    d.Branch_ID = $('input[name="ID"]').val( );
+                    d.Picture = $('input[name="Picture"]').val( );
                     return d;
                 }
         },
@@ -103,17 +102,16 @@ $(document).ready(function( ){
                           default :
                               return data;
                       }
-
                   }
             },{
-              data : 'Email'
+                data : 'Email'
             },{
-              data : 'Verified'
+                data : 'Verified'
             },{
-              data : 'Branch'
+                data : 'Branch'
             },{
               data : 'Branch_Type',
-               render : function( data, type, row, meta ){
+              render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
                             return  row.Branch_Type == "Employee"
@@ -127,9 +125,7 @@ $(document).ready(function( ){
                 }
             },{
               data : 'Branch_ID'
-              
-            },
-            {
+            },{
             data:'Picture',
               render : function( data, type, row, meta ){
                     switch( type ){
@@ -139,7 +135,6 @@ $(document).ready(function( ){
                                         "<div class='col-12'><img src=data:"+row.Picture_Type +";base64,"+row.Picture +" width='100px;' height='100px;'></div>" +
                                     "</div>"
                                 :   null;
-
                         default :
                             return data;
                     }
@@ -147,7 +142,7 @@ $(document).ready(function( ){
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );

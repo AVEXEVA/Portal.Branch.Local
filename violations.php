@@ -97,33 +97,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</h4></div>
-                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='violations.php'>
-                    <div class='row g-0'>
-                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Search(1);?>Search:</div>
-                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Search' value='<?php echo $Violation['Search'];?>' /></div>
-                    </div>
-                    <div class='row g-0'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row g-0'>
-                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
-                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Violation['Name'];?>' /></div>
-                    </div>
-                    <div class='row g-0'>
-                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?>Date:</div>
-                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Date' value='<?php echo $Violation['Date'];?>' /></div>
-                    </div>
-                    <div class='row g-0'>
-                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?>Location:</div>
-                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Location' value='<?php echo $Violation['Location'];?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-12'><select name='Status' class='form-control edit'>
-                            <option value=''>Select</option>
-                            <option value='0' <?php echo $Violation[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
-                            <option value='1' <?php echo $Violation[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
-                        </select></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                </form></div>
+                
                 <div class="card-body bg-dark">
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
@@ -131,14 +105,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th title='Customer'>Customer</th>
                             <th title='Location'>Location</th>
                             <th title="Date">Date</th>
+                            <th title="Units">Units</th>
                             <th title='Status'>Status</th>
                         </tr><tr class='form-desktop'>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                             <th title='Customer'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                             <th title='Location'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
                             <th title="Date"><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
-                            <th title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
-                        </tr></thead>
+                               <th title="Units"><input class='redraw form-control' type='text' name='Units' placeholder='Unit' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null;?>' /></th>
+                            <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
+                            <option value=''>Select</option>
+                            <option value='0'>Active</option>
+                            <option value='1'>Inactive</option>
+                            <option value='2'>Demolished</option>
+                          </select></th>
+
+
+                            
+                        </tr>
+
+
+                    </thead>
                     </table>
                 </div>
             </div>
