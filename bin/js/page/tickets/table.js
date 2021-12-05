@@ -308,7 +308,7 @@ $(document).ready(function( ){
         },
         buttons: [
             {
-                text: 'Email Ticket',
+                text: 'Email Ticket',className: 'form-control',
                 action: function ( e, dt, node, config ) {
                     var rows = dt.rows( { selected : true } ).indexes( );
                     var dte = dt.cells( rows, 0 ).data( ).toArray( );
@@ -323,7 +323,7 @@ $(document).ready(function( ){
                     });
                 }
             },{
-                text: 'Reset Search',
+                text: 'Reset Search',className: 'form-control',
                 action: function ( e, dt, node, config ) {
                     $( 'input, select' ).each( function( ){
                         $( this ).val( '' );
@@ -331,7 +331,7 @@ $(document).ready(function( ){
                     Table_Tickets.draw( );
                 }
             },{
-                text : 'Get URL',
+                text : 'Get URL',className: 'form-control',
                 action : function( e, dt, node, config ){
                     var d = { };
                     d.ID             = $('input[name="ID"]').val( );
@@ -357,25 +357,27 @@ $(document).ready(function( ){
             },
             {
                 text: 'Create',
+                className: 'form-control',
                 action: function ( e, dt, node, config ) {
                     var rows = dt.rows( { selected : true } ).indexes( );
                     var dte = dt.cells( rows, 0 ).data( ).toArray( );
                     document.location.href = 'invoices.php?Tickets=' + dte.join( ',' );
                 }
             },
-            { extend: 'create', editor: Editor_Tickets },
-            { extend: 'edit',   editor: Editor_Tickets },
-            { extend: 'remove', editor: Editor_Tickets },
+            { extend: 'create',className: 'form-control', editor: Editor_Tickets },
+            { extend: 'edit', className: 'form-control',  editor: Editor_Tickets },
+            { extend: 'remove',className: 'form-control', editor: Editor_Tickets },
             {
-                text: 'Print',
+                text: 'Print',className: 'form-control',
                 action: function ( e, dt, node, config ) {
                     var rows = dt.rows( { selected : true } ).indexes( );
                     var dte = dt.cells( rows, 0 ).data( ).toArray( );
                     document.location.href = 'print_tickets.php?Tickets=' + dte.join( ',' );
                 }
             },
-            'copy',
-            'csv'
+            { extend: 'copy', className: 'form-control' },
+            { extend: 'csv', className: 'form-control' },
+
         ]
     } );
 } );

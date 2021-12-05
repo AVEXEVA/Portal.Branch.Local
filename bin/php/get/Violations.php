@@ -163,12 +163,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Loc        AS Location_ID,
                           Location.Tag        AS Location_Name,
                           Location.Tag        AS Locations,
-                          Units.ID        AS Unit_ID,
-                          Units.fDesc        AS Units,
+                          Unit.ID        AS Unit_ID,
+                          Unit.Unit        AS Units,
                           Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                          LEFT JOIN Unit AS Units ON Units.ID = Violation.Elev
+                          LEFT JOIN Elev AS Unit ON Unit.ID = Violation.Elev
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name
@@ -187,10 +187,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
         $sQueryRow="SELECT 
                         Violation.ID        AS ID,                   
-                        Units.fDesc        AS Units
+                        Unit.Unit        AS Units
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                          LEFT JOIN Unit AS Units ON Units.ID = Violation.Elev
+                          LEFT JOIN Elev AS Unit ON Unit.ID = Violation.Elev
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name

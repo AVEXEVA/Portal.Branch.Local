@@ -133,7 +133,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
 
       $parameters[] = $_GET['search'];
-      $search[] = "Units.fDesc LIKE '%' + ? + '%'";
+      $search[] = "Unit.Unit LIKE '%' + ? + '%'";
      
 
     }
@@ -179,12 +179,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Customer.Name       AS Customer,
                         Location.Tag        AS Locations,
                         Customer.ID         AS Customer_ID,
-                          Units.ID        AS Unit_ID,
-                        Units.fDesc        AS Units,
+                          Unit.ID        AS Unit_ID,
+                        Unit.fDesc        AS Units,
                         Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                          LEFT JOIN Unit AS Units ON Units.ID = Violation.Elev
+                          LEFT JOIN Elev AS Unit ON Unit.ID = Violation.Elev
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name
