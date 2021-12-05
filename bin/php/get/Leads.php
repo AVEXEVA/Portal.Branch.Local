@@ -147,6 +147,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 Lead.Probability  AS Probability,
                                 Lead.Level        AS Level,
                                 Lead.Status 		  AS Status,
+                                CASE  WHEN Lead.Status = 0 THEN 'Open'
+                                      WHEN Lead.Status = 1 THEN 'Canceled'
+                                      WHEN Lead.Status = 2 THEN 'Withdrawn'
+                                      WHEN Lead.Status = 3 THEN 'Disqualified'
+                                      WHEN Lead.Status = 4 THEN 'Award Successful'
+                                      WHEN Lead.Status = 5 THEN 'Award Competitor'
+                                END AS Status,
         								        Lead.Type 		    AS Type,
         								        Lead.Address      AS Street,
         								        Lead.City         AS City,

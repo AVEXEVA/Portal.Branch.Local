@@ -201,11 +201,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    			$Lead[ 'Zip' ],
     	    			$Lead[ 'Status' ],
     	    			$Lead[ 'Probability' ],
-    	    			$Lead[ 'Level' ],
-    	    			$Lead[ 'Revenue' ],
-    	    			$Lead[ 'Cost' ],
-    	    			$Lead[ 'Labor' ],
-                $Lead[ 'Profit' ],
+    	    			!empty( $Lead[ 'Level' ] ) ? $Lead[ 'Level' ] : 0,
+    	    			!empty( $Lead[ 'Revenue' ] ) ? $Lead[ 'Revenue' ] : 0,
+    	    			!empty( $Lead[ 'Cost' ] ) ? $Lead[ 'Cost' ] : 0,
+    	    			!empty( $Lead[ 'Labor' ] ) ? $Lead[ 'Labor' ] : 0,
+                !empty( $Lead[ 'Profit' ] ) ? $Lead[ 'Profit' ] : 0,
                 $Lead[ 'Ratio' ],
                 $Lead[ 'Notes' ],
                 $Lead[ 'Latitude' ],
@@ -214,7 +214,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 !empty( $Lead[ 'GeoLock' ] ) ? $Lead[ 'GeoLock' ] : 0
     	    		)
     	    	);
-            var_dump(sqlsrv_errors( ) );
             sqlsrv_next_result( $result );
             $Lead[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
           //  header( 'Location: lead.php?ID=' . $Lead[ 'ID' ] );

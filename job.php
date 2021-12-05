@@ -104,27 +104,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               		Job.fDesc             AS Name,
               		Job.fDate             AS Date,
 	                Job.BHour             AS Budgeted_Hours,
-     			    JobType.Type          AS Type,
-					Job.Remarks 		  AS Remarks,
-                    Job.Status            AS Status,
-                    Emp.fFirst            AS Employee_First_Name,
-                    Emp.Last              AS Employee_Last_Name,
-    		        Loc.Loc               AS Location_ID,
+         			    JobType.Type          AS Type,
+      				    Job.Remarks      		  AS Remarks,
+                  Job.Status            AS Status,
+                  Emp.fFirst            AS Employee_First_Name,
+                  Emp.Last              AS Employee_Last_Name,
+    		          Loc.Loc               AS Location_ID,
               		Loc.Tag               AS Location_Name,
               		Loc.Address           AS Location_Street,
               		Loc.City              AS Location_City,
               		Loc.State             AS Location_State,
               		Loc.Zip               AS Location_Zip,
-                    Loc.Latt              AS Location_Latitude,
-                    Loc.fLong             AS Location_Longitude,
+                  Loc.Latt              AS Location_Latitude,
+                  Loc.fLong             AS Location_Longitude,
               		Route.ID              AS Route_ID,
-                    Route.Name            AS Route_Name,
-                    Zone.ID               AS Division_ID,
+                  Route.Name            AS Route_Name,
+                  Zone.ID               AS Division_ID,
               		Zone.Name             AS Division_Name,
               		Customer.ID           AS Customer_ID,
               		Customer.Name     	  AS Customer_Name,
-             	 	Owner.Status       	  AS Customer_Status,
-              		Owner.Elevs    		  AS Customer_Elevators,
+              	 	Owner.Status       	  AS Customer_Status,
+              		Owner.Elevs    		    AS Customer_Elevators,
               		Customer.Street       AS Customer_Street,
               		Customer.City         AS Customer_City,
               		Customer.State        AS Customer_State,
@@ -143,10 +143,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               		Emp.fFirst            AS Employee_First_Name,
               		Emp.Last              AS Employee_Last_Name,
               		Route.ID              AS Route_ID,
-      				Violation.ID          AS Violation_ID,
-      				Violation.fdate       AS Violation_Date,
-      				Violation.Status      AS Violation_Status,
-      				Violation.Remarks     AS Violation_Remarks
+      				    Violation.ID          AS Violation_ID,
+      		        Violation.fdate       AS Violation_Date,
+      				    Violation.Status      AS Violation_Status,
+      				    Violation.Remarks     AS Violation_Remarks
           	FROM 	 Job
               		 LEFT JOIN Loc           	ON Job.Loc      = Loc.Loc
               		 LEFT JOIN Elev 			ON Elev.ID      = Job.Elev
@@ -174,8 +174,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
          	$ID,
           $Name
          )
-     );
-     $Job =   (       empty( $ID )
+       );
+       $Job =   (       empty( $ID )
                         &&    !empty( $Name )
                         &&    !$result
                       ) || (  empty( $ID )
@@ -234,7 +234,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Type,
                   fDesc,
                   Status,
-                  Remarks," . /*,
+                  Remarks," .
+                  /*,
                   PO,
                   Rev,
                   Mat,
@@ -306,6 +307,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   TechOrRoute,
                   TFMID,
                   TFMSource,*/ "
+                  fLong,
+                  Latt,
                   Custom1, Custom2, Custom3, Custom4, Custom5,
                   Custom6, Custom7, Custom8, Custom9, Custom10,
                   Custom11, Custom12, Custom13, Custom14, Custom15,
@@ -313,7 +316,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   TFMCustom1, TFMCustom2, TFMCustom3, TFMCustom4, TFMCustom5*/ "
                   , Rev, Mat, Labor, Cost, Profit, Ratio, Reg, OT, DT, TT, Hour, BRev, BMat, BLabor, BCost, BProfit, BRatio, BHour, NT
                 )
-                VALUES ( @MAXID + 1, @Customer, @Location, @Unit, @Type, " . implode( ',', array_fill( 0, 23 /*99*/, '?' ) ) . ", " . implode( ',', array_fill( 0, 19, '0' ) ) . ");
+                VALUES ( @MAXID + 1, @Customer, @Location, @Unit, @Type, " . implode( ',', array_fill( 0, 25 /*99*/, '?' ) ) . ", " . implode( ',', array_fill( 0, 19, '0' ) ) . ");
                 SELECT @MAXID + 1;",
               array(
                 $Job[ 'Customer_Name' ],
@@ -323,6 +326,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $Job[ 'Name' ],
                 $Job[ 'Status' ],
                 $Job[ 'Remarks' ],
+                $Job[ 'Location_Latitude'],
+                $Job[ 'Location_Longitude'],
                 /*null,//PO
                 0,//Rev
                 0,//Mat
@@ -458,13 +463,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='card-heading'>
           <div class='row g-0 px-3 py-2'>
             <div class='col-6'>
-              <h5><?php \singleton\fontawesome::getInstance( )->Job( 1 );?><a href='jobs.php?<?php
-                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] : array( ) );
-              ?>'>Job</a>: <span><?php
-                echo is_null( $User[ 'ID' ] )
-                  ? 'New'
-                  : $User[ 'Email' ];
-              ?></span></h5>
+              <div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><a href='jobs.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] : array( ) ) : null;?>'>Jobs</a>: <span><?php echo is_null( $Job[ 'ID' ] ) ? 'New' : $Job[ 'Name' ];?></span></h5></div>
             </div>
             <div class='col-2'></div>
             <div class='col-2'>
@@ -508,10 +507,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             var map;
                             function initialize() {
                                  map = new google.maps.Map(
-                                    document.getElementById( 'customer_map' ),
+                                    document.getElementById( 'location_map' ),
                                     {
                                       zoom: 10,
-                                      center: new google.maps.LatLng( <?php echo $Job[ 'Latitude' ];?>, <?php echo $Job[ 'Longitude' ];?> ),
+                                      center: new google.maps.LatLng( <?php echo $Job[ 'Location_Latitude' ];?>, <?php echo $Job[ 'Location_Longitude' ];?> ),
                                       mapTypeId: google.maps.MapTypeId.ROADMAP
                                     }
                                 );
@@ -525,6 +524,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     title: '<?php echo $Job[ 'Name' ];?>'
                                 });
                             }
+
                             $(document).ready(function(){ initialize(); });
                         </script>
               </div><?php
@@ -724,7 +724,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='row g-0'>
                 <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
                 <div class='col-6'></div>
-                <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Employee=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='locations.php?Location=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
               <div class='row g-0'>
                 <div class='col-1'>&nbsp;</div>
@@ -832,7 +832,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                         WHERE  	Location.Loc = ? ;",
                       array(
-                        $Job[ 'Loc' ]
+                        $Job[ 'Location_ID' ]
                       )
                     );
                   ?>
@@ -853,7 +853,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='card card-primary my-3'>
                 <div class='card-heading'>
                   <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+                    <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+                      <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='ticket.php?Name=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                     <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                   </div>
                 </div>
@@ -1012,7 +1013,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='card card-primary my-3'>
                 <div class='card-heading'>
                   <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                    <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                    <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='invoice.php?Name=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                     <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                   </div>
                 </div>
@@ -1044,12 +1046,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='col-1'>&nbsp;</div>
                       <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
                       <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                      $r = \singleton\database::getInstance( )->query(null,"
-                        SELECT 	Count( Invoice.Ref ) AS Count
-                        FROM   	Invoice
+                      $r = \singleton\database::getInstance( )->query(null,
+                        " SELECT 	Count( Invoice.Ref ) AS Count
+                          FROM   	Invoice
                               LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                        WHERE  		Location.Owner = ?
-                            AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                          WHERE  		Location.Owner = ?
+                          AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
 
                       ;",array($Job[ 'ID' ]));
                       $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
@@ -1173,7 +1175,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Job[ 'ID' ];?>' method='POST'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Workers</span></h5></div>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Mechanics</span></h5></div>
                   <div class='col-2'>&nbsp;</div>
                 </div>
               </div>
@@ -1181,8 +1183,33 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <input type='hidden' name='ID' value='<?php echo $Job[ 'ID' ];?>' />
                 <div class='row g-0'>
                   <div class='col-0'>&nbsp;</div>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Mechanic Count:</div>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Employees:</div>
                   <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Tickets' value='' /></div>
+                </div>
+              </div>
+            </div>
+              <div class='card card-primary my-3'>
+                <div class='card-heading'>
+                  <div class='row g-0 px-3 py-2'>
+                    <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Collection( 1 );?><span>Proposals</span></h5></div>
+                      <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='proposal.php?Name=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
+                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='proposals.php?Proposals=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                  </div>
+                </div>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
+                  <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
+                  <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
+                  $r = \singleton\database::getInstance( )->query(null,
+                    " SELECT Sum( OpenAR.Balance ) AS Balance
+                      FROM   OpenAR
+                         LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+                      WHERE  Location.Owner = ?
+                  ;",array($Job[ 'ID' ]));
+                  $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
+                  echo money_format('%(n',$Balance);
+                  ?>' /></div>
+                  <div class='col-2'>&nbsp;</div>
                 </div>
               </div>
             </div>
@@ -1190,7 +1217,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div>
       </div>
     </div>
-  </body>
+  </div>
+</body>
 </html>
 <?php
 }
