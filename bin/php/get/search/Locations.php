@@ -77,7 +77,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $conditions = array( );
     $search = array( );
     $parameters = array( );
-
+    if( isset($_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Street'];
+      $conditions[] = "Location.Address LIKE '%' + ? + '%'";
+    } 
     if( isset( $_GET[ 'search'] ) ){
       $parameters[ ] = $_GET[ 'search' ];
       $search[ ] = "Location.Tag LIKE '%' + ? + '%'";

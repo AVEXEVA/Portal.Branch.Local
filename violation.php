@@ -73,118 +73,57 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ||  !check( privilege_read, level_group, $Privileges[ 'User' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
-         $ID = isset( $_GET[ 'ID' ] )
-            ? $_GET[ 'ID' ]
-            : (
-                isset( $_POST[ 'ID' ] )
-                    ? $_POST[ 'ID' ]
-                    : null
-                );
-        $Email = isset( $_GET[ 'Email' ] )
-            ? $_GET[ 'Email' ]
-            : (
-                isset( $_POST[ 'Email' ] )
-                    ? $_POST[ 'Email' ]
-                    : null
-            );
-        $result = $database->query(
-            'Portal',
-            "   SELECT  Top 1
-                        *
-                FROM    dbo.[User]
-                WHERE   [User].[ID] = ?;",
-          array(
-            $ID,
-            $Email
-          )
-        );
-        $User =   (       empty( $ID )
-                        &&    !empty( $Name )
-                        &&    !$result
-                      ) || (  empty( $ID )
-                        &&    empty( $Name )
-                      )  ? array(
-            'ID' => null,
-            'Email' => null
-        ) : sqlsrv_fetch_array( $result );
-        if( isset( $_POST ) && count( $_POST ) > 0 ){
-            $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
-            if( empty( $_POST[ 'ID' ] ) ){
-                $result = \singleton\database::getInstance( )->query(
-                  'Portal',
-                  " INSERT INTO dbo.[User]( Email )
-                    VALUES( ? );
-                    SELECT Max( ID ) FROM dbo.[User];",
-                    array(
-                        $_POST[ 'Email' ]
-                    )
-                );
-                sqlsrv_next_result( $result );
-                $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-                header( 'Location: violation.php?ID=' . $User[ 'ID' ] );
-                exit;
-            } else {
-                \singleton\database::getInstance( )->query(
-                    'Portal',
-                    "   UPDATE  dbo.[User]
-                        SET     [User].[Email] = ?,
-                        WHERE   [User].[ID] = ?;",
-                    array(
-                        $User[ 'Email' ],
-                        $User[ 'ID' ]
-                    )
-                );
-            }
-        }
-        $ID = isset( $_GET[ 'ID' ] )
+      $ID = isset( $_GET[ 'ID' ] )
   			? $_GET[ 'ID' ]
   			: (
   				isset( $_POST[ 'ID' ] )
   					? $_POST[ 'ID' ]
   					: null
   			);
-      		$Name = isset( $_GET[ 'Name' ] )
-          		? $_GET[ 'Name' ]
-          		: (
-          			isset( $_POST[ 'Name' ] )
-          				? $_POST[ 'Name' ]
-          				: null
-        	);
+  		$Name = isset( $_GET[ 'Name' ] )
+      		? $_GET[ 'Name' ]
+      		: (
+      			isset( $_POST[ 'Name' ] )
+      				? $_POST[ 'Name' ]
+      				: null
+    	 );
     // sets $ID, $Name Variable and Posts ID and Name into $result
           $result = \singleton\database::getInstance( )->query(
           	null,
-              "	SELECT 	Top 1
-              			Violation.*
-              	FROM    (
-              				SELECT 	Violation.ID        AS ID,
-                  						Violation.Elev      AS Elev,
-                  						Violation.fdate     AS 'Date',
-                          		Violation.Status    AS Status,
-                              Violation.Quote     AS Quote,
-                              Violation.Ticket    AS Ticket,
-                              Violation.Remarks   AS Remarks,
-                          		Violation.Estimate  AS Estimate,
-        	                    Violation.Price     AS Price,
-                              Loc.Loc 				    AS Location_ID,
-                              Loc.Tag 				    AS Location_Name,
-                              Rol.ID 	            AS Rolodex,
-                          		Rol.Name            AS Name,
-                              Rol.Phone           AS Phone,
-                              Rol.Email           AS Email,
-                              Rol.Contact         AS Contact,
-                          		Rol.Address         AS Street,
-        	                    Rol.City            AS City,
-        	                    Rol.State           AS State,
-        	                    Rol.Zip             AS Zip,
-        	                    Rol.Latt 	          AS Latitude,
-        	                    Rol.fLong           AS Longitude,
-  							    FROM    Owner
-  									        LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                            LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
-                            LEFT JOIN Job ON Invoice.Job = Job.ID
-              		) AS violation
-              	WHERE   	Violation.ID = ?
-              			OR 	Customer.Name = ?;",
+              " SELECT 	Violation.ID        AS ID,
+            						Unit.ID             AS Elev,
+                        Customer.ID 	      AS Customer_ID,
+                    		Customer.Name       AS Customer_Name,
+                        Loc.Loc 				    AS Location_ID,
+                        Loc.Tag 				    AS Location_Name,
+            						Violation.fdate     AS Date,
+                    		Violation.Status    AS Status,
+                        Violation.Quote     AS Quote,
+                        Violation.Ticket    AS Ticket,
+                        Violation.Remarks   AS Remarks,
+                    		Violation.Estimate  AS Estimate,
+  	                    Violation.Price     AS Price,
+                        Rol.Phone           AS Phone,
+                        Rol.Email           AS Email,
+                        Rol.Contact         AS Contact,
+                    		Rol.Address         AS Street,
+  	                    Rol.City            AS City,
+  	                    Rol.State           AS State,
+  	                    Rol.Zip             AS Zip,
+  	                    Rol.Latt 	          AS Latitude,
+  	                    Rol.fLong           AS Longitude,
+					      FROM    Violation
+                        LEFT JOIN (
+                          SELECT  Owner.ID, 
+                                  Rol.Name
+                          FROM    Owner 
+                                  LEFT JOIN Rol    ON Owner.Rol = Rol.ID
+                        ) AS Customer              ON Customer.ID = Job.Owner
+                        LEFT JOIN Loc  AS Location ON Invoice.Loc = Loc.Loc
+                        LEFT JOIN Job              ON Invoice.Job = Job.ID
+                        LEFT JOIN Elev AS Unit     ON Violation.Elev = Unit.ID
+              	WHERE   	  Violation.ID = ?
+              			    OR 	Customer.Name = ?;",
               array(
               	$ID,
               	$Name
@@ -386,7 +325,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <body>
   <div id="wrapper">
     <?php require(bin_php .'element/navigation.php');?>
-    <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
+    <div id="page-wrapper" class='content'>
       <div class='card card-primary'>
         <div class='card-heading'>
           <div class='row g-0 px-3 py-2'>
@@ -406,13 +345,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <button
                       class='form-control rounded'
                       onClick="document.location.href='violation.php';"
-                    >Create</button>
+                    >Save</button>
                   </div>
                   <div class='col-4'>
                     <button
                       class='form-control rounded'
                       onClick="document.location.href='violation.php?ID=<?php echo $User[ 'ID' ];?>';"
                     >Refresh</button>
+                  </div>
+                  <div class='col-4'>
+                    <button
+                      class='form-control rounded'
+                      onClick="document.location.href='violation.php';"
+                    >New</button>
                   </div>
                 </div>
               </div>
@@ -425,92 +370,159 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </div>
           </div>
-        </div>
         <div class='card-body bg-dark text-white'>
           <div class='card-columns'>
-          <div class='card card-primary my-3'><form action='violation.php?ID=<?php echo $Violation[ 'ID' ];?>' method='POST'>
-            <div class='card-heading position-relative' style='z-index:1;'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Location</span></h5></div>
-                <div class='col-2'>&nbsp;</div>
-                <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
+            <?php if( !in_array( $Location[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Location['Longitude' ], array( null, 0 ) ) ){
+            ?><div class='card card-primary'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Map( 1 );?><span>Map</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
               </div>
-            </div>
-          <!-- Second card headding that holds vio.php information and fontawesome icon, the POST call retrieves information from $Violation ID    -->
-          <div class='card-body bg-dark text-white' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-            <input type='hidden' name='ID' value='<?php echo $Violation[ 'ID' ];?>' />
-            <!-- Selector for status that has echos the Customer Status and checks the value 0/1 and assignes a color -Warning or -Success  -->
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Location:</div>
-              <div class='col-6'>
-                <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Violation[ 'Location_Name' ];?>' />
-                <script>
-                  $( 'input[name="Location"]' )
-                      .typeahead({
-                          minLength : 4,
-                          hint: true,
-                          highlight: true,
-                          limit : 5,
-                          display : 'FieldValue',
-                          source: function( query, result ){
-                              $.ajax({
-                                  url : 'bin/php/get/search/Locations.php',
-                                  method : 'GET',
-                                  data    : {
-                                      search :  $('input:visible[name="Location"]').val( )
-                                  },
-                                  dataType : 'json',
-                                  beforeSend : function( ){
-                                      abort( );
-                                  },
-                                  success : function( data ){
-                                      result( $.map( data, function( item ){
-                                          return item.FieldValue;
-                                      } ) );
+              <div class='card-body bg-darker'>
+                <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+                <script type="text/javascript">
+                          var map;
+                          function initialize() {
+                               map = new google.maps.Map(
+                                  document.getElementById( 'location_map' ),
+                                  {
+                                    zoom: 10,
+                                    center: new google.maps.LatLng( <?php echo $Location[ 'Latitude' ];?>, <?php echo $Location[ 'Longitude' ];?> ),
+                                    mapTypeId: google.maps.MapTypeId.ROADMAP
                                   }
+                              );
+                              var markers = [];
+                              markers[0] = new google.maps.Marker({
+                                  position: {
+                                      lat:<?php echo $Location['Latitude'];?>,
+                                      lng:<?php echo $Location['Longitude'];?>
+                                  },
+                                  map: map,
+                                  title: '<?php echo $Location[ 'Name' ];?>'
                               });
-                          },
-                          afterSelect: function( value ){
-                              $( 'input[name="Location"]').val( value );
-                              $( 'input[name="Location"]').closest( 'form' ).submit( );
                           }
-                      }
-                  );
-                </script>
+                          $(document).ready(function(){ initialize(); });
+                      </script>
+                    <div class='card-body'>
+                      <div id='location_map' class='map'>&nbsp;</div>
+                    </div>
               </div>
-              <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                if( in_array( $Violation[ 'ID' ], array( null, 0, '', ' ') ) ){
-                  echo "onClick=\"document.location.href='locations.php?Field=1';\"";
-                } else {
-                  echo "onClick=\"document.location.href='location.php?ID=" . $Violation[ 'Location_ID' ] . "';\"";
-                }
-              ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-          </div>
-          <div class='row g-0'>
-            <div class='col-4 border-bottom border-white my-auto'>Address:</div>
-            <div class='col-8'><input type='text' class='form-control edit' name='Address' value='<?php echo $Violation['Address'];?>' /></div>
-          </div>
-          <div class='row g-0'>
-            <div class='col-4 border-bottom border-white my-auto'>City:</div>
-            <div class='col-8'><input type='text' class='form-control edit' name='City' value='<?php echo $Violation['City'];?>' /></div>
-          </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Zip:</div>
-              <div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Violation['Zip'];?>' /></div>
             </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Latitude:</div>
-              <div class='col-8'><input type='text' class='form-control edit <?php echo $Violation[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Violation['Latitude'];?>' /></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Longitude:</div>
-              <div class='col-8'><input type='text' class='form-control edit <?php echo $Violation[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Violation['Longitude'];?>' /></div>
-            </div>
-            <div class='col-2'>&nbsp;</div>
-          </div>
-        </div>
-            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Violation[ 'ID' ];?>' method='POST'>
+          <?php }?>
+            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+              <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?>Name:</div>
+                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Violation['Name'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Date:</div>
+                  <div class='col-8'><input type='date' class='form-control edit' name='Date' value='<?php echo $Violation['Date'];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Note( 1 );?> Remarks:</div>
+                  <div class='col-8'><textarea type='text' class='form-control edit' name='Remarks' value='<?php echo $Violation['Remarks'];?>'></textarea></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Price:</div>
+                  <div class='col-8'><input type='text' class='form-control edit' name='Price' value='<?php echo $Violation['Price'];?>' /></div>
+                </div>
+              </div>
+            </form></div>
+            <div class='card card-primary my-3'><form action='violation.php?ID=<?php echo $Violation[ 'ID' ];?>' method='POST'>
+              <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
+              <div class='card-heading position-relative'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Location</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark text-white' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
                 <input type='hidden' name='ID' value='<?php echo $Violation[ 'ID' ];?>' />
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Location:</div>
+                  <div class='col-6'>
+                    <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Violation[ 'Location_Name' ];?>' />
+                    <script>
+                      $( 'input[name="Location"]' )
+                          .typeahead({
+                              minLength : 4,
+                              hint: true,
+                              highlight: true,
+                              limit : 5,
+                              display : 'FieldValue',
+                              source: function( query, result ){
+                                  $.ajax({
+                                      url : 'bin/php/get/search/Locations.php',
+                                      method : 'GET',
+                                      data    : {
+                                          search :  $('input:visible[name="Location"]').val( )
+                                      },
+                                      dataType : 'json',
+                                      beforeSend : function( ){
+                                          abort( );
+                                      },
+                                      success : function( data ){
+                                          result( $.map( data, function( item ){
+                                              return item.FieldValue;
+                                          } ) );
+                                      }
+                                  });
+                              },
+                              afterSelect: function( value ){
+                                  $( 'input[name="Location"]').val( value );
+                                  $( 'input[name="Location"]').closest( 'form' ).submit( );
+                              }
+                          }
+                      );
+                    </script>
+                  </div>
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                    if( in_array( $Violation[ 'ID' ], array( null, 0, '', ' ') ) ){
+                      echo "onClick=\"document.location.href='locations.php?';\"";
+                    } else {
+                      echo "onClick=\"document.location.href='location.php?ID=" . $Violation[ 'Location_ID' ] . "';\"";
+                    }
+                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
+                <div class='col-6'></div>
+                <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Street:</div>
+                <div class='col-8'><input type='text' class='form-control edit' name='Street' value='<?php echo $Violation[ 'Street' ];?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> City:</div>
+                <div class='col-8'><input type='text' class='form-control edit' name='City' value='<?php echo $Violation[ 'City' ];?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
+                <div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Violation[ 'Zip' ];?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Latitude:</div>
+                <div class='col-8'><input type='text' class='form-control edit <?php echo $Violation[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Violation['Latitude'];?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Longitude:</div>
+                <div class='col-8'><input type='text' class='form-control edit <?php echo $Violation[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Violation['Longitude'];?>' /></div>
+              </div>
+            </div>
+          </div>
+          <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Violation[ 'ID' ];?>' method='POST'>
+            <input type='hidden' name='ID' value='<?php echo $Violation[ 'ID' ];?>' />
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
                   <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Proposal</span></h5></div>
@@ -518,351 +530,339 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
               </div>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Date:</div>
-              <div class='col-8'><input type='date' class='form-control edit' name='Date' value='<?php echo $Violation['Date'];?>' /></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Remarks:</div>
-              <div class='col-8'><textarea type='text' class='form-control edit' name='Remarks' value='<?php echo $Violation['Remarks'];?>' /></textarea>
-            </div>
-          </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Price:</div>
-              <div class='col-8'><input type='text' class='form-control edit' name='Price' value='<?php echo $Violation['Price'];?>' /></div>
-            </div>
-          </div>
-        </div>
-        <div class='card card-primary my-3'>
-          <div class='card-heading'>
-            <div class='row g-0 px-3 py-2'>
-              <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Job( 1 );?><span>Jobs</span></h5></div>
-              <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-            </div>
-          </div>
-          <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Jobs' ] ) && $_SESSION[ 'Cards' ][ 'Jobs' ] == 0 ? "style='display:none;'" : null;?>>
-            <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Statuses</div>
-                <div class='col-6'>&nbsp;</div>
-              <div class='col-2'>&nbsp;</div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>Open</div>
-                <div class='col-6'><input class='form-control' type='text' readonly name='Jobs' value='<?php
-                $r = \singleton\database::getInstance( )->query(null,"
-                  SELECT Count( Job.ID ) AS Jobs
-                  FROM   Job
-                       LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
-                  WHERE  		Location.Owner = ?
-                      AND Job.Type <> 9
-                      AND Job.Status = 0
-                ;",array($Violation[ 'ID' ]));
-              echo $r ? sqlsrv_fetch_array($r)['Jobs'] : 0;
-              ?>' /></div>
-              <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>On Hold</div>
-                <div class='col-6'><input class='form-control' type='text' readonly name='Jobs' value='<?php
-                $r = \singleton\database::getInstance( )->query(null,"
-                  SELECT Count( Job.ID ) AS Jobs
-                  FROM   Job
-                       LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
-                  WHERE  Location.Owner = ? AND Job.Status = 2
-                ;",array($Violation[ 'ID' ]));
-              echo $r ? sqlsrv_fetch_array($r)['Jobs'] : 0;
-              ?>' /></div>
-              <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>Closed</div>
-                <div class='col-6'><input class='form-control' type='text' readonly name='Jobs' value='<?php
-                $r = \singleton\database::getInstance( )->query(null,"
-                  SELECT Count( Job.ID ) AS Jobs
-                  FROM   Job
-                       LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
-                  WHERE  		Location.Owner = ?
-                      AND Job.Type <> 9
-                      AND Job.Status = 1
-                ;",array($Violation[ 'ID' ]));
-              echo $r ? sqlsrv_fetch_array($r)['Jobs'] : 0;
-              ?>' /></div>
-              <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-            </div>
-          </div>
-        </div>
-        <?php
-              $r = \singleton\database::getInstance( )->query(
-                null,
-                "	SELECT Count( Tickets.ID ) AS Tickets
-                  FROM   (
-                        (
-                          SELECT 	TicketO.ID AS ID
-                          FROM   	TicketO
-                                LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                          WHERE  		Location.Owner = ?
-                              AND TicketO.Assigned = 1
-                        )
-                      ) AS Tickets;",
-                array(
-                  $Violation[ 'ID' ]
-                )
-              );?>
-              <div class='row g-0'>
-                <div class='card card-primary my-3'>
-                  <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                
               </div>
             </div>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
-              <?php
-                $r = \singleton\database::getInstance( )->query(
-                  null,
-                  "	SELECT 	Count( Unit.ID ) AS Units
-                    FROM   	Elev AS Unit
-                          LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                    WHERE  	Location.Owner = ? ;",
-                  array(
-                    $Violation[ 'ID' ]
-                  )
-                );
-              ?>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Type</div>
-                  <div class='col-6'>&nbsp;</div>
-                <div class='col-2'>&nbsp;</div>
+            <div class='card card-primary my-3'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Job( 1 );?><span>Jobs</span></h5></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
               </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Elevators</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Jobs' ] ) && $_SESSION[ 'Cards' ][ 'Jobs' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='row g-0'>
+                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Statuses</div>
+                    <div class='col-6'>&nbsp;</div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                    <div class='col-3 border-bottom border-white my-auto'>Open</div>
+                    <div class='col-6'><input class='form-control' type='text' readonly name='Jobs' value='<?php
+                    $r = \singleton\database::getInstance( )->query(null,"
+                      SELECT Count( Job.ID ) AS Jobs
+                      FROM   Job
+                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
+                      WHERE  		Location.Owner = ?
+                          AND Job.Type <> 9
+                          AND Job.Status = 0
+                    ;",array($Violation[ 'ID' ]));
+                  echo $r ? sqlsrv_fetch_array($r)['Jobs'] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                    <div class='col-3 border-bottom border-white my-auto'>On Hold</div>
+                    <div class='col-6'><input class='form-control' type='text' readonly name='Jobs' value='<?php
+                    $r = \singleton\database::getInstance( )->query(null,"
+                      SELECT Count( Job.ID ) AS Jobs
+                      FROM   Job
+                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
+                      WHERE  Location.Owner = ? AND Job.Status = 2
+                    ;",array($Violation[ 'ID' ]));
+                  echo $r ? sqlsrv_fetch_array($r)['Jobs'] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                    <div class='col-3 border-bottom border-white my-auto'>Closed</div>
+                    <div class='col-6'><input class='form-control' type='text' readonly name='Jobs' value='<?php
+                    $r = \singleton\database::getInstance( )->query(null,"
+                      SELECT Count( Job.ID ) AS Jobs
+                      FROM   Job
+                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
+                      WHERE  		Location.Owner = ?
+                          AND Job.Type <> 9
+                          AND Job.Status = 1
+                    ;",array($Violation[ 'ID' ]));
+                  echo $r ? sqlsrv_fetch_array($r)['Jobs'] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+              </div>
+            </div>
+            <?php
                   $r = \singleton\database::getInstance( )->query(
                     null,
-                    "	SELECT 	Count( Unit.ID ) AS Units
-                      FROM   	Elev AS Unit
-                            LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                      WHERE  		Location.Owner = ?
-                          AND Unit.Type = 'Elevator'
-                  ;",array($Violation[ 'ID' ]));
-                  //Selects the unit.ID as counts from Elev and adds it to $Violation[ID]
-                  echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>&Type=Elevator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    "	SELECT Count( Tickets.ID ) AS Tickets
+                      FROM   (
+                            (
+                              SELECT 	TicketO.ID AS ID
+                              FROM   	TicketO
+                                    LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+                              WHERE  		Location.Owner = ?
+                                  AND TicketO.Assigned = 1
+                            )
+                          ) AS Tickets;",
+                    array(
+                      $Violation[ 'ID' ]
+                    )
+                  );?>
+                  <div class='row g-0'>
+                    <div class='card card-primary my-3'>
+                      <div class='card-heading'>
+                        <div class='row g-0 px-3 py-2'>
+                      <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
+                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                  </div>
+                </div>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php
+                    $r = \singleton\database::getInstance( )->query(
+                      null,
+                      "	SELECT 	Count( Unit.ID ) AS Units
+                        FROM   	Elev AS Unit
+                              LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                        WHERE  	Location.Owner = ? ;",
+                      array(
+                        $Violation[ 'ID' ]
+                      )
+                    );
+                  ?>
+                  <div class='row g-0'>
+                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Type</div>
+                      <div class='col-6'>&nbsp;</div>
+                    <div class='col-2'>&nbsp;</div>
+                  </div>
+                  <div class='row g-0'>
+                    <div class='col-1'>&nbsp;</div>
+                      <div class='col-3 border-bottom border-white my-auto'>Elevators</div>
+                      <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
+                      $r = \singleton\database::getInstance( )->query(
+                        null,
+                        "	SELECT 	Count( Unit.ID ) AS Units
+                          FROM   	Elev AS Unit
+                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE  		Location.Owner = ?
+                              AND Unit.Type = 'Elevator'
+                      ;",array($Violation[ 'ID' ]));
+                      //Selects the unit.ID as counts from Elev and adds it to $Violation[ID]
+                      echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
+                    ?>' /></div>
+                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>&Type=Elevator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                  </div>
+                  <div class='row g-0'>
+                    <div class='col-1'>&nbsp;</div>
+                      <div class='col-3 border-bottom border-white my-auto'>Escalators</div>
+                      <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
+                      $r = \singleton\database::getInstance( )->query(null,
+                        " SELECT 	Count( Unit.ID ) AS Units
+                          FROM   	Elev AS Unit
+                              LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE  		Location.Owner = ?
+                          AND Unit.Type = 'Escalator'
+                      ;",array($Violation[ 'ID' ]));
+                      echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
+                    ?>' /></div>
+                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>&Type=Escalator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                  </div>
+                  <div class='row g-0'>
+                    <div class='col-1'>&nbsp;</div>
+                      <div class='col-3 border-bottom border-white my-auto'>Other</div>
+                      <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
+                      $r = \singleton\database::getInstance( )->query(null,
+                        " SELECT 	Count( Unit.ID ) AS Units
+                          FROM   	Elev AS Unit
+                              LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE  		Location.Owner = ?
+                            AND Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                      ;",array($Violation[ 'ID' ]));
+                      echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
+                    ?>' /></div>
+                    <div class='col-2'><button class='h-100 w-100' readonly onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='card-footer'>
+                   <div class='row'>
+                     <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                   </div>
+                </div>
               </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Escalators</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,
-                    " SELECT 	Count( Unit.ID ) AS Units
-                      FROM   	Elev AS Unit
-                          LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                      WHERE  		Location.Owner = ?
-                      AND Unit.Type = 'Escalator'
-                  ;",array($Violation[ 'ID' ]));
-                  echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>&Type=Escalator';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Other</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Units' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,
-                    " SELECT 	Count( Unit.ID ) AS Units
-                      FROM   	Elev AS Unit
-                          LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                      WHERE  		Location.Owner = ?
-                        AND Unit.Type NOT IN ( 'Elevator', 'Escalator' )
-                  ;",array($Violation[ 'ID' ]));
-                  echo $r ? sqlsrv_fetch_array($r)['Units'] : 0;
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' readonly onClick="document.location.href='units.php?Customer=<?php echo $Violation[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
             </div>
-            <div class='card-footer'>
-               <div class='row'>
-                 <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-               </div>
+                <div class='card card-primary my-3'>
+    							<div class='card-heading'>
+    								<div class='row g-0 px-3 py-2'>
+    									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+    									<div class='col-2'></div>
+    								</div>
+    							</div>
+    							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+    								<div class='row g-0'>
+    								    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
+    								    <div class='col-6'>&nbsp;</div>
+    									<div class='col-2'>&nbsp;</div>
+    								</div>
+    								<div class='row g-0'><?php
+    										$r = \singleton\database::getInstance( )->query(
+    											null,
+    											"	SELECT Count( Tickets.ID ) AS Tickets
+    												FROM   (
+    															(
+    																SELECT 	TicketO.ID AS ID
+    																FROM   	TicketO
+    																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+    																WHERE  		Location.Owner = ?
+    																		AND TicketO.Assigned = 0
+    															)
+    														) AS Tickets;",
+    											array(
+    												$Violation[ 'ID' ]
+    											)
+    										);
+    									?><div class='col-1'>&nbsp;</div>
+    								    <div class='col-3 border-bottom border-white my-auto'>Open</div>
+    								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+    										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+    									?>' /></div>
+    									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    								</div>
+    								<div class='row g-0'><?php
+    										$r = \singleton\database::getInstance( )->query(
+    											null,
+    											"	SELECT Count( Tickets.ID ) AS Tickets
+    												FROM   (
+    															(
+    																SELECT 	TicketO.ID AS ID
+    																FROM   	TicketO
+    																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+    																WHERE  		Location.Owner = ?
+    																		AND TicketO.Assigned = 1
+    															)
+    														) AS Tickets;",
+    											array(
+    												$Violation[ 'ID' ]
+    											)
+    										);
+    									?><div class='col-1'>&nbsp;</div>
+    								    <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
+    								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+    										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+    									?>' /></div>
+    									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    								</div>
+    								<div class='row g-0'><?php
+    										$r = \singleton\database::getInstance( )->query(
+    											null,
+    											"	SELECT Count( Tickets.ID ) AS Tickets
+    												FROM   (
+    															(
+    																SELECT 	TicketO.ID AS ID
+    																FROM   	TicketO
+    																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+    																WHERE  		Location.Owner = ?
+    																		AND TicketO.Assigned = 2
+    															)
+    														) AS Tickets;",
+    											array(
+    												$Violation[ 'ID' ]
+    											)
+    										);
+    									?><div class='col-1'>&nbsp;</div>
+    								    <div class='col-3 border-bottom border-white my-auto'>En Route</div>
+    								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+    										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+    									?>' /></div>
+    									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    								</div>
+    								<div class='row g-0'><?php
+    										$r = \singleton\database::getInstance( )->query(
+    											null,
+    											"	SELECT Count( Tickets.ID ) AS Tickets
+    												FROM   (
+    															(
+    																SELECT 	TicketO.ID AS ID
+    																FROM   	TicketO
+    																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+    																WHERE  		Location.Owner = ?
+    																		AND TicketO.Assigned = 3
+    															)
+    														) AS Tickets;",
+    											array(
+    												$Violation[ 'ID' ]
+    											)
+    										);
+    									?><div class='col-1'>&nbsp;</div>
+    								    <div class='col-3 border-bottom border-white my-auto'>On Site</div>
+    								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+    										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+    									?>' /></div>
+    									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    								</div>
+    								<div class='row g-0'><?php
+    										$r = \singleton\database::getInstance( )->query(
+    											null,
+    											"	SELECT Count( Tickets.ID ) AS Tickets
+    												FROM   (
+    															(
+    																SELECT 	TicketO.ID AS ID
+    																FROM   	TicketO
+    																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+    																WHERE  		Location.Owner = ?
+    																		AND TicketO.Assigned = 6
+    															)
+    														) AS Tickets;",
+    											array(
+    												$Violation[ 'ID' ]
+    											)
+    										);
+    									?><div class='col-1'>&nbsp;</div>
+    								    <div class='col-3 border-bottom border-white my-auto'>Review</div>
+    								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+    										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+    									?>' /></div>
+    									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    								</div>
+    								<div class='row g-0'><?php
+    										$r = \singleton\database::getInstance( )->query(
+    											null,
+    											"	SELECT Count( Tickets.ID ) AS Tickets
+    												FROM   (
+    															(
+    																SELECT 	TicketO.ID AS ID
+    																FROM   	TicketO
+    																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
+    																WHERE  		Location.Owner = ?
+    																		AND TicketO.Assigned = 4
+    															)
+    														) AS Tickets;",
+    											array(
+    												$Violation[ 'ID' ]
+    											)
+    										);
+    									?><div class='col-1'>&nbsp;</div>
+    								    <div class='col-3 border-bottom border-white my-auto'>Complete</div>
+    								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+    										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+    									?>' /></div>
+    									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    								</div>
+    							</div>
+    						</div>
+              </div>
             </div>
           </div>
         </div>
-            <div class='card card-primary my-3'>
-							<div class='card-heading'>
-								<div class='row g-0 px-3 py-2'>
-									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
-									<div class='col-2'></div>
-								</div>
-							</div>
-							<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-								<div class='row g-0'>
-								    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
-								    <div class='col-6'>&nbsp;</div>
-									<div class='col-2'>&nbsp;</div>
-								</div>
-								<div class='row g-0'><?php
-										$r = \singleton\database::getInstance( )->query(
-											null,
-											"	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
-																		AND TicketO.Assigned = 0
-															)
-														) AS Tickets;",
-											array(
-												$Violation[ 'ID' ]
-											)
-										);
-									?><div class='col-1'>&nbsp;</div>
-								    <div class='col-3 border-bottom border-white my-auto'>Open</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-									?>' /></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-								<div class='row g-0'><?php
-										$r = \singleton\database::getInstance( )->query(
-											null,
-											"	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
-																		AND TicketO.Assigned = 1
-															)
-														) AS Tickets;",
-											array(
-												$Violation[ 'ID' ]
-											)
-										);
-									?><div class='col-1'>&nbsp;</div>
-								    <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-									?>' /></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-								<div class='row g-0'><?php
-										$r = \singleton\database::getInstance( )->query(
-											null,
-											"	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
-																		AND TicketO.Assigned = 2
-															)
-														) AS Tickets;",
-											array(
-												$Violation[ 'ID' ]
-											)
-										);
-									?><div class='col-1'>&nbsp;</div>
-								    <div class='col-3 border-bottom border-white my-auto'>En Route</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-									?>' /></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-								<div class='row g-0'><?php
-										$r = \singleton\database::getInstance( )->query(
-											null,
-											"	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
-																		AND TicketO.Assigned = 3
-															)
-														) AS Tickets;",
-											array(
-												$Violation[ 'ID' ]
-											)
-										);
-									?><div class='col-1'>&nbsp;</div>
-								    <div class='col-3 border-bottom border-white my-auto'>On Site</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-									?>' /></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-								<div class='row g-0'><?php
-										$r = \singleton\database::getInstance( )->query(
-											null,
-											"	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
-																		AND TicketO.Assigned = 6
-															)
-														) AS Tickets;",
-											array(
-												$Violation[ 'ID' ]
-											)
-										);
-									?><div class='col-1'>&nbsp;</div>
-								    <div class='col-3 border-bottom border-white my-auto'>Review</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-									?>' /></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-								<div class='row g-0'><?php
-										$r = \singleton\database::getInstance( )->query(
-											null,
-											"	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
-																		AND TicketO.Assigned = 4
-															)
-														) AS Tickets;",
-											array(
-												$Violation[ 'ID' ]
-											)
-										);
-									?><div class='col-1'>&nbsp;</div>
-								    <div class='col-3 border-bottom border-white my-auto'>Complete</div>
-								    <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-										echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-									?>' /></div>
-									<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Violation[ 'Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-								</div>
-							</div>
-						</div>
-          </div>
-        </div>
-      </div>
+      </form></div>
+     </div>
     </div>
-  </form></div>
- </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</body>
-</html>
-<?php
-    }
-} else {?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
+  </div>
+  </div>
+  </div>
+  </div>
+  </body>
+  </html>
+  <?php
+      }
+  } else {?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
