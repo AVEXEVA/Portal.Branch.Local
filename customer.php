@@ -112,20 +112,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             "	SELECT 	Top 1
             			Customer.*
             	FROM    (
-            				SELECT 	Owner.ID        AS ID,
+            				SELECT 	Owner.ID    AS ID,
             						Owner.Type      AS Type,
-            						Rolodex.ID 		AS Rolodex,
-                                    Rolodex.Name    AS Name,
-                                    Rolodex.Phone   AS Phone,
-                                    Rolodex.Email   AS Email,
-                                    Rolodex.Contact AS Contact,
-                                    Rolodex.Address AS Street,
-                                    Rolodex.City    AS City,
-                                    Rolodex.State   AS State,
-                                    Rolodex.Zip     AS Zip,
-                                    Rolodex.Latt 	AS Latitude,
-                                    Rolodex.fLong   AS Longitude,
-                                    Owner.Status    AS Status,
+            						Rolodex.ID 		  AS Rolodex,
+                        Rolodex.Name    AS Name,
+                        Rolodex.Phone   AS Phone,
+                        Rolodex.Email   AS Email,
+                        Rolodex.Contact AS Contact,
+                        Rolodex.Address AS Street,
+                        Rolodex.City    AS City,
+                        Rolodex.State   AS State,
+                        Rolodex.Zip     AS Zip,
+                        Rolodex.Latt 	  AS Latitude,
+                        Rolodex.fLong   AS Longitude,
+                        Owner.Status    AS Status,
           							Rolodex.Website AS Website,
           							Owner.Internet  AS Internet,
           							Owner.fLogin    AS Login,
@@ -162,18 +162,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Zip'       => null,
         	'Latitude'  => null,
         	'Longitude' => null,
-            'Phone'     =>  null,
-            'Email'     =>  null,
+          'Phone'     =>  null,
+          'Email'     =>  null,
         	'Rolodex'   => null,
-            'Phone'     => null,
-            'Email'     => null
+          'Phone'     => null,
+          'Email'     => null
         ) : sqlsrv_fetch_array($result);
 //Binds $ID, $Name, $Customer and query values into the $result variable
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           // if the $_Post is set and the count is null, select if available
         	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
-            $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ]     : $Customer[ 'Contact' ];
+          $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ]     : $Customer[ 'Contact' ];
         	$Customer[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Customer[ 'Phone' ];
         	$Customer[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Customer[ 'Email' ];
         	$Customer[ 'Login' ] 		= isset( $_POST[ 'Login' ] ) 	 ? $_POST[ 'Login' ] 	 : $Customer[ 'Login' ];

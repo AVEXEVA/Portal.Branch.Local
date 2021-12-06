@@ -80,7 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'contracts.php'
+            'territories.php'
         )
       );
 ?><!DOCTYPE html>
@@ -99,7 +99,43 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require( bin_php.  'element/loading.php' );?>
     <div id='page-wrapper' class='content'>
 			<div class="card card-full card-primary border-0">
-				<div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Territories</h4></div>
+        <div class='card-heading'>
+          <div class='row g-0 px-3 py-2'>
+            <div class='col-6'>
+              <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='territories.php?<?php
+                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] : array( ) );
+              ?>'>Territories</a>: <span><?php
+                echo is_null( $User[ 'ID' ] )
+                  ? 'New'
+                  : $User[ 'Email' ];
+              ?></span></h5>
+            </div>
+            <div class='col-2'></div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='territory.php';"
+                  >Create</button>
+                </div>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='territory.php?ID=<?php echo $User[ 'ID' ];?>';"
+                  >Refresh</button>
+                </div>
+              </div>
+            </div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territories.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] : array( ) );?>';">Table</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
 				<div class="form-mobile card-body bg-dark text-white"><form method='GET' action='territories.php'>
 					<div class='row'><div class='col-12'>&nbsp;</div></div>
            <div class='row'>
@@ -137,10 +173,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 							<th class='text-white border border-white' title='ID'>ID</th>
 							<th class='text-white border border-white' title='Customer'>Location</th>
 							<th class='text-white border border-white' title='Location'>Unit</th>
-							<th class='text-white border border-white' title='Job'>Leads</th>
-              <th class='text-white border border-white' title='Job'>Proposals</th>
-              <th class='text-white border border-white' title='Job'>Collection</th>
-              <th class='text-white border border-white' title='Job'>Invoices</th>
+							<th class='text-white border border-white' title='Leads'>Leads</th>
+              <th class='text-white border border-white' title='Proposals'>Proposals</th>
+              <th class='text-white border border-white' title='Collection'>Collection</th>
+              <th class='text-white border border-white' title='Invoices'>Invoices</th>
 			    </tr><tr class='form-desktop'>
 							<th class='text-white border border-white' title='ID'><input class='redraw' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
 							<th class='text-white border border-white' title='Location'><input class='redraw' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
@@ -159,4 +195,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=contracts.php';</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href='../login.php?Forward=territories.php';</script></head></html><?php }?>
