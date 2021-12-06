@@ -146,36 +146,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Invoice =   (  empty( $ID )
                            &&  !$result
                       )    || (empty( $ID ) )    ? array(
-                'ID,'                   => null,
-                'Description,'          => null,
-                'Date,'                 => null,
-                'Amount,'               => null,
-                'Sales_Tax,'            => null,
-                'Total,'                => null,
-                'Taxable,'              => null,
-                'Customer_ID,'          => null,
-                'Customer_Name,'        => null,
-                'Customer_Street,'      => null,
-                'Customer_City,'        => null,
-                'Customer_State,'       => null,
-                'Customer_Zip,'         => null,
-                'Customer_Contact,'     => null,
-                'Location_ID,'          => null,
-                'Location_Name,'        => null,
-                'Location_Street,'      => null,
-                'Location_City,'        => null,
-                'Location_State,'       => null,
-                'Location_Zip,'         => null,
-                'Job_ID,'               => null,
-                'Job_Name,'             => null,
-                'Job_Type,'             => null,
-                'Division_ID,'          => null,
-                'Division_Name,'        => null,
-                'Route_ID,'             => null,
-                'Route_Name,'           => null,
-                'Employee_ID,'            => null,
-                'Employee_First_Name,'    => null,
-                'Employee_Last_Name'      => null
+                'ID'                   => null,
+                'Description'          => null,
+                'Date'                 => null,
+                'Amount'               => null,
+                'Sales_Tax'            => null,
+                'Total'                => null,
+                'Taxable'              => null,
+                'Customer_ID'          => null,
+                'Customer_Name'        => null,
+                'Customer_Street'      => null,
+                'Customer_City'        => null,
+                'Customer_State'       => null,
+                'Customer_Zip'         => null,
+                'Customer_Contact'     => null,
+                'Location_ID'          => null,
+                'Location_Name'        => null,
+                'Location_Street'      => null,
+                'Location_City'        => null,
+                'Location_State'       => null,
+                'Location_Zip'         => null,
+                'Job_ID'               => null,
+                'Job_Name'             => null,
+                'Job_Type'             => null,
+                'Division_ID'          => null,
+                'Division_Name'        => null,
+                'Route_ID'             => null,
+                'Route_Name'           => null,
+                'Employee_ID'          => null,
+                'Employee_First_Name'  => null,
+                'Employee_Last_Name'   => null
         ) : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $Invoice[ 'Location_Name' ] = isset( $_POST[ 'Location' ] )  ? $_POST[ 'Location' ]       : $Invoice[ 'Location_Name' ];
@@ -321,7 +321,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 <div class='row g-0'>
                                     <label class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</label>
                                     <div class='col-6'>
-                                        <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Invoice[ 'Location_Name' ];?>' />
+                                        <input placeholder='Location' type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Invoice[ 'Location_Name' ];?>' />
                                         <script>
                                             $( 'input[name="Location"]' )
                                                 .typeahead({
@@ -367,7 +367,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 <div class='row g-0'>
                                     <label class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</label>
                                     <div class='col-6'>
-                                        <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Invoice[ 'Job_Name' ];?>' />
+                                        <input placeholder='Job' type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Invoice[ 'Job_Name' ];?>' />
                                         <script>
                                             $( 'input[name="Job"]' )
                                                 .typeahead({
@@ -411,24 +411,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                                 </div>
                                 <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Description'><?php \singleton\fontawesome::getInstance( )->Description( 1 );?> Description:</label>
-                                    <div class='col-12'><textarea class='form-control' name='Description' rows='8'><?php echo $Invoice[ 'Description' ];?></textarea></div>
+                                    <label class='col-4 border-bottom border-white my-auto' for='Description'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Description:</label>
+                                    <div class='col-12'><textarea class='form-control' name='Description' rows='8' placeholder='Description'><?php echo $Invoice[ 'Description' ];?></textarea></div>
                                 </div>
                                 <div class='row g-0'>
                                     <label class='col-4 border-bottom border-white my-auto' for='Date'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Date:</label>
-                                    <div class='col-8'><input class='form-control date' autocomplete='off' name='Date' value='<?php echo empty( $Invoice[ 'Date' ] ) ? null : date( 'm/d/Y', strtotime( $Invoice[ 'Date' ] ) );?>' /></div>
+                                    <div class='col-8'><input placeholder='mm/dd/yy' class='form-control date' autocomplete='off' name='Date' value='<?php echo empty( $Invoice[ 'Date' ] ) ? null : date( 'm/d/Y', strtotime( $Invoice[ 'Date' ] ) );?>' /></div>
                                 </div>
                                 <div class='row g-0'>
                                     <label class='col-4 border-bottom border-white my-auto' for='Amount'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Amount:</label>
-                                    <div class='col-8'><input class='form-control' name='Amount' value='<?php echo empty( $Invoice[ 'Amount' ] ) ? 0.00 : $Invoice[ 'Amount' ];?>' /></div>
+                                    <div class='col-8'><input placeholder='$.00' class='form-control' name='Amount' value='<?php echo empty( $Invoice[ 'Amount' ] ) ? null : $Invoice[ 'Amount' ];?>' /></div>
                                 </div>
                                 <div class='row g-0'>
                                     <label class='col-4 border-bottom border-white my-auto' for='Sales_Tax'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Sales Tax:</label>
-                                    <div class='col-8'><input class='form-control' name='Sales_Tax' value='<?php echo empty( $Invoice[ 'Sales_Tax' ] ) ? 0.00 : $Invoice[ 'Sales_Tax' ];?>' /></div>
+                                    <div class='col-8'><input placeholder='$.00' class='form-control' name='Sales_Tax' value='<?php echo empty( $Invoice[ 'Sales_Tax' ] ) ? null : $Invoice[ 'Sales_Tax' ];?>' /></div>
                                 </div>
                                 <div class='row g-0'>
                                     <label class='col-4 border-bottom border-white my-auto' for='Total'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Total:</label>
-                                    <div class='col-8'><input readonly class='form-control' name='Total' value='<?php echo empty( $Invoice[ 'Total' ] ) ? 0.00 : $Invoice[ 'Total' ];?>' /></div>
+                                    <div class='col-8'><input placeholder='$.00' readonly class='form-control' name='Total' value='<?php echo empty( $Invoice[ 'Total' ] ) ? null : $Invoice[ 'Total' ];?>' /></div>
                                 </div>
                             </div>
                         </div>

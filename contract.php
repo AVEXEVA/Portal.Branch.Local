@@ -426,7 +426,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								<div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
                   <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Contract[ 'Customer_Name' ];?>' />
+                    <input placeholder='Customer' type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Contract[ 'Customer_Name' ];?>' />
                     <script>
                       $( 'input[name="Customer"]' )
                           .typeahead({
@@ -472,7 +472,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								<div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
                   <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Contract[ 'Location_Name' ];?>' />
+                    <input placeholder='Location' type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Contract[ 'Location_Name' ];?>' />
                     <script>
                       $( 'input[name="Location"]' )
                           .typeahead({
@@ -519,7 +519,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
                   <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Contract[ 'Job_Name' ];?>' />
+                    <input placeholder='Job' type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Contract[ 'Job_Name' ];?>' />
                     <script>
                       $( 'input[name="Job"]' )
                           .typeahead({
@@ -581,15 +581,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <input type='hidden' name='ID' value='<?php echo $Contract[ 'ID' ];?>' />
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Start:</div>
-                  <div class='col-8'><input type='text' class='form-control edit date' name='Billing_Start' value='<?php echo date( 'm/d/Y', strtotime( $Contract[ 'Billing_Start' ] ) );?>' /></div>
+                  <div class='col-8'><input placeholder='mm/dd/yy' autocomplete='off' type='text' class='form-control edit date' name='Billing_Start' value='<?php echo is_null( $Contract[ 'Billing_Start' ] ) ? null : date( 'm/d/Y', strtotime( $Contract[ 'Billing_Start' ] ) );?>' /></div>
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Finish:</div>
-                  <div class='col-8'><input type='text' class='form-control edit date' name='Billing_Finish' value='<?php echo date( 'm/d/Y', strtotime( $Contract[ 'Billing_Finish' ] ) );?>' /></div>
+                  <div class='col-8'><input placeholder='mm/dd/yy' autocomplete='off' type='text' class='form-control edit date' name='Billing_Finish' value='<?php echo is_null( $Contract[ 'Billing_Finish' ] ) ? null : date( 'm/d/Y', strtotime( $Contract[ 'Billing_Finish' ] ) );?>' /></div>
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Length:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Billing_Length' value='<?php echo $Contract[ 'Billing_Length' ];?>' /></div>
+                  <div class='col-8'><input placeholder='monthes' type='text' class='form-control edit' name='Billing_Length' value='<?php echo $Contract[ 'Billing_Length' ];?>' /></div>
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Cycle:</div>
@@ -606,7 +606,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Amount:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div> 
+                  <div class='col-8'><input placeholder='$$$' type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div> 
                 </div>
               </div>
               <div class='card-footer'>
@@ -626,7 +626,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <input type='hidden' name='ID' value='<?php echo $Contract[ 'ID' ];?>' />
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Last:</div>
-                  <div class='col-8'><input type='text' class='form-control edit date' name='Escalation_Last' value='<?php echo $Contract[ 'Escalation_Last' ] == '1969-12-30 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Contract[ 'Escalation_Last' ] ) );?>' /></div>
+                  <div class='col-8'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Escalation_Last' value='<?php echo $Contract[ 'Escalation_Last' ] == '1969-12-30 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Contract[ 'Escalation_Last' ] ) );?>' /></div>
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Cycle:</div>
@@ -634,7 +634,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Factor:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Billing_Escalation_Factor' value='<?php echo $Contract[ 'Billing_Escalation_Factor' ];?>' /></div>
+                  <div class='col-8'><input placeholder='.00%' type='text' class='form-control edit' name='Billing_Escalation_Factor' value='<?php echo $Contract[ 'Billing_Escalation_Factor' ];?>' /></div>
                 </div>
               </div>
               <div class='card-footer'>
@@ -643,6 +643,56 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   </div>
               </div>
             </form></div>
+            <div class='card card-primary my-3'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+              </div>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='row g-0'>
+                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
+                    <div class='col-6'>&nbsp;</div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+                <?php if(isset($Privileges['Invoice']) ) {?>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
+                    <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
+                    $r = \singleton\database::getInstance( )->query(null,"
+                      SELECT Count( OpenAR.Ref ) AS Count
+                      FROM   OpenAR
+                           LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+                      WHERE  OpenAR.Job = ?
+                    ;",array($Contract[ 'Job_ID' ]));
+                    $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                    echo $Count
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <?php }?>
+                <?php if(isset($Privileges['Invoice']) ) {?>
+                <div class='row g-0'>
+                  <div class='col-1'>&nbsp;</div>
+                    <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
+                    <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
+                    $r = \singleton\database::getInstance( )->query(null,"
+                      SELECT  Count( Invoice.Ref ) AS Count
+                      FROM    Invoice
+                            LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+                      WHERE     Invoice.Job = ?
+                          AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                    ;",array($Contract[ 'Job_ID' ]));
+                    $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                    echo $Count
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <?php }?>
+              </div>
+            </div>
           </div>
         </div>
 			</div>
