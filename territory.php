@@ -5,7 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
   //Connection
-    $resultesult = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
       'Portal',
       " SELECT  [Connection].[ID]
         FROM    dbo.[Connection]
@@ -16,9 +16,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $_SESSION[ 'Connection' ][ 'Hash' ]
       )
     );
-    $Connection = sqlsrv_fetch_array($resultesult);
+    $Connection = sqlsrv_fetch_array($result);
     //User
-    $resultesult = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         null,
         " SELECT  Emp.fFirst  AS First_Name,
                   Emp.Last    AS Last_Name,
@@ -31,11 +31,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $_SESSION[ 'Connection' ][ 'User' ]
         )
     );
-    $User   = sqlsrv_fetch_array( $resultesult );
+    $User   = sqlsrv_fetch_array( $result );
     //Privileges
     $Access = 0;
     $Hex = 0;
-    $resultesult = \singleton\database::getInstance( )->query(
+    $result = \singleton\database::getInstance( )->query(
         'Portal',
         "   SELECT  [Privilege].[Access],
                     [Privilege].[Owner],
@@ -53,7 +53,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         )
     );
     $Privileges = array();
-    if( $resultesult ){while( $Privilege = sqlsrv_fetch_array( $resultesult, SQLSRV_FETCH_ASSOC ) ){
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(     !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Unit' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'User' ] )
+        ||  !isset( $Privileges[ 'Territory' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Territory' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
          $ID = isset( $_GET[ 'ID' ] )
@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ? $_POST[ 'Email' ]
                     : null
             );
-        $resultesult = $database->query(
+        $result = $database->query(
             'Portal',
             "   SELECT  Top 1
                         *
@@ -100,17 +100,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         );
         $User =   (       empty( $ID )
                         &&    !empty( $Name )
-                        &&    !$resultesult
+                        &&    !$result
                       ) || (  empty( $ID )
                         &&    empty( $Name )
                       )  ? array(
             'ID' => null,
             'Email' => null
-        ) : sqlsrv_fetch_array( $resultesult );
+        ) : sqlsrv_fetch_array( $result );
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
             if( empty( $_POST[ 'ID' ] ) ){
-                $resultesult = \singleton\database::getInstance( )->query(
+                $result = \singleton\database::getInstance( )->query(
                   'Portal',
                   " INSERT INTO dbo.[User]( Email )
                     VALUES( ? );
@@ -119,9 +119,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         $_POST[ 'Email' ]
                     )
                 );
-                sqlsrv_next_result( $resultesult );
-                $User[ 'ID' ] = sqlsrv_fetch_array( $resultesult )[ 0 ];
-                header( 'Location: violation.php?ID=' . $User[ 'ID' ] );
+                sqlsrv_next_result( $result );
+                $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+                header( 'Location: territory.php?ID=' . $User[ 'ID' ] );
                 exit;
             } else {
                 \singleton\database::getInstance( )->query(
@@ -151,40 +151,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           				: null
         	);
     // sets $ID, $Name Variable and Posts ID and Name into $resultesult
-          $resultesult = \singleton\database::getInstance( )->query(
+          $result = \singleton\database::getInstance( )->query(
           	null,
               "	SELECT 	Top 1
-              			Violation.*
+              			   Territory.*
               	FROM    (
-              				SELECT 	Violation.ID        AS ID,
-                  						Violation.Elev      AS Elev,
-                  						Violation.fdate     AS 'Date',
-                          		Violation.Status    AS Status,
-                              Violation.Quote     AS Quote,
-                              Violation.Ticket    AS Ticket,
-                              Violation.Remarks   AS Remarks,
-                          		Violation.Estimate  AS Estimate,
-        	                    Violation.Price     AS Price,
-                              Loc.Loc 				    AS Location_ID,
-                              Loc.Tag 				    AS Location_Name,
-                              Rol.ID 	            AS Rolodex,
-                          		Rol.Name            AS Name,
-                              Rol.Phone           AS Phone,
-                              Rol.Email           AS Email,
-                              Rol.Contact         AS Contact,
-                          		Rol.Address         AS Street,
-        	                    Rol.City            AS City,
-        	                    Rol.State           AS State,
-        	                    Rol.Zip             AS Zip,
-        	                    Rol.Latt 	          AS Latitude,
-        	                    Rol.fLong           AS Longitude,
-  							    FROM    Owner
-  									        LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                            LEFT JOIN Loc ON Invoice.Loc = Loc.Loc
-                            LEFT JOIN Job ON Invoice.Job = Job.ID
-              		) AS violation
-              	WHERE   	Violation.ID = ?
-              			OR 	Customer.Name = ?;",
+              				SELECT 	Terr.ID             AS ID,
+                  						Terr.Name           AS Name,
+                  						Terr.SMan           AS SMAN,
+                          		Terr.SDesc          AS Description,
+                              Terr.Remarks        AS Remarks,
+                              Terr.Count          AS Count,
+                              Terr.Symbol         AS Symbol,
+                          		Terr.EN             AS EN,
+        	                    Terr.Address        AS Address,
+                              Terr.TFMID          AS TFMID,
+                              Terr.TFMSource      AS TFMSource
+  							    FROM    Terr
+              		) AS      Territory
+              	WHERE   	Territory.ID = ?
+              			OR 	  Territory.Name = ?;",
               array(
               	$ID,
               	$Name
@@ -192,183 +178,112 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 );
                 $Territory =   (  empty( $ID )
                              &&  !empty( $Name )
-                             &&  !$resultesult
+                             &&  !$result
                         )    || (empty( $ID )
                              &&  empty( $Name )
                         )    ? array(
           	'ID' => null,
             'Name' => null,
-          	'Elev' => null,
-          	'Date' => null,
-          	'Job' => null,
-          	'Status' => null,
-          	'Quote' => null,
-          	'Ticket' => null,
+          	'SMan' => null,
+          	'SDesc' => null,
           	'Remarks' => null,
-            'Estimate' => null,
-          	'Price' => null,
-            'Address' => null,
-            'Phone' => null,
-          	'Contact' => null,
-            'Street' => null,
-            'City' => null,
-            'State' => null,
-          	'Zip' => null,
-          	'Latitude' => null,
-          	'Longitude' => null,
-            'Location_ID' => null,
-            'Location_Name' => null
-          ) : sqlsrv_fetch_array($resultesult);
+          	'Count' => null,
+          	'Symbol' => null,
+          	'EN' => null,
+          	'Address' => null,
+            'TFMID' => null,
+          	'TFMSource' => null,
+          ) : sqlsrv_fetch_array($result);
   //Binds $ID, $Name, $Territory and query values into the $resultesult variable
 
           if( isset( $_POST ) && count( $_POST ) > 0 ){
             // if the $_Post is set and the count is null, select if available
-          	$Territory[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Territory[ 'Name' ];
-    	      $Territory[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Territory[ 'Contact' ];
-          	$Territory[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Territory[ 'Phone' ];
-          	$Territory[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Territory[ 'Email' ];
-          	$Territory[ 'Login' ] 		= isset( $_POST[ 'Login' ] ) 	 ? $_POST[ 'Login' ] 	 : $Territory[ 'Login' ];
-          	$Territory[ 'Password' ] = isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Territory[ 'Password' ];
-          	$Territory[ 'Geofence' ] = isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Territory[ 'Geofence' ];
-          	$Territory[ 'Type' ]     = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Territory[ 'Type' ];
-          	$Territory[ 'Status' ] 	= isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Territory[ 'Status' ];
-          	$Territory[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Territory[ 'Website' ];
-          	$Territory[ 'Internet' ] = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Territory[ 'Internet' ];
+          	$Territory[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Territory[ 'ID' ];
+    	      $Territory[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Territory[ 'Name' ];
+          	$Territory[ 'SMan' ] 		= isset( $_POST[ 'SMan' ] ) 	 ? $_POST[ 'SMan' ] 	 : $Territory[ 'SMan' ];
+          	$Territory[ 'SDesc' ] 		= isset( $_POST[ 'SDesc' ] ) 	 ? $_POST[ 'SDesc' ] 	 : $Territory[ 'SDesc' ];
+          	$Territory[ 'Remarks' ] 		= isset( $_POST[ 'Remarks' ] ) 	 ? $_POST[ 'Remarks' ] 	 : $Territory[ 'Remarks' ];
+          	$Territory[ 'Count' ] = isset( $_POST[ 'Count' ] )  ? $_POST[ 'Count' ]  : $Territory[ 'Count' ];
+          	$Territory[ 'Symbol' ] = isset( $_POST[ 'Symbol' ] )  ? $_POST[ 'Symbol' ]  : $Territory[ 'Symbol' ];
+          	$Territory[ 'EN' ]     = isset( $_POST[ 'EN' ] ) 	   ? $_POST[ 'EN' ] 	   : $Territory[ 'EN' ];
           	$Territory[ 'Address' ] 	= isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
-            $Territory[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Territory[ 'Street' ];
-          	$Territory[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Territory[ 'City' ];
-          	$Territory[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Territory[ 'State' ];
-          	$Territory[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Territory[ 'Zip' ];
-            $Territory[ 'Location_ID' ]    = isset( $_POST[ 'Location_ID' ] )  ? $_POST[ 'Location_ID' ]  : $Territory[ 'Location_ID' ];
-            $Territory[ 'Location_Name' ] 	= isset( $_POST[ 'Location' ] )  ? $_POST[ 'Location' ]  : $Territory[ 'Location_Name' ];
-          	$Territory[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Territory[ 'Latitude' ];
-          	$Territory[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Territory[ 'Longitude' ];
-
+          	$Territory[ 'TFMID' ] 	= isset( $_POST[ 'TFMID' ] ) 	 ? $_POST[ 'TFMID' ] 	 : $Territory[ 'TFMID' ];
+          	$Territory[ 'TFMSource' ] = isset( $_POST[ 'TFMSource' ] )  ? $_POST[ 'TFMSource' ]  : $Territory[ 'TFMSource' ];
+          	$Territory[ 'Address' ] 	= isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
+            $Territory[ 'Price' ] 	= isset( $_POST[ 'Price' ] ) 	 ? $_POST[ 'Price' ] 	 : $Territory[ 'Price' ];
           	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
-          		$resultesult = \singleton\database::getInstance( )->query(
+          		$result = \singleton\database::getInstance( )->query(
           			null,
           			"	DECLARE @MAXID INT;
-          				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Violation ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Violation ) END ;
-          				INSERT INTO Violation(
+          				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Terr ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Terr ) END ;
+          				INSERT INTO Terr(
                     ID,
-          					Locs,
-          					Elev,
-                    fDate,
-                    Status,
-                    Quote,
-                    Job,
-                    Ticket
-          					Remarks,
-                    Price,
-          					Address,
-          					City,
-          					State,
-          					Zip,
-          					Latt,
-          					fLong,
-          					Geolock
+          					Name,
+          					SDesc,
+                    Remarks,
+                    Count,
+                    Symbol,
+                    EN,
+                    Address,
+          					TFMID,
+                    TFMSource
           				)
-          				VALUES( @MAXID + 1 , 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+          				VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ? );
           				SELECT @MAXID + 1;",
           			array(
           				$Territory[ 'ID' ],
-                  $Territory[ 'Locs' ],
-                  $Territory[ 'Elev' ],
-                  $Territory[ 'fDate' ],
-                  $Territory[ 'Status' ],
-                  $Territory[ 'Quote' ],
-                  $Territory[ 'Job' ],
-                  $Territory[ 'Ticket' ],
+                  $Territory[ 'Name' ],
+                  $Territory[ 'SDesc' ],
                   $Territory[ 'Remarks' ],
-                  $Territory[ 'Price' ],
+                  $Territory[ 'Count' ],
+                  $Territory[ 'Symbol' ],
+                  $Territory[ 'EN' ],
                   $Territory[ 'Address' ],
-          				$Territory[ 'Street' ],
-          				$Territory[ 'City' ],
-          				$Territory[ 'State' ],
-          				$Territory[ 'Zip' ],
-          				$Territory[ 'Latitude' ],
-          				$Territory[ 'Longitude' ],
-          				isset( $Territory[ 'Geofence' ] ) ? $Territory[ 'Geofence' ] : 0
+                  $Territory[ 'TFMID' ],
+                  $Territory[ 'TFMSource' ],
+                  $Territory[ 'Price' ]
           			)
           		);
-          		sqlsrv_next_result( $resultesult );
+          		sqlsrv_next_result( $result );
       //Update query to fill values for $Territory and appends to $resultesult for any updated colums
-          		$Territory[ 'Rolodex' ] = sqlsrv_fetch_array( $resultesult )[ 0 ];
+          		$Territory[ 'Rolodex' ] = sqlsrv_fetch_array( $result )[ 0 ];
   // finds any result with the value of 0/ null
   // query that inserts values into the $Territory [rolodex] variable datatable and appends it to the $resultesult variable
-          		sqlsrv_next_result( $resultesult );
-          		$Territory[ 'ID' ] = sqlsrv_fetch_array( $resultesult )[ 0 ];
+          		sqlsrv_next_result( $result );
+          		$Territory[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
   // Checks the $Territory[ID] for any fields that are null, if none exit,
-          		header( 'Location: violation.php?ID=' . $Territory[ 'ID' ] );
+
+
+            	header( 'Location: territory.php?ID=' . $Territory[ 'ID' ] );
           		exit;
           	} else {
           		\singleton\database::getInstance( )->query(
   	        		null,
-  	        		"	UPDATE 	Violation
-  	        			SET Violation.ID = ?,
-  	        					Violation.Locs = ?,
-  	        					Violation.Elev = ?,
-  	        					Violation.fdate = ?,
-  	        					Violation.Type = ?,
-                      Violation.Status = ?,
-                      Violation.Quote = ?,
-                      Violation.Job = ?,
-                      Violation.Ticket = ?,
-                      Violation.Remarks = ?,
-                      Violation.Price = ?,
-                      Violation.Address = ?,
-                      Violation.City = ?,
-                      Violation.Zip = ?,
-  	        			WHERE 	Owner.ID = ?;",
+  	        		"	UPDATE 	Territory
+  	        			SET Territory.ID = ?,
+  	        					Territory.Name = ?,
+  	        					Territory.SMan = ?,
+  	        					Territory.SDesc = ?,
+  	        					Territory.Remarks = ?,
+                      Territory.Count = ?,
+                      Territory.Symbol = ?,
+                      Territory.EN = ?,
+                      Territory.Address = ?,
+                      Territory.TFMID = ?,
+                      Territory.TFMSource = ?,
+  	        			WHERE 	Terr.ID = ?;",
   	        		array(
-                  $Territory[ 'ID' ],
-                  $Territory[ 'Location' ],
-                  $Territory[ 'Elev' ],
-                  $Territory[ 'Date' ],
-                  $Territory[ 'Status' ],
-                  $Territory[ 'Quote' ],
-                  $Territory[ 'Job' ],
-                  $Territory[ 'Ticket' ],
+                  $Territory[ 'Name' ],
+                  $Territory[ 'SMan' ],
+                  $Territory[ 'SDesc' ],
                   $Territory[ 'Remarks' ],
-                  $Territory[ 'Price' ],
+                  $Territory[ 'Count' ],
+                  $Territory[ 'Symbol' ],
+                  $Territory[ 'EN' ],
                   $Territory[ 'Address' ],
-          				$Territory[ 'Street' ],
-          				$Territory[ 'City' ],
-          				$Territory[ 'State' ],
-          				$Territory[ 'Zip' ],
-          				$Territory[ 'Latitude' ],
-          				$Territory[ 'Longitude' ]
-  	        		)
-  	        	);
-  	        	\singleton\database::getInstance( )->query(
-  	        		null,
-  	        		"	UPDATE 	Rol
-  	        			SET 	Rol.Name = ?,
-              					Rol.Website = ?,
-              					Rol.Address = ?,
-                        Rol.Street = ?,
-              					Rol.City = ?,
-              					Rol.State = ?,
-              					Rol.Zip = ?,
-              					Rol.Latt = ?,
-              					Rol.fLong = ?,
-                        Rol.Phone = ?,
-                        Rol.EMail = ?
-
-  	        			WHERE 	Rol.ID = ?;",
-  	        		array(
-  	        			$Territory[ 'Name' ],
-  	        			$Territory[ 'Website' ],
-  	        			$Territory[ 'Street' ],
-                  $Territory[ 'Address' ],
-  	        			$Territory[ 'City' ],
-  	        			$Territory[ 'State' ],
-  	        			$Territory[ 'Zip' ],
-  	        			$Territory[ 'Latitude' ],
-  	        			$Territory[ 'Longitude' ],
-                  $Territory[ 'Phone' ],
-                  $Territory[ 'Email' ],
-  	        			$Territory[ 'Rolodex' ]
+                  $Territory[ 'TFMID' ],
+                  $Territory[ 'TFMSource' ],
+                  $Territory[ 'Price' ]
   	        		)
   	        	);
           	}
@@ -383,7 +298,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishkLoadingPage();'>
+<body onload='finishLoadingPage();'>
   <div id="wrapper">
     <?php require(bin_php .'element/navigation.php');?>
     <div id="page-wrapper" class='content'>
@@ -398,149 +313,67 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   ? 'New'
                   : $User[ 'Email' ];
               ?></span></h5>
-              </div>
-              <div class='col-2'></div>
-              <div class='col-2'>
-                <div class='row g-0'>
-                  <div class='col-4'>
-                    <button
-                      class='form-control rounded'
-                      onClick="document.location.href='territory.php';"
-                    >Create</button>
-                  </div>
-                  <div class='col-4'>
-                    <button
-                      class='form-control rounded'
-                      onClick="document.location.href='territory.php?ID=<?php echo $User[ 'ID' ];?>';"
-                    >Refresh</button>
-                  </div>
+            </div>
+            <div class='col-2'></div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='territory.php';"
+                  >Create</button>
+                </div>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='territory.php?ID=<?php echo $User[ 'ID' ];?>';"
+                  >Refresh</button>
                 </div>
               </div>
-              <div class='col-2'>
-                <div class='row g-0'>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='Territories.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';">Table</button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-                </div>
+            </div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territories.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] : array( ) );?>';">Table</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true ) ) + 1 ] : null;?>';">Next</button></div>
               </div>
             </div>
           </div>
         </div>
-        <div class='card-body bg-dark text-white'>
-          <div class='card-columns'>
-          <div class='card card-primary my-3'><form action='violation.php?ID=<?php echo $Territory[ 'ID' ];?>' method='POST'>
+      <div class='card-body bg-dark text-white'>
+        <div class='card-columns'>
+          <div class='card card-primary my-3'><form action='territory.php?ID=<?php echo $Territory[ 'ID' ];?>' method='POST'>
             <div class='card-heading position-relative' style='z-index:1;'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Location</span></h5></div>
+                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Locations</span></h5></div>
                 <div class='col-2'>&nbsp;</div>
                 <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
               </div>
             </div>
           <!-- Second card headding that holds vio.php information and fontawesome icon, the POST call retrieves information from $Territory ID    -->
-          <div class='card-body bg-dark text-white' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+          <div class='card-body bg-dark text-white' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Territories' ] == 0 ? "style='display:none;'" : null;?>>
             <input type='hidden' name='ID' value='<?php echo $Territory[ 'ID' ];?>' />
             <!-- Selector for status that has echos the Customer Status and checks the value 0/1 and assignes a color -Warning or -Success  -->
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Location:</div>
               <div class='col-6'>
-                <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Territory[ 'Location_Name' ];?>' />
-                <script>
-                  $( 'input[name="Location"]' )
-                      .typeahead({
-                          minLength : 4,
-                          hint: true,
-                          highlight: true,
-                          limit : 5,
-                          display : 'FieldValue',
-                          source: function( query, result ){
-                              $.ajax({
-                                  url : 'bin/php/get/search/Locations.php',
-                                  method : 'GET',
-                                  data    : {
-                                      search :  $('input:visible[name="Location"]').val( )
-                                  },
-                                  dataType : 'json',
-                                  beforeSend : function( ){
-                                      abort( );
-                                  },
-                                  success : function( data ){
-                                      result( $.map( data, function( item ){
-                                          return item.FieldValue;
-                                      } ) );
-                                  }
-                              });
-                          },
-                          afterSelect: function( value ){
-                              $( 'input[name="Location"]').val( value );
-                              $( 'input[name="Location"]').closest( 'form' ).submit( );
-                          }
-                      }
-                  );
-                </script>
               </div>
-              <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                if( in_array( $Territory[ 'ID' ], array( null, 0, '', ' ') ) ){
-                  echo "onClick=\"document.location.href='locations.php?Field=1';\"";
-                } else {
-                  echo "onClick=\"document.location.href='location.php?ID=" . $Territory[ 'Location_ID' ] . "';\"";
-                }
-              ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              <div class='col-2'>
           </div>
           <div class='row g-0'>
-            <div class='col-4 border-bottom border-white my-auto'>Address:</div>
-            <div class='col-8'><input type='text' class='form-control edit' name='Address' value='<?php echo $Territory['Address'];?>' /></div>
+            <div class='col-4 border-bottom border-white my-auto'>Count:</div>
+            <div class='col-8'><input type='text' class='form-control edit' name='Address' value='<?php echo $Territory['Count'];?>' /></div>
           </div>
-          <div class='row g-0'>
-            <div class='col-4 border-bottom border-white my-auto'>City:</div>
-            <div class='col-8'><input type='text' class='form-control edit' name='City' value='<?php echo $Territory['City'];?>' /></div>
-          </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Zip:</div>
-              <div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Territory['Zip'];?>' /></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Latitude:</div>
-              <div class='col-8'><input type='text' class='form-control edit <?php echo $Territory[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Territory['Latitude'];?>' /></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Longitude:</div>
-              <div class='col-8'><input type='text' class='form-control edit <?php echo $Territory[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Territory['Longitude'];?>' /></div>
-            </div>
             <div class='col-2'>&nbsp;</div>
           </div>
+          <div class='row g-0'>
+          </div>
         </div>
-            <div class='card card-primary my-3'><form action='proposal.php?ID=<?php echo $Territory[ 'ID' ];?>' method='POST'>
-                <input type='hidden' name='ID' value='<?php echo $Territory[ 'ID' ];?>' />
+            <div class='card card-primary my-3'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Proposal</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Date:</div>
-              <div class='col-8'><input type='date' class='form-control edit' name='Date' value='<?php echo $Territory['Date'];?>' /></div>
-            </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Remarks:</div>
-              <div class='col-8'><textarea type='text' class='form-control edit' name='Remarks' value='<?php echo $Territory['Remarks'];?>' /></textarea>
-            </div>
+              <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
+            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Territory=<?php echo $Territory[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
           </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'>Price:</div>
-              <div class='col-8'><input type='text' class='form-control edit' name='Price' value='<?php echo $Territory['Price'];?>' /></div>
-            </div>
           </div>
-        </div>
-              <div class='row g-0'>
-                <div class='card card-primary my-3'>
-                  <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Territory=<?php echo $Territory[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-            </div>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
               <?php
                 $result = \singleton\database::getInstance( )->query(
@@ -678,7 +511,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 																SELECT 	TicketO.ID AS ID
 																FROM   	TicketO
 																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
+																WHERE  		Location.Terr = ?
 																		AND TicketO.Assigned = 2
 															)
 														) AS Tickets;",
@@ -702,7 +535,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 																SELECT 	TicketO.ID AS ID
 																FROM   	TicketO
 																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
+																WHERE  		Location.Terr = ?
 																		AND TicketO.Assigned = 3
 															)
 														) AS Tickets;",
@@ -726,7 +559,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 																SELECT 	TicketO.ID AS ID
 																FROM   	TicketO
 																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
+																WHERE  		Location.Terr = ?
 																		AND TicketO.Assigned = 6
 															)
 														) AS Tickets;",
@@ -751,7 +584,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 																SELECT 	TicketO.ID AS ID
 																FROM   	TicketO
 																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Owner = ?
+																WHERE  		Location.Terr = ?
 																		AND TicketO.Assigned = 4
 															)
 														) AS Tickets;",
@@ -779,13 +612,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='row g-0'>
                         <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
                         <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
-                        $r = \singleton\database::getInstance( )->query(null,"
-                          SELECT Sum( OpenAR.Balance ) AS Balance
-                          FROM   OpenAR
+                        $result = \singleton\database::getInstance( )->query(null,
+                          " SELECT Sum( OpenAR.Balance ) AS Balance
+                            FROM   OpenAR
                                LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                          WHERE  Location.Owner = ?
+                            WHERE  Location.Terr = ?
                         ;",array($Territory [ 'ID' ]));
-                        $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
+                        $Balance = $result ? sqlsrv_fetch_array($result)['Balance'] : 0;
                         echo money_format('%(n',$Balance);
                       ?>' /></div>
                       <div class='col-2'>&nbsp;</div>
@@ -810,13 +643,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <div class='col-1'>&nbsp;</div>
                         <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
                         <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                        $r = \singleton\database::getInstance( )->query(null,"
+                        $result = \singleton\database::getInstance( )->query(null,"
                           SELECT Count( OpenAR.Ref ) AS Count
                           FROM   OpenAR
                                LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                          WHERE  Location.Owner = ?
+                          WHERE  Location.Terr = ?
                         ;",array($Territory [ 'ID' ]));
-                        $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                        $Count = $result ? sqlsrv_fetch_array($result)['Count'] : 0;
                         echo $Count
                       ?>' /></div>
                       <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Location=<?php echo $Territory [ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
@@ -827,15 +660,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <div class='col-1'>&nbsp;</div>
                         <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
                         <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                        $r = \singleton\database::getInstance( )->query(null,"
+                        $result = \singleton\database::getInstance( )->query(null,"
                           SELECT 	Count( Invoice.Ref ) AS Count
                           FROM   	Invoice
                                 LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                          WHERE  		Location.Owner = ?
+                          WHERE  		Location.Terr = ?
                               AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
-
                         ;",array($Territory [ 'ID' ]));
-                        $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
+                        $Count = $result ? sqlsrv_fetch_array($result)['Count'] : 0;
                         echo $Count
                       ?>' /></div>
                       <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Location=<?php echo $Territory [ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
@@ -864,7 +696,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           									SELECT 	Count(Estimate.ID) AS Proposals
           									FROM   	Estimate
           										   	LEFT JOIN Loc AS Location ON Estimate.LocID = Location.Loc
-          									WHERE  		Location.Owner = ?
+          									WHERE  		Location.Terr = ?
           											AND Estimate.Status = 0
           								;",array($Territory [ 'ID' ]));
           								echo $result ? sqlsrv_fetch_array($result)['Proposals'] : 0;
@@ -879,7 +711,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           									SELECT 	Count(Estimate.ID) AS Proposals
           									FROM   	Estimate
           										   	LEFT JOIN Loc AS Location ON Estimate.LocID = Location.Loc
-          									WHERE  		Location.Owner = ?
+          									WHERE  		Location.Terr = ?
           											AND Estimate.Status = 4
           								;",array($Territory [ 'ID' ]));
           								echo $result ? sqlsrv_fetch_array($result)['Proposals'] : 0;
@@ -906,18 +738,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='col-8'><textarea type='text' class='form-control edit' name='Remarks' value='<?php echo $Territory['Remarks'];?>' /></textarea>
               </div>
             </div>
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'>Price:</div>
-                <div class='col-8'><input type='text' class='form-control edit' name='Price' value='<?php echo $Territory['Price'];?>' /></div>
-            </div>
           </div>
         </div>
 		 </div>
    </div>
  </div>
+</div>
 </form>
 </body>
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href="../login.php?Forward=unit<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href="../login.php?Forward=territory<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";</script></head></html><?php }?>
