@@ -116,7 +116,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Violation.Ticket    AS Ticket,
                   Violation.Remarks   AS Note,
                   Violation.Estimate  AS Estimate,
-                  Violation.Price     AS Price
+                  Violation.Price     AS Price,
+                  Violation.Custom1   AS File_Permit,
+                  Violation.Custom2   AS Permit_Approved,
+                  Violation.Custom3   AS Date_Sent,
+                  Violation.Custom4   AS Forms_to_DOB,
+                  Violation.Custom5   AS Inspection,
+                  Violation.Custom6   AS Hearing,
+                  Violation.Custom7   AS Due_Date,
+                  Violation.Custom8   AS Forms_to_Customer,
+                  Violation.Custom9   AS Recieved_from_Customer,
+                  Violation.Custom10  AS Cancel_Contract
 		      FROM    Violation
                   LEFT JOIN Job                      ON Violation.Job   = Job.ID
                   LEFT JOIN (
@@ -170,7 +180,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       	'Price' => null,
         'Address' => null,
         'Phone' => null,
-      	'Contact' => null
+      	'Contact' => null,
+        'File_Permit' => null,
+        'Permit_Approved' => null,
+        'Date_Sent' => null,
+        'Forms_to_DOB' => null,
+        'Inspection' => null,
+        'Hearing' => null,
+        'Due_Date' => null,
+        'Forms_to_Customer' => null,
+        'Recieved_from_Customer' => null,
+        'Cancel_Contract' => null,
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -303,50 +323,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <input type='hidden' name='ID' value='<?php echo $Violation[ 'ID' ];?>' />
         <div class='card-heading'>
         	<div class='row g-0 px-3 py-2'>
-          	<div class='col-4'>
+          	<div class='col-12 col-lg-6'>
               	<h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><a href='violations.php?<?php
                 	echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] : array( ) );
               	?>'>Violation</a>: <span><?php
                 	echo is_null( $Violation[ 'ID' ] )
                   		? 'New'
-                  		: $Violation[ 'ID' ];
+                  		: '#' . $Violation[ 'ID' ];
               	?></span></h5>
           	</div>
-          	<div class='col-4'></div>
-          	<div class='col-2'>
+          	<div class='col-6 col-lg-3'>
             		<div class='row g-0'>
               		<div class='col-4'>
 	                 	<button
 	                    	class='form-control rounded'
 	                    	onClick="document.location.href='violation.php';"
-	                  	>Save</button>
+	                  	><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
 	                </div>
 	                <div class='col-4'>
 	                  	<button
 	                    	class='form-control rounded'
 	                    	onClick="document.location.href='violation.php?ID=<?php echo $User[ 'ID' ];?>';"
-	                  	>Refresh</button>
+	                  	><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
 	                </div>
 	                <div class='col-4'>
 	                  	<button
 	                    	class='form-control rounded'
 	                    	onClick="document.location.href='violation.php';"
-	                  	>New</button>
+	                  	><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
 	                </div>
 	            </div>
           	</div>
-          	<div class='col-2'>
+          	<div class='col-6 col-lg-3'>
             		<div class='row g-0'>
-              		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-              		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';">Table</button></div>
-              		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+              		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+              		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+              		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
             		</div>
           	</div>
         	</div>
       	</div>
       	<div class='card-body bg-dark text-white'>
-      		<div class='card-columns'>
-        		<div class='card card-primary my-3'>
+      		<div class='row g-0'>
+        		<div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
           		<div class='card-heading'>
             		<div class='row g-0 px-3 py-2'>
               			<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
@@ -355,7 +374,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           		</div>
           		<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
             		<div class='row g-0'>
-              			<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?>Name:</div>
+              			<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Name:</div>
               			<div class='col-8'><input placeholder='Name' type='text' class='form-control edit' name='Name' value='<?php echo is_null( $Violation[ 'Name' ] ) ? null : $Violation[ 'Name' ];?>' /></div>
               	</div>
               	<div class='row g-0'>
@@ -661,6 +680,56 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </div>
           </div>
+          <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
+            <div class='card-heading'>
+              <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?><span>Dates</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+              </div>
+            </div>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> File Permit:</div>
+                <div class='col-8'><input placeholder='File_Permit' type='text' class='form-control edit date' name='File_Permit' value='<?php echo is_null( $Violation[ 'File_Permit' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'File_Permit' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Permit Approved:</div>
+                <div class='col-8'><input placeholder='File_Permit' type='text' class='form-control edit date' name='File_Permit' value='<?php echo is_null( $Violation[ 'Permit_Approved' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Permit_Approved' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Date Sent:</div>
+                <div class='col-8'><input placeholder='File_Permit' type='text' class='form-control edit date' name='File_Permit' value='<?php echo is_null( $Violation[ 'Date_Sent' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Date_Sent' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Forms to DOB:</div>
+                <div class='col-8'><input placeholder='Forms_to_DOB' type='text' class='form-control edit date' name='Forms_to_DOB' value='<?php echo is_null( $Violation[ 'Forms_to_DOB' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Forms_to_DOB' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Inspection:</div>
+                <div class='col-8'><input placeholder='Inspection' type='text' class='form-control edit date' name='Inspection' value='<?php echo is_null( $Violation[ 'Inspection' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Inspection' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Hearing:</div>
+                <div class='col-8'><input placeholder='Hearing' type='text' class='form-control edit date' name='Hearing' value='<?php echo is_null( $Violation[ 'Hearing' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Hearing' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Due Date:</div>
+                <div class='col-8'><input placeholder='Due_Date' type='text' class='form-control edit date' name='Due_Date' value='<?php echo is_null( $Violation[ 'Due_Date' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Due_Date' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Forms to Customer:</div>
+                <div class='col-8'><input placeholder='Forms_to_Customer' type='text' class='form-control edit date' name='Forms_to_Customer' value='<?php echo is_null( $Violation[ 'Forms_to_Customer' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Forms_to_Customer' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Recieved from Customer:</div>
+                <div class='col-8'><input placeholder='Recieved_from_Customer' type='text' class='form-control edit date' name='Recieved_from_Customer' value='<?php echo is_null( $Violation[ 'Recieved_from_Customer' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Recieved_from_Customer' ] ) );?>' /></div>
+              </div>
+              <div class='row g-0'>
+                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Cancel Contract:</div>
+                <div class='col-8'><input placeholder='Cancel_Contract' type='text' class='form-control edit date' name='Cancel_Contract' value='<?php echo is_null( $Violation[ 'Cancel_Contract' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Cancel_Contract' ] ) );?>' /></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </form></div>
@@ -669,8 +738,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href="../login.php?Forward=violation<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";
-
-
-</script></head></html><?php }?>
->>>>>>> 2ce4a5e50db66f2cb7f130c90ac17a3c393918ff
+} else {?><html><head><script>document.location.href="../login.php?Forward=violation<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";<?php }?>

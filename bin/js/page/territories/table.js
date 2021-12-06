@@ -191,9 +191,8 @@ $( document ).ready( function( ){
                         default :
                             return data;
                   }
-                }
-              }
-            ],
+            }
+        }],
         buttons: [
             {
                 text: 'Reset Search',
