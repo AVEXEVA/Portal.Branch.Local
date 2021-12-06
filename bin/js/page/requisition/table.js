@@ -1,55 +1,6 @@
-function search( link ){
-    var api = link.api();
-    $('input[name="Search"]', api.table().container())
-        .typeahead({
-            minLength : 4,
-            hint: true,
-            highlight: true,
-            limit : 5,
-            display : 'FieldValue',
-            source: function( query, result ){
-                $.ajax({
-                    url : 'bin/php/get/search/Requisitions.php',
-                    method : 'GET',
-                    data    : {
-                        ID                    :  $('input:visible[name="ID"]').val( ),
-                        User                  :  $('input:visible[name="Person"]').val( ),
-                        Start_Date            :  $('input:visible[name="Start_Date"]').val( ),
-                        End_Date              :  $('input:visible[name="End_Date"]').val( ),
-                        Required              :  $('input:visible[name="Location"]').val( ),
-                        Location              :  $('input:visible[name="Unit"]').val( ),
-                        Drop_Off              :  $('input:visible[name="Job"]').val( ),
-                        Unit                  :  $('select:visible[name="Type"]').val( ),
-                        Job                   :  $('select:visible[name="Level"]').val( ),
-                    },
-                    dataType : 'json',
-                    beforeSend : function( ){
-                        abort( );
-                    },
-                    success : function( data ){
-                        result( $.map( data, function( item ){
-                            return item.FieldName + ' => ' + item.FieldValue;
-                        } ) );
-                    }
-                });
-            },
-            afterSelect: function( value ){
-                var FieldName = value.split( ' => ' )[ 0 ];
-                var FieldValue = value.split( ' => ' )[ 1 ];
-                $( 'input[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
-                $( 'input[name="Search"]').val( '' );
-            }
-        }
-    );
-}
 $(document).ready(function( ){
-    var Editor_Requsistions = new $.fn.dataTable.Editor( {
-        idSrc    : 'ID',
-        ajax     : 'index.php',
-        table    : '#Table_Requisitions'
-    } );
-    var Table_Requisitions = $('#Table_Requisitions').DataTable( {
-        dom            : "<'row desktop'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+    var Table_Requisition_Items = $('#Table_Requisition_Items').DataTable( {
+        dom            : "<'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
         searching      : false,
@@ -67,7 +18,7 @@ $(document).ready(function( ){
           selector : 'td.ID'
         },
         ajax: {
-                url     : 'bin/php/get/requisitions.php',
+                url     : 'bin/php/get/Requisition_Items.php',
                 data    : function(d){
                     d = {
                         draw : d.draw,
@@ -78,48 +29,36 @@ $(document).ready(function( ){
                             dir : d.order[0].dir
                         }
                     };
-                    d.ID             = $('input:visible[name="ID"]').val( );
-                    d.User         = $('input:visible[name="User"]').val( );
-                    d.Start_Date       = $('input:visible[name="Start_Date"]').val( );
-                    d.End_Date        = $('input:visible[name="End_Date"]').val( );
-                    d.Required           = $('input:visible[name="Unit"]').val( );
-                    d.Location            = $('input:visible[name="Job"]').val( );
-                    d.Drop_Off           = $('select:visible[name="Type"]').val( );
-                    d.Unit          = $('select:visible[name="Level"]').val( );
+                    d.ID          = $('#Table_Requisition_Items input:visible[name="ID"]').val( );
+                    d.Description = $('#Table_Requisition_Items input:visible[name="Description"]').val( );
+                    d.Requisition = $('input[type="hidden"][name="ID"]').val( );
                     return d;
                 }
         },
         columns: [
-        },{
-            data : 'ID'
-        },{
-            data : 'User'
-        },{
-            data : 'Start_Date'
-        },{
-            data : 'End_Date'
-        },{
-            data : 'Required'
-        },{
-            data : 'Location'
-        },{
-            data : 'Drop_Off'
-        },{
-            data : 'Unit'
+            {
+                data : 'ID'
+            },{
+                data : 'Description'
+            },{
+                data : 'Image'
+            }
         ],
         initComplete : function( ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' autocomplete='off' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Requisitions.draw(); });
-        },{
+            $( '.redraw' ).bind( 'change', function(){ Table_Requisition_Items.draw(); });
+        },
+        buttons: [
+            {
                 text: 'Reset Search',
                 action: function ( e, dt, node, config ) {
                     $( 'input, select' ).each( function( ){
                         $( this ).val( '' );
                     } );
-                    Table_Requisitions.draw( );
+                    Table_Requisition_Items.draw( );
                 }
             },{
                 text : 'Get URL',
@@ -146,9 +85,6 @@ $(document).ready(function( ){
                     document.location.href = 'requisitions.php?' + new URLSearchParams( d ).toString();
                 }
             },
-            { extend: 'create', editor: Editor_Requsistions },
-            { extend: 'edit',   editor: Editor_Requsistions },
-            { extend: 'remove', editor: Editor_Requsistions },
             {
                 text: 'Print',
                 action: function ( e, dt, node, config ) {
