@@ -329,7 +329,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               	?>'>Violation</a>: <span><?php
                 	echo is_null( $Violation[ 'ID' ] )
                   		? 'New'
-                  		: $Violation[ 'ID' ];
+                  		: '#' . $Violation[ 'ID' ];
               	?></span></h5>
           	</div>
           	<div class='col-6 col-lg-3'>
@@ -683,7 +683,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Dates</span></h5></div>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?><span>Dates</span></h5></div>
                   <div class='col-2'>&nbsp;</div>
               </div>
             </div>
@@ -738,8 +738,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href="../login.php?Forward=violation<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";
-
-
-</script></head></html><?php }?>
->>>>>>> 2ce4a5e50db66f2cb7f130c90ac17a3c393918ff
+} else {?><html><head><script>document.location.href="../login.php?Forward=violation<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? "s.php" : ".php?ID={$_GET['ID']}";?>";<?php }?>

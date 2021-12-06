@@ -192,7 +192,7 @@ $( document ).ready( function( ){
                             return data;
                 }
             }
-        ],
+        }],
 
         buttons: [
             {
