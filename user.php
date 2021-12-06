@@ -87,29 +87,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ? $_POST[ 'Email' ]
                     : null
             );
-           $priv=array();
-                 $sQueryRow ="SELECT Privilege.User_Privilege FROM   Privilege WHERE  User_ID=? AND Access_Table='User'";
-            $parameters= array(
-                    $ID
-                    );
-
-           $r = \singleton\database::getInstance( )->query(
-                  null,
-                  $sQueryRow ,
-                  $parameters
-                ) or die(print_r(sqlsrv_errors()));
-
-        while($array = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC)){
-         $priv[]=   $array['User_Privilege'];
-        }
-
-
         $result = $database->query(
             'Portal',
             "   SELECT  Top 1
-                        *
+                        [User].[ID] AS ID,
+                        [User].[Email] AS Email,
+                        [User].[Password] AS Password,
+                        [User].[Verified] AS Verified,
+                        [User].[Branch] AS Branch,
+                        [User].[Branch_Type] AS Branch_Type,
+                        [User].[Branch_ID] AS Branch_ID,
+                        [User].[Picture] AS Picture,
+                        [User].[Picture_Type] AS Picture_Type
                 FROM    dbo.[User]
-                WHERE   [User].[ID] = ?;",
+                WHERE   [User].[ID] = ?
+                        OR [User].Email = ?;",
           array(
             $ID,
             $Email
@@ -124,6 +116,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'ID' => null,
             'Email' => null,
             'Password' => null,
+            'Verified' => null,
             'Branch' => null,
             'Branch_Type' => null,
             'Branch_ID' => null,
@@ -133,113 +126,65 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
             $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
+            $User[ 'Verified' ] = isset( $_POST[ 'Verified' ] ) ? $_POST[ 'Verified' ] : $User[ 'Verified' ];
             $User[ 'Branch' ] = isset( $_POST[ 'Branch' ] ) ? $_POST[ 'Branch' ] : $User[ 'Branch' ];
             $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
             $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
-                        $picture=empty( $_POST[ 'ID' ] )?0:$User[ 'Picture' ];
-            $picture_type=empty( $_POST[ 'ID' ] )?'':$User[ 'Picture_Type' ];;
+            $User[ 'Picture' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? base64_encode( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) ) : $User[ 'Picture' ];
+            $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $_FILES[ 'Picture' ][ 'type' ];
 
-
-            if(isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) )
-    {
-    ob_start( );
-  $image = imagecreatefromstring( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) );
-  imagejpeg( $image, null, 50 );
-  $image = ob_get_clean( );
-  $image = base64_encode( $image );
-
-          $picture=  array(
-        $image,
-        SQLSRV_PARAM_IN,
-        SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
-        SQLSRV_SQLTYPE_VARBINARY('max')
-      );
-
-        $picture_type=  $_FILES[ 'Picture' ][ 'type' ];
-
-        if( ( $ID )>0 ){
-          $sQueryRow = "UPDATE  [User]
-                        SET     [User].[Picture] = ?,
-                                [User].[Picture_Type] = ?
-                                WHERE   [User].[ID] = ?
-                         ";
-         $parameters= array(
-                    $picture,
-                       $picture_type,
-                       $ID
-                    );
-
-                $fResult = \singleton\database::getInstance( )->query(
-      'Portal',
-      $sQueryRow ,
-      $parameters
-    ) or die(print_r(sqlsrv_errors()));
-
-        }
-      }
             if( empty( $_POST[ 'ID' ] ) ){
 	            $result = \singleton\database::getInstance( )->query(
 	              'Portal',
-	              " INSERT INTO dbo.[User]( Email, Password, Verified, Branch, Branch_Type, Branch_ID )
-	                VALUES( ?, ?, 0, ?, ?, ? );
+	              " INSERT INTO dbo.[User]( Email, Password, Verified, Branch, Branch_Type, Branch_ID, Picture, Picture_Type )
+	                VALUES( ?, ?, ?, ?, ?, ?, ? , ? );
 	                SELECT Max( ID ) FROM dbo.[User];",
 	                array(
 	                    $User[ 'Email' ],
 	                    $User[ 'Password' ],
+                      is_null( $User[ 'Verified' ] ) ? 0 : $User[ 'Verified' ],
                       $User[ 'Branch' ],
                       $User[ 'Branch_Type' ],
-                      $User[ 'Branch_ID' ]
+                      $User[ 'Branch_ID' ],
+                      array(
+                        $User[ 'Picture' ],
+                        SQLSRV_PARAM_IN,
+                        SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
+                        SQLSRV_SQLTYPE_VARBINARY('max')
+                      ),
+                      $User[ 'Picture_Type' ]
 	                )
 	            );
-
 	            sqlsrv_next_result( $result );
 	            $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-                if(strlen( $picture_type )>1){
-                   $sQueryRow = "UPDATE  dbo.[User]
-                        SET     [User].[Picture] = ?,
-                                [User].[Picture_Type] = ?
-                                WHERE   [User].[ID] = ?;
-                         ";
-         $parameters= array(
-                    $picture,
-                       $picture_type,
-                       $User[ 'ID' ]
-                    );
-
-                $fResult = \singleton\database::getInstance( )->query(
-                  'Portal',
-                  $sQueryRow ,
-                  $parameters
-                ) or die(print_r(sqlsrv_errors()));
-                }
-
 	            header( 'Location: user.php?ID=' . $User[ 'ID' ] );
 	            exit;
-	        } else {
-
-                   $sQueryRow = "UPDATE  [User]
-                        SET     [User].[Email] = ?,
-                                [User].[Branch] = ?,
-                                [User].[Branch_Type] = ?,
-                          [User].[Branch_ID] = ?
-                                WHERE   [User].[ID] = ?;
-                         ";
-         $parameters= array(
-                          $User[ 'Email' ],
-                       $User[ 'Branch' ],
-                      $User[ 'Branch_Type' ],
-                      $User[ 'Branch_ID' ],
-                      $ID
-                    );
-
-                $fResult = \singleton\database::getInstance( )->query(
-                  'Portal',
-                  $sQueryRow ,
-                  $parameters
-                ) or die(print_r(sqlsrv_errors()));
-
-
-
+	        } else {        
+            $result = \singleton\database::getInstance( )->query(
+              'Portal',
+              " UPDATE  [User]
+                SET     [User].[Email] = ?,
+                        [User].[Branch] = ?,
+                        [User].[Branch_Type] = ?,
+                        [User].[Branch_ID] = ?,
+                        [User].[Picture] = ?,
+                        [User].[Picture_Type] = ?
+                WHERE   [User].[ID] = ?;",
+              array(
+                $User[ 'Email' ],
+                $User[ 'Branch' ],
+                $User[ 'Branch_Type' ],
+                $User[ 'Branch_ID' ],
+                array(
+                  $User[ 'Picture' ],
+                  SQLSRV_PARAM_IN,
+                  SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
+                  SQLSRV_SQLTYPE_VARBINARY('max')
+                ),
+                $User[ 'Picture_Type' ],
+                $User[ 'ID' ]
+              )
+            ) or die(print_r(sqlsrv_errors()));
 	        }
 	    }
 ?><!DOCTYPE html>
@@ -258,8 +203,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <body>
   <div id="wrapper">
     <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
-    <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-      <div class='card card-primary'>
+    <div id="page-wrapper" class='content'>
+      <div class='card card-primary'><form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST' enctype="multipart/form-data">
+        <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
         <div class='card-heading'>
           <div class='row g-0 px-3 py-2'>
             <div class='col-6'>
@@ -283,6 +229,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='col-4'>
                   <button
                     class='form-control rounded'
+                    type='submit'
+                  >Save</button>
+                </div>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
                     onClick="document.location.href='user.php?ID=<?php echo $User[ 'ID' ];?>';"
                   >Refresh</button>
                 </div>
@@ -298,91 +250,109 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           </div>
         </div>
         <div class='card-body bg-dark text-white'>
-            <div class='card-columns'>
-                <div class='card card-primary my-3'><form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST' enctype="multipart/form-data">
-                    <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
-                    <div class='card-heading'>
-                      <div class='row g-0 px-3 py-2'>
-                        <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                        <div class='col-2'>&nbsp;</div>
-                      </div>
-                    </div>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                        <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Email:</div>
-                            <div class='col-8'><input type='text' name='Email' class='form-control edit' placeholder='Email' value='<?php echo $User[ 'Email' ];?>' /></div>
-                        </div>
-                        <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Password:</div>
-                            <div class='col-8'><input type='password' name='Password' class='form-control edit' placeholder='Password' value='<?php echo str_repeat( '*', strlen( $User[ 'Password' ] ) );?>' /></div>
-                        </div>
-                        <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Branch:</div>
-                            <div class='col-8'><input type='text' name='Branch' class='form-control edit' placeholder='Branch' value='<?php echo $User[ 'Branch' ];?>' /></div>
-                        </div>
-                        <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Type:</div>
-                            <div class='col-8'><input type='text' name='Branch_Type' class='form-control edit' placeholder='Type' value='<?php echo $User[ 'Branch_Type' ];?>' /></div>
-                        </div>
-                        <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>ID:</div>
-                            <div class='col-8'><input type='text' name='Branch_ID' class='form-control edit' placeholder='ID' value='<?php echo $User[ 'Branch_ID' ];?>' /></div>
-                        </div>
-                                                 <div class='row'>
-                              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Image:</div>
-                              <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php
-                                print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];
-                              ?>" /><?php }?><input type='file' name='Picture' class='form-control edit' /></div><?php ?>
-                            </div>
-                    </div>
-                    <div class='card-footer'>
-	                  	<div class='row'>
-	                      	<div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-	                  	</div>
-	              	</div>
-                </div>
-</form>
-
-                <div class="card card-primary my-3">
-        <form name ="privilege" action="privileges.php" method="POST">
-                <input type="hidden" name="UserID" value="<?php echo $User[ 'ID' ];?>">
-                <input type="hidden" name="Access_Table" value="User">
-                <input type="hidden" name="Group_Privilege" value="0">
-                <input type="hidden" name="Other_Privilege" value="0">
-              <div class="card-heading">
-                <div class="row g-0 px-3 py-2">
-                  <div class="col-10"><h5><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i><span>Privileges</span></h5></div>
-
-                  <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='privileges.php?UserID=<?php echo $User[ 'ID' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
+          <div class='row g-1' >
+            <div class='card card-primary my-3 col-3'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
                 </div>
               </div>
-              <?php if ($User[ 'ID' ]>0) { ?>
-              <div class="card-body bg-dark">
-                <div class="row">
-                  <div class="col-4"><i class="fa fa-user fa-fw fa-1x" aria-hidden="true"></i> Permissions:</div>
-                  <div class="col-8"><select name="User_Privilege[]" class="form-control"  multiple="mutilple">
-
-                <?php if(in_array(8,$priv)){ echo '<option value="8" >Read</option>'; }?>
-                 <?php if(in_array(4,$priv)){echo '<option value="4"  >Write</option>';} ?>
-                  <?php if(in_array(1,$priv)){echo '<option value="1"  >Execute</option>';} ?>
-                    <?php if(in_array(2,$priv)){echo '<option value="2"  >Delete</option>';} ?>
-                                    </select></div>
-
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
+                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
+                    <div class='col-8'><input type='text' name='Email' class='form-control edit' placeholder='Email' value='<?php echo $User[ 'Email' ];?>' /></div>
+                </div>
+                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
+                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Password:</div>
+                    <div class='col-8'><input type='password' name='Password' class='form-control edit' placeholder='Password' value='<?php echo str_repeat( '*', strlen( $User[ 'Password' ] ) );?>' /></div>
+                </div>
+                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
+                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Branch:</div>
+                    <div class='col-8'><input type='text' name='Branch' class='form-control edit' placeholder='Branch' value='<?php echo $User[ 'Branch' ];?>' /></div>
+                </div>
+                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
+                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Type:</div>
+                    <div class='col-8'><input type='text' name='Branch_Type' class='form-control edit' placeholder='Type' value='<?php echo $User[ 'Branch_Type' ];?>' /></div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Image:</div>
+                  <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php
+                    print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];
+                  ?>" /><?php }?><input type='file' name='Picture' class='form-control edit' /></div><?php ?>
+                </div>
+              </div>
+            </div>
+            <div class='card card-primary my-y col-9'>
+                <div class='card-heading'>
+                  <div class='row g-0 px-3 py-2'>
+                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Privileges</span></h5></div>
+                    <div class='col-2'>&nbsp;</div>
                   </div>
-
+                </div>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Privileges' ] ) && $_SESSION[ 'Cards' ][ 'Privileges' ] == 0 ? "style='display:none;'" : null;?>>
+                  <table id='Table_Privileges' class='display' cellspacing='0' width='100%'>
+                    <thead><tr>
+                      <th>Access</th>
+                      <th colspan='4'>Owner</th>
+                      <th colspan='4'>Group</th>
+                      <th colspan='4'>Department</th>
+                      <th colspan='4'>Database</th>
+                      <th colspan='4'>Server</th>
+                    </tr><tr>
+                      <th>&nbsp;</th>
+                      <th>Read</th>
+                      <th>Write</th>
+                      <th>Execute</th>
+                      <th>Delete</th>
+                      <th>Read</th>
+                      <th>Write</th>
+                      <th>Execute</th>
+                      <th>Delete</th>
+                      <th>Read</th>
+                      <th>Write</th>
+                      <th>Execute</th>
+                      <th>Delete</th>
+                      <th>Read</th>
+                      <th>Write</th>
+                      <th>Execute</th>
+                      <th>Delete</th>
+                      <th>Read</th>
+                      <th>Write</th>
+                      <th>Execute</th>
+                      <th>Delete</th>
+                    </tr><tr>
+                      <th><input type='text' class='form-input redraw' name='Access' placeholder='Access' value='<?php echo isset( $_GET[ 'Access'] ) ? $_GET[ 'Access' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Owner_Read' placeholder='Owner_Read' value='<?php echo isset( $_GET[ 'Owner_Read'] ) ? $_GET[ 'Owner_Read' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Owner_Write' placeholder='Owner_Write' value='<?php echo isset( $_GET[ 'Owner_Write'] ) ? $_GET[ 'Owner_Write' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Owner_Execute' placeholder='Owner_Execute' value='<?php echo isset( $_GET[ 'Owner_Execute'] ) ? $_GET[ 'Owner_Execute' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Owner_Delete' placeholder='Owner_Delete' value='<?php echo isset( $_GET[ 'Owner_Delete'] ) ? $_GET[ 'Owner_Delete' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Group_Read' placeholder='Group_Read' value='<?php echo isset( $_GET[ 'Group_Read'] ) ? $_GET[ 'Group_Read' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Group_Write' placeholder='Group_Write' value='<?php echo isset( $_GET[ 'Group_Write'] ) ? $_GET[ 'Group_Write' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Group_Execute' placeholder='Group_Execute' value='<?php echo isset( $_GET[ 'Group_Execute'] ) ? $_GET[ 'Group_Execute' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Group_Delete' placeholder='Group_Delete' value='<?php echo isset( $_GET[ 'Group_Delete'] ) ? $_GET[ 'Group_Delete' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Department_Read' placeholder='Department_Read' value='<?php echo isset( $_GET[ 'Department_Read'] ) ? $_GET[ 'Department_Read' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Department_Write' placeholder='Department_Write' value='<?php echo isset( $_GET[ 'Department_Write'] ) ? $_GET[ 'Department_Write' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Department_Execute' placeholder='Department_Execute' value='<?php echo isset( $_GET[ 'Department_Execute'] ) ? $_GET[ 'Department_Execute' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Department_Delete' placeholder='Department_Delete' value='<?php echo isset( $_GET[ 'Department_Delete'] ) ? $_GET[ 'Department_Delete' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Database_Read' placeholder='Database_Read' value='<?php echo isset( $_GET[ 'Database_Read'] ) ? $_GET[ 'Database_Read' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Database_Write' placeholder='Database_Write' value='<?php echo isset( $_GET[ 'Database_Write'] ) ? $_GET[ 'Database_Write' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Database_Execute' placeholder='Database_Execute' value='<?php echo isset( $_GET[ 'Database_Execute'] ) ? $_GET[ 'Database_Execute' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Database_Delete' placeholder='Database_Delete' value='<?php echo isset( $_GET[ 'Database_Delete'] ) ? $_GET[ 'Database_Delete' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Server_Read' placeholder='Server_Read' value='<?php echo isset( $_GET[ 'Server_Read'] ) ? $_GET[ 'Server_Read' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Server_Write' placeholder='Server_Write' value='<?php echo isset( $_GET[ 'Server_Write'] ) ? $_GET[ 'Server_Write' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Server_Execute' placeholder='Server_Execute' value='<?php echo isset( $_GET[ 'Server_Execute'] ) ? $_GET[ 'Server_Execute' ] : null;?>' /></th>
+                      <th><input type='checkbox' class='form-input redraw' name='Server_Delete' placeholder='Server_Delete' value='<?php echo isset( $_GET[ 'Server_Delete'] ) ? $_GET[ 'Server_Delete' ] : null;?>' /></th>
+                    </tr></thead>
+                  </table>
+                </div>
               </div>
-             <?php } ?>
-
             </div>
-
-                      </div>
-                      </div>
-                        </div>
-                          </div>
-
-            </div>
+          </div>
         </div>
+      </form></div>
     </div>
+  </div>
 </body>
 </html>
 <?php

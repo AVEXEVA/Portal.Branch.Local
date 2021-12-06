@@ -11,6 +11,10 @@
     .desktop {
       .display : block;
     }
+    .card {
+      padding-left  : 15px;
+      padding-right : 15px;
+    }
 }
 @media only screen and ( max-width : 1024px ){
     div.form-mobile, .mobile {
@@ -19,6 +23,12 @@
     tr.form-desktop, .desktop {
       display : none;
     }
+}
+.card {
+  background-color : transparent !important;
+}
+.card>.card-body {
+  border: 1px solid white;
 }
 .card.card-primary .card-heading {
   background-color : white;
