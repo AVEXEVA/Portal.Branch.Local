@@ -112,27 +112,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             "	SELECT 	Top 1
             			Customer.*
             	FROM    (
-            				SELECT 	Owner.ID    AS ID,
-                						Owner.Type  AS Type,
-                						Rol.ID 		AS Rolodex,
-                        		Rol.Name    AS Name,
-                            Rol.Phone   AS Phone,
-                            Rol.Email   AS Email,
-                            Rol.Contact AS Contact,
-                        		Rol.Address AS Street,
-      	                    Rol.City    AS City,
-      	                    Rol.State   AS State,
-      	                    Rol.Zip     AS Zip,
-      	                    Rol.Latt 	AS Latitude,
-      	                    Rol.fLong   AS Longitude,
-      	                    Owner.Status  AS Status,
-          									Rol.Website AS Website,
-          									Owner.Internet AS Internet,
-          									Owner.fLogin AS Login,
-          									Owner.Password AS Password,
-          									Rol.Geolock AS Geofence
-							    FROM    Owner
-									        LEFT JOIN Rol ON Owner.Rol = Rol.ID
+            				SELECT 	Owner.ID        AS ID,
+            						Owner.Type      AS Type,
+            						Rolodex.ID 		AS Rolodex,
+                                    Rolodex.Name    AS Name,
+                                    Rolodex.Phone   AS Phone,
+                                    Rolodex.Email   AS Email,
+                                    Rolodex.Contact AS Contact,
+                                    Rolodex.Address AS Street,
+                                    Rolodex.City    AS City,
+                                    Rolodex.State   AS State,
+                                    Rolodex.Zip     AS Zip,
+                                    Rolodex.Latt 	AS Latitude,
+                                    Rolodex.fLong   AS Longitude,
+                                    Owner.Status    AS Status,
+          							Rolodex.Website AS Website,
+          							Owner.Internet  AS Internet,
+          							Owner.fLogin    AS Login,
+          							Owner.Password  AS Password,
+          							Rolodex.Geolock AS Geofence
+							 FROM   Owner
+									LEFT JOIN Rolodex ON Owner.Rol = Rolodex.ID
             		) AS Customer
             	WHERE   	Customer.ID = ?
             			OR 	Customer.Name = ?;",
@@ -141,49 +141,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	$Name
                   )
               );
-              $Customer =   (  empty( $ID )
-                           &&  !empty( $Name )
-                           &&  !$result
-                      )    || (empty( $ID )
-                           &&  empty( $Name )
-                      )    ? array(
-        	'ID' => null,
-        	'Name' => null,
-        	'Login' => null,
-        	'Password' => null,
-        	'Geofence' => null,
-        	'Type' => null,
-        	'Status' => null,
-        	'Website' => null,
-        	'Internet' => null,
-        	'Street' => null,
-        	'City' => null,
-        	'State' => null,
-        	'Zip' => null,
-        	'Latitude' => null,
+        $Customer = (  empty( $ID )
+                       &&  !empty( $Name )
+                       &&  !$result
+                    )    || (empty( $ID )
+                       &&  empty( $Name )
+                    )    ? array(
+        	'ID'        => null,
+        	'Name'      => null,
+        	'Login'     => null,
+        	'Password'  => null,
+        	'Geofence'  => null,
+        	'Type'      => null,
+        	'Status'    => null,
+        	'Website'   => null,
+        	'Internet'  => null,
+        	'Street'    => null,
+        	'City'      => null,
+        	'State'     => null,
+        	'Zip'       => null,
+        	'Latitude'  => null,
         	'Longitude' => null,
-          'Phone'   =>  null,
-          'Email'   =>  null,
-        	'Rolodex' => null,
-          'Phone' => null,
-          'Email' => null
+            'Phone'     =>  null,
+            'Email'     =>  null,
+        	'Rolodex'   => null,
+            'Phone'     => null,
+            'Email'     => null
         ) : sqlsrv_fetch_array($result);
 //Binds $ID, $Name, $Customer and query values into the $result variable
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           // if the $_Post is set and the count is null, select if available
         	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
-  	      $Customer[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Customer[ 'Contact' ];
+            $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ]     : $Customer[ 'Contact' ];
         	$Customer[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Customer[ 'Phone' ];
         	$Customer[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Customer[ 'Email' ];
         	$Customer[ 'Login' ] 		= isset( $_POST[ 'Login' ] ) 	 ? $_POST[ 'Login' ] 	 : $Customer[ 'Login' ];
-        	$Customer[ 'Password' ] = isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Customer[ 'Password' ];
-        	$Customer[ 'Geofence' ] = isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Customer[ 'Geofence' ];
-        	$Customer[ 'Type' ]     = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Customer[ 'Type' ];
-        	$Customer[ 'Status' ] 	= isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Customer[ 'Status' ];
-        	$Customer[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Customer[ 'Website' ];
-        	$Customer[ 'Internet' ] = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Customer[ 'Internet' ];
-        	$Customer[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Customer[ 'Street' ];
+        	$Customer[ 'Password' ]     = isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Customer[ 'Password' ];
+        	$Customer[ 'Geofence' ]     = isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Customer[ 'Geofence' ];
+        	$Customer[ 'Type' ]         = isset( $_POST[ 'Type' ] ) 	 ? $_POST[ 'Type' ] 	 : $Customer[ 'Type' ];
+        	$Customer[ 'Status' ] 	    = isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Customer[ 'Status' ];
+        	$Customer[ 'Website' ] 	    = isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Customer[ 'Website' ];
+        	$Customer[ 'Internet' ]     = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Customer[ 'Internet' ];
+        	$Customer[ 'Street' ] 	    = isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Customer[ 'Street' ];
         	$Customer[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Customer[ 'City' ];
         	$Customer[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Customer[ 'State' ];
         	$Customer[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Customer[ 'Zip' ];
@@ -433,7 +433,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
-									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Customer['Name'];?>' /></div>
+									<div class='col-8'><input placeholder='Name' type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Customer['Name'];?>' /></div>
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Type:</div>
@@ -459,7 +459,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
-									<div class='col-8'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Customer['Website']) > 0 ?  $Customer['Website'] : "&nbsp;";?>' /></div>
+									<div class='col-8'><input placeholder='https://www.website.com' type='text' class='form-control edit' name='Website' value='<?php echo strlen($Customer['Website']) > 0 ?  $Customer['Website'] : "&nbsp;";?>' /></div>
 								</div>
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
@@ -469,12 +469,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 									<div class='col-3 border-bottom border-white my-auto'>Street:</div>
-									<div class='col-8'><input type='text' class='form-control edit' name='Street' value='<?php echo $Customer['Street'];?>' /></div>
+									<div class='col-8'><input placeholder='Street' type='text' class='form-control edit' name='Street' value='<?php echo $Customer['Street'];?>' /></div>
 								</div>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 									<div class='col-3 border-bottom border-white my-auto'>City:</div>
-									<div class='col-8'><input type='text' class='form-control edit' name='City' value='<?php echo $Customer['City'];?>' /></div>
+									<div class='col-8'><input placeholder='City' type='text' class='form-control edit' name='City' value='<?php echo $Customer['City'];?>' /></div>
 								</div>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
@@ -537,17 +537,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 									<div class='col-3 border-bottom border-white my-auto'>Zip:</div>
-									<div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Customer['Zip'];?>' /></div>
+									<div class='col-8'><input placeholder='Zip' type='text' class='form-control edit' name='Zip' value='<?php echo $Customer['Zip'];?>' /></div>
 								</div>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 									<div class='col-3 border-bottom border-white my-auto'>Latitude:</div>
-									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Customer['Latitude'];?>' /></div>
+									<div class='col-8'><input placeholder='Latitude' type='text' class='form-control edit <?php echo $Customer[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Customer['Latitude'];?>' /></div>
 								</div>
 								<div class='row g-0'>
 									<div class='col-1'>&nbsp;</div>
 									<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
-									<div class='col-8'><input type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
+									<div class='col-8'><input placeholder='Longitude' type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
 							</div>
                <div class='card-footer'>
@@ -569,16 +569,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <!-- Card hedding, that holds customer contacts, with a post call that gets customer contact information based on $Customer ID  -->
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Contacts' ] ) && $_SESSION[ 'Cards' ][ 'Contacts' ] == 0 ? "style='display:none;'" : null;?>>
                 <div class='row'>
-                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Name:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Name' value='<?php echo $Customer[ 'Name' ];?>' /></div>
+                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Contact:</div>
+                  <div class='col-8'><input placeholder='Name' type='text' class='form-control edit' name='Name' value='<?php echo $Customer[ 'Contact' ];?>' /></div>
                 </div>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Customer[ 'Phone' ];?>' /></div>
+                  <div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='Phone' value='<?php echo $Customer[ 'Phone' ];?>' /></div>
                 </div>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Customer[ 'Email' ];?>' /></div>
+                  <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='Email' value='<?php echo $Customer[ 'Email' ];?>' /></div>
                 </div>
               </div>
               <div class='card-footer'>
