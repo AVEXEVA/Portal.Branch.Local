@@ -70,6 +70,20 @@ $( document ).ready( function( ){
                             return data;
                     }
                 }
+              },{
+                data : 'Items',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.Item !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='requisition.php?ID=" + row.Item + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Item + "</a></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
             },{
                 data : 'Date'
             },{
