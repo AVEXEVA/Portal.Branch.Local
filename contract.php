@@ -140,7 +140,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN (
                             SELECT  Owner.ID AS ID,
                                     Rol.Name AS Name
-                            FROM    Owner 
+                            FROM    Owner
                                     LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Customer.ID = Contract.Owner
                 WHERE   	    [Contract].ID = ?;",
@@ -394,24 +394,47 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id="page-wrapper" class='content'>
         	<div class='card card-primary'>
         		<div class='card-heading'>
-        			<div class='row g-0 px-3 py-2'>
-        				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='contracts.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] : array( ) ) : null;?>'>Contracts</a>: #<span><?php echo is_null( $Contract[ 'ID' ] ) ? 'New' : $Contract[ 'ID' ];?></span></h5></div>
-        				<div class='col-2'></div>
-        				<div class='col-2'>
-        					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php';">Create</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php?ID=<?php echo $Contract[ 'ID' ];?>';">Refresh</button></div>
-        					</div>
-        				</div>
-        				<div class='col-2'>
-        					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php?ID=<?php echo !is_null( $Contract[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true )[ array_search( $Contract[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] : array( ) );?>';">Table</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php?ID=<?php echo !is_null( $Contract[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true )[ array_search( $Contract[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Contacts' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-        					</div>
-        				</div>
-        			</div>
-        		</div>
+              <div class='row g-0 px-3 py-2'>
+                <div class='col-12 col-lg-6'>
+                    <h5><?php \singleton\fontawesome::getInstance( )->Contract( 1 );?><a href='contracts.php?<?php
+                      echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] : array( ) );
+                    ?>'>Contract</a>: <span><?php
+                      echo is_null( $Contract[ 'ID' ] )
+                          ? 'New'
+                          : '#' . $Contract[ 'ID' ];
+                    ?></span></h5>
+                </div>
+                <div class='col-6 col-lg-3'>
+                    <div class='row g-0'>
+                      <div class='col-4'>
+                        <button
+                            class='form-control rounded'
+                            onClick="document.location.href='violation.php';"
+                          ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+                      </div>
+                      <div class='col-4'>
+                          <button
+                            class='form-control rounded'
+                            onClick="document.location.href='violation.php?ID=<?php echo $User[ 'ID' ];?>';"
+                          ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
+                      </div>
+                      <div class='col-4'>
+                          <button
+                            class='form-control rounded'
+                            onClick="document.location.href='violation.php';"
+                          ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
+                      </div>
+                  </div>
+                </div>
+                <div class='col-6 col-lg-3'>
+                    <div class='row g-0'>
+                      <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+                      <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+                      <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                    </div>
+                </div>
+              </div>
+            </div>
         		<div class='card-body bg-dark text-white'>
 					<div class='card-columns'>
 						<div class='card card-primary my-3'><form action='contract.php?ID=<?php echo $Contract[ 'ID' ];?>' method='POST'>
@@ -606,7 +629,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Amount:</div>
-                  <div class='col-8'><input placeholder='$$$' type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div> 
+                  <div class='col-8'><input placeholder='$$$' type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div>
                 </div>
               </div>
               <div class='card-footer'>
