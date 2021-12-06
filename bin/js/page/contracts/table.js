@@ -39,68 +39,6 @@ function search( link ){
     );
 }
 $( document ).ready( function() {
-  var Editor_Contracts = new $.fn.dataTable.Editor( {
-    idSrc    : 'ID',
-    ajax     : 'index.php',
-    table    : '#Table_Contracts',
-    template : '#Form_Contract',
-    formOptions: {
-      inline: {
-        submit: 'allIfChanged'
-      }
-    },
-    fields : [
-      {
-        label : 'Customer',
-        name  : 'Customer',
-        type  : 'readonly',
-        attr:{
-          disabled:true
-        }
-      },{
-        label : 'Location',
-        name  : 'Location',
-        type  : 'readonly',
-        attr:{
-          disabled : true
-        }
-      },{
-        label : 'Job',
-        name  : 'Job',
-        type  : 'readonly',
-        attr:{
-          disabled:true
-        }
-      },{
-        label : 'Start',
-        name  : 'Start_Date',
-        type  : 'datetime'
-      },{
-        label : 'End',
-        name  : 'End_Date',
-        type  : 'datetime'
-      },{
-        label : 'Length',
-        name  : 'Length'
-      },{
-        label : 'Amount',
-        name  : 'Amount'
-      },{
-        label : 'Cycle',
-        name  : 'Cycle',
-        type  : 'select'
-      },{
-        label : 'Escalation Factor',
-        name  : 'Escalation_Factor'
-      },{
-        label : 'Escalation Date',
-        name  : 'Escalation_Date'
-      }
-    ]
-  });
-  $('#Table_Contracts').on( 'click', 'tbody td:not(.control)', function (e) {
-    Editor_Contracts.inline( this );
-  } );
   var Table_Contracts = $('#Table_Contracts').DataTable( {
     dom 	   : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
     processing     : true,
@@ -114,15 +52,9 @@ $( document ).ready( function() {
     scrollCollapse : true,
     paging         : true,
     orderCellsTop  : true,
-    responsive     : {
-      details : {
-        type   : 'column',
-        target : 0
-      }
-    },
     select         : {
       style : 'multi',
-      selector : 'td.control'
+      selector : 'td.ID'
     },
     ajax       : {
       url : 'bin/php/get/Contracts.php',
@@ -156,8 +88,20 @@ $( document ).ready( function() {
     },
     columns: [
       {
-        className : 'control',
-        data 	: 'ID'
+          className : 'ID',
+          data : 'ID',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='contract.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Contract #" + row.ID + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
       },{
         data : 'Customer_ID',
         render : function( data, type, row, meta ){
@@ -165,7 +109,7 @@ $( document ).ready( function() {
             case 'display' :
               return  row.Customer_ID !== null
                 ?   "<div class='row'>" +
-                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" +
+                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                     "</div>"
                 :   null;
             default :
@@ -194,7 +138,19 @@ $( document ).ready( function() {
               }
           }
       },{
-        data 	: 'Job'
+        data : 'Job_ID',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.Job_ID !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='job.php?ID=" + row.Job_Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_Name + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
       },{
         data 	: 'Start_Date'
       },{
@@ -232,43 +188,40 @@ $( document ).ready( function() {
         $( '.redraw' ).bind( 'change', function(){ Table_Contracts.draw(); });
     },
     buttons: [
-        {
-            text: 'Reset Search',
-            className: 'form-control',
-            action: function ( e, dt, node, config ) {
-                $( 'input:visible, select:visible' ).each( function( ){
-                    $( this ).val( '' );
-                } );
-                Table_Contracts.draw( );
-            }
-        },{
-        text : 'Create',
+      {
+          text: 'Reset Search',
+          className: 'form-control',
+          action: function ( e, dt, node, config ) {
+              $( 'input:visible, select:visible' ).each( function( ){
+                  $( this ).val( '' );
+              } );
+              Table_Contracts.draw( );
+          }
+      },{
+      text : 'Create',
+      className: 'form-control',
+      action : function( e, dt, node, config ){
+          document.location.href='contract.php';}
+
+      },{
+        text : 'Delete',
         className: 'form-control',
         action : function( e, dt, node, config ){
-            document.location.href='contract.php';}
-
-        },{ extend: 'edit',
-            editor: Editor_Contracts,
-            className: 'form-control',
-        },{
-            text : 'Delete',
-            className: 'form-control',
-            action : function( e, dt, node, config ){
-              var rows = dt.rows( { selected : true } ).indexes( );
-              var dte = dt.cells( rows, 0 ).data( ).toArray( );
-              $.ajax ({
-                url    : 'bin/php/post/contract.php',
-                method : 'POST',
-                data   : {
-                  action : 'delete' ,
-                  data : dte
-                },
-                success : function(response){
-                  Table_Contracts.draw();
-                }
-              })
+          var rows = dt.rows( { selected : true } ).indexes( );
+          var dte = dt.cells( rows, 0 ).data( ).toArray( );
+          $.ajax ({
+            url    : 'bin/php/post/contract.php',
+            method : 'POST',
+            data   : {
+              action : 'delete' ,
+              data : dte
+            },
+            success : function(response){
+              Table_Contracts.draw();
             }
-          },
+          })
+        }
+      }
     ]
-});
+  });
 });

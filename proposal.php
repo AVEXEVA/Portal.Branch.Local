@@ -174,7 +174,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Quoted' => null,
                 'Phase' => null,
                 'Probability' => null,
-                'Location_ID' => nll,
+                'Location_ID' => null,
                 'Location_Name' => null,
                 'Street' => null,
                 'State' => null,
@@ -544,7 +544,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         <input type='hidden' name='ID' value='<?php echo $Proposal[ 'ID' ];?>' />
                         <div class='card-heading'>
                           <div class='row g-0 px-3 py-2'>
-                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?><span>Billing</span></h5></div>
                             <div class='col-2'>&nbsp;</div>
                           </div>
                         </div>

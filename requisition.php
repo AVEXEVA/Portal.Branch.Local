@@ -83,57 +83,68 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'requisition.php'
         )
       );
-    $r = \singleton\database::getInstance()->query($Portal,
-      " SELECT  Requisition.*,
-                Loc.Tag AS Location_Tag,
-                DropOff.Tag AS DropOff_Tag,
-                Elev.State AS Unit_State,
-                Elev.Unit AS Unit_Label,
-                Job.fDesc AS Job_Name,
-                Job.ID AS Job_ID,
-                Loc.Address AS Location_Street,
-                Loc.City AS Location_City,
-                Loc.State AS Location_State,
-                Loc.Zip AS Location_Zip,
-                DropOff.Address AS DropOff_Street,
-                DropOff.City AS DropOff_City,
-                DropOff.State AS DropOff_State,
-                DropOff.Zip AS DropOff_Zip,
-                JobType.Type AS Job_Type,
-                Emp.fFirst + ' ' + Emp.Last AS User_Name
-        FROM    Portal.dbo.Requisition
-                LEFT JOIN Loc ON Requisition.Location = Loc.Loc
-                LEFT JOIN Loc AS DropOff ON Requisition.DropOff = DropOff.Loc
-                LEFT JOIN Elev ON Requisition.Unit = Elev.ID
-                LEFT JOIN Job ON Requisition.Job = Job.ID
-                LEFT JOIN JobType ON JobType.ID = Job.Type
-                LEFT JOIN Emp ON Emp.ID = Requisition.[User]
-        WHERE Requisition.ID = ?
-      ;",array($_GET['ID']));
-    $Requisition = sqlsrv_fetch_array($r);
-    $r = $database->query($Portal,"SELECT * FROM Portal.dbo.Requisition_Item WHERE Requisition_Item.Requisition = ?;",array($_GET['ID']));
-    $Requisition_Items = array();
-    if($r){while($row = sqlsrv_fetch_array($r)){$Requisition_Items[] = $row;}}
+      $ID = isset( $_GET[ 'ID' ] )
+        ? $_GET[ 'ID' ]
+        : (
+          isset( $_POST[ 'ID' ] )
+            ? $_POST[ 'ID' ]
+            : null
+        );
+      $result = \singleton\database::getInstance( )->query(
+        null,
+        " SELECT  Requisition.*,
+                  DropOff.Tag       AS DropOff_Tag,
+                  Unit.State        AS Unit_State,
+                  Unit.Unit         AS Unit_Label,
+                  Job.ID            AS Job_ID,
+                  Job.fDesc         AS Job_Name,
+                  Job_Type.Type     AS Job_Type,
+                  Location.Loc      AS Location_ID,
+                  Location.Tag      AS Location_Name,
+                  Location.Address  AS Location_Street,
+                  Location.City     AS Location_City,
+                  Location.State    AS Location_State,
+                  Location.Zip      AS Location_Zip,
+                  DropOff.Address   AS DropOff_Street,
+                  DropOff.City      AS DropOff_City,
+                  DropOff.State     AS DropOff_State,
+                  DropOff.Zip       AS DropOff_Zip,
+                  Employee.fFirst + ' ' + Employee.Last AS User_Name
+          FROM    Requisition
+                  LEFT JOIN Loc     AS Location   ON Requisition.Location = Location.Loc
+                  LEFT JOIN Loc     AS DropOff    ON Requisition.DropOff  = DropOff.Loc
+                  LEFT JOIN Elev    AS Unit       ON Requisition.Unit     = Unit.ID
+                  LEFT JOIN Job     AS Job        ON Requisition.Job      = Job.ID
+                  LEFT JOIN JobType AS Job_Type   ON Job_Type.ID          = Job.Type
+                  LEFT JOIN Emp     AS Employee   ON Employee.ID          = Requisition.[User]
+          WHERE   Requisition.ID = ?;",
+        array(
+          $ID
+        )
+      );
+      $Requisition = sqlsrv_fetch_array( $result );
+      $result = \singleton\database::getInstance( )->query(
+        null,
+        " SELECT  * 
+          FROM    Requisition_Item 
+          WHERE   Requisition_Item.Requisition = ?;",
+        array(
+          $ID
+        )
+      );
+      $Requisition_Items = array( );
+      if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){ $Requisition_Items[ ] = $row; } }
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Peter D. Speranza">
-    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-       <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-       <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-       <?php	require( bin_meta . 'index.php');?>
-       <?php	require( bin_css  . 'index.php');?>
-       <?php  require( bin_js   . 'index.php');?>
-	<!--  base structure css  -->
+  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+  <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+  <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+  <?php	require( bin_meta . 'index.php');?>
+  <?php	require( bin_css  . 'index.php');?>
+  <?php  require( bin_js   . 'index.php');?>
 	<link href="css/ufd-base.css" rel="stylesheet" type="text/css" />
-
-	<!--  plain css skin  -->
 	<link href="css/plain.css" rel="stylesheet" type="text/css" />
-
   <style>
   .popup {
     z-index:999999999;
@@ -159,298 +170,327 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   .noprint {display:block;}
   </style>
 </head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-          <div class='print' style='overflow:hidden;'>
-            <div class='row'>
-              <div class='row'>
-                  <div class='col-xs-6'>
-                      <div><img src='http://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='position:relative;left:110px;' /></div>
-                      <h3 style='text-align:left;' class='BankGothic'>Nouveau Elevator</h3>
+<body onload='finishLoadingPage();'>
+    <div id='wrapper'>
+      <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+      <div id="page-wrapper" class='content'>
+        <div class='card card-primary'><form action='customer.php?ID=<?php echo $Requisition[ 'ID' ];?>' method='POST'>
+          <input type='hidden' name='ID' value='<?php echo $Requisition[ 'ID' ];?>' />
+          <div class='card-heading'>
+            <div class='row g-0 px-3 py-2'>
+                <div class='col-4'>
+                    <h5><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?><a href='customers.php?<?php
+                        echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] : array( ) );
+                    ?>'>Requisitions</a>: <span><?php
+                        echo is_null( $Requisition[ 'ID' ] )
+                            ? 'New'
+                            : $Requisition[ 'Name' ];
+                    ?></span></h5>
+                </div>
+                <div class='col-4'></div>
+                <div class='col-2'>
+                    <div class='row g-0'>
+                        <div class='col-4'>
+                            <button
+                                class='form-control rounded'
+                                type='submit'
+                            >Save</button>
+                        </div>
+                        <div class='col-4'>
+                            <button
+                                class='form-control rounded'
+                                onClick="document.location.href='requisition.php?ID=<?php echo $Requisition[ 'ID' ];?>';"
+                            >Refresh</button>
+                        </div>
+                        <div class='col-4'>
+                            <button
+                                class='form-control rounded'
+                                onClick="document.location.href='requisition.php?';"
+                            >New</button>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-2'>
+                    <div class='row g-0'>
+                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $Requisition[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true )[ array_search( $Requisition[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitions.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] : array( ) );?>';">Table</button></div>
+                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $Requisition[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true )[ array_search( $Requisition[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='card-body bg-dark text-white'>
+          <div class='card-columns'>
+            <div class='card card-primary my-3'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class="row g-0">
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> User:</div>
+      						<div class='col-8'><input class='form-control edit' type='text' name='Employee' size='15' value='<?php echo $Requisition['User_Name'];?>' /></div>
+      					</div>
+      					<div class="row g-0">
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</div>
+      						<div class='col-8'><input class='form-control edit' type='text' name='Date' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Date']));?>' /></div>
+      					</div>
+      					<div class="row g-0">
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Required</div>
+      						<div class='col-8'><input class='form-control edit' type='text' name='Required' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Required']));?>' /></div>
+      					</div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
+                  <div class='col-6'>
+                    <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Requisition[ 'Location_Name' ];?>' />
+                    <script>
+                      $( 'input[name="Location"]' )
+                          .typeahead({
+                              minLength : 4,
+                              hint: true,
+                              highlight: true,
+                              limit : 5,
+                              display : 'FieldValue',
+                              source: function( query, result ){
+                                  $.ajax({
+                                      url : 'bin/php/get/search/Locations.php',
+                                      method : 'GET',
+                                      data    : {
+                                          search :  $('input:visible[name="Location"]').val( )
+                                      },
+                                      dataType : 'json',
+                                      beforeSend : function( ){
+                                          abort( );
+                                      },
+                                      success : function( data ){
+                                          result( $.map( data, function( item ){
+                                              return item.FieldValue;
+                                          } ) );
+                                      }
+                                  });
+                              },
+                              afterSelect: function( value ){
+                                  $( 'input[name="Location"]').val( value );
+                                  $( 'input[name="Location"]').closest( 'form' ).submit( );
+                              }
+                          }
+                      );
+                    </script>
                   </div>
-                  <div class='col-xs-6' style='text-align:right;'>
-                      <div clsas='row' style='font-size:12px;'>
-                          <div class='col-xs-12'>47-55 37th Street LIC, NY 11101</div>
-                      </div>
-                      <div clsas='row' style='font-size:12px;'>
-                          <div class='col-xs-12'>Tel:(718)349-4700 Fax:383:3218</div>
-                      </div>
-                      <div clsas='row' style='font-size:12px;'>
-                          <div class='col-xs-12'>www.NouveauElevator.com</div>
-                      </div>
-                  </div>
-              </div>
-            </div>
-            <hr/>
-            <div class='row' style='background-color:#1d1d1d;color:white;text-align:center;text-decoration:underline;'><h3>Parts Requisition #<?php echo $_GET['ID'];?></h3></div>
-            <hr/>
-            <div class='row'>
-              <div class='col-xs-6'>
-                <div class='row'>
-                  <div class='col-xs-12' style='text-decoration:underline;'><h4>Location</h4></div>
-                  <div class='col-xs-6' style='text-align:right;'>Tag:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Location_Tag'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Street:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Location_Street'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>City:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Location_City'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>State:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Location_State'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Zip:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Location_Zip'];?></div>
-                </div>
-              </div>
-              <div class='col-xs-6'>
-                <div class='row'>
-                  <div class='col-xs-12' style='text-decoration:underline;'><h4>Drop Off Point</h4></div>
-                  <div class='col-xs-6' style='text-align:right;'>Tag:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['DropOff_Tag'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Street:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['DropOff_Street'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>City:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['DropOff_City'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>State:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['DropOff_State'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Zip:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['DropOff_Zip'];?></div>
-                </div>
-              </div>
-            </div>
-            <hr/>
-            <div class='row'>
-              <div class='col-xs-6'>
-                <div class='row'>
-                  <div class='col-xs-12' style='text-decoration:underline;'><h4>Job</h4></div>
-                  <div class='col-xs-6' style='text-align:right;'>ID:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Job_ID'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Description:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Job_Name'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Type:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Job_Type'];?></div>
-                </div>
-              </div>
-              <div class='col-xs-6'>
-                <div class='row'>
-                  <div class='col-xs-12' style='text-decoration:underline;'><h4>Unit</h4></div>
-                  <div class='col-xs-6' style='text-align:right;'>City ID:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Unit_State'];?></div>
-                  <div class='col-xs-6' style='text-align:right;'>Building ID:</div>
-                  <div class='col-xs-6'><?php echo $Requisition['Unit_Label'];?></div>
-                </div>
-              </div>
-            </div>
-            <hr/>
-            <div class='row'>
-              <div class='col-xs-12' style='text-decoration:underline;'><h4>Details</h4></div>
-              <div class='col-xs-3' style='text-align:right;'>Requested By:</div>
-              <div class='col-xs-3'><?php echo $Requisition['User_Name'];?></div>
-              <div class='col-xs-3' style='text-align:right;'>Date:</div>
-              <div class='col-xs-3'><?php echo date("m/d/Y",strtotime($Requisition['Date']));?></div>
-              <div class='col-xs-3' style='text-align:right;'>Required:</div>
-              <div class='col-xs-3'><?php echo date("m/d/Y",strtotime($Requisition['Required']));?></div>
-              <div class='col-xs-3' style='text-align:right;'>Shutdown:</div>
-              <div class='col-xs-3'><input type='checkbox' disabled name='Shutdown' <?php echo isset($Requisition['Shutdown']) && $Requisition['Shutdown'] == 1 ? 'checked' : '';?>  /></div>
-              <div class='col-xs-3' style='text-align:right;'>A.S.A.P.:</div>
-              <div class='col-xs-3'><input type='checkbox' disabled name='ASAP' <?php echo isset($Requisition['ASAP']) && $Requisition['ASAP'] == 1 ? 'checked' : '';?>  /></div>
-              <div class='col-xs-3' style='text-align:right;'>Rush:</div>
-              <div class='col-xs-3'><input type='checkbox' disabled name='Rush' <?php echo isset($Requisition['Rush']) && $Requisition['Rush'] == 1 ? 'checked' : '';?>  /></div>
-              <div class='col-xs-3' style='text-align:right;'>L/S/D:</div>
-              <div class='col-xs-3'><input type='checkbox' disabled name='LSD' <?php echo isset($Requisition['LSD']) && $Requisition['LSD'] == 1 ? 'checked' : '';?>  /></div>
-              <div class='col-xs-3' style='text-align:right;'>F.R.M.:</div>
-              <div class='col-xs-3'><input type='checkbox' disabled name='FRM' <?php echo isset($Requisition['FRM']) && $Requisition['FRM'] == 1 ? 'checked' : '';?>  /></div>
-            </div>
-            <hr/>
-            <div class='row'><div class='col-xs-12'><h4 style='text-decoration:underline;'>Items</h4></div></div>
-            <div class='row'>
-              <div class='col-xs-12'>&nbsp;</div>
-            </div>
-            <div class='row'>
-              <div class='col-xs-12' style='padding:0px;margin:0px;'>
-                <div class='row Item-Header'>
-                  <div class='col-xs-1'><b><i>#</i></b></div>
-                  <div class='col-xs-1'><b><i>Quantity</i></b></div>
-                  <div class='col-xs-6'><b><i>Description</i></b></div>
-                  <div class='col-xs-2'><b><i>B/O</i></b></div>
-                  <div class='col-xs-2'><b><i>Quantity Out</i></b></div>
-                </div>
-                <?php
-                if(is_array($Requisition_Items) && count($Requisition_Items) > 0){
-                  $i = 0;
-                  foreach($Requisition_Items AS $array){
-                    $i++;
-                    ?><div class='row Item'>
-                      <div class='col-xs-1'><?php echo $i;?></div>
-                      <div class='col-xs-1'><input type='text' name='Quantity' disabled value='<?php echo $array['Quantity'];?>' style='width:100%;' /></div>
-                      <div class='col-xs-6'><input type='text' name='Comments' disabled value='<?php echo $array['Item_Description'];?>' style='width:100%;' /></div>
-                      <div class='col-xs-2'><input type='text' name='B/O' disabled style='wdith:100%;' /></div>
-                      <div class='col-xs-2'><input type='text' name='Quantity_Out' disabled style='wdith:100%;' /></div>
-                    </div><?php
-                  }
-                }
-                ?>
-              </div>
-            </div>
-            </hr>
-            </br>
-            </br>
-            </br>
-            <div class='row'><div class='col-xs-12'><h4 style='text-decoration:underline;'>Approval</h4></div></div>
-            <div class='row'>
-              <div class='col-xs-3' style='text-align:right;'>Approved By:</div>
-              <div class='col-xs-3' style=''>_______________________________</div>
-              <div class='col-xs-3' style='text-align:right;'>Date Approved:</div>
-              <div class='col-xs-3' style=''>_______________________________</div>
-            </div>
-            <div style='page-break-before:always;'>
-              <?php
-              if(is_array($Requisition_Items) && count($Requisition_Items) > 0){
-                $i = 0;
-                foreach($Requisition_Items AS $array){
-                  $i++;
-                  ?><div class='row Item'>
-                    <div class='col-xs-12'><h1><?php echo $array['Item_Description'];?></h1></div>
-                    <div class='col-xs-12'><img height='500px' src="<?php
-                      print "data:" . $array['Image_Type'] . ";base64, " . $array['Image'];
-                    ?>" /></div>
-                  </div><?php
-                }
-              }
-              ?>
-            </div>
-          </div>
-    			<div class="panel panel-primary no-print">
-    				<div class="panel-heading" onClick="document.location.href='requisitions.php'"><h3 style='margin:0px;'><?php \singleton\fontawesome::getInstance( )->Requisition();?> Requisition #<?php echo $Requisition['ID'];?></h3></div>
-    				<div class="panel-body" style=''>
-    					<div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-              <div class="row">
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->User(1);?> User:</div>
-    						<div class='col-xs-8'><input disabled type='text' name='User_Name' size='15' value='<?php echo $Requisition['User_Name'];?>' /></div>
-    					</div>
-    					<div class="row">
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Calendar(1);?> Date:</div>
-    						<div class='col-xs-8'><input disabled type='text' name='Date' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Date']));?>' /></div>
-    					</div>
-    					<div class="row">
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Required</div>
-    						<div class='col-xs-8'><input disabled type='text' name='Required' size='15' value='<?php echo date("m/d/Y",strtotime($Requisition['Required']));?>' /></div>
-    					</div>
-              <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-              <div class='row'>
-      					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
-      					<div class='col-xs-8'><?php echo $Requisition['Location_Tag'];?></div>
-              </div>
-              <div class='row'>
-      					<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Drop Off:</div>
-      					<div class='col-xs-8'><?php echo $Requisition['DropOff_Tag'];?></div>
-              </div>
-              <div class='row'>
-                <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
-                <div class='col-xs-8'><?php echo $Requisition['Unit_State'];?></div>
-              </div>
-              <div class='row'>
-                <div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
-                <div class='col-xs-8'><?php echo $Requisition['Job_Name'];?></div>
-              </div>
-              <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-    					<div class='row Labels' >
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Shutdown:</div>
-    						<div class='col-xs-8'><input type='checkbox' disabled name='Shutdown' <?php echo isset($Requisition['Shutdown']) && $Requisition['Shutdown'] == 1 ? 'checked' : '';?> /></div>
-    					</div>
-    					<div class='row Labels' >
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> A.S.A.P.:</div>
-    						<div class='col-xs-8'><input type='checkbox' disabled name='ASAP' <?php echo isset($Requisition['ASAP']) && $Requisition['ASAP'] == 1 ? 'checked' : '';?>  /></div>
-    					</div>
-              <div class='row Labels' >
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Rush:</div>
-    						<div class='col-xs-8'><input type='checkbox' disabled name='Rush' <?php echo isset($Requisition['Rush']) && $Requisition['Rush'] == 1 ? 'checked' : '';?>  /></div>
-    					</div>
-              <div class='row Labels' >
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> L/S/D.:</div>
-    						<div class='col-xs-8'><input type='checkbox' disabled name='LSD' <?php echo isset($Requisition['LSD']) && $Requisition['LSD'] == 1 ? 'checked' : '';?>  /></div>
-    					</div>
-              <div class='row Labels' >
-    						<div class='col-xs-4'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> F.R.M.:</div>
-    						<div class='col-xs-8'><input type='checkbox' disabled name='FRM' <?php echo isset($Requisition['FRM']) && $Requisition['FRM'] == 1 ? 'checked' : '';?>  /></div>
-    					</div>
-              <div class='row Labels' >
-                <div class='col-xs-12'><?php \singleton\fontawesome::getInstance( )->Paragraph(1);?> Notes:</div>
-                <div class='col-xs-12'><textarea name='Notes' style='width:100%;' rows='9' disabled><?php echo isset($Requisition['Notes']) ? $Requisition['Notes'] : NULL;?></textarea></div>
-              </div>
-              <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-            </div>
-            <div class='panel-heading'><h3><?php \singleton\fontawesome::getInstance( )->Purchase();?> Items</h3></div>
-            <div class='panel-body'>
-              <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-    					<div class='row'>
-    						<div class='col-xs-12' style='padding:0px;margin:0px;'>
-    							<div class='row Item-Header'>
-    								<div class='col-xs-1'><b><i>#</i></b></div>
-    								<div class='col-xs-2'><b><i>Quantity</i></b></div>
-    								<div class='col-xs-6'><b><i>Description</i></b></div>
-                    <div class='col-xs-3'><b><i>Image</i></b></div>
-    							</div>
-    							<?php
-                  if(is_array($Requisition_Items) && count($Requisition_Items) > 0){
-                    $i = 0;
-                    foreach($Requisition_Items AS $array){
-                      $i++;
-                      ?><div class='row Item'>
-        								<div class='col-xs-1'><?php echo $i;?></div>
-        								<div class='col-xs-2'><input type='text' name='Quantity' disabled value='<?php echo $array['Quantity'];?>' style='width:100%;' /></div>
-        								<div class='col-xs-6'><input type='text' name='Comments' disabled value='<?php echo $array['Item_Description'];?>' style='width:100%;' /></div>
-                        <div class='col-xs-3'><img height='25px' src="<?php print "data:" . $array['Image_Type'] . ";base64, " . $array['Image'];?>" /></div>
-        							</div><?php
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                    if( in_array( $Requisition[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
+                      echo "onClick=\"document.location.href='locations.php';\"";
+                    } else {
+                      echo "onClick=\"document.location.href='location.php?ID=" . $Requisition[ 'Location_ID' ] . "';\"";
                     }
-                  }
-                  ?>
-    							<div class='row New-Item'>
-    								<div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-    								<div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='col-xs-12'><button onClick='saveRequisition();' style='width:100%;height:50px;'>Save</button></div>
-                    <div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='col-xs-12'><div class='col-xs-12'>&nbsp;</div></div>
-    							</div>
-    						</div>
-    					</div>
-    				</div>
+                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Dropoff:</div>
+                  <div class='col-6'>
+                    <input type='text' autocomplete='off' class='form-control edit' name='Dropoff' value='<?php echo $Requisition[ 'Dropoff_Name' ];?>' />
+                    <script>
+                      $( 'input[name="Dropoff"]' )
+                          .typeahead({
+                              minLength : 4,
+                              hint: true,
+                              highlight: true,
+                              limit : 5,
+                              display : 'FieldValue',
+                              source: function( query, result ){
+                                  $.ajax({
+                                      url : 'bin/php/get/search/Locations.php',
+                                      method : 'GET',
+                                      data    : {
+                                          search :  $('input:visible[name="Dropoff"]').val( )
+                                      },
+                                      dataType : 'json',
+                                      beforeSend : function( ){
+                                          abort( );
+                                      },
+                                      success : function( data ){
+                                          result( $.map( data, function( item ){
+                                              return item.FieldValue;
+                                          } ) );
+                                      }
+                                  });
+                              },
+                              afterSelect: function( value ){
+                                  $( 'input[name="Dropoff"]').val( value );
+                                  $( 'input[name="Dropoff"]').closest( 'form' ).submit( );
+                              }
+                          }
+                      );
+                    </script>
+                  </div>
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                    if( in_array( $Requisition[ 'Dropoff_ID' ], array( null, 0, '', ' ') ) ){
+                      echo "onClick=\"document.location.href='locations.php';\"";
+                    } else {
+                      echo "onClick=\"document.location.href='location.php?ID=" . $Requisition[ 'Dropoff_ID' ] . "';\"";
+                    }
+                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
+                  <div class='col-6'>
+                    <input type='text' autocomplete='off' class='form-control edit' name='Unit' value='<?php echo $Requisition[ 'Unit_Name' ];?>' />
+                    <script>
+                      $( 'input[name="Unit"]' )
+                          .typeahead({
+                              minLength : 4,
+                              hint: true,
+                              highlight: true,
+                              limit : 5,
+                              display : 'FieldValue',
+                              source: function( query, result ){
+                                  $.ajax({
+                                      url : 'bin/php/get/search/Units.php',
+                                      method : 'GET',
+                                      data    : {
+                                          search :  $('input:visible[name="Unit"]').val( ),
+                                          Location : $('input:visible[name="Location"]').val( )
+                                      },
+                                      dataType : 'json',
+                                      beforeSend : function( ){
+                                          abort( );
+                                      },
+                                      success : function( data ){
+                                          result( $.map( data, function( item ){
+                                              return item.FieldValue;
+                                          } ) );
+                                      }
+                                  });
+                              },
+                              afterSelect: function( value ){
+                                  $( 'input[name="Unit"]').val( value );
+                                  $( 'input[name="Unit"]').closest( 'form' ).submit( );
+                              }
+                          }
+                      );
+                    </script>
+                  </div>
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                    if( in_array( $Requisition[ 'Unit_ID' ], array( null, 0, '', ' ') ) ){
+                      echo "onClick=\"document.location.href='units.php';\"";
+                    } else {
+                      echo "onClick=\"document.location.href='unit.php?ID=" . $Requisition[ 'Unit_ID' ] . "';\"";
+                    }
+                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <label class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</label>
+                  <div class='col-6'>
+                    <input type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Requisition[ 'Job_Name' ];?>' />
+                    <script>
+                      $( 'input[name="Job"]' )
+                        .typeahead({
+                          minLength : 4,
+                          hint: true,
+                          highlight: true,
+                          limit : 5,
+                          display : 'FieldValue',
+                          source: function( query, result ){
+                            $.ajax({
+                              url : 'bin/php/get/search/Jobs.php',
+                              method : 'GET',
+                              data    : {
+                                search :  $('input:visible[name="Job"]').val( ),
+                                Location : $('input:visible[name="Location"]').val( ) 
+                              },
+                              dataType : 'json',
+                              beforeSend : function( ){
+                                  abort( );
+                              },
+                              success : function( data ){
+                                  result( $.map( data, function( item ){
+                                      return item.FieldValue;
+                                  } ) );
+                              }
+                            });
+                          },
+                          afterSelect: function( value ){
+                            $( 'input[name="Job"]').val( value );
+                            $( 'input[name="Job"]').closest( 'form' ).submit( );
+                          }
+                        }
+                      );
+                    </script>
+                  </div>
+                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                    if( in_array( $Requisition[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
+                      echo "onClick=\"document.location.href='jobs.php';\"";
+                    } else {
+                      echo "onClick=\"document.location.href='job.php?ID=" . $Requisition[ 'Job_ID' ] . "';\"";
+                    }
+                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+      					<div class='row Labels' >
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Shutdown:</div>
+      						<div class='col-8'><input type='checkbox' disabled name='Shutdown' <?php echo isset($Requisition['Shutdown']) && $Requisition['Shutdown'] == 1 ? 'checked' : '';?> /></div>
+      					</div>
+      					<div class='row Labels' >
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> A.S.A.P.:</div>
+      						<div class='col-8'><input type='checkbox' disabled name='ASAP' <?php echo isset($Requisition['ASAP']) && $Requisition['ASAP'] == 1 ? 'checked' : '';?>  /></div>
+      					</div>
+                <div class='row Labels' >
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Rush:</div>
+      						<div class='col-8'><input type='checkbox' disabled name='Rush' <?php echo isset($Requisition['Rush']) && $Requisition['Rush'] == 1 ? 'checked' : '';?>  /></div>
+      					</div>
+                <div class='row Labels' >
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> L/S/D.:</div>
+      						<div class='col-8'><input type='checkbox' disabled name='LSD' <?php echo isset($Requisition['LSD']) && $Requisition['LSD'] == 1 ? 'checked' : '';?>  /></div>
+      					</div>
+                <div class='row Labels' >
+      						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> F.R.M.:</div>
+      						<div class='col-8'><input type='checkbox' disabled name='FRM' <?php echo isset($Requisition['FRM']) && $Requisition['FRM'] == 1 ? 'checked' : '';?>  /></div>
+      					</div>
+                <div class='row Labels' >
+                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph(1);?> Notes:</div>
+                  <div class='col-12'><textarea name='Notes' style='width:100%;' rows='9' disabled><?php echo isset($Requisition['Notes']) ? $Requisition['Notes'] : NULL;?></textarea></div>
+                </div>
+                <div class='row'><div class='col-12'>&nbsp;</div></div>
+              </div>
+            </div>
+            <div class='card card-primary my-3'>
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Items</span></h5></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+              </div>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='row g-0'>
+                  <div class='col-12'>
+                    <table id='Table_Requisition_Items' class='display' cellspacing='0' width='100%'>
+                      <thead><tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Image</th>
+                      </tr><tr>
+                        <th><input type='text' class='form-control redraw' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID'] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                        <th><input type='text' class='form-control redraw' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description'] ) ? $_GET[ 'Description' ] : null;?>' /></th>
+                        <th><input type='text' class='form-control redraw' name='Image' placeholder='Image' disabled /></th>
+                      </tr></thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </form></div>
     </div>
-    <!-- Bootstrap Core JavaScript -->
-
-
-    <!-- Metis Menu Plugin JavaScript -->
-
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-    <!-- Custom Theme JavaScript -->
-
-
-    <!--Moment JS Date Formatter-->
-
-
-    <!-- JQUERY UI Javascript -->
-
-
-    <!-- Custom Date Filters-->
-
-
-	<!--  if you want iE6 not to poke select boxes thru your dropdowns, you need ... -->
+  </div>
 	<script type="text/javascript" src="js/jquery.bgiframe.min.js"></script>
-
-	<!-- Plugin source development location, distribution location: only 1 of 2 is there..	 -->
 	<script type="text/javascript" src="js/jquery.ui.ufd.js"></script>
     <script>
 	var Item_Count = 5;
 	function newItem(){
 		Item_Index = Item_Count - 1;
-		$(".New-Item").before("<div class='row Item'><div class='col-xs-1'>" + Item_Count.toString() + "</div><div class='col-xs-2'><input type='text' name='Quantity[" + Item_Index.toString() + "]' style='width:100%;' /></div><div class='col-xs-9'><input type='text' name='Description[" + Item_Index.toString() + "]' style='width:100%;' /></div>");
+		$(".New-Item").before("<div class='row Item'><div class='col-1'>" + Item_Count.toString() + "</div><div class='col-2'><input type='text' name='Quantity[" + Item_Index.toString() + "]' style='width:100%;' /></div><div class='col-9'><input type='text' name='Description[" + Item_Index.toString() + "]' style='width:100%;' /></div>");
 		Item_Count = Item_Count + 1;
 	}
 	$(document).ready(function(){

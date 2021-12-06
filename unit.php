@@ -312,17 +312,47 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		<div id="page-wrapper" class='content'>
       <div class="card card-primary"><form action='unit.php?ID=<?php echo $Unit[ 'ID' ];?>' method='POST'>
         <input type='hidden' name='ID' value='<?php echo $Unit[ 'ID' ];?>' />
-        <div class="card-heading">
-          <div class="row g-0 px-3 py-2">
-            <div class="col-6"><h5><i class="fa fa-link fa-fw fa-1x" aria-hidden="true"></i><a href="units.php?">Unit</a>: <span>New</span></h5></div>
-            <div class="col-2"></div>
-    				<div class='col-2'>
-    					<div class='row g-0'>
-    						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='unit.php?ID=<?php echo !is_null( $Unit[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Units' ], true )[ array_search( $Unit[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Units' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-    						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='units.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Units' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Units' ][ 0 ] : array( ) );?>';">Table</button></div>
-    						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='unit.php?ID=<?php echo !is_null( $Unit[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Units' ], true )[ array_search( $Unit[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Units' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-    					</div>
-    				</div>
+        <div class='card-heading'>
+          <div class='row g-0 px-3 py-2'>
+            <div class='col-2'>
+              <h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><a href='units.php?<?php
+                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Units' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Units' ][ 0 ] : array( ) );
+              ?>'>Units</a>: <span><?php
+                echo is_null( $Unit[ 'ID' ] )
+                  ? 'New'
+                  : $Unit[ 'Name' ];
+              ?></span></h5>
+            </div>
+            <div class='col-2'></div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='violation.php';"
+                  >Save</button>
+                </div>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='violation.php?ID=<?php echo $User[ 'ID' ];?>';"
+                  >Refresh</button>
+                </div>
+                <div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='violation.php';"
+                  >New</button>
+                </div>
+              </div>
+            </div>
+            <div class='col-2'>
+              <div class='row g-0'>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';">Table</button></div>
+                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="card-body bg-dark text-white">
