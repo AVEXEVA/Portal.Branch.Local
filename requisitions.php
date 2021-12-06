@@ -99,37 +99,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
        <?php  require( bin_js   . 'index.php');?>
 </head>
 <body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require(bin_php  . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Requisitions</span></h5></div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
-          <div style='float:right;' onClick="document.location.href='purchase-requisition.php';"><?php \singleton\fontawesome::getInstance( )->Add(1);?></div>
-          <div style='clear:both;'></div>
-        </div>
-				<div class="panel-body">
-					<table id='Table_Requisitions' class='display' cellspacing='0' width='100%'>
-						<thead>
-							<th>ID</th>
-							<th>User</th>
-							<th>Date</th>
-							<th>Required</th>
-							<th>Location</th>
-							<th>Drop Off</th>
-							<th>Unit</th>
-							<th>Job</th>
+  <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
+    <?php require(bin_php . 'element/navigation.php');?>
+    <div id='page-wrapper' class='content'>
+      <div class='card card-full card-primary border-0'>
+        <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?> Requisitions</h4></div>
+        <div class='card-body bg-dark'>
+          <table id='Table_Requisitions' class='display' cellspacing='0' width='100%'>
+              <thead><tr>
+  							<th>ID</th>
+  							<th>User</th>
+  							<th>Date</th>
+  							<th>Required</th>
+  							<th>Location</th>
+  							<th>Drop Off</th>
+  							<th>Unit</th>
+  							<th>Job</th>
+              </tr><tr>
+                <th><input type='text' class='form-control edit' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID'] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='User' placeholder='User' value='<?php echo isset( $_GET[ 'User'] ) ? $_GET[ 'User' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date'] ) ? $_GET[ 'Date' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Required' placeholder='Required' value='<?php echo isset( $_GET[ 'Required'] ) ? $_GET[ 'Required' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location'] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Drop Off' placeholder='Drop Off' value='<?php echo isset( $_GET[ 'Drop Off'] ) ? $_GET[ 'Drop Off' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Unit' placeholder='Unit' value='<?php echo isset( $_GET[ 'Unit'] ) ? $_GET[ 'Unit' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job'] ) ? $_GET[ 'Job' ] : null;?>' /></th>
+              </tr>
 						</thead>
-					</table>
-				</div>
+          </table>
+        </div>
       </div>
+    </div>
   </div>
-</div>
 </body>
 </html>
 <?php
