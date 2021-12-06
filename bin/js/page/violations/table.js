@@ -98,7 +98,7 @@ $( document ).ready( function( ){
               case 'display' :
                 return  row.ID !== null
                   ?   "<div class='row'>" +
-                          "<div class='col-12'><a href='violations.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Route #" + row.ID + "</a></div>" +
+                          "<div class='col-12'><a href='violation.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Violation #" + row.ID + "</a></div>" +
                       "</div>"
                   :   null;
               default :

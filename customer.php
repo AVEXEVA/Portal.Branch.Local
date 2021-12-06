@@ -343,75 +343,94 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id="wrapper">
         <?php require( bin_php . 'element/navigation.php'); ?>
         <div id="page-wrapper" class='content'>
-        	<div class='card card-primary'>
+        	<div class='card card-primary'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
         		<div class='card-heading'>
-        			<div class='row g-0 px-3 py-2'>
-        				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='customers.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Customer' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) ) : null;?>'>Customer</a>: <span><?php echo is_null( $Customer[ 'ID' ] ) ? 'New' : $Customer[ 'Name' ];?></span></h5></div>
-        				<div class='col-2'></div>
-        				<div class='col-2'>
-        					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php';">Create</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo $Customer[ 'ID' ];?>';">Refresh</button></div>
-        					</div>
-        				</div>
-        				<div class='col-2'>
-        					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true )[ array_search( $Customer[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) );?>';">Table</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true )[ array_search( $Customer[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-        					</div>
-        				</div>
-        			</div>
-        		</div>
-            <!-- Card hedding, that holds Create refresh and headder links back to customers.php  -->
+                    <div class='row g-0 px-3 py-2'>
+                        <div class='col-4'>
+                            <h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='customers.php?<?php
+                                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) );
+                            ?>'>Customers</a>: <span><?php
+                                echo is_null( $Customer[ 'ID' ] )
+                                    ? 'New'
+                                    : $Customer[ 'Name' ];
+                            ?></span></h5>
+                        </div>
+                        <div class='col-4'></div>
+                        <div class='col-2'>
+                            <div class='row g-0'>
+                                <div class='col-4'>
+                                    <button
+                                        class='form-control rounded'
+                                        type='submit'
+                                    >Save</button>
+                                </div>
+                                <div class='col-4'>
+                                    <button
+                                        class='form-control rounded'
+                                        onClick="document.location.href='customer.php?ID=<?php echo $User[ 'ID' ];?>';"
+                                    >Refresh</button>
+                                </div>
+                                <div class='col-4'>
+                                    <button
+                                        class='form-control rounded'
+                                        onClick="document.location.href='customer.php?';"
+                                    >New</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col-2'>
+                            <div class='row g-0'>
+                                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
+                                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) );?>';">Table</button></div>
+                                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         		<div class='card-body bg-dark text-white'>
 					<div class='card-columns'>
-						<?php if( !in_array( $Customer[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Customer['Longitude' ], array( null, 0 ) ) ){
-							?><div class='card card-primary my-3'>
-								<div class='card-heading position-relative' style='z-index:1;'>
-									<div class='row g-0 px-3 py-2'>
-										<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Map</span></h5></div>
-										<div class='col-2'>&nbsp;</div>
-									</div>
+						<?php if( !in_array( $Customer[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Customer['Longitude' ], array( null, 0 ) ) ){ ?><div class='card card-primary my-3'>
+							<div class='card-heading position-relative' style='z-index:1;'>
+								<div class='row g-0 px-3 py-2'>
+									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Map</span></h5></div>
+									<div class='col-2'>&nbsp;</div>
 								</div>
-								<div id='customer_map' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
-								<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-									<script type="text/javascript">
-						                var map;
-						                function initialize() {
-						                     map = new google.maps.Map(
-						                        document.getElementById( 'customer_map' ),
-						                        {
-						                          zoom: 10,
-						                          center: new google.maps.LatLng( <?php echo $Customer[ 'Latitude' ];?>, <?php echo $Customer[ 'Longitude' ];?> ),
-						                          mapTypeId: google.maps.MapTypeId.ROADMAP
-						                        }
-						                    );
-						                    var markers = [];
-						                    markers[0] = new google.maps.Marker({
-						                        position: {
-						                            lat:<?php echo $Customer['Latitude'];?>,
-						                            lng:<?php echo $Customer['Longitude'];?>
-						                        },
-						                        map: map,
-						                        title: '<?php echo $Customer[ 'Name' ];?>'
-						                    });
-						                }
-						                $(document).ready(function(){ initialize(); });
-						            </script>
-							</div><?php
-						}?>
-            <!-- Card that holds the google maps api with scripts that hold vanilla JS  -->
-						<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+							</div>
+							<div id='customer_map' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
+							<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+								<script type="text/javascript">
+					                var map;
+					                function initialize() {
+					                     map = new google.maps.Map(
+					                        document.getElementById( 'customer_map' ),
+					                        {
+					                          zoom: 10,
+					                          center: new google.maps.LatLng( <?php echo $Customer[ 'Latitude' ];?>, <?php echo $Customer[ 'Longitude' ];?> ),
+					                          mapTypeId: google.maps.MapTypeId.ROADMAP
+					                        }
+					                    );
+					                    var markers = [];
+					                    markers[0] = new google.maps.Marker({
+					                        position: {
+					                            lat:<?php echo $Customer['Latitude'];?>,
+					                            lng:<?php echo $Customer['Longitude'];?>
+					                        },
+					                        map: map,
+					                        title: '<?php echo $Customer[ 'Name' ];?>'
+					                    });
+					                }
+					                $(document).ready(function(){ initialize(); });
+					            </script>
+						</div><?php }?>
+						<div class='card card-primary my-3'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
 									<div class='col-2'>&nbsp;</div>
 								</div>
 							</div>
-              <!-- Second card headding that holds Customer.php information and fontawesome icon, the POST call retrieves information from $Customer ID    -->
 						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-						 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
 									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Customer['Name'];?>' /></div>
@@ -438,7 +457,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										<option value='1' <?php echo $Customer[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
 									</select></div>
 								</div>
-                <!-- Selector for status that has echos the Customer Status and checks the value 0/1 and assignes a color -Warning or -Success  -->
 								<div class='row g-0'>
 									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Web(1);?> Website:</div>
 									<div class='col-8'><input type='text' class='form-control edit' name='Website' value='<?php echo strlen($Customer['Website']) > 0 ?  $Customer['Website'] : "&nbsp;";?>' /></div>

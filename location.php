@@ -587,8 +587,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
-                <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='ticket.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='tickets.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
@@ -746,7 +747,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='unit.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                 <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
@@ -820,7 +822,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Job( 1 );?><span>Jobs</span></h5></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Job( 1 );?><span>Jobs</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='job.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                 <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='jobs.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
@@ -881,7 +884,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='violation.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                 <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
@@ -926,7 +930,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Proposal( 1 );?><span>Proposals</span></h5></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Proposal( 1 );?><span>Proposals</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='proposal.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                 <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='proposals.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
@@ -971,8 +976,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='violation.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='violations.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
@@ -1016,7 +1022,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3'>
             <div class='card-heading'>
               <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
+                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='invoice.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
                 <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
               </div>
             </div>
