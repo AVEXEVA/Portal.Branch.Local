@@ -112,15 +112,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.Geolock AS Geofence,
         				Rolodex.ID 		AS Rolodex,
         				Rolodex.Name    AS Name,
-                Rolodex.Phone   AS Phone,
-                Rolodex.Email   AS Email,
-                Rolodex.Contact AS Contact,
+                        Rolodex.Phone   AS Phone,
+                        Rolodex.Email   AS Email,
+                        Rolodex.Contact AS Contact,
         				tblWork.Super   AS Supervisor,
-        				Users.Email 			AS UserEmail
+        				[User].ID       AS User_ID,
+        				[User].Email 	AS User_Email
         		FROM 	dbo.Emp AS Employee
-        				LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
-        				LEFT JOIN dbo.Rol AS Rolodex ON Employee.Rol = Rolodex.ID
-                LEFT JOIN Portal.dbo.[User] AS Users ON Users.Branch_Type = 'Employee' AND Users.Branch_ID = Employee.ID 
+        				LEFT JOIN dbo.tblWork       AS tblWork  ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
+        				LEFT JOIN dbo.Rol           AS Rolodex  ON Employee.Rol = Rolodex.ID
+                        LEFT JOIN Portal.dbo.[User]             ON [User].Branch_Type = 'Employee' AND [User].Branch_ID = Employee.ID
         		WHERE 	Employee.ID = ?
         				OR Employee.fFirst + ' ' + Employee.Last = ?;",
         	array(
@@ -128,6 +129,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		$Name
         	)
         );
+        //var_dump( sqlsrv_errors( ) );
         $Employee =   (       empty( $ID )
                         &&    !empty( $Name )
                         &&    !$result
@@ -325,6 +327,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='col-4'><button class='form-control rounded' onClick="document.location.href='employee.php?ID=<?php echo !is_null( $Employee[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true )[ array_search( $Employee[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
                 <div class='col-4'><button class='form-control rounded' onClick="document.location.href='employees.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Employees' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Employees' ][ 0 ] : array( ) );?>';">Table</button></div>
                 <div class='col-4'><button class='form-control rounded' onClick="document.location.href='employee.php?ID=<?php echo !is_null( $Employee[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true )[ array_search( $Employee[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Employees' ], true ) ) + 1 ] : null;?>';">Next</button></div>
+
               </div>
             </div>
           </div>
@@ -366,7 +369,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			            </script>
 				</div><?php
 			}?>
-            <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+            <div class='card card-primary my-3'>
+            	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
                   <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
@@ -377,11 +381,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>First Name:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['First_Name'];?>' /></div>
+                  <div class='col-8'><input placeholder='First Name' type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['First_Name'];?>' /></div>
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Last Name:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Last_Name' value='<?php echo $Employee['Last_Name'];?>' /></div>
+                  <div class='col-8'><input placeholder='Last Name' type='text' class='form-control edit animation-focus' name='Last_Name' value='<?php echo $Employee['Last_Name'];?>' /></div>
                 </div>
                 <div class='row g-0'>
 					<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
@@ -391,12 +395,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				<div class='row g-0'>
 					<div class='col-1'>&nbsp;</div>
 					<div class='col-3 border-bottom border-white my-auto'>Street:</div>
-					<div class='col-8'><input type='text' class='form-control edit' name='Street' value='<?php echo $Employee['Street'];?>' /></div>
+					<div class='col-8'><input placeholder='Street' type='text' class='form-control edit' name='Street' value='<?php echo $Employee['Street'];?>' /></div>
 				</div>
 				<div class='row g-0'>
 					<div class='col-1'>&nbsp;</div>
 					<div class='col-3 border-bottom border-white my-auto'>City:</div>
-					<div class='col-8'><input type='text' class='form-control edit' name='City' value='<?php echo $Employee['City'];?>' /></div>
+					<div class='col-8'><input placeholder='City' type='text' class='form-control edit' name='City' value='<?php echo $Employee['City'];?>' /></div>
 				</div>
 				<div class='row g-0'>
 					<div class='col-1'>&nbsp;</div>
@@ -459,17 +463,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				<div class='row g-0'>
 					<div class='col-1'>&nbsp;</div>
 					<div class='col-3 border-bottom border-white my-auto'>Zip:</div>
-					<div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Employee['Zip'];?>' /></div>
+					<div class='col-8'><input placeholder='Zip' type='text' class='form-control edit' name='Zip' value='<?php echo $Employee['Zip'];?>' /></div>
 				</div>
 				<div class='row g-0'>
 					<div class='col-1'>&nbsp;</div>
 					<div class='col-3 border-bottom border-white my-auto'>Latitude:</div>
-					<div class='col-8'><input type='text' class='form-control edit <?php echo $Employee[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Employee['Latitude'];?>' /></div>
+					<div class='col-8'><input placeholder='Latitude' type='text' class='form-control edit <?php echo $Employee[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Employee['Latitude'];?>' /></div>
 				</div>
 				<div class='row g-0'>
 					<div class='col-1'>&nbsp;</div>
 					<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
-					<div class='col-8'><input type='text' class='form-control edit <?php echo $Employee[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Employee['Longitude'];?>' /></div>
+					<div class='col-8'><input placeholder='Longitude' type='text' class='form-control edit <?php echo $Employee[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Employee['Longitude'];?>' /></div>
+				</div>
 				</div>
               <div class='card-footer'>
                   <div class='row'>
@@ -477,46 +482,55 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   </div>
               </div>
         </form></div>
+
         <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
-          <div class='card-heading'>
-            <div class='row g-0 px-3 py-2'>
-              <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>User</span></h5></div>
-            </div>
-          </div>
+
+           <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>User</span></h5></div>
+                   <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='user.php?ID=<?php echo $Employee[ 'User_ID' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
+                </div>
+              </div>
           <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'User' ] ) && $_SESSION[ 'Cards' ][ 'User' ] == 0 ? "style='display:none;'" : null;?>>
             <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
             <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>UserEmail:</div>
-              <div class='col-8'><input type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['UserEmail'];?>' /></div>
+              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Email:</div>
+              <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['UserEmail'];?>' /></div>
             </div>
             <div class='row g-0'>
               <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Employee ID:</div>
-              <div class='col-8'><input type='text' class='form-control edit animation-focus' name='ID' value='<?php echo $Employee['ID'];?>' /></div>
+              <div class='col-8'><input placeholder='000000' type='text' class='form-control edit animation-focus' name='ID' value='<?php echo $Employee['ID'];?>' /></div>
             </div>
           </div>
-        </div></form>
+           <div class='card-footer'>
+                  <div class='row'>
+                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                  </div>
+              </div>
+        </form>
       </div>
 
-       <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+       <div class='card card-primary my-3'>
+       	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
                 <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contacts</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contact</span></h5></div>
+                   <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='contact.php?ID=<?php echo $Employee[ 'Rolodex' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
                 </div>
               </div>
               <div class='card-body bg-dark'>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Name:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Name' value='<?php echo $Employee[ 'Name' ];?>' /></div>
+                  <div class='col-8'><input placeholder='Name' type='text' class='form-control edit' name='Name' value='<?php echo $Employee[ 'Name' ];?>' /></div>
                 </div>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Phone' value='<?php echo $Employee[ 'Phone' ];?>' /></div>
+                  <div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='Phone' value='<?php echo $Employee[ 'Phone' ];?>' /></div>
                 </div>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Email' value='<?php echo $Employee[ 'Email' ];?>' /></div>
+                  <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='Email' value='<?php echo $Employee[ 'Email' ];?>' /></div>
                 </div>
               </div>
               <div class='card-footer'>
@@ -526,6 +540,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </form>
             </div>
+
+            <div class='card card-primary my-3'>
+       	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+                <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
+              <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Paid Time Off</span></h5></div>
+                   <div class="col-2"></div>
+                </div>
+              </div>
+            </form>
+          </div>
     </div>
   </div>
 </body>

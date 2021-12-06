@@ -83,10 +83,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			$parameters[] = $_GET['Customer'];
 			$conditions[] = "Customer.Name LIKE '%' + ? + '%'";
 		}
-    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Status'];
-      $conditions[] = "Lead.Status LIKE '%' + ? + '%'";
-    }
+	    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Status'];
+	      $conditions[] = "Lead.Status LIKE '%' + ? + '%'";
+	    }
 		if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
 			$parameters[] = $_GET['Type'];
 			$conditions[] = "Lead.Type LIKE '%' + ? + '%'";
@@ -118,15 +118,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
 
 	    $Columns = array(
-	      0 =>  'Lead.ID',
-	      1 =>  'Lead.fDesc',
-	      2 =>  'Customer_Name',
-        3 =>  'Lead.Status',
-	      4 =>  'Lead.Type',
-	      5 =>  'Lead.Address',
-	      6 =>  'Lead.City',
-	      7 =>  'Lead.State',
-	      8 =>  'Lead.Zip',
+	      	0 =>  'Lead.ID',
+	      	1 =>  'Lead.fDesc',
+	      	2 =>  'Customer_Name',
+        	3 =>  'Lead.Status',
+	      	4 =>  'Lead.Type',
+	      	5 =>  'Lead.Address',
+	      	6 =>  'Lead.City',
+	      	7 =>  'Lead.State',
+	      	8 =>  'Lead.Zip',
+        	9 =>  'Rolodex.Contact',
+        	10 =>  'Lead.Probability',
+        	11 =>  'Lead.Level',
 	    );
 	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
 	        ? $Columns[ $_GET['order']['column'] ]
@@ -139,6 +142,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		            FROM 	(
 			                 	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 			            	            Lead.ID           AS ID,
+<<<<<<< HEAD
         								        Lead.fDesc        AS Name,
                                 Rolodex.ID        AS Contact_ID,
                                 Rolodex.Contact   AS Contact_Name,
@@ -159,6 +163,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         								        Lead.City         AS City,
         								        Lead.State        AS State,
         								        Lead.Zip          AS Zip
+=======
+        								Lead.fDesc        AS Name,
+                                		Rolodex.ID        AS Contact_ID,
+                                		Rolodex.Contact   AS Contact_Name,
+        								Customer.ID       AS Customer_ID,
+        								Customer.Name 	  AS Customer_Name,
+                                		Lead.Probability  AS Probability,
+                                		Lead.Level        AS Level,
+                                		Lead.Status 	  AS Status,
+        								Lead.Type 		  AS Type,
+        								Lead.Address      AS Street,
+        								Lead.City         AS City,
+        								Lead.State        AS State,
+        								Lead.Zip          AS Zip
+>>>>>>> 3bab2ac4c46e60480981d8978a7890adab4dacdd
 			                  	FROM    Lead
 			                  			LEFT JOIN (
 					                        SELECT  Owner.ID,
@@ -178,16 +197,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    ) or die(print_r(sqlsrv_errors()));
 
 	    $sQueryRow = "	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-	                            Lead.ID           AS ID,
-						        Lead.fDesc        AS Name,
-						        Customer.ID       AS Customer_ID,
-						        Customer.Name 	  AS Customer_Name,
-                    Lead.Status 		  AS Status,
-						        Lead.Type 		    AS Type,
-						        Lead.Address      AS Street,
-						        Lead.City         AS City,
-						        Lead.State        AS State,
-						        Lead.Zip          AS Zip
+	            	            Lead.ID           AS ID,
+								Lead.fDesc        AS Name,
+                        		Rolodex.ID        AS Contact_ID,
+                        		Rolodex.Contact   AS Contact_Name,
+								Customer.ID       AS Customer_ID,
+								Customer.Name 	  AS Customer_Name,
+                        		Lead.Probability  AS Probability,
+                        		Lead.Level        AS Level,
+                        		Lead.Status 	  AS Status,
+								Lead.Type 		  AS Type,
+								Lead.Address      AS Street,
+								Lead.City         AS City,
+								Lead.State        AS State,
+								Lead.Zip          AS Zip
 	                  	FROM    Lead
 	                  			LEFT JOIN (
 			                        SELECT  Owner.ID,
@@ -196,7 +219,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			                        FROM    Owner
 			                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
 			                    ) AS Customer ON Lead.Owner = Customer.ID
-	                  WHERE   ({$conditions}) AND ({$search});";
+                      			LEFT JOIN Rol AS Rolodex ON Lead.Rol = Rolodex.ID
+	                  	WHERE   ({$conditions}) AND ({$search});";
 	    $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
 	    $iFilteredTotal = 0;

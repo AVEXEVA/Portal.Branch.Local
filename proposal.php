@@ -600,7 +600,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         <input type='hidden' name='ID' value='<?php echo $Proposal[ 'ID' ];?>' />
                         <div class='card-heading'>
                           <div class='row g-0 px-3 py-2'>
+<<<<<<< HEAD
                             <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Billing</span></h5></div>
+=======
+                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?><span>Billing</span></h5></div>
+>>>>>>> 3bab2ac4c46e60480981d8978a7890adab4dacdd
                             <div class='col-2'>&nbsp;</div>
                           </div>
                         </div>

@@ -4,9 +4,9 @@
       changePanelBody( $( link ).attr( 'card' ) );
   }
   function changePanelHeading( card ){
-      $(".dashboard .card-heading ul li ").each(function(){ 
+      $(".dashboard .card-heading ul li ").each(function(){
         if( card === null ){
-          $( this ).addClass( 'show' ); 
+          $( this ).addClass( 'show' );
           $( this ).removeClass( 'active' );
       } else if ( card != $( this ).attr( 'card ') ) {
         $( this ).removeClass( 'show' );
@@ -17,7 +17,7 @@
     if( card != null ){
       $( ".dashboard .card-heading ul li[card='" + card + "']").addClass( 'active' );
     }
-  } 
+  }
   function changePanelBody( card ){
     $(".dashboard .card-body").each(function(){ $( this ).removeClass( 'active' ); });
     $(".dashboard .card-body[card='" + card + "']").addClass( 'active' );
@@ -104,7 +104,7 @@ function submit_Acknowledgement_of_Safety(link){
       ||  !$("input[name='Lock_Out_Kit']").is(':checked')
       ||  !$("input[name='Safety_Glasses']").is(':checked')
       ||  !$("input[name='GFCI']").is(':checked')
-  ){  
+  ){
       alert('You must have all of your safety equipment in order to clock in');
       return;
   }
@@ -115,8 +115,8 @@ function submit_COVID_19_Questionaire(link){
       ||  $("input[name='COVID_19_Questionaire_2']:checked").length == 0
       ||  $("input[name='COVID_19_Questionaire_3']:checked").length == 0
       ||  $("input[name='COVID_19_Questionaire_4']:checked").length == 0
-  ){ 
-    alert('Please answer all questions'); return; 
+  ){
+    alert('Please answer all questions'); return;
   }
   $(link).html("Saving <img src='media/images/spinner.gif' height='25px' width='auto' />");
   $(link).attr('disabled','disabled')
@@ -136,7 +136,7 @@ function submit_COVID_19_Questionaire(link){
       } else {
         $.ajax( {
           method:"POST",
-          data:{Notes : dt_notes}, 
+          data:{Notes : dt_notes},
           url:"bin/php/post/clock_in.php",
           success:function(code){ document.location.href='home.php'; }
         } );
@@ -208,13 +208,13 @@ $( document ).ready( function(){
     initComplete : function(){ },
     paging : false,
     createdRow : function( row, data, dataIndex ) {
-      if ( data['Status'] == 'On Site' || data['Status'] == 'En Route') { $(row).addClass('gold'); } 
-      else if( data['Priority'] == 1 && data['Status'] != 'Reviewing' && data['Status'] != 'Completed'){ $(row).addClass('red'); } 
-      else if ( data['Level'] == 'Service Call' && data['Status'] != 'Reviewing' && data['Status'] != 'Completed' && data['Status'] != 'Signed' ){ $(row).addClass('blue'); } 
-      else if( data['Status'] == 'Signed' ){ $(row).addClass('green'); } 
+      if ( data['Status'] == 'On Site' || data['Status'] == 'En Route') { $(row).addClass('gold'); }
+      else if( data['Priority'] == 1 && data['Status'] != 'Reviewing' && data['Status'] != 'Completed'){ $(row).addClass('red'); }
+      else if ( data['Level'] == 'Service Call' && data['Status'] != 'Reviewing' && data['Status'] != 'Completed' && data['Status'] != 'Signed' ){ $(row).addClass('blue'); }
+      else if( data['Status'] == 'Signed' ){ $(row).addClass('green'); }
       else if (data['Status'] != 'Reviewing' && data['Status'] != 'Completed' ){ $(row).addClass('light'); }
     },
-    rowGroup: { 
+    rowGroup: {
       // Uses the 'row group' plugin
       dataSrc: [
         'Level',
@@ -245,8 +245,8 @@ $( document ).ready( function(){
         return $('<tr/>').append('<td colspan="5">' + group  + ' ( ' + rows.count() + ' total' + newString + ' ) </td>').attr('data-name', groupAll).toggleClass('collapsed', collapsed);
       }
     },
-    drawCallback : function ( settings ) { 
-      hrefTickets( ); 
+    drawCallback : function ( settings ) {
+      hrefTickets( );
     }
   } );
 });
@@ -288,14 +288,14 @@ $(document).ready(function(){
                 d.Street = $('input[name="Street"]').val( );
                 d.Maintained = $('select[name="Maintained"]').val( );
                 d.Status = $('select[name="Status"]').val( );
-                return d; 
+                return d;
             }
         },
     columns   : [
       {
         data    : 'ID',
         className : 'hidden'
-      },{ 
+      },{
         data : 'Name'
       },{
         data : 'Customer'
@@ -311,12 +311,12 @@ $(document).ready(function(){
             ? 'Yes'
             : 'No';
         }
-        
+
       },{
         className : 'hidden',
-        data   : 'Status', 
+        data   : 'Status',
         render : function ( data ){
-          return data == 0 
+          return data == 0
             ? 'Yes'
             : 'No';
         }
@@ -335,21 +335,17 @@ function browseProfilePicture( ){
   $("#UploadProfilePicture input").click( );
 }
 function uploadProfilePicture( ){
-	 var myform = document.getElementById("UploadProfilePicture");
-  //  var formData = new FormData(myform);
-  var formData = new FormData( $( '#upload' ) [ 0 ] );
- 
+   var formData = new FormData( $( '#upload' ) [ 0 ] );
   $.ajax({
     url : 'bin/php/post/uploadProfilePicture.php',
-	enctype: 'multipart/form-data',
+    enctype: 'multipart/form-data',
     method : 'POST',
     cache: false,
     processData: false,
     contentType: false,
     data: formData,
     timeout:10000,
-    success: function( ){ document.location.href = 'index.php';
-	}
+    success: function( ){ document.location.href = 'index.php'; }
   });
   $("#UploadProfilePiocture").remove( );
 }

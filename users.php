@@ -114,7 +114,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th class='text-white border border-white'  title='Branch'>Branch</th>
                             <th class='text-white border border-white'  title='Branch_Type'>Type</th>
                             <th class='text-white border border-white'  title='Branch_ID'>Reference</th>
-                             <th class='text-white border border-white'  title='Picture'>Picture</th>
+                            <th class='text-white border border-white'  title='Picture'>Picture</th>
                         </tr><tr>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
                             <th class='text-white border border-white' title='Email'><input class='redraw form-control' type='text' name='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null; ?>' /></th>

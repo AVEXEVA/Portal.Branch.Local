@@ -72,7 +72,7 @@ var Table_Leads = $('#Table_Leads').DataTable( {
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.ID !== null
+                      return  row.Name !== null && row.Name != ''
                           ?   "<div class='row'>" +
                                   "<div class='col-12'><a href='lead.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
                               "</div>"
@@ -88,7 +88,7 @@ var Table_Leads = $('#Table_Leads').DataTable( {
       render : function( data, type, row, meta ){
           switch( type ){
               case 'display' :
-                  return  row.Customer_ID !== null
+                  return  row.Customer_ID !== null && row.Customer_ID != ''
                       ?   "<div class='row'>" +
                               "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                           "</div>"
@@ -102,14 +102,16 @@ var Table_Leads = $('#Table_Leads').DataTable( {
       render : function( data, type, row, meta ){
           switch( type ){
               case 'display' :
-                  return  "<div class='row'>" +
-                              "<div class='col-12'>" +
+                  return  row.Street !== null && row.Street != ''
+                            ? "<div class='row'>" +
+                                "<div class='col-12'>" +
                                   "<div class='row'>" +
                                       "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
                                       "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
                                   "</div>" +
-                              "</div>" +
-                          "</div>"
+                                "</div>" +
+                              "</div>"
+                            : null;
               default :
                   return data;
           }

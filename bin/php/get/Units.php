@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
         'Portal',
         "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             dechex( $Privilege[ 'Department' ] ),
             dechex( $Privilege[ 'Database' ] ),
             dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Other' ] ),
             dechex( $Privilege[ 'Token' ] ),
             dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     else {
       \singleton\database::getInstance( )->query(
         null,
-        " INSERT INTO Activity([User], [Date], [Page] ) 
+        " INSERT INTO Activity([User], [Date], [Page] )
           VALUES( ?, ?, ? );",
         array(
           $_SESSION[ 'Connection' ][ 'User' ],
@@ -95,7 +95,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Name'];
       $parameters[] = $_GET['Name'];
-      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.Unit LIKE '%' + ? + '%' )";
+      $conditions[] = "Unit.City_ID LIKE '%' + ? + '%' ";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -158,9 +158,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Unit.Building_ID AS Building_ID,
                           Unit.Type AS Type,
                           Unit.fDesc AS Name,
-                         Ticket.ID AS Ticket_ID,  
+                         Ticket.ID AS Ticket_ID,
                           Unit.Status AS Status
-                         
+
                   FROM    Unit
                           LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                           LEFT JOIN (
@@ -195,8 +195,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Location.Tag AS Location_Name,
                             Unit.Building_ID AS Building_ID,
                             Unit.Type AS Type,
+                            Ticket.ID AS Ticket_ID,
                             Unit.Status AS Status
-                            
+
                     FROM    Unit
                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                             LEFT JOIN (

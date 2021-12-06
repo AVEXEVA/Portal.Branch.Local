@@ -153,7 +153,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <th class='text-white border border-white' title='Contact'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Probability'><input class='redraw form-control' type='text' name='Probability' placeholder='Probability' value='<?php echo isset( $_GET[ 'Probability' ] ) ? $_GET[ 'Probability' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Level'><input class='redraw form-control' type='text' name='Level' placeholder='Level' value='<?php echo isset( $_GET[ 'Level' ] ) ? $_GET[ 'Level' ] : null;?>' /></th>
-              <th class='text-white border border-white' title='Status'><input class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Status'><select class='redraw form-control' type='text' name='Status' placeholder='Status' value='<?php echo isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null;?>' /></th>
             </tr></thead>
 					</table>
 				</div>

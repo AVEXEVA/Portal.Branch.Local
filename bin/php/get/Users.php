@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
         'Portal',
         "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             dechex( $Privilege[ 'Department' ] ),
             dechex( $Privilege[ 'Database' ] ),
             dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Other' ] ),
             dechex( $Privilege[ 'Token' ] ),
             dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     else {
       \singleton\database::getInstance( )->query(
         null,
-        " INSERT INTO Activity([User], [Date], [Page] ) 
+        " INSERT INTO Activity([User], [Date], [Page] )
           VALUES( ?, ?, ? );",
         array(
           $_SESSION[ 'Connection' ][ 'User' ],
@@ -88,19 +88,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters = array( );
 
     /*Filter $_GET Columns to SQL*/
-      if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['ID'];
-        $conditions[] = "[User].[ID] LIKE '%' + ? + '%'";
-      }
-      if( isset( $_GET[ 'Email' ] ) && !in_array( $_GET[ 'Email' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Email'];
-        $conditions[] = "[User].[Email] LIKE '%' + ? + '%'";
-      }
-      if( isset( $_GET[ 'Branch_Type' ] ) && !in_array( $_GET[ 'Branch_Type' ], array( '', ' ', null ) ) ){
+    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['ID'];
+      $conditions[] = "[User].[ID] LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Email' ] ) && !in_array( $_GET[ 'Email' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Email'];
+      $conditions[] = "[User].[Email] LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Branch_Type' ] ) && !in_array( $_GET[ 'Branch_Type' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Branch_Type'];
         $conditions[] = "[User].[Branch_Type] LIKE '%' + ? + '%'";
-      }
-      
+    }
 
     /*Search Filters*/
     /*NONE*/
@@ -124,69 +123,68 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       ? $_GET['order']['dir']
       : 'ASC';
 
-    /*Perform Query*/
+        /*Perform Query*/
     $sQuery =
-    " SELECT  *
-      FROM  (
-              SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                      [User].[ID],
-                      [User].[Email],
-                      [User].[Verified],
-                      [User].[Branch],
-                      [User].[Branch_Type],
-                      [User].[Branch_ID],
-                      [User].[Picture],
-                      [User].[Picture_Type]
-              FROM    [User]
-              WHERE   ({$conditions}) AND ({$search})
-            ) AS Tbl
-      WHERE     Tbl.ROW_COUNT >= ?
-            AND Tbl.ROW_COUNT <= ?;";
-    //echo $sQuery;
-    $rResult = $database->query(
-      'Portal',
-      $sQuery,
-      $parameters
-    ) or die(print_r(sqlsrv_errors()));
+            " SELECT  *
+              FROM  (
+                      SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                              [User].[ID],
+                              [User].[Email],
+                              [User].[Verified],
+                              [User].[Branch],
+                              [User].[Branch_Type],
+                              [User].[Branch_ID],
+                              [User].[Picture],
+                              [User].[Picture_Type]
+                      FROM    [User]
+                      WHERE   ({$conditions}) AND ({$search})
+                    ) AS Tbl
+              WHERE     Tbl.ROW_COUNT >= ?
+                    AND Tbl.ROW_COUNT <= ?;";
+        //echo $sQuery;
+      $rResult = $database->query(
+        'Portal',
+        $sQuery,
+        $parameters
+      ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "SELECT  [User].[ID]
+        $sQueryRow = "SELECT  [User].[ID]
                   FROM    [User]
                   WHERE   ({$conditions}) AND ({$search});";
 
-    $fResult = \singleton\database::getInstance( )->query( 
-      'Portal', 
-      $sQueryRow , 
-      $parameters 
-    ) or die(print_r(sqlsrv_errors()));
+        $fResult = \singleton\database::getInstance( )->query(
+            'Portal',
+            $sQueryRow ,
+            $parameters
+        ) or die(print_r(sqlsrv_errors()));
 
-    $iFilteredTotal = 0;
-    $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
-    $_SESSION[ 'Tables' ][ 'Users' ] = isset( $_SESSION[ 'Tables' ][ 'Users' ]  ) ? $_SESSION[ 'Tables' ][ 'Users' ] : array( );
-    if( count( $_SESSION[ 'Tables' ][ 'Users' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Users' ] as &$Value ){ $Value = false; } }
-    $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] = $_GET;
-    while( $Row = sqlsrv_fetch_array( $fResult ) ){
-        $_SESSION[ 'Tables' ][ 'Users' ][ $Row[ 'ID' ] ] = true;
-        $iFilteredTotal++;
-    }
+        $iFilteredTotal = 0;
+        $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+        $_SESSION[ 'Tables' ][ 'Users' ] = isset( $_SESSION[ 'Tables' ][ 'Users' ]  ) ? $_SESSION[ 'Tables' ][ 'Users' ] : array( );
+        if( count( $_SESSION[ 'Tables' ][ 'Users' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Users' ] as &$Value ){ $Value = false; } }
+        $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] = $_GET;
+        while( $Row = sqlsrv_fetch_array( $fResult ) ){
+            $_SESSION[ 'Tables' ][ 'Users' ][ $Row[ 'ID' ] ] = true;
+            $iFilteredTotal++;
+        }
 
-    $parameters = array( );
-    $sQuery = " SELECT  COUNT( [User].[ID] )
+        $parameters = array( );
+        $sQuery = " SELECT  COUNT( [User].[ID] )
                 FROM    [User];";
-    $rResultTotal = \singleton\database::getInstance( )->query( 
-      'Portal',  
-      $sQuery, 
-      $parameters 
-    ) or die(print_r(sqlsrv_errors()));
-    $aResultTotal = sqlsrv_fetch_array($rResultTotal);
-    $iTotal = $aResultTotal[0];
+        $rResultTotal = \singleton\database::getInstance( )->query(
+            'Portal',
+            $sQuery,
+            $parameters
+        ) or die(print_r(sqlsrv_errors()));
+        $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+        $iTotal = $aResultTotal[0];
 
-    $output = array(
-        'sEcho'         =>  intval( $_GET[ 'draw' ] ),
-        'iTotalRecords'     =>  $iTotal,
-        'iTotalDisplayRecords'  =>  $iFilteredTotal,
-        'aaData'        =>  array()
-    );
-
+        $output = array(
+            'sEcho'         =>  intval( $_GET[ 'draw' ] ),
+            'iTotalRecords'     =>  $iTotal,
+            'iTotalDisplayRecords'  =>  $iFilteredTotal,
+            'aaData'        =>  array()
+        );
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $output['aaData'][]       = $Row;
     }
