@@ -100,7 +100,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 
                 <div class="card-body bg-dark">
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
+                      <thead>
+                        <tr>
                             <th title='ID'>ID</th>
                             <th title='Customer'>Customer</th>
                             <th title='Location'>Location</th>
@@ -119,13 +120,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <option value='1'>Inactive</option>
                             <option value='2'>Demolished</option>
                           </select></th>
-
-
-                            
                         </tr>
-
-
-                    </thead>
+                      </thead>
                     </table>
                 </div>
             </div>
