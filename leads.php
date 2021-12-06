@@ -102,7 +102,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				<div class='card-heading'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
 				<div class='card-body bg-dark'>
           <table id='Table_Leads' class='display' cellspacing='0' width='100%'>
-						<thead><tr>
+					<thead><tr>
               <th class='text-white border border-white' title='ID'>ID</th>
               <th class='text-white border border-white' title='Name'>Name</th>
               <th class='text-white border border-white' title='Type'>Type</th>
@@ -126,28 +126,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         limit : 5,
                         display : 'FieldValue',
                         source: function( query, result ){
-                            $.ajax({
-                                url : 'bin/php/get/search/Customers.php',
-                                method : 'GET',
-                                data    : {
-                                    search :  $('input:visible[name="Customer"]').val( )
-                                },
-                                dataType : 'json',
-                                beforeSend : function( ){
-                                    abort( );
-                                },
-                                success : function( data ){
-                                    result( $.map( data, function( item ){
-                                        return item.FieldValue;
-                                    } ) );
-                                }
-                            });
+                          $.ajax({
+                              url : 'bin/php/get/search/Customers.php',
+                              method : 'GET',
+                              data    : {
+                                  search :  $('input:visible[name="Customer"]').val( )
+                              },
+                              dataType : 'json',
+                              beforeSend : function( ){
+                                  abort( );
+                              },
+                              success : function( data ){
+                                  result( $.map( data, function( item ){
+                                      return item.FieldValue;
+                                  } ) );
+                              }
+                          });
                         },
-                        afterSelect: function( value ){
-                            $( 'input:visible[name="Customer"]').val( value );
-                        }
-                    }
-                );
+                    afterSelect: function( value ){
+                        $( 'input:visible[name="Customer"]').val( value );
+                      }
+                  }
+              );
               </script></th>
               <th class='text-white border border-white' title='Address'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Contact'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>

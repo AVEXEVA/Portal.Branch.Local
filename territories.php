@@ -80,11 +80,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'territories.php'
+            'contracts.php'
         )
       );
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
      <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
@@ -93,79 +93,70 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php.'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-			<div class="panel panel-primary">
-				<div class="panel-heading"><h4><?php \singleton\fontawesome::getInstance( )->Territory();?> Territories</h4></div>
-				<div class="panel-body">
-					<table id='Table_Territories' class='display' cellspacing='0' width='100%' style='font-size:12px;'>
-						<thead>
-							<th title="Territory's ID"></th>
-							<th title="Territory's Name"></th>
-						</thead>
-					</table>
-				</div>
-			</div>
-        </div>
+<body onload='finishLoadingPage();'>
+	<div id='wrapper'>
+    <?php require( bin_php . 'element/navigation.php' );?>
+    <?php require( bin_php.  'element/loading.php' );?>
+    <div id='page-wrapper' class='content'>
+			<div class="card card-full card-primary border-0">
+				<div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Territories</h4></div>
+				<div class="form-mobile card-body bg-dark text-white"><form method='GET' action='territories.php'>
+					<div class='row'><div class='col-12'>&nbsp;</div></div>
+           <div class='row'>
+                <div class='col-4'>ID</div>
+    						<div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></div>
+            </div>
+              <div class='row'>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Customer();?>Location</div>
+              <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></div>
+            </div>
+            <div class='row'>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Location();?>Unit</div>
+              <div class='col-8'><input type='text' name='Unit' placeholder='Unit' class='redraw' vlaue='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null;?>' /></div>
+            </div>
+            <div class='row'>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job();?>Leads</div>
+              <div class='col-8'><input type='text' name='Leads' placeholder='Leads' class='redraw' value='<?php echo isset( $_GET[ 'Leads' ] ) ? $_GET[ 'Leads' ] : null;?>' /></div>
+            </div>
+            <div class='row'>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job();?>Proposals</div>
+              <div class='col-8'><input type='text' name='Proposal' placeholder='Proposal' class='redraw' value='<?php echo isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null;?>' /></div>
+            </div>
+            <div class='row'>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job();?>Collections</div>
+              <div class='col-8'><input type='text' name='Collection' placeholder='Collection' class='redraw' value='<?php echo isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null;?>' /></div>
+            </div>
+            <div class='row'>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Job();?>Invoices</div>
+              <div class='col-8'><input type='text' name='Invoices' placeholder='Invoices' class='redraw' value='<?php echo isset( $_GET[ 'Invoice' ] ) ? $_GET[ 'Invoice' ] : null;?>' /></div>
+            </div>
+          </form></div>
+        <div class="card-body bg-dark">
+					<table id='Table_Territories' class='display' cellspacing='0' width='100%'>
+						<thead><tr class='text-center'>
+							<th class='text-white border border-white' title='ID'>ID</th>
+							<th class='text-white border border-white' title='Customer'>Location</th>
+							<th class='text-white border border-white' title='Location'>Unit</th>
+							<th class='text-white border border-white' title='Job'>Leads</th>
+              <th class='text-white border border-white' title='Job'>Proposals</th>
+              <th class='text-white border border-white' title='Job'>Collection</th>
+              <th class='text-white border border-white' title='Job'>Invoices</th>
+			    </tr><tr class='form-desktop'>
+							<th class='text-white border border-white' title='ID'><input class='redraw' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Location'><input class='redraw' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Unit'><input class='redraw' type='text' name='Unit' placeholder='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Lead'><input class='redraw' type='text' name='Lead' placeholder='Lead' value='<?php echo isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Proposal'><input class='redraw' type='text' name='Proposal' placeholder='Proposal' value='<?php echo isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Collection'><input class='redraw' type='text' name='Collection' placeholder='Collection' value='<?php echo isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Invoice'><input class='redraw' type='text' name='Invoice' placeholder='Invoice' value='<?php echo isset( $_GET[ 'Invoice' ] ) ? $_GET[ 'Invoice' ] : null;?>' /></th>
+          </th>
+          </tr></thead>
+        </table>
+		   </div>
     </div>
-    <script>
-        var Table_Territories = $('#Table_Territories').DataTable( {
-			"processing":true,
-			"serverSide":true,
-			"ajax": "bin/php/get/Territories.php",
-			"order": [[ 1, "asc" ]],
-			"columns": [
-				{
-					"className":"hidden"
-				},{
-				}
-			],
-			<?php if(!isMobile()){?>"buttons":[
-				{
-					extend: 'collection',
-					text: 'Export',
-					buttons: [
-						'copy',
-						'excel',
-						'csv',
-						'pdf',
-						'print'
-					]
-				},
-				{ text:"View",
-				  action:function(e,dt,node,config){
-					  var id = Table_Territories.rows({selected:true}).data()[0];
-					  document.location.href = 'territory.php?ID=' + id;
-				  }
-				}
-			],<?php }?>
-			"language":{
-				"loadingRecords":"<div style='text-align:center;'><div class='sk-cube-grid' style='display:inline-block;position:relative;';><div class='sk-cube sk-cube1' style='background-color:#cc0000'></div><div class='sk-cube sk-cube2' style='background-color:#cc0000'></div><div class='sk-cube sk-cube3' style='background-color:#cc0000'></div><div class='sk-cube sk-cube4' style='background-color:#cc0000'></div><div class='sk-cube sk-cube5' style='background-color:#cc0000'></div><div class='sk-cube sk-cube6' style='background-color:#cc0000'></div><div class='sk-cube sk-cube7' style='background-color:#cc0000'></div><div class='sk-cube sk-cube8' style='background-color:#cc0000'></div><div class='sk-cube sk-cube9' style='background-color:#cc0000'></div></div><div class='sk-cube-grid' style='display:inline-block;position:relative;top:-45px;'><div class='sk-cube sk-cube1' style='background-color:#00007f'></div><div class='sk-cube sk-cube2' style='background-color:#00007f'></div><div class='sk-cube sk-cube3' style='background-color:#00007f'></div><div class='sk-cube sk-cube4' style='background-color:#00007f'></div><div class='sk-cube sk-cube5' style='background-color:#00007f'></div><div class='sk-cube sk-cube6' style='background-color:#00007f'></div><div class='sk-cube sk-cube7' style='background-color:#00007f'></div><div class='sk-cube sk-cube8' style='background-color:#00007f'></div><div class='sk-cube sk-cube9' style='background-color:#00007f'></div></div><div class='sk-cube-grid' style='display:inline-block;position:relative;top:-84px;'><div class='sk-cube sk-cube1' style='background-color:gold'></div><div class='sk-cube sk-cube2' style='background-color:gold'></div><div class='sk-cube sk-cube3' style='background-color:gold'></div><div class='sk-cube sk-cube4' style='background-color:gold'></div><div class='sk-cube sk-cube5' style='background-color:gold'></div><div class='sk-cube sk-cube6' style='background-color:gold'></div><div class='sk-cube sk-cube7' style='background-color:gold'></div><div class='sk-cube sk-cube8' style='background-color:gold'></div><div class='sk-cube sk-cube9' style='background-color:gold'></div></div></div><div style='font-size:72px;text-align:center;' class='BankGothic'>Nouveau Texas</div><div style='font-size:42px;text-align:center;'><i>Raising Your Life</i></div>"
-			},
-			"paging":true,
-			<?php if(!isMobile()){?>"dom":"Bfrtip",<?php }?>
-			"select":true,
-			"initComplete":function(){
-			},
-			"scrollY" : "600px",
-			"scrollCollapse":true,
-			"lengthChange": false,
-			"search":{
-				"search":"<?php echo isset($_SESSION['Forward-Backward'],$_SESSION['Forward-Backward']['Locations']) ? $_SESSION['Forward-Backward']['Locations'] : '';?>"
-			}
-		} );
-
-
-	<?php if(isMobile()){?>
-		function hrefTerritories(){hrefRow("Table_Territories","territory");}
-		$("Table#Table_Territories").on("draw.dt",function(){hrefTerritories();});
-	<?php }?>
-    </script>
+  </div>
 </body>
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=locations.php';</script></head></html><?php }?>
+} else {?><html><head><script>document.location.href='../login.php?Forward=contracts.php';</script></head></html><?php }?>

@@ -103,13 +103,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Name
             )
         );
-        $Division =   (  empty( $ID )
-                     &&  !empty( $Name )
-                     &&  !$result
-                )    || (empty( $ID )
-                     &&  empty( $Name )
-                )    ? array(
-
+$Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
     'ID' => null,
     'Name' => null,
     'Bonus' => null,
@@ -127,7 +121,107 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     'Tax' => null,
       ) : sqlsrv_fetch_array($result);
 
+      if( isset( $_POST ) && count( $_POST ) > 0 ){
+        // if the $_Post is set and the count is null, select if available
+        $Divsion[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Divsion[ 'ID' ];
+        $Divsion[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Divsion[ 'Name' ];
+        $Divsion[ 'Bonus' ] 		= isset( $_POST[ 'Bonus' ] ) 	 ? $_POST[ 'Bonus' ] 	 : $Divsion[ 'Bonus' ];
+        $Divsion[ 'Count' ] 		= isset( $_POST[ 'Count' ] ) 	 ? $_POST[ 'Count' ] 	 : $Divsion[ 'Count' ];
+        $Divsion[ 'IDistance' ] 		= isset( $_POST[ 'IDistance' ] ) 	 ? $_POST[ 'IDistance' ] 	 : $Divsion[ 'IDistance' ];
+        $Divsion[ 'ODistance' ] = isset( $_POST[ 'ODistance' ] )  ? $_POST[ 'ODistance' ]  : $Divsion[ 'ODistance' ];
+        $Divsion[ 'Location' ] = isset( $_POST[ 'Location' ] )  ? $_POST[ 'Location' ]  : $Divsion[ 'Location' ];
+        $Divsion[ 'Units' ]     = isset( $_POST[ 'Units' ] ) 	   ? $_POST[ 'Units' ] 	   : $Divsion[ 'Units' ];
+        $Divsion[ 'Violation' ] 	= isset( $_POST[ 'Violation' ] ) 	 ? $_POST[ 'Violation' ] 	 : $Divsion[ 'Violation' ];
+        $Divsion[ 'Tickets' ] 	= isset( $_POST[ 'Tickets' ] ) 	 ? $_POST[ 'Tickets' ] 	 : $Divsion[ 'Tickets' ];
+        $Divsion[ 'Internet' ] = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Divsion[ 'Internet' ];
+        $Divsion[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Divsion[ 'Street' ];
+        $Divsion[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Divsion[ 'City' ];
+        $Divsion[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Divsion[ 'State' ];
+        $Divsion[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Divsion[ 'Zip' ];
+        $Divsion[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Divsion[ 'Latitude' ];
+        $Divsion[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Divsion[ 'Longitude' ];
 
+        if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
+          $result = \singleton\database::getInstance( )->query(
+            null,
+            "	DECLARE @MAXID INT;
+              SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Zone ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Zone ) END ;
+              INSERT INTO Zone(
+                ID,
+                Name,
+                Bonus,
+                Count,
+                Remarks,
+                Price1,
+                Price2,
+                Price3,
+                Price4,
+                Price5,
+                IDistance,
+                ODistance,
+                Color,
+                fDesc,
+                Tax
+              )
+              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+              SELECT @MAXID + 1;",
+            array(
+              $Divsion[ 'ID' ],
+              $Divsion[ 'Name' ],
+              $Divsion[ 'Bonus' ],
+              $Divsion[ 'Count' ],
+              $Divsion[ 'Remarks' ],
+              $Divsion[ 'Price1' ],
+              $Divsion[ 'Price2' ],
+              $Divsion[ 'Price3' ],
+              $Divsion[ 'Price4' ],
+              $Divsion[ 'Price5' ],
+              $Divsion[ 'IDistance' ],
+              $Divsion[ 'ODistance' ],
+              $Divsion[ 'Color' ],
+              $Divsion[ 'fDesc' ],
+              $Divsion[ 'Tax' ],
+              isset( $Divsion[ 'Geofence' ] ) ? $Divsion[ 'Geofence' ] : 0
+            )
+          );
+          sqlsrv_next_result( $result );
+          $Division [ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+        //  header( 'Location: lead.php?ID=' . $Division [ 'ID' ] );
+        } else {
+          \singleton\database::getInstance( )->query(
+            null,
+            "	UPDATE 	Zone
+              SET       Zone.ID   = ?,
+                        Zone.Name = ?,
+                        Zone.Bonus = ?,
+                        Zone.Count = ?,
+                        Zone.Remarks = ?,
+                        Zone.fDesc   = ?,
+                        zone.TFMID   = ?,
+                        zone.TFMSource = ?
+              WHERE 	  Zone.ID = ?;",
+            array(
+              $Divsion[ 'ID' ],
+              $Divsion[ 'Name' ],
+              $Divsion[ 'Bonus' ],
+              $Divsion[ 'Count' ],
+              $Divsion[ 'Remarks' ],
+              $Divsion[ 'Price1' ],
+              $Divsion[ 'Price2' ],
+              $Divsion[ 'Price3' ],
+              $Divsion[ 'Price4' ],
+              $Divsion[ 'Price5' ],
+              $Divsion[ 'IDistance' ],
+              $Divsion[ 'ODistance' ],
+              $Divsion[ 'Color' ],
+              $Divsion[ 'fDesc' ],
+              $Divsion[ 'Tax' ],
+              !empty( $Division [ 'GeoLock' ] ) ? $Division [ 'GeoLock' ] : 0
+            )
+          );
+        }
+      }
+  var_dump( sqlsrv_errors( ) );
       ?><!DOCTYPE html>
       <html lang="en">
       <head>
@@ -147,10 +241,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div id="wrapper">
               <?php require( bin_php . 'element/navigation.php');?>
               <div id="page-wrapper" class='content'>
-      			<div class='card card-primary border-0'>
-      				<div class='card-heading'>
+      			        <div class='card card-primary border-0'>
+      				      <div class='card-heading'>
               			<div class='row g-0 px-3 py-2'>
-              				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><a href='locations.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Location' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Locations' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Locations' ][ 0 ] : array( ) ) : null;?>'>Location</a>: <span><?php echo is_null( $Division[ 'ID' ] ) ? 'New' : $Division[ 'Name' ];?></span></h5></div>
+              				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><a href='locations.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Division' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Division' ][ 0 ] : array( ) ) : null;?>'>Leads</a>: <span><?php echo is_null( $Division[ 'ID' ] ) ? 'New' : $Division[ 'Name' ];?></span></h5></div>
               				<div class='col-2'></div>
               				<div class='col-2'>
               					<div class='row g-0'>
