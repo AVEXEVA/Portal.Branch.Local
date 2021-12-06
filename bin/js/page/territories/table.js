@@ -12,13 +12,13 @@ function search( link ){
                     url : 'bin/php/get/search/Territories.php',
                     method : 'GET',
                     data    : {
-                        ID                    :  $('input:visible[name="ID"]').val( ),
-                        Location                :  $('input:visible[name="Location"]').val( ),
-                        Unit                :  $('input:visible[name="Unit"]').val( ),
-                        Leads                :  $('input:visible[name="Leads"]').val( ),
-                        Proposals                :  $('input:visible[name="Proposals"]').val( ),
-                        Collection                :  $('input:visible[name="Collection"]').val( ),
-                        Invoice                :  $('input:visible[name="Invoice"]').val( ),
+                        ID                :  $('input:visible[name="ID"]').val( ),
+                        Location          :  $('input:visible[name="Location"]').val( ),
+                        Unit              :  $('input:visible[name="Unit"]').val( ),
+                        Leads             :  $('input:visible[name="Leads"]').val( ),
+                        Proposals         :  $('input:visible[name="Proposals"]').val( ),
+                        Collection        :  $('input:visible[name="Collection"]').val( ),
+                        Invoice           :  $('input:visible[name="Invoice"]').val( ),
                     },
                     dataType : 'json',
                     beforeSend : function( ){
@@ -190,10 +190,9 @@ $( document ).ready( function( ){
                                 :   null;
                         default :
                             return data;
-                }
+                  }
             }
         }],
-
         buttons: [
             {
                 text: 'Reset Search',
