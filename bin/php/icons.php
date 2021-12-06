@@ -51,6 +51,7 @@ class Icons {
 	public function Modernization($Size=null){?><i class="fa fa-cogs fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Testing($Size=null){?><i class="fa fa-cogs fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Add($Size=null){?><i class="fa fa-plus-circle fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
+	public function Refresh($Size=null){?><i class="fa fa-refresh fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Edit($Size=null){?><i class="fa fa-edit fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Delete($Size=null){?><i class="fa fa-trash fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Save($Size=null){?><i class="fa fa-save fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
@@ -83,4 +84,6 @@ class Icons {
 	public function Report($Size=null){?><i class="fa fa-paperclip fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Github($Size=null){?><i class="fa fa-github fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Paragraph($Size=null){?><i class="fa fa-paragraph fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
+	public function Next($Size=null){?><i class="fa fa-arrow-right fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
+	public function Previous($Size=null){?><i class="fa fa-arrow-left fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 }?>

@@ -27,8 +27,8 @@
 .card {
   background-color : transparent !important;
 }
-.card>.card-body {
-  border: 1px solid white;
+.card .card-body {
+  padding : 0px !important;
 }
 .card.card-primary .card-heading {
   background-color : white;
