@@ -109,19 +109,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='row'><div class='col-12'>&nbsp;</div></div>
           <div class='row'>
             <div class='col-4'>Name:</div>
-            <div class='col-8'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' value='<?php echo $_GET[ 'Name' ];?>' /></div>
+            <div class='col-8'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></div>
           </div>
           <div class='row'>
             <div class='col-4'>Customer:</div>
-            <div class='col-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' value='<?php echo $_GET[ 'Customer' ];?>' /></div>
+            <div class='col-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
           </div>
           <div class='row'>
             <div class='col-4'>City:</div>
-            <div class='col-8'><input type='text' name='City' placeholder='City' onChange='redraw( );' value='<?php echo $_GET[ 'City' ];?>' /></div>
+            <div class='col-8'><input type='text' name='City' placeholder='City' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'City' ] : null;?>' /></div>
           </div>
           <div class='row'>
             <div class='col-4'>Street:</div>
-            <div class='col-8'><input type='text' name='Street' placeholder='Street' onChange='redraw( );' value='<?php echo $_GET[ 'Street' ];?>' /></div>
+            <div class='col-8'><input type='text' name='Street' placeholder='Street' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Street' ] : null;?>' /></div>
           </div>
           <div class='row'>
             <div class='col-4'>Maintained:</div>
@@ -173,10 +173,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   $result = $database->query(
                     null,
                     "   SELECT    Elev.Building
-                      FROM    Elev
-                      WHERE     Elev.Building NOT IN ( '', ' ' )
-                      GROUP BY  Elev.Building
-                      ORDER BY  Elev.Building ASC;"
+                        FROM      Elev
+                        WHERE     Elev.Building NOT IN ( '', ' ' )
+                        GROUP BY  Elev.Building
+                        ORDER BY  Elev.Building ASC;"
                   );
                   if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['Building'];?>'><?php echo $row['Building'];?></option><?php } }
                 ?>
