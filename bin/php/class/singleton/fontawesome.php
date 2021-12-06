@@ -86,4 +86,7 @@ class fontawesome extends \singleton\index {
 	public function Inspection($Size=null){?><i class='fa fa-paperclip fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Github($Size=null){?><i class='fa fa-github fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Paragraph($Size=null){?><i class='fa fa-paragraph fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function Refresh($Size=null){?><i class="fa fa-refresh fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
+	public function Next($Size=null){?><i class="fa fa-arrow-right fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
+	public function Previous($Size=null){?><i class="fa fa-arrow-left fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 }?>
