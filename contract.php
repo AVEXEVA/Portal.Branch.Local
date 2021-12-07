@@ -140,7 +140,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN (
                             SELECT  Owner.ID AS ID,
                                     Rol.Name AS Name
-                            FROM    Owner 
+                            FROM    Owner
                                     LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Customer.ID = Contract.Owner
                 WHERE   	    [Contract].ID = ?;",
@@ -629,7 +629,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Amount:</div>
-                  <div class='col-8'><input placeholder='$$$' type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div> 
+                  <div class='col-8'><input placeholder='$$$' type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div>
                 </div>
               </div>
               <div class='card-footer'>

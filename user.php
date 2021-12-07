@@ -159,7 +159,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	            $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 	            header( 'Location: user.php?ID=' . $User[ 'ID' ] );
 	            exit;
-	        } else {        
+	        } else {
             $result = \singleton\database::getInstance( )->query(
               'Portal',
               " UPDATE  [User]
@@ -221,19 +221,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='row g-0 px-3 py-2'>
             <div class='col-12 col-lg-6'>
               <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
-                echo http_build_query( isset( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) && is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
+                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
               ?>'>User</a>: <span><?php
                 echo is_null( $User[ 'ID' ] )
-                  ? 'New'
-                  : $User[ 'Email' ];
+                    ? 'New'
+                    : '#' . $User[ 'ID' ];
               ?></span></h5>
-            </div>
-            <div class='col-6 col-lg-3'>
+          </div>
+          <div class='col-6 col-lg-3'>
               <div class='row g-0'>
                 <div class='col-4'>
                   <button
                       class='form-control rounded'
-                      type='submit'
+                      onClick="document.location.href='user.php';"
                     ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
                 </div>
                 <div class='col-4'>
