@@ -43,6 +43,8 @@ $( document ).ready( function( ){
           d.Last_Name = $('input[name="Last_Name"]').val( );
           d.First_Name = $('input[name="First_Name"]').val( );
           d.Supervisor = $('input[name="Supervisor"]').val( );
+          d.Latittude = $('input[name="Latittude"]').val( );
+          d.Longitude = $('input[name="Longitude"]').val( );
           return d;
       }
     },
@@ -69,8 +71,24 @@ $( document ).ready( function( ){
           data : 'First_Name'
       },{
           data : 'Supervisor'
-      }
-    ],
+      },{
+        className : 'GPSLocation',       
+        searchable: false,
+        render : function( data, type, row, meta ){
+            switch( type ){
+                case 'display' :
+                    return  (row.Latittude !== null && row.Longitude !== null)
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='https://www.google.com/maps/search/?api=1&query=" + row.Latitude + "," + row.Longitude + "' target='_blank' ><i class='fa fa-map-marker'></i> GPS </a></div>" +
+                            "</div>"
+                        :   null;
+                default :
+                    return data;
+            }
+
+        }
+    }
+    ],  
     buttons: [
         {
             text: 'Reset Search',
@@ -131,7 +149,7 @@ $( document ).ready( function( ){
         $('input.date').datepicker( { } );
         $('input.time').timepicker( {  timeFormat : 'h:i A' } );
         //search( this );
-        $( '.redraw' ).bind( 'change', function(){ Table_Customers.draw(); });
+        $( '.redraw' ).bind( 'change', function(){ Table_Employees.draw(); });
     }
   } );
 } );
