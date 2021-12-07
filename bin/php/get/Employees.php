@@ -112,9 +112,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                     SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                            Employee.ID          AS ID,
-                            Employee.fFirst      AS First_Name,
-                            Employee.Last        AS Last_Name,
+                            Employee.ID     AS ID,
+                            Employee.fFirst AS First_Name,
+                            Employee.Last   AS Last_Name,
                             tblWork.Super   AS Supervisor
                     FROM    dbo.Emp AS Employee
                             LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
