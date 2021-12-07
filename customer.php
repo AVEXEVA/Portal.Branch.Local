@@ -115,24 +115,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             				SELECT 	Owner.ID    AS ID,
             						Owner.Type      AS Type,
             						Rolodex.ID 		  AS Rolodex,
-                        Rolodex.Name    AS Name,
-                        Rolodex.Phone   AS Phone,
-                        Rolodex.Email   AS Email,
-                        Rolodex.Contact AS Contact,
-                        Rolodex.Address AS Street,
-                        Rolodex.City    AS City,
-                        Rolodex.State   AS State,
-                        Rolodex.Zip     AS Zip,
-                        Rolodex.Latt 	  AS Latitude,
-                        Rolodex.fLong   AS Longitude,
-                        Owner.Status    AS Status,
+                                    Rolodex.Name    AS Name,
+                                    Rolodex.Phone   AS Phone,
+                                    Rolodex.Email   AS Email,
+                                    Rolodex.Contact AS Contact,
+                                    Rolodex.Address AS Street,
+                                    Rolodex.City    AS City,
+                                    Rolodex.State   AS State,
+                                    Rolodex.Zip     AS Zip,
+                                    Rolodex.Latt 	  AS Latitude,
+                                    Rolodex.fLong   AS Longitude,
+                                    Owner.Status    AS Status,
           							Rolodex.Website AS Website,
           							Owner.Internet  AS Internet,
           							Owner.fLogin    AS Login,
           							Owner.Password  AS Password,
           							Rolodex.Geolock AS Geofence
 							 FROM   Owner
-									LEFT JOIN Rolodex ON Owner.Rol = Rolodex.ID
+									LEFT JOIN Rol AS Rolodex ON Owner.Rol = Rolodex.ID
             		) AS Customer
             	WHERE   	Customer.ID = ?
             			OR 	Customer.Name = ?;",
@@ -549,15 +549,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 									<div class='col-8'><input placeholder='Longitude' type='text' class='form-control edit <?php echo $Customer[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Customer['Longitude'];?>' /></div>
 								</div>
 							</div>
-               <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-              </div>
-		      </form></div>
+		      </div>
           <!-- End of customer inforation card, ending with card-footer div class with a button for save  -->
-            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
-                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+            <div class='card card-primary my-3'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
                   	<div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Users( 1 );?><span>Contacts</span></h5></div>
@@ -580,15 +574,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='Email' value='<?php echo $Customer[ 'Email' ];?>' /></div>
                 </div>
               </div>
-              <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-              </div>
-            </form>
             </div>
         	<!-- End of customer contact information card, ending with customer card-footer and a submit button-->
-        	<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+        	<div class='card card-primary my-3'>
 				<div class='card-heading'>
 					<div class='row g-0 px-3 py-2'>
 						<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Portal</span></h5></div>
@@ -597,7 +585,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				</div>
   				<!-- Start of a new card Using a post method to fill data based on $Customer ID -->
 				<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Portal' ] ) && $_SESSION[ 'Cards' ][ 'Portal' ] == 0 ? "style='display:none;'" : null;?>>
-			 		<input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
 			 		<div class='row g-0'>
 						<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Privilege(1);?> Login:</div>
 						<div class='col-6'></div>
@@ -606,10 +593,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					<div class='row g-0'>
 						<div class='col-1'>&nbsp;</div>
 			 			<div class='col-3'>Portal:</div>
-			 			<div class='col-8'><select class='form-control edit <?php echo $Customer[ 'Internet' ] == 1 ? 'bg-success' : 'bg-warning';?>' name='Internet' >
-			 				<option value=''>Select</option>
-			 				<option value='0' <?php echo $Customer[ 'Internet' ] == 0 ? 'selected' : null;?>>Disabled</option>
-			 				<option value='1' <?php echo $Customer[ 'Internet' ] == 1 ? 'selected' : null;?>>Enabled</option>
+			 			<div class='col-8'><select 
+                            <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
+                            class='form-control edit' 
+                            name='Internet' >
+    			 				<option value=''>Select</option>
+    			 				<option value='0' <?php echo $Customer[ 'Internet' ] == 0 ? 'selected' : null;?>>Disabled</option>
+    			 				<option value='1' <?php echo $Customer[ 'Internet' ] == 1 ? 'selected' : null;?>>Enabled</option>
 			 			</select></div>
 			 		</div>
 					<div class='row g-0' <?php echo $Customer[ 'Internet' ] == 0 ? "style='display:none;'" : null;?>>
@@ -625,150 +615,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			 		<div class='row g-0'>
 			 			<div class='col-1'>&nbsp;</div>
 			 			<div class='col-3'>Geofence:</div>
-			 			<div class='col-8'><select class='form-control edit <?php echo $Customer[ 'Geofence' ] == 1 ? 'bg-success' : 'bg-warning';?>' name='Geofence' >
-			 				<option value=''>Select</option>
-			 				<option value='0' <?php echo $Customer[ 'Geofence' ] == 0 ? 'selected' : null;?>>Disabled</option>
-			 				<option value='1' <?php echo $Customer[ 'Geofence' ] == 1 ? 'selected' : null;?>>Enabled</option>
+			 			<div class='col-8'><select 
+                            <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
+                            class='form-control edit' 
+                            name='Geofence' >
+    			 				<option value=''>Select</option>
+    			 				<option value='0' <?php echo $Customer[ 'Geofence' ] == 0 ? 'selected' : null;?>>Disabled</option>
+    			 				<option value='1' <?php echo $Customer[ 'Geofence' ] == 1 ? 'selected' : null;?>>Enabled</option>
 			 			</select></div>
 			 		</div>
 				</div>
-          		<div class='card-footer'>
-	              	<div class='row'>
-	                  	<div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-	              	</div>
-	         	</div>
-			</form></div>
-            <!-- End of customer Portal information card, ending with customer card-footer and a Save button-->
-            <?php
-            $r = \singleton\database::getInstance( )->query(
-                null,
-                "   SELECT  Count(TicketD.ID) AS Count,
-                            Substring(TicketD.DescRes, 18, PATINDEX('%-----Notes-----%', TicketD.DescRes ) - 18 ) AS Codes
-                    FROM    [TicketD]
-                            LEFT JOIN Job ON TicketD.Job = Job.ID
-                    WHERE   TicketD.DescRes LIKE '%-----Notes-----%'
-                            AND TicketD.EDate >= ?
-                            AND Job.Owner = ?
-                    GROUP BY TicketD.DescRes
-                    ORDER BY Count( TicketD.ID ) DESC;",
-                array(
-                    date( 'Y-m-d H:i:s', strtotime( '-1 year' ) ),
-                    $Customer[ 'ID' ]
-                )
-            );
-
-            // Selecting the ticket count from TicketD, and joining Ticket Job and storing it with the date time into the $Customer ID variable
-            $tResolutionCodes = array( );
-            $total = 0;
-            // Sets the Variable $ticketResolutionCodes to an empty array, and the $total variable to = 0
-            while( $rResolutionCodes = sqlsrv_fetch_array( $r ) ){
-                if( strpos( $rResolutionCodes['Codes'],  "\n" ) !== false ){
-                    $eResolutionCodes = explode("\n", $rResolutionCodes[ 'Codes' ] );
-                    while( ( $eResolutionCode = array_pop( $eResolutionCodes ) ) !== null ){
-                        $eResolutionCode = trim( $eResolutionCode );
-                        $tResolutionCodes[ $eResolutionCode ] = isset( $tResolutionCodes[ $eResolutionCode ] ) ? $tResolutionCodes[ $eResolutionCode ] + $rResolutionCodes[ 'Count' ] : $rResolutionCodes[ 'Count' ];
-                        $total += $rResolutionCodes[ 'Count' ];
-                    }
-                } else {
-                    $tResolutionCodes[ trim( $rResolutionCodes[ 'Codes' ] ) ] = isset( $tResolutionCodes[ trim( $rResolutionCodes[ 'Codes' ] ) ] ) ? $tResolutionCodes[ trim( $rResolutionCodes ['Codes' ] ) ] + $rResolutionCodes[ 'Count' ] : $rResolutionCodes ['Count' ];
-                    $total += $rResolutionCodes[ 'Count' ];
-                }
-            }
-            $ttResolutionCodes = array();
-            foreach( $tResolutionCodes as $key=>$value ){ $ttResolutionCodes[ explode( ' - ', $key )[ 0 ] ] = $value; }
-            //add $ttResolutionCodes with the key and emptystring starting at 0 to the $value variable, this is some type of graph I assume
-            ?><div class='card card-primary my-3'>
-                <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                        <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Codes</span></h5></div>
-                        <div class='col-2'>&nbsp;</div>
-                    </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Codes' ] ) && $_SESSION[ 'Cards' ][ 'Codes' ] == 0 || true ? "style='display:none;'" : null;?>><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
-                    <div class='row'>
-                        <div id='ticket-resolution-codes-pie-chart' class='col-xs-12'><div id='ticketResolutionCodes-flot-pie' style='width:100%;height:350px;'>&nbsp;</div></div>
-                        <script>
-                            function resize_ticketResolutionCodes(){
-                                $('#ticketResolutionCodes-flot-pie').width( 'width', $('#ticketTypes-flot-pie').width( ) + 'px' );
-                            }
-                            function plotResolutionCodes(){
-                                $.plot(
-                                    $('#ticketResolutionCodes-flot-pie'),
-                                    [
-                                        <?php
-                                            $pResolutionCodes = array( );
-                                            if( count( $ttResolutionCodes ) > 0 ){ foreach( $ttResolutionCodes as $key=>$value ){
-                                                $pResolutionCodes[ ] = "{ label : \"" . $key . "\", data : " . $value . ", color: '#" . str_pad(dechex(rand(0x000000, 0x333333)), 6, 0, STR_PAD_LEFT) . "' }";
-                                            } }
-                                            echo implode( ', ', $pResolutionCodes );
-                                        ?>
-                                    ],{
-                                        series: {
-                                            pie: {
-                                                show: true
-                                            }
-                                        },
-                                        legend : {
-                                            show : false
-                                        },
-                                        grid: {
-                                            hoverable: true
-                                        },
-                                        tooltip : true,
-                                        tooltipOpts: {
-                                            cssClass: "flotTip",
-                                            content: "%p.0%, %s",
-                                            shifts: {
-                                                x: 55,
-                                                y: 0
-                                            },
-                                            defaultTheme: false
-                                        }
-                                    }
-                                );
-                            }
-                            $(document).ready( function() {
-                                resize_ticketResolutionCodes( );
-                                plotResolutionCodes();
-                            });
-                            $(window).resize( function(){
-                                resize_ticketResolutionCodes( )
-                                plotResolutionCodes( );
-                            });
-                        </script>
-                        <!-- javascript for plotting the Ticket resolution code to a chart of some kind, not sure how it works -->
-                        <div id='ticket-resolution-codes-table' class='col-xs-12 action-rows' style='display:none;'>
-                            <div class='row'>
-                                <div class='col-xs-6'>Type</div>
-                                <div class='col-xs-3'>Count</div>
-                                <div class='col-xs-3'>Percent</div>
-                            </div>
-                            <?php
-                                foreach( $tResolutionCodes as $key=>$value ){
-                                    if( $key == '' ){ continue; }
-                                    ?><div class='row'>
-                                        <div class='col-xs-6'><?php echo $key;?></div>
-                                        <div class='col-xs-3'><?php echo $value;?></div>
-                                        <div class='col-xs-3'><?php echo round( $value / $total * 100, 2 ) . '%';?></div>
-                                    </div><?php
-                                }
-                            ?><script>
-                            function hoverType( level ){
-                              document.location.href='dashboard.php?Location=<?php
-                                echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;
-                              ?>&Unit=<?php
-                                echo isset($_GET['Unit']) ? $_GET['Unit'] : null;
-                              ?>&Assigned=<?php
-                                echo isset($_GET['Assigned']) ? $_GET['Assigned'] : null;
-                              ?>&Level=' + level;
-                            }
-                            </script>
-                  <!-- javascript for plotting the Ticket resolution code to a chart of some kind, not sure how it works -->
-                        </div>
-                    </div>
-                </div>
-                <div class='card-footer'><div class='row'><div class='col-xs-12'>&nbsp;</div></div></div>
-            </div>
+			</div>
 			<div class='card card-primary my-3'>
 				<div class='card-heading'>
 					<div class='row g-0 px-3 py-2'>

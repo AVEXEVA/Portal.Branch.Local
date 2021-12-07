@@ -99,25 +99,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     		);
         $result = \singleton\database::getInstance( )->query(
         	null,
-        	"	SELECT 	Employee.ID,
+        	"	SELECT 	Employee.ID                           AS ID,
         				Employee.fFirst + ' ' + Employee.Last AS Name,
-        				Employee.fFirst AS First_Name,
-        				Employee.Last   AS Last_Name,
-        				Rolodex.Address AS Street,
-        				Rolodex.City    AS City,
-        				Rolodex.State   AS State,
-        				Rolodex.Zip     AS Zip,
-        				Rolodex.Latt    AS Latitude,
-        				Rolodex.fLong   AS Longitude,
-        				Rolodex.Geolock AS Geofence,
-        				Rolodex.ID 		AS Rolodex,
-        				Rolodex.Name    AS Name,
-                        Rolodex.Phone   AS Phone,
-                        Rolodex.Email   AS Email,
-                        Rolodex.Contact AS Contact,
-        				tblWork.Super   AS Supervisor,
-        				[User].ID       AS User_ID,
-        				[User].Email 	AS User_Email
+        				Employee.fFirst                       AS First_Name,
+        				Employee.Last                         AS Last_Name,
+                        Employee.Title                        AS Title,
+        				Rolodex.Address                       AS Street,
+        				Rolodex.City                          AS City,
+        				Rolodex.State                         AS State,
+        				Rolodex.Zip                           AS Zip,
+        				Rolodex.Latt                          AS Latitude,
+        				Rolodex.fLong                         AS Longitude,
+        				Rolodex.Geolock                       AS Geofence,
+        				Rolodex.ID 		                      AS Rolodex,
+        				Rolodex.Name                          AS Name,
+                        Rolodex.Phone                         AS Phone,
+                        Rolodex.Email                         AS Email,
+                        Rolodex.Contact                       AS Contact,
+        				tblWork.Super                         AS Supervisor,
+        				[User].ID                             AS User_ID,
+        				[User].Email 	                      AS User_Email
         		FROM 	dbo.Emp AS Employee
         				LEFT JOIN dbo.tblWork       AS tblWork  ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
         				LEFT JOIN dbo.Rol           AS Rolodex  ON Employee.Rol = Rolodex.ID
@@ -140,6 +141,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Name' => null,
         	'First_Name' => null,
         	'Last_Name' => null,
+            'Title' => null,
         	'Sales' => null,
         	'Field' => null,
         	'In_Use' => null,
@@ -156,13 +158,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Supervisor' => null,
         	'Name' => null,
         	'Email' => null,
-        	'Phone' => null,
-        	'UserEmail' => null,
+        	'Phone' => null
         ) : sqlsrv_fetch_array($result);
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
         	$Employee[ 'First_Name' ]      = isset( $_POST[ 'First_Name' ] )    ? $_POST[ 'First_Name' ]    : $Employee[ 'First_Name' ];
             $Employee[ 'Last_Name' ]        = isset( $_POST[ 'Last_Name' ] )     ? $_POST[ 'Last_Name' ]     : $Employee[ 'Last_Name' ];
+            $Employee[ 'Title' ]        = isset( $_POST[ 'Title' ] )     ? $_POST[ 'Title' ]     : $Employee[ 'Title' ];
             $Employee[ 'Street' ]       = isset( $_POST[ 'Street' ] )    ? $_POST[ 'Street' ]    : $Employee[ 'Street' ];
             $Employee[ 'City' ]        = isset( $_POST[ 'City' ] )     ? $_POST[ 'City' ]     : $Employee[ 'City' ];
             $Employee[ 'State' ]       = isset( $_POST[ 'State' ] )    ? $_POST[ 'State' ]    : $Employee[ 'State' ];
@@ -217,17 +219,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             fWork,
         					fFirst,
         					Last,
+                            Title,
         					Status,
         					Sales,
         					Field,
         					InUse ,
                             Rol
         				)
-        				VALUES ( @MAXID + 1, @MAXFWORK + 1, ?, ?, ?, ?, ?, ?, ? );
+        				VALUES ( @MAXID + 1, @MAXFWORK + 1, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Employee[ 'First_Name' ],
         				$Employee[ 'Last_Name' ],
+                        $Employee[ 'Title' ],
         				$Employee[ 'Status' ],
         				!is_null( $Employee[ 'Sales' ] ) ? $Employee[ 'Sales' ] : 0,
         				!is_null( $Employee[ 'Field' ] ) ? $Employee[ 'Field' ] : 0,
@@ -246,10 +250,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		"	UPDATE 	Emp
 	        			SET 	Emp.fFirst = ?,
 	        					Emp.Last = ?,
+                                Emp.Title = ?
 	        			WHERE 	Emp.ID = ?;",
 	        		array(
 	        			$Employee[ 'First_Name' ],
-	        			$Employee[ 'Last_Name' ]
+	        			$Employee[ 'Last_Name' ],
+                        $Employee[ 'Title' ],
+                        $Employee[ 'ID' ]
 	        		)
 	        	);
 	        	\singleton\database::getInstance( )->query(
@@ -374,190 +381,289 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				</div><?php
 			}?>
             <div class='card card-primary my-3'>
-            	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
+                <div class='card-heading'>
+                    <div class='row g-0 px-3 py-2'>
+                      <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
+                      <div class='col-2'>&nbsp;</div>
+                    </div>
                 </div>
-              </div>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>First Name:</div>
-                  <div class='col-8'><input placeholder='First Name' type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['First_Name'];?>' /></div>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                    <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
+                    <div class='row g-0'>
+                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> First Name:</div>
+                      <div class='col-8'><input placeholder='First Name' type='text' class='form-control edit' name='First_Name' value='<?php echo $Employee[ 'First_Name' ];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Last Name:</div>
+                      <div class='col-8'><input placeholder='Last Name' type='text' class='form-control edit' name='Last_Name' value='<?php echo $Employee[ 'Last_Name' ];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Title:</div>
+                      <div class='col-8'><input placeholder='Title' type='text' class='form-control edit' name='Title' value='<?php echo $Employee[ 'Title' ];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Supervisor:</div>
+                      <div class='col-8'><input placeholder='Supervisor' type='text' class='form-control edit' name='Supervisor' value='<?php echo $Employee[ 'Supervisor' ];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email(1);?> Email:</div>
+                      <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='First_Name' value='<?php echo $Employee[ 'Email' ];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
+                        <div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='Phone' value='<?php echo $Employee[ 'Phone' ];?>' /></div>
+                    </div>
+                    <div class='row g-0'>
+    					<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
+    					<div class='col-6'></div>
+    					<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Employee=<?php echo $Employee[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+    				</div>
+    				<div class='row g-0'>
+    					<div class='col-1'>&nbsp;</div>
+    					<div class='col-3 border-bottom border-white my-auto'>Street:</div>
+    					<div class='col-8'><input placeholder='Street' type='text' class='form-control edit' name='Street' value='<?php echo $Employee[ 'Street' ];?>' /></div>
+    				</div>
+    				<div class='row g-0'>
+    					<div class='col-1'>&nbsp;</div>
+    					<div class='col-3 border-bottom border-white my-auto'>City:</div>
+    					<div class='col-8'><input placeholder='City' type='text' class='form-control edit' name='City' value='<?php echo $Employee[ 'City' ];?>' /></div>
+    				</div>
+    				<div class='row g-0'>
+    					<div class='col-1'>&nbsp;</div>
+    					<div class='col-3 border-bottom border-white my-auto'>State:</div>
+    					<div class='col-8'><select class='form-control edit' name='State'>
+    						<option value=''>Select</option>
+    						<option <?php echo $Employee[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
+    						<option <?php echo $Employee[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
+    						<option <?php echo $Employee[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
+    						<option <?php echo $Employee[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
+    						<option <?php echo $Employee[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
+    						<option <?php echo $Employee[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
+    						<option <?php echo $Employee[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
+    						<option <?php echo $Employee[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
+    						<option <?php echo $Employee[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
+    						<option <?php echo $Employee[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
+    						<option <?php echo $Employee[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
+    						<option <?php echo $Employee[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
+    						<option <?php echo $Employee[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
+    						<option <?php echo $Employee[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
+    						<option <?php echo $Employee[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
+    						<option <?php echo $Employee[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
+    						<option <?php echo $Employee[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
+    						<option <?php echo $Employee[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
+    						<option <?php echo $Employee[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
+    						<option <?php echo $Employee[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
+    						<option <?php echo $Employee[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
+    						<option <?php echo $Employee[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
+    						<option <?php echo $Employee[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
+    						<option <?php echo $Employee[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
+    						<option <?php echo $Employee[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
+    						<option <?php echo $Employee[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
+    						<option <?php echo $Employee[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
+    						<option <?php echo $Employee[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
+    						<option <?php echo $Employee[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
+    						<option <?php echo $Employee[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
+    						<option <?php echo $Employee[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
+    						<option <?php echo $Employee[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
+    						<option <?php echo $Employee[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
+    						<option <?php echo $Employee[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
+    						<option <?php echo $Employee[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
+    						<option <?php echo $Employee[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
+    						<option <?php echo $Employee[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
+    						<option <?php echo $Employee[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
+    						<option <?php echo $Employee[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
+    					</select></div>
+    				</div>
+    				<div class='row g-0'>
+    					<div class='col-1'>&nbsp;</div>
+    					<div class='col-3 border-bottom border-white my-auto'>Zip:</div>
+    					<div class='col-8'><input placeholder='Zip' type='text' class='form-control edit' name='Zip' value='<?php echo $Employee['Zip'];?>' /></div>
+    				</div>
+    				<div class='row g-0'>
+    					<div class='col-1'>&nbsp;</div>
+    					<div class='col-3 border-bottom border-white my-auto'>Latitude:</div>
+    					<div class='col-8'><input placeholder='Latitude' type='text' class='form-control edit <?php echo $Employee[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Employee['Latitude'];?>' /></div>
+    				</div>
+    				<div class='row g-0'>
+    					<div class='col-1'>&nbsp;</div>
+    					<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
+    					<div class='col-8'><input placeholder='Longitude' type='text' class='form-control edit <?php echo $Employee[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Employee['Longitude'];?>' /></div>
+    				</div>
                 </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Last Name:</div>
-                  <div class='col-8'><input placeholder='Last Name' type='text' class='form-control edit animation-focus' name='Last_Name' value='<?php echo $Employee['Last_Name'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-					<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
-					<div class='col-6'></div>
-					<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Employee=<?php echo $Employee[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-				</div>
-				<div class='row g-0'>
-					<div class='col-1'>&nbsp;</div>
-					<div class='col-3 border-bottom border-white my-auto'>Street:</div>
-					<div class='col-8'><input placeholder='Street' type='text' class='form-control edit' name='Street' value='<?php echo $Employee['Street'];?>' /></div>
-				</div>
-				<div class='row g-0'>
-					<div class='col-1'>&nbsp;</div>
-					<div class='col-3 border-bottom border-white my-auto'>City:</div>
-					<div class='col-8'><input placeholder='City' type='text' class='form-control edit' name='City' value='<?php echo $Employee['City'];?>' /></div>
-				</div>
-				<div class='row g-0'>
-					<div class='col-1'>&nbsp;</div>
-					<div class='col-3 border-bottom border-white my-auto'>State:</div>
-					<div class='col-8'><select class='form-control edit' name='State'>
-						<option value=''>Select</option>
-						<option <?php echo $Employee[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
-						<option <?php echo $Employee[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
-						<option <?php echo $Employee[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
-						<option <?php echo $Employee[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
-						<option <?php echo $Employee[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
-						<option <?php echo $Employee[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
-						<option <?php echo $Employee[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
-						<option <?php echo $Employee[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
-						<option <?php echo $Employee[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
-						<option <?php echo $Employee[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
-						<option <?php echo $Employee[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
-						<option <?php echo $Employee[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
-						<option <?php echo $Employee[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
-						<option <?php echo $Employee[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
-						<option <?php echo $Employee[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
-						<option <?php echo $Employee[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
-						<option <?php echo $Employee[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
-						<option <?php echo $Employee[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
-						<option <?php echo $Employee[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
-						<option <?php echo $Employee[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
-						<option <?php echo $Employee[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
-						<option <?php echo $Employee[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
-						<option <?php echo $Employee[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
-						<option <?php echo $Employee[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
-						<option <?php echo $Employee[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
-						<option <?php echo $Employee[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
-						<option <?php echo $Employee[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
-						<option <?php echo $Employee[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
-						<option <?php echo $Employee[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
-						<option <?php echo $Employee[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
-						<option <?php echo $Employee[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
-						<option <?php echo $Employee[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
-						<option <?php echo $Employee[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
-						<option <?php echo $Employee[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
-						<option <?php echo $Employee[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
-						<option <?php echo $Employee[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
-						<option <?php echo $Employee[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
-						<option <?php echo $Employee[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
-						<option <?php echo $Employee[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
-						<option <?php echo $Employee[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
-						<option <?php echo $Employee[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
-						<option <?php echo $Employee[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
-						<option <?php echo $Employee[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
-						<option <?php echo $Employee[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
-						<option <?php echo $Employee[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
-						<option <?php echo $Employee[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
-						<option <?php echo $Employee[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
-						<option <?php echo $Employee[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
-						<option <?php echo $Employee[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
-						<option <?php echo $Employee[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
-						<option <?php echo $Employee[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
-					</select></div>
-				</div>
-				<div class='row g-0'>
-					<div class='col-1'>&nbsp;</div>
-					<div class='col-3 border-bottom border-white my-auto'>Zip:</div>
-					<div class='col-8'><input placeholder='Zip' type='text' class='form-control edit' name='Zip' value='<?php echo $Employee['Zip'];?>' /></div>
-				</div>
-				<div class='row g-0'>
-					<div class='col-1'>&nbsp;</div>
-					<div class='col-3 border-bottom border-white my-auto'>Latitude:</div>
-					<div class='col-8'><input placeholder='Latitude' type='text' class='form-control edit <?php echo $Employee[ 'Latitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Latitude' value='<?php echo $Employee['Latitude'];?>' /></div>
-				</div>
-				<div class='row g-0'>
-					<div class='col-1'>&nbsp;</div>
-					<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
-					<div class='col-8'><input placeholder='Longitude' type='text' class='form-control edit <?php echo $Employee[ 'Longitude' ] != 0 ? 'bg-success' : 'bg-warning';?>' name='Longitude' value='<?php echo $Employee['Longitude'];?>' /></div>
-				</div>
-				</div>
-              <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-              </div>
-        </form></div>
-
-        <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
-
-           <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>User</span></h5></div>
-                   <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='user.php?ID=<?php echo $Employee[ 'User_ID' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
-                </div>
-              </div>
-          <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'User' ] ) && $_SESSION[ 'Cards' ][ 'User' ] == 0 ? "style='display:none;'" : null;?>>
-            <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Email:</div>
-              <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit animation-focus' name='First_Name' value='<?php echo $Employee['UserEmail'];?>' /></div>
             </div>
-            <div class='row g-0'>
-              <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Employee ID:</div>
-              <div class='col-8'><input placeholder='000000' type='text' class='form-control edit animation-focus' name='ID' value='<?php echo $Employee['ID'];?>' /></div>
-            </div>
-          </div>
-           <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-              </div>
-        </form>
-      </div>
-
-       <div class='card card-primary my-3'>
-       	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
-                <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Contact</span></h5></div>
-                   <div class="col-2"><button class="h-100 w-100" onclick="document.location.href='contact.php?ID=<?php echo $Employee[ 'Rolodex' ];?>';"><i class="fa fa-search fa-fw fa-1x" aria-hidden="true"></i></button></div>
-                </div>
-              </div>
-              <div class='card-body bg-dark'>
-                <div class='row'>
-                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->User( 1 );?> Name:</div>
-                  <div class='col-8'><input placeholder='Name' type='text' class='form-control edit' name='Name' value='<?php echo $Employee[ 'Name' ];?>' /></div>
-                </div>
-                <div class='row'>
-                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Phone:</div>
-                  <div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='Phone' value='<?php echo $Employee[ 'Phone' ];?>' /></div>
-                </div>
-                <div class='row'>
-                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-                  <div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='Email' value='<?php echo $Employee[ 'Email' ];?>' /></div>
-                </div>
-              </div>
-              <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-              </div>
-            </form>
-            </div>
-
             <div class='card card-primary my-3'>
-       	<form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
-                <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><span>Paid Time Off</span></h5></div>
-                   <div class="col-2"></div>
+                <div class='card-heading'>
+                    <div class='row g-0 px-3 py-2'>
+                        <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
+                        <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
                 </div>
-              </div>
-            </form>
-          </div>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                    <div class='row g-0'>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
+                        <div class='col-6'>&nbsp;</div>
+                        <div class='col-2'>&nbsp;</div>
+                    </div>
+                    <div class='row g-0'><?php
+                            $r = \singleton\database::getInstance( )->query(
+                                null,
+                                "   SELECT Count( Tickets.ID ) AS Tickets
+                                    FROM   (
+                                                (
+                                                    SELECT  TicketO.ID AS ID
+                                                    FROM    TicketO
+                                                            LEFT JOIN Emp AS Employee ON TicketO.fWork = Employee.fWork
+                                                    WHERE       Employee.ID = ?
+                                                            AND TicketO.Assigned = 0
+                                                )
+                                            ) AS Tickets;",
+                                array(
+                                    $Employee[ 'ID' ]
+                                )
+                            );
+                        ?><div class='col-1'>&nbsp;</div>
+                        <div class='col-3 border-bottom border-white my-auto'>Open</div>
+                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                            echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                        ?>' /></div>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
+                    <div class='row g-0'><?php
+                            $r = \singleton\database::getInstance( )->query(
+                                null,
+                                "   SELECT Count( Tickets.ID ) AS Tickets
+                                    FROM   (
+                                                (
+                                                    SELECT  TicketO.ID AS ID
+                                                    FROM    TicketO
+                                                            LEFT JOIN Emp AS Employee ON TicketO.fWork = Employee.fWork
+                                                    WHERE       Employee.ID = ?
+                                                            AND TicketO.Assigned = 1
+                                                )
+                                            ) AS Tickets;",
+                                array(
+                                    $Employee[ 'ID' ]
+                                )
+                            );
+                        ?><div class='col-1'>&nbsp;</div>
+                        <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
+                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                            echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                        ?>' /></div>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
+                    <div class='row g-0'><?php
+                            $r = \singleton\database::getInstance( )->query(
+                                null,
+                                "   SELECT Count( Tickets.ID ) AS Tickets
+                                    FROM   (
+                                                (
+                                                    SELECT  TicketO.ID AS ID
+                                                    FROM    TicketO
+                                                            LEFT JOIN Emp AS Employee ON TicketO.fWork = Employee.fWork
+                                                    WHERE       Employee.ID = ?
+                                                            AND TicketO.Assigned = 2
+                                                )
+                                            ) AS Tickets;",
+                                array(
+                                    $Employee[ 'ID' ]
+                                )
+                            );
+                        ?><div class='col-1'>&nbsp;</div>
+                        <div class='col-3 border-bottom border-white my-auto'>En Route</div>
+                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                            echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                        ?>' /></div>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
+                    <div class='row g-0'><?php
+                            $r = \singleton\database::getInstance( )->query(
+                                null,
+                                "   SELECT Count( Tickets.ID ) AS Tickets
+                                    FROM   (
+                                                (
+                                                    SELECT  TicketO.ID AS ID
+                                                    FROM    TicketO
+                                                            LEFT JOIN Emp AS Employee ON TicketO.fWork = Employee.fWork
+                                                    WHERE       Employee.ID = ?
+                                                            AND TicketO.Assigned = 3
+                                                )
+                                            ) AS Tickets;",
+                                array(
+                                    $Employee[ 'ID' ]
+                                )
+                            );
+                        ?><div class='col-1'>&nbsp;</div>
+                        <div class='col-3 border-bottom border-white my-auto'>On Site</div>
+                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                            echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                        ?>' /></div>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
+                    <div class='row g-0'><?php
+                            $r = \singleton\database::getInstance( )->query(
+                                null,
+                                "   SELECT Count( Tickets.ID ) AS Tickets
+                                    FROM   (
+                                                (
+                                                    SELECT  TicketO.ID AS ID
+                                                    FROM    TicketO
+                                                            LEFT JOIN Emp AS Employee ON TicketO.fWork = Employee.fWork
+                                                    WHERE       Employee.ID = ?
+                                                            AND TicketO.Assigned = 6
+                                                )
+                                            ) AS Tickets;",
+                                array(
+                                    $Employee[ 'ID' ]
+                                )
+                            );
+                        ?><div class='col-1'>&nbsp;</div>
+                        <div class='col-3 border-bottom border-white my-auto'>Review</div>
+                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                            echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                        ?>' /></div>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
+                    <div class='row g-0'><?php
+                            $r = \singleton\database::getInstance( )->query(
+                                null,
+                                "   SELECT Count( Tickets.ID ) AS Tickets
+                                    FROM   (
+                                                (
+                                                    SELECT  TicketO.ID AS ID
+                                                    FROM    TicketO
+                                                            LEFT JOIN Emp AS Employee ON TicketO.fWork = Employee.fWork
+                                                    WHERE       Employee.ID = ?
+                                                            AND TicketO.Assigned = 4
+                                                )
+                                            ) AS Tickets;",
+                                array(
+                                    $Employee[ 'ID' ]
+                                )
+                            );
+                        ?><div class='col-1'>&nbsp;</div>
+                        <div class='col-3 border-bottom border-white my-auto'>Complete</div>
+                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                            echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
+                        ?>' /></div>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Customer[ 'Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                    </div>
+                </div>
+            </div>
+        </div>            
     </div>
-  </div>
 </body>
 </html>
  <?php
