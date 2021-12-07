@@ -90,7 +90,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     /*Filter $_GET Columns to SQL*/
     if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['ID'];
-      $conditions[] = "[Privilege].[ID] LIKE '%' + ? + '%'";
+      $conditions[] = "[Privilege].[User] LIKE '%' + ? + '%'";
     }
 
     /*Search Filters*/
@@ -120,15 +120,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               FROM  (
                       SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                               [Privilege].[ID],
+                              [Privilege].[User],
                               [Privilege].[Access],
-                              [Privilege].[Owner],
-                              [Privilege].[Group],
-                              [Privilege].[Department],
-                              [Privilege].[Database],
-                              [Privilege].[Server],
-                              [Privilege].[Other],
-                              [Privilege].[Token],
-                              [Privilege].[Internet]
+                              CASE  WHEN [Privilege].[Owner] IS NULL THEN 0
+                                    ELSE [Privilege].[Owner] END AS [Owner],
+                              CASE  WHEN [Privilege].[Group] IS NULL THEN 0
+                                    ELSE [Privilege].[Group] END AS [Group],
+                              CASE  WHEN [Privilege].[Department] IS NULL THEN 0
+                                    ELSE [Privilege].[Department] END AS [Department],
+                              CASE  WHEN [Privilege].[Database] IS NULL THEN 0
+                                    ELSE [Privilege].[Database] END AS [Database],
+                              CASE  WHEN [Privilege].[Server] IS NULL THEN 0
+                                    ELSE [Privilege].[Server] END AS [Server],
+                              CASE  WHEN [Privilege].[Other] IS NULL THEN 0
+                                    ELSE [Privilege].[Other] END AS [Other],
+                              CASE  WHEN [Privilege].[Token] IS NULL THEN 0
+                                    ELSE [Privilege].[Token] END AS [Token],
+                              CASE  WHEN [Privilege].[Internet] IS NULL THEN 0
+                                    ELSE [Privilege].[Internet] END AS [Internet]
                       FROM    [Privilege]
                       WHERE   ({$conditions}) AND ({$search})
                     ) AS Tbl
@@ -209,7 +218,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Row[ 'Server_Write' ]     = check( privilege_write, level_server, $Row[ 'dechex' ] );
       $Row[ 'Server_Execute' ]   = check( privilege_execute, level_server, $Row[ 'dechex' ] );
       $Row[ 'Server_Delete' ]    = check( privilege_delete, level_server, $Row[ 'dechex' ] );
-
       $output['aaData'][]       = $Row;
     }
     echo json_encode( $output );

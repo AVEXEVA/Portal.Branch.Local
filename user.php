@@ -223,9 +223,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
                 echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
               ?>'>User</a>: <span><?php
-                echo is_null( $User[ 'ID' ] )
+                echo is_null( $User[ 'Email' ] )
                     ? 'New'
-                    : '#' . $User[ 'ID' ];
+                    : $User[ 'Email' ];
               ?></span></h5>
           </div>
           <div class='col-6 col-lg-3'>

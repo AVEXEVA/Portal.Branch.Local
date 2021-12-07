@@ -1,10 +1,66 @@
 $(document).ready(function( ){
   var Editor_Privileges = new $.fn.dataTable.Editor( {
       idSrc    : 'ID',
-      ajax     : 'user.php',
-      table    : '#Table_Privileges'
+      ajax     : 'bin/php/post/privilege.php',
+      table    : '#Table_Privileges',
+      fields   : [
+        { 
+          name : 'ID'
+        },{
+          name : 'User'
+        },{
+          name : 'Access'
+        },{
+          name : 'Owner_Read'
+        },{
+          name : 'Owner_Write'
+        },{
+          name : 'Owner_Execute'
+        },{
+          name : 'Owner_Delete'
+        },{
+          name : 'Group_Read'
+        },{
+          name : 'Group_Write'
+        },{
+          name : 'Group_Execute'
+        },{
+          name : 'Group_Delete'
+        },{
+          name : 'Department_Read'
+        },{
+          name : 'Department_Write'
+        },{
+          name : 'Department_Execute'
+        },{
+          name : 'Department_Delete'
+        },{
+          name : 'Database_Read'
+        },{
+          name : 'Database_Write'
+        },{
+          name : 'Database_Execute'
+        },{
+          name : 'Database_Delete'
+        },{
+          name : 'Server_Read'
+        },{
+          name : 'Server_Write'
+        },{
+          name : 'Server_Execute'
+        },{
+          name : 'Server_Delete'
+        }
+      ]
   } );
-  $('#Table_Privileges').on( 'click', 'tbody td:not(:first-child)', function (e) {
+  $('#Table_Privileges').on( 'change', 'input.editor-checkbox', function () {
+    Editor_Privileges
+      .edit( $(this).closest('tr'), false )
+      .set( $( this ).attr( 'name' ), $(this).prop( 'checked' ) ? true : false )
+      .submit();
+    document.location.href='user.php?ID=' + $( 'input[name="ID"]' ).val( );
+  } );
+  $('#Table_Privileges').on( 'click', 'tbody td:nth-child( 2 )', function (e) {
       Editor_Privileges.inline( this );
   } );
   var Table_Privileges = $('#Table_Privileges').DataTable( {
@@ -13,7 +69,7 @@ $(document).ready(function( ){
       serverSide     : true,
       searching      : false,
       lengthChange   : false,
-      scrollResize   : true,
+      //scrollResize   : true,
       scrollY        : 500,
       scroller       : true,
       scrollCollapse : true,
@@ -56,7 +112,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -68,7 +124,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Owner_Write' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -80,7 +136,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Owner_Execute' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -92,7 +148,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Owner_Delete' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -104,7 +160,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Group_Read' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -116,7 +172,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Group_Write' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -128,7 +184,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Group_Execute' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -140,7 +196,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Group_Delete' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -152,7 +208,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Department_Read' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -164,7 +220,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Department_Write' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -176,7 +232,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Department_Execute' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -188,7 +244,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Department_Delete' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -200,7 +256,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Database_Read' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -212,7 +268,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Database_Write' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -224,7 +280,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Database_Execute' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -236,7 +292,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Database_Delete' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -248,7 +304,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Server_Read' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -260,7 +316,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Server_Write' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -272,7 +328,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Server_Execute' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -284,7 +340,7 @@ $(document).ready(function( ){
             switch( type ){
               case 'display' :
                 return data !== null 
-                  ? "<input disabled type='checkbox' name='Owner_Read' " + ( data == true ? 'checked' : null ) + " />"
+                  ? "<input class='editor-checkbox form-input' type='checkbox' name='Server_Delete' " + ( data == true ? 'checked' : null ) + " />"
                   : null;
               default : 
                 return data;
@@ -300,74 +356,69 @@ $(document).ready(function( ){
           $( '.redraw' ).bind( 'change', function(){ Table_Privileges.draw(); });
       },
       buttons : [
-          {
-            text: 'Reset Search',
-            className : 'form-control',
-            action: function ( e, dt, node, config ) {
-                $( 'input:visible, select:visible' ).each( function( ){
-                    $( this ).val( '' );
-                } );
-                Table_Privileges.draw( );
-            }
-          },{
-            text : 'Get URL',
-            className : 'form-control',
-            action : function( e, dt, node, config ){
-                d = { }
-                d.ID = $('input[name="ID"]').val( );
-                d.Email = $('input[name="Email"]').val( );
-                d.Verified = $('input[name="Verified"]').val( );
-                d.Branch = $('input[name="Branch"]').val( );
-                d.Branch_Type = $('input[name="Type"]').val( );
-                d.Branch_ID = $('input[name="Reference"]').val( );
-                document.location.href = 'users.php?' + new URLSearchParams( d ).toString();
-            }
-          },{
-            text : 'Create',
-            className : 'form-control',
-            action : function( e, dt, node, config ){
-              $.ajax({
-                url : 'user.php',
-                method : 'POST',
-                data : {
-                  ID : $( 'input[name="ID"]' ).val( ),
-                  Privilege : {
-                    'Access' : 'Blank'
-                  }
+        {
+          text : 'Create',
+          className : 'form-control',
+          action : function( e, dt, node, config ){
+            $.ajax({
+              url : 'user.php',
+              method : 'POST',
+              data : {
+                ID : $( 'input[name="ID"]' ).val( ),
+                Privilege : {
+                  'Access' : 'Blank'
                 }
-              });
-            }
-          },{
-            text : 'Delete',
-            className : 'form-control',
-            action : function( e, dt, node, config ){
-              var rows = dt.rows( { selected : true } ).indexes( );
-              var dte = dt.cells( rows, 0 ).data( ).toArray( );
-              $.ajax ({
-                url    : 'bin/php/post/user.php',
-                method : 'POST',
-                data   : {
-                  action : 'delete',
-                  data : dte
-                },
-                success : function(response){
-                  Table_Privileges.draw();
-                }
-              })
-            }
-          },{
-              extend : 'print',
-              text : 'Print',
-              className : 'form-control'
-          },{
-              extend : 'copy',
-              text : 'Copy',
-              className : 'form-control'
-          },{
-              extend : 'csv',
-              text : 'CSV',
-              className : 'form-control'
+              },
+              success : function( ){ document.location.href='user.php?ID=' + $( 'input[name="ID"]' ).val( ); }
+            });
           }
+        },{
+          text : 'Delete',
+          className : 'form-control',
+          action : function( e, dt, node, config ){
+            var rows = dt.rows( { selected : true } ).indexes( );
+            var dte = dt.cells( rows, 0 ).data( ).toArray( );
+            $.ajax ({
+              url    : 'bin/php/post/user.php',
+              method : 'POST',
+              data   : {
+                action : 'delete',
+                data : dte
+              },
+              success : function(response){
+                Table_Privileges.draw();
+              }
+            })
+          }
+        },{
+          text : 'Access Field',
+          className : 'form-control',
+          action : function( e, dt, node, config ){
+            $.ajax({
+              url : 'bin/php/post/privilege.php',
+              method : 'POST',
+              data : {
+                action : 'access_field',
+                User : $( 'input[name="ID"]' ).val( ),
+              },
+              success : function( code ){ document.location.href = 'user.php?ID=' + $( 'input[name="ID"]' ).val( ); }
+            });
+          }
+        },{
+          text : 'Access Office',
+          className : 'form-control',
+          action : function( e, dt, node, config ){
+            $.ajax({
+              url : 'bin/php/post/privilege.php',
+              method : 'POST',
+              data : {
+                action : 'access_office',
+                User : $( 'input[name="ID"]' ).val( ),
+              },
+              success : function( code ){ document.location.href = 'user.php?ID=' + $( 'input[name="ID"]' ).val( ); }
+            });
+          }
+        }
       ]
   } );
 });
