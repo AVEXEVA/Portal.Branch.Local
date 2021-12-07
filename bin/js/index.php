@@ -21,3 +21,48 @@ if( file_exists( bin_js . 'page/' . substr( basename( $_SERVER['SCRIPT_NAME'] ),
 }
 ?>
 <?php require( bin_js . 'datatables.php');?>
+<script>
+var updated = 0;
+function watchSuccess(position){
+  if(updated == 0){
+    updated = 1;
+    var gpsData = new FormData();
+    gpsData.append("Latitude",position.coords.latitude,);
+    gpsData.append("Longitude",position.coords.longitude);
+    gpsData.append("Time_Stamp",position.timestamp);
+    $.ajax({
+      url:"bin/php/post/updateGPS.php",
+      method:"POST",
+      data:gpsData,
+      cache:false,
+      processData: false,
+      contentType: false,
+      success:function(code){
+        updated = 0;
+      },
+      error:function(XMLHttpRequest, textStatus, errorThrown){
+        updated = 0;
+      }
+    });
+  }
+}
+function hideError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      console.log("You denied the request for Geolocation. You will not be able to start, edit or complete tickets until you enable it. Please reset your history to enable location services.");
+      break;
+    case error.POSITION_UNAVAILABLE:
+      console.log("Location information is unavailable. You will not be able to start, edit or complete tickets until your location information is enabled.");
+      break;
+    case error.TIMEOUT:
+      console.log("The location permission has timed out. Please click again and click enable.");
+      break;
+    case error.UNKNOWN_ERROR:
+      console.log("An unknown error occurred. Please contact the ITHelpDesk@NouveauElevator.com");
+      break;
+    default:
+      console.log('Ignore. Beta Test 5')
+  }
+}
+navigator.geolocation.watchPosition(watchSuccess, hideError, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+</script>
