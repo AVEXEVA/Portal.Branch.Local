@@ -1,10 +1,10 @@
 $( document ).ready( function( ){
-    var Editor_Requisitions = new $.fn.dataTable.Editor( {
+    var Editor_Profitability = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
-        table    : '#Table_Requisitions'
+        table    : '#Table_Profitability'
     } );
-    var Table_Requisitions = $('#Table_Requisitions').DataTable( {
+    var Table_Profitability = $('#Table_Profitability').DataTable( {
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
@@ -22,7 +22,7 @@ $( document ).ready( function( ){
           selector : 'td.ID'
         },
         ajax      : {
-            url : 'bin/php/get/Requisitions.php',
+            url : 'bin/php/get/Profitability.php',
             data : function( d ){
                 d = {
                     draw : d.draw,
@@ -157,7 +157,7 @@ $( document ).ready( function( ){
                     $( 'input:visible, select:visible' ).each( function( ){
                         $( this ).val( '' );
                     } );
-                    Table_Requisitions.draw( );
+                    Table_Profitability.draw( );
                 }
             },{
                 text : 'Get URL',
@@ -190,7 +190,7 @@ $( document ).ready( function( ){
                       data : dte
                     },
                     success : function(response){
-                      Table_Requisitions.draw();
+                      Table_Profitability.draw();
                     }
                   })
                 }
@@ -213,7 +213,7 @@ $( document ).ready( function( ){
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             //search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Requisitions.draw(); });
+            $( '.redraw' ).bind( 'change', function(){ Table_Profitability.draw(); });
         }
     } );
 } );

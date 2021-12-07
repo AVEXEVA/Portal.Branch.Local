@@ -122,13 +122,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   			<div class='card-body bg-dark'>
           <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
   					<thead>
-              <th class='text-white border border-white' title='Location'></th>
-              <th class='text-white border border-white' title='ID'>ID</th>
-              <th class='text-white border border-white' title='Status'>Status</th>
-              <th class='text-white border border-white' title='Date'>Date</th>
-              <th class='text-white border border-white' title='Unit'>Unit</th>
-  						<th class='text-white border border-white' title='Type'>Type</th>
-              <th class='text-white border border-white' title='Priority'>Priority</th>
+              <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+              <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+              <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
+              <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+              <th class='text-white border border-white' title='Unit'><?php \singleton\fontawesome::getInstance( )->Unit();?>Unit</th>
+  						<th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
+              <th class='text-white border border-white' title='Priority'><?php \singleton\fontawesome::getInstance( )->List1();?>Priority</th>
   					</thead>
   				</table>
   			</div>

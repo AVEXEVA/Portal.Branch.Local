@@ -149,20 +149,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <table id='Table_Invoices' class='display' cellspacing='0' width='100%'>
                         <thead>
                           <tr>
-                            <th>Invoice #</th>
-                            <th>Customer</th>
-                            <th>Location</th>
-                            <th>Job</th>
-							              <th>Type</th>
-                            <th>Date</th>
-                            <th>Due</th>
-                            <th>Original</th>
-                            <th>Balance</th>
-                            <th>Description</th>
+                            <th class='text-white border border-white' title='Invoice#'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoice #</th>
+                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+                            <th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Job</th>
+							              <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
+                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+                            <th class='text-white border border-white' title='Due'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Due</th>
+                            <th class='text-white border border-white' title='Original'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Original</th>
+                            <th class='text-white border border-white' title='Balanace'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Balance</th>
+                            <th class='text-white border border-white' title='Description'><?php \singleton\fontawesome::getInstance( )->Description();?>Description</th>
                         </tr>
                         <tr class='form-desktop'>
                           <th><input class='redraw form-control' type='text' name='Invoice #' placeholder='Invoice #' value='<?php echo isset( $_GET[ 'Invoice #' ] ) ? $_GET[ 'Invoice #' ] : null;?>' /></th>
-                          <th class='text-white border border-white' title='Customer'><div><input type='text' autocomplete='off' class='redraw form-control' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
+                          <th class='text-white border border-white' title='Customer'><div><input type='text' autocomplete='off' class='redraw form-control' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
                           <script>
                             $( 'input:visible[name="Customer"]' )
                                 .typeahead({

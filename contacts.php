@@ -184,14 +184,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				<div class='card-body bg-darker'>
 					<table id='Table_Contacts' class='display' cellspacing='0' width='100%'>
 						<thead class='text-white border border-white'><tr>
-							<th class='text-white border border-white'>ID</th>
-							<th class='text-white border border-white'>Name</th>
-							<th class='text-white border border-white'>Type</th>
-							<th class='text-white border border-white'>Entity</th>
-							<th class='text-white border border-white'>Position</th>
-							<th class='text-white border border-white'>Phone</th>
-							<th class='text-white border border-white'>Email</th>
-							<th class='text-white border border-white'>Address</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Proposal( );?>ID</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Customer( );?>Name</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Note( );?>Type</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->User( );?>Entity</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Users( );?>Position</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Phone( );?>Phone</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Email( );?>Email</th>
+							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Address( );?>Address</th>
 			            </tr>
 			            <tr class='form-desktop'>
 							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>

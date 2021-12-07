@@ -97,73 +97,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
        <?php	require( bin_css  . 'index.php');?>
        <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload="finishLoadingPage();">
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content'>
-			<table id='Table_Customers' class='display' cellspacing='0' width='100%'>
-				<thead>
-					<th title=''>Customer</th>
-					<th title=''>Profit</th>
-					<th title=''>Profit %</th>
-					<th title=''>Revenue</th>
-					<th>Material</th>
-					<th>Labor</th>
-				</thead>
-			</table>
+<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
+  <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
+    <?php require(bin_php . 'element/navigation.php');?>
+    <div id='page-wrapper' class='content'>
+      <div class='card card-full card-primary border-0'>
+        <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?> Profitability</h4></div>
+        <div class='card-body bg-dark'>
+          <table id='Table_Profitability' class='display' cellspacing='0' width='100%'>
+              <thead><tr>
+  							<th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+  							<th class='text-white border border-white' title='User'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit</th>
+                <th class='text-white border border-white' title='Item'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit %</th>
+  							<th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Revenue</th>
+  							<th class='text-white border border-white' title='Required'><?php \singleton\fontawesome::getInstance( )->List1();?>Material</th>
+  							<th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Hours();?>Labor</th>
+              </tr><tr>
+                <th><input type='text' class='form-control edit' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer'] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Profit' placeholder='Profit' value='<?php echo isset( $_GET[ 'Profit'] ) ? $_GET[ 'Profit' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Profit' placeholder='Profit' value='<?php echo isset( $_GET[ 'Profit%'] ) ? $_GET[ 'Profit' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Revenue' placeholder='Revenue' value='<?php echo isset( $_GET[ 'Revenue'] ) ? $_GET[ 'Revenue' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Material' placeholder='Material' value='<?php echo isset( $_GET[ 'Material'] ) ? $_GET[ 'Material' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Labor' placeholder='Labor' value='<?php echo isset( $_GET[ 'Labor'] ) ? $_GET[ 'Labor' ] : null;?>' /></th>
+              </tr>
+						</thead>
+          </table>
         </div>
+      </div>
     </div>
-	<!-- Bootstrap Core JavaScript -->
-
-    <!-- Metis Menu Plugin JavaScript -->
-
-
-    <?php require(PROJECT_ROOT.'js/datatables.php');?>
-
-    <!-- Custom Theme JavaScript -->
-
-
-    <!--Moment JS Date Formatter-->
-
-
-    <!-- JQUERY UI Javascript -->
-
-
-    <!-- Custom Date Filters-->
-
-    <script>
-
-        $(document).ready(function(){
-            var Table_Customers = $('#Table_Customers').DataTable( {
-                "ajax": {
-                    "url":"bin/php/reports/Profitability.php",
-                    "dataSrc":function(json){
-                        if(!json.data){json.data = [];}
-                        return json.data;}
-                },
-                "columns": [
-                    { "data": "Location"},
-					{ "data": "Profit",render: function(data){return parseFloat(data).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');;}},
-					{ "data": "Profit_Percentage"},
-					{ "data": "Revenue",render: function(data){return parseFloat(data).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');;}},
-					{ "data": "Material",render: function(data){return parseFloat(data).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');;}},
-					{ "data": "Labor",render: function(data){return parseFloat(data).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');;}}
-                ],
-                "order": [[1, 'desc']],
-                "lengthMenu":[[10,25,50,100,500,-1],[10,25,50,100,500,"All"]],
-                "language":{"loadingRecords":""},
-                "initComplete":function(){finishLoadingPage();}
-            } );
-            $("Table#Table_Customers").on("draw.dt",function(){
-
-            });
-            <?php if(!$Mobile){?>
-            yadcf.init(Table_Customers,[
-            ]);
-            stylizeYADCF();<?php }?>
-        });
-    </script>
+  </div>
 </body>
 </html>
 <?php
