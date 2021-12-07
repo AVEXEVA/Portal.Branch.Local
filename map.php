@@ -70,7 +70,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }}
     if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Map' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Map' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Ticket' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -121,9 +121,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showDivision1();' style='background-color:magenta;color:black;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%DIVISION 1%'
                                 ;");
@@ -133,9 +133,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showDivision2();' style='background-color:green;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%DIVISION 2%'
                                 ;");
@@ -145,9 +145,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showDivision3();' style='background-color:blue;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%DIVISION 3%'
                                 ;");
@@ -157,9 +157,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showDivision4();' style='background-color:teal;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%DIVISION 4%'
                                 ;");
@@ -169,9 +169,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showModernization();' style='background-color:black;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%Modernization%'
                                 ;");
@@ -181,9 +181,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showEscalator();' style='background-color:brown;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%Escalator%'
                                 ;");
@@ -193,9 +193,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showFiremen();' style='background-color:red;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%Firemen%'
                                 ;");
@@ -205,9 +205,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showRepair();' style='background-color:purple;color:white;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%Repair%'
                                 ;");
@@ -217,9 +217,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='col-xs-1' onClick='showTesting();' style='background-color:orange;color:black;'><?php
                               $r = $database->query(null,
                                 " SELECT  Count(*) AS Count
-                                  FROM    nei.dbo.TicketO
+                                  FROM    TicketO
                                           LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
                                   WHERE   TicketO.Assigned = 3
                                           AND tblWork.Super LIKE '%Testing%'
                                 ;");
@@ -340,8 +340,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             FROM
                 TechLocation
                 LEFT JOIN Emp ON TechLocation.TechID = Emp.fWork
-                LEFT JOIN nei.dbo.tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                LEFT JOIN nei.dbo.TicketO ON TechLocation.TicketID = TicketO.ID
+                LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
+                LEFT JOIN TicketO ON TechLocation.TicketID = TicketO.ID
             WHERE
                 DateTimeRecorded >= ?
                 AND DateTimeRecorded <= ?
@@ -620,7 +620,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
         }
         <?php /*
-        $r = $database->query(null,"SELECT * FROM nei.dbo.Loc WHERE Loc.Maint = 1;");
+        $r = $database->query(null,"SELECT * FROM Loc WHERE Loc.Maint = 1;");
         if($r){while($row = sqlsrv_fetch_array($r)){
           ?>marker[<?php echo $key;?>] = new mapIcons.Marker({
             map: map,
