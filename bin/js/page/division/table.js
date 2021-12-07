@@ -137,15 +137,43 @@ columns: [
     search( this );
     $( '.redraw' ).bind( 'change', function(){ Table_Divisions.draw(); });
 },
-buttons: [
-    {
-        text: 'Reset Search',
-        action: function ( e, dt, node, config ) {
-            $( 'input, select' ).each( function( ){
-                $( this ).val( '' );
-            } );
-            Table_Divisions.draw( );
-        }
-    }
+        buttons: [
+        {
+            text: 'Reset Search',
+            className: 'form-control',
+            action: function ( e, dt, node, config ) {
+                $( 'input:visible, select:visible' ).each( function( ){
+                    $( this ).val( '' );
+                } );
+                Table_Divisions.draw( );
+            }
+        },{
+        text : 'Create',
+        className: 'form-control',
+        action : function( e, dt, node, config ){
+            document.location.href='contact.php';}
+
+        },{ extend: 'edit',
+            editor: Editor_Divisions,
+            className: 'form-control',
+        },{
+            text : 'Delete',
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+              var rows = dt.rows( { selected : true } ).indexes( );
+              var dte = dt.cells( rows, 0 ).data( ).toArray( );
+              $.ajax ({
+                url    : 'bin/php/post/division.php',
+                method : 'POST',
+                data   : {
+                  action : 'delete' ,
+                  data : dte
+                },
+                success : function(response){
+                  Table_Divisions.draw();
+                }
+              })
+            }
+          },
 ]
 } );

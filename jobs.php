@@ -103,15 +103,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     				<div class='card-body bg-dark'>
     					<table id='Table_Jobs' class='display' cellspacing='0' width='100%'>
     						<thead><tr class='text-align:center;'>
-                      <th class='text-white border border-white' title='ID'>ID</th>
-                      <th class='text-white border border-white' title='Name'>Name</th>
-                      <th class='text-white border border-white' title='Date'>Date</th>
-                      <th class='text-white border border-white' title='Customer'>Customer</th>
-                      <th class='text-white border border-white' title='Location'>Location</th>
-                      <th class='text-white border border-white' title='Type'>Type</th>
-                      <th class='text-white border border-white' title='Status'>Status</th>
-                      <th class='text-white border border-white' title='Tickets'>Tickets</th>
-                      <th class='text-white border border-white' title='Invoices'>Invoices</th>
+                      <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+                      <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->Customer();?>Name</th>
+                      <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+                      <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+                      <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+                      <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
+                      <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
+                      <th class='text-white border border-white' title='Tickets'><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</th>
+                      <th class='text-white border border-white' title='Invoices'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</th>
                   </tr><tr>
                       <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                       <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text'name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>

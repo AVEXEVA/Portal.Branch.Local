@@ -102,17 +102,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='card-body bg-dark'>
           <table id='Table_Requisitions' class='display' cellspacing='0' width='100%'>
               <thead><tr>
-  							<th>ID</th>
-  							<th>User</th>
-  							<th>Date</th>
-  							<th>Required</th>
-  							<th>Location</th>
-  							<th>Drop Off</th>
-  							<th>Unit</th>
-  							<th>Job</th>
+  							<th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+  							<th class='text-white border border-white' title='User'><?php \singleton\fontawesome::getInstance( )->User();?>User</th>
+                <th class='text-white border border-white' title='Item'><?php \singleton\fontawesome::getInstance( )->List1();?>Items</th>
+  							<th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+  							<th class='text-white border border-white' title='Required'><?php \singleton\fontawesome::getInstance( )->Description();?>Required</th>
+  							<th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+  							<th class='text-white border border-white' title='Drop Off'><?php \singleton\fontawesome::getInstance( )->Location();?>Drop Off</th>
+  							<th class='text-white border border-white' title='Unit'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
+  							<th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Jobs</th>
               </tr><tr>
                 <th><input type='text' class='form-control edit' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID'] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='User' placeholder='User' value='<?php echo isset( $_GET[ 'User'] ) ? $_GET[ 'User' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Item' placeholder='Item' value='<?php echo isset( $_GET[ 'Item'] ) ? $_GET[ 'Item' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date'] ) ? $_GET[ 'Date' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Required' placeholder='Required' value='<?php echo isset( $_GET[ 'Required'] ) ? $_GET[ 'Required' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location'] ) ? $_GET[ 'Location' ] : null;?>' /></th>

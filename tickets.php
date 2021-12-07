@@ -131,20 +131,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="card-body bg-dark">
                     <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
                         <thead><tr class='text-center'>
-                            <th class='text-white border border-white' title='ID'>ID</th>
-                            <th class='text-white border border-white' title='Person'>Person</th>
-                            <th class='text-white border border-white' title='Customer'>Customer</th>
-                            <th class='text-white border border-white' title='Location'>Location</th>
-                            <th class='text-white border border-white' title='Unit'>Unit</th>
-                            <th class='text-white border border-white' title='Job'>Job</th>
-                            <th class='text-white border border-white' title='Type'>Type</th>
-                            <th class='text-white border border-white' title='Status'>Status</th>
-                            <th class='text-white border border-white' title='Date'>Date</th>
-                            <th class='text-white border border-white' title='En Route'>En Route</th>
-                            <th class='text-white border border-white' title='On Site'>On Site</th>
-                            <th class='text-white border border-white' title='Completed'>Completed</th>
-                            <th class='text-white border border-white' title='Hours'>Hours</th>
-                            <th class='text-white border border-white' title='LSD'>LSD</th>
+                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+                            <th class='text-white border border-white' title='Person'><?php \singleton\fontawesome::getInstance( )->User();?>Person</th>
+                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+                            <th class='text-white border border-white' title='Unit'><?php \singleton\fontawesome::getInstance( )->Unit();?>Unit</th>
+                            <th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Job</th>
+                            <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
+                            <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
+                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+                            <th class='text-white border border-white' title='En Route'><?php \singleton\fontawesome::getInstance( )->Route();?>En Route</th>
+                            <th class='text-white border border-white' title='On Site'><?php \singleton\fontawesome::getInstance( )->Sitemap();?>On Site</th>
+                            <th class='text-white border border-white' title='Completed'><?php \singleton\fontawesome::getInstance( )->Description();?>Completed</th>
+                            <th class='text-white border border-white' title='Hours'><?php \singleton\fontawesome::getInstance( )->Hours();?>Hours</th>
+                            <th class='text-white border border-white' title='LSD'><?php \singleton\fontawesome::getInstance( )->Violation();?>LSD</th>
 
                         </tr><tr class='form-desktop'>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>

@@ -119,10 +119,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="card-body bg-dark">
                     <table id='Table_Employees' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
-                            <th title='ID'>Work ID</th>
-                            <th title='First Name'>First Name</th>
-                            <th title='Last Name'>Last Name</th>
-                            <th title='Supervisor'>Supervisor</th>
+                            <th class='text-white border border-white' title='Work_ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>Work ID</th>
+                            <th class='text-white border border-white' title='First Name'><?php \singleton\fontawesome::getInstance( )->User();?>First Name</th>
+                            <th class='text-white border border-white' title='Last Name'><?php \singleton\fontawesome::getInstance( )->User();?>Last Name</th>
+                            <th class='text-white border border-white' title='Supervisor'><?php \singleton\fontawesome::getInstance( )->Admin();?>Supervisor</th>
                         </tr><tr class='desktop'>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
                             <th title='Last Name'><input class='redraw form-control' type='text' name='Last Name' value='<?php echo isset( $_GET[ 'Last Name' ] ) ? $_GET[ 'Last Name' ] : null; ?>' placeholder='Last Name' /></th>

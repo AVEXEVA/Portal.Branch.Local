@@ -135,20 +135,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="card-body bg-dark text-white">
                     <table id='Table_Proposals' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
-                            <th title='ID'>ID</th>
-                            <th title='Territory'>Territory</th>
-                            <th title='Customer'>Customer</th>
-                            <th title='Location'>Location</th>
-                            <th title='Contact'>Contact</th>
-                            <th title='Title'>Title</th>
-                            <th title='Status'>Status</th>
-                            <th title='Phone'>Phone</th>
-                            <th title='Email'>Email</th>
-                            <th title='Address'>Address</th>
-                            <th title='Date'>Date</th>
-                            <th title='Job'>Job</th>
-                            <th title='Cost'>Cost</th>
-                            <th title='Price'>Price</th>
+                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Ticket();?>ID</th>
+                            <th class='text-white border border-white' title='Territory'><?php \singleton\fontawesome::getInstance( )->Territory();?>Territory</th>
+                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+                            <th class='text-white border border-white' title='Contact'><?php \singleton\fontawesome::getInstance( )->User();?>Contact</th>
+                            <th class='text-white border border-white' title='Title'><?php \singleton\fontawesome::getInstance( )->Paragraph();?>Title</th>
+                            <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
+                            <th class='text-white border border-white' title='Phone'><?php \singleton\fontawesome::getInstance( )->Phone();?>Phone</th>
+                            <th class='text-white border border-white' title='Email'><?php \singleton\fontawesome::getInstance( )->Email();?>Email</th>
+                            <th class='text-white border border-white' title='Address'><?php \singleton\fontawesome::getInstance( )->Address();?>Address</th>
+                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+                            <th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Job</th>
+                            <th class='text-white border border-white' title='Cost'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Cost</th>
+                            <th class='text-white border border-white' title='Price'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Price</th>
                         </tr><tr class='form-desktop'>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                             <th title='Territory'><input class='redraw form-control' type='text' name='Territory' placeholder='Territory' value='<?php echo isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null;?>' /></th>
@@ -172,7 +172,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th title='Cost'><input class='redraw form-control' type='text' name='Cost' placeholder='Cost' value='<?php echo isset( $_GET[ 'Cost' ] ) ? $_GET[ 'Cost' ] : null;?>' /></th>
                             <th title='Price'><input class='redraw form-control' type='text' name='Price' placeholder='Price' value='<?php echo isset( $_GET[ 'Price' ] ) ? $_GET[ 'Price' ] : null;?>' /></th>
                         </tr></thead>
-					</table>
+					         </table>
                 </div>
             </div>
         </div>

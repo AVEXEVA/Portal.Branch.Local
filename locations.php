@@ -147,19 +147,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class="card-body bg-dark">
           <table id='Table_Locations' class='display' cellspacing='0' width='100%'>
             <thead><tr class='text-center'>
-              <th class='text-white border border-white' title='ID'>ID</th>
-              <th class='text-white border border-white' title='Name'>Name</th>
-              <th class='text-white border border-white' title='Customer'>Customer</th>
-              <th class='text-white border border-white' title='Type'>Type</th>
-              <th class='text-white border border-white' title='Division'>Division</th>
-              <th class='text-white border border-white' title='Route'>Route</th>
-              <th class='text-white border border-white' title='Street'>Street</th>
-              <th class='text-white border border-white' title='City'>City</th>
-              <th class='text-white border border-white' title='State'>State</th>
-              <th class='text-white border border-white' title='Zip'>Zip</th>
-              <th class='text-white border border-white' title='Units'>Units</th>
-              <th class='text-white border border-white' title='Maintained'>Maintained</th>
-              <th class='text-white border border-white' title='Status'>Status</th>
+              <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+              <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->Customer();?>Name</th>
+              <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+              <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
+              <th class='text-white border border-white' title='Division'><?php \singleton\fontawesome::getInstance( )->Division();?>Division</th>
+              <th class='text-white border border-white' title='Route'><?php \singleton\fontawesome::getInstance( )->Route();?>Route</th>
+              <th class='text-white border border-white' title='Street'><?php \singleton\fontawesome::getInstance( )->Address();?>Street</th>
+              <th class='text-white border border-white' title='City'><?php \singleton\fontawesome::getInstance( )->Address();?>City</th>
+              <th class='text-white border border-white' title='State'><?php \singleton\fontawesome::getInstance( )->Address();?>State</th>
+              <th class='text-white border border-white' title='Zip'><?php \singleton\fontawesome::getInstance( )->Address();?>Zip</th>
+              <th class='text-white border border-white' title='Units'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
+              <th class='text-white border border-white' title='Maintained'><?php \singleton\fontawesome::getInstance( )->Maintenance();?>Maintained</th>
+              <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
               <!--<th class='text-white border border-white' title='Labor'>Labor</th>
               <th class='text-white border border-white' title='Revenue'>Revenue</th>
               <th class='text-white border border-white' title='Net Income'>Net Income</th>-->
