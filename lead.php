@@ -300,20 +300,43 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       <div class='card card-primary'>
         <div class='card-heading'>
           <div class='row g-0 px-3 py-2'>
-            <div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='leads.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Customer' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] : array( ) ) : null;?>'>Lead</a>: <span><?php echo is_null( $Lead[ 'ID' ] ) ? 'New' : $Lead[ 'Name' ];?></span></h5></div>
-            <div class='col-2'></div>
-            <div class='col-2'>
-              <div class='row g-0'>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php';">Create</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo $Lead[ 'ID' ];?>';">Refresh</button></div>
+            <div class='col-12 col-lg-6'>
+                <h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='leads.php?<?php
+                  echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] : array( ) );
+                ?>'>Leads</a>: <span><?php
+                  echo is_null( $Lead[ 'ID' ] )
+                      ? 'New'
+                      : '#' . $Lead[ 'ID' ];
+                ?></span></h5>
+            </div>
+            <div class='col-6 col-lg-3'>
+                <div class='row g-0'>
+                  <div class='col-4'>
+                    <button
+                        class='form-control rounded'
+                        onClick="document.location.href='violation.php';"
+                      ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+                  </div>
+                  <div class='col-4'>
+                      <button
+                        class='form-control rounded'
+                        onClick="document.location.href='violation.php?ID=<?php echo $User[ 'ID' ];?>';"
+                      ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
+                  </div>
+                  <div class='col-4'>
+                      <button
+                        class='form-control rounded'
+                        onClick="document.location.href='violation.php';"
+                      ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
+                  </div>
               </div>
             </div>
-            <div class='col-2'>
-              <div class='row g-0'>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo !is_null( $Lead[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true )[ array_search( $Lead[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='leads.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] : array( ) );?>';">Table</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo !is_null( $Lead[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true )[ array_search( $Lead[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Leads' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-              </div>
+            <div class='col-6 col-lg-3'>
+                <div class='row g-0'>
+                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                </div>
             </div>
           </div>
         </div>
@@ -386,7 +409,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <option value='Schools' <?php echo $Lead[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
                   </select></div>
                 </div>
-        
+
                 <div class='row g-0'>
                   <div class='col-1'>&nbsp;</div>
                   <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> State:</div>

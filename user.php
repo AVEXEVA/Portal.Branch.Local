@@ -159,7 +159,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	            $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 	            header( 'Location: user.php?ID=' . $User[ 'ID' ] );
 	            exit;
-	        } else {        
+	        } else {
             $result = \singleton\database::getInstance( )->query(
               'Portal',
               " UPDATE  [User]
@@ -208,44 +208,43 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
         <div class='card-heading'>
           <div class='row g-0 px-3 py-2'>
-            <div class='col-6'>
-              <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
-                echo http_build_query( isset( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) && is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
-              ?>'>User</a>: <span><?php
-                echo is_null( $User[ 'ID' ] )
-                  ? 'New'
-                  : $User[ 'Email' ];
-              ?></span></h5>
+            <div class='col-12 col-lg-6'>
+                <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
+                  echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
+                ?>'>User</a>: <span><?php
+                  echo is_null( $User[ 'ID' ] )
+                      ? 'New'
+                      : '#' . $User[ 'ID' ];
+                ?></span></h5>
             </div>
-            <div class='col-2'></div>
-            <div class='col-2'>
-              <div class='row g-0'>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='user.php';"
-                  >Create</button>
-                </div>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    type='submit'
-                  >Save</button>
-                </div>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='user.php?ID=<?php echo $User[ 'ID' ];?>';"
-                  >Refresh</button>
-                </div>
+            <div class='col-6 col-lg-3'>
+                <div class='row g-0'>
+                  <div class='col-4'>
+                    <button
+                        class='form-control rounded'
+                        onClick="document.location.href='user.php';"
+                      ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+                  </div>
+                  <div class='col-4'>
+                      <button
+                        class='form-control rounded'
+                        onClick="document.location.href='user.php?ID=<?php echo $User[ 'ID' ];?>';"
+                      ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
+                  </div>
+                  <div class='col-4'>
+                      <button
+                        class='form-control rounded'
+                        onClick="document.location.href='user.php';"
+                      ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
+                  </div>
               </div>
             </div>
-            <div class='col-2'>
-              <div class='row g-0'>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='user.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='users.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';">Table</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='user.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-              </div>
+            <div class='col-6 col-lg-3'>
+                <div class='row g-0'>
+                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='user.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='users.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='user.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                </div>
             </div>
           </div>
         </div>

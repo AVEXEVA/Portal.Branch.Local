@@ -125,8 +125,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Requisition = sqlsrv_fetch_array( $result );
       $result = \singleton\database::getInstance( )->query(
         null,
-        " SELECT  * 
-          FROM    Requisition_Item 
+        " SELECT  *
+          FROM    Requisition_Item
           WHERE   Requisition_Item.Requisition = ?;",
         array(
           $ID
@@ -178,47 +178,46 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <input type='hidden' name='ID' value='<?php echo $Requisition[ 'ID' ];?>' />
           <div class='card-heading'>
             <div class='row g-0 px-3 py-2'>
-                <div class='col-4'>
-                    <h5><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?><a href='customers.php?<?php
-                        echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] : array( ) );
-                    ?>'>Requisitions</a>: <span><?php
-                        echo is_null( $Requisition[ 'ID' ] )
-                            ? 'New'
-                            : $Requisition[ 'Name' ];
-                    ?></span></h5>
-                </div>
-                <div class='col-4'></div>
-                <div class='col-2'>
-                    <div class='row g-0'>
-                        <div class='col-4'>
-                            <button
-                                class='form-control rounded'
-                                type='submit'
-                            >Save</button>
-                        </div>
-                        <div class='col-4'>
-                            <button
-                                class='form-control rounded'
-                                onClick="document.location.href='requisition.php?ID=<?php echo $Requisition[ 'ID' ];?>';"
-                            >Refresh</button>
-                        </div>
-                        <div class='col-4'>
-                            <button
-                                class='form-control rounded'
-                                onClick="document.location.href='requisition.php?';"
-                            >New</button>
-                        </div>
+              <div class='col-12 col-lg-6'>
+                  <h5><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?><a href='requisitions.php?<?php
+                    echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] : array( ) );
+                  ?>'>Requisitions</a>: <span><?php
+                    echo is_null( $Requisition[ 'ID' ] )
+                        ? 'New'
+                        : '#' . $Requisition[ 'ID' ];
+                  ?></span></h5>
+              </div>
+              <div class='col-6 col-lg-3'>
+                  <div class='row g-0'>
+                    <div class='col-4'>
+                      <button
+                          class='form-control rounded'
+                          onClick="document.location.href='requisition.php';"
+                        ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+                    </div>
+                    <div class='col-4'>
+                        <button
+                          class='form-control rounded'
+                          onClick="document.location.href='requisition.php?ID=<?php echo $User[ 'ID' ];?>';"
+                        ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
+                    </div>
+                    <div class='col-4'>
+                        <button
+                          class='form-control rounded'
+                          onClick="document.location.href='requisition.php';"
+                        ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
                     </div>
                 </div>
-                <div class='col-2'>
-                    <div class='row g-0'>
-                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $Requisition[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true )[ array_search( $Requisition[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitions.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] : array( ) );?>';">Table</button></div>
-                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $Requisition[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true )[ array_search( $Requisition[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-                    </div>
-                </div>
+              </div>
+              <div class='col-6 col-lg-3'>
+                  <div class='row g-0'>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitons.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitions.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                  </div>
+              </div>
             </div>
-        </div>
+          </div>
         <div class='card-body bg-dark text-white'>
           <div class='card-columns'>
             <div class='card card-primary my-3'>
@@ -398,7 +397,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               method : 'GET',
                               data    : {
                                 search :  $('input:visible[name="Job"]').val( ),
-                                Location : $('input:visible[name="Location"]').val( ) 
+                                Location : $('input:visible[name="Location"]').val( )
                               },
                               dataType : 'json',
                               beforeSend : function( ){
