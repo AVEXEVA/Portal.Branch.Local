@@ -108,13 +108,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <div class="card-body bg-dark">
                     <table id='Table_Users' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
-                            <th class='text-white border border-white'  title='ID'>ID</th>
-                            <th class='text-white border border-white'  title='Email'>Email</th>
-                            <th class='text-white border border-white'  title='Verified'>Verified</th>
-                            <th class='text-white border border-white'  title='Branch'>Branch</th>
-                            <th class='text-white border border-white'  title='Branch_Type'>Type</th>
-                            <th class='text-white border border-white'  title='Branch_ID'>Reference</th>
-                            <th class='text-white border border-white'  title='Picture'>Picture</th>
+                            <th class='text-white border border-white'  title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+                            <th class='text-white border border-white'  title='Email'><?php \singleton\fontawesome::getInstance( )->Email();?>Email</th>
+                            <th class='text-white border border-white'  title='Verified'><?php \singleton\fontawesome::getInstance( )->Description();?>Verified</th>
+                            <th class='text-white border border-white'  title='Branch'><?php \singleton\fontawesome::getInstance( )->Division();?>Branch</th>
+                            <th class='text-white border border-white'  title='Branch_Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
+                            <th class='text-white border border-white'  title='Branch_ID'><?php \singleton\fontawesome::getInstance( )->Review();?>Reference</th>
+                            <th class='text-white border border-white'  title='Picture'><?php \singleton\fontawesome::getInstance( )->Birthday();?>Picture</th>
                         </tr><tr>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
                             <th class='text-white border border-white' title='Email'><input class='redraw form-control' type='text' name='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null; ?>' /></th>

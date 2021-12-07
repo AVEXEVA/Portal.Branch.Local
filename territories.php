@@ -110,40 +110,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   : $User[ 'Email' ];
               ?></span></h5>
             </div>
-            <div class='col-2'></div>
-            <div class='col-2'>
-              <div class='row g-0'>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='territory.php';"
-                  >Create</button>
-                </div>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='territory.php?ID=<?php echo $User[ 'ID' ];?>';"
-                  >Refresh</button>
-                </div>
-              </div>
-            </div>
-            <div class='col-2'>
-              <div class='row g-0'>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territories.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Territories' ][ 0 ] : array( ) );?>';">Table</button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='territory.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Territories' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-              </div>
-            </div>
           </div>
-        </div>
 				<div class="form-mobile card-body bg-dark text-white"><form method='GET' action='territories.php'>
 					<div class='row'><div class='col-12'>&nbsp;</div></div>
            <div class='row'>
                 <div class='col-4'>ID</div>
     						<div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></div>
             </div>
+            <div class='row'>
+            <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Customer();?>Names</div>
+            <div class='col-8'><input type='text' name='Name' placeholder='Name' class='redraw' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></div>
+              </div>
               <div class='row'>
-              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Customer();?>Location</div>
+              <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Customer();?>Locations</div>
               <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></div>
             </div>
             <div class='row'>
@@ -170,18 +149,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class="card-body bg-dark">
 					<table id='Table_Territories' class='display' cellspacing='0' width='100%'>
 						<thead><tr class='text-center'>
-							<th class='text-white border border-white' title='ID'>ID</th>
-							<th class='text-white border border-white' title='Customer'>Location</th>
-							<th class='text-white border border-white' title='Location'>Unit</th>
-							<th class='text-white border border-white' title='Leads'>Leads</th>
-              <th class='text-white border border-white' title='Proposals'>Proposals</th>
-              <th class='text-white border border-white' title='Collection'>Collection</th>
-              <th class='text-white border border-white' title='Invoices'>Invoices</th>
+							<th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Territory();?>ID</th>
+              <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->User();?>Name</th>
+							<th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Location();?>Locations</th>
+							<th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Unit();?>Unit</th>
+							<th class='text-white border border-white' title='Leads'><?php \singleton\fontawesome::getInstance( )->Information();?>Leads</th>
+              <th class='text-white border border-white' title='Proposals'><?php \singleton\fontawesome::getInstance( )->Proposal();?>Proposals</th>
+              <th class='text-white border border-white' title='Collection'><?php \singleton\fontawesome::getInstance( )->Collection();?>Collection</th>
+              <th class='text-white border border-white' title='Invoices'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</th>
 			    </tr><tr class='form-desktop'>
 							<th class='text-white border border-white' title='ID'><input class='redraw' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-							<th class='text-white border border-white' title='Location'><input class='redraw' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Name'><input class='redraw' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Location'><input class='redraw' type='text' name='Location' placeholder='Locatins' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
 							<th class='text-white border border-white' title='Unit'><input class='redraw' type='text' name='Unit' placeholder='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null;?>' /></th>
-							<th class='text-white border border-white' title='Lead'><input class='redraw' type='text' name='Lead' placeholder='Lead' value='<?php echo isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null;?>' /></th>
+							<th class='text-white border border-white' title='Lead'><input class='redraw' type='text' name='Lead' placeholder='Leads' value='<?php echo isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Proposal'><input class='redraw' type='text' name='Proposal' placeholder='Proposal' value='<?php echo isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Collection'><input class='redraw' type='text' name='Collection' placeholder='Collection' value='<?php echo isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null;?>' /></th>
               <th class='text-white border border-white' title='Invoice'><input class='redraw' type='text' name='Invoice' placeholder='Invoice' value='<?php echo isset( $_GET[ 'Invoice' ] ) ? $_GET[ 'Invoice' ] : null;?>' /></th>

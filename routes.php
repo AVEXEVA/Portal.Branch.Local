@@ -117,13 +117,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="card-body bg-dark">
                     <table id='Table_Routes' class='display' cellspacing='0' width='100%'>
                         <thead><tr>
-                            <th title='ID'>ID</th>
-                            <th title='Name'>Name</th>
-                            <th title='Person'>Person</th>
-                            <th title='Locations'>Locations</th>
-                            <th title='Units'>Units</th>
-                             <th title='Violation'>Violation</th>
-                              <th title='Mechanic'>Mechanic</th>
+                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+                            <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->Route();?>Route Name</th>
+                            <th class='text-white border border-white' title='Person'><?php \singleton\fontawesome::getInstance( )->User();?>Person</th>
+                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Locations</th>
+                            <th class='text-white border border-white' title='Unit'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
+                            <th class='text-white border border-white' title='Violation'><?php \singleton\fontawesome::getInstance( )->Violation();?>Violation</th>
+                            <th class='text-white border border-white' title='Mechanic'><?php \singleton\fontawesome::getInstance( )->Repair();?>Mechanic</th>
                         </tr><tr>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
                             <th title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>

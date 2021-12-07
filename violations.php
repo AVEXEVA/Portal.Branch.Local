@@ -97,17 +97,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</h4></div>
-                
+
                 <div class="card-body bg-dark">
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
                       <thead>
                         <tr>
-                            <th title='ID'>ID</th>
-                            <th title='Customer'>Customer</th>
-                            <th title='Location'>Location</th>
-                            <th title="Date">Date</th>
-                            <th title="Units">Units</th>
-                            <th title='Status'>Status</th>
+                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
+                            <th class='text-white border border-white' title='Units'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
+                            <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
                         </tr><tr class='form-desktop'>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                             <th title='Customer'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>

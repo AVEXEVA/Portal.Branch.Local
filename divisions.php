@@ -100,7 +100,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id="page-wrapper" class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Division</h4></div>
-                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='locations.php'>
+                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='divisions.php'>
                   <div class='row'><div class='col-12'>&nbsp;</div></div>
                   <div class='row'>
                     <div class='col-4'>Search:</div>
@@ -119,12 +119,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="card-body bg-dark">
                     <table id='Table_Divisions' class='display' cellspacing='0' width='100%'>
                         <thead><tr class='text-center'>
-                            <th class='text-white border border-white' title='ID'>ID</th>
-                            <th class='text-white border border-white' title='Name'>Name</th>
-                            <th class='text-white border border-white' title='Location'>Location</th>
-                            <th class='text-white border border-white' title='Units'>Units</th>
-                            <th class='text-white border border-white' title='Violation'>Violation</th>
-                            <th class='text-white border border-white' title='Tickets'>Tickets</th>
+                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
+                            <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->User();?>Name</th>
+                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
+                            <th class='text-white border border-white' title='Units'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
+                            <th class='text-white border border-white' title='Violation'><?php \singleton\fontawesome::getInstance( )->Violation();?>Violation</th>
+                            <th class='text-white border border-white' title='Tickets'><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</th>
                         </tr><tr class='form-desktop'>
                             <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
                             <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
