@@ -100,7 +100,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       0 =>  'Employee.ID',
       1 =>  'Employee.fFirst',
       2 =>  'Employee.Last',
-      3 =>  'tblWork.Super'
+      3 =>  'tblWork.Super',
+      4 =>  "tblWork.Latt + ', ' + tblWork.fLong"
     );
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
@@ -115,13 +116,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Employee.ID          AS ID,
                             Employee.fFirst      AS First_Name,
                             Employee.Last        AS Last_Name,
-                            tblWork.Super   AS Supervisor
+                            tblWork.Super   AS Supervisor,
+                            tblWork.Latt   AS Latitude,
+                            tblWork.fLong   AS Longitude
                     FROM    dbo.Emp AS Employee
                             LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
                     WHERE   {$conditions}
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-
+    
     $rResult = \singleton\database::getInstance( )->query(
       null,
       $sQuery,

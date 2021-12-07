@@ -123,11 +123,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <th title='First Name'>First Name</th>
                             <th title='Last Name'>Last Name</th>
                             <th title='Supervisor'>Supervisor</th>
+                            <th title='GPSLocation'>GPS</th>                            
                         </tr><tr class='desktop'>
                             <th title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
                             <th title='Last Name'><input class='redraw form-control' type='text' name='Last Name' value='<?php echo isset( $_GET[ 'Last Name' ] ) ? $_GET[ 'Last Name' ] : null; ?>' placeholder='Last Name' /></th>
                             <th title='First Name'><input class='redraw form-control' type='text' name='First Name' value='<?php echo isset( $_GET[ 'First Name' ] ) ? $_GET[ 'First Name' ] : null; ?>' placeholder='First Name' /></th>
                             <th title='Supervisor'><input class='redraw form-control' type='text' name='Supervisor' value='<?php echo isset( $_GET[ 'Supervisor' ] ) ? $_GET[ 'Supervisor' ] : null; ?>' placeholder='Supervisor' /></th>
+                            <th title='GPSLocation'><input class='redraw form-control' type='text' name='GPSLocation' value='<?php echo isset( $_GET[ 'GPSLocation' ] ) ? $_GET[ 'GPSLocation' ] : null; ?>' placeholder='GPSLocation' /></th>
+                            
                         </tr></thead>
                     </table>
                 </div>
