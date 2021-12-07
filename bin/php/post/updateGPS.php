@@ -68,7 +68,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           dechex( $Privilege[ 'Internet' ] )
       ) );
   }}
-  if( !isset( $Connection[ 'ID' ] ) ){
+  if( isset( $Connection[ 'ID' ] ) ){
     $timestamp = floor($_POST['Time_Stamp'] / 1000); // Get seconds from milliseconds
     $datetime = new DateTime('@'.$timestamp);
     $_POST['Time_Stamp'] = $datetime->format('Y-m-d H:i:s');

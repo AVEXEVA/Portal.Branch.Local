@@ -132,7 +132,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
             $User[ 'Picture' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? base64_encode( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) ) : $User[ 'Picture' ];
             $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $User[ 'Picture_Type' ];
-
             if( empty( $_POST[ 'ID' ] ) ){
 	            $result = \singleton\database::getInstance( )->query(
 	              'Portal',
@@ -284,6 +283,52 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='row' style='padding-top:10px;padding-bottom:10px;'>
                     <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Type:</div>
                     <div class='col-8'><input type='text' name='Branch_Type' class='form-control edit' placeholder='Type' value='<?php echo $User[ 'Branch_Type' ];?>' /></div>
+                </div>
+                <div class='row g-0'>
+                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Employee:</div>
+                    <div class='col-6'>
+                        <input type='text' autocomplete='off' class='form-control edit' name='Branch_ID' value='<?php echo $User[ 'Branch_ID' ];?>' />
+                        <script>
+                            $( 'input[name="Branch_ID"]' )
+                                .typeahead({
+                                        minLength : 4,
+                                        hint: true,
+                                        highlight: true,
+                                        limit : 5,
+                                        display : 'FieldValue',
+                                        source: function( query, result ){
+                                            $.ajax({
+                                                url : 'bin/php/get/search/Employees.php',
+                                                method : 'GET',
+                                                data    : {
+                                                    search :  $('input:visible[name="Branch_ID"]').val( )
+                                                },
+                                                dataType : 'json',
+                                                beforeSend : function( ){
+                                                    abort( );
+                                                },
+                                                success : function( data ){
+                                                    result( $.map( data, function( item ){
+                                                        return item.FieldValue;
+                                                    } ) );
+                                                }
+                                            });
+                                        },
+                                        afterSelect: function( value ){
+                                            $( 'input[name="Branch_ID"]').val( value );
+                                            $( 'input[name="Branch_ID"]').closest( 'form' ).submit( );
+                                        }
+                                    }
+                                );
+                        </script>
+                    </div>
+                    <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                        if( in_array( $User[ 'Branch_ID' ], array( null, 0, '', ' ') ) ){
+                            echo "onClick=\"document.location.href='employees.php?Field=1';\"";
+                        } else {
+                            echo "onClick=\"document.location.href='employee.php?ID=" . $User[ 'Branch_ID' ] . "';\"";
+                        }
+                        ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                 </div>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Image:</div>
