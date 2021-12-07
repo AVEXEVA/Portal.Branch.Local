@@ -220,28 +220,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           </div>
         </div><?php
       }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Customer' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Contact' ] ) ? $Privileges[ 'Contact' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3 btn-three' onclick="document.location.href='contacts.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
           <div class ='nav-text'>Contacts</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Invoice' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Collection' ] ) ? $Privileges[ 'Collection' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='collections.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Collection(3);?></div>
           <div class ='nav-text'>Collections</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Contract' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Contract' ] ) ? $Privileges[ 'Contract' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='contracts.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Contract(3);?></div>
           <div class ='nav-text'>Contracts</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Customer' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='customers.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
@@ -256,7 +256,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='nav-icon'><i class="fa fa-tencent-weibo fa-3x" aria-hidden="true"></i></div>
         <div class ='nav-text'>Geofence</div>
       </div><?php }*/ ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'User' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='employees.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'User' ] ) ? $Privileges[ 'User' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='employees.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
           <div class ='nav-text'>Employees</div>
@@ -274,28 +274,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Incident Report</div>
         </div>
       </div>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Invoice' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Invoice' ] ) ? $Privileges[ 'Invoice' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='invoices.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
           <div class ='nav-text'>Invoices</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Job' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Job' ] ) ? $Privileges[ 'Job' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='jobs.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Job(3);?></div>
           <div class ='nav-text'>Jobs</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Lead' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Lead' ] ) ? $Privileges[ 'Lead' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='leads.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
           <div class ='nav-text'>Leads</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Location' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Location' ] ) ? $Privileges[ 'Location' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='locations.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
@@ -308,14 +308,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Logout</div>
         </div>
       </div>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Map' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Map' ] ) ? $Privileges[ 'Map' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='maps.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
           <div class ='nav-text'>Map</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Admin' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='payroll.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Admin' ] ) ? $Privileges[ 'Admin' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='payroll.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Invoice(3);?></div>
           <div class ='nav-text'>Payroll</div>
@@ -328,13 +328,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class ='nav-text'>Profile</div>
           </div>
       </div>
-      <?php if( check( privilege_read, level_department, $Privileges[ 'Executive' ] ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='profitability.php'">
+      <?php if( check( privilege_read, level_department, isset( $Privileges[ 'Executive' ] ) ? $Privileges[ 'Executive' ] : 0 ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='profitability.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><i class="fa fa-dollar fa-3x fa-fw" aria-hidden="true"></i></div>
           <div class ='nav-text'>Profitability</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Proposal' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='proposals.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Proposal' ] ) ? $Privileges[ 'Proposal' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='proposals.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Proposal(3);?></div>
           <div class ='nav-text'>Proposals</div>
@@ -344,19 +344,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Calendar(3);?></div>
         <div class ='nav-text'>PTO</div>
       </div>*/?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Requisition' ] ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='requisitions.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Requisition' ] ) ? $Privileges[ 'Requisition' ] : 0 ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='requisitions.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Requisition(3);?></div>
           <div class ='nav-text'>Requisitions</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_department, $Privileges[ 'Time' ] ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='review.php'">
+      <?php if( check( privilege_read, level_department, isset( $Privileges[ 'Time' ] ) ? $Privileges[ 'Time' ] : 0 ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='review.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer( 3 );?></div>
           <div class ='nav-text'>Review</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Route' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='routes.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Route' ] ) ? $Privileges[ 'Route' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='routes.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Route(3);?></div>
           <div class ='nav-text'>Routes</div>
@@ -374,7 +374,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         )
       );
       $RouteNav = sqlsrv_fetch_array($result);
-      if( check( privilege_read, level_group, $Privileges[ 'Route' ] ) && is_array($RouteNav) && isset($RouteNav['ID']) && $RouteNav['ID'] > 0 ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='route.php?ID=<?php echo $RouteNav['ID'];?>'">
+      if( check( privilege_read, level_group, isset( $Privileges[ 'Route' ] ) ? $Privileges[ 'Route' ] : 0 ) && is_array($RouteNav) && isset($RouteNav['ID']) && $RouteNav['ID'] > 0 ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='route.php?ID=<?php echo $RouteNav['ID'];?>'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Route(3);?></div>
           <div class ='nav-text'>Route</div>
@@ -386,50 +386,50 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Settings</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Admin' ] ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='supervising.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Admin' ] ) ? $Privileges[ 'Admin' ] : 0 ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='supervising.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer(3);?></div>
           <div class ='nav-text'>Supervising</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Ticket' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='tickets.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Ticket' ] ) ? $Privileges[ 'Ticket' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='tickets.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
           <div class ='nav-text'>Tickets</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Territory' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='territories.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Territory' ] ) ? $Privileges[ 'Territory' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='territories.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Territory(3);?></div>
           <div class ='nav-text'>Territories</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Code' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='category_tests.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Code' ] ) ? $Privileges[ 'Code' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='category_tests.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><i class="fa fa-clipboard fa-3x fa-fw" aria-hidden="true"></i></div>
           <div class ='nav-text'>Tests</div>
         </div>
       </div><?php }?>
 
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Time' ] ) && $_SESSION[ 'Connection' ][ 'Branch_Type' ] == 'User'  ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='Tickets.php?Person=<?php echo $User[ 'Name' ];  ?>'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Time' ] ) ? $Privileges[ 'Time' ] : 0 ) && $_SESSION[ 'Connection' ][ 'Branch_Type' ] == 'User'  ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='Tickets.php?Person=<?php echo $User[ 'Name' ];  ?>'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Timesheet(3);?></div>
           <div class ='nav-text'>Timesheet</div>
         </div>
       </div><?php }?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Unit' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='units.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Unit' ] ) ? $Privileges[ 'Unit' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='units.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Unit(3);?></div>
           <div class ='nav-text'>Units</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'User' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='users.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'User' ] ) ? $Privileges[ 'User' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='users.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Users(3);?></div>
           <div class ='nav-text'>Users</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Violation' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='violations.php'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Violation' ] ) ? $Privileges[ 'Violation' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='violations.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
           <div class ='nav-text'>Violations</div>
@@ -454,14 +454,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class ='nav-text'>Reports</div>
           </div>
       </div>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Division' ] ) ){
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Division' ] ) ? $Privileges[ 'Division' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='divisions.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Web(3);?></div>
           <div class ='nav-text'>Division</div>
         </div>
       </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Legacy' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='../portal2/'">
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Legacy' ] ) ? $Privileges[ 'Legacy' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='../portal2/'">
         <div class='p-1 border'>
           <div class='nav-icon'><i class="fa fa-user-secret fa-3x fa-fw" aria-hidden="true"></i></div>
           <div class ='nav-text'>Legacy</div>

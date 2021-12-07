@@ -1,72 +1,91 @@
 <?php
-if(session_id() == '' || !isset($_SESSION) ){
-  session_start( [ 'read_and_close' => true ] );
-  require('/var/www/html/Portal.Branch.Local/bin/php/index.php');
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-function distance($lat1, $lon1, $lat2, $lon2, $unit) {
-  if (($lat1 == $lat2) && ($lon1 == $lon2)) {
-    return 0;
-  }
-  else {
-    $theta = $lon1 - $lon2;
-    $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-    $dist = acos($dist);
-    $dist = rad2deg($dist);
-    $miles = $dist * 60 * 1.1515;
-    $unit = strtoupper($unit);
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
-    if ($unit == "K") {
-      return ($miles * 1.609344);
-    } else if ($unit == "N") {
-      return ($miles * 0.8684);
-    } else {
-      return $miles;
-    }
-  }
-}
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-  $r = $database->query(null,
-    "  SELECT *
-       FROM   Connection
-	     WHERE  Connection.Connector = ?
-	            AND Connection.Hash  = ?
-    ;",array($_SESSION['User'],$_SESSION['Hash']));
-  $My_Connection = sqlsrv_fetch_array($r,SQLSRV_FETCH_ASSOC);
-  $r = $database->query(null,
-    "SELECT *,
-	          Emp.fFirst AS First_Name,
-		        Emp.Last   AS Last_Name
-	   FROM   Emp
-     WHERE  Emp.ID = ?
-    ;",array($_SESSION['User']));
-  $My_User = sqlsrv_fetch_array($r);
-  $r = $database->query('Portal',
-    " SELECT *
-	    FROM   Privilege
-	      WHERE  Privilege.User_ID = ?
-     ;",array($_SESSION['User']));
-  $My_Privileges = array();
-  if($r){while($My_Privilege = sqlsrv_fetch_array($r)){$My_Privileges[$My_Privilege['Access']] = $My_Privilege;}}
-  if(!isset($My_Connection['ID']) || !isset($My_Privileges['Map']) || $My_Privileges['Map']['Owner']  < 4 || $My_Privileges['Map']['Group'] < 4 || $My_Privileges['Map']['Other'] < 4){require('../404.html');}
-  else {
-  	$database->query(null,
-      "   INSERT INTO Activity([User], [Date], [Page])
-  		     VALUES(?,?,?)
-  	   ;",array($_SESSION['User'],date("Y-m-d H:i:s"), "map.php"));?><!DOCTYPE html>
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(   !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Map' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Map' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {?><!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php require( bin_meta . 'index.php');?>
     <title>Nouveau Elevator Portal</title>
+    <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+    <?php require( bin_meta . 'index.php');?>
     <?php require( bin_css . 'index.php');?>
     <?php require( bin_js . 'index.php');?>
     <!--ToolTipster-->
     <!--<link rel="stylesheet" type="text/css" href="bin/libraries/tooltipster/tooltipster.bundle.min.css" />
     <style>
       .tooltipster-base {background-color:white;position:absolute;}
-      .row.shadower {
+      .row g-0.shadower {
         padding-top:5px;
         padding-bottom:5px;
       }
@@ -77,7 +96,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     .tooltipTicket {
       width:650px;
     }
-    .tooltipTicket_popup .row{
+    .tooltipTicket_popup .row g-0{
       padding-top:5px;
       padding-bottom:5px;
     }
@@ -92,51 +111,51 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     <?php require( bin_php . 'element/navigation.php');?>
     <?php require( bin_php . 'element/loading.php');?>
     <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
-      <div class="row" style='height:100%;'>
+      <div class="row g-0" style='height:100%;'>
           <div class="col-lg-12">
-              <div class="panel panel-primary">
-                  <div class="panel-heading">
-                    <div class='row'>
-                      <div class='col-xs-2'><h3>Divisional Map</h3></div>
-                      <div class='col-xs-1'><button onClick="document.location.href='map3.php';" style='color:black;height:30px;'>Breadcrumb Map</button></div>
-                      <div class='col-xs-1'><button onClick="codeAddress(prompt('What address would you like to center on?'));" style='width:100%;color:black;'>Center Address</button></div>
-                      <div class='col-xs-2'><select name='Employee' style='color:black !important;' onChange='zoomUser(this);'>
+              <div class="card card-primary">
+                  <div class="card-heading">
+                    <div class='row g-0'>
+                      <div class='col-2'><h3>Divisional Map</h3></div>
+                      <div class='col-1'><button onClick="document.location.href='map3.php';" style='color:black;height:30px;'>Breadcrumb Map</button></div>
+                      <div class='col-1'><button onClick="codeAddress(prompt('What address would you like to center on?'));" style='width:100%;color:black;'>Center Address</button></div>
+                      <div class='col-2'><select name='Employee' style='color:black !important;' onChange='zoomUser(this);'>
                         <option value=''>Select User to Center</option>
                         <?php $r = $database->query(null,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
                         if($r){while($row = sqlsrv_fetch_array($r)){
                           ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Last'] . ', ' . $row['fFirst'];?></option><?php
                         }}?>
                       </select></div>
-                      <div class='col-xs-2'><select name='Employee' style='color:black !important;' onChange='breadcrumbUser(this);'>
+                      <div class='col-2'><select name='Employee' style='color:black !important;' onChange='breadcrumbUser(this);'>
                         <option value=''>Select User to Breadcrumb</option>
                         <?php $r = $database->query(null,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
                         if($r){while($row = sqlsrv_fetch_array($r)){
                           ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Last'] . ', ' . $row['fFirst'];?></option><?php
                         }}?>
                       </select></div>
-                      <div class='col-xs-2'>
+                      <div class='col-2'>
                         <button onClick='takeServiceCall();' style='float:right;height:30px;color:black;'>Take Service Call</button>
                       </div>
-                      <div class='col-xs-2'>
+                      <div class='col-2'>
                         &nbsp;
                       </div>
                     </div>
-                  <div class='panel-heading'>
-                    <div class='row'>
-                      <div class='col-xs-1' style='background-color:white;color:black;' onClick='clearMarkers();'>Toggle</div>
-                      <div class='col-xs-1' onClick='showDivision1();' style='background-color:white;color:black;border:1px solid black;'>Division #1</div>
-                      <div class='col-xs-1' onClick='showDivision2();' style='background-color:white;color:black;border:1px solid black;'>Division #2</div>
-                      <div class='col-xs-1' onClick='showDivision3();' style='background-color:white;color:black;border:1px solid black;'>Division #3</div>
-                      <div class='col-xs-1' onClick='showDivision4();' style='background-color:white;color:black;border:1px solid black;'>Division #4</div>
-                      <div class='col-xs-1' onClick='showModernization();' style='background-color:white;color:black;border:1px solid black;'>Modernization</div>
-                      <div class='col-xs-1' onClick='showEscalator();' style='background-color:white;color:black;border:1px solid black;'>Escalator</div>
-                      <div class='col-xs-1' onClick='showFiremen();' style='background-color:white;color:black;border:1px solid black;'>Firemen</div>
-                      <div class='col-xs-1' onClick='showRepair();' style='background-color:white;color:black;border:1px solid black;'>Repair</div>
-                      <div class='col-xs-1' onClick='showTesting();' style='background-color:white;color:black;border:1px solid black;'>Testing</div>
+                  <div class='card-heading'>
+                    <div class='row g-0'>
+                      <div class='col-1' style='background-color:white;color:black;' onClick='clearMarkers();'>Toggle</div>
+                      <div class='col-1' onClick='showDivision1();' style='background-color:white;color:black;border:1px solid black;'>Division #1</div>
+                      <div class='col-1' onClick='showDivision2();' style='background-color:white;color:black;border:1px solid black;'>Division #2</div>
+                      <div class='col-1' onClick='showDivision3();' style='background-color:white;color:black;border:1px solid black;'>Division #3</div>
+                      <div class='col-1' onClick='showDivision4();' style='background-color:white;color:black;border:1px solid black;'>Division #4</div>
+                      <div class='col-1' onClick='showModernization();' style='background-color:white;color:black;border:1px solid black;'>Modernization</div>
+                      <div class='col-1' onClick='showEscalator();' style='background-color:white;color:black;border:1px solid black;'>Escalator</div>
+                      <div class='col-1' onClick='showFiremen();' style='background-color:white;color:black;border:1px solid black;'>Firemen</div>
+                      <div class='col-1' onClick='showRepair();' style='background-color:white;color:black;border:1px solid black;'>Repair</div>
+                      <div class='col-1' onClick='showTesting();' style='background-color:white;color:black;border:1px solid black;'>Testing</div>
                     </div>
-                    <div class='row'>
-                      <div class='col-xs-1' style='background-color:white;color:black;' onClick='clearMarkers();'>&nbsp;</div>
-                      <div class='col-xs-1' onClick='showDivision1();' style='background-color:white;color:black;border:1px solid black;'><?php
+                    <div class='row g-0'>
+                      <div class='col-1' style='background-color:white;color:black;' onClick='clearMarkers();'>&nbsp;</div>
+                      <div class='col-1' onClick='showDivision1();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -148,7 +167,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showDivision2();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showDivision2();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -160,7 +179,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showDivision3();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showDivision3();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -172,7 +191,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showDivision4();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showDivision4();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -184,7 +203,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showModernization();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showModernization();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -196,7 +215,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showEscalator();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showEscalator();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -208,7 +227,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showFiremen();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showFiremen();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -220,7 +239,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showRepair();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showRepair();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -232,7 +251,7 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         $row =  $r ? sqlsrv_fetch_array($r) : null;
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
-                      <div class='col-xs-1' onClick='showTesting();' style='background-color:white;color:black;border:1px solid black;'><?php
+                      <div class='col-1' onClick='showTesting();' style='background-color:white;color:black;border:1px solid black;'><?php
                         $r = $database->query(null,
                           " SELECT  Count(*) AS Count
                             FROM    TicketO
@@ -245,28 +264,28 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
                         echo is_array($row) ? $row['Count'] : null;
                       ?> personnel</div>
                     </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                      <div class='col-xs-1' style='background-color:white;color:black;'>LEGEND:</div>
-                      <div class='col-xs-1' style='background-color:white;color:black;'>People (Pins):</div>
-                      <div class='col-xs-2' style='background-color:green;color:black;'>GPS TIME <= 30 MINS</div>
-                      <div class='col-xs-1' style='background-color:yellow;color:black;'>GPS TIME <= 2 HRS</div>
-                      <div class='col-xs-1' style='background-color:orange;color:black;'>GPS TIME <= 9 HRS</div>
-                      <div class='col-xs-1' style='background-color:brown;color:black;'>9 HRS <= GPS TIME</div>
+                    <div class='row g-0'><div class='col-12'>&nbsp;</div></div>
+                    <div class='row g-0'>
+                      <div class='col-1' style='background-color:white;color:black;'>LEGEND:</div>
+                      <div class='col-1' style='background-color:white;color:black;'>People (Pins):</div>
+                      <div class='col-2' style='background-color:green;color:black;'>GPS TIME <= 30 MINS</div>
+                      <div class='col-1' style='background-color:yellow;color:black;'>GPS TIME <= 2 HRS</div>
+                      <div class='col-1' style='background-color:orange;color:black;'>GPS TIME <= 9 HRS</div>
+                      <div class='col-1' style='background-color:brow g-0n;color:black;'>9 HRS <= GPS TIME</div>
                     </div>
-                    <div class='row'>
-                      <div class='col-xs-1' style='background-color:white;color:black;'>&nbsp;</div>
-                      <div class='col-xs-1' style='background-color:white;color:black;'>Service Calls (Flags):</div>
-                      <div class='col-xs-2' style='background-color:red;color:white;'>Unanswered Entrapments</div>
-                      <div class='col-xs-2' style='background-color:purple;color:white;'>Answered Entrapments</div>
-                      <div class='col-xs-2' style='background-color:blue;color:white;'>Unanswered Shutdowns</div>
-                      <div class='col-xs-2' style='background-color:cyan;color:black;'>Answered Shutdowns</div>
+                    <div class='row g-0'>
+                      <div class='col-1' style='background-color:white;color:black;'>&nbsp;</div>
+                      <div class='col-1' style='background-color:white;color:black;'>Service Calls (Flags):</div>
+                      <div class='col-2' style='background-color:red;color:white;'>Unanswered Entrapments</div>
+                      <div class='col-2' style='background-color:purple;color:white;'>Answered Entrapments</div>
+                      <div class='col-2' style='background-color:blue;color:white;'>Unanswered Shutdowns</div>
+                      <div class='col-2' style='background-color:cyan;color:black;'>Answered Shutdowns</div>
                     </div>
                   </div>
-                  <div class="panel-body">
-                    <div class='row'>
-                      <div class='col-xs-9'><div id="map" style='height:675px;width:100%;'></div></div>
-                      <div class='col-xs-3'>
+                  <div class="card-body">
+                    <div class='row g-0'>
+                      <div class='col-9'><div id="map" style='height:675px;width:100%;'></div></div>
+                      <div class='col-3'>
                         <div id='Feed_Title'><h3>Timeline</h3></div>
                         <div id='Feed' style='min-height:625px;max-height:625px;height:625px !important;overflow-y:scroll;margin-top:15px;'>&nbsp;</div>
                       </div>
@@ -288,10 +307,10 @@ if(isset($_SESSION['User'],$_SESSION['Hash'])){
     $r = $database->query(null,
       " SELECT  Top 1 *
         FROM    GPS
-        WHERE   GPS.Employee_ID = ?
+        WHERE   GPS.[User] = ?
         ORDER BY GPS.Time_Stamp DESC
-      ;", array($_GET['Mechanic']));
-    $asdf = sqlsrv_fetch_array($r);?>
+      ;", array( isset( $_GET['Mechanic']) ? $_GET[ 'Mechanic' ] : $_SESSION[ 'Connection' ][ 'User' ] ) );
+    $asdf = $r ? sqlsrv_fetch_array($r) : array( );?>
 <!-- Map Icons -->
 <link rel="stylesheet" type="text/css" href="bin/libraries/map-icons-master/dist/css/map-icons.css">
 <script type="text/javascript" src="bin/libraries/map-icons-master/dist/js/map-icons.js"></script>
@@ -589,7 +608,7 @@ function find_closest_marker(lat, lng ) {
                 $(".popup").remove();
                 var mech = t.split(' - ')[0];
                 var time = t.split(' - ')[1];
-                $("body").append('<div class="popup directions" style="font-size:20px !important;width:700px !important;left:unset;right:1% !important;height:auto;">' + "<div class='panel-primary'><div class='panel-heading'>Directions Information<div style='float:right;' onClick='close_this(this);'>Close</div></div><div class='panel-body'><div class='row'><div class='col-xs-3'>Mechanic:</div><div class='col-xs-9'>" + mech + "</div></div><div class='row'><div class='col-xs-3'>GPS Stamp</div><div class='col-xs-9'>" + moment(new Date(time)).format('MM/DD/YYYY hh:mm A') + "</div></div><div class='row'><div class='col-xs-3'>Duration:</div><div class='col-xs-9'>" + response.rows[0].elements[0].duration.text + "</div><div class='row'><div class='col-xs-6'><button onClick='previous_Nearest(\"" + t + "\");' style='width:100%;'>Previous Nearest</button></div><div class='col-xs-6'><button onClick='next_Nearest(\"" + t + "\");' style='width:100%;'>Next Nearest</button></div></div><div class='row'><div class='col-xs-12' style='font-size:12px !important;background-color:white !important;color:black !important;'>" + ticket + "</div></div></div></div>");
+                $("body").append('<div class="popup directions" style="font-size:20px !important;width:700px !important;left:unset;right:1% !important;height:auto;">' + "<div class='card-primary'><div class='card-heading'>Directions Information<div style='float:right;' onClick='close_this(this);'>Close</div></div><div class='card-body'><div class='row g-0'><div class='col-3'>Mechanic:</div><div class='col-9'>" + mech + "</div></div><div class='row g-0'><div class='col-3'>GPS Stamp</div><div class='col-9'>" + moment(new Date(time)).format('MM/DD/YYYY hh:mm A') + "</div></div><div class='row g-0'><div class='col-3'>Duration:</div><div class='col-9'>" + response.rows[0].elements[0].duration.text + "</div><div class='row g-0'><div class='col-6'><button onClick='previous_Nearest(\"" + t + "\");' style='width:100%;'>Previous Nearest</button></div><div class='col-6'><button onClick='next_Nearest(\"" + t + "\");' style='width:100%;'>Next Nearest</button></div></div><div class='row g-0'><div class='col-12' style='font-size:12px !important;background-color:white !important;color:black !important;'>" + ticket + "</div></div></div></div>");
               }
             });
 	        }
@@ -657,7 +676,7 @@ function getModernizations(){
               position: new google.maps.LatLng(GPS_Data[i].Latitude, GPS_Data[i].Longitude),
               title: GPS_Data[i].Title,
               icon: {
-                path:mapIcons.shapes.SQUARE_PIN,
+                path:pinSymbol( 'black' ),
                 fillColor:'#00CCBB',
                 fillOpacity:0,
                 strokeColor:'black',
@@ -876,13 +895,13 @@ function getTimeline(){
         for(i in ticketData){
           if(TIMELINE[i]){}
           else {
-            $("#Feed").prepend("<div rel='" + ticketData[i].Entity_ID + "' class='row toolesttipster' id='timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID + "'><div class='col-xs-12'>"
-              + "<div class='row'><div class='col-xs-12'>" + '<?php \singleton\fontawesome::getInstance( )->Ticket(1);?> ' + ticketData[i].Entity + ' #' + ticketData[i].Entity_ID + "</div></div>"
-              + "<div class='row'><div class='col-xs-12'>" + '<?php \singleton\fontawesome::getInstance( )->Calendar(1);?> ' + ticketData[i].Action + " @ " + ticketData[i].Time_Stamp + '</div></div>'
-              + "<div class='row'><div class='col-xs-12'>" + '<?php \singleton\fontawesome::getInstance( )->Calendar(1);?> ' + ticketData[i].Location_Tag + '</div></div>'
-              + "<div class='row'><div class='col-xs-12'>"  + '<?php \singleton\fontawesome::getInstance( )->User(1);?> ' + ticketData[i].Employee_Name + '</div></div>'
+            $("#Feed").prepend("<div rel='" + ticketData[i].Entity_ID + "' class='row g-0 toolesttipster' id='timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID + "'><div class='col-12'>"
+              + "<div class='row g-0'><div class='col-12'>" + "<?php \singleton\fontawesome::getInstance( )->Ticket(1);?> " + ticketData[i].Entity + ' #' + ticketData[i].Entity_ID + "</div></div>"
+              + "<div class='row g-0'><div class='col-12'>" + "<?php \singleton\fontawesome::getInstance( )->Calendar(1);?> " + ticketData[i].Action + " @ " + ticketData[i].Time_Stamp + '</div></div>'
+              + "<div class='row g-0'><div class='col-12'>" + "<?php \singleton\fontawesome::getInstance( )->Calendar(1);?> " + ticketData[i].Location_Tag + '</div></div>'
+              + "<div class='row g-0'><div class='col-12'>"  + "<?php \singleton\fontawesome::getInstance( )->User(1);?> " + ticketData[i].Employee_Name + '</div></div>'
             +  "</div></div>"
-            + "<div class='row'><div class='col-xs-12'>&nbsp;</div></div>");
+            + "<div class='row g-0'><div class='col-12'>&nbsp;</div></div>");
             $("#timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID).on('click',function(){
               $.ajax({
                 url:"bin/php/tooltip/Ticket.php",
@@ -896,37 +915,6 @@ function getTimeline(){
                 }
               });
             });
-            /*$("#timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID).qtip({
-              content: {
-                 text: 'Loading...', // The text to use whilst the AJAX request is loading
-                 ajax: {
-                     url: 'bin/php/tooltip/Ticket.php?ID=' + ticketData[i].Entity_ID, // URL to the local file
-                     type: 'GET', // POST or GET
-                     data: {
-                       ID: $(this).attr('rel')
-                     },
-                     success: function(data, status) {
-                        this.set('content.text', data);
-                    }
-                 }
-             },
-             position: {
-                  my: 'right center',
-                  at: 'left center',
-                  target: $("#timeline_" + ticketData[i].Entity + "_" + ticketData[i].Entity_ID),
-                  effect: false,
-                  viewport: $('#page-wrapper'),
-                  adjust: {
-                      method: 'shift'
-                  }
-              },
-              style: {
-                classes: 'tooltipTicket qtip-shadow',
-                width: 750/*, // Overrides width set by CSS (but no max-width!)
-                height: 750 // Overrides height set by CSS (but no max-height!)*/
-
-              //}
-            //});*/
             TIMELINE[i] = ticketData[i];
           }
         }
@@ -945,7 +933,7 @@ function getGPS(){
   if(GETTING_GPS == 0){
     GETTING_GPS = 1;
     $.ajax({
-      url:"bin/php/get/getGPS.php",
+      url:"bin/php/get/GPS.php",
       method:"GET",
       success:function(json){
         var GPS_Data = JSON.parse(json);
@@ -978,7 +966,7 @@ function getGPS(){
               position: new google.maps.LatLng(GPS_Data[i].Latitude, GPS_Data[i].Longitude),
               title: GPS_Data[i].Title,
               icon: {
-                path:mapIcons.shapes.SQUARE_PIN,
+                path:pinSymbol( 'black' ),
                 fillColor:'#00CCBB',
                 fillOpacity:0,
                 strokeColor:'black',

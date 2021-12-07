@@ -211,7 +211,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Loc.City            AS Location_City,
                             Loc.State           AS Location_State,
                             Loc.Zip             AS Location_Zip,
-                            Job.fDesc           AS Job,
+                            Job.ID              AS Job_ID,
+                            Job.fDesc           AS Job_Name,
                             Contract.BStart     AS Start_Date,
                             Contract.BFinish    AS End_Date,
                             Contract.BAmt       AS Amount,
@@ -281,9 +282,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'options' => array( )
     );
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Start_Date' ]      = date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
-      $Row[ 'End_Date' ]        = date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
-      $Row[ 'Escalation_Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
+      $Row[ 'Start_Date' ]      = is_null( $Row[ 'Start_Date' ] )       ? null : date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
+      $Row[ 'End_Date' ]        = is_null( $Row[ 'End_Date' ] )         ? null : date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
+      $Row[ 'Escalation_Date' ] = is_null( $Row[ 'Escalation_Date' ] )  ? null : date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
       //preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
       //$Row[ 'Link' ]            = $matches[ 0 ];

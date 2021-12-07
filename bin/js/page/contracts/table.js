@@ -142,9 +142,9 @@ $( document ).ready( function() {
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Job_ID !== null
+                      return  row.Job_ID !== null && row.Job_ID != ''
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='job.php?ID=" + row.Job_Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_Name + "</a></div>" +
+                                  "<div class='col-12'><a href='job.php?ID=" + row.Job_ID + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + ( row.Job_Name !== null ? row.Job_Name : 'Job #' + row.Job_ID ) + "</a></div>" +
                               "</div>"
                           :   null;
                   default :

@@ -144,6 +144,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 myOptions);
             var marker = new Array();
         <?php
+        $_GET[ 'Type' ] = 'Live';
         if($_GET['Type']       == 'Live'){
             $Start_Date            = new DateTime('now');
             $Start_Date            = $Start_Date->format("Y-m-d 00:00:00.000");
@@ -246,7 +247,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 });
             <?php }*/
         }?>}</script>
-            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+            <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g&callback=renderMap"></script>
 </body>
 </html>
 <?php
