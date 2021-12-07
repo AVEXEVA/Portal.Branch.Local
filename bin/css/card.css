@@ -29,6 +29,9 @@
 }
 .card .card-body {
   padding : 0px !important;
+  border-left : 1px solid white;
+  border-right : 1px solid white;
+  border-bottom : 1px solid white;
 }
 .card.card-primary .card-heading {
   background-color : white;

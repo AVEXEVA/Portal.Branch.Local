@@ -131,7 +131,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
             $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
             $User[ 'Picture' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? base64_encode( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) ) : $User[ 'Picture' ];
-            $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $_FILES[ 'Picture' ][ 'type' ];
+            $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $User[ 'Picture_Type' ];
 
             if( empty( $_POST[ 'ID' ] ) ){
 	            $result = \singleton\database::getInstance( )->query(
@@ -185,6 +185,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $User[ 'ID' ]
               )
             ) or die(print_r(sqlsrv_errors()));
+            if( isset( $_POST[ 'Privilege' ][ 'Access' ] ) ){
+              $result = \singleton\database::getInstance( )->query(
+                'Portal',
+                " INSERT INTO dbo.Privilege( [User], [Access] )
+                  VALUES( ?, ? );",
+                array(
+                  $User[ 'ID' ],
+                  $_POST[ 'Privilege' ][ 'Access' ]
+                )
+              );
+            }
 	        }
 	    }
 ?><!DOCTYPE html>
@@ -209,34 +220,34 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='card-heading'>
           <div class='row g-0 px-3 py-2'>
             <div class='col-12 col-lg-6'>
-                <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
-                  echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
-                ?>'>User</a>: <span><?php
-                  echo is_null( $User[ 'ID' ] )
-                      ? 'New'
-                      : '#' . $User[ 'ID' ];
-                ?></span></h5>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'>
+              <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
+                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
+              ?>'>User</a>: <span><?php
+                echo is_null( $User[ 'Email' ] )
+                    ? 'New'
+                    : $User[ 'Email' ];
+              ?></span></h5>
+          </div>
+          <div class='col-6 col-lg-3'>
+              <div class='row g-0'>
+                <div class='col-4'>
+                  <button
+                      class='form-control rounded'
+                      onClick="document.location.href='user.php';"
+                    ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+                </div>
+                <div class='col-4'>
                     <button
-                        class='form-control rounded'
-                        onClick="document.location.href='user.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='user.php?ID=<?php echo $User[ 'ID' ];?>';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='user.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-                  </div>
+                      class='form-control rounded'
+                      onClick="document.location.href='user.php?ID=<?php echo $User[ 'ID' ];?>';"
+                    ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
+                </div>
+                <div class='col-4'>
+                    <button
+                      class='form-control rounded'
+                      onClick="document.location.href='user.php';"
+                    ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
+                </div>
               </div>
             </div>
             <div class='col-6 col-lg-3'>
@@ -292,6 +303,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Privileges' ] ) && $_SESSION[ 'Cards' ][ 'Privileges' ] == 0 ? "style='display:none;'" : null;?>>
                   <table id='Table_Privileges' class='display' cellspacing='0' width='100%'>
                     <thead><tr>
+                      <th>ID</th>
                       <th>Access</th>
                       <th colspan='4'>Owner</th>
                       <th colspan='4'>Group</th>
@@ -299,6 +311,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <th colspan='4'>Database</th>
                       <th colspan='4'>Server</th>
                     </tr><tr>
+                      <th>&nbsp;</th>
                       <th>&nbsp;</th>
                       <th>Read</th>
                       <th>Write</th>
@@ -321,6 +334,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <th>Execute</th>
                       <th>Delete</th>
                     </tr><tr>
+                      <th>&nbsp;</th>
                       <th><input type='text' class='form-input redraw' name='Access' placeholder='Access' value='<?php echo isset( $_GET[ 'Access'] ) ? $_GET[ 'Access' ] : null;?>' /></th>
                       <th><input type='checkbox' class='form-input redraw' name='Owner_Read' placeholder='Owner_Read' value='<?php echo isset( $_GET[ 'Owner_Read'] ) ? $_GET[ 'Owner_Read' ] : null;?>' /></th>
                       <th><input type='checkbox' class='form-input redraw' name='Owner_Write' placeholder='Owner_Write' value='<?php echo isset( $_GET[ 'Owner_Write'] ) ? $_GET[ 'Owner_Write' ] : null;?>' /></th>
