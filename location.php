@@ -165,13 +165,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	'Geofence' => null,
     	'Sales_Tax' => null,
     	'Customer_ID' => null,
-    	'Customer_Name' => isset $_GET['Customer'] ? isset $_GET[ 'Customer'] : null,
+    	'Customer_Name' => isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null,
     	'Division_ID' => null,
-    	'Division_Name' => null,
+    	'Division_Name' => isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null,
     	'Route_ID' => null,
-    	'Route_Name' => null,
+    	'Route_Name' => isset( $_GET[ 'Route' ] ) ? $_GET[ 'Route' ] : null,
     	'Territory_ID' => null,
-    	'Territory_Name' => null,
+    	'Territory_Name' => isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null,
     	'Sales_Tax' => null,
     	'In_Use' => null
     ) : sqlsrv_fetch_array( $result );

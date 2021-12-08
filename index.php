@@ -309,7 +309,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div>
       </div>
       <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Map' ] ) ? $Privileges[ 'Map' ] : 0 ) ){
-        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='maps.php'">
+        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='map.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
           <div class ='nav-text'>Map</div>
