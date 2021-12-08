@@ -165,7 +165,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	'Geofence' => null,
     	'Sales_Tax' => null,
     	'Customer_ID' => null,
-    	'Customer_Name' => null,
+    	'Customer_Name' => isset $_GET['Customer'] ? isset $_GET[ 'Customer'] : null,
     	'Division_ID' => null,
     	'Division_Name' => null,
     	'Route_ID' => null,
