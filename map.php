@@ -18,26 +18,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-	$result = \singleton\database::getInstance( )->query(
-		null,
-		" SELECT  Emp.fFirst  AS First_Name,
-		          Emp.Last    AS Last_Name,
-		          Emp.fFirst + ' ' + Emp.Last AS Name,
-		          Emp.Title AS Title,
-		          Emp.Field   AS Field
-		  FROM  Emp
-		  WHERE   Emp.ID = ?;",
-		array(
-		  	$_SESSION[ 'Connection' ][ 'User' ]
-		)
-	);
-	$User   = sqlsrv_fetch_array( $result );
-	//Privileges
-	$Access = 0;
-	$Hex = 0;
-	$result = \singleton\database::getInstance( )->query(
-		'Portal',
-		"   SELECT  [Privilege].[Access],
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
                     [Privilege].[Owner],
                     [Privilege].[Group],
                     [Privilege].[Department],
@@ -46,641 +46,619 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     [Privilege].[Other],
                     [Privilege].[Token],
                     [Privilege].[Internet]
-		  FROM      dbo.[Privilege]
-		  WHERE     Privilege.[User] = ?;",
-		array(
-		  	$_SESSION[ 'Connection' ][ 'User' ],
-		)
-	);
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
         ) );
     }}
-    if( 	!isset( $Connection[ 'ID' ] )
+    if(   !isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Map' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Ticket' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Map' ] )
     ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'map.php'
-        )
-      );
-?><!DOCTYPE html>
+    else {?><!DOCTYPE html>
 <html lang="en">
 <head>
-  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-     <?php	require( bin_meta . 'index.php');?>
-     <?php	require( bin_css  . 'index.php');?>
-     <?php  require( bin_js   . 'index.php');?>
+    <title>Nouveau Elevator Portal</title>
+    <?php  	$_GET[ 'Bootstrap' ] = '5.1';?>
+    <?php 	require( bin_meta . 'index.php');?>
+    <?php 	require( bin_css . 'index.php');?>
+    <?php 	require( bin_js . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
-  <div id='container'>
-    <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
-        <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
-        <div id="page-wrapper" class='content' style='margin-right:0px !important;'>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading"><h3>Map</h3></div>
-                        <div class='panel-heading'>
-                          <div class='row'>
-                            <div class='col-xs-1' style='background-color:white;color:black;' onClick='clearMarkers();'>Toggle</div>
-                            <div class='col-xs-1' onClick='showDivision1();' style='background-color:magenta;color:black;'>Division #1</div>
-                            <div class='col-xs-1' onClick='showDivision2();' style='background-color:green;color:white;'>Division #2</div>
-                            <div class='col-xs-1' onClick='showDivision3();' style='background-color:blue;color:white;'>Division #3</div>
-                            <div class='col-xs-1' onClick='showDivision4();' style='background-color:teal;color:white;'>Division #4</div>
-                            <div class='col-xs-1' onClick='showModernization();' style='background-color:black;color:white;'>Modernization</div>
-                            <div class='col-xs-1' onClick='showEscalator();' style='background-color:brown;color:white;'>Escalator</div>
-                            <div class='col-xs-1' onClick='showFiremen();' style='background-color:red;color:white;'>Firemen</div>
-                            <div class='col-xs-1' onClick='showRepair();' style='background-color:purple;color:white;'>Repair</div>
-                            <div class='col-xs-1' onClick='showTesting();' style='background-color:orange;color:black;'>Testing</div>
-                          </div>
-                          <div class='row'>
-                            <div class='col-xs-1' style='background-color:white;color:black;' onClick='clearMarkers();'>&nbsp;</div>
-                            <div class='col-xs-1' onClick='showDivision1();' style='background-color:magenta;color:black;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%DIVISION 1%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showDivision2();' style='background-color:green;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%DIVISION 2%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showDivision3();' style='background-color:blue;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%DIVISION 3%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showDivision4();' style='background-color:teal;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%DIVISION 4%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showModernization();' style='background-color:black;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%Modernization%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showEscalator();' style='background-color:brown;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%Escalator%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showFiremen();' style='background-color:red;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%Firemen%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showRepair();' style='background-color:purple;color:white;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%Repair%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                            <div class='col-xs-1' onClick='showTesting();' style='background-color:orange;color:black;'><?php
-                              $r = $database->query(null,
-                                " SELECT  Count(*) AS Count
-                                  FROM    TicketO
-                                          LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
-                                          LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                                  WHERE   TicketO.Assigned = 3
-                                          AND tblWork.Super LIKE '%Testing%'
-                                ;");
-                              $row =  $r ? sqlsrv_fetch_array($r) : null;
-                              echo is_array($row) ? $row['Count'] : null;
-                            ?> personnel</div>
-                          </div>
-                        </div>
-                        <div class='panel-heading'>
-                          <div class='row'>
-                            <div class='col-xs-3'><button onClick="codeAddress(prompt('What address would you like to center on?'));" style='width:100%;color:black;'>Center on Address</button></div>
-                            <div class='col-xs-3'><select name='Employee' style='color:black !important;' onChange='zoomUser(this);'>
-                              <option value=''>Select</option>
-                              <?php $r = $database->query(null,"SELECT * FROM Emp WHERE Emp.Status = 0 ORDER BY Emp.Last, Emp.fFirst ASC;");
-                              if($r){while($row = sqlsrv_fetch_array($r)){
-                                ?><option value='<?php echo $row['ID'];?>'><?php echo $row['Last'] . ', ' . $row['fFirst'];?></option><?php
-                              }}?>
-                            </select></div>
-                          </div>
-                        </div>
+<body>
+  	<div id="wrapper">
+    	<?php require( bin_php . 'element/navigation.php');?>
+    	<div id="page-wrapper" class='content' >
+            <div class="card card-primary text-white"><form action='map.php' method='GET'>
+                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+        		<div class='card-heading'>
+					<div class='row g-0 px-3 py-2'>
+						<div class='col-12 col-lg-6'>
+							<h5><?php \singleton\fontawesome::getInstance( )->Map( 1 );?> Map</h5>
+						</div>
+						<div class='col-6 col-lg-3'>
+							<div class='row g-0'>
+								<div class='col-4'>
+									<button
+										class='form-control rounded'
+										type='submit'
+									><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'>Refresh</span></button>
+								</div>
+								<div class='col-4'>
+									<!--<button
+										class='form-control rounded'
+										onClick="document.location.href='customer.php?ID=<?php echo $User[ 'ID' ];?>';"
+									><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>-->
+								</div>
+								<div class='col-4'>
+									<!--<button
+										class='form-control rounded'
+										onClick="document.location.href='customer.php';"
+									><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>-->
+								</div>
+							</div>
+						</div>
+						<div class='col-6 col-lg-3'>
+							<div class='row g-0'>
+								<div class='col-4'>
+									<!--<button 
+										class='form-control rounded' 
+										onClick="document.location.href='customer.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"
+									><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button>-->
+								</div>
+								<div class='col-4'>
+									<!--<button 
+										class='form-control rounded' 
+										onClick="document.location.href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"
+									><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button>-->
+								</div>
+								<div class='col-4'>
+									<!--<button 
+										class='form-control rounded' 
+										onClick="document.location.href='customer.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"
+									><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button>-->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class='card-body bg-dark'>
+					<div class='row g-0'>
+						<div class='col-4'>
+							<div class='row g-0'>
+								<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Locations:</div>
+								<div class='col-8'>&nbsp;</div>
+							</div>
+							<div class='row g-0'>
+			              		<div class='col-1'>&nbsp;</div>
+			                  	<div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
+			                  	<div class='col-6'>
+			                  	  <input placeholder='Division' type='text' autocomplete='off' class='form-control edit' name='Division' value='<?php echo isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null;?>' />
+			                  	  <script>
+			                  	    $( 'input[name="Division"]' )
+			                  	        .typeahead({
+			                  	            minLength : 4,
+			                  	            hint: true,
+			                  	            highlight: true,
+			                  	            limit : 5,
+			                  	            display : 'FieldValue',
+			                  	            source: function( query, result ){
+			                  	                $.ajax({
+			                  	                    url : 'bin/php/get/search/Routes.php',
+			                  	                    method : 'GET',
+			                  	                    data    : {
+			                  	                        search :  $('input:visible[name="Division"]').val( )
+			                  	                    },
+			                  	                    dataType : 'json',
+			                  	                    beforeSend : function( ){
+			                  	                        abort( );
+			                  	                    },
+			                  	                    success : function( data ){
+			                  	                        result( $.map( data, function( item ){
+			                  	                            return item.FieldValue;
+			                  	                        } ) );
+			                  	                    }
+			                  	                });
+			                  	            },
+			                  	            afterSelect: function( value ){
+			                  	                $( 'input[name="Division"]').val( value );
+			                  	                $( 'input[name="Division"]').closest( 'form' ).submit( );
+			                  	            }
+			                  	        }
+			                  	    );
+			                  	  </script>
+			                  	</div>
+			                  	<div class='col-2'><button class='h-100 w-100' type='button' <?php
+			                  	  if( in_array( isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null, array( null, 0, '', ' ') ) ){
+			                  	    echo "onClick=\"document.location.href='divisions.php';\"";
+			                  	  } else {
+			                  	    echo "onClick=\"document.location.href='division.php?ID=" . $_GET[ 'Division' ] . "';\"";
+			                  	  }
+			                  	?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+			              	</div>
+							<div class='row g-0'>
+			              		<div class='col-1'>&nbsp;</div>
+			                  	<div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Route(1);?> Route:</div>
+			                  	<div class='col-6'>
+			                  	  <input placeholder='Route' type='text' autocomplete='off' class='form-control edit' name='Route' value='<?php echo isset( $_GET[ 'Route' ] ) ? $_GET[ 'Route' ] : null;?>' />
+			                  	  <script>
+			                  	    $( 'input[name="Route"]' )
+			                  	        .typeahead({
+			                  	            minLength : 4,
+			                  	            hint: true,
+			                  	            highlight: true,
+			                  	            limit : 5,
+			                  	            display : 'FieldValue',
+			                  	            source: function( query, result ){
+			                  	                $.ajax({
+			                  	                    url : 'bin/php/get/search/Routes.php',
+			                  	                    method : 'GET',
+			                  	                    data    : {
+			                  	                        search :  $('input:visible[name="Route"]').val( )
+			                  	                    },
+			                  	                    dataType : 'json',
+			                  	                    beforeSend : function( ){
+			                  	                        abort( );
+			                  	                    },
+			                  	                    success : function( data ){
+			                  	                        result( $.map( data, function( item ){
+			                  	                            return item.FieldValue;
+			                  	                        } ) );
+			                  	                    }
+			                  	                });
+			                  	            },
+			                  	            afterSelect: function( value ){
+			                  	                $( 'input[name="Route"]').val( value );
+			                  	                $( 'input[name="Route"]').closest( 'form' ).submit( );
+			                  	            }
+			                  	        }
+			                  	    );
+			                  	  </script>
+			                  	</div>
+			                  	<div class='col-2'><button class='h-100 w-100' type='button' <?php
+			                  	  if( in_array( isset( $_GET[ 'Route' ] ) ? $_GET[ 'Route' ] : null, array( null, 0, '', ' ') ) ){
+			                  	    echo "onClick=\"document.location.href='routes.php';\"";
+			                  	  } else {
+			                  	    echo "onClick=\"document.location.href='route.php?ID=" . $_GET[ 'Route' ] . "';\"";
+			                  	  }
+			                  	?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+			              	</div>
+							<div class='row g-0'>
+								<div class='col-1'>&nbsp;</div>
+			                  	<div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
+			                  	<div class='col-6'>
+			                  	  	<input placeholder='Customer' type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' />
+			                  	  	<script>
+			                  	  	  $( 'input[name="Customer"]' )
+			                  	  	      .typeahead({
+			                  	  	          minLength : 4,
+			                  	  	          hint: true,
+			                  	  	          highlight: true,
+			                  	  	          limit : 5,
+			                  	  	          display : 'FieldValue',
+			                  	  	          source: function( query, result ){
+			                  	  	              $.ajax({
+			                  	  	                  url : 'bin/php/get/search/Customers.php',
+			                  	  	                  method : 'GET',
+			                  	  	                  data    : {
+			                  	  	                      search :  $('input:visible[name="Customer"]').val( )
+			                  	  	                  },
+			                  	  	                  dataType : 'json',
+			                  	  	                  beforeSend : function( ){
+			                  	  	                      abort( );
+			                  	  	                  },
+			                  	  	                  success : function( data ){
+			                  	  	                      result( $.map( data, function( item ){
+			                  	  	                          return item.FieldValue;
+			                  	  	                      } ) );
+			                  	  	                  }
+			                  	  	              });
+			                  	  	          },
+			                  	  	          afterSelect: function( value ){
+			                  	  	              $( 'input[name="Customer"]').val( value );
+			                  	  	              $( 'input[name="Customer"]').closest( 'form' ).submit( );
+			                  	  	          }
+			                  	  	      }
+			                  	  	  );
+			                  	  	</script>
+			                  	</div>
+			                  	<div class='col-2'><button class='h-100 w-100' type='button' <?php
+			                  	  	if( in_array( isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, array( null, 0, '', ' ') ) ){
+			                  	  	  	echo "onClick=\"document.location.href='customers.php';\"";
+			                  	  	} else {
+			                  	  	  	echo "onClick=\"document.location.href='customer.php?ID=" . $_GET[ 'Customer' ] . "';\"";
+			                  	  	}
+			                  	?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+			              	</div>
+							<div class='row g-0'>
+								<div class='col-1'>&nbsp;</div>
+			                  	<div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
+			                  	<div class='col-6'>
+			                  	  <input placeholder='Location' type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' />
+			                  	  <script>
+			                  	    $( 'input[name="Location"]' )
+			                  	        .typeahead({
+			                  	            minLength : 4,
+			                  	            hint: true,
+			                  	            highlight: true,
+			                  	            limit : 5,
+			                  	            display : 'FieldValue',
+			                  	            source: function( query, result ){
+			                  	                $.ajax({
+			                  	                    url : 'bin/php/get/search/Locations.php',
+			                  	                    method : 'GET',
+			                  	                    data    : {
+			                  	                        search :  $('input:visible[name="Location"]').val( ),
+			                  	                        Customer : $('input:visible[name="Customer"]').val( )
+			                  	                    },
+			                  	                    dataType : 'json',
+			                  	                    beforeSend : function( ){
+			                  	                        abort( );
+			                  	                    },
+			                  	                    success : function( data ){
+			                  	                        result( $.map( data, function( item ){
+			                  	                            return item.FieldValue;
+			                  	                        } ) );
+			                  	                    }
+			                  	                });
+			                  	            },
+			                  	            afterSelect: function( value ){
+			                  	                $( 'input[name="Location"]').val( value );
+			                  	                $( 'input[name="Location"]').closest( 'form' ).submit( );
+			                  	            }
+			                  	        }
+			                  	    );
+			                  	  </script>
+			                  	</div>
+			                  	<div class='col-2'><button class='h-100 w-100' type='button' <?php
+			                  	  if( in_array( isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, array( null, 0, '', ' ') ) ){
+			                  	    echo "onClick=\"document.location.href='locations.php';\"";
+			                  	  } else {
+			                  	    echo "onClick=\"document.location.href='location.php?ID=" . $_GET[ 'Location' ] . "';\"";
+			                  	  }
+			                  	?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+			              	</div>
+						</div>
+						<div class='col-4'>
+							<div class='row g-0'>
+								<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Users( 1 );?> Users:</div>
+								<div class='col-8'>&nbsp;</div>
+							</div>
+							<div class='row g-0'>
+                                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Supervisor:</div>
+                                <div class='col-6'>
+                                    <input placeholder='Supervisor' type='text' autocomplete='off' class='form-control edit' name='Supervisor' value='<?php echo isset( $_GET[ 'Supervisor' ] ) ? $_GET[ 'Supervisor' ] : null;?>' />
+                                    <script>
+                                        $( 'input[name="Supervisor"]' )
+                                            .typeahead({
+                                                    minLength : 4,
+                                                    hint: true,
+                                                    highlight: true,
+                                                    limit : 5,
+                                                    display : 'FieldValue',
+                                                    source: function( query, result ){
+                                                        $.ajax({
+                                                            url : 'bin/php/get/search/Employees.php',
+                                                            method : 'GET',
+                                                            data    : {
+                                                                search :  $('input:visible[name="Supervisor"]').val( )
+                                                            },
+                                                            dataType : 'json',
+                                                            beforeSend : function( ){
+                                                                abort( );
+                                                            },
+                                                            success : function( data ){
+                                                                result( $.map( data, function( item ){
+                                                                    return item.FieldValue;
+                                                                } ) );
+                                                            }
+                                                        });
+                                                    },
+                                                    afterSelect: function( value ){
+                                                        $( 'input[name="Supervisor"]').val( value );
+                                                        $( 'input[name="Supervisor"]').closest( 'form' ).submit( );
+                                                    }
+                                                }
+                                            );
+                                    </script>
+                                </div>
+                                <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                                    if( in_array( isset( $_GET[ 'Supervisor' ] ) ? $_GET[ 'Supervisor' ] : null, array( null, 0, '', ' ') ) ){
+                                        echo "onClick=\"document.location.href='supervisors.php?';\"";
+                                    } else {
+                                        echo "onClick=\"document.location.href='supervisor.php?ID=" . $_GET[ 'Supervisor' ] . "';\"";
+                                    }
+                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                            </div>
+							<div class='row g-0'>
+                                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> User:</div>
+                                <div class='col-6'>
+                                    <input placeholder='User' type='text' autocomplete='off' class='form-control edit' name='User' value='<?php echo isset( $_GET[ 'User' ] ) ? $_GET[ 'User' ] : null;?>' />
+                                    <script>
+                                        $( 'input[name="User"]' )
+                                            .typeahead({
+                                                    minLength : 4,
+                                                    hint: true,
+                                                    highlight: true,
+                                                    limit : 5,
+                                                    display : 'FieldValue',
+                                                    source: function( query, result ){
+                                                        $.ajax({
+                                                            url : 'bin/php/get/search/Employees.php',
+                                                            method : 'GET',
+                                                            data    : {
+                                                                search :  $('input:visible[name="User"]').val( )
+                                                            },
+                                                            dataType : 'json',
+                                                            beforeSend : function( ){
+                                                                abort( );
+                                                            },
+                                                            success : function( data ){
+                                                                result( $.map( data, function( item ){
+                                                                    return item.FieldValue;
+                                                                } ) );
+                                                            }
+                                                        });
+                                                    },
+                                                    afterSelect: function( value ){
+                                                        $( 'input[name="User"]').val( value );
+                                                        $( 'input[name="User"]').closest( 'form' ).submit( );
+                                                    }
+                                                }
+                                            );
+                                    </script>
+                                </div>
+                                <div class='col-2'><button class='h-100 w-100' type='button' <?php
+                                    if( in_array( isset( $_GET[ 'User' ] ) ? $_GET[ 'User' ] : null, array( null, 0, '', ' ') ) ){
+                                        echo "onClick=\"document.location.href='users.php?Field=1';\"";
+                                    } else {
+                                        echo "onClick=\"document.location.href='user.php?ID=" . $_GET[ 'User' ] . "';\"";
+                                    }
+                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                            </div>
+						</div>
+						<div class='col-4'>
+							<div class='row g-0'>
+								<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Tickets:</div>
+								<div class='col-8'>&nbsp;</div>
+							</div>
+							<div class='row g-0'>
+                                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Tags:</div>
+                                <div class='col-8'><select class='form-control edit' name='Tags' multiple>
+                                	<option value=''>Select</option>
+                                	<option value='Shutdown'>Shutdown</option>
+                                	<option value='Entrapment'>Entrapment</option>
+                                	<option value='Service Call'>Service Call</option>
+                                	<option value='Maintenance'>Maintenance</option>
+                                	<option value='Repair'>Repair</option>
+                                	<option value='Modernization'>Modernization</option>
+                                	<option value='Resident'>Resident</option>
+                                </select></div>
+                            </div>
 
-                        <div class='panel-heading' style='color:black;background-color:white;'><button onClick="document.location.href='map.php?Type=Live';">Live View</button><button onClick="document.location.href='map.php?Type=1D';">24 Hour View</button><button onClick="document.location.href='map.php?Type=2D';">48 Hour View</button></div>
-                        <div class="panel-body"><div id="map" style='height:675px;width:100%;'></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Bootstrap Core JavaScript -->
+						</div>
+					</div>
+				</div>
+				<div class='card-body'>
+					<div id='map' style='height:750px;'>&nbsp;</div>
+				</div>
+			</form></div>
+		</div>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<script type="text/javascript">
+		function pinSymbol(color) {
+		    return {
+		        path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+		        fillColor: color,
+		        fillOpacity: 1,
+		        strokeColor: '#000',
+		        strokeWeight: 2,
+		        scale: 1,
+		   };
+		}
+		var marker = new Array( );
+		var markers = new Array( );
+		var map;
+		var directionsDisplay1;
+		var directionsService1;
+		function renderMap(){
+		  	var latlng = {
+		  		lat : <?php echo isset($_GET['Latitude']) ? $_GET['Latitude'] : 40.7831;?>, 
+		  		lng:<?php echo isset($_GET['Longitude']) ? $_GET['Longitude'] : -73.9712;?>
+		  	};
+			var myOptions = {
+		  		zoom: <?php echo isset($_GET['Latitude'], $_GET['Longitude']) ? 18 : 10;?>,
+		  		center: latlng
+			};
+			map = new google.maps.Map( 
+				document.getElementById( 'map' ), 
+				myOptions
+			);
+		  	$(document).ready(function(){
+		    	getGPS( );
+		    	setInterval(
+		    		getGPS,
+		    		15000
+		    	);
+		  	});
+		}
+		var GETTING_GPS = 0;
+		function rad( x ) { return x * Math.PI / 180; }
+		function getGPS( ){
+		  if( GETTING_GPS == 0 ){
+		    GETTING_GPS = 1;
+		    $.ajax({
+		      url:"bin/php/get/GPS.php",
+		      method:"GET",
+		      success:function(json){
+		        var GPS_Data = JSON.parse(json);
+		        for(i in GPS_Data){
+		          if(marker[i] && marker[i]['Color'] && marker[i]['Color'] == 'black'){
+		            var Color = 'black';
+		          } else if(moment().diff(moment(GPS_Data[i].Time_Stamp,'YYYY-MM-DD HH:mm:ss'), 'minutes') < 30){
+		            var ClassName = 'New-GPS';
+		            var Color = 'green';
+		          } else if(moment().diff(moment(GPS_Data[i].Time_Stamp,'YYYY-MM-DD HH:mm:ss'), 'minutes') < 120) {
+		            var ClassName = 'Old-GPS';
+		            var Color = 'yellow';
+		          } else if(moment().diff(moment(GPS_Data[i].Time_Stamp,'YYYY-MM-DD HH:mm:ss'), 'minutes') < 550) {
+		            var ClassName = 'Ancient-GPS';
+		            var Color = 'orange';
+		          } else {
+		            var ClassName ='Dead-GPS';
+		            var Color = 'brown';
+		          }
+		          if(marker[i]){
+		            marker[i].setPosition(new google.maps.LatLng(GPS_Data[i].Latitude, GPS_Data[i].Longitude));
+		            marker[i].setTitle(GPS_Data[i].Title);
+		            marker[i].setIcon(pinSymbol(Color));
+		            marker[i]['Color'] = Color;
+		            marker[i]['Employee_ID'] = i;
+		            marker[i]['Ticket_ID'] = GPS_Data[i].Ticket_ID;
+		          } else {
+		            marker[i] = new google.maps.Marker({
+		              map: map,
+		              position: new google.maps.LatLng(GPS_Data[i].Latitude, GPS_Data[i].Longitude),
+		              title: GPS_Data[i].Title,
+		              icon: {
+		                path:pinSymbol( 'black' ),
+		                fillColor:'#00CCBB',
+		                fillOpacity:0,
+		                strokeColor:'black',
+		                strokeWeight:0
+		              },
+		              id:i,
+		              Color:Color,
+		              Employee_ID:i,
+		              Ticket_ID:GPS_Data[i].Ticket_ID,
+		              icon:pinSymbol(Color)
+		            });
+		          }
+		          marker[i].addListener('dblclick', function() {
+		            $.ajax({
+		              url:"bin/php/tooltip/GPS.php",
+		              method:"GET",
+		              data:{
+		                ID:this['Employee_ID']
+		              },
+		              success:function(code){
+		                $(".popup").remove();
+		                $("body").append(code);
+		              }
+		            });
+		          });
+		          markers.push( i );
+		        }
+		        GETTING_GPS = 0;
+		        if(GOT_DIRECTIONS == 0){setTimeout(function(){<?php if(isset($_GET['Latitude'],$_GET['Longitude']) && isset($_GET['Nearest'])){?>find_closest_marker(<?php echo $_GET['Latitude'];?>, <?php echo $_GET['Longitude'];?>);<?php }?>},100);GOT_DIRECTIONS = 1;}
+		      }
+		    });
+		  }
+		}
+		function codeAddress(address) {
+		    geocoder = new google.maps.Geocoder();
+		    geocoder.geocode({
+		        'address': address
+		    }, function(results, status) {
+		        if (status == google.maps.GeocoderStatus.OK) {
+		          map.setCenter(results[0].geometry.location);
+		          map.setZoom(18);
+		          if(LookUp_Address != null){LookUp_Address.setMap(null);}
+		          LookUp_Address = new google.maps.Marker({
+		            map: map,
+		            position: new google.maps.LatLng(results[0].geometry.location.lat(),results[0].geometry.location.lng()),
+		            icon: {
+		              path:mapIcons.shapes.SQUARE_PIN,
+		              fillColor:'#00CCBB',
+		              fillOpacity:0,
+		              strokeColor:'black',
+		              strokeWeight:0
+		            },
+		            zIndex:99999999,
+		            id:'LookUp_Address',
+		            icon:flagSymbol('black')
+		          });
+		        }
+		    });
 
+		}
+		function takeServiceCall(){
+		  $.ajax({
+		    url:"bin/php/element/map/Service_Call.php",
+		    method:"GET",
+		    success:function(code){
+		      $("body").append(code);
+		    }
+		  });
+		}
+		function zoomUser(link){
+		  var val = $(link).val();
+		  for ( i in marker ){
+		    if(marker[i].id == val){
+		      var latlng = new google.maps.LatLng(marker[i].getPosition().lat(), marker[i].getPosition().lng());
+		      map.setCenter(marker[i].getPosition());
+		      map.setZoom(15);
+		      if(LookUp_User != null){
+		        marker[LookUp_User].setIcon(pinSymbol(marker[LookUp_User]['Color']));
+		      }
+		      marker[i].setIcon(pinSymbol('black'));
+		      marker[i]['Color'] = 'black';
+		      LookUp_User = i;
+		    }
+		  }
+		}
+		function breadcrumbUser(link){
+		  var val = $(link).val();
+		  document.location.href='map3.php?ID=' + val;
+		}
+		var toggle = 0;
+		function setMapOnAll(mapped) {
+		  for ( i in marker )
+		    marker[i].setMap(mapped);
+		  for ( i in shutdowns )
+		    shutdowns[i].setMap(mapped);
+		  for ( i in entrapments )
+		    entrapments[i].setMap(mapped);
+		  //marker = new Array();
+		}
+		function clearMarkers() {
+		  setMapOnAll(toggle == 0 ? null : map);
+		  toggle = toggle == 0 ? 1 : 0;
+		  Timeline_Supervisor = ''
+		  $("#Feed").html("");
+		  REFRESH_DATETIME = '<?php echo date("Y-m-d H:i:s",strtotime('-300 minutes'));?>';
+		  TIMELINE = new Array();
+		  getTimeline();
+		}
+		$(document).on('click',function(e){
+			if($(e.target).closest('.popup:not([class*="directions"])').length === 0){
+				$('.popup:not([class*="directions"])').fadeOut(300);
+				$('.popup:not([class*="directions"])').remove();
+			}
+		});
+	</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g&callback=renderMap"></script>
+<script type='text/javascript' src='https://maps.googleapis.com/maps/api/directions/json?origin=43.65077%2C-79.378425&destination=43.63881%2C-79.42745&key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g'></script>
 
-    <!-- JQUERY UI Javascript -->
-
-
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyBzxfjkN8x4t6TcuynQhk3cfo2AkXmHGiY"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBzxfjkN8x4t6TcuynQhk3cfo2AkXmHGiY"></script>
-  	<!-- Map Icons -->
-  	<link rel="stylesheet" type="text/css" href="bin/libraries/map-icons-master/dist/css/map-icons.css">
-  	<script type="text/javascript" src="bin/libraries/map-icons-master/dist/js/map-icons.js"></script>
-    <style>
-    .map-icon-label .map-icon {
-      font-size: 24px;
-      color: #000;
-      line-height: 48px;
-      text-align: center;
-      white-space: nowrap;
-      padding:0px;
-      margin:0px;
-      }
-      .map-icon-label .map-icon.Division1 {color:magenta !important;}
-      .map-icon-label .map-icon.Division2 {color:green !important;}
-      .map-icon-label .map-icon.Division3 {color:blue !important;}
-      .map-icon-label .map-icon.Division4 {color:teal !important;}
-      .map-icon-label .map-icon.Modernization {color:black !important;}
-      .map-icon-label .map-icon.Escalator {color:brown !important;}
-      .map-icon-label .map-icon.Firemen {color:red !important;}
-      .map-icon-label .map-icon.Repair {color:purple !important;}
-      .map-icon-label .map-icon.Testing {color:orange !important;}
-      .map-icon-label .map-icon.map-icon-location {color:black !important;}
-    </style>
-    <script type="text/javascript">
-    var latlng = new google.maps.LatLng(40.7831, -73.9712);
-    var myOptions = {
-      zoom: 10,
-      center: latlng,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var marker = new Array();
-    var marker_set_Division1 = new Array();
-    var marker_set_Division2 = new Array();
-    var marker_set_Division3 = new Array();
-    var marker_set_Division4 = new Array();
-    var marker_set_Firemen = new Array();
-    var marker_set_Repair = new Array();
-    var marker_set_Escalator = new Array();
-    var marker_set_Testing = new Array();
-    var marker_set_Modernization = new Array();
-    function showModernization(){for (i in marker){marker[i].setMap(marker_set_Modernization.includes(i) ? map : null);}}
-    function showDivision1(){for (i in marker){marker[i].setMap(marker_set_Division1.includes(i) ? map : null);}}
-    function showDivision2(){for (i in marker){marker[i].setMap(marker_set_Division2.includes(i) ? map : null);}}
-    function showDivision3(){for (i in marker){marker[i].setMap(marker_set_Division3.includes(i) ? map : null);}}
-    function showDivision4(){for (i in marker){marker[i].setMap(marker_set_Division4.includes(i) ? map : null);}}
-    function showFiremen(){for (i in marker){marker[i].setMap(marker_set_Firemen.includes(i) ? map : null);}}
-    function showTesting(){for (i in marker){marker[i].setMap(marker_set_Testing.includes(i) ? map : null);}}
-    function showEscalator(){for (i in marker){marker[i].setMap(marker_set_Escalator.includes(i) ? map : null);}}
-    function showRepair(){for (i in marker){marker[i].setMap(marker_set_Repair.includes(i) ? map : null);}}
-    var map = new google.maps.Map(document.getElementById("map"),
-        myOptions);
-          function initialize() {
-
-
-
-        <?php
-        if($_GET['Type']       == 'Live'){
-            $Start_Date            = date("Y-m-d H:i:s",strtotime('-1 week'));
-            $End_Date              = date("Y-m-d 23:59:59.999",strtotime('now'));
-        } elseif($_GET['Type'] == '1D') {
-            $Start_Date            = new DateTime('now');
-            $Start_Date            = $Start_Date->sub(new DateInterval('P1D'))->format("Y-m-d 00:00:00.000");
-            $End_Date              = new DateTime('now');
-            $End_Date              = $End_Date->format("Y-m-d 23:59:59.999");
-        } elseif($_GET['Type'] == '2D') {
-            $Start_Date            = new DateTime('now');
-            $Start_Date            = $Start_Date->sub(new DateInterval('P2D'))->format("Y-m-d 00:00:00.000");
-            $End_Date              = new DateTime('now');
-            $End_Date              = $End_Date->format("Y-m-d 23:59:59.999");
-        }
-        $r = $database->query(null,
-        "   SELECT
-                TechLocation.*,
-                Emp.fFirst AS First_Name,
-                Emp.Last   AS Last_Name,
-                Emp.fWork,
-				        Emp.fWork  AS Employee_Work_ID,
-                Emp.ID as Employee_ID,
-                tblWork.Super AS Super,
-                TicketO.TimeSite AS TimeSite
-            FROM
-                TechLocation
-                LEFT JOIN Emp ON TechLocation.TechID = Emp.fWork
-                LEFT JOIN tblWork ON 'A' + convert(varchar(10),Emp.ID) + ',' = tblWork.Members
-                LEFT JOIN TicketO ON TechLocation.TicketID = TicketO.ID
-            WHERE
-                DateTimeRecorded >= ?
-                AND DateTimeRecorded <= ?
-        ;",array($Start_Date,$End_Date));
-        $GPS_Locations = array("General"=>array());
-        while($array = sqlsrv_fetch_array($r)){
-            if(!isset($GPS_Locations[$array['TicketID']])){$GPS_Locations[$array['TicketID']] = array("General"=>array());}
-            if($array['ActionGroup'] == "General"){$GPS_Locations['General'][$array['ID']] = $array;}
-            elseif(in_array($array['ActionGroup'],array("On site time","Completed time"))){$GPS_Locations[$array['TicketID']][$array['ActionGroup']] = $array;}
-        }
-        $GPS = $GPS_Locations;
-        $Now_Location = array();
-        foreach($GPS_Locations as $key=>$GPS_Location){
-            if($key == "General"){continue;}
-            if(!isset($GPS_Location['Completed time'])){$Now = $GPS_Location['On site time'];break;}
-        }
-        $GPS = $GPS_Locations;
-        foreach($GPS_Locations["General"] as $ID=>$General_Location){
-            if(strtotime($General_Location['DateTimeRecorded']) >= strtotime($Now_Location['DateTimeRecorded'])){$GPS[$Now_Location['TicketID']]['General'][$General_Location['ID']] = $General_Location;}
-            else {
-                $Temp = $GPS_Locations;
-                unset($Temp['General']);
-                foreach($Temp as $key=>$value){
-                    if(strtotime($value['On site time']['DateTimeRecorded']) <= strtotime($General_Location['DateTimeRecorded']) && strtotime($value['Completed time']) >= strtotime($General_Location['DateTimeRecorded'])){$GPS[$key]['General'][$General_Location['ID']] = $General_Location;unset($GPS['General']);break;}
-                }
-            }
-        }
-        //var_dump($GPS);
-        foreach($GPS as $key=>$array){
-            if($_GET['Type'] == 'Live' && isset($array['Completed time'])){continue;}
-            if($key == "General"){continue;}
-            $Elapsed = round((strtotime(date("H:i:s")) - strtotime(date("H:i:s",strtotime($GPS_Location['TimeSite'])))) / (60*60),2);
-            $colors = array(
-              'Division 1'=>'yellow',
-              'Division 2'=>'green',
-              'Division 3'=>'blue',
-              'Division 4'=>'lightblue',
-              'Firemen' => 'red',
-              'Repair'=>'purple',
-              'Testing'=>'orange',
-              'Modernization'=>'black',
-              'Escalator'=>'brown'
-            );
-            if(isset($array['On site time'])){
-                $GPS_Location = $array['On site time'];
-                $r = $database->query($Portal,
-                  "SELECT Max(Phone_GPS.[Timestamp]) AS TimeStamp,
-                          Phone_GPS.ID AS ID,
-                          Phone_GPS.Latitude AS Latitude,
-                          Phone_GPS.Longitude AS Longitude,
-                          Phone_GPS.Phone AS IMEI
-                   FROM   Portal.dbo.Phone_GPS
-                          LEFT JOIN Portal.dbo.Employee_Phone ON Phone_GPS.Phone = Employee_Phone.IMEI
-                   WHERE  Employee_Phone.Employee_ID = ?
-                   GROUP BY Phone_GPS.ID, Phone_GPS.Latitude, Phone_GPS.Longitude, Phone_GPS.[TimeStamp], Phone_GPS.Phone
-                   ORDER BY Phone_GPS.[TimeStamp] DESC
-                  ;",array($GPS_Location['Employee_ID']));
-                if($r){
-                  $row = sqlsrv_fetch_array($r);
-                  if(is_array($row)){
-                    $GPS_Location['Latitude'] = $row['Latitude'];
-                    $GPS_Location['Longitude'] = $row['Longitude'];
-                    $GPS_Location['DateTimeRecorded'] = $row['TimeStamp'];
-                  }
-                }
-                ?>
-                marker[<?php echo $key;?>] = new mapIcons.Marker({
-                  map: map,
-                  position: new google.maps.LatLng(<?php echo $GPS_Location['Latitude'];?>,<?php echo $GPS_Location['Longitude'];?>),
-                  title: '<?php echo $GPS_Location['First_Name'] . " " . $GPS_Location['Last_Name'];?> -- <?php echo date("m/d/Y H:i:s",strtotime($GPS_Location['DateTimeRecorded']));?> -- <?php echo $GPS_Location['TicketID'];?>',
-                  icon: {
-                    path:mapIcons.shapes.SQUARE_PIN,
-                    fillColor:'#00CCBB',
-                    fillOpacity:0,
-                    strokeColor:'<?php echo $colors[$GPS_Location['Super']];?>',
-                    strokeWeight:0
-                  },
-                  id:"<?php echo $GPS_Location['Employee_ID'];?>",
-                  map_icon_label:'<span class="map-icon map-icon-walking <?php echo str_replace(' ','',ucwords(strtolower($GPS_Location['Super'])));?>"></span>'
-                });
-                marker[<?php echo $key;?>].addListener('click', function() {
-                    $.ajax({
-                      url:"get_ticket_popup.php",
-                      method:"GET",
-                      data:{ 'ID' : '<?php echo $GPS_Location['TicketID'];?>'},
-                      success:function(code){
-                        $("body").append(code);
-                      }
-                  });
-                });
-                <?php if(in_array(ucwords(strtolower($GPS_Location['Super'])),array('Division 1','Division 2', 'Division 3', 'Division 4', 'Modernization', 'Firemen', 'Testing', 'Repair','Escalator'))){?>
-                  marker_set_<?php echo str_replace(' ','',ucwords(strtolower($GPS_Location['Super'])));?>.push('<?php echo $key;?>');
-                <?php }?>
-            <?php }
-            if(isset($array['Completed time'])){
-                $GPS_Location = $array['Completed time'];
-                ?>
-                marker[<?php echo $key;?>] = new google.maps.Marker({
-                  position: {lat:<?php echo $GPS_Location['Latitude'];?>,lng:<?php echo $GPS_Location['Longitude'];?>},
-                  map: map,
-                  title: '<?php echo $GPS_Location['First_Name'] . " " . $GPS_Location['Last_Name'];?> -- <?php echo date("m/d/Y H:i:s",strtotime($GPS_Location['DateTimeRecorded']));?> -- <?php echo $GPS_Location['TicketID'];?>',
-                  Icon: 'https://vps9073.inmotionhosting.com/~skeera6/portal/images/GoogleMapsMarkers/<?php if($GPS_Location['ActionGroup'] == 'Completed time'){?>green_MarkerC<?php }
-                  elseif($GPS_Location['ActionGroup'] == 'On site time'){?>yellow_MarkerO<?php }
-                elseif($GPS_Location['ActionGroup'] == 'General'){?>paleblue_MarkerG<?php }?>.png'
-                });
-                marker[<?php echo $key;?>].addListener('click', function() {
-                    $.ajax({
-                      url:"get_ticket_popup.php",
-                      method:"GET",
-                      data:{ 'ID' : '<?php echo $GPS_Location['TicketID'];?>'},
-                      success:function(code){
-                        $("body").append(code);
-                      }
-                  });
-                });
-            <?php }
-        }?>}
-        function zoomUser(link){
-          var val = $(link).val();
-          for ( i in marker ){
-            if(marker[i].id == val){
-              var latlng = new google.maps.LatLng(marker[i].getPosition().lat(), marker[i].getPosition().lng());
-              var myOptions = {
-                  zoom: 17,
-                  center: latlng,
-                  mapTypeId: google.maps.MapTypeId.ROADMAP
-              }
-              map = new google.maps.Map(document.getElementById("map"), myOptions);
-              <?php foreach($GPS as $key=>$array){
-                $Elapsed = round((strtotime(date("H:i:s")) - strtotime(date("H:i:s",strtotime($GPS_Location['TimeSite'])))) / (60*60),2);
-                $colors = array(
-                  'Division 1'=>'yellow',
-                  'Division 2'=>'green',
-                  'Division 3'=>'blue',
-                  'Division 4'=>'lightblue',
-                  'Firemen' => 'red',
-                  'Repair'=>'purple',
-                  'Testing'=>'orange',
-                  'Modernization'=>'pink',
-                  'Escalator'=>'pink'
-                );
-                  if($_GET['Type'] == 'Live' && isset($array['Completed time'])){continue;}
-                  if($key == "General"){continue;}
-                  if(isset($array['On site time'])){
-                      $GPS_Location = $array['On site time'];
-                      $r = $database->query($Portal,
-                        "SELECT Max(Phone_GPS.[Timestamp]) AS TimeStamp,
-                                Phone_GPS.ID AS ID,
-                                Phone_GPS.Latitude AS Latitude,
-                                Phone_GPS.Longitude AS Longitude,
-                                Phone_GPS.Phone AS IMEI
-                         FROM   Portal.dbo.Phone_GPS
-                                LEFT JOIN Portal.dbo.Employee_Phone ON Phone_GPS.Phone = Employee_Phone.IMEI
-                         WHERE  Employee_Phone.Employee_ID = ?
-                         GROUP BY Phone_GPS.ID, Phone_GPS.Latitude, Phone_GPS.Longitude, Phone_GPS.[TimeStamp], Phone_GPS.Phone
-                         ORDER BY Phone_GPS.[TimeStamp] DESC
-                        ;",array($GPS_Location['Employee_ID']));
-                      if($r){
-                        $row = sqlsrv_fetch_array($r);
-                        if(is_array($row)){
-                          $GPS_Location['Latitude'] = $row['Latitude'];
-                          $GPS_Location['Longitude'] = $row['Longitude'];
-                          $GPS_Location['DateTimeRecorded'] = $row['TimeStamp'];
-                        }
-                      }
-                      ?>
-                      marker[<?php echo $key;?>] = new mapIcons.Marker({
-                        map: map,
-                        position: new google.maps.LatLng(<?php echo $GPS_Location['Latitude'];?>,<?php echo $GPS_Location['Longitude'];?>),
-                        title: '<?php echo $GPS_Location['First_Name'] . " " . $GPS_Location['Last_Name'];?> -- <?php echo date("m/d/Y H:i:s",strtotime($GPS_Location['DateTimeRecorded']));?> -- <?php echo $GPS_Location['TicketID'];?>',
-                        icon: {
-                          path:mapIcons.shapes.SQUARE_PIN,
-                          fillColor:'#00CCBB',
-                          fillOpacity:0,
-                          strokeColor:'',
-                          strokeWeight:0
-                        },
-                        id:"<?php echo $GPS_Location['Employee_ID'];?>",
-                        map_icon_label:'<span class="map-icon map-icon-walking <?php echo str_replace(' ','',ucwords(strtolower($GPS_Location['Super'])));?>"></span>'
-                      });
-                      marker[<?php echo $key;?>].addListener('click', function() {
-                        $.ajax({
-                          url:"get_ticket_popup.php",
-                          method:"GET",
-                          data:{ 'ID' : '<?php echo $GPS_Location['TicketID'];?>'},
-                          success:function(code){$("body").append(code);}
-                        });
-                      });
-                  <?php }
-                }?>
-            }
-          }
-        }
-        function codeAddress(address) {
-            geocoder = new google.maps.Geocoder();
-            geocoder.geocode({
-                'address': address
-            }, function(results, status) {
-                if (status == google.maps.GeocoderStatus.OK) {
-                    var myOptions = {
-                        zoom: 17,
-                        center: results[0].geometry.location,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP
-                    }
-                    map = new google.maps.Map(document.getElementById("map"), myOptions);
-
-
-                    marker[0] = new google.maps.Marker({
-                        map: map,
-                        position: results[0].geometry.location
-                    });
-                    <?php foreach($GPS as $key=>$array){
-                      $Elapsed = round((strtotime(date("H:i:s")) - strtotime(date("H:i:s",strtotime($GPS_Location['TimeSite'])))) / (60*60),2);
-                      $colors = array(
-                        'Division 1'=>'yellow',
-                        'Division 2'=>'green',
-                        'Division 3'=>'blue',
-                        'Division 4'=>'lightblue',
-                        'Firemen' => 'red',
-                        'Repair'=>'purple',
-                        'Testing'=>'orange',
-                        'Modernization'=>'pink',
-                        'Escalator'=>'pink'
-                      );
-                        if($_GET['Type'] == 'Live' && isset($array['Completed time'])){continue;}
-                        if($key == "General"){continue;}
-                        if(isset($array['On site time'])){
-                            $GPS_Location = $array['On site time'];
-                            $r = $database->query($Portal,
-                              "SELECT Max(Phone_GPS.[Timestamp]) AS TimeStamp,
-                                      Phone_GPS.ID AS ID,
-                                      Phone_GPS.Latitude AS Latitude,
-                                      Phone_GPS.Longitude AS Longitude,
-                                      Phone_GPS.Phone AS IMEI
-                               FROM   Portal.dbo.Phone_GPS
-                                      LEFT JOIN Portal.dbo.Employee_Phone ON Phone_GPS.Phone = Employee_Phone.IMEI
-                               WHERE  Employee_Phone.Employee_ID = ?
-                               GROUP BY Phone_GPS.ID, Phone_GPS.Latitude, Phone_GPS.Longitude, Phone_GPS.[TimeStamp], Phone_GPS.Phone
-                               ORDER BY Phone_GPS.[TimeStamp] DESC
-                              ;",array($GPS_Location['Employee_ID']));
-                            if($r){
-                              $row = sqlsrv_fetch_array($r);
-                              if(is_array($row)){
-                                $GPS_Location['Latitude'] = $row['Latitude'];
-                                $GPS_Location['Longitude'] = $row['Longitude'];
-                                $GPS_Location['DateTimeRecorded'] = $row['TimeStamp'];
-                              }
-                            }
-                            ?>
-                            marker[<?php echo $key;?>] = new mapIcons.Marker({
-                              map: map,
-                              id:"<?php echo $GPS_Location['Employee_ID'];?>",
-                              title: '<?php echo $GPS_Location['First_Name'] . " " . $GPS_Location['Last_Name'];?> -- <?php echo date("m/d/Y H:i:s",strtotime($GPS_Location['DateTimeRecorded']));?> -- <?php echo $GPS_Location['TicketID'];?>',
-                              position: new google.maps.LatLng(<?php echo $GPS_Location['Latitude'];?>,<?php echo $GPS_Location['Longitude'];?>),
-                              icon: {
-                                path:mapIcons.shapes.SQUARE_PIN,
-                                fillColor:'#00CCBB',
-                                fillOpacity:0,
-                                strokeColor:'',
-                                strokeWeight:0
-                              },
-                              map_icon_label:'<span class="map-icon map-icon-walking <?php echo str_replace(' ','',ucwords(strtolower($GPS_Location['Super'])));?>"></span>'
-                            });
-                            marker[<?php echo $key;?>].addListener('click', function() {
-                              $.ajax({
-                                url:"get_ticket_popup.php",
-                                method:"GET",
-                                data:{ 'ID' : '<?php echo $GPS_Location['TicketID'];?>'},
-                                success:function(code){$("body").append(code);}
-                              });
-                            });
-                        <?php }
-                      }?>
-                }
-            });
-
-        }
-        <?php /*
-        $r = $database->query(null,"SELECT * FROM Loc WHERE Loc.Maint = 1;");
-        if($r){while($row = sqlsrv_fetch_array($r)){
-          ?>marker[<?php echo $key;?>] = new mapIcons.Marker({
-            map: map,
-            position: new google.maps.LatLng(<?php echo $row['Latt'];?>,<?php echo $row['fLong'];?>),
-            icon: {
-              path:mapIcons.shapes.SQUARE_PIN,
-              fillColor:'#00CCBB',
-              fillOpacity:0,
-              strokeColor:'',
-              strokeWeight:0
-            },
-            map_icon_label:'<span class="map-icon map-icon-local-government map-icon-location"></span>'
-          });
-        }}*/
-        ?>
-        var toggle = 0;
-        function setMapOnAll(mapped) {
-          for ( i in marker )
-            marker[i].setMap(mapped);
-          //marker = new Array();
-        }
-        function clearMarkers() {
-          setMapOnAll(toggle == 0 ? null : map);
-          toggle = toggle == 0 ? 1 : 0;
-        }
-        function showMarkers(){
-
-        }</script>
-        <script>
-
-          </script>
-          <script>
-          $("div#container").on('click',function(e){
-            if($(e.target).closest('.popup').length === 0 && $(e.target).closest('td').length === 0){
-              $('.popup').fadeOut(300);
-              $('.popup').remove();
-            }
-          });
-          </script>
-
-            <style>
-              .popup {
-                position:absolute;
-                z-index:99;
-                left:20%;
-                right:20%;
-                top:20%;
-                /*bottom:20%;*/
-                /*height:60%;*/
-                width:60%;
-                background-color:#2d2d2d !important;
-                padding:0px;
-                max-height:600px;
-                overflow-y:scroll;
-              }
-            </style>
-          </div>
 </body>
-</html>
 <?php
-}
-    } else {?><html><head><script>document.location.href='../login.php?Forward=map.php?Type=Live';</script></head></html><?php }
-} ?>
+  }
+} else {?><html><head><script>document.location.href='../login.php?Forward=map.php?Type=Live';</script></head></html><?php }
+?>
