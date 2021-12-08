@@ -83,32 +83,46 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'division.php'
         )
       );
-
+      $ID = isset( $_GET[ 'ID' ] )
+    ? $_GET[ 'ID' ]
+    : (
+      isset( $_POST[ 'ID' ] )
+        ? $_POST[ 'ID' ]
+        : null
+    );
+  $Name = isset( $_GET[ 'Name' ] )
+      ? $_GET[ 'Name' ]
+      : (
+        isset( $_POST[ 'Name' ] )
+          ? $_POST[ 'Name' ]
+          : null
+      );
       $result = \singleton\database::getInstance( )->query(
     		null,
-    		" SELECT  Zone.ID         AS ID,
+    		" SELECT
+                  Zone.ID         AS ID,
                   Zone.Name       AS Name,
+                  Zone.Surcharge  AS Surcharge,
                   Zone.Bonus      AS Bonus,
                   Zone.Count      AS Count,
-                  Zone.Remarks    AS Remarks,
-                  Zone.fDesc      AS Description
-                  zone.TFMID      AS TFMID
+                  Zone.Remarks    AS Notes,
+                  Zone.fDesc      AS Description,
+                  zone.TFMID      AS TFMID,
                   zone.TFMSource  AS TFMsource
-          FROM Zone
-                 LEFT JOIN Loc    ON Zone.ID = Loc.Zone
-                 LEFT JOIN Unit   ON
-          WHERE Zone.ID =?;",
-      array(
-        $ID,
-        $Name
-            )
-        );
+                  FROM Zone
+                  WHERE Zone.ID = ?;",
+                  array(
+                    $ID,
+                    $Name
+                  )
+                );
 $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
     'ID' => null,
     'Name' => null,
     'Bonus' => null,
     'Count' => null,
-    'Remarks' => null,
+    'Notes' => null,
+    'Description' => null,
     'Price1' => null,
     'Price2' => null,
     'Price3' => null,
@@ -119,28 +133,28 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
     'Color' => null,
     'fDesc' => null,
     'Tax' => null,
+    'Maintenance' => null,
+    'Route_Name' => null,
+    'Route_ID' => null
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
         // if the $_Post is set and the count is null, select if available
         $Divsion[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Divsion[ 'ID' ];
         $Divsion[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Divsion[ 'Name' ];
+        $Divsion[ 'Surcharge' ] 	= isset( $_POST[ 'Surcharge' ] ) ? $_POST[ 'Surcharge' ] : $Divsion[ 'Surcharge' ];
         $Divsion[ 'Bonus' ] 		= isset( $_POST[ 'Bonus' ] ) 	 ? $_POST[ 'Bonus' ] 	 : $Divsion[ 'Bonus' ];
         $Divsion[ 'Count' ] 		= isset( $_POST[ 'Count' ] ) 	 ? $_POST[ 'Count' ] 	 : $Divsion[ 'Count' ];
-        $Divsion[ 'IDistance' ] 		= isset( $_POST[ 'IDistance' ] ) 	 ? $_POST[ 'IDistance' ] 	 : $Divsion[ 'IDistance' ];
-        $Divsion[ 'ODistance' ] = isset( $_POST[ 'ODistance' ] )  ? $_POST[ 'ODistance' ]  : $Divsion[ 'ODistance' ];
-        $Divsion[ 'Location' ] = isset( $_POST[ 'Location' ] )  ? $_POST[ 'Location' ]  : $Divsion[ 'Location' ];
-        $Divsion[ 'Units' ]     = isset( $_POST[ 'Units' ] ) 	   ? $_POST[ 'Units' ] 	   : $Divsion[ 'Units' ];
-        $Divsion[ 'Violation' ] 	= isset( $_POST[ 'Violation' ] ) 	 ? $_POST[ 'Violation' ] 	 : $Divsion[ 'Violation' ];
-        $Divsion[ 'Tickets' ] 	= isset( $_POST[ 'Tickets' ] ) 	 ? $_POST[ 'Tickets' ] 	 : $Divsion[ 'Tickets' ];
+        $Divsion[ 'Notes' ] = isset( $_POST[ 'Remarks' ] )  ? $_POST[ 'Remarks' ]  : $Divsion[ 'Notes' ];
+        $Divsion[ 'Price1' ]     = isset( $_POST[ 'Price1' ] ) 	   ? $_POST[ 'Price1' ] 	   : $Divsion[ 'Price1' ];
+        $Divsion[ 'IDistance' ] 	= isset( $_POST[ 'IDistance' ] ) 	 ? $_POST[ 'IDistance' ] 	 : $Divsion[ 'IDistance' ];
+        $Divsion[ 'ODistance' ] 	= isset( $_POST[ 'ODistance' ] ) 	 ? $_POST[ 'ODistance' ] 	 : $Divsion[ 'ODistance' ];
         $Divsion[ 'Internet' ] = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Divsion[ 'Internet' ];
-        $Divsion[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Divsion[ 'Street' ];
-        $Divsion[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Divsion[ 'City' ];
-        $Divsion[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Divsion[ 'State' ];
-        $Divsion[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Divsion[ 'Zip' ];
-        $Divsion[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Divsion[ 'Latitude' ];
-        $Divsion[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Divsion[ 'Longitude' ];
-
+        $Divsion[ 'Color' ] 	= isset( $_POST[ 'Color' ] ) 	 ? $_POST[ 'Color' ] 	 : $Divsion[ 'Color' ];
+        $Divsion[ 'fDesc' ] 		= isset( $_POST[ 'fDesc' ] ) 	 ? $_POST[ 'fDesc' ] 	 : $Divsion[ 'fDesc' ];
+        $Divsion[ 'Tax' ] 		= isset( $_POST[ 'Tax' ] ) 	 ? $_POST[ 'Tax' ] 	 : $Divsion[ 'Tax' ];
+        $Divsion[ 'TFMID' ] 			= isset( $_POST[ 'TFMID' ] ) 		 ? $_POST[ 'TFMID' ] 		 : $Divsion[ 'TFMID' ];
+        $Divsion[ 'TFMSource' ] 	= isset( $_POST[ 'TFMSource' ] )  ? $_POST[ 'TFMSource' ]  : $Divsion[ 'TFMSource' ];
         if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
           $result = \singleton\database::getInstance( )->query(
             null,
@@ -170,17 +184,15 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
               $Divsion[ 'Name' ],
               $Divsion[ 'Bonus' ],
               $Divsion[ 'Count' ],
-              $Divsion[ 'Remarks' ],
+              $Divsion[ 'Notes' ],
               $Divsion[ 'Price1' ],
-              $Divsion[ 'Price2' ],
-              $Divsion[ 'Price3' ],
-              $Divsion[ 'Price4' ],
-              $Divsion[ 'Price5' ],
               $Divsion[ 'IDistance' ],
               $Divsion[ 'ODistance' ],
               $Divsion[ 'Color' ],
               $Divsion[ 'fDesc' ],
               $Divsion[ 'Tax' ],
+              $Divsion[ 'TFMID' ],
+              $Divsion[ 'TFMSource'],
               isset( $Divsion[ 'Geofence' ] ) ? $Divsion[ 'Geofence' ] : 0
             )
           );
@@ -205,7 +217,7 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
               $Divsion[ 'Name' ],
               $Divsion[ 'Bonus' ],
               $Divsion[ 'Count' ],
-              $Divsion[ 'Remarks' ],
+              $Divsion[ 'Notes' ],
               $Divsion[ 'Price1' ],
               $Divsion[ 'Price2' ],
               $Divsion[ 'Price3' ],
@@ -221,7 +233,6 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
           );
         }
       }
-  var_dump( sqlsrv_errors( ) );
       ?><!DOCTYPE html>
       <html lang="en">
       <head>
@@ -238,70 +249,54 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
            </style>
       </head>
       <body>
-          <div id="wrapper">
-              <?php require( bin_php . 'element/navigation.php');?>
-              <div id="page-wrapper" class='content'>
-      			        <div class='card card-primary border-0'>
-      				      <div class='card-heading'>
-              			<div class='row g-0 px-3 py-2'>
-              				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><a href='locations.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Division' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Division' ][ 0 ] : array( ) ) : null;?>'>Leads</a>: <span><?php echo is_null( $Division[ 'ID' ] ) ? 'New' : $Division[ 'Name' ];?></span></h5></div>
-              				<div class='col-2'></div>
-              				<div class='col-2'>
-              					<div class='row g-0'>
-              						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='location.php';">Create</button></div>
-              						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='location.php?ID=<?php echo $Division[ 'ID' ];?>';">Refresh</button></div>
-              					</div>
-              				</div>
-              				<div class='col-2'>
-              					<div class='row g-0'>
-              						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='location.php?ID=<?php echo !is_null( $Division[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Locations' ], true )[ array_search( $Division[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Locations' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-              						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='locations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Locations' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Locations' ][ 0 ] : array( ) );?>';">Table</button></div>
-              						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='location.php?ID=<?php echo !is_null( $Division[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Locations' ], true )[ array_search( $Division[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Locations' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-              					</div>
-              				</div>
-              			</div>
-              		</div>
+    <div id="wrapper">
+        <?php require( bin_php . 'element/navigation.php');?>
+        <div id="page-wrapper" class='content'>
+			        <div class='card card-primary border-0'>
+				      <div class='card-heading'>
+                <div class='row g-0 px-3 py-2'>
+                  <div class='col-12 col-lg-6'>
+                    <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='divisions.php?<?php
+                      echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Divisions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Divisions' ][ 0 ] : array( ) );
+                    ?>'>Division</a>: <span><?php
+                      echo is_null( $Division[ 'ID' ] )
+                          ? 'New'
+                          : '#' . $Division[ 'ID' ];
+                    ?></span></h5>
+                  </div>
+                  <div class='col-6 col-lg-3'>
+                      <div class='row g-0'>
+                        <div class='col-4'>
+                          <button
+                              class='form-control rounded'
+                              onClick="document.location.href='division.php';"
+                            ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+                        </div>
+                        <div class='col-4'>
+                            <button
+                              class='form-control rounded'
+                              onClick="document.location.href='division.php?ID=<?php echo $User[ 'ID' ];?>';"
+                            ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
+                        </div>
+                        <div class='col-4'>
+                            <button
+                              class='form-control rounded'
+                              onClick="document.location.href='division.php';"
+                            ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
+                        </div>
+                    </div>
+                  </div>
+                  <div class='col-6 col-lg-3'>
+                      <div class='row g-0'>
+                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='division.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Divisions' ], true )[ array_search( $Division[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Divisions' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='divisions.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Divisions' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+                        <div class='col-4'><button class='form-control rounded' onClick="document.location.href='division.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Divisions' ], true )[ array_search( $Division[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Divisions' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                      </div>
+                  </div>
+                </div>
+              </div>
       				<div class='card-body bg-dark text-white'>
       				<div class='card-columns'>
-      					<?php if( !in_array( $Division[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Division['Longitude' ], array( null, 0 ) ) ){
-      						?><div class='card card-primary'>
-      							<div class='card-heading'>
-      								<div class='row g-0 px-3 py-2'>
-      									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Map( 1 );?><span>Map</span></h5></div>
-      									<div class='col-2'>&nbsp;</div>
-      								</div>
-      							</div>
-      							<div class='card-body bg-darker'>
-      								<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-      								<script type="text/javascript">
-      					                var map;
-      					                function initialize() {
-      					                     map = new google.maps.Map(
-      					                        document.getElementById( 'location_map' ),
-      					                        {
-      					                          zoom: 10,
-      					                          center: new google.maps.LatLng( <?php echo $Division[ 'Latitude' ];?>, <?php echo $Division[ 'Longitude' ];?> ),
-      					                          mapTypeId: google.maps.MapTypeId.ROADMAP
-      					                        }
-      					                    );
-      					                    var markers = [];
-      					                    markers[0] = new google.maps.Marker({
-      					                        position: {
-      					                            lat:<?php echo $Division['Latitude'];?>,
-      					                            lng:<?php echo $Division['Longitude'];?>
-      					                        },
-      					                        map: map,
-      					                        title: '<?php echo $Division[ 'Name' ];?>'
-      					                    });
-      					                }
-      					                $(document).ready(function(){ initialize(); });
-      					            </script>
-      						        <div class='card-body'>
-      						        	<div id='location_map' class='map'>&nbsp;</div>
-      						        </div>
-      							</div>
-      						</div>
-      					<?php }?>
       					<div class='card card-primary my-3'>
       						<div class='card-heading'>
       							<div class='row g-0 px-3 py-2'>
@@ -310,155 +305,18 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
       							</div>
       						</div>
       						<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-      							<form action='location.php?ID=<?php echo $Division[ 'ID' ];?>' method='POST'>
+      							<form action='division.php?ID=<?php echo $Division[ 'ID' ];?>' method='POST'>
       								<input type='hidden' name='ID' value='<?php echo isset( $Division[ 'ID' ] ) ? $Division[ 'ID' ] : null;?>' />
       				                <div class='row g-0'>
       									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?>Name:</div>
       									<div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Division['Name'];?>' /></div>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Description(1);?>Description:</div>
+                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Description' value='<?php echo $Division['Description'];?>' /></div>
+                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Note(1);?>Notes:</div>
+                        <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Notes' value='<?php echo $Division['Notes'];?>' /></div>
       								</div>
-      								<div class='row g-0'>
-      									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
-      								    <div class='col-6'>
-      								    	<input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Division[ 'Customer_Name' ];?>' />
-      								    	<script>
-      								    		$( 'input[name="Customer"]' )
-      										        .typeahead({
-      										            minLength : 4,
-      										            hint: true,
-      										            highlight: true,
-      										            limit : 5,
-      										            display : 'FieldValue',
-      										            source: function( query, result ){
-      										                $.ajax({
-      										                    url : 'bin/php/get/search/Customers.php',
-      										                    method : 'GET',
-      										                    data    : {
-      										                        search :  $('input:visible[name="Customer"]').val( )
-      										                    },
-      										                    dataType : 'json',
-      										                    beforeSend : function( ){
-      										                        abort( );
-      										                    },
-      										                    success : function( data ){
-      										                        result( $.map( data, function( item ){
-      										                            return item.FieldValue;
-      										                        } ) );
-      										                    }
-      										                });
-      										            },
-      										            afterSelect: function( value ){
-      										                $( 'input[name="Customer"]').val( value );
-      										                $( 'input[name="Customer"]').closest( 'form' ).submit( );
-      										            }
-      										        }
-      										    );
-      								    	</script>
-      								    </div>
-      								    <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='customer.php?ID=<?php echo $Division[ 'Customer_ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-      								</div>
-      				         <div class='row g-0'>
-      									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
-      									<div class='col-8'><select name='Status' class='form-control edit'>
-      										<option value=''>Select</option>
-      										<option value='0' <?php echo $Division[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
-      										<option value='1' <?php echo $Division[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
-      									</select></div>
-      							</div>
-                    <div class='row g-0'>
-                      <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Territory(1);?> Territory:</div>
-                      <div class='col-8'><input type='text' class='form-control edit' name='Territory' value='<?php echo $Division['Territory_ID'];?>' /></div>
                     </div>
-      				        <div class='row g-0'>
-      									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
-      									<div class='col-6'></div>
-      									<div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='map.php?Location=<?php echo $Division[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-1'>&nbsp;</div>
-      									<div class='col-3 border-bottom border-white my-auto'>Street:</div>
-      									<div class='col-8'><input type='text' class='form-control edit' name='Street' value='<?php echo $Division['Street'];?>' /></div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-1'>&nbsp;</div>
-      									<div class='col-3 border-bottom border-white my-auto'>City:</div>
-      									<div class='col-8'><input type='text' class='form-control edit' name='City' value='<?php echo $Division['City'];?>' /></div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-1'>&nbsp;</div>
-      									<div class='col-3 border-bottom border-white my-auto'>State:</div>
-      									<div class='col-8'><select class='form-control edit' name='State'>
-      										<option <?php echo $Division[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
-      										<option <?php echo $Division[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
-      										<option <?php echo $Division[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
-      										<option <?php echo $Division[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
-      										<option <?php echo $Division[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
-      										<option <?php echo $Division[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
-      										<option <?php echo $Division[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
-      										<option <?php echo $Division[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
-      										<option <?php echo $Division[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
-      										<option <?php echo $Division[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
-      										<option <?php echo $Division[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
-      										<option <?php echo $Division[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
-      										<option <?php echo $Division[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
-      										<option <?php echo $Division[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
-      										<option <?php echo $Division[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
-      										<option <?php echo $Division[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
-      										<option <?php echo $Division[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
-      										<option <?php echo $Division[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
-      										<option <?php echo $Division[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
-      										<option <?php echo $Division[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
-      										<option <?php echo $Division[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
-      										<option <?php echo $Division[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
-      										<option <?php echo $Division[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
-      										<option <?php echo $Division[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
-      										<option <?php echo $Division[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
-      										<option <?php echo $Division[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
-      										<option <?php echo $Division[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
-      										<option <?php echo $Division[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
-      										<option <?php echo $Division[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
-      										<option <?php echo $Division[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
-      										<option <?php echo $Division[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
-      										<option <?php echo $Division[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
-      										<option <?php echo $Division[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
-      										<option <?php echo $Division[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
-      										<option <?php echo $Division[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
-      										<option <?php echo $Division[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
-      										<option <?php echo $Division[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
-      										<option <?php echo $Division[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
-      										<option <?php echo $Division[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
-      										<option <?php echo $Division[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
-      										<option <?php echo $Division[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
-      										<option <?php echo $Division[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
-      										<option <?php echo $Division[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
-      										<option <?php echo $Division[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
-      										<option <?php echo $Division[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
-      										<option <?php echo $Division[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
-      										<option <?php echo $Division[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
-      										<option <?php echo $Division[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
-      										<option <?php echo $Division[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
-      										<option <?php echo $Division[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
-      										<option <?php echo $Division[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
-      									</select></div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-1'>&nbsp;</div>
-      									<div class='col-3 border-bottom border-white my-auto'>Zip:</div>
-      									<div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Division['Zip'];?>' /></div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-1'>&nbsp;</div>
-      									<div class='col-3 border-bottom border-white my-auto'>Latitude:</div>
-      									<div class='col-8'><input type='text' class='form-control edit' name='Latitude' value='<?php echo $Division['Latitude'];?>' /></div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-1'>&nbsp;</div>
-      									<div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
-      									<div class='col-8'><input type='text' class='form-control edit' name='Longitude' value='<?php echo $Division['Longitude'];?>' /></div>
-      								</div>
-      				           </form>
-      					    </div>
-      					</div>
+                  </div>
       					<div class='card card-primary my-3'>
       						<div class='card-heading'>
       							<div class='row g-0 px-3 py-2'>
@@ -467,7 +325,7 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
       							</div>
       						</div>
       						<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-      							<form action='location.php?ID=<?php echo $Division[ 'ID' ];?>' method='POST'>
+      							<form action='division.php?ID=<?php echo $Division[ 'ID' ];?>' method='POST'>
       								<input type='hidden' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' />
       								<div class='row g-0'>
       									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Maintenance:</div>
@@ -479,20 +337,6 @@ $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
       								    	</select>
       								    </div>
       								    <div class='col-2'>&nbsp;</div>
-      								</div>
-      								<div class='row g-0'>
-      									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Division(1);?> Division:</div>
-      								    <div class='col-6'>
-      								    	<input type='hidden' disabled name='Division' value='<?php echo $Division[ 'Division_ID' ];?>' />
-      								    	<input type='text' class='form-control edit' name='Division_Autocomplete' value='<?php echo $Division[ 'Division_Name' ];?>' />
-      								    </div>
-      								    <div class='col-2'><button class='h-100 w-100' type='button' <?php
-      								    	if( in_array( $Division[ 'Route_ID' ], array( null, 0, '', ' ') ) ){
-      								    		echo "onClick=\"document.location.href='divisions.php';\"";
-      								    	} else {
-      								    		echo "onClick=\"document.location.href='division.php?ID=" . $Division[ 'Division_ID' ] . "';\"";
-      								    	}
-      								    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
       								</div>
       								<div class='row g-0'>
       									<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Route(1);?> Route:</div>

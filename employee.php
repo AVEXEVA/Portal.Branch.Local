@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Employee.fFirst + ' ' + Employee.Last AS Name,
         				Employee.fFirst                       AS First_Name,
         				Employee.Last                         AS Last_Name,
-                        Employee.Title                        AS Title,
+                Employee.Title                        AS Title,
         				Rolodex.Address                       AS Street,
         				Rolodex.City                          AS City,
         				Rolodex.State                         AS State,
@@ -113,9 +113,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.Geolock                       AS Geofence,
         				Rolodex.ID 		                      AS Rolodex,
         				Rolodex.Name                          AS Name,
-                        Rolodex.Phone                         AS Phone,
-                        Rolodex.Email                         AS Email,
-                        Rolodex.Contact                       AS Contact,
+                Rolodex.Phone                         AS Phone,
+                Rolodex.Email                         AS Email,
+                Rolodex.Contact                       AS Contact,
         				tblWork.Super                         AS Supervisor,
         				[User].ID                             AS User_ID,
         				[User].Email 	                      AS User_Email
@@ -141,7 +141,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Name' => null,
         	'First_Name' => null,
         	'Last_Name' => null,
-            'Title' => null,
+          'Title' => null,
         	'Sales' => null,
         	'Field' => null,
         	'In_Use' => null,
@@ -180,7 +180,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     						ID,
         					Type,
         					Name,
-                            Contact,
+                  Contact,
         					Website,
         					Address,
         					City,
@@ -194,8 +194,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SELECT @MAXID + 1;",
         			array(
         				$Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
-                        $Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
-        				'',
+                $Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
+                '',
         				$Employee[ 'Street' ],
         				$Employee[ 'City' ],
         				$Employee[ 'State' ],
@@ -216,22 +216,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         SET @MAXFWORK = CASE WHEN ( SELECT Max( fWork ) FROM Emp ) IS NULL THEN 1 ELSE ( SELECT Max( fWork ) FROM Emp ) END ;
         				INSERT INTO Emp(
         					ID,
-                            fWork,
+                  fWork,
         					fFirst,
         					Last,
-                            Title,
+                  Title,
         					Status,
         					Sales,
         					Field,
         					InUse ,
-                            Rol
+                  Rol
         				)
         				VALUES ( @MAXID + 1, @MAXFWORK + 1, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Employee[ 'First_Name' ],
         				$Employee[ 'Last_Name' ],
-                        $Employee[ 'Title' ],
+                $Employee[ 'Title' ],
         				$Employee[ 'Status' ],
         				!is_null( $Employee[ 'Sales' ] ) ? $Employee[ 'Sales' ] : 0,
         				!is_null( $Employee[ 'Field' ] ) ? $Employee[ 'Field' ] : 0,
@@ -248,15 +248,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		\singleton\database::getInstance( )->query(
 	        		null,
 	        		"	UPDATE 	Emp
-	        			SET 	Emp.fFirst = ?,
-	        					Emp.Last = ?,
-                                Emp.Title = ?
-	        			WHERE 	Emp.ID = ?;",
+                SET 	Emp.fFirst = ?,
+	        					  Emp.Last = ?,
+                      Emp.Title = ?
+                WHERE 	Emp.ID = ?;",
 	        		array(
 	        			$Employee[ 'First_Name' ],
 	        			$Employee[ 'Last_Name' ],
-                        $Employee[ 'Title' ],
-                        $Employee[ 'ID' ]
+                $Employee[ 'Title' ],
+                $Employee[ 'ID' ]
 	        		)
 	        	);
 	        	\singleton\database::getInstance( )->query(
@@ -662,7 +662,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     </div>
                 </div>
             </div>
-        </div>            
+        </div>
     </div>
 </body>
 </html>
