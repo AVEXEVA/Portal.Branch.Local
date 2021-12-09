@@ -140,12 +140,12 @@ $(document).ready(function( ){
                                         :   (
                                                 row.Type == 'Location'
                                                     ?   "<div class='row'>" +
-                                                            "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
+                                                            "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
                                                         "</div>"
                                                     :   (
                                                             row.Type == 'Employee'
                                                                 ?   "<div class='row'>" +
-                                                                        "<div class='col-12'><a href='employee.php?Name=" + row.Entity + "'>" + row.Entity + "</a></div>" +
+                                                                        "<div class='col-12'><a href='employee.php?Name=" + row.Entity + "'><i class='fa fa-users fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
                                                                     "</div>"
                                                                 : null
                                                         )

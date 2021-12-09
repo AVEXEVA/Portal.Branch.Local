@@ -33,17 +33,18 @@ $( document ).ready( function( ){
                         dir : d.order[0].dir
                     }
                 };
-                d.Customer_ID = $('input[name="Search"]').val( );
-                d.Profit = $('input[name="ID"]').val( );
-                d.Revenue = $('input[name="Name"]').val( );
-                d.Material = $('select[name="Status"]').val( );
-                d.Labor = $('select[name="Status"]').val( );
+                d.Customer = $('input[name="Customer"]').val( );
+                d.Profit = $('input[name="Profit"]').val( );
+                d.Profit_Percentage = $('input[name="Profit_Percentage="]')
+                d.Revenue = $('input[name="Revenue"]').val( );
+                d.Material = $('select[name="Material"]').val( );
+                d.Labor = $('select[name="Labor"]').val( );
                 return d;
             }
         },
         columns: [
          {
-            data : 'Customer_ID',
+            data : 'Customer',
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
@@ -56,14 +57,28 @@ $( document ).ready( function( ){
                         return data;
                       }
                   }
-              },{
-                data : 'Profit',
+                },{
+                  data : 'Profit',
+                  render : function( data, type, row, meta ){
+                      switch( type ){
+                          case 'display' :
+                              return  row.Profit !== null
+                                  ?   "<div class='row'>" +
+                                          "<div class='col-12'><a href='profitability.php?ID=" + row.Profit + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Profit + "</a></div>" +
+                                      "</div>"
+                                  :   null;
+                          default :
+                              return data;
+                      }
+                  }
+                },{
+                data : 'Profit_Percentage',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Profit !== null
+                            return  row.Profit_Percentage !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='profitability.php?ID=" + row.Profit + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Profit + "</a></div>" +
+                                        "<div class='col-12'><a href='profitability.php?ID=" + row.Profit_Percentage + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Profit_Percentage + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
