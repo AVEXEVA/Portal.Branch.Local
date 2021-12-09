@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace singleton;
 class fontawesome extends \singleton\index {
 	//Data columns
@@ -110,4 +110,12 @@ class fontawesome extends \singleton\index {
 	public function Refresh($Size=null){?><i class="fa fa-refresh fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Next($Size=null){?><i class="fa fa-arrow-right fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
 	public function Previous($Size=null){?><i class="fa fa-arrow-left fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
+	public function icon( $icon, $size ){?><i class='fa fa-<?php echo $icon;?> fa-fw fa-<?php echo $size;?>x'></i><?php }
+	public function __call( $function, $_args){
+    if( method_exists( $this, $function ) ){
+      $this->$function($_args);
+    } else {
+			$this->icon( $function, $args );
+		}
+  }
 }?>

@@ -106,16 +106,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='card-body bg-dark'>
           <table id='Table_Profitability' class='display' cellspacing='0' width='100%'>
               <thead><tr>
-  							<th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-  							<th class='text-white border border-white' title='User'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit</th>
-                <th class='text-white border border-white' title='Item'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit %</th>
-  							<th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Revenue</th>
-  							<th class='text-white border border-white' title='Required'><?php \singleton\fontawesome::getInstance( )->List1();?>Material</th>
-  							<th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Hours();?>Labor</th>
+  							<th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
+  							<th class='text-white border border-white' title='Profit'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit</th>
+                <th class='text-white border border-white' title='Profit%'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit %</th>
+  							<th class='text-white border border-white' title='Revenue'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Revenue</th>
+  							<th class='text-white border border-white' title='Material'><?php \singleton\fontawesome::getInstance( )->List1();?>Material</th>
+  							<th class='text-white border border-white' title='Labor'><?php \singleton\fontawesome::getInstance( )->Hours();?>Labor</th>
               </tr><tr>
                 <th><input type='text' class='form-control edit' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer'] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Profit' placeholder='Profit' value='<?php echo isset( $_GET[ 'Profit'] ) ? $_GET[ 'Profit' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Profit' placeholder='Profit' value='<?php echo isset( $_GET[ 'Profit%'] ) ? $_GET[ 'Profit' ] : null;?>' /></th>
+                <th><input type='text' class='form-control edit' name='Profit%' placeholder='Profit' value='<?php echo isset( $_GET[ 'Profit%'] ) ? $_GET[ 'Profit' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Revenue' placeholder='Revenue' value='<?php echo isset( $_GET[ 'Revenue'] ) ? $_GET[ 'Revenue' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Material' placeholder='Material' value='<?php echo isset( $_GET[ 'Material'] ) ? $_GET[ 'Material' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Labor' placeholder='Labor' value='<?php echo isset( $_GET[ 'Labor'] ) ? $_GET[ 'Labor' ] : null;?>' /></th>

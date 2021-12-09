@@ -134,6 +134,143 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       );
       $Requisition_Items = array( );
       if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){ $Requisition_Items[ ] = $row; } }
+      $Requisition  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
+          'DropOff_Tag' => null,
+          'Unit_State' => null,
+          'Unit_Label' => null,
+          'Job_ID' => null,
+          'Job_Name' => null,
+          'Job_Type' => null,
+          'Location_ID' => null,
+          'Location_Name' => null,
+          'Location_Street' => null,
+          'Location_City' => null,
+          'Location_State' => null,
+          'Location_Zip' => null,
+          'DropOff_Name' => null,
+          'DropOff_ID' => null,
+          'DropOff_Street' => null,
+          'DropOff_City' => null,
+          'DropOff_State' => null,
+          'DropOff_Zip' => null,
+          'Unit_Name' => null,
+          'Unit_ID' => null,
+          'User_Name' => null,
+          'ID' => null,
+          'Required' => null,
+          'User' => null,
+          'Location' => null,
+          'DropOff' => null,
+          'Unit' => null,
+          'Job' => null,
+          'Shutdown' => null,
+          'ASAP:' => null,
+          'Rush' => null,
+          'LSD' => null,
+          'FRM' => null,
+          'ASAP' => null,
+          'Notes' => null
+            ) : sqlsrv_fetch_array($result);
+
+            if( isset( $_POST ) && count( $_POST ) > 0 ){
+              // if the $_Post is set and the count is null, select if available
+              $Requisition[ 'DropOff_Tag' ] 		= isset( $_POST[ 'DropOff_Tag' ] ) 	 ? $_POST[ 'DropOff_Tag' ] 	 : $Requisition[ 'DropOff_Tag' ];
+              $Requisition[ 'Unit_State' ] 	= isset( $_POST[ 'Unit_State' ] ) ? $_POST[ 'Unit_State' ] : $Requisition[ 'Unit_State' ];
+              $Requisition[ 'Unit_Label' ] 	= isset( $_POST[ 'Unit_Label' ] ) ? $_POST[ 'Unit_Label' ] : $Requisition[ 'Unit_Label' ];
+              $Requisition[ 'Job_ID' ] 		= isset( $_POST[ 'Job_ID' ] ) 	 ? $_POST[ 'Job_ID' ] 	 : $Requisition[ 'Job_ID' ];
+              $Requisition[ 'Job_Name' ] 		= isset( $_POST[ 'Job' ] ) 	 ? $_POST[ 'Job' ] 	 : $Requisition[ 'Job_Name' ];
+              $Requisition[ 'Job_Type' ] = isset( $_POST[ 'Job_Type' ] )  ? $_POST[ 'Job_Type' ]  : $Requisition[ 'Job_Type' ];
+              $Requisition[ 'Location_ID' ]     = isset( $_POST[ 'Location_ID' ] ) 	   ? $_POST[ 'Location_ID' ] 	   : $Requisition[ 'Location_ID' ];
+              $Requisition[ 'Location_Name' ] 	= isset( $_POST[ 'Location' ] ) 	 ? $_POST[ 'Location' ] 	 : $Requisition[ 'Location_Name' ];
+              $Requisition[ 'Location_Street' ] 	= isset( $_POST[ 'Location_Street' ] ) 	 ? $_POST[ 'Location_Street' ] 	 : $Requisition[ 'Location_Street' ];
+              $Requisition[ 'Location_City' ] = isset( $_POST[ 'Location_City' ] )  ? $_POST[ 'Location_City' ]  : $Requisition[ 'Location_City' ];
+              $Requisition[ 'Location_State' ] 	= isset( $_POST[ 'Location_State' ] ) 	 ? $_POST[ 'Location_State' ] 	 : $Requisition[ 'Location_State' ];
+              $Requisition[ 'Location_Zip' ] 		= isset( $_POST[ 'Location_Zip' ] ) 	 ? $_POST[ 'Location_Zip' ] 	 : $Requisition[ 'Location_Zip' ];
+              $Requisition[ 'DropOff_Street' ] 		= isset( $_POST[ 'DropOff_Street' ] ) 	 ? $_POST[ 'DropOff_Street' ] 	 : $Requisition[ 'DropOff_Street' ];
+              $Requisition[ 'DropOff_City' ] 			= isset( $_POST[ 'DropOff_City' ] ) 		 ? $_POST[ 'DropOff_City' ] 		 : $Requisition[ 'DropOff_City' ];
+              $Requisition[ 'DropOff_State' ] 	= isset( $_POST[ 'DropOff_State' ] )  ? $_POST[ 'DropOff_State' ]  : $Requisition[ 'DropOff_State' ];
+              $Requisition[ 'DropOff_Zip' ] 	= isset( $_POST[ 'DropOff_Zip' ] )  ? $_POST[ 'DropOff_Zip' ]  : $Requisition[ 'DropOff_Zip' ];
+              $Requisition[ 'User_Name' ] 	= isset( $_POST[ 'Employee' ] )  ? $_POST[ 'Employee' ]  : $Requisition[ 'User_Name' ];
+              if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
+                $result = \singleton\database::getInstance( )->query(
+                  null,
+                  "	DECLARE @MAXID INT;
+                    SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Requisition ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Requisition ) END ;
+                    INSERT INTO Zone(
+                      ID,
+                      User,
+                      Required,
+                      Location,
+                      DropOff,
+                      Unit,
+                      Job,
+                      Shutdown,
+                      ASAP,
+                      Rush,
+                      LSD,
+                      FRM,
+                      Notes,
+                    )
+                    VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+                    SELECT @MAXID + 1;",
+                  array(
+                    $Requisition[ 'ID' ],
+                    $Requisition[ 'User' ],
+                    $Requisition[ 'Required' ],
+                    $Requisition[ 'Location' ],
+                    $Requisition[ 'DropOff' ],
+                    $Requisition[ 'Unit' ],
+                    $Requisition[ 'Job' ],
+                    $Requisition[ 'Shutdown' ],
+                    $Requisition[ 'ASAP' ],
+                    $Requisition[ 'Rush' ],
+                    $Requisition[ 'LSD' ],
+                    $Requisition[ 'FRM' ],
+                    $Requisition[ 'Notes'],
+                    isset( $Requisition[ 'Geofence' ] ) ? $Requisition[ 'Geofence' ] : 0
+                  )
+                );
+                sqlsrv_next_result( $result );
+                $Requisition [ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+                var_dump( sqlsrv_errors( ) );
+              //  header( 'Location: lead.php?ID=' . $Division [ 'ID' ] );
+              } else {
+                \singleton\database::getInstance( )->query(
+                  null,
+                  "	UPDATE 	Requisition
+                    SET       Requisition.ID   = ?,
+                              Requisition.User = ?,
+                              Requisition.Required = ?,
+                              Requisition.Location = ?,
+                              Requisition.DropOff = ?,
+                              Requisition.Unit   = ?,
+                              Requisition.Job   = ?,
+                              Requisition.Shutdown = ?,
+                              Requisition.ASAP = ?,
+                              Requisition.Rush = ?,
+                              Requisition.LSD = ?,
+                              Requisition.FRM = ?,
+                              Requisition.Notes = ?
+                    WHERE 	  Zone.ID = ?;",
+                  array(
+                    $Requisition[ 'ID' ],
+                    $Requisition[ 'User' ],
+                    $Requisition[ 'Required' ],
+                    $Requisition[ 'Location' ],
+                    $Requisition[ 'DropOff' ],
+                    $Requisition[ 'Unit' ],
+                    $Requisition[ 'Job' ],
+                    $Requisition[ 'Shutdown' ],
+                    $Requisition[ 'ASAP' ],
+                    $Requisition[ 'Rush' ],
+                    $Requisition[ 'LSD' ],
+                    $Requisition[ 'FRM' ],
+                    $Requisition[ 'Notes' ],
+                    !empty( $Requisition [ 'GeoLock' ] ) ? $Requisition [ 'GeoLock' ] : 0
+                  )
+                );
+              }
+            }
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,7 +311,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id='wrapper'>
       <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
       <div id="page-wrapper" class='content'>
-        <div class='card card-primary'><form action='customer.php?ID=<?php echo $Requisition[ 'ID' ];?>' method='POST'>
+        <div class='card card-primary'><form action='requisition.php?ID=<?php echo $Requisition[ 'ID' ];?>' method='POST'>
           <input type='hidden' name='ID' value='<?php echo $Requisition[ 'ID' ];?>' />
           <div class='card-heading'>
             <div class='row g-0 px-3 py-2'>
@@ -211,16 +348,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
               <div class='col-6 col-lg-3'>
                   <div class='row g-0'>
-                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitons.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitions.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisition.php?ID=<?php echo !is_null( $Requisition[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true )[ array_search( $Requisition[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitons.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Requisitions' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
+                    <div class='col-4'><button class='form-control rounded' onClick="document.location.href='requisitions.php?ID=<?php echo !is_null( $Requisition[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true )[ array_search( $Requisition[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Requisitions' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
                   </div>
               </div>
             </div>
           </div>
         <div class='card-body bg-dark text-white'>
-          <div class='card-columns'>
-            <div class='card card-primary my-3'>
+          <div class='row g-0'>
+            <div class='card card-primary my-3 col-3'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
                   <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
@@ -289,7 +426,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Dropoff:</div>
                   <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Dropoff' value='<?php echo $Requisition[ 'Dropoff_Name' ];?>' />
+                    <input type='text' autocomplete='off' class='form-control edit' name='Dropoff' value='<?php echo $Requisition[ 'DropOff_Name' ];?>' />
                     <script>
                       $( 'input[name="Dropoff"]' )
                           .typeahead({
@@ -325,10 +462,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     </script>
                   </div>
                   <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Requisition[ 'Dropoff_ID' ], array( null, 0, '', ' ') ) ){
+                    if( in_array( $Requisition[ 'DropOff_ID' ], array( null, 0, '', ' ') ) ){
                       echo "onClick=\"document.location.href='locations.php';\"";
                     } else {
-                      echo "onClick=\"document.location.href='location.php?ID=" . $Requisition[ 'Dropoff_ID' ] . "';\"";
+                      echo "onClick=\"document.location.href='location.php?ID=" . $Requisition[ 'DropOff_ID' ] . "';\"";
                     }
                   ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                 </div>
@@ -453,7 +590,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='row'><div class='col-12'>&nbsp;</div></div>
               </div>
             </div>
-            <div class='card card-primary my-3'>
+            <div class='card card-primary my-3 col-7'>
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
                   <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Items</span></h5></div>
@@ -466,10 +603,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <table id='Table_Requisition_Items' class='display' cellspacing='0' width='100%'>
                       <thead><tr>
                         <th>ID</th>
+                        <th>Quantity</th>
                         <th>Description</th>
                         <th>Image</th>
                       </tr><tr>
                         <th><input type='text' class='form-control redraw' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID'] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                        <th><input type='text' class='form-control redraw' name='Quantity' placeholder='Quantity' value='<?php echo isset( $_GET[ 'Quantity'] ) ? $_GET[ 'Quantity' ] : null;?>' /></th>
                         <th><input type='text' class='form-control redraw' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description'] ) ? $_GET[ 'Description' ] : null;?>' /></th>
                         <th><input type='text' class='form-control redraw' name='Image' placeholder='Image' disabled /></th>
                       </tr></thead>
