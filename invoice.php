@@ -247,7 +247,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         $Invoice[ 'Location_Name' ],
                         $Invoice[ 'Job_Name' ],
                         $Invoice[ 'Description' ],
-                        $Invoice[ 'fDate' ],
+                        $Invoice[ 'Date' ],
                         $Invoice[ 'Amount' ],
                         $Invoice[ 'Total' ],
                         $Invoice[ 'ID' ]
@@ -271,48 +271,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id="page-wrapper" class='content'>
             <div class='no-print card card-primary'><form action='invoice.php?ID=<?php echo $Invoice[ 'ID' ];?>' method='POST'>
                 <input type='hidden' class='form-control' name='ID' value='<?php echo $Invoice[ 'ID' ];?>' />
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-12 col-lg-6'>
-                        <h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><a href='invoices.php?<?php
-                          echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Invoices' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Invoices' ][ 0 ] : array( ) );
-                        ?>'>Invoice</a>: <span><?php
-                          echo is_null( $Invoice[ 'ID' ] )
-                              ? 'New'
-                              : '#' . $Invoice[ 'ID' ];
-                        ?></span></h5>
-                    </div>
-                    <div class='col-6 col-lg-3'>
-                        <div class='row g-0'>
-                          <div class='col-4'>
-                            <button
-                                class='form-control rounded'
-                                onClick="document.location.href='invoice.php';"
-                              ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-                          </div>
-                          <div class='col-4'>
-                              <button
-                                class='form-control rounded'
-                                onClick="document.location.href='invoice.php?ID=<?php echo $User[ 'ID' ];?>';"
-                              ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                          </div>
-                          <div class='col-4'>
-                              <button
-                                class='form-control rounded'
-                                onClick="document.location.href='invoice.php';"
-                              ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-                          </div>
-                      </div>
-                    </div>
-                    <div class='col-6 col-lg-3'>
-                        <div class='row g-0'>
-                          <div class='col-4'><button class='form-control rounded' onClick="document.location.href='invoice.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                          <div class='col-4'><button class='form-control rounded' onClick="document.location.href='invoices.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                          <div class='col-4'><button class='form-control rounded' onClick="document.location.href='invoice.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
-                        </div>
-                    </div>
-                  </div>
-                </div>
+                <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Invoice', 'Invoices', $Invoice[ 'ID' ] );?>
                 <div class='card-body bg-dark text-white'>
                     <div class='card-columns'>
                         <div class='card card-primary my-3'>
@@ -323,118 +282,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</label>
-                                    <div class='col-6'>
-                                        <input placeholder='Location' type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Invoice[ 'Location_Name' ];?>' />
-                                        <script>
-                                            $( 'input[name="Location"]' )
-                                                .typeahead({
-                                                    minLength : 4,
-                                                    hint: true,
-                                                    highlight: true,
-                                                    limit : 5,
-                                                    display : 'FieldValue',
-                                                    source: function( query, result ){
-                                                        $.ajax({
-                                                            url : 'bin/php/get/search/Locations.php',
-                                                            method : 'GET',
-                                                            data    : {
-                                                                search :  $('input:visible[name="Location"]').val( )
-                                                            },
-                                                            dataType : 'json',
-                                                            beforeSend : function( ){
-                                                                abort( );
-                                                            },
-                                                            success : function( data ){
-                                                                result( $.map( data, function( item ){
-                                                                    return item.FieldValue;
-                                                                } ) );
-                                                            }
-                                                        });
-                                                    },
-                                                    afterSelect: function( value ){
-                                                        $( 'input[name="Location"]').val( value );
-                                                        $( 'input[name="Location"]').closest( 'form' ).submit( );
-                                                    }
-                                                }
-                                            );
-                                        </script>
-                                    </div>
-                                    <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                    if( in_array( $Invoice[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
-                                            echo "onClick=\"document.location.href='locations.php';\"";
-                                        } else {
-                                            echo "onClick=\"document.location.href='location.php?ID=" . $Invoice[ 'Location_ID' ] . "';\"";
-                                        }
-                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</label>
-                                    <div class='col-6'>
-                                        <input placeholder='Job' type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Invoice[ 'Job_Name' ];?>' />
-                                        <script>
-                                            $( 'input[name="Job"]' )
-                                                .typeahead({
-                                                    minLength : 4,
-                                                    hint: true,
-                                                    highlight: true,
-                                                    limit : 5,
-                                                    display : 'FieldValue',
-                                                    source: function( query, result ){
-                                                        $.ajax({
-                                                            url : 'bin/php/get/search/Jobs.php',
-                                                            method : 'GET',
-                                                            data    : {
-                                                                search :  $('input:visible[name="Job"]').val( )
-                                                            },
-                                                            dataType : 'json',
-                                                            beforeSend : function( ){
-                                                                abort( );
-                                                            },
-                                                            success : function( data ){
-                                                                result( $.map( data, function( item ){
-                                                                    return item.FieldValue;
-                                                                } ) );
-                                                            }
-                                                        });
-                                                    },
-                                                    afterSelect: function( value ){
-                                                        $( 'input[name="Job"]').val( value );
-                                                        $( 'input[name="Job"]').closest( 'form' ).submit( );
-                                                    }
-                                                }
-                                            );
-                                        </script>
-                                    </div>
-                                    <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                        if( in_array( $Invoice[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                                            echo "onClick=\"document.location.href='jobs.php';\"";
-                                        } else {
-                                            echo "onClick=\"document.location.href='job.php?ID=" . $Invoice[ 'Job_ID' ] . "';\"";
-                                        }
-                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Description'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Description:</label>
-                                    <div class='col-12'><textarea class='form-control' name='Description' rows='8' placeholder='Description'><?php echo $Invoice[ 'Description' ];?></textarea></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Date'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Date:</label>
-                                    <div class='col-8'><input placeholder='mm/dd/yy' class='form-control date' autocomplete='off' name='Date' value='<?php echo empty( $Invoice[ 'Date' ] ) ? null : date( 'm/d/Y', strtotime( $Invoice[ 'Date' ] ) );?>' /></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Amount'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Amount:</label>
-                                    <div class='col-8'><input placeholder='$.00' class='form-control' name='Amount' value='<?php echo empty( $Invoice[ 'Amount' ] ) ? null : $Invoice[ 'Amount' ];?>' /></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Sales_Tax'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Sales Tax:</label>
-                                    <div class='col-8'><input placeholder='$.00' class='form-control' name='Sales_Tax' value='<?php echo empty( $Invoice[ 'Sales_Tax' ] ) ? null : $Invoice[ 'Sales_Tax' ];?>' /></div>
-                                </div>
-                                <div class='row g-0'>
-                                    <label class='col-4 border-bottom border-white my-auto' for='Total'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Total:</label>
-                                    <div class='col-8'><input placeholder='$.00' readonly class='form-control' name='Total' value='<?php echo empty( $Invoice[ 'Total' ] ) ? null : $Invoice[ 'Total' ];?>' /></div>
-                                </div>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Invoice[ 'Location_ID' ], $Invoice[ 'Location_Name' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Invoice[ 'Job_ID' ], $Invoice[ 'Job_Name' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Description', $Invoice[ 'Description' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Invoice[ 'Date' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Amount', $Invoice[ 'Amount' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Sales_Tax', $Invoice[ 'Sales_Tax' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Total', $Invoice[ 'Total' ] );?>
                             </div>
                         </div>
                     </div>
