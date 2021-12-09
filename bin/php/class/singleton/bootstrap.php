@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace singleton;
 class bootstrap extends \singleton\index {
 	public function primary_card_header( $singular, $plural, $primary_key ){
@@ -41,21 +41,21 @@ class bootstrap extends \singleton\index {
             <div class='col-6 col-lg-3'>
               <div class='row g-0'>
                 <div class='col-4'>
-                  <button 
-                    type='button' 
-                    class='form-control rounded' 
+                  <button
+                    type='button'
+                    class='form-control rounded'
                     onClick="document.location.href='<?php echo strtolower( $singular );?>.php?ID=<?php echo !is_null( $primary_key ) ? array_keys( $_SESSION[ 'Tables' ][ $plural ], true )[ array_search( $primary_key, array_keys( $_SESSION[ 'Tables' ][ $plural ], true ) ) - 1 ] : null;?>';"
                   ><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
                 <div class='col-4'>
-                  <button 
-                    type='button' 
-                    class='form-control rounded' 
+                  <button
+                    type='button'
+                    class='form-control rounded'
                     onClick="document.location.href='<?php echo strtolower( $plural );?>.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ $plural ][ 0 ] ) ? $_SESSION[ 'Tables' ][ $plural ][ 0 ] : array( ) );?>';"
                   ><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
                 <div class='col-4'>
-                  <button 
-                    type='button' 
-                    class='form-control rounded' 
+                  <button
+                    type='button'
+                    class='form-control rounded'
                     onClick="document.location.href='<?php echo strtolower( $singular );?>.php?ID=<?php echo !is_null( $primary_key )? array_keys( $_SESSION[ 'Tables' ][ $plural ], true )[ array_search( $primary_key, array_keys( $_SESSION[ 'Tables' ][ $plural ], true ) ) + 1 ] : null;?>';"
                   ><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
               </div>
@@ -112,13 +112,13 @@ class bootstrap extends \singleton\index {
 	public function card_row_form_input_date( $singular, $value ){
 		?><div class='row g-0'>
 			<label class='col-4 border-bottom border-white my-auto' for='<?php echo $singular;?>'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> <?php echo $singular;?>:</label>
-			<div class='col-8'><input placeholder='mm/dd/yy' class='form-control date' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) ? null : date( 'm/d/Y', strtotime( $value ) );?>' /></div>
+			<div class='col-8'><input placeholder='mm/dd/yy' class='form-control date edit' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) ? null : date( 'm/d/Y', strtotime( $value ) );?>' /></div>
         </div><?php
 	}
 	public function card_row_form_input_currency( $singular, $value ){
 		?><div class='row g-0'>
 			<label class='col-4 border-bottom border-white my-auto' for='<?php echo $singular;?>'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> <?php echo $singular;?>:</label>
-			<div class='col-8'><input placeholder='$.00' type='number' min='0.00' max='999999999999' class='form-control date' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) ? null : $value;?>' /></div>
+			<div class='col-8'><input placeholder='$.00' type='number' min='0.00' max='999999999999' class='form-control edit' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) ? null : $value;?>' /></div>
         </div><?php
 	}
 	public function card_row_form_select( $label, $key, $value, $options ){
