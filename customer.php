@@ -148,7 +148,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                        &&  empty( $Name )
                     )    ? array(
         	'ID'        => null,
-        	'Name'      => null,
+        	'Name'      => isset( $_GET [ 'Name' ] ) ? $_GET ['Name'] : null,
         	'Login'     => null,
         	'Password'  => null,
         	'Geofence'  => null,
@@ -160,13 +160,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'City'      => null,
         	'State'     => null,
         	'Zip'       => null,
-        	'Latitude'  => null,
-        	'Longitude' => null,
+        	'Latitude'  => isset( $_GET [ 'Latitude' ] ) ? $_GET ['Latitude'] : null,
+        	'Longitude' => isset( $_GET [ 'Longitude' ] ) ? $_GET ['Longitude'] : null,
           'Phone'     =>  null,
           'Email'     =>  null,
-        	'Rolodex'   => null,
+        	'Rolodex'   => isset( $_GET [ 'Rolodex' ] ) ? $_GET ['Rolodex'] : null,
           'Phone'     => null,
-          'Email'     => null
+          'Email'     => null,
+          'Contact'   => isset( $_GET [ 'Contact' ] ) ? $_GET [ 'Contact' ] : null
         ) : sqlsrv_fetch_array($result);
 //Binds $ID, $Name, $Customer and query values into the $result variable
 
@@ -593,9 +594,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					<div class='row g-0'>
 						<div class='col-1'>&nbsp;</div>
 			 			<div class='col-3'>Portal:</div>
-			 			<div class='col-8'><select 
+			 			<div class='col-8'><select
                             <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
-                            class='form-control edit' 
+                            class='form-control edit'
                             name='Internet' >
     			 				<option value=''>Select</option>
     			 				<option value='0' <?php echo $Customer[ 'Internet' ] == 0 ? 'selected' : null;?>>Disabled</option>
@@ -615,9 +616,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			 		<div class='row g-0'>
 			 			<div class='col-1'>&nbsp;</div>
 			 			<div class='col-3'>Geofence:</div>
-			 			<div class='col-8'><select 
+			 			<div class='col-8'><select
                             <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
-                            class='form-control edit' 
+                            class='form-control edit'
                             name='Geofence' >
     			 				<option value=''>Select</option>
     			 				<option value='0' <?php echo $Customer[ 'Geofence' ] == 0 ? 'selected' : null;?>>Disabled</option>
@@ -1070,7 +1071,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				<div class='card card-primary my-3'>
 					<div class='card-heading'>
 						<div class='row g-0 px-3 py-2'>
-							<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoices( 1 );?><span>Invoices</span></h5></div>
+							<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
 							<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
 						</div>
 					</div>

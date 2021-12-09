@@ -297,7 +297,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class='card card-primary my-3 col-12 col-lg-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php 
+                <?php
                   \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', 'Name', $Contact[ 'Name' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', 'Type', $Contact[ 'Type' ], array( 0 => 'Customer', 4 => 'Location', 5 => 'Employee' ) );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', 'Website', $Contact[ 'Website' ] );

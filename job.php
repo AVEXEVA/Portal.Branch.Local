@@ -188,21 +188,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Remarks' => null,
           'Status' => null,
           'Location_ID' => null,
-          'Location_Name' => null,
+          'Location_Name' => isset( $_GET [ 'Location' ] ) ? $_GET ['Location'] : null,
           'Location_Street' => null,
           'Location_City' => null,
           'Location_State' => null,
           'Location_Zip' => null,
           'Location_Latitude' => null,
           'Location_Longitude' => null,
-          'Customer_ID' => null,
-          'Customer_Name' => null,
+          'Customer_ID' =>  null,
+          'Customer_Name' => isset( $_GET [ 'Location' ] ) ? $_GET ['Location'] : null,
           'Unit_ID' => null,
-          'Unit_Name' => null,
+          'Unit_Name' => isset( $_GET [ 'Unit' ] ) ? $_GET ['Unit'] : null,
           'Violation_ID' => null,
-          'Violation_Name' => null,
+          'Violation_Name' => isset( $_GET [ 'Violation' ] ) ? $_GET ['Violation'] : null,
           'Division_ID' => null,
-          'Division_Name' => null
+          'Division_Name' => isset( $_GET [ 'Division' ] ) ? $_GET ['Division'] : null
         ) : sqlsrv_fetch_array($result);
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
