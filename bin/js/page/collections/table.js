@@ -255,7 +255,7 @@ $( document ).ready( function( ){
           text : 'Create',
           className: 'form-control',
           action : function( e, dt, node, config ){
-              document.location.href='invoices.php';}
+              document.location.href='invoice.php';}
             },{
             text: 'Print',
             className: 'form-control',
