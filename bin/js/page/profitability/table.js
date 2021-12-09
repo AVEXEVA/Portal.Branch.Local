@@ -114,7 +114,7 @@ $( document ).ready( function( ){
                 text : 'Create',
                 className : 'form-control',
                 action : function( e, dt, node, config ){
-                    document.location.href='profitability.php';
+                    document.location.href='bin/php/reports/Profitability.php';
                 }
             },
             {

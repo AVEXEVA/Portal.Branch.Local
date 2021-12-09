@@ -1,10 +1,10 @@
 $( document ).ready( function( ){
-    var Editor_Profitability = new $.fn.dataTable.Editor( {
+    var Editor_Requisitions = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
-        table    : '#Table_Profitability'
+        table    : '#Table_Requisitions'
     } );
-    var Table_Profitability = $('#Table_Profitability').DataTable( {
+    var Table_Requisitions = $('#Table_Requisitions').DataTable( {
         dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
@@ -22,7 +22,7 @@ $( document ).ready( function( ){
           selector : 'td.ID'
         },
         ajax      : {
-            url : 'bin/php/get/Profitability.php',
+            url : 'bin/php/get/Requisitions.php',
             data : function( d ){
                 d = {
                     draw : d.draw,
@@ -36,7 +36,13 @@ $( document ).ready( function( ){
                 d.Search = $('input[name="Search"]').val( );
                 d.ID = $('input[name="ID"]').val( );
                 d.Name = $('input[name="Name"]').val( );
-                d.Status = $('select[name="Status"]').val( );
+                d.Employee_ID = $('select[name="Employee_ID"]').val( );
+                d.Date = $('select[name="Date"]').val( );
+                d.Required = $('select[name="Required"]').val( );
+                d.Location_ID = $('select[name="Location_ID"]').val( );
+                d.Dropoff_ID = $('select[name="Dropoff_ID"]').val( );
+                d.Unit_ID = $('select[name="Unit_ID"]').val( );
+                d.Job_ID = $('select[name="Job_ID"]').val( );
                 return d;
             }
         },
@@ -157,7 +163,7 @@ $( document ).ready( function( ){
                     $( 'input:visible, select:visible' ).each( function( ){
                         $( this ).val( '' );
                     } );
-                    Table_Profitability.draw( );
+                    Table_Requisitions.draw( );
                 }
             },{
                 text : 'Get URL',
@@ -167,7 +173,7 @@ $( document ).ready( function( ){
                     d.ID = $('input[name="ID"]').val( );
                     d.Name = $('input[name="Name"]').val( );
                     d.Status = $('select[name="Status"]').val( );
-                    document.location.href = 'Requisitions.php?' + new URLSearchParams( d ).toString();
+                    document.location.href = 'requisitions.php?' + new URLSearchParams( d ).toString();
                 }
             },{
                 text : 'Create',
@@ -183,14 +189,14 @@ $( document ).ready( function( ){
                   var rows = dt.rows( { selected : true } ).indexes( );
                   var dte = dt.cells( rows, 0 ).data( ).toArray( );
                   $.ajax ({
-                    url    : 'bin/php/post/requisition.php',
+                    url    : 'bin/php/post/requisitions.php',
                     method : 'POST',
                     data   : {
                       action : 'delete' ,
                       data : dte
                     },
                     success : function(response){
-                      Table_Profitability.draw();
+                      Table_Requisitions.draw();
                     }
                   })
                 }
@@ -213,7 +219,7 @@ $( document ).ready( function( ){
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             //search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Profitability.draw(); });
+            $( '.redraw' ).bind( 'change', function(){ Table_Requisitions.draw(); });
         }
     } );
 } );

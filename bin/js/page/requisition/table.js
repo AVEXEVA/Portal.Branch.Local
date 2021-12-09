@@ -41,6 +41,8 @@ $(document).ready(function( ){
             },{
                 data : 'Description'
             },{
+                data : 'Quantity'
+            },{
                 data : 'Image'
             }
         ],
