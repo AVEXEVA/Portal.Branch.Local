@@ -1,11 +1,30 @@
 <?php
 namespace singleton;
 class fontawesome extends \singleton\index {
-	public function Check($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Requisition($Size=null){?><i class='fa fa-barcode fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Sitemap($Size=null){?><i class='fa fa-sitemap fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	//Data columns
+	public function Name($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function Type($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function Status($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Description($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+
+	//Address columns
+	public function Street($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function City($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function State($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	public function Zip($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+
+	//Table names
+	public function Contact($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }	
+	public function Requisition($Size=null){?><i class='fa fa-barcode fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+
+	//Input Types
+	public function Check($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Checkbox($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+
+	
+	public function Sitemap($Size=null){?><i class='fa fa-sitemap fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+	
+	
 	public function Home($Size=null){?><i class='fa fa-home fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Personnel_Request($Size=null){?><i class='fa fa-users fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function User($Size=null){?><i class='fa fa-user fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
@@ -16,6 +35,7 @@ class fontawesome extends \singleton\index {
 	public function Customer($Size=null){?><i class='fa fa-link fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Archive($Size=null){?><i class='fa fa-archive fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Info($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
+
 	public function Information($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Human_Resources($Size=null){?><i class='fa fa-child fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
 	public function Book($Size=null){?><i class='fa fa-book fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }

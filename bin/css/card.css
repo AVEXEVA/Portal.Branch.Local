@@ -24,6 +24,9 @@
       display : none;
     }
 }
+.row>.card[class*='col-'] {
+  height : fit-content;
+}
 .card {
   background-color : transparent !important;
 }
