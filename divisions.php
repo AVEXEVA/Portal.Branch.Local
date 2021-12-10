@@ -83,6 +83,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'divisions.php'
         )
       );
+//Suck it 
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
