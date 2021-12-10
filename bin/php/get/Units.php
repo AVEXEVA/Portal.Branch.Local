@@ -92,10 +92,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['ID'];
       $conditions[] = "Unit.ID LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Name'];
-      $parameters[] = $_GET['Name'];
-      $conditions[] = "Unit.City_ID LIKE '%' + ? + '%' ";
+    if( isset($_GET[ 'City_ID' ] ) && !in_array( $_GET[ 'City_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET[ 'City_ID' ];
+      $conditions[] = "Unit.State LIKE '%' + ? + '%' ";
+    }
+    if( isset($_GET[ 'Building_ID' ] ) && !in_array( $_GET[ 'Building_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET[ 'Building_ID' ];
+      $conditions[] = "Unit.Unit LIKE '%' + ? + '%' ";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -150,26 +153,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Unit.ID AS ID,
-                          Unit.City_ID As City_ID,
-                         Customer.ID AS Customer_ID,
+                          Unit.State As City_ID,
+                          Customer.ID AS Customer_ID,
                           Customer.Name AS Customer_Name,
                           Location.Loc AS Location_ID,
                           Location.Tag AS Location_Name,
-                          Unit.Building_ID AS Building_ID,
+                          Unit.Unit AS Building_ID,
                           Unit.Type AS Type,
                           Unit.fDesc AS Name,
-                         Ticket.ID AS Ticket_ID,
+                          Ticket.ID AS Ticket_ID,
                           Unit.Status AS Status
 
-                  FROM    Unit
+                  FROM    Elev AS Unit
                           LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name
                             FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                        ) AS Customer ON Unit.Owner = Customer.ID
-                         LEFT JOIN (
+                          ) AS Customer ON Unit.Owner = Customer.ID
+                          LEFT JOIN (
                             SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                                       TicketD.Elev AS Unit,
                                       TicketD.ID ,
@@ -188,17 +191,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
       $sQueryRow = "SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                             Unit.ID AS ID,
-                            Unit.City_ID AS City_ID,
+                            Unit.State AS City_ID,
                             Customer.ID AS Customer_ID,
                             Customer.Name AS Customer_Name,
                             Location.Loc AS Location_ID,
                             Location.Tag AS Location_Name,
-                            Unit.Building_ID AS Building_ID,
+                            Unit.Unit AS Building_ID,
                             Unit.Type AS Type,
                             Ticket.ID AS Ticket_ID,
                             Unit.Status AS Status
 
-                    FROM    Unit
+                    FROM    Elev AS Unit
                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                             LEFT JOIN (
                               SELECT  Owner.ID,
@@ -228,8 +231,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       }
 
       $parameters = array( );
-      $sQuery = " SELECT  COUNT(Route.ID)
-                  FROM    Route;";
+      $sQuery = " SELECT  COUNT(Elev.ID)
+                  FROM    Elev;";
       $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
       $aResultTotal = sqlsrv_fetch_array($rResultTotal);
       $iTotal = $aResultTotal[0];

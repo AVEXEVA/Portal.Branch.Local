@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     ? $_POST[ 'Email' ]
                     : null
             );
-        $result = $database->query(
+        $result = \singleton\database::getInstance( )->query(
             'Portal',
             "   SELECT  Top 1
                         [User].[ID] AS ID,
@@ -100,8 +100,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         [User].[Picture] AS Picture,
                         [User].[Picture_Type] AS Picture_Type
                 FROM    dbo.[User]
-                WHERE   [User].[ID] = ?
-                        OR [User].Email = ?;",
+                WHERE       [User].[ID] = ?
+                        OR  [User].Email = ?;",
           array(
             $ID,
             $Email
@@ -123,6 +123,29 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'Picture' => null,
             'Picture_Type' => null
         ) : sqlsrv_fetch_array( $result );
+        $result = \singleton\database::getInstance( )->query(
+          $User[ 'Branch' ],
+          " SELECT  Employee.ID                           AS Employee_ID,
+                    Employee.fWork                        AS Employee_Work_ID,
+                    Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
+                    Employee.fFirst                       AS Employee_First_Name,
+                    Employee.Last                         AS Employee_Last_Name
+            FROM    Emp AS Employee 
+            WHERE   Employee.ID = ?;",
+          array( 
+            $User[ 'Branch_ID' ]
+          )
+        );
+        //var_dump( sqlsrv_errors( ) );
+        $User = ( !$result ) 
+          ? array_merge( $User, array( 
+            'Employee_ID' => null,
+            'Employee_Work_ID' => null,
+            'Employee_Name' => null,
+            'Employee_First_Name' => null,
+            'Employee_Last_Name' => null
+          ) )
+          : array_merge( $User, sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) );
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
             $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
@@ -216,48 +239,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id="page-wrapper" class='content'>
       <div class='card card-primary'><form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST' enctype="multipart/form-data">
         <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
-        <div class='card-heading'>
-          <div class='row g-0 px-3 py-2'>
-            <div class='col-12 col-lg-6'>
-              <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='users.php?<?php
-                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );
-              ?>'>User</a>: <span><?php
-                echo is_null( $User[ 'Email' ] )
-                    ? 'New'
-                    : $User[ 'Email' ];
-              ?></span></h5>
-          </div>
-          <div class='col-6 col-lg-3'>
-              <div class='row g-0'>
-                <div class='col-4'>
-                  <button
-                      class='form-control rounded'
-                      onClick="document.location.href='user.php';"
-                    ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-                </div>
-                <div class='col-4'>
-                    <button
-                      class='form-control rounded'
-                      onClick="document.location.href='user.php?ID=<?php echo $User[ 'ID' ];?>';"
-                    ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                </div>
-                <div class='col-4'>
-                    <button
-                      class='form-control rounded'
-                      onClick="document.location.href='user.php';"
-                    ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-                </div>
-              </div>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='user.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='users.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='user.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
-                </div>
-            </div>
-          </div>
-        </div>
+        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'User', 'Users', $User[ 'ID' ] );?>
         <div class='card-body bg-dark text-white'>
           <div class='row g-1' >
             <div class='card card-primary my-3 col-3'>
@@ -268,68 +250,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
               </div>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Email:</div>
-                    <div class='col-8'><input type='text' name='Email' class='form-control edit' placeholder='Email' value='<?php echo $User[ 'Email' ];?>' /></div>
-                </div>
-                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Password:</div>
-                    <div class='col-8'><input type='password' name='Password' class='form-control edit' placeholder='Password' value='<?php echo str_repeat( '*', strlen( $User[ 'Password' ] ) );?>' /></div>
-                </div>
-                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> Branch:</div>
-                    <div class='col-8'><input type='text' name='Branch' class='form-control edit' placeholder='Branch' value='<?php echo $User[ 'Branch' ];?>' /></div>
-                </div>
-                <div class='row' style='padding-top:10px;padding-bottom:10px;'>
-                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Type:</div>
-                    <div class='col-8'><input type='text' name='Branch_Type' class='form-control edit' placeholder='Type' value='<?php echo $User[ 'Branch_Type' ];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Employee:</div>
-                    <div class='col-6'>
-                        <input type='text' autocomplete='off' class='form-control edit' name='Branch_ID' value='<?php echo $User[ 'Branch_ID' ];?>' />
-                        <script>
-                            $( 'input[name="Branch_ID"]' )
-                                .typeahead({
-                                        minLength : 4,
-                                        hint: true,
-                                        highlight: true,
-                                        limit : 5,
-                                        display : 'FieldValue',
-                                        source: function( query, result ){
-                                            $.ajax({
-                                                url : 'bin/php/get/search/Employees.php',
-                                                method : 'GET',
-                                                data    : {
-                                                    search :  $('input:visible[name="Branch_ID"]').val( )
-                                                },
-                                                dataType : 'json',
-                                                beforeSend : function( ){
-                                                    abort( );
-                                                },
-                                                success : function( data ){
-                                                    result( $.map( data, function( item ){
-                                                        return item.FieldValue;
-                                                    } ) );
-                                                }
-                                            });
-                                        },
-                                        afterSelect: function( value ){
-                                            $( 'input[name="Branch_ID"]').val( value );
-                                            $( 'input[name="Branch_ID"]').closest( 'form' ).submit( );
-                                        }
-                                    }
-                                );
-                        </script>
-                    </div>
-                    <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                        if( in_array( $User[ 'Branch_ID' ], array( null, 0, '', ' ') ) ){
-                            echo "onClick=\"document.location.href='employees.php?Field=1';\"";
-                        } else {
-                            echo "onClick=\"document.location.href='employee.php?ID=" . $User[ 'Branch_ID' ] . "';\"";
-                        }
-                        ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $User[ 'Email' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_password( 'Password', $User[ 'Password' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Branch', $User[ 'Branch' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Branch_Type', $User[ 'Branch_Type' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $User[ 'Employee_ID' ], $User[ 'Employee_Name' ] );?>
                 <div class='row'>
                   <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Image:</div>
                   <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php
