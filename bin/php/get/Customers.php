@@ -8,7 +8,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
       'Portal',
       " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
+        FROM    [Connection]
         WHERE       [Connection].[User] = ?
                 AND [Connection].[Hash] = ?;",
       array(
@@ -38,15 +38,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
         'Portal',
         "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
                     [Privilege].[Other],
                     [Privilege].[Token],
                     [Privilege].[Internet]
-          FROM      dbo.[Privilege]
+          FROM      [Privilege]
           WHERE     Privilege.[User] = ?;",
         array(
             $_SESSION[ 'Connection' ][ 'User' ],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             dechex( $Privilege[ 'Department' ] ),
             dechex( $Privilege[ 'Database' ] ),
             dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Other' ] ),
             dechex( $Privilege[ 'Token' ] ),
             dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -113,7 +113,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           3 =>  'Customer_Locations.Count',
           4 =>  'Customer_Units.Count',
           5 =>  'Customer_Jobs.Count',
-          6 =>  'Customer_Tickets.Count'
+          6 =>  'Customer_Tickets.Count',
+          6 =>  'Customer_Violations.Count',
+          6 =>  'Customer_Invoices.Count'
         );
         $Order = isset( $Columns[ $_GET['order']['column'] ] )
             ? $Columns[ $_GET['order']['column'] ]
@@ -192,9 +194,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $parameters
         ) or die(print_r(sqlsrv_errors()));
 
-        $sQueryRow = "
-           SELECT   Customer.ID
-            FROM    (
+        $sQueryRow =
+          "  SELECT   Customer.ID
+              FROM    (
                         SELECT  Owner.ID,
                                 Rol.Name,
                                 Owner.Status

@@ -215,6 +215,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Forms_to_Customer' => null,
         'Recieved_from_Customer' => null,
         'Cancel_Contract' => null,
+        'Job' => null,
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -288,19 +289,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		null,
         		"	UPDATE 	Violation
         			SET     Violation.Job = (
-                        SELECT  Top 1 
+                        SELECT  Top 1
                                 Job.ID
                         FROM    Job
                         WHERE   Job.fDesc = ?
                       ),
         					    Violation.Loc = (
-                        SELECT  Top 1 
+                        SELECT  Top 1
                                 Loc.Loc
                         FROM    Loc
                         WHERE   Loc.Tag = ?
                       ),
         					    Violation.Elev = (
-                        SELECT  Top 1 
+                        SELECT  Top 1
                                 Elev.ID
                         FROM    Elev
                         WHERE   Elev.ID = ?
