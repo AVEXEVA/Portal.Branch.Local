@@ -484,10 +484,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php 
                   \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Location[ 'Name' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Location[ 'Customer_ID' ], $Location[ 'Customer_Name' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Location[ 'Status' ], array(
-                      0 => 'Disabled',
-                      1 => 'Enabled'
-                  ) );
+                  \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Location[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );
                   \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Territory', 'Territories', $Location[ 'Territory_ID' ], $Location[ 'Territory_Name' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Location['Street'].' '.$Location['City'].' '.$Location[ 'State' ].' '.$Location[ 'Zip' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Location[ 'Street' ] );

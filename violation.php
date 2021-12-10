@@ -113,9 +113,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Quote.fDesc         AS Quote_Name,
                   Inspection.ID       AS Inspection_ID,
                   Inspection.Type     AS Inspection_Name,
-                  Violation.Ticket    AS Ticket,
+                  Violation.Ticket    AS Ticket_ID,
+                  Violation.Ticket    AS Ticket_Name,
                   Violation.Remarks   AS Note,
-                  Violation.Estimate  AS Estimate,
+                  Violation.Estimate  AS Proposal_ID,
+                  Violation.Estimate  AS Proposal_Name,
                   Violation.Price     AS Price,
                   Violation.Custom1   AS File_Permit,
                   Violation.Custom2   AS Permit_Approved,
@@ -333,422 +335,42 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id="page-wrapper" class='content'>
     	<div class='card card-primary'><form action='violation.php?ID=<?php echo $Violation[ 'ID' ];?>' method='POST'>
         <input type='hidden' name='ID' value='<?php echo $Violation[ 'ID' ];?>' />
-        <div class='card-heading'>
-        	<div class='row g-0 px-3 py-2'>
-          	<div class='col-12 col-lg-6'>
-              	<h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><a href='violations.php?<?php
-                	echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] : array( ) );
-              	?>'>Violation</a>: <span><?php
-                	echo is_null( $Violation[ 'ID' ] )
-                  		? 'New'
-                  		: '#' . $Violation[ 'ID' ];
-              	?></span></h5>
-          	</div>
-          	<div class='col-6 col-lg-3'>
-            		<div class='row g-0'>
-              		<div class='col-4'>
-	                 	<button
-	                    	class='form-control rounded'
-	                    	onClick="document.location.href='violation.php';"
-	                  	><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-	                </div>
-	                <div class='col-4'>
-	                  	<button
-	                    	class='form-control rounded'
-	                    	onClick="document.location.href='violation.php?ID=<?php echo $Violation[ 'ID' ];?>';"
-	                  	><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-	                </div>
-	                <div class='col-4'>
-	                  	<button
-	                    	class='form-control rounded'
-	                    	onClick="document.location.href='violation.php';"
-	                  	><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-	                </div>
-	            </div>
-          	</div>
-          	<div class='col-6 col-lg-3'>
-          		<div class='row g-0'>
-            		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $Violation[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Violations' ], true )[ array_search( $Violation[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Violations' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-            		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violations.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Violations' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-            		<div class='col-4'><button class='form-control rounded' onClick="document.location.href='violation.php?ID=<?php echo !is_null( $Violation[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Violations' ], true )[ array_search( $Violation[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Violations' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
-          		</div>
-          	</div>
-        	</div>
-      	</div>
+        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Violation', 'Violations', $Violation[ 'ID' ] );?>
       	<div class='card-body bg-dark text-white'>
-      		<div class='row g-0'>
+      		<div class='row g-0' data-masonry='{"percentPosition": true }'>
         		<div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
-          		<div class='card-heading'>
-            		<div class='row g-0 px-3 py-2'>
-              			<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-              			<div class='col-2'>&nbsp;</div>
-            		</div>
-          		</div>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
           		<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-            		<div class='row g-0'>
-              			<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Name:</div>
-              			<div class='col-8'><input placeholder='Name' type='text' class='form-control edit' name='Name' value='<?php echo is_null( $Violation[ 'Name' ] ) ? null : $Violation[ 'Name' ];?>' /></div>
-              	</div>
-              	<div class='row g-0'>
-                		<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Status:</div>
-                		<div class='col-8'><select name='Status' class='form-control edit'>
-                  		<option value=''>Select</option>
-                  		<option value='0' <?php echo $Violation[ 'Status' ] == 0 ? 'selected' : null;?>>Active</option>
-                  		<option value='1' <?php echo $Violation[ 'Status' ] == 1 ? 'selected' : null;?>>Inactive</option>
-                		</select></div>
-              	</div>
-              	<div class='row g-0'>
-                  	<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Date:</div>
-                  	<div class='col-8'><input placeholder='mm/dd/yy' type='input' class='form-control edit date' name='Date' value='<?php echo is_null( $Violation[ 'Date' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Date' ] ) );?>' /></div>
-              	</div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Violation(1);?> Location:</div>
-                  <div class='col-6'>
-                    <input type='text' placeholder='Location' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Violation[ 'Location_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Location"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Locations.php',
-                                      method : 'GET',
-                                      data    : {
-                                    search :  $('input:visible[name="Location"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Location"]').val( value );
-                                  $( 'input[name="Location"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Violation[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='locations.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='location.php?Name=" . $Violation[ 'Location_Name' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
-                  <div class='col-6'>
-                    <input type='text' placeholder='Job #000000' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Violation['Job_Name'];?>' />
-                    <script>
-                      $( 'input[name="Job"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                $.ajax({
-                                  url : 'bin/php/get/search/Jobs.php',
-                                  method : 'GET',
-                                  data    : {
-                                    search :  $('input:visible[name="Job"]').val( )
-                                  },
-                                  dataType : 'json',
-                                  beforeSend : function( ){
-                                    abort( );
-                                  },
-                                  success : function( data ){
-                                    result( $.map( data, function( item ){
-                                        return item.FieldValue;
-                                    } ) );
-                                  }
-                                });
-                              },
-                              afterSelect: function( value ){
-                                $( 'input[name="Job"]').val( value );
-                                $( 'input[name="Job"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Violation[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='jobs.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='job.php?ID=" . $Violation[ 'Job_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Ticket:</div>
-                  <div class='col-6'>
-                    <input type='text' placeholder='Ticket #000000' autocomplete='off' class='form-control edit' name='Ticket' value='' />
-                    <script>
-                      $( 'input[name="Ticket"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Tickets.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Ticket"]').val( ),
-                                          Location : $('input:visible[name="Location"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Ticket"]').val( value );
-                                  $( 'input[name="Ticket"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Violation[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='tickets.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='ticket.php?ID=" . $Violation[ 'Ticket_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
-                  <div class='col-6'>
-                    <input type='text' placeholder='Unit City ID' autocomplete='off' class='form-control edit' name='Unit' value='<?php echo $Violation['Unit_Name']?>' />
-                    <script>
-                      $( 'input[name="Elev"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Units.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Unit"]').val( ),
-                                          Customer : $('input:visible[name="Customer"]').val( ),
-                                          Location : $('input:visible[name="Location"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Unit"]').val( value );
-                                  $( 'input[name="Unit"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Violation[ 'Unit_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='units.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='unit.php?ID=" . $Violation[ 'Unit_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Proposal:</div>
-                  <div class='col-6'>
-                  <input type='text' placeholder='Proposal #000000' autocomplete='off' class='form-control edit' name='Proposal' value='' />
-                  <script>
-                    $( 'input[name="Proposal"]' )
-                        .typeahead({
-                            minLength : 4,
-                            hint: true,
-                            highlight: true,
-                            limit : 5,
-                            display : 'FieldValue',
-                            source: function( query, result ){
-                                $.ajax({
-                                    url : 'bin/php/get/search/Proposals.php',
-                                    method : 'GET',
-                                    data    : {
-                                        search :  $('input:visible[name="Proposal"]').val( ),
-                                        Location : $('input:visible[name="Location"]').val( )
-                                    },
-                                    dataType : 'json',
-                                    beforeSend : function( ){
-                                        abort( );
-                                    },
-                                    success : function( data ){
-                                        result( $.map( data, function( item ){
-                                            return item.FieldValue;
-                                        } ) );
-                                    }
-                                });
-                            },
-                            afterSelect: function( value ){
-                                $( 'input[name="Proposal"]').val( value );
-                                $( 'input[name="Proposal"]').closest( 'form' ).submit( );
-                            }
-                        }
-                    );
-                  </script>
-                </div>
-                <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                  if( in_array( $Violation[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                    echo "onClick=\"document.location.href='proposals.php';\"";
-                  } else {
-                    echo "onClick=\"document.location.href='proposal.php?ID=" . $Violation[ 'Proposal_ID' ] . "';\"";
-                  }
-                ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Inspection(1);?> Inspection:</div>
-                  <div class='col-6'>
-                    <input type='text' placeholder='Inspection #000000' autocomplete='off' class='form-control edit' name='Inspection' value='<?php echo $Violation['Inspection_Name']?>' />
-                    <script>
-                      $( 'input[name="Inspection"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Inspections.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Inspection"]').val( ),
-                                          Location : $('input:visible[name="Location"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Inspection"]').val( value );
-                                  $( 'input[name="Inspection"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Violation[ 'Inspection_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='inspections.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='inspection.php?ID=" . $Violation[ 'Inspection_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-            	<div class='row g-0'>
-            		<div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Price:</div>
-            		<div class='col-8'><input placeholder='$.00' type='text' class='form-control edit' name='Price' value='<?php echo $Violation[ 'Price' ];?>' /></div>
-            	</div>
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Note( 1 );?> Note:</div>
-                <div class='col-8'><textarea placeholder='Notes' type='text' class='form-control edit' name='Note' value='<?php echo $Violation[ 'Note' ];?>' rows='8'></textarea></div>
+            		<?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Violation[ 'Name' ] );?>
+              	<?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Violation[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );?>
+              	<?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Violation[ 'Date' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Violation[ 'Location_ID' ], $Violation[ 'Location_Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Violation[ 'Job_ID' ], $Violation[ 'Job_Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Ticket', 'Tickets', $Violation[ 'Ticket_ID' ], $Violation[ 'Ticket_ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Unit', 'Units', $Violation[ 'Unit_ID' ], $Violation[ 'Unit_Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Proposal', 'Proposals', $Violation[ 'Proposal_ID' ], $Violation[ 'Proposal_ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Inspection', 'Inspections', $Violation[ 'Inspection_ID' ], $Violation[ 'Inspection_Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Price', $Violation[ 'Price' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Note', $Job[ 'Note' ] );?>
               </div>
             </div>
-          </div>
+            <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Dates' );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'File_Permit', $Violation[ 'File_Permit' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Permit_Approved', $Violation[ 'Permit_Approved' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date_Sent', $Violation[ 'Date_Sent' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Forms_to_DOB', $Violation[ 'Forms_to_DOB' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Inspection', $Violation[ 'Inspection' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Hearing', $Violation[ 'Hearing' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Due_Date', $Violation[ 'Due_Date' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Forms_to_Customer', $Violation[ 'Forms_to_Customer' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Recieved_from_Customer', $Violation[ 'Recieved_from_Customer' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Cancel_Contract', $Violation[ 'Cancel_Contract' ] );?>
+              </div>
+            </div>
           <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?><span>Dates</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> File Permit:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='File_Permit' value='<?php echo is_null( $Violation[ 'File_Permit' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'File_Permit' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Permit Approved:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='File_Permit' value='<?php echo is_null( $Violation[ 'Permit_Approved' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Permit_Approved' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Date Sent:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='File_Permit' value='<?php echo is_null( $Violation[ 'Date_Sent' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Date_Sent' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Forms to DOB:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Forms_to_DOB' value='<?php echo is_null( $Violation[ 'Forms_to_DOB' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Forms_to_DOB' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Inspection:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Inspection' value='<?php echo is_null( $Violation[ 'Inspection' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Inspection' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Hearing:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Hearing' value='<?php echo is_null( $Violation[ 'Hearing' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Hearing' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Due Date:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Due_Date' value='<?php echo is_null( $Violation[ 'Due_Date' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Due_Date' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Forms to Customer:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Forms_to_Customer' value='<?php echo is_null( $Violation[ 'Forms_to_Customer' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Forms_to_Customer' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Recieved from Customer:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Recieved_from_Customer' value='<?php echo is_null( $Violation[ 'Recieved_from_Customer' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Recieved_from_Customer' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Calendar( 1 );?> Cancel Contract:</div>
-                <div class='col-6'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Cancel_Contract' value='<?php echo is_null( $Violation[ 'Cancel_Contract' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Cancel_Contract' ] ) );?>' /></div>
-              </div>
-            </div>
-          </div>
-          <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?><span>Assignments</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Assignments' );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
               <div class='row g-0'>
                 <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Created:</div>
@@ -793,12 +415,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             </div>
           </div>
           <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?><span>Custom Fields</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Custom Fields' );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
               <div class='row g-0'>
                 <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom1:</div>

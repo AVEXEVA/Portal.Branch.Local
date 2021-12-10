@@ -63,6 +63,38 @@ class bootstrap extends \singleton\index {
           </div>
         </div><?php
 	}
+  public function card_map( $element, $title, $latitude, $longitude ){
+    if( !in_array( $latitude, array( null, 0 ) ) && !in_array( $longitude, array( null, 0 ) ) ){
+      ?><div class='card card-primary my-3 col-12 col-lg-3'>
+        <?php self::card_header( 'Map' );?>
+        <div id='<?php echo $element;?>' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+        <script type="text/javascript">
+          var map;
+          function initialize() {
+            map = new google.maps.Map(
+              document.getElementById( '<?php echo $element;?>' ),
+              {
+                zoom: 10,
+                center: new google.maps.LatLng( <?php echo $latitude;?>, <?php echo $longitude;?> ),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+              }
+            );
+            var markers = [];
+            markers[0] = new google.maps.Marker({
+              position: {
+                lat:<?php echo $latitude;?>,
+                lng:<?php echo $longitude;?>
+              },
+              map: map,
+              title: '<?php echo $title;?>'
+            });
+          }
+          $(document).ready(function(){ initialize(); });
+        </script>
+      </div><?php
+    }
+  }
 	public function card_header( $label, $singular = null, $plural = null, $reference = null, $id = null ){
     ?><div class='card-heading'>
       <div class='row g-0 px-3 py-2'>

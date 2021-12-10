@@ -328,7 +328,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php require(bin_php.'element/navigation.php');?>
         <div id="page-wrapper" class='content'>
             <div class='no-print'>
-                <div class='card card-primary'><form action='proposal.php?ID=<?php echo $Proposal[ 'ID' ];?>' method='POST'>
+                <div class='card card-primary'>
+                  <form action='proposal.php?ID=<?php echo $Proposal[ 'ID' ];?>' method='POST'>
                     <input type='hidden' name='ID' value='<?php echo $Proposal[ 'ID' ];?>' />
                     <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Proposal', 'Proposals', $Proposal[ 'ID' ] );?>
                     <div class='card-body bg-dark text-white'>
@@ -366,7 +367,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	                      	</div>
 	                    </div>
 	                </div>
-            	</form></div>
+                </form>
+              </div>
 	            <div class='print'>
 	                <div class='row'>
 	                    <div class='col-12' style='text-align:center;'>
