@@ -375,8 +375,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	'Maintenance' => null,
     	'Geofence' => null,
     	'Sales_Tax' => null,
-    	'Customer_ID' => null,
-    	'Customer_Name' => isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null,
+    	'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+    	'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
     	'Division_ID' => null,
     	'Division_Name' => isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null,
     	'Route_ID' => null,
@@ -402,20 +402,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	$Location[ 'Sales_Tax' ] = isset( $_POST[ 'Sales_Tax' ] ) ? $_POST[ 'Sales_Tax' ] : $Location[ 'Sales_Tax' ];
     	$Location[ 'In_Use' ] = isset( $_POST[ 'In_Use' ] ) ? $_POST[ 'In_Use' ] : $Location[ 'In_Use' ];
     	$Location[ 'Customer_ID' ] = isset( $_POST[ 'Customer_ID' ] ) ? $_POST[ 'Customer_ID' ] : $Location[ 'Customer_ID' ];
-    	$Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer' ] ) ? $_POST[ 'Customer' ] : $Location[ 'Customer_Name' ];
+    	$Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Location[ 'Customer_Name' ];
 
     	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
     		$result = \singleton\database::getInstance( )->query(
 	    		null,
 	    		"	DECLARE @MAXID INT;
-	    			DECLARE @OwnerID INT;
-        			SET @MAXID = CASE WHEN ( SELECT Max( Loc ) FROM dbo.Loc ) IS NULL THEN 0 ELSE ( SELECT Max( Loc ) FROM dbo.Loc ) END;
-        			SET @OwnerID = ( SELECT Top 1 Owner.ID FROM dbo.Owner LEFT JOIN dbo.Rol ON Owner.Rol = Rol.ID WHERE Rol.Name = ? );
-        			INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse )
-	    			VALUES( @MAXID + 1, @OwnerID, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
-        			SELECT @MAXID + 1;",
+        		SET @MAXID = CASE WHEN ( SELECT Max( Loc ) FROM dbo.Loc ) IS NULL THEN 0 ELSE ( SELECT Max( Loc ) FROM dbo.Loc ) END;
+        		INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse )
+	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        		SELECT @MAXID + 1;",
 	    		array(
-	    			$Location[ 'Customer_Name' ],
+	    			$Location[ 'Customer_ID' ],
 	    			$Location[ 'Name' ],
 	    			$Location[ 'Status' ],
 	    			$Location[ 'Street' ],
@@ -490,6 +488,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id="page-wrapper" class='content'>
       <div class='card card-primary border-0'>
         <form action='location.php?ID=<?php echo $Location[ 'ID' ];?>' method='POST'>
+          <input type='hidden' name='ID' value='<?php echo $Location[ 'ID' ];?>' />
           <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Location', 'Locations', $Location[ 'ID' ] );?>
   				<div class='card-body bg-dark text-white'>
             <div class='row g-0' data-masonry='{"percentPosition": true }'>

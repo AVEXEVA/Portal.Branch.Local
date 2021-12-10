@@ -91,6 +91,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    null,
 		    " 	SELECT  TOP 1
 	                    Unit.ID,
+	                    CASE 	WHEN Unit.State IS NULL AND Unit.Unit IS NULL THEN ''
+	                    		WHEN Unit.State IS NULL THEN Unit.Unit 
+	                    		WHEN Unit.Unit  IS NULL THEN Unit.State 
+	                    		ELSE Unit.State + ' - ' + Unit.Unit 
+	                    END AS Name,
 	                    Unit.Unit        		AS Building_ID,
 	                    Unit.State              AS City_ID,
 	                    Customer.ID             AS Customer_ID,
@@ -115,7 +120,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	                    Unit.Template           AS Template,
 	                    Unit.Status             AS Status,
 	                    Unit.TFMID              AS TFMID,
-	                    Unit.TFMSource          AS TFMSource
+	                    Unit.TFMSource          AS TFMSource,
+	                    CASE    WHEN Invoices.[Open] IS NULL THEN 0
+                                ELSE Invoices.[Open] END AS Invoices_Open,
+                        CASE    WHEN Invoices.[Closed] IS NULL THEN 0
+                                ELSE Invoices.[Closed] END AS Invoices_Closed
 	            FROM    Elev AS Unit
 	                    LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
 	                    LEFT JOIN (
@@ -188,6 +197,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										GROUP BY  	Violation.Elev
 									) AS Job_Created ON Job_Created.Unit = Unit.ID
 						) AS Violations ON Violations.Unit = Unit.ID
+						LEFT JOIN (
+                            SELECT      Job.Elev                AS Unit,
+                                        Sum( [Open].Count )     AS [Open],
+                                        Sum( [Closed].Count )   AS Closed
+                            FROM        Job AS Job
+                                        LEFT JOIN (
+                                          SELECT    Invoice.Job AS Job,
+                                                    Count( Invoice.Ref ) AS Count
+                                          FROM      Invoice
+                                          WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
+                                          GROUP BY  Invoice.Loc
+                                        ) AS [Open] ON Job.ID = [Open].Job 
+                                        LEFT JOIN (
+                                          SELECT    Invoice.Loc AS Location,
+                                                    Count( Invoice.Ref ) AS Count
+                                          FROM      Invoice
+                                          WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                                          GROUP BY  Invoice.Loc
+                                        ) AS [Closed] ON Job.ID = [Closed].Job 
+                            GROUP BY    Job.ID
+                        ) AS Invoices ON Invoices.Unit = Unit.ID
 	            WHERE      Unit.ID = ?
 	                    OR Unit.State = ?;",
             array(
@@ -205,6 +235,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				)    
 					? array(
 					    'ID' => null,
+					    'Name' => null,
 					    'Customer_ID' => null,
 					    'Customer_Name' => null,
 					    'Location_ID' => null,
@@ -229,7 +260,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					    'Template' => null,
 					    'Status' => null,
 					    'TFMID' => null,
-					    'TFMSource' => null
+					    'TFMSource' => null,
+					    //Totals
+					    'Tickets_Open' => null,
+					    'Tickets_Assigned' => null,
+					    'Tickets_En_Route' => null,
+					    'Tickets_On_Site' => null,
+					    'Tickets_Reviewing' => null,
+					    'Violations_Preliminary_Report' => null,
+					    'Violations_Job_Created' => null,
+					    'Invoices_Open' => null,
+					    'Invoices_Closed' => null
 					) 
 					: sqlsrv_fetch_array($result);
 
@@ -462,52 +503,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				              	</div>
 				            </div>
 				            <div class='card card-primary my-3 col-12 col-lg-3'>
-				            	<?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Unit', $Unit[ 'ID' ] );?>
-				            	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-				            		<?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Unit=' . $Unit[ 'ID' ] );?>
-				            		<div class='row g-0'>
-				            			<div class='col-1'>&nbsp;</div>
-				            			<div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
-				            			<div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-				            				$r = \singleton\database::getInstance( )->query(
-				            					null,
-				            					" 	SELECT  Count( OpenAR.Ref ) AS Count
-				            						FROM    OpenAR
-				            								LEFT JOIN Job ON OpenAR.Job = Job.ID
-				            						WHERE   Job.Elev = ?;",
-				            					array(
-				            						$Unit[ 'ID' ]
-				            					)
-				            				);
-				            				$Count = $r ? sqlsrv_fetch_array($r)[ 'Count' ] : 0;
-				            				echo $Count;
-				            			?>' /></div>
-				            			<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-				            		</div>
-				            		<div class='row g-0'>
-				            			<div class='col-1'>&nbsp;</div>
-				            			<div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
-				            			<div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-				            				$r = \singleton\database::getInstance( )->query(
-				            					null,
-				            					" 	SELECT 	Count( Invoice.Ref ) AS Count
-				            						FROM   	Invoice
-				            								LEFT JOIN Job ON OpenAR.Job = Job.ID
-				            						WHERE 		Job.Elev = ?
-				            								AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR );",
-				            					array(
-				            						$Unit[ 'ID' ]
-				            					)
-				            				);
-				            				$Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-				            				echo $Count
-				            			?>' /></div>
-				            		<div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Unit[ 'Customer_Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-				            	</div>
-				            </div>
+                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Unit', $Unit[ 'ID' ] );?>
+                                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Unit=' . $Unit[ 'ID' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Unit[ 'Invoices_Open' ], true, true, 'invoices.php?Unit=' . $Unit[ 'ID' ] . '&Status=0');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Unit[ 'Invoices_Closed' ], true, true, 'invoices.php?Unit=' . $Unit[ 'ID' ] ) . '&Status=1';?>
+                                </div>
+                            </div>
 				        </div>
 				    </div>
-				</div>
+				</form>
 			</div>
 		</div>
 	</div>
