@@ -78,9 +78,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $search = array( );
         $parameters = array( );
 
+        if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['ID'];
+          $conditions[] = "Customer.ID LIKE '%' + ? + '%'";
+        }
         if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
           $parameters[] = $_GET['Name'];
           $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+        }
+        if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Location'];
+          $conditions[] = "Customer.Location LIKE '%' + ? + '%'";
         }
         if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
           $parameters[] = $_GET['Status'];

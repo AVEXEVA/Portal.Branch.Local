@@ -52,4 +52,12 @@
 .card.card-primary .card-heading h4 a {
   color : black;
   text-decoration : none;
+<<<<<<< HEAD
 }
+=======
+}
+.card.links-page {
+  height : 100%;
+  width : fit-content;
+}
+>>>>>>> 5ff54db4353ee355b49633ad6e8fa96f81312dc4

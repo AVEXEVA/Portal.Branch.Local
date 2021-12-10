@@ -95,17 +95,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Contact.ID LIKE '%' + ? + '%'";
 	    }
+      if( isset( $_GET[ 'Contact' ] ) && !in_array(  $_GET[ 'Contact' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Contact'];
+      $conditions[] = "Contact.Contact LIKE '%' + ? + '%'";
+      }
 	    if( isset( $_GET[ 'Type' ] ) && !in_array(  $_GET[ 'Type' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Type'];
 	      $conditions[] = "Contact.Type LIKE '%' + ? + '%'";
 	    }
-	    if( isset( $_GET[ 'Entity' ] ) && !in_array(  $_GET[ 'Entity' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Entity'];
+	    if( isset( $_GET[ 'Name' ] ) && !in_array(  $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Name'];
 	      $conditions[] = "Contact.Name LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Person'];
-	      $conditions[] = "Contact.Contact LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Position' ] ) && !in_array( $_GET[ 'Position' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Position'];
@@ -120,8 +120,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      $conditions[] = "Contact.Email LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Street'];
-	      $conditions[] = "Contact.Street + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
+	      $parameters[] = $_GET['Address'];
+	      $conditions[] = "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
 	    }
 
 		/*Search Filters*/
@@ -160,8 +160,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 						Contact.ID 						  AS ID,
-						Contact.Name 					  AS Entity,
-						Contact.Contact 				AS Name,
+						Contact.Name 					  AS Name,
+						Contact.Contact 				AS Contact,
 						Contact.Position  		  AS Position,
 						Contact.Phone 					AS Phone,
 						Contact.Email 					AS Email,
