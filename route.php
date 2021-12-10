@@ -100,9 +100,63 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         "SELECT   Route.ID              AS ID,
                   Route.Name            AS Name,
                   Employee.ID           AS Employee_ID,
-                  Employee.fFirst + ' ' + Employee.Last AS Employee_Name
+                  Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
+                  Tickets.Unassigned    AS Tickets_Open,
+                  Tickets.Assigned      AS Tickets_Assigned,
+                  Tickets.En_Route      AS Tickets_En_Route,
+                  Tickets.On_Site       AS Tickets_On_Site,
+                  Tickets.Reviewing     AS Tickets_Reviewing
           FROM    Route
                   LEFT JOIN Emp  AS Employee  ON  Route.Mech = Employee.fWork
+                  LEFT JOIN (
+                    SELECT  Route.ID AS Route,
+                            Unassigned.Count AS Unassigned,
+                            Assigned.Count AS Assigned,
+                            En_Route.Count AS En_Route,
+                            On_Site.Count AS On_Site,
+                            Reviewing.Count AS Reviewing
+                    FROM    Route 
+                            LEFT JOIN (
+                              SELECT    Location.Route AS Route,
+                                        Count( TicketO.ID ) AS Count
+                              FROM      TicketO
+                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                              WHERE     TicketO.Assigned = 0
+                              GROUP BY  Location.Route
+                            ) AS Unassigned ON Unassigned.Route = Route.ID
+                            LEFT JOIN (
+                              SELECT    Location.Route AS Route,
+                                        Count( TicketO.ID ) AS Count
+                              FROM      TicketO
+                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                              WHERE     TicketO.Assigned = 1
+                              GROUP BY  Location.Route
+                            ) AS Assigned ON Assigned.Route = Route.ID
+                            LEFT JOIN (
+                              SELECT    Location.Route AS Route,
+                                        Count( TicketO.ID ) AS Count
+                              FROM      TicketO
+                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                              WHERE     TicketO.Assigned = 2
+                              GROUP BY  Location.Route
+                            ) AS En_Route ON En_Route.Route = Route.ID
+                            LEFT JOIN (
+                              SELECT    Location.Route AS Route,
+                                        Count( TicketO.ID ) AS Count
+                              FROM      TicketO
+                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                              WHERE     TicketO.Assigned = 3
+                              GROUP BY  Location.Route
+                            ) AS On_Site ON On_Site.Route = Route.ID
+                            LEFT JOIN (
+                              SELECT    Location.Route AS Route,
+                                        Count( TicketO.ID ) AS Count
+                              FROM      TicketO
+                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                              WHERE     TicketO.Assigned = 6
+                              GROUP BY  Location.Route
+                            ) AS Reviewing ON Reviewing.Route = Route.ID
+                  ) AS Tickets ON Tickets.Route = Route.ID
           WHERE       Route.ID =   ?
                   OR  Route.Name = ?;",
         array(
@@ -110,6 +164,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Name
         )
       );
+      //var_dump( sqlsrv_errors( ) );
       $Route =   (          empty( $ID )
                       &&    !empty( $Name )
                       &&    !$result
@@ -194,8 +249,6 @@ if( $locations ) {
 	<?php
 		$_GET[ 'Bootstrap' ] = '5.1';
 		$_GET[ 'Entity_CSS' ] = 1;
-	?>
-	<?php
     require( bin_meta . 'index.php' );
     require( bin_css  . 'index.php' );
     require( bin_js   . 'index.php' );
@@ -205,538 +258,243 @@ if( $locations ) {
   <div id="wrapper">
     <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-      <div class='card card-primary'>
-        <div class='card-heading'>
-          <div class='row g-0 px-3 py-2'>
-            <div class='col-12 col-lg-6'>
-                <h5><?php \singleton\fontawesome::getInstance( )->Route( 1 );?><a href='routes.php?<?php
-                  echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Routes' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Routes' ][ 0 ] : array( ) );
-                ?>'>Routes</a>: <span><?php
-                  echo is_null( $Route[ 'ID' ] )
-                      ? 'New'
-                      : '#' . $Route[ 'ID' ];
-                ?></span></h5>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'>
-                    <button
-                        class='form-control rounded'
-                        onClick="document.location.href='route.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='route.php?ID=<?php echo $User[ 'ID' ];?>';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='route.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
+      <div class='card card-primary'><form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
+        <input type='hidden' name='ID' value='<?php echo $Route[ 'ID' ];?>' />
+        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Route', 'Routes', $Route[ 'ID' ] );?>
+        <div class='card-body bg-dark text-white'>
+          <div class='row g-0'>
+            <?php if( count($finalLoc)>0 ){?>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                  <?php \singleton\bootstrap::getInstance( )->card_header( 'Map' );?>
+                  <div class='card-body bg-darker'>
+                      <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+                      <script type="text/javascript">
+                          var map;
+                          function initialize() {
+                              map = new google.maps.Map(
+                                  document.getElementById( 'location_map' ),
+                                  {
+                                      zoom: 1,
+                                      center: new google.maps.LatLng( 0, 0 ),
+                                      mapTypeId: google.maps.MapTypeId.ROADMAP
+                                  }
+                              );
+                              /* Map Bound */
+                              var markers = [];
+                              <?php /* For Each Location Create a Marker. */
+                              foreach( $finalLoc as $location ){
+                              $name = $location['Tag'];
+                              $addr = $location['Tag'];
+                              $map_lat = $location['Latitude'];
+                              $map_lng = $location['Longitude'];
+                              if( !in_array( $map_lat, array( null, 0 ) ) && !in_array( $map_lng, array( null, 0 ) ) ){
+                              ?>
+
+                              markersNew = new google.maps.Marker({
+                                  position: {
+                                      lat: <?php echo $map_lat; ?>,
+                                      lng: <?php echo $map_lng; ?>,
+                                      title: '<?php echo $name; ?>',
+                                  },
+                                  map: map,
+                                  title: '<?php echo $name; ?>',
+                                  infoWindow: {
+                                      content: '<p><?php echo $name; ?></p>'
+                                  }
+                              });
+                              markers.push(markersNew);
+                              /* Set Bound Marker */
+                              var latlng = new google.maps.LatLng(<?php echo $map_lat; ?>, <?php echo $map_lng; ?>);
+                              bounds.push(latlng);
+                              /* Add Marker */
+                              map.addMarker({
+                                  lat: <?php echo $map_lat; ?>,
+                                  lng: <?php echo $map_lng; ?>,
+                                  title: '<?php echo $name; ?>',
+                                  infoWindow: {
+                                      content: '<p><?php echo $name; ?></p>'
+                                  }
+                              });
+                              <?php } } //end foreach locations ?>
+                          }
+                          $(document).ready(function(){ initialize(); });
+                      </script>
+                      <div class='card-body'>
+                          <div id='location_map' class='map'>&nbsp;</div>
+                      </div>
                   </div>
               </div>
+            <?php }?>
+            <div class='card card-primary my-3 col-12 col-lg-3'> 
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php 
+                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Route[ 'Name' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Route[ 'Employee_ID' ], $Route[ 'Employee_Name' ] );
+                ?>
+              </div>
             </div>
-            <div class='col-6 col-lg-3'>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Route', $Route[ 'ID' ] );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Route=' . $Route[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Route[ 'Tickets_Open' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] . '&Status=0');?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Route[ 'Tickets_Assigned' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=1';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En_Route', $Route[ 'Tickets_En_Route' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=2';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On_Site', $Route[ 'Tickets_On_Site' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=3';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Route[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=6';?>
+              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violation', 'Violations', 'Route', $Route[ 'ID' ] );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route=' . $Route[ 'ID' ] );?>
                 <div class='row g-0'>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='route.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='routes.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='route.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
+                  <?php
+                    $result = \singleton\database::getInstance()->query(
+                      null,
+                      " SELECT Violation.Status FROM Violation GROUP BY Status;",
+                    );
+                    if( $result ){ while ($row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){ ?>
+                      <div class='col-1'>&nbsp;</div>
+                      <div class='col-3 border-bottom border-white my-auto'><?php  echo $row['Status']; ?></div>
+                      <div class='col-6'>
+                        <?php
+                        $r = \singleton\database::getInstance( )->query(
+                          null,
+                          " SELECT  Count( Violation.ID ) AS Violations
+                            FROM    Violation
+                                    LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
+                            WHERE       Location.Route = ?
+                                    AND Violation.Status = ?;",
+                          array(
+                            $_GET['ID'],
+                            $row[ 'Status' ]
+                          )
+                        );
+                        echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;?>
+                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Route=<?php echo $_GET['ID'];?>&Status=<?php echo $row['Status'];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                      </div>
+                    <?php } ?>
+                  <?php } ?>
                 </div>
+              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', 'Route', $Route[ 'ID' ] );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Location' ] ) && $_SESSION[ 'Cards' ][ 'Location' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'locations.php?Route=' . $Route[ 'ID' ] );?>
+                <div class='row g-0'>
+                  <?php
+                  $currentMonth = date('Y-m').'-01';
+                  $r = \singleton\database::getInstance( )->query(
+                    null,
+                    " SELECT  Loc
+                      FROM    Loc
+                              LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) ) AS LastTicket
+                      WHERE   LastTicket  < = ?;",
+                      array(
+                        date( 'Y-m-01', strtotime( 'this month' ))
+                      )
+                    );
+                  ?>
+                  <div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'>Visited</div>
+                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                    echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <?php
+                  $lastDayMonth = date('Y-m-d', strtotime( 'last day of last month' ));
+                  $r = \singleton\database::getInstance( )->query(
+                    null,
+                    " SELECT  Loc
+                      FROM    Loc
+                              LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) ) AS LastTicket
+                      WHERE   LastTicket < = ?;",
+                    array(
+                      $lastDayMonth
+                    )
+                  );
+                  ?><div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'>To Do</div>
+                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                    echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Route', $Route[ 'ID' ] );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Unit' ] ) && $_SESSION[ 'Cards' ][ 'Unit' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'units.php?Route=' . $Route[ 'ID' ] );?>
+                <div class='row g-0'>
+                  <?php
+                    $currentMonth = date('Y-m').'-01';
+                    $r = \singleton\database::getInstance( )->query(
+                      null,
+                      "	SELECT  Count( Unit.ID ) AS Unit
+                        FROM    Unit  
+                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                        WHERE  	    Location.Route = ?
+                                AND Unit.Type = 'Elevator' ;",
+                      array(
+                        $Route[ 'ID' ]
+                      )
+                    );
+                  ?><div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'>Elevator</div>
+                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                    echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <?php
+                    $r = \singleton\database::getInstance( )->query(
+                      null,
+                      "	SELECT  Count( Unit.ID ) AS Unit
+                        FROM    Unit  
+                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                        WHERE  	    Location.Route = ?
+																AND Unit.Type = 'Escalator' ;",
+                      array(
+                        $Route[ 'ID' ]
+                      )
+                    );
+                  ?><div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'>Escalator</div>
+                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                    echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+                <div class='row g-0'>
+                  <?php
+                    $r = \singleton\database::getInstance( )->query(
+                      null,
+                      "	SELECT  Count( Unit.ID ) AS Unit
+                        FROM    Unit  
+                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                        WHERE  	Location.Route = ?
+																		AND Unit.Status = 0 ;",
+                      array(
+                        $Route[ 'ID' ]
+                      )
+                    );
+                  ?><div class='col-1'>&nbsp;</div>
+                  <div class='col-3 border-bottom border-white my-auto'>Unmaintained</div>
+                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
+                    echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
+                  ?>' /></div>
+                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class='card-body bg-dark text-white'>
-            <div class='card-columns'>
-                <div class='card card-primary my-3'> <form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
-                        <input type='hidden' name='ID' value='<?php echo $Route[ 'ID' ];?>' />
-                        <div class='card-heading'>
-                            <div class='row g-0 px-3 py-2'>
-                                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                                <div class='col-2'>&nbsp;</div>
-                            </div>
-                        </div>
-                        <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                            <div class='row g-0'>
-                                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Name:</div>
-                                <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Route['Name'];?>' /></div>
-                            </div>
-                            <div class='row g-0'>
-                                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->User(1);?> Employee:</div>
-                                <div class='col-6'>
-                                    <input type='text' autocomplete='off' class='form-control edit' name='Employee' value='<?php echo $Route[ 'Employee_Name' ];?>' />
-                                    <script>
-                                        $( 'input[name="Employee"]' )
-                                            .typeahead({
-                                                    minLength : 4,
-                                                    hint: true,
-                                                    highlight: true,
-                                                    limit : 5,
-                                                    display : 'FieldValue',
-                                                    source: function( query, result ){
-                                                        $.ajax({
-                                                            url : 'bin/php/get/search/Employees.php',
-                                                            method : 'GET',
-                                                            data    : {
-                                                                search :  $('input:visible[name="Employee"]').val( )
-                                                            },
-                                                            dataType : 'json',
-                                                            beforeSend : function( ){
-                                                                abort( );
-                                                            },
-                                                            success : function( data ){
-                                                                result( $.map( data, function( item ){
-                                                                    return item.FieldValue;
-                                                                } ) );
-                                                            }
-                                                        });
-                                                    },
-                                                    afterSelect: function( value ){
-                                                        $( 'input[name="Employee"]').val( value );
-                                                        $( 'input[name="Employee"]').closest( 'form' ).submit( );
-                                                    }
-                                                }
-                                            );
-                                    </script>
-                                </div>
-                                <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                                    if( in_array( $Route[ 'Employee_ID' ], array( null, 0, '', ' ') ) ){
-                                        echo "onClick=\"document.location.href='employees.php?Field=1';\"";
-                                    } else {
-                                        echo "onClick=\"document.location.href='employee.php?ID=" . $Route[ 'Employee_ID' ] . "';\"";
-                                    }
-                                    ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                            </div>
-                            <div class='card-footer'>
-                                <div class='row'>
-                                    <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form></div>
-
-
-                <?php if( count($finalLoc)>0 ){
-                    ?>
-                    <div class='card card-primary my-3'>
-                        <div class='card-heading'>
-                            <div class='row g-0 px-3 py-2'>
-                                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Map( 1 );?><span>Map</span></h5></div>
-                                <div class='col-2'>&nbsp;</div>
-                            </div>
-                        </div>
-                        <div class='card-body bg-darker'>
-                            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-                            <script type="text/javascript">
-                                var map;
-                                function initialize() {
-                                    map = new google.maps.Map(
-                                        document.getElementById( 'location_map' ),
-                                        {
-                                            zoom: 1,
-                                            center: new google.maps.LatLng( 0, 0 ),
-                                            mapTypeId: google.maps.MapTypeId.ROADMAP
-                                        }
-                                    );
-                                    /* Map Bound */
-                                    var markers = [];
-                                    <?php /* For Each Location Create a Marker. */
-                                    foreach( $finalLoc as $location ){
-                                    $name = $location['Tag'];
-                                    $addr = $location['Tag'];
-                                    $map_lat = $location['Latitude'];
-                                    $map_lng = $location['Longitude'];
-                                    if( !in_array( $map_lat, array( null, 0 ) ) && !in_array( $map_lng, array( null, 0 ) ) ){
-                                    ?>
-
-                                    markersNew = new google.maps.Marker({
-                                        position: {
-                                            lat: <?php echo $map_lat; ?>,
-                                            lng: <?php echo $map_lng; ?>,
-                                            title: '<?php echo $name; ?>',
-                                        },
-                                        map: map,
-                                        title: '<?php echo $name; ?>',
-                                        infoWindow: {
-                                            content: '<p><?php echo $name; ?></p>'
-                                        }
-                                    });
-                                    markers.push(markersNew);
-                                    /* Set Bound Marker */
-                                    var latlng = new google.maps.LatLng(<?php echo $map_lat; ?>, <?php echo $map_lng; ?>);
-                                    bounds.push(latlng);
-                                    /* Add Marker */
-                                    map.addMarker({
-                                        lat: <?php echo $map_lat; ?>,
-                                        lng: <?php echo $map_lng; ?>,
-                                        title: '<?php echo $name; ?>',
-                                        infoWindow: {
-                                            content: '<p><?php echo $name; ?></p>'
-                                        }
-                                    });
-                                    <?php } } //end foreach locations ?>
-                                }
-                                $(document).ready(function(){ initialize(); });
-                            </script>
-                            <div class='card-body'>
-                                <div id='location_map' class='map'>&nbsp;</div>
-                            </div>
-                        </div>
-                    </div>
-                <?php }?>
-                <div class='card card-primary my-3'>
-                    <div class='card-heading'>
-                        <div class='row g-0 px-3 py-2'>
-                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
-                            <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                    </div>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                        <div class='row g-0'>
-                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
-                            <div class='col-6'>&nbsp;</div>
-                            <div class='col-2'>&nbsp;</div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.Assigned = 0
-															)
-														) AS Tickets;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?>
-                            <div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Unassigned</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.Assigned = 1
-															)
-														) AS Tickets;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.Assigned = 2
-															)
-														) AS Tickets;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>En Route</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.Assigned = 3
-															)
-														) AS Tickets;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>On Site</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.Assigned = 6
-															)
-														) AS Tickets;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Reviewing</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Tickets.ID ) AS Tickets
-												FROM   (
-															(
-																SELECT 	TicketO.ID AS ID
-																FROM   	TicketO
-																	   	LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND TicketO.Assigned = 4
-															)
-														) AS Tickets;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Completed</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                    </div>
-                </div>
-                <div class='card card-primary my-3'>
-                    <div class='card-heading'>
-                        <div class='row g-0 px-3 py-2'>
-                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?><span>Violations</span></h5></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Route=<?php echo $_GET['ID'];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                    </div>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-                        <div class='row g-0'>
-                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Violation(1);?><span>Violations</span></div>
-                            <div class='col-6'>&nbsp;</div>
-                            <div class='col-2'>&nbsp;</div>
-                        </div>
-                        <div class='row g-0'>
-
-
-                            <?php
-                            $result = \singleton\database::getInstance()->query(
-                                null,
-                                " SELECT Violation.Status FROM Violation GROUP BY Status;",
-                            );
-                            if( $result ){ while ($row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){ ?>
-                                <div class='col-1'>&nbsp;</div>
-                                <div class='col-3 border-bottom border-white my-auto'><?php  echo $row['Status']; ?></div>
-                                <div class='col-6'>
-                                <?php
-                                $r = \singleton\database::getInstance( )->query(null,"
-											SELECT Count( Violation.ID ) AS Violations
-											FROM   Violation
-												   LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
-											WHERE  Location.Route = ?
-													AND Violation.Status = ?
-										;",array($_GET['ID'],$row['Status']));
-                                echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;
-                                ?>
-
-                                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Route=<?php echo $_GET['ID'];?>&Status=<?php echo $row['Status'];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                                </div>
-                                    <?php } ?>
-
-                            <?php } ?>
-
-                        </div>
-
-                    </div>
-                </div>
-                <div class='card card-primary my-3'>
-                    <div class='card-heading'>
-                        <div class='row g-0 px-3 py-2'>
-                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><span>Location</span></h5></div>
-                            <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='loncations.php?Route=<?php echo $Route[ 'ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                    </div>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Location' ] ) && $_SESSION[ 'Cards' ][ 'Location' ] == 0 ? "style='display:none;'" : null;?>>
-                        <div class='row g-0'>
-                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Summary Report</div>
-                            <div class='col-6'>&nbsp;</div>
-                            <div class='col-2'>&nbsp;</div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $currentMonth = date('Y-m').'-01';
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                " SELECT  Loc
-                                  FROM    Loc
-                                          LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) ) AS LastTicket
-                                  WHERE   LastTicket  < = ?;",
-                                array(
-                                    date( 'Y-m-01', strtotime( 'this month' ))
-                                )
-                            );
-                            ?>
-                            <div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Visited</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-
-                            $lastDayMonth = date('Y-m-d', strtotime( 'last day of last month' ));
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "SELECT Loc
-                                FROM Loc
-                                LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) ) AS LastTicket
-                                WHERE LastTicket < = ?;",
-                                array(
-                                    $lastDayMonth
-                                )
-                            );
-
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>To Do</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class='card card-primary my-3'>
-                    <div class='card-heading'>
-                        <div class='row g-0 px-3 py-2'>
-                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
-                            <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='units.php?Route=<?php echo $Route[ 'ID' ].'&Type=Elevator';?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                    </div>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Unit' ] ) && $_SESSION[ 'Cards' ][ 'Unit' ] == 0 ? "style='display:none;'" : null;?>>
-                        <div class='row g-0'>
-                            <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Summary Report</div>
-                            <div class='col-6'>&nbsp;</div>
-                            <div class='col-2'>&nbsp;</div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-                            $currentMonth = date('Y-m').'-01';
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Unit.ID ) AS Unit
-												FROM Unit  LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND Unit.Type = 'Elevator' ;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?>
-                            <div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Elevator</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Unit.ID ) AS Unit
-												FROM Unit  LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND Unit.Type = 'Escalator' ;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Escalator</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-                        <div class='row g-0'>
-                            <?php
-
-                            $r = \singleton\database::getInstance( )->query(
-                                null,
-                                "	SELECT Count( Unit.ID ) AS Unit
-												FROM Unit  LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-																WHERE  		Location.Route = ?
-																		AND Unit.Status = 0 ;",
-                                array(
-                                    $Route[ 'ID' ]
-                                )
-                            );
-                            ?><div class='col-1'>&nbsp;</div>
-                            <div class='col-3 border-bottom border-white my-auto'>Unmaintained</div>
-                            <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                                echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
-                                ?>' /></div>
-                            <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
         </div>
       </div>
     </div>

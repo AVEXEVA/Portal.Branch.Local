@@ -274,13 +274,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Invoice', 'Invoices', $Invoice[ 'ID' ] );?>
                 <div class='card-body bg-dark text-white'>
                     <div class='card-columns'>
-                        <div class='card card-primary my-3'>
-                            <div class='card-heading'>
-                                <div class='row g-0 px-3 py-2'>
-                                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                                    <div class='col-2'>&nbsp;</div>
-                                </div>
-                            </div>
+                        <div class='card card-primary my-3 col-12 col-lg-3'>
+                            <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
                             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Invoice[ 'Location_ID' ], $Invoice[ 'Location_Name' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Invoice[ 'Job_ID' ], $Invoice[ 'Job_Name' ] );?>
@@ -321,7 +316,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='col-4'><?php echo $Invoice['Location_Name'];?></div>
                 </div>
                 <div class='row' style='font-size:12px;'>
-                    <div class='col-2'>&nbsp;</div>
+                    <div class='col-2'>&nbsp;</div>cmd
                     <div class='col-4'>ATTN:<?php echo $Invoice['Customer_Contact'];?></div>
                     <div class='col-2'>&nbsp;</div>
                     <div class='col-4'><?php echo $Invoice['Location_Name'];?></div>

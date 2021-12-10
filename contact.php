@@ -298,16 +298,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                 <?php
-                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', 'Name', $Contact[ 'Name' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', 'Type', $Contact[ 'Type' ], array( 0 => 'Customer', 4 => 'Location', 5 => 'Employee' ) );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', 'Website', $Contact[ 'Website' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Contact', 'Contact', $Contact[ 'Contact' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', 'Email', $Contact[ 'Email' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_tel( 'Phone', 'Phone', $Contact[ 'Phone' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'Address', 'https://maps.google.com/?q=' . $Contact['Street'].' '.$Contact['City'].' '.$Contact[ 'State' ].' '.$Contact[ 'Zip' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', 'Street', $Contact[ 'Street' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', 'City', $Contact[ 'City' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', 'State', $Contact[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Contact[ 'Name' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Contact[ 'Type' ], array( 0 => 'Customer', 4 => 'Location', 5 => 'Employee' ) );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Contact[ 'Website' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Contact', $Contact[ 'Contact' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $Contact[ 'Email' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_tel( 'Phone', $Contact[ 'Phone' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Contact['Street'].' '.$Contact['City'].' '.$Contact[ 'State' ].' '.$Contact[ 'Zip' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Contact[ 'Street' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Contact[ 'City' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Contact[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', 'Zip', $Contact[ 'Zip' ] );
                 ?>
               </div>
