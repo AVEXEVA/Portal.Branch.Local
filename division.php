@@ -126,7 +126,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           En_Route.Count AS En_Route,
                           On_Site.Count AS On_Site,
                           Reviewing.Count AS Reviewing
-                  FROM    Zone AS Division 
+                  FROM    Zone AS Division
                           LEFT JOIN (
                             SELECT    Location.Zone AS Division,
                                       Count( TicketO.ID ) AS Count
@@ -194,7 +194,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Tax' => null,
         'Maintenance' => null,
         'Route_Name' => null,
-        'Route_ID' => null
+        'Route_ID' => null,
+        'Tickets_Open' => null,
+        'Tickets_Assigned' => null,
+        'Tickets_En_Route' => null,
+        'Tickets_On_Site' => null,
+        'Tickets_Reviewing' => null
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -213,7 +218,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Divsion[ 'fDesc' ] 		= isset( $_POST[ 'fDesc' ] ) 	 ? $_POST[ 'fDesc' ] 	 : $Divsion[ 'fDesc' ];
         $Divsion[ 'Tax' ] 		= isset( $_POST[ 'Tax' ] ) 	 ? $_POST[ 'Tax' ] 	 : $Divsion[ 'Tax' ];
         $Divsion[ 'TFMID' ] 			= isset( $_POST[ 'TFMID' ] ) 		 ? $_POST[ 'TFMID' ] 		 : $Divsion[ 'TFMID' ];
-        $Divsion[ 'TFMSource' ] 	= isset( $_POST[ 'TFMSource' ] )  ? $_POST[ 'TFMSource' ]  : $Divsion[ 'TFMSource' ];
+        $Divsion[ 'Tickets_Open' ] 	= isset( $_POST[ 'Tickets_Open' ] )  ? $_POST[ 'Tickets_Open' ]  : $Divsion[ 'Tickets_Open' ];
+        $Divsion[ 'Tickets_Assigned' ] 	= isset( $_POST[ 'Tickets_Assigned' ] )  ? $_POST[ 'Tickets_Assigned' ]  : $Divsion[ 'Tickets_Assigned' ];
+        $Divsion[ 'Tickets_En_Route' ] 	= isset( $_POST[ 'Tickets_En_Route' ] )  ? $_POST[ 'Tickets_En_Route' ]  : $Divsion[ 'Tickets_En_Route' ];
+        $Divsion[ 'Tickets_On_Site' ] 	= isset( $_POST[ 'Tickets_On_Site' ] )  ? $_POST[ 'Tickets_On_Site' ]  : $Divsion[ 'Tickets_On_Site' ];
+        $Divsion[ 'Tickets_Reviewing' ] 	= isset( $_POST[ 'Tickets_Reviewing' ] )  ? $_POST[ 'Tickets_Reviewing' ]  : $Divsion[ 'Tickets_Reviewing' ];
         if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
           $result = \singleton\database::getInstance( )->query(
             null,
@@ -296,7 +305,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang="en">
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php   
+  <?php
     $_GET[ 'Bootstrap' ] = '5.1';
     $_GET[ 'Entity_CSS' ] = 1;
     require( bin_meta . 'index.php');
