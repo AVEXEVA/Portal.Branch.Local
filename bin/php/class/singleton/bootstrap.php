@@ -157,14 +157,20 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
 			<div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
-        </div><?php
+    </div><?php
 	}
 	public function card_row_form_input_email( $label, $value ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
 			<div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
-        </div><?php
+    </div><?php
 	}
+  public function card_row_form_input_password( $label, $value ){
+    ?><div class='row g-0'>
+      <?php self::card_row_label( $label );?>
+      <div class='col-8'><input placeholder='password' type='password' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
+    </div><?php
+  }
 	public function card_row_form_input_date( $singular, $value, $label = null ){
     $label = is_null( $label ) ? $singular : $label;
 		?><div class='row g-0'>
