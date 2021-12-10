@@ -105,7 +105,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               		Job.fDate             AS Date,
 	                Job.BHour             AS Budgeted_Hours,
          			    JobType.Type          AS Type,
-      				    Job.Remarks      		  AS Remarks,
+      				    Job.Remarks      		  AS Notes,
                   Job.Status            AS Status,
                   Emp.fFirst            AS Employee_First_Name,
                   Emp.Last              AS Employee_Last_Name,
@@ -146,35 +146,167 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       				    Violation.ID          AS Violation_ID,
       		        Violation.fdate       AS Violation_Date,
       				    Violation.Status      AS Violation_Status,
-      				    Violation.Remarks     AS Violation_Remarks
+      				    Violation.Remarks     AS Violation_Remarks,
+                  CASE    WHEN Tickets.Unassigned IS NULL THEN 0
+                          ELSE Tickets.Unassigned END AS Tickets_Open,
+                  CASE    WHEN Tickets.Assigned IS NULL THEN 0
+                          ELSE Tickets.Assigned END AS Tickets_Assigned,
+                  CASE    WHEN Tickets.En_Route IS NULL THEN 0
+                          ELSE Tickets.En_Route END AS Tickets_En_Route,
+                  CASE    WHEN Tickets.On_Site IS NULL THEN 0
+                          ELSE Tickets.On_Site END AS Tickets_On_Site,
+                  CASE    WHEN Tickets.Reviewing IS NULL THEN 0
+                          ELSE Tickets.Reviewing END AS Tickets_Reviewing,
+                  CASE    WHEN Invoices.[Open] IS NULL THEN 0
+                          ELSE Invoices.[Open] END AS Invoices_Open,
+                  CASE    WHEN Invoices.[Closed] IS NULL THEN 0
+                          ELSE Invoices.[Closed] END AS Invoices_Closed,
+                  CASE    WHEN Contracts.[Open] IS NULL THEN 0
+                          ELSE Contracts.[Open] END AS Contracts_Open,
+                  CASE    WHEN Contracts.[Closed] IS NULL THEN 0
+                          ELSE Contracts.[Closed] END AS Contracts_Closed,
+                  CASE    WHEN Proposals.[Open] IS NULL THEN 0
+                          ELSE Proposals.[Open] END AS Proposals_Open,
+                  CASE    WHEN Proposals.[Closed] IS NULL THEN 0
+                          ELSE Proposals.[Closed] END AS Proposals_Closed
           	FROM 	 Job
-              		 LEFT JOIN Loc           	ON Job.Loc      = Loc.Loc
-              		 LEFT JOIN Elev 			ON Elev.ID      = Job.Elev
-              		 LEFT JOIN Zone          	ON Loc.Zone     = Zone.ID
-              		 LEFT JOIN Route 			ON Route.ID     = Loc.Route
-              		 LEFT JOIN JobType       	ON Job.Type     = JobType.ID
+              		 LEFT JOIN Loc ON Job.Loc = Loc.Loc
+              		 LEFT JOIN Elev ON Elev.ID = Job.Elev
+              		 LEFT JOIN Zone ON Loc.Zone = Zone.ID
+              		 LEFT JOIN Route ON Route.ID = Loc.Route
+              		 LEFT JOIN JobType ON Job.Type = JobType.ID
               		 LEFT JOIN (
               		 	SELECT 	Owner.ID,
-              		 			Rol.Name,
-              		 			Rol.Address AS Street,
-              		 			Rol.City,
-              		 			Rol.State,
-              		 			Rol.Zip,
-              		 			Rol.Contact,
-              		 			Rol.Remarks
-              		 	FROM 	Owner
-              		 			LEFT JOIN Rol ON Owner.Rol = Rol.ID
-              		 ) AS Customer 	ON Job.Owner    = Customer.ID
-              		 LEFT JOIN Emp           	ON Emp.fWork    = Route.Mech
-					 LEFT JOIN Violation     	ON Job.ID       = Violation.Job
-					 LEFT JOIN Owner 			ON Owner.ID 	= Loc.Owner
-          	WHERE  Job.ID = ?
+              		 			    Rol.Name,
+              		 			    Rol.Address AS Street,
+              		 			    Rol.City,
+              		 			    Rol.State,
+              		 			    Rol.Zip,
+              		 			    Rol.Contact,
+              		 			    Rol.Remarks
+              		 	FROM 	  Owner
+              		 			    LEFT JOIN Rol ON Owner.Rol = Rol.ID
+              		 ) AS Customer 	ON Job.Owner = Customer.ID
+              		 LEFT JOIN Emp ON Emp.fWork = Route.Mech
+        					 LEFT JOIN Violation ON Job.ID = Violation.Job
+        					 LEFT JOIN Owner ON Owner.ID 	= Loc.Owner
+                   LEFT JOIN (
+                        SELECT  Job.ID AS Job,
+                                Unassigned.Count AS Unassigned,
+                                Assigned.Count AS Assigned,
+                                En_Route.Count AS En_Route,
+                                On_Site.Count AS On_Site,
+                                Reviewing.Count AS Reviewing
+                        FROM    Job AS Job 
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 0
+                                  GROUP BY  Job.ID
+                                ) AS Unassigned ON Unassigned.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 1
+                                  GROUP BY  Job.ID
+                                ) AS Assigned ON Assigned.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 2
+                                  GROUP BY  Job.ID
+                                ) AS En_Route ON En_Route.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 3
+                                  GROUP BY  Job.ID
+                                ) AS On_Site ON On_Site.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 6
+                                  GROUP BY  Job.ID
+                                ) AS Reviewing ON Reviewing.Job = Job.ID
+                    ) AS Tickets ON Tickets.Job = Job.ID
+                    LEFT JOIN (
+                      SELECT    Job.ID AS Job,
+                                [Open].Count AS [Open],
+                                [Closed].Count AS Closed
+                      FROM      Job
+                                LEFT JOIN (
+                                  SELECT    Invoice.Job,
+                                            Count( Invoice.Ref ) AS Count
+                                  FROM      Invoice
+                                  WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
+                                  GROUP BY  Invoice.Job
+                                ) AS [Open] ON Job.ID = [Open].Job 
+                                LEFT JOIN (
+                                  SELECT    Invoice.Job,
+                                            Count( Invoice.Ref ) AS Count
+                                  FROM      Invoice
+                                  WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                                  GROUP BY  Invoice.Job
+                                ) AS [Closed] ON Job.ID = [Closed].Job 
+                    ) AS Invoices ON Invoices.Job = Job.ID
+                    LEFT JOIN (
+                      SELECT    Job.ID AS Job,
+                                [Open].Count AS [Open],
+                                [Closed].Count AS Closed
+                      FROM      Job
+                                LEFT JOIN (
+                                  SELECT    Contract.Job,
+                                            Count( Contract.ID ) AS Count
+                                  FROM      Contract
+                                  WHERE     Contract.Status = 0
+                                  GROUP BY  Contract.Job
+                                ) AS [Open] ON Job.ID = [Open].Job 
+                                LEFT JOIN (
+                                  SELECT    Contract.Job,
+                                            Count( Contract.ID ) AS Count
+                                  FROM      Contract
+                                  WHERE     Contract.Status = 1
+                                  GROUP BY  Contract.Job
+                                ) AS [Closed] ON Job.ID = [Closed].Job 
+                    ) AS Contracts ON Contracts.Job = Job.ID
+                    LEFT JOIN (
+                      SELECT    Job.ID AS Job,
+                                [Open].Count AS [Open],
+                                [Closed].Count AS Closed
+                      FROM      Job
+                                LEFT JOIN (
+                                  SELECT    Estimate.Job,
+                                            Count( Estimate.ID ) AS Count
+                                  FROM      Estimate
+                                  WHERE     Estimate.Status = 0
+                                  GROUP BY  Estimate.Job
+                                ) AS [Open] ON Job.ID = [Open].Job 
+                                LEFT JOIN (
+                                  SELECT    Estimate.Job,
+                                            Count( Estimate.ID ) AS Count
+                                  FROM      Estimate
+                                  WHERE     Estimate.Status = 1
+                                  GROUP BY  Estimate.Job
+                                ) AS [Closed] ON Job.ID = [Closed].Job 
+                    ) AS Proposals ON Proposals.Job = Job.ID
+          	WHERE      Job.ID = ?
                     OR Job.fDesc = ?;",
          array(
          	$ID,
           $Name
          )
        );
+      //var_dump( sqlsrv_errors( ) );
        $Job =   (       empty( $ID )
                         &&    !empty( $Name )
                         &&    !$result
@@ -185,7 +317,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Name' => null,
           'Date' => null,
           'Type' => null,
-          'Remarks' => null,
+          'Notes' => null,
           'Status' => null,
           'Location_ID' => null,
           'Location_Name' => isset( $_GET [ 'Location' ] ) ? $_GET ['Location'] : null,
@@ -212,7 +344,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Job[ 'Unit_Name' ] = isset( $_POST[ 'Unit' ] ) ? $_POST[ 'Unit' ] : $Job[ 'Unit_Name' ];
           $Job[ 'Date' ] = isset( $_POST[ 'Date' ] ) ? date( 'Y-m-d h:i:s', strtotime( $_POST[ 'Date' ] ) ) : $Job[ 'Date' ];
           $Job[ 'Type' ] = isset( $_POST[ 'Type' ] ) ? $_POST[ 'Type' ] : $Job[ 'Type' ];
-          $Job[ 'Remarks' ] = isset( $_POST[ 'Remarks' ] ) ? $_POST[ 'Remarks' ] : $Job[ 'Remarks' ];
+          $Job[ 'Notes' ] = isset( $_POST[ 'Notes' ] ) ? $_POST[ 'Notes' ] : $Job[ 'Notes' ];
           if( empty( $_POST[ 'ID' ] ) ){
             $result = \singleton\database::getInstance( )->query(
               null,
@@ -325,7 +457,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $Job[ 'Type' ],
                 $Job[ 'Name' ],
                 $Job[ 'Status' ],
-                $Job[ 'Remarks' ],
+                $Job[ 'Notes' ],
                 $Job[ 'Location_Latitude'],
                 $Job[ 'Location_Longitude'],
                 /*null,//PO
@@ -428,7 +560,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 		Job.Elev = @Unit,
                 		Job.Type = ?,
                 		Job.fDesc = ?,
-                		Job.fDate = ?
+                		Job.fDate = ?,
+                    Job.Remarks = ?
                 WHERE   Job.ID = ?;",
               array(
               	$Job[ 'Customer_Name' ],
@@ -437,6 +570,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               	$Job[ 'Type' ],
                 $Job[ 'Name' ],
                 $Job[ 'Date' ],
+                $Job[ 'Notes' ],
                 $Job[ 'ID' ]
               )
             );
@@ -459,53 +593,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <div id="wrapper">
     <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-      <div class='card card-primary'>
-        <div class='card-heading'>
-          <div class='row g-0 px-3 py-2'>
-            <div class='col-12 col-lg-6'>
-                <h5><?php \singleton\fontawesome::getInstance( )->User( 1 );?><a href='jobs.php?<?php
-                  echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Jobs' ][ 0 ] : array( ) );
-                ?>'>Jobs</a>: <span><?php
-                  echo is_null( $Job[ 'ID' ] )
-                      ? 'New'
-                      : '#' . $Job[ 'ID' ];
-                ?></span></h5>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'>
-                    <button
-                        class='form-control rounded'
-                        onClick="document.location.href='job.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='job.php?ID=<?php echo $User[ 'ID' ];?>';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='job.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-                  </div>
-              </div>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='job.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='jobs.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='job.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
-                </div>
-            </div>
-          </div>
-        </div>
+      <div class='card card-primary'><form action='job.php?ID=<?php echo $Job[ 'ID' ];?>' method='POST'>
+        <input type='hidden' name='ID' value='<?php echo $Job[ 'ID' ];?>' />
+        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Job', 'Jobs', $Job[ 'ID' ] );?>
         <div class='card-body bg-dark text-white'>
-          <div class='card-columns'>
+          <div class='row g-0' data-masonry='{"percentPosition": true }'>
             <?php if( !in_array( $Job[ 'Location_Latitude' ], array( null, 0 ) ) && !in_array( $Job['Location_Longitude' ], array( null, 0 ) ) ){
-              ?><div class='card card-primary my-3'>
+              ?><div class='card card-primary my-3 col-12 col-lg-3'>
                 <div class='card-heading position-relative' style='z-index:1;'>
                   <div class='row g-0 px-3 py-2'>
                     <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Map</span></h5></div>
@@ -514,715 +608,85 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div id='customer_map' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
                 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-                  <script type="text/javascript">
-                            var map;
-                            function initialize() {
-                                 map = new google.maps.Map(
-                                    document.getElementById( 'location_map' ),
-                                    {
-                                      zoom: 10,
-                                      center: new google.maps.LatLng( <?php echo $Job[ 'Location_Latitude' ];?>, <?php echo $Job[ 'Location_Longitude' ];?> ),
-                                      mapTypeId: google.maps.MapTypeId.ROADMAP
-                                    }
-                                );
-                                var markers = [];
-                                markers[0] = new google.maps.Marker({
-                                    position: {
-                                        lat:<?php echo $Job['Location_Latitude'];?>,
-                                        lng:<?php echo $Job['Location_Longitude'];?>
-                                    },
-                                    map: map,
-                                    title: '<?php echo $Job[ 'Name' ];?>'
-                                });
-                            }
-
-                            $(document).ready(function(){ initialize(); });
-                        </script>
+                <script type="text/javascript">
+                  var map;
+                  function initialize() {
+                     map = new google.maps.Map(
+                        document.getElementById( 'location_map' ),
+                        {
+                          zoom: 10,
+                          center: new google.maps.LatLng( <?php echo $Job[ 'Location_Latitude' ];?>, <?php echo $Job[ 'Location_Longitude' ];?> ),
+                          mapTypeId: google.maps.MapTypeId.ROADMAP
+                        }
+                    );
+                    var markers = [];
+                    markers[0] = new google.maps.Marker({
+                        position: {
+                            lat:<?php echo $Job['Location_Latitude'];?>,
+                            lng:<?php echo $Job['Location_Longitude'];?>
+                        },
+                        map: map,
+                        title: '<?php echo $Job[ 'Name' ];?>'
+                    });
+                  }
+                  $(document).ready(function(){ initialize(); });
+              </script>
               </div><?php
             }?>
-          <div class='card card-primary my-3'><form action='job.php?ID=<?php echo $Job[ 'ID' ];?>' method='POST'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
+          <div class='card card-primary my-3 col-12 col-lg-3'>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-              <input type='hidden' name='ID' value='<?php echo $Job[ 'ID' ];?>' />
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Name:</div>
-                <div class='col-8'><input type='text' class='form-control edit' name='Name' value='<?php echo $Job[ 'Name' ];?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Date:</div>
-                <div class='col-8'><input type='text' autocomplete='off' class='form-control edit date' name='Date' value='<?php echo date( 'm/d/Y', strtotime( $Job[ 'Date' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Type:</div>
-                <div class='col-8'><select class='form-control edit' name='Type'>
-                  <option value=''>Select</option>
-                  <?php
-                    $result = \singleton\database::getInstance( )->query(
-                      null,
-                      " SELECT  Job_Type.ID   AS ID,
-                                Job_Type.Type AS Name
-                        FROM    JobType AS Job_Type;"
-                    );
-                    if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){
-                      ?><option value='<?php echo $row[ 'ID' ];?>' <?php echo $row[ 'ID' ] == $Job[ 'Type' ] ? 'selected' : null;?>><?php echo $row[ 'Name' ];?></option><?php
-                    }}
-                  ?>
-                </select></div>
-              </div>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
-                  <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Job[ 'Customer_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Customer"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Customers.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Customer"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Customer"]').val( value );
-                                  $( 'input[name="Customer"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Job[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='customers.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='customer.php?ID=" . $Job[ 'Customer_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
-                  <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Job[ 'Location_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Location"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Locations.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Location"]').val( ),
-                                          Customer : $('input:visible[name="Customer"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Location"]').val( value );
-                                  $( 'input[name="Location"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Job[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='locations.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='location.php?ID=" . $Job[ 'Location_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Unit:</div>
-                  <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Unit' value='<?php echo $Job[ 'Unit_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Unit"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Units.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Unit"]').val( ),
-                                          Customer : $('input:visible[name="Customer"]').val( ),
-                                          Location : $('input:visible[name="Location"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Unit"]').val( value );
-                                  $( 'input[name="Unit"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Job[ 'Unit_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='units.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='unit.php?ID=" . $Job[ 'Unit_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Remarks:</div>
-                <div class='col-8'>&nbsp;</div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-12'><textarea class='form-control edit animation-focus' name='Remarks' rows='10'><?php echo $Job['Remarks'];?></textarea></div>
-              </div>
-            </div>
-          </form></div>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Location( 1 );?><span>Location</span></h5></div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Location' ] ) && $_SESSION[ 'Cards' ][ 'Location' ] == 0 ? "style='display:none;'" : null;?>>
-              <div class='row g-0'>
-                <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Address:</div>
-                <div class='col-6'></div>
-                <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='locations.php?Location=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>Street:</div>
-                <div class='col-8'><input readonly type='text' class='form-control' name='Location_Street' value='<?php echo $Job['Location_Street'];?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>City:</div>
-                <div class='col-8'><input readonly type='text' class='form-control' name='Location_City' value='<?php echo $Job['Location_City'];?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>State:</div>
-                <div class='col-8'><select readonly class='form-control' name='Location_State'>
-                  <option value=''>Select</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
-                  <option <?php echo $Job[ 'Location_State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
-                </select></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>Zip:</div>
-                <div class='col-8'><input readonly type='text' class='form-control' name='Location_Zip' value='<?php echo $Job['Location_Zip'];?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>Latitude:</div>
-                <div class='col-8'><input readonly type='text' class='form-control' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                <div class='col-3 border-bottom border-white my-auto'>Longitude:</div>
-                <div class='col-8'><input readonly type='text' class='form-control' /></div>
-              </div>
-              <div class='card-footer'>
-                  <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-              <div class='card card-primary my-3'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?><span>Units</span></h5></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='units.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php
-                    $r = \singleton\database::getInstance( )->query(
-                      null,
-                      "	SELECT 	Count( Unit.ID ) AS Units
-                        FROM   	Elev AS Unit
-                              LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                        WHERE  	Location.Loc = ? ;",
-                      array(
-                        $Job[ 'Location_ID' ]
-                      )
-                    );
-                  ?>
-                  <div class='row g-0'>
-                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Unit(1);?> Type</div>
-                      <div class='col-6'>&nbsp;</div>
-                    <div class='col-2'>&nbsp;</div>
-                  </div>
-                  <div class='row g-0'>
-                    <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>Maintenance</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Units' value=''>
-                    <div class='col-2'><button class='h-100 w-100' readonly onClick="document.location.href='units.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-              </div>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Job[ 'Name' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Job[ 'Date' ] );?>
+              <?php
+                $result = \singleton\database::getInstance( )->query(
+                  null,
+                  " SELECT  Job_Type.ID   AS ID,
+                            Job_Type.Type AS Name
+                    FROM    JobType AS Job_Type;"
+                );
+                if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){ $Job_Types[ $row[ 'ID' ] ] = $row[ 'Name' ]; } }
+                \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Job[ 'Type' ], $Job_Types );
+              ?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Job[ 'Customer_ID' ], $Job[ 'Customer_Name' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Job[ 'Location_ID' ], $Job[ 'Location_Name' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Unit', 'Units', $Job[ 'Unit_ID' ], $Job[ 'Unit_Name' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Notes', $Job[ 'Notes' ] );?>
             </div>
           </div>
-              <div class='card card-primary my-3'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Tickets</span></h5></div>
-                      <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='ticket.php?Name=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
-                    <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                  <div class='row g-0'>
-                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Statuses</div>
-                      <div class='col-6'>&nbsp;</div>
-                    <div class='col-2'>&nbsp;</div>
-                  </div>
-                  <div class='row g-0'><?php
-                      $r = \singleton\database::getInstance( )->query(
-                        null,
-                        "	SELECT Count( Tickets.ID ) AS Tickets
-                          FROM   (
-                                (
-                                  SELECT 	TicketO.ID AS ID
-                                  FROM   	TicketO
-                                        LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                  WHERE  		TicketO.Job = ?
-                                      AND TicketO.Assigned = 0
-                                )
-                              ) AS Tickets;",
-                        array(
-                          $Job[ 'ID' ]
-                        )
-                      );
-                    ?><div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>Open</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                      echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <div class='row g-0'><?php
-                      $r = \singleton\database::getInstance( )->query(
-                        null,
-                        "	SELECT Count( Tickets.ID ) AS Tickets
-                          FROM   (
-                                (
-                                  SELECT 	TicketO.ID AS ID
-                                  FROM   	TicketO
-                                        LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                  WHERE  		Location.Owner = ?
-                                      AND TicketO.Assigned = 1
-                                )
-                              ) AS Tickets;",
-                        array(
-                          $Job[ 'ID' ]
-                        )
-                      );
-                    ?><div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>Assigned</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                      echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <div class='row g-0'><?php
-                      $r = \singleton\database::getInstance( )->query(
-                        null,
-                        "	SELECT Count( Tickets.ID ) AS Tickets
-                          FROM   (
-                                (
-                                  SELECT 	TicketO.ID AS ID
-                                  FROM   	TicketO
-                                        LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                  WHERE  		Location.Owner = ?
-                                      AND TicketO.Assigned = 2
-                                )
-                              ) AS Tickets;",
-                        array(
-                          $Job[ 'ID' ]
-                        )
-                      );
-                    ?><div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>En Route</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                      echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=2';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <div class='row g-0'><?php
-                      $r = \singleton\database::getInstance( )->query(
-                        null,
-                        "	SELECT Count( Tickets.ID ) AS Tickets
-                          FROM   (
-                                (
-                                  SELECT 	TicketO.ID AS ID
-                                  FROM   	TicketO
-                                        LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                  WHERE  		Location.Owner = ?
-                                      AND TicketO.Assigned = 3
-                                )
-                              ) AS Tickets;",
-                        array(
-                          $Job[ 'ID' ]
-                        )
-                      );
-                    ?><div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>On Site</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                      echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=3';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <div class='row g-0'><?php
-                      $r = \singleton\database::getInstance( )->query(
-                        null,
-                        "	SELECT Count( Tickets.ID ) AS Tickets
-                          FROM   (
-                                (
-                                  SELECT 	TicketO.ID AS ID
-                                  FROM   	TicketO
-                                        LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                  WHERE  		Location.Owner = ?
-                                      AND TicketO.Assigned = 6
-                                )
-                              ) AS Tickets;",
-                        array(
-                          $Job[ 'ID' ]
-                        )
-                      );
-                    ?><div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>Review</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                      echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=6';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <div class='row g-0'><?php
-                      $r = \singleton\database::getInstance( )->query(
-                        null,
-                        "	SELECT Count( Tickets.ID ) AS Tickets
-                          FROM   (
-                                (
-                                  SELECT 	TicketO.ID AS ID
-                                  FROM   	TicketO
-                                        LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                  WHERE  		Location.Owner = ?
-                                      AND TicketO.Assigned = 4
-                                )
-                              ) AS Tickets;",
-                        array(
-                          $Job[ 'ID' ]
-                        )
-                      );
-                    ?><div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'>Complete</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                      echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-              </div>
-              <div class='card card-primary my-3'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
-                    <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='invoice.php?Name=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-                  <div class='row g-0'>
-                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
-                      <div class='col-6'>&nbsp;</div>
-                    <div class='col-2'>&nbsp;</div>
-                  </div>
-                  <?php if(isset($Privileges['Invoice']) ) {?>
-                  <div class='row g-0'>
-                    <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                      $r = \singleton\database::getInstance( )->query(null,"
-                        SELECT Count( OpenAR.Ref ) AS Count
-                        FROM   OpenAR
-                             LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                        WHERE  Location.Owner = ?
-                      ;",array($Job[ 'ID' ]));
-                      $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                      echo $Count
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <?php }?>
-                  <?php if(isset($Privileges['Invoice']) ) {?>
-                  <div class='row g-0'>
-                    <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                      $r = \singleton\database::getInstance( )->query(null,
-                        " SELECT 	Count( Invoice.Ref ) AS Count
-                          FROM   	Invoice
-                              LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                          WHERE  		Location.Owner = ?
-                          AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
-
-                      ;",array($Job[ 'ID' ]));
-                      $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                      echo $Count
-                    ?>' /></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                  <?php }?>
-                </div>
-              </div>
-              <div class='card card-primary my-3'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Collection( 1 );?><span>Collections</span></h5></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
-                  <div class='row g-0'>
-                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
-                      $r = \singleton\database::getInstance( )->query(null,
-                        " SELECT Sum( OpenAR.Balance ) AS Balance
-                          FROM   OpenAR
-                             LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                          WHERE  Location.Owner = ?
-                      ;",array($Job[ 'ID' ]));
-                      $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
-                      echo money_format('%(n',$Balance);
-                      ?>' /></div>
-                      <div class='col-2'>&nbsp;</div>
-                    </div>
-                  </div>
-                </div>
-                <div class='card card-primary my-3'>
-                  <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                      <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Hours</span></h5></div>
-                      <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='payroll.php?Customer=<?php echo $Jobs[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                    </div>
-                  </div>
-                  <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Admin' ] ) && $_SESSION[ 'Cards' ][ 'Admin' ] == 0 ? "style='display:none;'" : null;?>>
-                    <div class='row g-0'>
-                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
-                        <div class='col-6'>&nbsp;</div>
-                      <div class='col-2'>&nbsp;</div>
-                    </div>
-                  </div>
-                </div>
-                <div class='card card-primary my-3'>
-                  <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                      <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?><span>Contracts</span></h5></div>
-                      <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                    </div>
-                  </div>
-                  <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                    <div class='row g-0'>
-                        <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Ticket(1);?> Status</div>
-                        <div class='col-6'>&nbsp;</div>
-                      <div class='col-2'>&nbsp;</div>
-                    </div>
-                    <div class='row g-0'><?php
-                        $r = \singleton\database::getInstance( )->query(
-                          null,
-                          "	SELECT Count( Tickets.ID ) AS Tickets
-                            FROM   (
-                                  (
-                                    SELECT 	TicketO.ID AS ID
-                                    FROM   	TicketO
-                                          LEFT JOIN Loc AS Location ON TicketO.LID = Location.Loc
-                                    WHERE  		Location.Owner = ?
-                                        AND TicketO.Assigned = 0
-                                  )
-                                ) AS Tickets;",
-                          array(
-                            $Job[ 'ID' ]
-                          )
-                        );
-                      ?><div class='col-1'>&nbsp;</div>
-                        <div class='col-3 border-bottom border-white my-auto'>Open</div>
-                        <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                        echo $r ? sqlsrv_fetch_array($r)[ 'Tickets' ] : 0;
-                      ?>' /></div>
-                      <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Customer=<?php echo $Job[ 'Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                    </div>
-                  </div>
-                </div>
-                <div class='card card-primary my-3'>
-                  <div class='card-heading'>
-                    <div class='row g-0 px-3 py-2'>
-                      <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Profit</span></h5></div>
-                      <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-                  <div class='row g-0'>
-                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar( 1 );?> Profit</div>
-                      <div class='col-6'>&nbsp;</div>
-                    <div class='col-2'>&nbsp;</div>
-                  </div>
-                  <?php if(isset($Privileges['Invoice']) ) {?>
-                  <div class='row g-0'>
-                    <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> </div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                      $r = \singleton\database::getInstance( )->query(null,
-                        " SELECT  Count( OpenAR.Ref ) AS Count
-                          FROM    OpenAR
-                              LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                      WHERE   Location.Owner = ?
-                    ;",array($Job[ 'ID' ]));
-                    $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                    echo $Count
-                  ?>' /></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  <?php }?>
-                </div>
-              </div>
+          <div class='card card-primary my-3 col-12 col-lg-3'>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Job', $Job[ 'ID' ] );?>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Job=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Tickets_Open' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Job[ 'Tickets_Assigned' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Job[ 'Tickets_En_Route' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=2';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Job[ 'Tickets_On_Site' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=3';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Job[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=6';?>
             </div>
-            <div class='card card-primary my-3'><form action='employee.php?ID=<?php echo $Job[ 'ID' ];?>' method='POST'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Mechanics</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                <input type='hidden' name='ID' value='<?php echo $Job[ 'ID' ];?>' />
-                <div class='row g-0'>
-                  <div class='col-0'>&nbsp;</div>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?>Employees:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Tickets' value='' /></div>
-                </div>
-              </div>
+          </div>
+          <div class='card card-primary my-3 col-12 col-lg-3'>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Job', $Job[ 'ID' ] );?>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Job=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Invoices_Open' ], true, true, 'invoices.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Invoices_Closed' ], true, true, 'invoices.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
             </div>
-              <div class='card card-primary my-3'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Collection( 1 );?><span>Proposals</span></h5></div>
-                      <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='proposal.php?Name=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='proposals.php?Proposals=<?php echo $Job[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
-                </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
-                  <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,
-                    " SELECT Sum( OpenAR.Balance ) AS Balance
-                      FROM   OpenAR
-                         LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                      WHERE  Location.Owner = ?
-                  ;",array($Job[ 'ID' ]));
-                  $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
-                  echo money_format('%(n',$Balance);
-                  ?>' /></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
+          </div>
+          <div class='card card-primary my-3 col-12 col-lg-3'>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Contracts', 'Contract', 'Contracts', 'Job', $Job[ 'ID' ] );?>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Contracts' ] ) && $_SESSION[ 'Cards' ][ 'Contracts' ] == 0 ? "style='display:none;'" : null;?>>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'contracts.php?Job=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Contracts_Open' ], true, true, 'contracts.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Contracts_Closed' ], true, true, 'contracts.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
+            </div>
+          </div>
+          <div class='card card-primary my-3 col-12 col-lg-3'>
+            <?php \singleton\bootstrap::getInstance( )->card_header( 'Proposals', 'Proposal', 'Proposals', 'Job', $Job[ 'ID' ] );?>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Job=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Proposals_Open' ], true, true, 'proposals.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Proposals_Closed' ], true, true, 'proposals.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
             </div>
           </div>
         </div>

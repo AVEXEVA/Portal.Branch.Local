@@ -198,43 +198,43 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
-        $Contract[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Contract[ 'ID' ];
-        $Contract[ 'Job_Name' ] 	= isset( $_POST[ 'Job' ] ) ? $_POST[ 'Job' ] : $Contract[ 'Job_Name' ];
-        $Contract[ 'Location_Name' ] 		= isset( $_POST[ 'Location' ] ) 	 ? $_POST[ 'Location' ] 	 : $Contract[ 'Location_Name' ];
-        $Contract[ 'Customer_Name' ] 		= isset( $_POST[ 'Customer' ] ) 	 ? $_POST[ 'Customer' ] 	 : $Contract[ 'Customer_Name' ];
-        $Contract[ 'Review' ]     = isset( $_POST[ 'Review' ] ) 	   ? $_POST[ 'Review' ] 	   : $Contract[ 'Review' ];
-        $Contract[ 'Discount_1' ] 	= isset( $_POST[ 'Discount_1' ] ) 	 ? $_POST[ 'Discount_1' ] 	 : $Contract[ 'Discount_1' ];
-        $Contract[ 'Discount_2' ] 	= isset( $_POST[ 'Discount_2' ] ) 	 ? $_POST[ 'Discount_2' ] 	 : $Contract[ 'Discount_2' ];
-        $Contract[ 'Discount_3' ] 		= isset( $_POST[ 'Discount_3' ] ) 	 ? $_POST[ 'Discount_3' ] 	 : $Contract[ 'Discount_3' ];
-        $Contract[ 'Discount_4' ] 		= isset( $_POST[ 'Discount_4' ] ) 	 ? $_POST[ 'Discount_4' ] 	 : $Contract[ 'Discount_4' ];
-        $Contract[ 'Discount_5' ] 			= isset( $_POST[ 'Discount_5' ] ) 		 ? $_POST[ 'Discount_5' ] 		 : $Contract[ 'Discount_5' ];
-        $Contract[ 'Discount_6' ] 	= isset( $_POST[ 'Discount_6' ] )  ? $_POST[ 'Discount_6' ]  : $Contract[ 'Discount_6' ];
-        $Contract[ 'Discount_Type' ] 	= isset( $_POST[ 'Discount_Type' ] ) ? $_POST[ 'Discount_Type' ] : $Contract[ 'Discount_Type' ];
-        $Contract[ 'Discount_Rate' ] 	= isset( $_POST[ 'Discount_Rate' ] ) ? $_POST[ 'Discount_Rate' ] : $Contract[ 'Discount_Rate' ];
-        $Contract[ 'Billing_Cycle' ] 	= isset( $_POST[ 'Billing_Cycle' ] ) ? $_POST[ 'Billing_Cycle' ] : $Contract[ 'Billing_Cycle' ];
-        $Contract[ 'Billing_Start' ] 	= isset( $_POST[ 'Billing_Start' ] ) ? $_POST[ 'Billing_Start' ] : $Contract[ 'Billing_Start' ];
-        $Contract[ 'Billing_Length' ] 	= isset( $_POST[ 'Billing_Length' ] ) ? $_POST[ 'Billing_Length' ] : $Contract[ 'Billing_Length' ];
-        $Contract[ 'Billing_Finish' ] 	= isset( $_POST[ 'Billing_Finish' ] ) ? $_POST[ 'Billing_Finish' ] : $Contract[ 'Billing_Finish' ];
-        $Contract[ 'Billing_Amount' ] 	= isset( $_POST[ 'Billing_Amount' ] ) ? $_POST[ 'Billing_Amount' ] : $Contract[ 'Billing_Amount' ];
-        $Contract[ 'Billing_Escalation_Cycle' ] 	= isset( $_POST[ 'Billing_Escalation_Cycle' ] ) ? $_POST[ 'Billing_Escalation_Cycle' ] : $Contract[ 'Billing_Escalation_Cycle' ];
-        $Contract[ 'Billing_Escalation_Factor' ] 	= isset( $_POST[ 'Billing_Escalation_Factor' ] ) ? $_POST[ 'Billing_Escalation_Factor' ] : $Contract[ 'Billing_Escalation_Factor' ];
-        $Contract[ 'Scheduling_Cycle' ] 	= isset( $_POST[ 'Scheduling_Cycle' ] ) ? $_POST[ 'Scheduling_Cycle' ] : $Contract[ 'Scheduling_Cycle' ];
-        $Contract[ 'Scheduling_Day' ] 	= isset( $_POST[ 'Scheduling_Day' ] ) ? $_POST[ 'Scheduling_Day' ] : $Contract[ 'Scheduling_Day' ];
-        $Contract[ 'Scheduling_Date' ] 	= isset( $_POST[ 'Scheduling_Date' ] ) ? $_POST[ 'Scheduling_Date' ] : $Contract[ 'Scheduling_Date' ];
-        $Contract[ 'Scheduling_Time' ] 	= isset( $_POST[ 'Scheduling_Time' ] ) ? $_POST[ 'Scheduling_Time' ] : $Contract[ 'Scheduling_Time' ];
-        $Contract[ 'Scheduling_Weekends' ] 	= isset( $_POST[ 'Scheduling_Weekends' ] ) ? $_POST[ 'Scheduling_Weekends' ] : $Contract[ 'Scheduling_Weekends' ];
-        $Contract[ 'Scheduling_Start' ] 	= isset( $_POST[ 'Scheduling_Start' ] ) ? $_POST[ 'Scheduling_Start' ] : $Contract[ 'Scheduling_Start' ];
-        $Contract[ 'Detail' ] 	= isset( $_POST[ 'Detail' ] ) ? $_POST[ 'Detail' ] : $Contract[ 'Detail' ];
-        $Contract[ 'Cycle' ] 	= isset( $_POST[ 'Cycle' ] ) ? $_POST[ 'Cycle' ] : $Contract[ 'Cycle' ];
-        $Contract[ 'Escalation_Last' ] 	= isset( $_POST[ 'Escalation_Last' ] ) ? $_POST[ 'Escalation_Last' ] : $Contract[ 'Escalation_Last' ];
-        $Contract[ 'Old_Amount' ] 	= isset( $_POST[ 'Old_Amount' ] ) ? $_POST[ 'Old_Amount' ] : $Contract[ 'Old_Amount' ];
-        $Contract[ 'Week' ] 	= isset( $_POST[ 'Week' ] ) ? $_POST[ 'Week' ] : $Contract[ 'Week' ];
-        $Contract[ 'Skill' ] 	= isset( $_POST[ 'Skill' ] ) ? $_POST[ 'Skill' ] : $Contract[ 'Skill' ];
-        $Contract[ 'Status' ] 	= isset( $_POST[ 'Status' ] ) ? $_POST[ 'Status' ] : $Contract[ 'Status' ];
-        $Contract[ 'Hours' ] 	= isset( $_POST[ 'Hours' ] ) ? $_POST[ 'Hours' ] : $Contract[ 'Hours' ];
-        $Contract[ 'Hour' ] 	= isset( $_POST[ 'Hour' ] ) ? $_POST[ 'Hour' ] : $Contract[ 'Hour' ];
-        $Contract[ 'Terms' ] 	= isset( $_POST[ 'Terms' ] ) ? $_POST[ 'Terms' ] : $Contract[ 'Terms' ];
-        $Contract[ 'Off_Service' ] 	= isset( $_POST[ 'Off_Service' ] ) ? $_POST[ 'Off_Service' ] : $Contract[ 'Off_Service' ];
+        $Contract[ 'ID' ] 		                    = isset( $_POST[ 'ID' ] ) 	                     ? $_POST[ 'ID' ] 	                                                     : $Contract[ 'ID' ];
+        $Contract[ 'Job_Name' ] 	                = isset( $_POST[ 'Job' ] )                       ? $_POST[ 'Job' ]                                                       : $Contract[ 'Job_Name' ];
+        $Contract[ 'Location_Name' ] 		          = isset( $_POST[ 'Location' ] ) 	               ? $_POST[ 'Location' ] 	                                               : $Contract[ 'Location_Name' ];
+        $Contract[ 'Customer_Name' ] 		          = isset( $_POST[ 'Customer' ] ) 	               ? $_POST[ 'Customer' ] 	                                               : $Contract[ 'Customer_Name' ];
+        $Contract[ 'Review' ]                     = isset( $_POST[ 'Review' ] ) 	                 ? $_POST[ 'Review' ] 	                                                 : $Contract[ 'Review' ];
+        $Contract[ 'Discount_1' ] 	              = isset( $_POST[ 'Discount_1' ] ) 	             ? $_POST[ 'Discount_1' ] 	                                             : $Contract[ 'Discount_1' ];
+        $Contract[ 'Discount_2' ] 	              = isset( $_POST[ 'Discount_2' ] ) 	             ? $_POST[ 'Discount_2' ] 	                                             : $Contract[ 'Discount_2' ];
+        $Contract[ 'Discount_3' ] 		            = isset( $_POST[ 'Discount_3' ] ) 	             ? $_POST[ 'Discount_3' ] 	                                             : $Contract[ 'Discount_3' ];
+        $Contract[ 'Discount_4' ] 		            = isset( $_POST[ 'Discount_4' ] ) 	             ? $_POST[ 'Discount_4' ] 	                                             : $Contract[ 'Discount_4' ];
+        $Contract[ 'Discount_5' ] 			          = isset( $_POST[ 'Discount_5' ] ) 	             ? $_POST[ 'Discount_5' ] 	                                             : $Contract[ 'Discount_5' ];
+        $Contract[ 'Discount_6' ] 	              = isset( $_POST[ 'Discount_6' ] )                ? $_POST[ 'Discount_6' ]                                                : $Contract[ 'Discount_6' ];
+        $Contract[ 'Discount_Type' ] 	            = isset( $_POST[ 'Discount_Type' ] )             ? $_POST[ 'Discount_Type' ]                                             : $Contract[ 'Discount_Type' ];
+        $Contract[ 'Discount_Rate' ] 	            = isset( $_POST[ 'Discount_Rate' ] )             ? $_POST[ 'Discount_Rate' ]                                             : $Contract[ 'Discount_Rate' ];
+        $Contract[ 'Billing_Cycle' ] 	            = isset( $_POST[ 'Billing_Cycle' ] )             ? $_POST[ 'Billing_Cycle' ]                                             : $Contract[ 'Billing_Cycle' ];
+        $Contract[ 'Billing_Start' ] 	            = isset( $_POST[ 'Billing_Start' ] )             ? date( 'Y-m-d 00:00:00.000', strtotime( $_POST[ 'Billing_Start' ] ) )  : $Contract[ 'Billing_Start' ];
+        $Contract[ 'Billing_Length' ] 	          = isset( $_POST[ 'Billing_Length' ] )            ? $_POST[ 'Billing_Length' ]                                            : $Contract[ 'Billing_Length' ];
+        $Contract[ 'Billing_Finish' ] 	          = isset( $_POST[ 'Billing_Finish' ] )            ? date( 'Y-m-d 00:00:00.000', strtotime( $_POST[ 'Billing_Finish' ] ) ) : $Contract[ 'Billing_Finish' ];
+        $Contract[ 'Billing_Amount' ] 	          = isset( $_POST[ 'Billing_Amount' ] )            ? $_POST[ 'Billing_Amount' ]                                            : $Contract[ 'Billing_Amount' ];
+        $Contract[ 'Billing_Escalation_Cycle' ] 	= isset( $_POST[ 'Billing_Escalation_Cycle' ] )  ? $_POST[ 'Billing_Escalation_Cycle' ]                                  : $Contract[ 'Billing_Escalation_Cycle' ];
+        $Contract[ 'Billing_Escalation_Factor' ] 	= isset( $_POST[ 'Billing_Escalation_Factor' ] ) ? $_POST[ 'Billing_Escalation_Factor' ]                                 : $Contract[ 'Billing_Escalation_Factor' ];
+        $Contract[ 'Scheduling_Cycle' ] 	        = isset( $_POST[ 'Scheduling_Cycle' ] )          ? $_POST[ 'Scheduling_Cycle' ]                                          : $Contract[ 'Scheduling_Cycle' ];
+        $Contract[ 'Scheduling_Day' ] 	          = isset( $_POST[ 'Scheduling_Day' ] )            ? $_POST[ 'Scheduling_Day' ]                                            : $Contract[ 'Scheduling_Day' ];
+        $Contract[ 'Scheduling_Date' ] 	          = isset( $_POST[ 'Scheduling_Date' ] )           ? $_POST[ 'Scheduling_Date' ]                                           : $Contract[ 'Scheduling_Date' ];
+        $Contract[ 'Scheduling_Time' ] 	          = isset( $_POST[ 'Scheduling_Time' ] )           ? $_POST[ 'Scheduling_Time' ]                                           : $Contract[ 'Scheduling_Time' ];
+        $Contract[ 'Scheduling_Weekends' ] 	      = isset( $_POST[ 'Scheduling_Weekends' ] )       ? $_POST[ 'Scheduling_Weekends' ]                                       : $Contract[ 'Scheduling_Weekends' ];
+        $Contract[ 'Scheduling_Start' ] 	        = isset( $_POST[ 'Scheduling_Start' ] )          ? $_POST[ 'Scheduling_Start' ]                                          : $Contract[ 'Scheduling_Start' ];
+        $Contract[ 'Detail' ] 	                  = isset( $_POST[ 'Detail' ] )                    ? $_POST[ 'Detail' ]                                                    : $Contract[ 'Detail' ];
+        $Contract[ 'Cycle' ] 	                    = isset( $_POST[ 'Cycle' ] )                     ? $_POST[ 'Cycle' ]                                                     : $Contract[ 'Cycle' ];
+        $Contract[ 'Escalation_Last' ] 	          = isset( $_POST[ 'Escalation_Last' ] )           ? $_POST[ 'Escalation_Last' ]                                           : $Contract[ 'Escalation_Last' ];
+        $Contract[ 'Old_Amount' ] 	              = isset( $_POST[ 'Old_Amount' ] )                ? $_POST[ 'Old_Amount' ]                                                : $Contract[ 'Old_Amount' ];
+        $Contract[ 'Week' ] 	                    = isset( $_POST[ 'Week' ] )                      ? $_POST[ 'Week' ]                                                      : $Contract[ 'Week' ];
+        $Contract[ 'Skill' ] 	                    = isset( $_POST[ 'Skill' ] )                     ? $_POST[ 'Skill' ]                                                     : $Contract[ 'Skill' ];
+        $Contract[ 'Status' ]                     = isset( $_POST[ 'Status' ] )                    ? $_POST[ 'Status' ]                                                    : $Contract[ 'Status' ];
+        $Contract[ 'Hours' ] 	                    = isset( $_POST[ 'Hours' ] )                     ? $_POST[ 'Hours' ]                                                     : $Contract[ 'Hours' ];
+        $Contract[ 'Hour' ] 	                    = isset( $_POST[ 'Hour' ] )                      ? $_POST[ 'Hour' ]                                                      : $Contract[ 'Hour' ];
+        $Contract[ 'Terms' ] 	                    = isset( $_POST[ 'Terms' ] )                     ? $_POST[ 'Terms' ]                                                     : $Contract[ 'Terms' ];
+        $Contract[ 'Off_Service' ] 	              = isset( $_POST[ 'Off_Service' ] )               ? $_POST[ 'Off_Service' ]                                               : $Contract[ 'Off_Service' ];
         /*$Contract[ 'TFMID' ] 	= isset( $_POST[ 'TFMID' ] ) ? $_POST[ 'TFMID' ] : $Contract[ 'TFMID' ];
         $Contract[ 'TFMSource' ] 	= isset( $_POST[ 'TFMSource' ] ) ? $_POST[ 'TFMSource' ] : $Contract[ 'TFMSource' ];
         $Contract[ 'sDay2' ] 	= isset( $_POST[ 'sDay2' ] ) ? $_POST[ 'sDay2' ] : $Contract[ 'sDay2' ];
@@ -392,241 +392,45 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <div id="wrapper">
     <?php require( bin_php . 'element/navigation.php' ); ?>
     <div id="page-wrapper" class='content'>
-      <div class='card card-primary'>
-        <div class='card-heading'>
-          <div class='row g-0 px-3 py-2'>
-            <div class='col-12 col-lg-6'>
-              <h5><?php \singleton\fontawesome::getInstance( )->Contract( 1 );?><a href='contracts.php?<?php
-                echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] : array( ) );
-              ?>'>Contract</a>: <span><?php
-                echo is_null( $Contract[ 'ID' ] )
-                  ? 'New'
-                  : '#' . $Contract[ 'ID' ];
-              ?></span></h5>
-            </div>
-            <div class='col-6 col-lg-3'>
-              <div class='row g-0'>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='contract.php';"
-                  ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
-                </div>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='contract.php?ID=<?php echo $Contract[ 'ID' ];?>';"
-                  ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                </div>
-                <div class='col-4'>
-                  <button
-                    class='form-control rounded'
-                    onClick="document.location.href='contract.php';"
-                  ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-                </div>
-              </div>
-            </div>
-            <div class='col-6 col-lg-3'>
-              <div class='row g-0'>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php?ID=<?php echo !is_null( $Contract[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Contracts' ], true )[ array_search( $Contract[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Contracts' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='contracts.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                <div class='col-4'><button class='form-control rounded' onClick="document.location.href='contract.php?ID=<?php echo !is_null( $Contract[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Contracts' ], true )[ array_search( $Contract[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Contracts' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class='card card-primary'><form action='contract.php?ID=<?php echo $Contract[ 'ID' ];?>' method='POST'>
+        <input type='hidden' name='ID' value='<?php echo $Contract[ 'ID' ];?>' />
+        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Contract', 'Contracts', $Contract[ 'ID' ] );?>
         <div class='card-body bg-dark text-white'>
-					<div class='card-columns'>
-						<div class='card card-primary my-3'><form action='contract.php?ID=<?php echo $Contract[ 'ID' ];?>' method='POST'>
-							<div class='card-heading'>
-								<div class='row g-0 px-3 py-2'>
-									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-									<div class='col-2'>&nbsp;</div>
-								</div>
-							</div>
+					<div class='row g-0'>
+						<div class='card card-primary my-3 col-12 col-lg-3'>
+							<?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
 						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Information' ] ) && $_SESSION[ 'Cards' ][ 'Information' ] == 0 ? "style='display:none;'" : null;?>>
-						 		<input type='hidden' name='ID' value='<?php echo $Contract[ 'ID' ];?>' />
-								<div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Customer:</div>
-                  <div class='col-6'>
-                    <input placeholder='Customer' type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Contract[ 'Customer_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Customer"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Customers.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Customer"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Customer"]').val( value );
-                                  $( 'input[name="Customer"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Contract[ 'Customer_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='customer.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='customer.php?ID=" . $Contract[ 'Customer_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-								<div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Location(1);?> Location:</div>
-                  <div class='col-6'>
-                    <input placeholder='Location' type='text' autocomplete='off' class='form-control edit' name='Location' value='<?php echo $Contract[ 'Location_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Location"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Locations.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Location"]').val( ),
-                                          Customer : $('input[name="Customer"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Location"]').val( value );
-                                  $( 'input[name="Location"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Contract[ 'Location_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='customer.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='customer.php?ID=" . $Contract[ 'Location_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Job(1);?> Job:</div>
-                  <div class='col-6'>
-                    <input placeholder='Job' type='text' autocomplete='off' class='form-control edit' name='Job' value='<?php echo $Contract[ 'Job_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Job"]' )
-                          .typeahead({
-                              minLength : 4,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Jobs.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Job"]').val( ),
-                                          Customer : $('input[name="Customer"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Job"]').val( value );
-                                  $( 'input[name="Job"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' <?php
-                    if( in_array( $Contract[ 'Job_ID' ], array( null, 0, '', ' ') ) ){
-                      echo "onClick=\"document.location.href='job.php';\"";
-                    } else {
-                      echo "onClick=\"document.location.href='job.php?ID=" . $Contract[ 'Job_ID' ] . "';\"";
-                    }
-                  ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Contract[ 'Customer_ID' ], $Contract[ 'Customer_Name' ] );?>
+								<?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Contract[ 'Location_ID' ], $Contract[ 'Location_Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Contract[ 'Job_ID' ], $Contract[ 'Job_Name' ] );?>
               </div>
               <div class='card-footer'>
                   <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                      <div class='col-12'>&nbsp;</div>
                   </div>
               </div>
-						</form></div>
-            <div class='card card-primary my-3'><form action='contract.php?ID=<?php echo $Contract[ 'ID' ];?>' method='POST'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Billing</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
+						</div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Accounting' ); ?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Billing' ] ) && $_SESSION[ 'Cards' ][ 'Billing' ] == 0 ? "style='display:none;'" : null;?>>
-                <input type='hidden' name='ID' value='<?php echo $Contract[ 'ID' ];?>' />
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Start:</div>
-                  <div class='col-8'><input placeholder='mm/dd/yy' autocomplete='off' type='text' class='form-control edit date' name='Billing_Start' value='<?php echo is_null( $Contract[ 'Billing_Start' ] ) ? null : date( 'm/d/Y', strtotime( $Contract[ 'Billing_Start' ] ) );?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Finish:</div>
-                  <div class='col-8'><input placeholder='mm/dd/yy' autocomplete='off' type='text' class='form-control edit date' name='Billing_Finish' value='<?php echo is_null( $Contract[ 'Billing_Finish' ] ) ? null : date( 'm/d/Y', strtotime( $Contract[ 'Billing_Finish' ] ) );?>' /></div>
-                </div>
+                <?php 
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Start', $Contract[ 'Billing_Start' ], 'Start' );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Finish', $Contract[ 'Billing_Finish' ], 'Finish' );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Length', $Contract[ 'Billing_Length' ] );
+                ?>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Length:</div>
                   <div class='col-8'><input placeholder='monthes' type='text' class='form-control edit' name='Billing_Length' value='<?php echo $Contract[ 'Billing_Length' ];?>' /></div>
                 </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Cycle:</div>
-                  <div class='col-8'><select name='Billing_Cycle' class='form-control edit'>
-                    <option value=''>Select</option>
-                    <option value='0' <?php echo $Contract[ 'Billing_Cycle' ] == 0 ? 'selected' : null;?>>Monthly</option>
-                    <option value='1' <?php echo $Contract[ 'Billing_Cycle' ] == 1 ? 'selected' : null;?>>Bi-Monthly</option>
-                    <option value='2' <?php echo $Contract[ 'Billing_Cycle' ] == 2 ? 'selected' : null;?>>Quarterly</option>
-                    <option value='3' <?php echo $Contract[ 'Billing_Cycle' ] == 3 ? 'selected' : null;?>>Trimester</option>
-                    <option value='4' <?php echo $Contract[ 'Billing_Cycle' ] == 4 ? 'selected' : null;?>>Semi-Annually</option>
-                    <option value='5' <?php echo $Contract[ 'Billing_Cycle' ] == 5 ? 'selected' : null;?>>Annually</option>
-                    <option value='6' <?php echo $Contract[ 'Billing_Cycle' ] == 6 ? 'selected' : null;?>>Never</option>
-                  </select></div>
-                </div>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Cycle', $Contract[ 'Billing_Cycle' ],  array(
+                  0 => 'Monthly',
+                  1 => 'Bi-Monthly',
+                  2 => 'Quarterly',
+                  3 => 'Trimester',
+                  4 => 'Semi-Annually',
+                  5 => 'Annually',
+                  6 => 'Never'
+                ) );?>
                 <div class='row g-0'>
                   <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Amount:</div>
                   <div class='col-8'><input placeholder='$$$' type='text' class='form-control edit' name='Billing_Amount' value='<?php echo $Contract[ 'Billing_Amount' ];?>' /></div>
@@ -634,51 +438,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
               <div class='card-footer'>
                   <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                      <div class='col-12'>&nbsp;</div>
                   </div>
               </div>
-            </form></div>
-            <div class='card card-primary my-3'><form action='contract.php?ID=<?php echo $Contract[ 'ID' ];?>' method='POST'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Escalation</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Escalation' ); ?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Escalation' ] ) && $_SESSION[ 'Cards' ][ 'Escalation' ] == 0 ? "style='display:none;'" : null;?>>
                 <input type='hidden' name='ID' value='<?php echo $Contract[ 'ID' ];?>' />
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto' ><?php \singleton\fontawesome::getInstance( )->Phone( 1 );?> Last:</div>
-                  <div class='col-8'><input placeholder='mm/dd/yy' type='text' class='form-control edit date' name='Escalation_Last' value='<?php echo $Contract[ 'Escalation_Last' ] == '1969-12-30 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Contract[ 'Escalation_Last' ] ) );?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Address(1);?> Cycle:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Billing_Escalation_Cycle' value='<?php echo $Contract[ 'Billing_Escalation_Cycle' ];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Email( 1 );?> Factor:</div>
-                  <div class='col-8'><input placeholder='.00%' type='text' class='form-control edit' name='Billing_Escalation_Factor' value='<?php echo $Contract[ 'Billing_Escalation_Factor' ];?>' /></div>
-                </div>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Escalation_Last', $Contract[ 'Escalation_Last' ], 'Escalated' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Escalation_Cycle', $Contract[ 'Billing_Cycle' ],  array(
+                  0 => 'Monthly',
+                  1 => 'Bi-Monthly',
+                  2 => 'Quarterly',
+                  3 => 'Trimester',
+                  4 => 'Semi-Annually',
+                  5 => 'Annually',
+                  6 => 'Never'
+                ) );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Escalation_Factor', $Contract[ 'Billing_Escalation_Factor' ], 'Factor' );?>
               </div>
               <div class='card-footer'>
                   <div class='row'>
-                      <div class='col-12'><button class='form-control' type='submit'>Save</button></div>
+                      <div class='col-12'>&nbsp;</div>
                   </div>
               </div>
-            </form></div>
-            <div class='card card-primary my-3'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices' ); ?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-                <div class='row g-0'>
-                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
-                    <div class='col-6'>&nbsp;</div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Invoices', 'Invoices', 'invoices.php?Job=' . $Contract[ 'Job_Name' ] );?>
                 <?php if(isset($Privileges['Invoice']) ) {?>
                 <div class='row g-0'>
                   <div class='col-1'>&nbsp;</div>
