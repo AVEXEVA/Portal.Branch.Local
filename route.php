@@ -424,7 +424,7 @@ if( $locations ) {
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Route', $Route[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violation', 'Violations', 'Route', $Route[ 'ID' ] );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route=' . $Route[ 'ID' ] );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Route[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] . '&Status=Preliminary Report');?>
