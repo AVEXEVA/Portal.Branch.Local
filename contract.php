@@ -157,14 +157,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                               Count( Invoice.Ref ) AS Count
                                     FROM      Invoice
                                     WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
-                                    GROUP BY  Invoice.Loc
+                                    GROUP BY  Invoice.Job
                                   ) AS [Open] ON Job.ID = [Open].Job 
                                   LEFT JOIN (
-                                    SELECT    Invoice.Loc AS Location,
+                                    SELECT    Invoice.Job AS Job,
                                               Count( Invoice.Ref ) AS Count
                                     FROM      Invoice
                                     WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
-                                    GROUP BY  Invoice.Loc
+                                    GROUP BY  Invoice.Job
                                   ) AS [Closed] ON Job.ID = [Closed].Job 
                       ) AS Invoices ON Invoices.Job = Job.ID
             WHERE   	[Contract].ID = ?;",

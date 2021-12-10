@@ -74,3 +74,6 @@ table.dataTable thead tr th ul.typeahead.dropdown-menu[role='listbox']{
 	z-index: 10;
 	top : 65px !important;
 }
+.search input[name='Search'] {
+	width : 100%;
+}
