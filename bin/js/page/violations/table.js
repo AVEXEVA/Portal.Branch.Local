@@ -19,7 +19,7 @@ function search( link ){
                           Units                  :  $('input:visible[name="Units"]').val( ),
                           Status                :  $('select:visible[name="Status"]').val( ),
                           Date                  :  $('input:visible[name="Date"]').val( )
-                        
+
                       },
                       dataType : 'json',
                       beforeSend : function( ){
@@ -42,13 +42,13 @@ function search( link ){
       );
   }
 $( document ).ready( function( ){
-  
-     var Editor_Users = new $.fn.dataTable.Editor( {
+
+     var Editor_Violations = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
         table    : '#Table_Violations'
     } );
-    
+
   var Table_Violations = $('#Table_Violations').DataTable( {
       dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
       processing     : true,
@@ -87,7 +87,7 @@ $( document ).ready( function( ){
            d.Status = $("select[name='Status']").val( );
             return d;
         }
-        
+
     },
       columns    : [
         {
@@ -126,7 +126,7 @@ $( document ).ready( function( ){
                     case 'display' :
                         return  row.Locations !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                                    "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -162,7 +162,7 @@ $( document ).ready( function( ){
         }
       }
     ],
-    
+
     initComplete : function( ){
       $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
       $('input.date').datepicker( { } );

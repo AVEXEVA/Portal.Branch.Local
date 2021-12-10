@@ -72,7 +72,7 @@ $( document ).ready( function( ){
       },{
           data : 'Supervisor'
       },{
-        className : 'GPSLocation',       
+        className : 'GPSLocation',
         searchable: false,
         render : function( data, type, row, meta ){
             switch( type ){
@@ -88,7 +88,7 @@ $( document ).ready( function( ){
 
         }
     }
-    ],  
+    ],
     buttons: [
         {
             text: 'Reset Search',
@@ -97,7 +97,7 @@ $( document ).ready( function( ){
                 $( 'input, select' ).each( function( ){
                     $( this ).val( '' );
                 } );
-                Table_Employees.draw( );
+                Table_Bugs.draw( );
             }
         },{
             text : 'Get URL',
@@ -110,13 +110,6 @@ $( document ).ready( function( ){
                 document.location.href = 'employees.php?' + new URLSearchParams( d ).toString();
             }
         },{
-            text : 'Create',
-            className: 'form-control',
-            action : function( e, dt, node, config ){
-                document.location.href='employee.php';
-            }
-        },
-        {
             text : 'Delete',
             className: 'form-control',
             action : function( e, dt, node, config ){

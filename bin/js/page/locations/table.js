@@ -61,7 +61,7 @@ $(document).ready(function( ){
         scrollCollapse : true,
         orderCellsTop  : true,
         autoWidth      : true,
-        responsive     : true,  
+        responsive     : true,
         select         : {
           style : 'multi',
           selector : 'td.ID'
@@ -71,7 +71,7 @@ $(document).ready(function( ){
                 data    : function(d){
                     d = {
                         draw : d.draw,
-                        start : d.start, 
+                        start : d.start,
                         length : d.length,
                         order : {
                             column : d.order[0].column,
@@ -115,9 +115,9 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" + 
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -130,9 +130,9 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Customer_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" + 
+                            return  row.Customer_ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -147,9 +147,9 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Division_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'><i class='fa fa-divide fa-fw fa-1x'></i>" + row.Division_Name + "</a></div>" + 
+                            return  row.Division_ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'><i class='fa fa-divide fa-fw fa-1x'></i>" + row.Division_Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -162,10 +162,10 @@ $(document).ready(function( ){
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            return  row.Route_ID !== null 
-                                ?   "<div class='row'>" + 
-                                        "<div class='col-12'><a href='route.php?ID=" + row.Route_ID + "'>" + row.Route_Name + "</a></div>" + 
-                                        "<div class='col-12'><a href='user.php?ID=" + row.Mechanic_ID + "'>" + row.Mechanic_Name + "</a></div>" + 
+                            return  row.Route_ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='route.php?ID=" + row.Route_ID + "'>" + row.Route_Name + "</a></div>" +
+                                        "<div class='col-12'><a href='user.php?ID=" + row.Mechanic_ID + "'>" + row.Mechanic_Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -190,10 +190,10 @@ $(document).ready(function( ){
             }
         ],
         initComplete : function( settings, json ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );' 
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );'
             $("div.columns-visibility").html(
-                "<div class='desktop bg-dark'>" + 
-                  "<div class='row'>" + 
+                "<div class='desktop bg-dark'>" +
+                  "<div class='row'>" +
                     "<div class='col-3'>Toggle Columns:</div>" +
                     "<div class='col-9'>" +
                       "<a class='toggle-vis text-white' data-column='0'>ID</a>" + ' ' +
@@ -212,11 +212,11 @@ $(document).ready(function( ){
                       "<a class='toggle-vis text-white' data-column='13'>Labor</a>" + ' ' +
                       "<a class='toggle-vis text-white' data-column='14'>Revenue</a>" + ' ' +
                       "<a class='toggle-vis text-white' data-column='15'>Net Income</a>" +
-                    "</div>" + 
+                    "</div>" +
                   "</div>" +
                 "</div>"
             );
-            $('input.date').datepicker( { } ); 
+            $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
             $( '.redraw' ).bind( 'change', function(){ Table_Locations.draw(); });
@@ -228,25 +228,50 @@ $(document).ready(function( ){
         buttons: [
             {
                 text: 'Reset Search',
+                className : 'form-control',
                 action: function ( e, dt, node, config ) {
                     $( 'input, select' ).each( function( ){
                         $( this ).val( '' );
                     } );
                     Table_Locations.draw( );
-                } 
+                }
             },{
                 text : 'Create',
+                className : 'form-control',
                 action : function( e, dt, node, config ){
                     document.location.href='location.php';
                 }
-            },{ 
-                extend: 'edit',   editor: Editor_Locations 
-            },{ 
-                extend: 'remove', editor: Editor_Locations 
-            },
-            'print',
-            'copy',
-            'csv'
+              },{
+              text : 'Delete',
+              className : 'form-control',
+              action : function( e, dt, node, config ){
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                $.ajax ({
+                  url    : 'bin/php/post/Location.php',
+                  method : 'POST',
+                  data   : {
+                    action : 'delete' ,
+                    data : dte
+                  },
+                  success : function(response){
+                    Table_Leads.draw();
+                  }
+                })
+              }
+            },{
+              extend : 'print',
+              text : 'Print',
+              className : 'form-control'
+            },{
+              extend : 'copy',
+              text : 'Copy',
+              className : 'form-control'
+            },{
+              extend : 'csv',
+              text : 'CSV',
+              className : 'form-control'
+            }
         ]
     } );
-} );
+    });

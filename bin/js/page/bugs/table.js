@@ -87,14 +87,69 @@ columns: [
             data      : 'Resolution',
           },{
             data      : 'Fixed',
-          },{
-]
+          }
+],
+buttons: [
+    {
+        text: 'Reset Search',
+        className: 'form-control',
+        action: function ( e, dt, node, config ) {
+            $( 'input, select' ).each( function( ){
+                $( this ).val( '' );
+            } );
+            Table_Bugs.draw( );
+        }
+    },{
+        text : 'Get URL',
+        className: 'form-control',
+        action : function( e, dt, node, config ){
+            d = { }
+            d.ID = $('input[name="ID"]').val( );
+            d.Name = $('input[name="Name"]').val( );
+            d.Status = $('select[name="Status"]').val( );
+            document.location.href = 'bugs.php?' + new URLSearchParams( d ).toString();
+        }
+    },{
+        text : 'Create',
+        className: 'form-control',
+        action : function( e, dt, node, config ){
+            document.location.href='bugs.php';
+        }
+    },
+    {
+        text : 'Delete',
+        className: 'form-control',
+        action : function( e, dt, node, config ){
+          var rows = dt.rows( { selected : true } ).indexes( );
+          var dte = dt.cells( rows, 0 ).data( ).toArray( );
+          $.ajax ({
+            url    : 'bin/php/post/bugs.php',
+            method : 'POST',
+            data   : {
+              action : 'delete' ,
+              data : dte
+            },
+            success : function(response){
+              Table_Bugs.draw();
+            }
+          })
+        }
+     },{
+        extend : 'copy',
+        text : 'Copy',
+        className : 'form-control'
+     },{
+        extend : 'csv',
+        text : 'CSV',
+        className : 'form-control'
+    }
+],
 initComplete : function( ){
     $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
     $('input.date').datepicker( { } );
     $('input.time').timepicker( {  timeFormat : 'h:i A' } );
     //search( this );
-    $( '.redraw' ).bind( 'change', function(){ Table_Customers.draw(); });
+    $( '.redraw' ).bind( 'change', function(){ Table_Bugs.draw(); });
 }
 } );
 } );

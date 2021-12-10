@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace singleton;
 class bootstrap extends \singleton\index {
 	public function primary_card_header( $singular, $plural, $primary_key ){
@@ -41,21 +41,21 @@ class bootstrap extends \singleton\index {
             <div class='col-6 col-lg-3'>
               <div class='row g-0'>
                 <div class='col-4'>
-                  <button 
-                    type='button' 
-                    class='form-control rounded' 
+                  <button
+                    type='button'
+                    class='form-control rounded'
                     onClick="document.location.href='<?php echo strtolower( $singular );?>.php?ID=<?php echo !is_null( $primary_key ) ? array_keys( $_SESSION[ 'Tables' ][ $plural ], true )[ array_search( $primary_key, array_keys( $_SESSION[ 'Tables' ][ $plural ], true ) ) - 1 ] : null;?>';"
                   ><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
                 <div class='col-4'>
-                  <button 
-                    type='button' 
-                    class='form-control rounded' 
+                  <button
+                    type='button'
+                    class='form-control rounded'
                     onClick="document.location.href='<?php echo strtolower( $plural );?>.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ $plural ][ 0 ] ) ? $_SESSION[ 'Tables' ][ $plural ][ 0 ] : array( ) );?>';"
                   ><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
                 <div class='col-4'>
-                  <button 
-                    type='button' 
-                    class='form-control rounded' 
+                  <button
+                    type='button'
+                    class='form-control rounded'
                     onClick="document.location.href='<?php echo strtolower( $singular );?>.php?ID=<?php echo !is_null( $primary_key )? array_keys( $_SESSION[ 'Tables' ][ $plural ], true )[ array_search( $primary_key, array_keys( $_SESSION[ 'Tables' ][ $plural ], true ) ) + 1 ] : null;?>';"
                   ><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
               </div>
