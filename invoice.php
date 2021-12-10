@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Job_Type.Type             AS Job_Type,
                     Division.ID               AS Division_ID,
                     Division.Name             AS Division_Name,
-                    Route.ID 				  AS Route_ID,
+                    Route.ID 				          AS Route_ID,
                     Route.Name                AS Route_Name,
                     Employee.ID               AS Employee_ID,
                     Employee.fFirst           AS Employee_First_Name,
@@ -239,9 +239,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         SET     Invoice.Loc     =   ( SELECT Top 1 Loc.Loc  FROM Loc WHERE Loc.Tag = ? ),
                                 Invoice.Job     =   ( SELECT Top 1 Job.ID   FROM Job WHERE Job.fDesc = ? ),
                                 Invoice.fDesc 	=   ?,
+                                Invoice.STax 	  =   ?,
                                 Invoice.fDate   =   ?,
                                 Invoice.Amount 	=   ?,
-                                Invoice.Total 	=   ?
+                                Invoice.Total 	=   ?,
                         WHERE   Invoice.Ref     =   ?;",
                     array(
                         $Invoice[ 'Location_Name' ],
@@ -250,7 +251,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         $Invoice[ 'Date' ],
                         $Invoice[ 'Amount' ],
                         $Invoice[ 'Total' ],
-                        $Invoice[ 'ID' ]
+                        $Invoice[ 'ID' ],
+                        $Invoice[ 'Sales_Tax']
                     )
                 );
             }

@@ -8,7 +8,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
       'Portal',
       " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
+        FROM        [Connection]
         WHERE       [Connection].[User] = ?
                 AND [Connection].[Hash] = ?;",
       array(
@@ -46,7 +46,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     [Privilege].[Other],
                     [Privilege].[Token],
                     [Privilege].[Internet]
-		  FROM      dbo.[Privilege]
+		  FROM          [Privilege]
 		  WHERE     Privilege.[User] = ?;",
 		array(
 		  	$_SESSION[ 'Connection' ][ 'User' ],
@@ -141,10 +141,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		$Columns = array(
 			0 =>  'Contact.ID',
 			1 =>  'Contact.Contact',
-			2 =>  "Contact.Position",
-			3 =>  "Contact.Phone",
-			4 =>  "Contact.Email",
-			5 =>  "Contact.Contact.Street + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip"
+      2 =>  "Contact.Type",
+      3 =>  "Contact.Name",
+			4 =>  "Contact.Position",
+			5 =>  "Contact.[Phone]",
+			6 =>  "Contact.Email",
+			7 =>  "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip"
 	    );
 	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
 	        ? $Columns[ $_GET['order']['column'] ]
@@ -157,10 +159,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		$Query = "SELECT 	*
 			FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-						Contact.ID 						AS ID,
-						Contact.Name 					AS Entity,
+						Contact.ID 						  AS ID,
+						Contact.Name 					  AS Entity,
 						Contact.Contact 				AS Name,
-						Contact.Position  		  		AS Position,
+						Contact.Position  		  AS Position,
 						Contact.Phone 					AS Phone,
 						Contact.Email 					AS Email,
 						Contact.Address 				AS Street,
