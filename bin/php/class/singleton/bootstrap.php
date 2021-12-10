@@ -111,7 +111,7 @@ class bootstrap extends \singleton\index {
   }
   public function card_row_label( $label, $col = '4', $icon = null ){
     $icon = empty( $icon ) ? $label : $icon;
-    ?><label class='col-<?php echo $col;?> border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> <?php echo $label;?>:</label><?php
+    ?><label class='col-<?php echo $col;?> border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> <?php echo str_replace( '_', ' ', $label );?>:</label><?php
   }
 	public function card_row_form_aggregated( $label, $onclick = null ){
 		?><div class='row g-0'>
@@ -147,6 +147,12 @@ class bootstrap extends \singleton\index {
 			<div class='col-8'><input placeholder='https://www.domain.com' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
         </div><?php
 	}
+  public function card_row_form_input_checkbox( $label, $value ){
+    ?><div class='row g-0'>
+      <?php self::card_row_label( $label );?>
+      <div class='col-8'><input type='checkbox' class='form-input edit' name='<?php echo $key;?>' value='1' /></div>
+    </div><?php
+  }
 	public function card_row_form_input_tel( $label, $value ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>

@@ -5,157 +5,156 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
   //Connection
-    $result = \singleton\database::getInstance( )->query(
-      'Portal',
-      " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
-        WHERE       [Connection].[User] = ?
-                AND [Connection].[Hash] = ?;",
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    " SELECT  [Connection].[ID]
+      FROM    dbo.[Connection]
+      WHERE       [Connection].[User] = ?
+              AND [Connection].[Hash] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ],
+      $_SESSION[ 'Connection' ][ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array($result);
+  //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Department],
+                [Privilege].[Database],
+                [Privilege].[Server],
+                [Privilege].[Other],
+                [Privilege].[Token],
+                [Privilege].[Internet]
+      FROM      dbo.[Privilege]
+      WHERE     Privilege.[User] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+    $key = $Privilege['Access'];
+    unset( $Privilege[ 'Access' ] );
+    $Privileges[ $key ] = implode( '', array(
+      dechex( $Privilege[ 'Owner' ] ),
+      dechex( $Privilege[ 'Group' ] ),
+      dechex( $Privilege[ 'Department' ] ),
+      dechex( $Privilege[ 'Database' ] ),
+      dechex( $Privilege[ 'Server' ] ),
+      dechex( $Privilege[ 'Other' ] ),
+      dechex( $Privilege[ 'Token' ] ),
+      dechex( $Privilege[ 'Internet' ] )
+    ) );
+  }}
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset( $Privileges[ 'Route' ] )
+      ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
+  ){ ?><?php require('404.html');?><?php }
+  else {
+    \singleton\database::getInstance( )->query(
+      null,
+      " INSERT INTO Activity([User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
       array(
         $_SESSION[ 'Connection' ][ 'User' ],
-        $_SESSION[ 'Connection' ][ 'Hash' ]
+        date('Y-m-d H:i:s'),
+        'route.php'
       )
     );
-    $Connection = sqlsrv_fetch_array($result);
-    //User
-    $result = \singleton\database::getInstance( )->query(
-        null,
-        " SELECT  Emp.fFirst  AS First_Name,
-                  Emp.Last    AS Last_Name,
-                  Emp.fFirst + ' ' + Emp.Last AS Name,
-                  Emp.Title AS Title,
-                  Emp.Field   AS Field
-          FROM  Emp
-          WHERE   Emp.ID = ?;",
-        array(
-            $_SESSION[ 'Connection' ][ 'User' ]
-        )
+    $ID = isset( $_GET[ 'ID' ] )
+    ? $_GET[ 'ID' ]
+    : (
+      isset( $_POST[ 'ID' ] )
+      ? $_POST[ 'ID' ]
+      : null
     );
-    $User   = sqlsrv_fetch_array( $result );
-    //Privileges
-    $result = \singleton\database::getInstance( )->query(
-        'Portal',
-        "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner],
-                    [Privilege].[Group],
-                    [Privilege].[Department],
-                    [Privilege].[Database],
-                    [Privilege].[Server],
-                    [Privilege].[Other],
-                    [Privilege].[Token],
-                    [Privilege].[Internet]
-          FROM      dbo.[Privilege]
-          WHERE     Privilege.[User] = ?;",
-        array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-        )
-    );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-            dechex( $Privilege[ 'Owner' ] ),
-            dechex( $Privilege[ 'Group' ] ),
-            dechex( $Privilege[ 'Department' ] ),
-            dechex( $Privilege[ 'Database' ] ),
-            dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ),
-            dechex( $Privilege[ 'Token' ] ),
-            dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-    if(     !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Route' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-        \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'route.php'
-        )
-      );
-        $ID = isset( $_GET[ 'ID' ] )
-      ? $_GET[ 'ID' ]
-      : (
-        isset( $_POST[ 'ID' ] )
-          ? $_POST[ 'ID' ]
-          : null
-      );
     $Name = isset( $_GET[ 'Name' ] )
-        ? $_GET[ 'Name' ]
-        : (
-          isset( $_POST[ 'Name' ] )
-            ? $_POST[ 'Name' ]
-            : null
-        );
-      $result = \singleton\database::getInstance( )->query(
-        null,
-        "SELECT   Route.ID              AS ID,
-                  Route.Name            AS Name,
-                  Employee.ID           AS Employee_ID,
-                  Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
-                  Tickets.Unassigned    AS Tickets_Open,
-                  Tickets.Assigned      AS Tickets_Assigned,
-                  Tickets.En_Route      AS Tickets_En_Route,
-                  Tickets.On_Site       AS Tickets_On_Site,
-                  Tickets.Reviewing     AS Tickets_Reviewing
-          FROM    Route
-                  LEFT JOIN Emp  AS Employee  ON  Route.Mech = Employee.fWork
-                  LEFT JOIN (
-                    SELECT  Route.ID AS Route,
-                            Unassigned.Count AS Unassigned,
-                            Assigned.Count AS Assigned,
-                            En_Route.Count AS En_Route,
-                            On_Site.Count AS On_Site,
-                            Reviewing.Count AS Reviewing
-                    FROM    Route 
-                            LEFT JOIN (
-                              SELECT    Location.Route AS Route,
-                                        Count( TicketO.ID ) AS Count
-                              FROM      TicketO
-                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                              WHERE     TicketO.Assigned = 0
-                              GROUP BY  Location.Route
-                            ) AS Unassigned ON Unassigned.Route = Route.ID
-                            LEFT JOIN (
-                              SELECT    Location.Route AS Route,
-                                        Count( TicketO.ID ) AS Count
-                              FROM      TicketO
-                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                              WHERE     TicketO.Assigned = 1
-                              GROUP BY  Location.Route
-                            ) AS Assigned ON Assigned.Route = Route.ID
-                            LEFT JOIN (
-                              SELECT    Location.Route AS Route,
-                                        Count( TicketO.ID ) AS Count
-                              FROM      TicketO
-                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                              WHERE     TicketO.Assigned = 2
-                              GROUP BY  Location.Route
-                            ) AS En_Route ON En_Route.Route = Route.ID
-                            LEFT JOIN (
-                              SELECT    Location.Route AS Route,
-                                        Count( TicketO.ID ) AS Count
-                              FROM      TicketO
-                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                              WHERE     TicketO.Assigned = 3
-                              GROUP BY  Location.Route
-                            ) AS On_Site ON On_Site.Route = Route.ID
-                            LEFT JOIN (
-                              SELECT    Location.Route AS Route,
-                                        Count( TicketO.ID ) AS Count
-                              FROM      TicketO
-                                        LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                              WHERE     TicketO.Assigned = 6
-                              GROUP BY  Location.Route
-                            ) AS Reviewing ON Reviewing.Route = Route.ID
+      ? $_GET[ 'Name' ]
+      : (
+        isset( $_POST[ 'Name' ] )
+        ? $_POST[ 'Name' ]
+        : null
+    );
+    $result = \singleton\database::getInstance( )->query(
+      null,
+      " SELECT  Route.ID              AS ID,
+                Route.Name            AS Name,
+                Employee.ID           AS Employee_ID,
+                Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
+                Tickets.Unassigned    AS Tickets_Open,
+                Tickets.Assigned      AS Tickets_Assigned,
+                Tickets.En_Route      AS Tickets_En_Route,
+                Tickets.On_Site       AS Tickets_On_Site,
+                Tickets.Reviewing     AS Tickets_Reviewing
+        FROM    Route
+                LEFT JOIN Emp  AS Employee  ON  Route.Mech = Employee.fWork
+                LEFT JOIN (
+                  SELECT  Route.ID AS Route,
+                          Unassigned.Count AS Unassigned,
+                          Assigned.Count AS Assigned,
+                          En_Route.Count AS En_Route,
+                          On_Site.Count AS On_Site,
+                          Reviewing.Count AS Reviewing
+                  FROM    Route 
+                          LEFT JOIN (
+                            SELECT    Location.Route AS Route,
+                                      Count( TicketO.ID ) AS Count
+                            FROM      TicketO
+                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                      WHERE     TicketO.Assigned = 0
+                                      GROUP BY  Location.Route
+                          ) AS Unassigned ON Unassigned.Route = Route.ID
+                          LEFT JOIN (
+                            SELECT    Location.Route AS Route,
+                                      Count( TicketO.ID ) AS Count
+                            FROM      TicketO
+                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                            WHERE     TicketO.Assigned = 1
+                            GROUP BY  Location.Route
+                          ) AS Assigned ON Assigned.Route = Route.ID
+                          LEFT JOIN (
+                            SELECT    Location.Route AS Route,
+                                      Count( TicketO.ID ) AS Count
+                            FROM      TicketO
+                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                            WHERE     TicketO.Assigned = 2
+                            GROUP BY  Location.Route
+                          ) AS En_Route ON En_Route.Route = Route.ID
+                          LEFT JOIN (
+                            SELECT    Location.Route AS Route,
+                                      Count( TicketO.ID ) AS Count
+                            FROM      TicketO
+                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                            WHERE     TicketO.Assigned = 3
+                            GROUP BY  Location.Route
+                          ) AS On_Site ON On_Site.Route = Route.ID
+                          LEFT JOIN (
+                            SELECT    Location.Route AS Route,
+                                      Count( TicketO.ID ) AS Count
+                            FROM      TicketO
+                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                            WHERE     TicketO.Assigned = 6
+                            GROUP BY  Location.Route
+                          ) AS Reviewing ON Reviewing.Route = Route.ID
                   ) AS Tickets ON Tickets.Route = Route.ID
           WHERE       Route.ID =   ?
                   OR  Route.Name = ?;",
@@ -164,7 +163,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Name
         )
       );
-      //var_dump( sqlsrv_errors( ) );
       $Route =   (          empty( $ID )
                       &&    !empty( $Name )
                       &&    !$result
