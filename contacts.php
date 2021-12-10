@@ -99,119 +99,91 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    <?php require( bin_php . 'element/loading.php' );?>
 	    <div id='page-wrapper' class='content'>
 			<div class='card card-full card-primary border-0'>
-				<div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Users( );?> Contacts</h4></div>
-				<div class="mobile card-body bg-dark text-white"><form method='GET' action='contacts.php'>
-			        <div class='row'>
-			            <div class='col-4'>Search:</div>
-			            <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw form-input'/></div>
+				<form method='GET' action='contacts.php'>
+					<div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Users( );?> Contacts</h4></div>
+					<div class="mobile card-body bg-dark text-white">
+				        <div class='row'>
+				            <div class='col-4'>Search:</div>
+				            <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw form-input'/></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>ID:</div>
+				            <div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw form-input'value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Contact:</div>
+				            <div class='col-8'><input type='text' name='Contact' placeholder='Contact' class='redraw form-input'value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Name:</div>
+				            <div class='col-8'><input type='text' name='Name' placeholder='Name' class='redraw form-input'value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Type:</div>
+				            <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw form-input'value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Position:</div>
+				            <div class='col-8'><input type='text' name='Position' placeholder='Position' class='redraw form-input'value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Phone:</div>
+				            <div class='col-8'><input type='text' name='Phone' placeholder='Phone' class='redraw form-input'value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Email:</div>
+				            <div class='col-8'><input type='text' name='Email' placeholder='Email' class='redraw form-input'value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Street:</div>
+				            <div class='col-8'><input type='text' name='Street' placeholder='Street' class='redraw form-input'value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>City:</div>
+				            <div class='col-8'><input type='text' name='City' placeholder='City' class='redraw form-input'value='<?php echo isset( $_GET[ 'City' ] ) ? $_GET[ 'City' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>State:</div>
+				            <div class='col-8'><input type='text' name='State' placeholder='State' class='redraw form-input'value='<?php echo isset( $_GET[ 'State' ] ) ? $_GET[ 'State' ] : null;?>' /></div>
+				        </div>
+				        <div class='row'>
+				            <div class='col-4'>Zip:</div>
+				            <div class='col-8'><input type='text' name='Zip' placeholder='Zip' class='redraw form-input'value='<?php echo isset( $_GET[ 'Zip' ] ) ? $_GET[ 'Zip' ] : null;?>' /></div>
+				        </div>
 			        </div>
-			        <div class='row'><div class='col-12'>&nbsp;</div></div>
-			        <div class='row'>
-			            <div class='col-4'>ID:</div>
-			            <div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw form-input'value='<?php echo $_GET[ 'ID' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Contact:</div>
-			            <div class='col-8'><input type='text' name='Contact' placeholder='Contact' class='redraw form-input'value='<?php echo $_GET[ 'Contact' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Name:</div>
-			            <div class='col-8'><input type='text' name='Name' placeholder='Name' class='redraw form-input'value='<?php echo $_GET[ 'Name' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Type:</div>
-			            <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw form-input'value='<?php echo $_GET[ 'Customer' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Position:</div>
-			            <div class='col-8'><input type='text' name='Position' placeholder='Position' class='redraw form-input'value='<?php echo $_GET[ 'Position' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Phone:</div>
-			            <div class='col-8'><input type='text' name='Phone' placeholder='Phone' class='redraw form-input'value='<?php echo $_GET[ 'Phone' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Email:</div>
-			            <div class='col-8'><input type='text' name='Email' placeholder='Email' class='redraw form-input'value='<?php echo $_GET[ 'Email' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Street:</div>
-			            <div class='col-8'><input type='text' name='Street' placeholder='Street' class='redraw form-input'value='<?php echo $_GET[ 'Street' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>City:</div>
-			            <div class='col-8'><input type='text' name='City' placeholder='City' class='redraw form-input'value='<?php echo $_GET[ 'City' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>State:</div>
-			            <div class='col-8'><input type='text' name='State' placeholder='State' class='redraw form-input'value='<?php echo $_GET[ 'State' ];?>' /></div>
-			        </div>
-			        <div class='row'>
-			            <div class='col-4'>Zip:</div>
-			            <div class='col-8'><input type='text' name='Zip' placeholder='Zip' class='redraw form-input'value='<?php echo $_GET[ 'Zip' ];?>' /></div>
-			        </div>
-			        <div class='row'><div class='col-12'>&nbsp;</div></div>
-			        <div class='row'>
-			            <div class='col-12'><input type='submit' value='Submit' /></div>
-			        </div>
-		        </form></div>
-				<!--<div class='card-body bg-darker'>
-					<div id='Form_Contacts'>
-						<div class='card'>
-							<div class='card-heading'></div>
-							<div class='card-body'>
-								<div>
-									<fieldset >
-										<legend>Contact</legend>
-										<editor-field name='ID'></editor-field>
-										<editor-field name='Entity'></editor-field>
-										<editor-field name='Type'></editor-field>
-										<editor-field name='Name'></editor-field>
-										<editor-field name='Position'></editor-field>
-										<editor-field name='Phone'></editor-field>
-										<editor-field name='Email'></editor-field>
-										<editor-field name='Street'></editor-field>
-										<editor-field name='City'></editor-field>
-										<editor-field name='State'></editor-field>
-										<editor-field name='Zip'></editor-field>
-									</fieldset>
-								</div>
-							</div>
-						</div>
+					<div class='card-body bg-darker'>
+						<table id='Table_Contacts' class='display' cellspacing='0' width='100%'>
+							<thead class='text-white border border-white'><tr>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Proposal( );?>ID</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Customer( );?>Contact</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Note( );?>Type</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->User( );?>Name</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Users( );?>Position</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Phone( );?>Phone</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Email( );?>Email</th>
+								<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Address( );?>Address</th>
+				            </tr>
+				            <tr class='form-desktop'>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>
+								<th class='text-white border border-white'><select name='Type' class='redraw form-control'>
+									<option value=''>Select</option>
+									<option value='0' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 0 ? 'selected' : true;?>>Customer</option>
+									<option value='4' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 4 ? 'selected' : true;?>>Location</option>
+									<option value='5' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 5 ? 'selected' : true;?>>Employee</option>
+								</select></th>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Position' placeholder='Position' value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></th>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>
+								<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
+							</tr></thead>
+						</table>
 					</div>
-				</div>-->
-				<div class='card-body bg-darker'>
-					<table id='Table_Contacts' class='display' cellspacing='0' width='100%'>
-						<thead class='text-white border border-white'><tr>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Proposal( );?>ID</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Customer( );?>Contact</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Note( );?>Type</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->User( );?>Name</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Users( );?>Position</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Phone( );?>Phone</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Email( );?>Email</th>
-							<th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Address( );?>Address</th>
-			            </tr>
-			            <tr class='form-desktop'>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Contact' placeholder='Contact' value='<?php echo isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null;?>' /></th>
-							<th class='text-white border border-white'><select name='Type' class='redraw form-control'>
-								<option value=''>Select</option>
-								<option value='0' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 0 ? 'selected' : true;?>>Customer</option>
-								<option value='4' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 4 ? 'selected' : true;?>>Location</option>
-                <option value='5' <?php echo isset( $_GET[ 'Type' ] ) && $_GET[ 'Type' ] == 5 ? 'selected' : true;?>>Employee</option>
-							</select></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Position' placeholder='Position' value='<?php echo isset( $_GET[ 'Position' ] ) ? $_GET[ 'Position' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Phone' placeholder='Phone' value='<?php echo isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Email' placeholder='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null;?>' /></th>
-							<th class='text-white border border-white'><input class='redraw form-control' type='text' name='Address' placeholder='Address' value='<?php echo isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null;?>' /></th>
-			     </tr></thead>
-					</table>
-				</div>
+				</form>
+    		</div>
     	</div>
-    </div>
-  </div>
+  	</div>
 </body>
 </html>
 <?php
