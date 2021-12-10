@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   $result = \singleton\database::getInstance( )->query(
     'Portal',
     "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           dechex( $Privilege[ 'Department' ] ),
           dechex( $Privilege[ 'Database' ] ),
           dechex( $Privilege[ 'Server' ] ),
-          dechex( $Privilege[ 'Other' ] ), 
+          dechex( $Privilege[ 'Other' ] ),
           dechex( $Privilege[ 'Token' ] ),
           dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -82,17 +82,48 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[ ] = $_GET[ 'search' ];
       $search[ ] = "Customer.Name LIKE '%' + ? + '%'";
     }
-
+    if( isset( $_GET[ 'ID'] ) ){
+      $parameters[ ] = $_GET[ 'ID' ];
+      $search[ ] = "Customer.ID LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Location'] ) ){
+      $parameters[ ] = $_GET[ 'Location' ];
+      $search[ ] = "Customer.Location LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Status'] ) ){
+      $parameters[ ] = $_GET[ 'Status' ];
+      $search[ ] = "Customer.Status LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Units'] ) ){
+      $parameters[ ] = $_GET[ 'Units' ];
+      $search[ ] = "Customer.Unit LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Jobs'] ) ){
+      $parameters[ ] = $_GET[ 'Jobs' ];
+      $search[ ] = "Customer.Job LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Tickets'] ) ){
+      $parameters[ ] = $_GET[ 'Tickets' ];
+      $search[ ] = "Customer.Ticket LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Violations'] ) ){
+      $parameters[ ] = $_GET[ 'Violations' ];
+      $search[ ] = "Customer.Violation LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Invoices'] ) ){
+      $parameters[ ] = $_GET[ 'Invoices' ];
+      $search[ ] = "Customer.Invoice LIKE '%' + ? + '%'";
+    }
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
     $parameters[ ] = $_GET[ 'search' ];
 
-    $sQuery = " 
-      SELECT  Top 10
+    $sQuery =
+      " SELECT  Top 10
               tbl.FieldName,
               tbl.FieldValue
-      FROM    (
+        FROM    (
                 SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                         attr.insRow.value('.', 'nvarchar(max)') as FieldValue
                 FROM    ( Select  convert(xml, (select i.* for xml raw)) as insRowCol

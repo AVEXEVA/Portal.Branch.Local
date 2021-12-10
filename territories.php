@@ -113,8 +113,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </div>
           </div>
-  				<div class="form-mobile card-body bg-dark text-white">
-  					<div class='row'><div class='col-12'>&nbsp;</div></div>
+  				<div class="mobile card-body bg-dark text-white">
              <div class='row'>
                   <div class='col-4'>ID</div>
       						<div class='col-8'><input type='text' name='ID' placeholder='ID' class='redraw' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></div>
