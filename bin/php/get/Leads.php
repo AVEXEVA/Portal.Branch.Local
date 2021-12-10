@@ -141,43 +141,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $sQuery = "	SELECT *
 		            FROM 	(
 			                 	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-			            	            Lead.ID           AS ID,
-<<<<<<< HEAD
-        								        Lead.fDesc        AS Name,
-                                Rolodex.ID        AS Contact_ID,
-                                Rolodex.Contact   AS Contact_Name,
-        								        Customer.ID       AS Customer_ID,
-        								        Customer.Name 	  AS Customer_Name,
-                                Lead.Probability  AS Probability,
-                                Lead.Level        AS Level,
-                                Lead.Status 		  AS Status,
-                                CASE  WHEN Lead.Status = 0 THEN 'Open'
-                                      WHEN Lead.Status = 1 THEN 'Canceled'
-                                      WHEN Lead.Status = 2 THEN 'Withdrawn'
-                                      WHEN Lead.Status = 3 THEN 'Disqualified'
-                                      WHEN Lead.Status = 4 THEN 'Award Successful'
-                                      WHEN Lead.Status = 5 THEN 'Award Competitor'
-                                END AS Status,
-        								        Lead.Type 		    AS Type,
-        								        Lead.Address      AS Street,
-        								        Lead.City         AS City,
-        								        Lead.State        AS State,
-        								        Lead.Zip          AS Zip
-=======
-        								Lead.fDesc        AS Name,
-                                		Rolodex.ID        AS Contact_ID,
-                                		Rolodex.Contact   AS Contact_Name,
-        								Customer.ID       AS Customer_ID,
-        								Customer.Name 	  AS Customer_Name,
-                                		Lead.Probability  AS Probability,
-                                		Lead.Level        AS Level,
-                                		Lead.Status 	  AS Status,
-        								Lead.Type 		  AS Type,
-        								Lead.Address      AS Street,
-        								Lead.City         AS City,
-        								Lead.State        AS State,
-        								Lead.Zip          AS Zip
->>>>>>> 3bab2ac4c46e60480981d8978a7890adab4dacdd
+			            	            Lead.ID           	AS ID,
+			            	            Lead.fDesc        	AS Name,
+			            	            Rolodex.ID        	AS Contact_ID,
+			            	            Rolodex.Contact   	AS Contact_Name,
+			            	            Customer.ID       	AS Customer_ID,
+			            	            Customer.Name 	  	AS Customer_Name,
+			            	            Lead.Probability  	AS Probability,
+			            	            Lead.Level        	AS Level,
+			            	            Lead.Status 		AS Status,
+			            	            CASE  	WHEN Lead.Status = 0 THEN 'Open'
+			            	            		WHEN Lead.Status = 1 THEN 'Canceled'
+			            	            		WHEN Lead.Status = 2 THEN 'Withdrawn'
+			            	            		WHEN Lead.Status = 3 THEN 'Disqualified'
+			            	            		WHEN Lead.Status = 4 THEN 'Award Successful'
+			            	            		WHEN Lead.Status = 5 THEN 'Award Competitor'
+			            	            END AS Status,
+			            	            Lead.Type 		    AS Type,
+			            	            Lead.Address      AS Street,
+			            	            Lead.City         AS City,
+			            	            Lead.State        AS State,
+			            	            Lead.Zip          AS Zip
 			                  	FROM    Lead
 			                  			LEFT JOIN (
 					                        SELECT  Owner.ID,
@@ -198,19 +182,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 	    $sQueryRow = "	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 	            	            Lead.ID           AS ID,
-								Lead.fDesc        AS Name,
-                        		Rolodex.ID        AS Contact_ID,
-                        		Rolodex.Contact   AS Contact_Name,
-								Customer.ID       AS Customer_ID,
-								Customer.Name 	  AS Customer_Name,
-                        		Lead.Probability  AS Probability,
-                        		Lead.Level        AS Level,
-                        		Lead.Status 	  AS Status,
-								Lead.Type 		  AS Type,
-								Lead.Address      AS Street,
-								Lead.City         AS City,
-								Lead.State        AS State,
-								Lead.Zip          AS Zip
 	                  	FROM    Lead
 	                  			LEFT JOIN (
 			                        SELECT  Owner.ID,
