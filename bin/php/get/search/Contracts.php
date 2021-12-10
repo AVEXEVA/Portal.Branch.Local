@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(   !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Contact' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Contact' ] )
+        ||  !isset( $Privileges[ 'Contracts' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Contracts' ] )
     ){ ?><?php require('404.html');?><?php }
   else {
     $output = array(
@@ -92,49 +92,61 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['ID'];
-      $conditions[] = "Contact.ID LIKE '%' + ? + '%'";
+      $conditions[] = "Contract.ID LIKE '%' + ? + '%'";
     }
     if( isset( $_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Person'];
-      $conditions[] = "Contact.Contact LIKE '%' + ? + '%'";
+      $conditions[] = "Contract.Contact LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Locaiton' ] ) && !in_array(  $_GET[ 'Locaiton' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Locaiton'];
-      $conditions[] = "Contact.Locaiton LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'Location' ] ) && !in_array(  $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location'];
+      $conditions[] = "Contract.Location LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Type' ] ) && !in_array(  $_GET[ 'Type' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Type'];
-      $conditions[] = "Contact.Type LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'Job' ] ) && !in_array(  $_GET[ 'Job' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Job'];
+      $conditions[] = "Contract.Job LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Entity' ] ) && !in_array(  $_GET[ 'Entity' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Entity'];
-      $conditions[] = "Contact.Name LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'Start_Date' ] ) && !in_array(  $_GET[ 'Start_Date' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Start_Date'];
+      $conditions[] = "Contract.BStart LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Position' ] ) && !in_array( $_GET[ 'Position' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Position'];
-      $conditions[] = "Contact.Position LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'End_Date' ] ) && !in_array( $_GET[ 'End_Date' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['End_Date'];
+      $conditions[] = "Contract.BFinish LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Phone' ] ) && !in_array( $_GET[ 'Phone' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Phone'];
-      $conditions[] = "Contact.Phone LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'Length' ] ) && !in_array( $_GET[ 'Length' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Length'];
+      $conditions[] = "Contract.BLenght LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Email' ] ) && !in_array( $_GET[ 'Email' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Email'];
-      $conditions[] = "Contact.Email LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'Amount' ] ) && !in_array(  $_GET[ 'Amount' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Amount'];
+      $conditions[] = "Contract.BAmt LIKE '%' + ? + '%'";
     }
-    if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Address'];
-      $conditions[] = "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
+    if( isset( $_GET[ 'Escalation_Factor' ] ) && !in_array(  $_GET[ 'Escalation_Factor' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Escalation_Factor'];
+      $conditions[] = "Contract.BEscFact LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Escalation_Date' ] ) && !in_array(  $_GET[ 'Escalation_Date' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Escalation_Date'];
+      $conditions[] = "Contract.EscLast LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Link' ] ) && !in_array(  $_GET[ 'Link' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Link'];
+      $conditions[] = "Contract.Custom15 LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Remarks' ] ) && !in_array(  $_GET[ 'Remarks' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Remarks'];
+      $conditions[] = "Contract.Remarks LIKE '%' + ? + '%'";
     }
 
     /*Search Filters*/
     if( isset( $_GET[ 'search' ] ) ){
 
       $parameters[ ] = $_GET[ 'search' ];
-      $search[ ] = "Contact.Name LIKE '%' + ? + '%'";
+      $search[ ] = "Contract.Name LIKE '%' + ? + '%'";
 
       $parameters[ ] = $_GET[ 'search' ];
-      $search[ ] = "Contact.Contact LIKE '%' + ? + '%'";
+      $search[ ] = "Contract.Contract LIKE '%' + ? + '%'";
     }
 
 
@@ -149,18 +161,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     /*Order && Direction*/
     //update columns from bin/js/tickets/table.js
     $Columns = array(
-      0 =>  'Contact.ID',
-      1 =>  'Contact.Contact',
-      2 =>  'Contact.Type',
-      3 =>  'Contact.name',
-      4 =>  "Contact.Position",
-      5 =>  "Contact.Phone",
-      6 =>  "Contact.Email",
-      7 =>  "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip"
+      0 =>  'Contract.ID',
+      1 =>  'Contract.Contract',
+      2 =>  'Contract.Location',
+      3 =>  'Contract.Job',
+      4 =>  "Contract.Start_Date",
+      5 =>  "Contract.End_Date",
+      6 =>  "Contract.Length",
+      7 =>  "Contract.Amount",
+      8 =>  "Contract.Cycle",
+      9 =>  "Contract.Escalation_Factor",
+      10 =>  "Contract.Escalation_Date",
+      11 =>  "Contract.Link",
+      12 =>  "Contract.Remarks",
     );
     $Order = isset( $_GET[ 'order' ] ) && isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
-        : "Contact.ID";
+        : "Contract.ID";
     $Direction = isset( $_GET[ 'order' ] ) && in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
       ? $_GET['order']['dir']
       : 'ASC';
@@ -178,23 +195,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           FROM ( SELECT  *
         FROM  (
               SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                      Contact.ID              AS ID,
-                      Contact.Name            AS Contact,
-                      Contact.Type            AS Type,
-                      Contact.Contact         AS Name,
-                      Contact.Position        AS Position,
-                      Contact.Phone           AS Phone,
-                      Contact.Email           AS Email,
-                      Contact.Address         AS Street,
-                      Contact.City            AS City,
-                      Contact.State           AS State,
-                      Contact.Zip             AS Zip,
-                      CASE  WHEN Contact.[Type] = 0 THEN  'Customer'
-                          WHEN Contact.[Type] = 4 THEN  'Location'
-                          WHEN Contact.[Type] = 5 THEN  'Employee'
+                      Contract.ID              AS ID,
+                      Contract.Name            AS Contract,
+                      Contract.Type            AS Type,
+                      Contract.Contract         AS Name,
+                      Contract.Position        AS Position,
+                      Contract.Phone           AS Phone,
+                      Contract.Email           AS Email,
+                      Contract.Address         AS Street,
+                      Contract.City            AS City,
+                      Contract.State           AS State,
+                      Contract.Zip             AS Zip,
+                      CASE  WHEN Contract.[Type] = 0 THEN  'Customer'
+                          WHEN Contract.[Type] = 4 THEN  'Location'
+                          WHEN Contract.[Type] = 5 THEN  'Employee'
                           ELSE 'Unknown'
                       END   AS [Type]
-              FROM  Rol AS Contact
+              FROM  Rol AS Contract
               WHERE   ({$conditions}) AND ({$search})
             ) AS Tbl
       WHERE     Tbl.ROW_COUNT >= ?

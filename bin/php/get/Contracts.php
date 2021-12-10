@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [ 'read_and_close' => true ] );
+    session_start( );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
@@ -116,7 +116,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Cycle'];
       $conditions[] = "Contract.BCycle LIKE '%' + ? + '%'";
     }
-    /*if( isset($_GET[ 'Amount_Start' ] ) && !in_array( $_GET[ 'Amount_Start' ], array( '', ' ', null ) ) ){
+    if( isset($_GET[ 'Amount_Start' ] ) && !in_array( $_GET[ 'Amount_Start' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Amount_Start'];
       $conditions[] = "Contract.BAmt >= ?";
     }
@@ -151,9 +151,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( isset($_GET[ 'Remarks' ] ) && !in_array( $_GET[ 'Remarks' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Remarks'];
       $conditions[] = "Job.Remarks LIKE '%' + ? + '%'";
-    }*/
+    }
 
-    /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
+    if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
       $parameters[] = $_GET['Search'];
       $search[] = "Contract.ID LIKE '%' + ? + '%'";
@@ -167,7 +167,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Search'];
       $search[] = "Job.fDesc LIKE '%' + ? + '%'";
 
-    }*/
+    }
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
@@ -251,35 +251,44 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters
     ) or die(print_r(sqlsrv_errors()));
 
-    $sQueryRow = "SELECT  Count( Contract.ID ) AS Count
-                FROM    Contract
-                LEFT JOIN Loc          ON Contract.Loc = Loc.Loc
-                LEFT JOIN (
-                    SELECT  Owner.ID,
-                            Rol.Name
-                    FROM    Owner
-                            LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                ) AS Customer ON Loc.Owner = Customer.ID
-                LEFT JOIN Job          ON Contract.Job = Job.ID
-        WHERE   ({$conditions})  AND ({$search});";
+    $sQueryRow = "SELECT  Contract.ID         AS ID
+                  FROM    Contract
+                          LEFT JOIN Loc          ON Contract.Loc = Loc.Loc
+                          LEFT JOIN (
+                              SELECT  Owner.ID,
+                                      Rol.Name
+                              FROM    Owner
+                                      LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                          ) AS Customer ON Loc.Owner = Customer.ID
+                          LEFT JOIN Job          ON Contract.Job = Job.ID
+                  WHERE   ({$conditions})  AND ({$search})";
 
-    $stmt = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+    $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
 
-    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 
-    $sQuery = " SELECT  COUNT(Contract.ID)
+    $iFilteredTotal = 0;
+    $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+    $_SESSION[ 'Tables' ][ 'Contracts' ] = isset( $_SESSION[ 'Tables' ][ 'Contracts' ]  ) ? $_SESSION[ 'Tables' ][ 'Contracts' ] : array( );
+    if( count( $_SESSION[ 'Tables' ][ 'Contracts' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Contracts' ] as &$Value ){ $Value = false; } }
+    $_SESSION[ 'Tables' ][ 'Contracts' ][ 0 ] = $_GET;
+    while( $Row = sqlsrv_fetch_array( $fResult ) ){
+        $_SESSION[ 'Tables' ][ 'Contracts' ][ $Row[ 'ID' ] ] = true;
+        $iFilteredTotal++;
+    }
+
+    $parameters = array( );
+    $sQuery = " SELECT  COUNT( Contract.ID)
                 FROM    Contract;";
-
-    $rResultTotal = \singleton\database::getInstance( )->query( null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
+    $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
 
     $output = array(
-        'sEcho'         =>  intval( $_GET['draw'] ),
+        'sEcho'         =>  intval( $_GET[ 'draw' ] ),
         'iTotalRecords'     =>  $iTotal,
         'iTotalDisplayRecords'  =>  $iFilteredTotal,
         'aaData'        =>  array(),
-        'options' => array( )
+        'options'       => array( )
     );
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Start_Date' ]      = is_null( $Row[ 'Start_Date' ] )       ? null : date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );

@@ -13,9 +13,11 @@ function search( link ){
                     data    : {
                         search : $('input:visible[name="Search"]').val(),
                         ID :  $('input:visible[name="ID"]').val( ),
+                        Contact :  $('input:visible[name="Contact"]:visible').val( ),
+                        Type :  $('select:visible[name="Type"]:visible').val( ),
+                        Name :  $('input:visible[name="Name"]:visible').val( ),
                         Phone : $('input:visible[name="Phone"]').val( ),
                         Customer :  $('input:visible[name="Customer"]').val( ),
-                        Name :  $('input:visible[name="Name"]:visible').val( ),
                         Type : $('select:visible[name="Type"]').val( ),
                         Division : $('select:visible[name="Division"]').val( ),
                         Route : $('select:visible[name="Route"]').val( ),
@@ -81,12 +83,11 @@ $(document).ready(function( ){
                             dir : d.order[0].dir
                         },
                         ID :  $('input:visible[name="ID"]').val( ),
-                        Type :  $('input:visible[name="Type"]').val( ),
-                        Entity :  $('input:visible[name="Entity"]').val( ),
+                        Contact :  $('input:visible[name="Contact"]').val( ),
+                        Type :  $('select:visible[name="Type"]').val( ),
+                        Name :  $('input:visible[name="Name"]').val( ),
+                        Position : $('input:visible[name="Position"]').val( ),
                         Customer :  $('input:visible[name="Customer"]').val( ),
-                        Type : $('select:visible[name="Type"]').val( ),
-                        Name : $('input:visible[name="Name"]').val( ),
-                        Positon : $('select:visible[name="Position"]').val( ),
                         Phone : $('input:visible[name="Phone"]').val( ),
                         Email :  $('input:visible[name="Email"]').val( ),
                         Address :  $('input:visible[name="Address"]').val( ),
@@ -111,13 +112,13 @@ $(document).ready(function( ){
                     }
                 }
             },{
-                data : 'Name',
+                data : 'Contact',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
                             return  row.ID !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Contact + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -127,25 +128,25 @@ $(document).ready(function( ){
             },{
                 data : 'Type'
             },{
-              data : 'Entity',
+              data : 'Name',
               render : function( data, type, row, meta ){
                   switch( type ){
                       case 'display' :
-                        return row.Entity !== null
+                        return row.Name !== null
                             ?   (
                                     row.Type == 'Customer'
                                         ?   "<div class='row'>" +
-                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
+                                                "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
                                             "</div>"
                                         :   (
                                                 row.Type == 'Location'
                                                     ?   "<div class='row'>" +
-                                                            "<div class='col-12'><a href='location.php?Name=" + row.Entity + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
+                                                            "<div class='col-12'><a href='location.php?Name=" + row.Name + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
                                                         "</div>"
                                                     :   (
                                                             row.Type == 'Employee'
                                                                 ?   "<div class='row'>" +
-                                                                        "<div class='col-12'><a href='employee.php?Name=" + row.Entity + "'><i class='fa fa-users fa-fw fa-1x'></i>" + row.Entity + "</a></div>" +
+                                                                        "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><i class='fa fa-users fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
                                                                     "</div>"
                                                                 : null
                                                         )
