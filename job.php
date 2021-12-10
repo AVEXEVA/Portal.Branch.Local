@@ -598,41 +598,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Job', 'Jobs', $Job[ 'ID' ] );?>
         <div class='card-body bg-dark text-white'>
           <div class='row g-0' data-masonry='{"percentPosition": true }'>
-            <?php if( !in_array( $Job[ 'Location_Latitude' ], array( null, 0 ) ) && !in_array( $Job['Location_Longitude' ], array( null, 0 ) ) ){
-              ?><div class='card card-primary my-3 col-12 col-lg-3'>
-                <div class='card-heading position-relative' style='z-index:1;'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Map</span></h5></div>
-                    <div class='col-2'>&nbsp;</div>
-                  </div>
-                </div>
-                <div id='customer_map' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
-                <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-                <script type="text/javascript">
-                  var map;
-                  function initialize() {
-                     map = new google.maps.Map(
-                        document.getElementById( 'location_map' ),
-                        {
-                          zoom: 10,
-                          center: new google.maps.LatLng( <?php echo $Job[ 'Location_Latitude' ];?>, <?php echo $Job[ 'Location_Longitude' ];?> ),
-                          mapTypeId: google.maps.MapTypeId.ROADMAP
-                        }
-                    );
-                    var markers = [];
-                    markers[0] = new google.maps.Marker({
-                        position: {
-                            lat:<?php echo $Job['Location_Latitude'];?>,
-                            lng:<?php echo $Job['Location_Longitude'];?>
-                        },
-                        map: map,
-                        title: '<?php echo $Job[ 'Name' ];?>'
-                    });
-                  }
-                  $(document).ready(function(){ initialize(); });
-              </script>
-              </div><?php
-            }?>
+            <?php \singleton\bootstrap::getInstance( )->card_map( 'job_map', $Job[ 'Name' ], $Job[ 'Location_Latitude' ], $Job[ 'Location_Longitude' ] );?>
           <div class='card card-primary my-3 col-12 col-lg-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infom ation' ] == 0 ? "style='display:none;'" : null;?>>

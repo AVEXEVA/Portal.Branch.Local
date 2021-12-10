@@ -140,7 +140,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     En_Route.Count AS En_Route,
                                     On_Site.Count AS On_Site,
                                     Reviewing.Count AS Reviewing
-                            FROM    Job AS Job 
+                            FROM    Emp AS Employee
                                     LEFT JOIN (
                                       SELECT    TicketO.fWork AS Work_ID,
                                                 Count( TicketO.ID ) AS Count
@@ -355,83 +355,46 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require(bin_php .'element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
       <div class='card card-primary'>
-        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Employee', 'Employees', $Employee[ 'ID' ] );?>
-        <div class='card-body bg-dark text-white'>
-            <div class='row g-0' data-masonry='{"percentPosition": true }'>
-                <?php if( !in_array( $Employee[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Employee['Longitude' ], array( null, 0 ) ) ){
-                    ?><div class='card card-primary my-3 col-12 col-lg-3'>
-                        <div class='card-heading position-relative' style='z-index:1;'>
-                            <div class='row g-0 px-3 py-2'>
-                                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Map</span></h5></div>
-                                <div class='col-2'>&nbsp;</div>
-                            </div>
-                        </div>
-                        <div id='customer_map' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
-                        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-                        <script type="text/javascript">
-			                var map;
-			                function initialize() {
-			                     map = new google.maps.Map(
-			                        document.getElementById( 'customer_map' ),
-			                        {
-			                          zoom: 10,
-			                          center: new google.maps.LatLng( <?php echo $Employee[ 'Latitude' ];?>, <?php echo $Employee[ 'Longitude' ];?> ),
-			                          mapTypeId: google.maps.MapTypeId.ROADMAP
-			                        }
-			                    );
-			                    var markers = [];
-			                    markers[0] = new google.maps.Marker({
-			                        position: {
-			                            lat:<?php echo $Employee['Latitude'];?>,
-			                            lng:<?php echo $Employee['Longitude'];?>
-			                        },
-			                        map: map,
-			                        title: '<?php echo $Employee[ 'Name' ];?>'
-			                    });
-			                }
-			                $(document).ready(function(){ initialize(); });
-			            </script>
-                    </div><?php
-                }?>
-                <div class='card card-primary my-3 col-12 col-lg-3'>
-                    <div class='card-heading'>
-                        <div class='row g-0 px-3 py-2'>
-                            <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                            <div class='col-2'>&nbsp;</div>
+        <form action='job.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+            <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
+            <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Employee', 'Employees', $Employee[ 'ID' ] );?>
+            <div class='card-body bg-dark text-white'>
+                <div class='row g-0' data-masonry='{"percentPosition": true }'>
+                    <?php \singleton\bootstrap::getInstance( )->card_map( 'employee_map', $Employee[ 'Name' ], $Employee[ 'Latitude' ], $Employee[ 'Longitude' ] );?>
+                    <div class='card card-primary my-3 col-12 col-lg-3'>
+                        <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
+                        <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                            <?php 
+                                \singleton\bootstrap::getInstance( )->card_row_form_input( 'First_Name', $Employee[ 'First_Name' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input( 'Last_Name', $Employee[ 'Last_Name' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', $Employee[ 'Title' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input( 'Supervisor', $Employee[ 'Supervisor' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $Employee[ 'Email' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_tel( 'Phone', $Employee[ 'Phone' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Employee['Street'].' '.$Employee['City'].' '.$Employee[ 'State' ].' '.$Employee[ 'Zip' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Employee[ 'Street' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Employee[ 'City' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Employee[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Employee[ 'Zip' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Latitude',  $Employee[ 'Latitude' ] );
+                                \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Longitude',  $Employee[ 'Longitude' ] );
+                            ?>
                         </div>
                     </div>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                        <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
-                        <?php 
-                            \singleton\bootstrap::getInstance( )->card_row_form_input( 'First_Name', $Employee[ 'First_Name' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Last_Name', $Employee[ 'Last_Name' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', $Employee[ 'Title' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Supervisor', $Employee[ 'Supervisor' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $Employee[ 'Email' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_tel( 'Phone', $Employee[ 'Phone' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Employee['Street'].' '.$Employee['City'].' '.$Employee[ 'State' ].' '.$Employee[ 'Zip' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Employee[ 'Street' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Employee[ 'City' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Employee[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Employee[ 'Zip' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Latitude',  $Employee[ 'Latitude' ] );
-                            \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Longitude',  $Employee[ 'Longitude' ] );
-                        ?>
-                    </div>
-                </div>
-                <div class='card card-primary my-3 col-12 col-lg-3'>
-                    <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Employee', $Employee[ 'ID' ] );?>
-                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                        <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Employee=' . $Employee[ 'ID' ] );?>
-                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Employee[ 'Tickets_Open' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] . '&Status=0');?>
-                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Employee[ 'Tickets_Assigned' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=1';?>
-                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Employee[ 'Tickets_En_Route' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=2';?>
-                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Employee[ 'Tickets_On_Site' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=3';?>
-                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Employee[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=6';?>
+                    <div class='card card-primary my-3 col-12 col-lg-3'>
+                        <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Employee', $Employee[ 'ID' ] );?>
+                        <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Employee=' . $Employee[ 'ID' ] );?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Employee[ 'Tickets_Open' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] . '&Status=0');?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Employee[ 'Tickets_Assigned' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=1';?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Employee[ 'Tickets_En_Route' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=2';?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Employee[ 'Tickets_On_Site' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=3';?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Employee[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=6';?>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </body>
 </html>
