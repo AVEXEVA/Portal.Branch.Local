@@ -138,7 +138,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Violation.Custom17  AS Repair,
                   Violation.Custom18  AS Code,
                   Violation.Custom19  AS Division_4,
-                  Violation.Custom20  AS Complete
+                  Violation.Custom20  AS Complete,
+                  Violation.Custom21  AS Custom21,
+                  Violation.Custom22  AS Custom22,
+                  Violation.Custom23  AS Custom23,
+                  Violation.Custom24  AS Custom24,
+                  Violation.Custom25  AS Custom25,
+                  Violation.Custom26  AS Custom26,
+                  Violation.Custom27  AS Custom27,
+                  Violation.Custom28  AS Custom28,
+                  Violation.Custom29  AS Custom29,
+                  Violation.Custom30  AS Custom30
 		      FROM    Violation
                   LEFT JOIN Job                      ON Violation.Job   = Job.ID
                   LEFT JOIN (
@@ -151,8 +161,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   LEFT JOIN Elev       AS Unit       ON Violation.Elev  = Unit.ID
                   LEFT JOIN Quote      AS Quote      ON Violation.Quote = Quote.Ref
                   LEFT JOIN Inspection AS Inspection ON Violation.ID    = Inspection.Violation
-        	WHERE   	Violation.ID = ?
-        			OR 	Violation.Name = ?;",
+        	WHERE   	  Violation.ID = ?
+                  OR 	Violation.Name = ?;",
         array(
         	$ID,
         	$Name
@@ -351,7 +361,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Proposal', 'Proposals', $Violation[ 'Proposal_ID' ], $Violation[ 'Proposal_ID' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Inspection', 'Inspections', $Violation[ 'Inspection_ID' ], $Violation[ 'Inspection_Name' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Price', $Violation[ 'Price' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Note', $Job[ 'Note' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Note', $Violation[ 'Note' ] );?>
               </div>
             </div>
             <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
@@ -371,92 +381,32 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             </div>
           <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Assignments' );?>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Created:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Created' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Code:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Code' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Sales:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Sales' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Division #1:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Division_1' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Division #2:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Division_2' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Division #3:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Division_3' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Division #4:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Division_4' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Repair:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Repair' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Modernization:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Modernization' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Checkbox( 1 );?> Complete:</div>
-                <div class='col-6'><input type='checkbox' class='form-input edit date' name='Complete' /></div>
-              </div>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Assignments' ] ) && $_SESSION[ 'Cards' ][ 'Assignments' ] == 0 ? "style='display:none;'" : null;?>>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Created', $Violation[ 'Created' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Code', $Violation[ 'Code' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Sales', $Violation[ 'Sales' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Division_1', $Violation[ 'Division_1' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Division_2', $Violation[ 'Division_2' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Division_3', $Violation[ 'Division_3' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Division_4', $Violation[ 'Division_4' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Repair', $Violation[ 'Repair' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Modernization', $Violation[ 'Modernization' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Complete', $Violation[ 'Complete' ] );?>
             </div>
           </div>
           <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Custom Fields' );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom1:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom1' value='<?php echo is_null( $Violation[ 'File_Permit' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'File_Permit' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom2:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom2' value='<?php echo is_null( $Violation[ 'Permit_Approved' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Permit_Approved' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom3:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom3' value='<?php echo is_null( $Violation[ 'Date_Sent' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Date_Sent' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom4:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom4' value='<?php echo is_null( $Violation[ 'Forms_to_DOB' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Forms_to_DOB' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom5:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom5' value='<?php echo is_null( $Violation[ 'Inspection' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Inspection' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom6:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom6' value='<?php echo is_null( $Violation[ 'Hearing' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Hearing' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom7:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom7' value='<?php echo is_null( $Violation[ 'Due_Date' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Due_Date' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom8:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom8' value='<?php echo is_null( $Violation[ 'Forms_to_Customer' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Forms_to_Customer' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom9:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom9' value='<?php echo is_null( $Violation[ 'Recieved_from_Customer' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Recieved_from_Customer' ] ) );?>' /></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-6 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Paragraph( 1 );?> Custom10:</div>
-                <div class='col-6'><input placeholder='text' type='text' class='form-control edit' name='Custom10' value='<?php echo is_null( $Violation[ 'Cancel_Contract' ] ) ? null : date( 'm/d/Y', strtotime( $Violation[ 'Cancel_Contract' ] ) );?>' /></div>
-              </div>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom21', $Violation[ 'Custom21' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom22', $Violation[ 'Custom22' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom23', $Violation[ 'Custom23' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom24', $Violation[ 'Custom24' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom25', $Violation[ 'Custom25' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom26', $Violation[ 'Custom26' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom27', $Violation[ 'Custom27' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom28', $Violation[ 'Custom28' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom29', $Violation[ 'Custom29' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom30', $Violation[ 'Custom30' ] );?>
             </div>
           </div>
         </div>
