@@ -133,7 +133,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       [Contract].[Hours]      AS Hours,
                       [Contract].[Hour]       AS Hour,
                       [Contract].[Terms]      AS Terms,
-                      [Contract].[OffService] AS Off_Service
+                      [Contract].[OffService] AS Off_Service,
+                      CASE    WHEN Invoices.[Open] IS NULL THEN 0
+                              ELSE Invoices.[Open] END AS Invoices_Open,
+                      CASE    WHEN Invoices.[Closed] IS NULL THEN 0
+                              ELSE Invoices.[Closed] END AS Invoices_Closed
             FROM      dbo.[Contract]
                       LEFT JOIN Job AS Job      ON Job.ID = Contract.Job
                       LEFT JOIN Loc AS Location ON Location.Loc = Contract.Loc
@@ -143,6 +147,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         FROM    Owner
                                 LEFT JOIN Rol   ON Owner.Rol = Rol.ID
                       ) AS Customer             ON Customer.ID = Contract.Owner
+                      LEFT JOIN (
+                        SELECT    Job.ID AS Job,
+                                  [Open].Count AS [Open],
+                                  [Closed].Count AS Closed
+                        FROM      Job AS Job
+                                  LEFT JOIN (
+                                    SELECT    Invoice.Job AS Job,
+                                              Count( Invoice.Ref ) AS Count
+                                    FROM      Invoice
+                                    WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
+                                    GROUP BY  Invoice.Loc
+                                  ) AS [Open] ON Job.ID = [Open].Job 
+                                  LEFT JOIN (
+                                    SELECT    Invoice.Loc AS Location,
+                                              Count( Invoice.Ref ) AS Count
+                                    FROM      Invoice
+                                    WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                                    GROUP BY  Invoice.Loc
+                                  ) AS [Closed] ON Job.ID = [Closed].Job 
+                      ) AS Invoices ON Invoices.Job = Job.ID
             WHERE   	[Contract].ID = ?;",
       array(
         $ID
@@ -378,11 +402,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-  <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-  <?php	require( bin_meta . 'index.php');?>
-  <?php	require( bin_css  . 'index.php');?>
-  <?php  require( bin_js   . 'index.php');?>
+  <?php  
+    $_GET[ 'Bootstrap' ] = '5.1';
+    $_GET[ 'Entity_CSS' ] = 1;
+    require( bin_meta . 'index.php');
+    require( bin_css  . 'index.php');
+    require( bin_js   . 'index.php');
+  ?>
 </head>
 <body>
   <div id="wrapper">
@@ -410,15 +436,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Finish', $Contract[ 'Billing_Finish' ], 'Finish' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Length', $Contract[ 'Billing_Length' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Length', $Contract[ 'Billing_Length' ] );
-                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Cycle', $Contract[ 'Billing_Cycle' ],  array(
-                      0 => 'Monthly',
-                      1 => 'Bi-Monthly',
-                      2 => 'Quarterly',
-                      3 => 'Trimester',
-                      4 => 'Semi-Annually',
-                      5 => 'Annually',
-                      6 => 'Never'
-                    ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Billing_Amount', $Contract[ 'Billing_Amount' ] );
                   ?>
                 </div>
@@ -428,66 +446,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Escalation' ] ) && $_SESSION[ 'Cards' ][ 'Escalation' ] == 0 ? "style='display:none;'" : null;?>>
                   <?php 
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Escalation_Last', $Contract[ 'Escalation_Last' ], 'Escalated' );
-                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Escalation_Cycle', $Contract[ 'Billing_Cycle' ],  array(
-                      0 => 'Monthly',
-                      1 => 'Bi-Monthly',
-                      2 => 'Quarterly',
-                      3 => 'Trimester',
-                      4 => 'Semi-Annually',
-                      5 => 'Annually',
-                      6 => 'Never'
-                    ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Escalation_Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Escalation_Factor', $Contract[ 'Billing_Escalation_Factor' ], 'Factor' );
                   ?>
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices' ); ?>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Invoices', 'Invoices', 'invoices.php?Job=' . $Contract[ 'Job_Name' ] );?>
-                  <?php if(isset($Privileges['Invoice']) ) {?>
-                    <div class='row g-0'>
-                      <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                        $r = \singleton\database::getInstance( )->query(
-                          null,
-                          " SELECT  Count( OpenAR.Ref ) AS Count
-                            FROM    OpenAR
-                                    LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                            WHERE   OpenAR.Job = ?;",
-                          array(
-                          $Contract[ 'Job_ID' ]
-                          )
-                        );
-                        $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                        echo $Count;
-                      ?>' /></div>
-                      <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                    </div>
-                  <?php }?>
-                  <?php if(isset($Privileges['Invoice']) ) {?>
-                    <div class='row g-0'>
-                      <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
-                      <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                        $r = \singleton\database::getInstance( )->query(
-                          null,
-                          " SELECT  Count( Invoice.Ref ) AS Count
-                            FROM    Invoice
-                                    LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                            WHERE       Invoice.Job = ?
-                                    AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR );",
-                          array(
-                          $Contract[ 'Job_ID' ]
-                          )
-                        );
-                        $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                        echo $Count;
-                      ?>' /></div>
-                      <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Customer=<?php echo $Customer[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                    </div>
-                  <?php }?>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Contract', $Contract[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $Contract[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Contract=' . $Contract[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Contract[ 'Invoices_Open' ], true, true, 'invoices.php?Contract=' . $Contract[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Contract[ 'Invoices_Closed' ], true, true, 'invoices.php?Contract=' . $Contract[ 'ID' ] ) . '&Status=1';?>
                 </div>
               </div>
             </div>
