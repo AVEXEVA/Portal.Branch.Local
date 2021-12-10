@@ -635,7 +635,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             }?>
           <div class='card card-primary my-3 col-12 col-lg-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infom ation' ] == 0 ? "style='display:none;'" : null;?>>
               <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Job[ 'Name' ] );?>
               <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Job[ 'Date' ] );?>
               <?php
