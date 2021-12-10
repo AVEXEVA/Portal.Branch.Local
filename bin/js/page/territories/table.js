@@ -104,6 +104,20 @@ $( document ).ready( function( ){
                       }
                   }
               },{
+                data : 'Name',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
+                    }
+                }
+            },{
                   data : 'Location',
                   render : function( data, type, row, meta ){
                       switch( type ){

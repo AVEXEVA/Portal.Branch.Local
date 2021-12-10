@@ -56,19 +56,65 @@ $( document ).ready( function( ){
                   }
 
               }
+            },{
+              data : 'Route',
+              render : function( data, type, row, meta ){
+                  switch( type ){
+                      case 'display' :
+                          return  row.ID !== null
+                              ?   "<div class='row'>" +
+                                      "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-road fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                  "</div>"
+                              :   null;
+                      default :
+                          return data;
+                  }
+              }
           },{
-            data : 'Name'
-          },{
-            data : 'Person'
+            data : 'Person',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='routes.php?ID=" + row.ID + "'><i class='fa fa-user fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+              }
           },{
             data : 'Locations'
           },{
-            data : 'Units'
-          },
-          {
-           data : 'Violation' 
-         },
-         {
+            data : 'Units',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Units !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='units.php?Routes=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                  }
+              }
+            },{
+            data : 'Violations',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Tickets !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='violations.php?Routes=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+              }
+          },{
           data : 'Assigned' ,
           render : function( data, type, row, meta ){
           switch(data){
@@ -84,9 +130,9 @@ $( document ).ready( function( ){
             default :
               return data;
 
+              }
+            }
           }
-          }
-         }
          }
       ],
       order : [ [ 1, 'asc' ] ],

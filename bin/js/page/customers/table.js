@@ -144,7 +144,6 @@ $( document ).ready( function( ){
                         default :
                             return data;
                     }
-
                 }
             },{
                 data : 'Invoices',

@@ -50,9 +50,9 @@ $( document ).ready( function( ){
         render : function( data, type, row, meta ){
             switch( type ){
                 case 'display' :
-                    return  row.ID !== null 
-                        ?   "<div class='row'>" + 
-                                "<div class='col-12'><a href='proposal.php?ID=" + row.ID + "'><i class='fa fa-ticket fa-fw fa-1x'></i> Proposal #" + row.ID + "</a></div>" + 
+                    return  row.ID !== null
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='proposal.php?ID=" + row.ID + "'><i class='fa fa-ticket fa-fw fa-1x'></i> Proposal #" + row.ID + "</a></div>" +
                             "</div>"
                         :   null;
                 default :
@@ -67,7 +67,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Territory_ID !== null
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'>" + row.Territory_Name + "</a></div>" +
+                              "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-black-tie fa-fw fa-1x'></i> Proposal #" + row.Territory_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -81,7 +81,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Customer_ID !== null && row.Customer_ID != ''
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'>" + row.Customer_Name + "</a></div>" +
+                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i> Proposal #" + row.Customer_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -95,7 +95,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Location_ID !== null && row.Location_ID != ''
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='customer.php?ID=" + row.Location_ID + "'>" + row.Location_Name + "</a></div>" +
+                              "<div class='col-12'><a href='customer.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i> Proposal #" + row.Location_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -109,7 +109,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Contact_ID !== null
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'>" + row.Contact_Name + "</a></div>" +
+                              "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><i class='fa fa-user fa-fw fa-1x'></i> Proposal #" + row.Contact_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -119,11 +119,11 @@ $( document ).ready( function( ){
       }
     },{
       data : 'Title'
-    },{ 
+    },{
       data : 'Status'
     },{
       data : 'Contact_Phone'
-    },{ 
+    },{
       data : 'Contact_Email'
     },{
       data : 'Contact_Street',
@@ -131,13 +131,13 @@ $( document ).ready( function( ){
           switch( type ){
               case 'display' :
                   return  row.Contact_Street !== null && row.Contact_Street != ''
-                      ?   "<div class='row'>" + 
+                      ?   "<div class='row'>" +
                               "<div class='col-12'>" +
                                   "<div class='row' onClick=\"document.location.href='https://www.google.com/maps/search/?api=1&query=" + encodeURI( row.Contact_Street + ' ' + row.Contact_City + ' ' + row.Contact_State + ' ' + row.Contact_Zip ) + "';\">" +
-                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Contact_Street + "</div>" + 
-                                      "<div class='col-12'>" + row.Contact_City + ", " + row.Contact_State + " " + row.Contact_Zip + "</div>" + 
+                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Contact_Street + "</div>" +
+                                      "<div class='col-12'>" + row.Contact_City + ", " + row.Contact_State + " " + row.Contact_Zip + "</div>" +
                                   "</div>" +
-                              "</div>" +  
+                              "</div>" +
                           "</div>"
                       :   null;
               default :
