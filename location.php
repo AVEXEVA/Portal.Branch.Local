@@ -152,7 +152,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     CASE    WHEN Violations.Preliminary IS NULL THEN 0
                             ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
                     CASE    WHEN Violations.Job_Created IS NULL THEN 0
-                            ELSE Violations.Job_Created END AS Violations_Job_Created
+                            ELSE Violations.Job_Created END AS Violations_Job_Created,
+                    CASE    WHEN Invoices.[Open] IS NULL THEN 0
+                            ELSE Invoices.[Open] END AS Invoices_Open,
+                    CASE    WHEN Invoices.[Closed] IS NULL THEN 0
+                            ELSE Invoices.[Closed] END AS Invoices_Closed,
+                    CASE    WHEN Proposals.[Open] IS NULL THEN 0
+                            ELSE Proposals.[Open] END AS Proposals_Open,
+                    CASE    WHEN Proposals.[Closed] IS NULL THEN 0
+                            ELSE Proposals.[Closed] END AS Proposals_Closed
             FROM    Loc AS Location
                     LEFT JOIN Zone  AS Division  ON Location.Zone   = Division.ID
                     LEFT JOIN Terr  AS Territory ON Territory.ID    = Location.Terr
@@ -305,6 +313,46 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 GROUP BY  Location.Loc
                               ) AS Job_Created ON Job_Created.Location = Location.Loc
                   ) AS Violations ON Violations.Location = Location.Loc
+                  LEFT JOIN (
+                    SELECT    Location.Loc AS Location,
+                              [Open].Count AS [Open],
+                              [Closed].Count AS Closed
+                    FROM      Loc AS Location
+                              LEFT JOIN (
+                                SELECT    Invoice.Loc AS Location,
+                                          Count( Invoice.Ref ) AS Count
+                                FROM      Invoice
+                                WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
+                                GROUP BY  Invoice.Loc
+                              ) AS [Open] ON Location.Loc = [Open].Location 
+                              LEFT JOIN (
+                                SELECT    Invoice.Loc AS Location,
+                                          Count( Invoice.Ref ) AS Count
+                                FROM      Invoice
+                                WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                                GROUP BY  Invoice.Loc
+                              ) AS [Closed] ON Location.Loc = [Closed].Location 
+                  ) AS Invoices ON Invoices.Location = Location.Loc
+                  LEFT JOIN (
+                    SELECT    Location.ID AS Location,
+                              [Open].Count AS [Open],
+                              [Closed].Count AS Closed
+                    FROM      Loc AS Location
+                              LEFT JOIN (
+                                SELECT    Estimate.LocID AS Location,
+                                          Count( Estimate.ID ) AS Count
+                                FROM      Estimate
+                                WHERE     Estimate.Status = 0
+                                GROUP BY  Estimate.LocID
+                              ) AS [Open] ON Location.ID = [Open].Location 
+                              LEFT JOIN (
+                                SELECT    Estimate.LocID AS Location,
+                                          Count( Estimate.ID ) AS Count
+                                FROM      Estimate
+                                WHERE     Estimate.Status = 1
+                                GROUP BY  Estimate.LocID
+                              ) AS [Closed] ON Location.ID = [Closed].Location 
+                  ) AS Proposals ON Proposals.Location = Location.Loc
 
             WHERE   	Location.Loc = ?
             		  OR 	Location.Tag = ?;",
@@ -327,8 +375,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	'Maintenance' => null,
     	'Geofence' => null,
     	'Sales_Tax' => null,
-    	'Customer_ID' => null,
-    	'Customer_Name' => isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null,
+    	'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+    	'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
     	'Division_ID' => null,
     	'Division_Name' => isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null,
     	'Route_ID' => null,
@@ -354,20 +402,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	$Location[ 'Sales_Tax' ] = isset( $_POST[ 'Sales_Tax' ] ) ? $_POST[ 'Sales_Tax' ] : $Location[ 'Sales_Tax' ];
     	$Location[ 'In_Use' ] = isset( $_POST[ 'In_Use' ] ) ? $_POST[ 'In_Use' ] : $Location[ 'In_Use' ];
     	$Location[ 'Customer_ID' ] = isset( $_POST[ 'Customer_ID' ] ) ? $_POST[ 'Customer_ID' ] : $Location[ 'Customer_ID' ];
-    	$Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer' ] ) ? $_POST[ 'Customer' ] : $Location[ 'Customer_Name' ];
+    	$Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Location[ 'Customer_Name' ];
 
     	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
     		$result = \singleton\database::getInstance( )->query(
 	    		null,
 	    		"	DECLARE @MAXID INT;
-	    			DECLARE @OwnerID INT;
-        			SET @MAXID = CASE WHEN ( SELECT Max( Loc ) FROM dbo.Loc ) IS NULL THEN 0 ELSE ( SELECT Max( Loc ) FROM dbo.Loc ) END;
-        			SET @OwnerID = ( SELECT Top 1 Owner.ID FROM dbo.Owner LEFT JOIN dbo.Rol ON Owner.Rol = Rol.ID WHERE Rol.Name = ? );
-        			INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse )
-	    			VALUES( @MAXID + 1, @OwnerID, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
-        			SELECT @MAXID + 1;",
+        		SET @MAXID = CASE WHEN ( SELECT Max( Loc ) FROM dbo.Loc ) IS NULL THEN 0 ELSE ( SELECT Max( Loc ) FROM dbo.Loc ) END;
+        		INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse )
+	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        		SELECT @MAXID + 1;",
 	    		array(
-	    			$Location[ 'Customer_Name' ],
+	    			$Location[ 'Customer_ID' ],
 	    			$Location[ 'Name' ],
 	    			$Location[ 'Status' ],
 	    			$Location[ 'Street' ],
@@ -440,256 +486,136 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <div id="wrapper">
     <?php require( bin_php . 'element/navigation.php');?>
     <div id="page-wrapper" class='content'>
-      <div class='card card-primary border-0'><form action='location.php?ID=<?php echo $Location[ 'ID' ];?>' method='POST'>
-        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Location', 'Locations', $Location[ 'ID' ] );?>
-				<div class='card-body bg-dark text-white'>
-          <div class='row g-0' data-masonry='{"percentPosition": true }'>
-            <?php if( !in_array( $Location[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Location['Longitude' ], array( null, 0 ) ) ){
-              ?><div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Map' );?>
-                <div class='card-body bg-darker'>
-                  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-                  <script type="text/javascript">
-                    var map;
-                    function initialize() {
-                      map = new google.maps.Map(
-                        document.getElementById( 'location_map' ),
-                        {
-                          zoom: 10,
-                          center: new google.maps.LatLng( <?php echo $Location[ 'Latitude' ];?>, <?php echo $Location[ 'Longitude' ];?> ),
-                          mapTypeId: google.maps.MapTypeId.ROADMAP
-                        }
-                      );
-                      var markers = [];
-                      markers[0] = new google.maps.Marker({
-                        position: {
-                          lat:<?php echo $Location['Latitude'];?>,
-                          lng:<?php echo $Location['Longitude'];?>
-                        },
-                        map: map,
-                        title: '<?php echo $Location[ 'Name' ];?>'
-                      });
-                    }
-                    $(document).ready(function(){ initialize(); });
-                  </script>
-                  <div class='card-body'>
-                    <div id='location_map' class='map'>&nbsp;</div>
+      <div class='card card-primary border-0'>
+        <form action='location.php?ID=<?php echo $Location[ 'ID' ];?>' method='POST'>
+          <input type='hidden' name='ID' value='<?php echo $Location[ 'ID' ];?>' />
+          <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Location', 'Locations', $Location[ 'ID' ] );?>
+  				<div class='card-body bg-dark text-white'>
+            <div class='row g-0' data-masonry='{"percentPosition": true }'>
+              <?php if( !in_array( $Location[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Location['Longitude' ], array( null, 0 ) ) ){
+                ?><div class='card card-primary my-3 col-12 col-lg-3'>
+                  <?php \singleton\bootstrap::getInstance( )->card_header( 'Map' );?>
+                  <div class='card-body bg-darker'>
+                    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+                    <script type="text/javascript">
+                      var map;
+                      function initialize() {
+                        map = new google.maps.Map(
+                          document.getElementById( 'location_map' ),
+                          {
+                            zoom: 10,
+                            center: new google.maps.LatLng( <?php echo $Location[ 'Latitude' ];?>, <?php echo $Location[ 'Longitude' ];?> ),
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                          }
+                        );
+                        var markers = [];
+                        markers[0] = new google.maps.Marker({
+                          position: {
+                            lat:<?php echo $Location['Latitude'];?>,
+                            lng:<?php echo $Location['Longitude'];?>
+                          },
+                          map: map,
+                          title: '<?php echo $Location[ 'Name' ];?>'
+                        });
+                      }
+                      $(document).ready(function(){ initialize(); });
+                    </script>
+                    <div class='card-body'>
+                      <div id='location_map' class='map'>&nbsp;</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            <?php }?>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php 
-                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Location[ 'Name' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Location[ 'Customer_ID' ], $Location[ 'Customer_Name' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Location[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );
-                  \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Territory', 'Territories', $Location[ 'Territory_ID' ], $Location[ 'Territory_Name' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Location['Street'].' '.$Location['City'].' '.$Location[ 'State' ].' '.$Location[ 'Zip' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Location[ 'Street' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Location[ 'City' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Location[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Location[ 'Zip' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Latitude',  $Location[ 'Latitude' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Longitude',  $Location[ 'Longitude' ] );
+              <?php }?>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php 
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Location[ 'Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Location[ 'Customer_ID' ], $Location[ 'Customer_Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Location[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Territory', 'Territories', $Location[ 'Territory_ID' ], $Location[ 'Territory_Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Location['Street'].' '.$Location['City'].' '.$Location[ 'State' ].' '.$Location[ 'Zip' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Location[ 'Street' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Location[ 'City' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Location[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Location[ 'Zip' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Latitude',  $Location[ 'Latitude' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Longitude',  $Location[ 'Longitude' ] );
+                  ?>
+                </div>
+  					 </div>
+  					 <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Maintenance' );?>
+  						<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+  							<?php 
+                  \singleton\bootstrap::getInstance( )->card_row_form_select( 'Maintenance', $Location[ 'Maintenance' ], array(
+                      0 => 'Disabled',
+                      1 => 'Enabled'
+                  ) );
+                  \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Division', 'Divisions', $Location[ 'Division_ID' ], $Location[ 'Division_Name' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Route', 'Routes', $Location[ 'Route_ID' ], $Location[ 'Route_Name' ] );
                 ?>
-              </div>
-					 </div>
-					 <div class='card card-primary my-3 col-12 col-lg-3'>
-            <?php \singleton\bootstrap::getInstance( )->card_header( 'Maintenance' );?>
-						<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-							<?php 
-                \singleton\bootstrap::getInstance( )->card_row_form_select( 'Maintenance', $Location[ 'Maintenance' ], array(
-                    0 => 'Disabled',
-                    1 => 'Enabled'
-                ) );
-                \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Division', 'Divisions', $Location[ 'Division_ID' ], $Location[ 'Division_Name' ] );
-                \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Route', 'Routes', $Location[ 'Route_ID' ], $Location[ 'Route_Name' ] );
-              ?>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Location', $Location[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Location=' . $Location[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Tickets_Open' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Location[ 'Tickets_Assigned' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Location[ 'Tickets_En_Route' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=2';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Location[ 'Tickets_On_Site' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=3';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Location[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=6';?>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Location', $Location[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Location=' . $Location[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Location[ 'Units_Elevators' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] . '&Type=Elevator');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Location[ 'Units_Escalators' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Escalator';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Location[ 'Units_Other' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Other';?>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Jobs', 'Job', 'Jobs', 'Location', $Location[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Jobs' ] ) && $_SESSION[ 'Cards' ][ 'Jobs' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'jobs.php?Location=' . $Location[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Jobs_Open' ], true, true, 'jobs.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Hold', $Location[ 'Jobs_On_Hold' ], true, true, 'jobs.php?Location=' . $Location[ 'ID' ] ) . '&Status=2';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Location[ 'Jobs_Closed' ], true, true, 'jobs.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Location', $Location[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Location=' . $Location[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Location[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Location=' . $Location[ 'ID' ] . '&Status=Preliminary Report');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Location[ 'Violations_Job_Created' ], true, true, 'violations.php?Location=' . $Location[ 'ID' ] ) . '&Status=Job Created';?>
-              </div>
-            </div>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Proposal( 1 );?><span>Proposals</span></h5></div>
-                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='proposal.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='proposals.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-            </div>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Proposal(1);?> Status</div>
-                  <div class='col-6'>&nbsp;</div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Open</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Proposals' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,"
-                    SELECT 	Count(Estimate.ID) AS Proposals
-                    FROM   	Estimate
-                          LEFT JOIN Loc AS Location ON Estimate.LocID = Location.Loc
-                    WHERE  		Location.Owner = ?
-                        AND Estimate.Status = 0
-                  ;",array($Location[ 'ID' ]));
-                  echo $r ? sqlsrv_fetch_array($r)['Proposals'] : 0;
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='proposals.php?Location=<?php echo $Location[ 'Name' ];?>&Status=0';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Awarded</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Proposals' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,"
-                    SELECT 	Count(Estimate.ID) AS Proposals
-                    FROM   	Estimate
-                          LEFT JOIN Loc AS Location ON Estimate.LocID = Location.Loc
-                    WHERE  		Location.Owner = ?
-                        AND Estimate.Status = 4
-                  ;",array($Location[ 'ID' ]));
-                  echo $r ? sqlsrv_fetch_array($r)['Proposals'] : 0;
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='proposals.php?Location=<?php echo $Location[ 'Name' ];?>&Status=4';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-            </div>
-          </div>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-8'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Invoices</span></h5></div>
-                <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='invoice.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Add( 1 );?></button></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='invoices.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-            </div>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Admins' ] ) && $_SESSION[ 'Cards' ][ 'Admins' ] == 0 ? "style='display:none;'" : null;?>>
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
-                  <div class='col-6'>&nbsp;</div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-              <?php if(isset($Privileges['Invoice']) ) {?>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Open</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,"
-                    SELECT Count( OpenAR.Ref ) AS Count
-                    FROM   OpenAR
-                         LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                    WHERE  Location.Owner = ?
-                  ;",array($Location[ 'ID' ]));
-                  $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                  echo $Count
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <?php }?>
-              <?php if(isset($Privileges['Invoice']) ) {?>
-              <div class='row g-0'>
-                <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice(1);?> Closed</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Collections' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,"
-                    SELECT 	Count( Invoice.Ref ) AS Count
-                    FROM   	Invoice
-                          LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                    WHERE  		Location.Owner = ?
-                        AND Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
-
-                  ;",array($Location[ 'ID' ]));
-                  $Count = $r ? sqlsrv_fetch_array($r)['Count'] : 0;
-                  echo $Count
-                ?>' /></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-              <?php }?>
-            </div>
-          </div>
-          <div class='card card-primary my-3'>
-            <div class='card-heading'>
-              <div class='row g-0 px-3 py-2'>
-                <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Collection( 1 );?><span>Collections</span></h5></div>
-                <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='collections.php?Location=<?php echo $Location[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-              </div>
-            </div>
-            <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
-
-              <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
-                  $r = \singleton\database::getInstance( )->query(null,"
-                    SELECT Sum( OpenAR.Balance ) AS Balance
-                    FROM   OpenAR
-                         LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                    WHERE  Location.Owner = ?
-                  ;",array($Location[ 'ID' ]));
-                  $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
-                  echo money_format('%(n',$Balance);
-                ?>' /></div>
-                <div class='col-2'>&nbsp;</div>
-              </div>
-            </div>
-          </div>
-              <div class='card card-primary my-3'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?><span>Hours</span></h5></div>
-                    <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='payroll.php?Location=<?php echo $Jobs[ 'Name' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                  </div>
                 </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Admin' ] ) && $_SESSION[ 'Cards' ][ 'Admin' ] == 0 ? "style='display:none;'" : null;?>>
-                  <div class='row g-0'>
-                      <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</div>
-                      <div class='col-6'>&nbsp;</div>
-                    <div class='col-2'>&nbsp;</div>
-                  </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Location', $Location[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Location=' . $Location[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Tickets_Open' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Location[ 'Tickets_Assigned' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Location[ 'Tickets_En_Route' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=2';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Location[ 'Tickets_On_Site' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=3';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Location[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=6';?>
+                </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Location', $Location[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Location=' . $Location[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Location[ 'Units_Elevators' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] . '&Type=Elevator');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Location[ 'Units_Escalators' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Escalator';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Location[ 'Units_Other' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Other';?>
+                </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Jobs', 'Job', 'Jobs', 'Location', $Location[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Jobs' ] ) && $_SESSION[ 'Cards' ][ 'Jobs' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'jobs.php?Location=' . $Location[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Jobs_Open' ], true, true, 'jobs.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Hold', $Location[ 'Jobs_On_Hold' ], true, true, 'jobs.php?Location=' . $Location[ 'ID' ] ) . '&Status=2';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Location[ 'Jobs_Closed' ], true, true, 'jobs.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
+                </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Location', $Location[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Location=' . $Location[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Location[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Location=' . $Location[ 'ID' ] . '&Status=Preliminary Report');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Location[ 'Violations_Job_Created' ], true, true, 'violations.php?Location=' . $Location[ 'ID' ] ) . '&Status=Job Created';?>
+                </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Proposals', 'Proposal', 'Proposals', 'Location', $Location[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Location=' . $Location[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Proposals_Open' ], true, true, 'proposals.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Location[ 'Proposals_Closed' ], true, true, 'proposals.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
+                </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Location', $Location[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Location=' . $Location[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Invoices_Open' ], true, true, 'invoices.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Location[ 'Invoices_Closed' ], true, true, 'invoices.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-			</div>
-		</div>
-	</div>
+  			</form>
+      </div>
+  	</div>
+  </div>
 </div>
 </body>
 </html><?php }
