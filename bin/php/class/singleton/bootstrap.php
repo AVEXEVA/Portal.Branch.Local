@@ -138,7 +138,7 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
 			<div class='col-1'>&nbsp;</div>
 			<?php self::card_row_label( $label, 3 );?>
-			<div class='col-8'><input placeholder='<?php echo $label;?>' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
+			<div class='col-8'><input placeholder='<?php echo $label;?>' type='text' class='form-control edit' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
         </div><?php
 	}
 	public function card_row_form_input_url( $label, $value ){
@@ -202,7 +202,7 @@ class bootstrap extends \singleton\index {
 	public function card_row_form_select( $label, $value, $options ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
-			<div class='col-8'><select name='<?php echo $key;?>' class='form-control edit'>
+			<div class='col-8'><select name='<?php echo $label;?>' class='form-control edit'>
 				<option value=''>Select</option>
 				<?php if( is_array( $options ) && count( $options ) > 0 ){ foreach( $options as $k=>$v ){
 					?><option value='<?php echo $k;?>' <?php echo $value == $k ? 'selected' : null;?>><?php echo $v;?></option>
@@ -214,7 +214,7 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
 			<div class='col-1'>&nbsp;</div>
 			<?php self::card_row_label( $label, 3 );?>
-			<div class='col-8'><select name='<?php echo $key;?>' class='form-control edit'>
+			<div class='col-8'><select name='<?php echo $label;?>' class='form-control edit'>
 				<option value=''>Select</option>
 				<?php if( is_array( $options ) && count( $options ) > 0 ){ foreach( $options as $k=>$v ){
 					?><option value='<?php echo $k;?>' <?php echo $value == $k ? 'selected' : null;?>><?php echo $v;?></option>
@@ -226,40 +226,7 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
       <?php self::card_row_label( $singular, 4 );?>
       <div class='col-6'>
-        <input placeholder='<?php echo $singular;?>' type='text' autocomplete='off' class='form-control edit' name='<?php echo $singular;?>' value='<?php echo $name;?>' />
-        <script>
-          $( 'input[name="<?php echo $singular;?>"]' )
-            .typeahead({
-              minLength : 4,
-              hint: true,
-              highlight: true,
-              limit : 5,
-              display : 'FieldValue',
-              source: function( query, result ){
-                $.ajax({
-                  url : 'bin/php/get/search/<?php echo $plural;?>.php',
-                  method : 'GET',
-                  data    : {
-                    search :  $('input:visible[name="<?php echo $singular;?>"]').val( )
-                  },
-                  dataType : 'json',
-                  beforeSend : function( ){
-                      abort( );
-                  },
-                  success : function( data ){
-                    result( $.map( data, function( item ){
-                        return item.FieldValue;
-                    } ) );
-                  }
-                });
-              },
-              afterSelect: function( value ){
-                $( 'input[name="<?php echo $singular;?>"]').val( value );
-                $( 'input[name="<?php echo $singular;?>"]').closest( 'form' ).submit( );
-              }
-            }
-          );
-        </script>
+        <?php self::autocomplete( $singular, $plural, $id, $name );?>
       </div>
       <div class='col-2'><button class='h-100 w-100' type='button' <?php
         if( in_array( $id, array( null, 0, '', ' ') ) ){
@@ -270,6 +237,43 @@ class bootstrap extends \singleton\index {
       ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
     </div><?php
 	}
+  public function autocomplete( $singular, $plural, $id, $name ){
+    ?><input placeholder='<?php echo $singular;?>' type='hidden' autocomplete='off' class='form-control edit' name='<?php echo $singular;?>_ID' value='<?php echo $id;?>' />
+    <input placeholder='<?php echo $singular;?>' type='text' autocomplete='off' class='form-control edit' name='<?php echo $singular;?>_Name' value='<?php echo $name;?>' />
+    <script>
+      $( 'input[name="<?php echo $singular;?>_Name"]' )
+        .typeahead({
+          minLength : 4,
+          hint: true,
+          highlight: true,
+          limit : 5,
+          display : 'FieldValue',
+          source: function( query, result ){
+            $.ajax({
+              url : 'bin/php/get/search/<?php echo $plural;?>.php',
+              method : 'GET',
+              data    : {
+                search :  $('input:visible[name="<?php echo $singular;?>_Name"]').val( )
+              },
+              dataType : 'json',
+              beforeSend : function( ){
+                  abort( );
+              },
+              success : function( data ){
+                result( $.map( data, function( item ){
+                    return item.FieldValue;
+                } ) );
+              }
+            });
+          },
+          afterSelect: function( value ){
+            $( 'input[name="<?php echo $singular;?>_Name"]').val( value );
+            $( 'input[name="<?php echo $singular;?>_Name"]').closest( 'form' ).submit( );
+          }
+        }
+      );
+    </script><?php
+  }
 	public function card_row_form_textarea( $singular, $value ){
 		?><div class='row g-0'>
       <?php self::card_row_label( $singular );?>

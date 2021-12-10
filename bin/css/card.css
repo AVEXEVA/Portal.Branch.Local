@@ -1,6 +1,12 @@
 .card.card-full {
 	height : 100%;
 }
+.card.card-full>form {
+  height : inherit;
+}
+.card.card-full>form>.card-body {
+  height : 90%;
+}
 @media only screen and ( min-width : 1024px ){
     div.form-mobile, .mobile {
       display : none;
@@ -46,8 +52,4 @@
 .card.card-primary .card-heading h4 a {
   color : black;
   text-decoration : none;
-}
-.card.links-page {
-  height : 100%;
-  width : fit-content;
 }

@@ -100,13 +100,61 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Route.Name            AS Name,
                 Employee.ID           AS Employee_ID,
                 Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
+                CASE    WHEN Units.Count IS NULL THEN 0
+                        ELSE Units.Count END AS Units_Count,
+                CASE    WHEN Units.Elevators IS NULL THEN 0
+                        ELSE Units.Elevators END AS Units_Elevators,
+                CASE    WHEN Units.Escalators IS NULL THEN 0
+                        ELSE Units.Escalators END AS Units_Escalators,
+                CASE    WHEN Units.Other IS NULL THEN 0
+                        ELSE Units.Other END AS Units_Other,
                 Tickets.Unassigned    AS Tickets_Open,
                 Tickets.Assigned      AS Tickets_Assigned,
                 Tickets.En_Route      AS Tickets_En_Route,
                 Tickets.On_Site       AS Tickets_On_Site,
-                Tickets.Reviewing     AS Tickets_Reviewing
+                Tickets.Reviewing     AS Tickets_Reviewing,
+                CASE    WHEN Violations.Preliminary IS NULL THEN 0
+                        ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
+                CASE    WHEN Violations.Job_Created IS NULL THEN 0
+                        ELSE Violations.Job_Created END AS Violations_Job_Created
         FROM    Route
                 LEFT JOIN Emp  AS Employee  ON  Route.Mech = Employee.fWork
+                LEFT JOIN (
+                    SELECT      Location.Route AS Route,
+                                Sum( Units.Count ) AS Count,
+                                Sum( Elevators.Count) AS Elevators,
+                                Sum( Escalators.Count ) AS Escalators,
+                                Sum( Other.Count ) AS Other
+                    FROM        Loc AS Location
+                                LEFT JOIN (
+                                    SELECT      Unit.Loc AS Location,
+                                                Count( Unit.ID ) AS Count
+                                    FROM        Elev AS Unit
+                                    GROUP BY    Unit.Loc
+                                ) AS Units ON Units.Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Unit.Loc AS Location,
+                                                Count( Unit.ID ) AS Count
+                                    FROM        Elev AS Unit
+                                    WHERE       Unit.Type = 'Elevator'
+                                    GROUP BY    Unit.Loc
+                                ) AS Elevators ON Elevators.Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Unit.Loc AS Location,
+                                                Count( Unit.ID ) AS Count
+                                    FROM        Elev AS Unit
+                                    WHERE       Unit.Type = 'Escalator'
+                                    GROUP BY    Unit.Loc
+                                ) AS Escalators ON Escalators.Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Unit.Loc AS Location,
+                                                Count( Unit.ID ) AS Count
+                                    FROM        Elev AS Unit
+                                    WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                                    GROUP BY    Unit.Loc
+                                ) AS Other ON Other.Location = Location.Loc
+                    GROUP BY    Location.Route
+                ) AS Units ON Units.Route = Route.ID 
                 LEFT JOIN (
                   SELECT  Route.ID AS Route,
                           Unassigned.Count AS Unassigned,
@@ -156,6 +204,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             GROUP BY  Location.Route
                           ) AS Reviewing ON Reviewing.Route = Route.ID
                   ) AS Tickets ON Tickets.Route = Route.ID
+                  LEFT JOIN (
+                      SELECT  Location.Route AS Route,
+                              Preliminary.Count AS Preliminary,
+                              Job_Created.Count AS Job_Created
+                      FROM    Loc AS Location 
+                              LEFT JOIN (
+                                SELECT    Location.Loc AS Location,
+                                          Count( Violation.ID ) AS Count
+                                FROM      Violation
+                                          LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                WHERE     Violation.Status = 'Preliminary Report'
+                                GROUP BY  Location.Loc
+                              ) AS Preliminary ON Preliminary.Location = Location.Loc
+                              LEFT JOIN (
+                                SELECT    Location.Loc AS Location,
+                                          Count( Violation.ID ) AS Count
+                                FROM      Violation
+                                          LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                WHERE     Violation.Status = 'Job Created'
+                                GROUP BY  Location.Loc
+                              ) AS Job_Created ON Job_Created.Location = Location.Loc
+                  ) AS Violations ON Violations.Route = Route.ID
           WHERE       Route.ID =   ?
                   OR  Route.Name = ?;",
         array(
@@ -256,244 +326,114 @@ if( $locations ) {
   <div id="wrapper">
     <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
-      <div class='card card-primary'><form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
-        <input type='hidden' name='ID' value='<?php echo $Route[ 'ID' ];?>' />
-        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Route', 'Routes', $Route[ 'ID' ] );?>
-        <div class='card-body bg-dark text-white'>
-          <div class='row g-0'>
-            <?php if( count($finalLoc)>0 ){?>
-              <div class='card card-primary my-3 col-12 col-lg-3'>
-                  <?php \singleton\bootstrap::getInstance( )->card_header( 'Map' );?>
-                  <div class='card-body bg-darker'>
-                      <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-                      <script type="text/javascript">
-                          var map;
-                          function initialize() {
-                              map = new google.maps.Map(
-                                  document.getElementById( 'location_map' ),
-                                  {
-                                      zoom: 1,
-                                      center: new google.maps.LatLng( 0, 0 ),
-                                      mapTypeId: google.maps.MapTypeId.ROADMAP
-                                  }
-                              );
-                              /* Map Bound */
-                              var markers = [];
-                              <?php /* For Each Location Create a Marker. */
-                              foreach( $finalLoc as $location ){
-                              $name = $location['Tag'];
-                              $addr = $location['Tag'];
-                              $map_lat = $location['Latitude'];
-                              $map_lng = $location['Longitude'];
-                              if( !in_array( $map_lat, array( null, 0 ) ) && !in_array( $map_lng, array( null, 0 ) ) ){
-                              ?>
+      <div class='card card-primary'>
+        <form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
+          <input type='hidden' name='ID' value='<?php echo $Route[ 'ID' ];?>' />
+          <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Route', 'Routes', $Route[ 'ID' ] );?>
+          <div class='card-body bg-dark text-white'>
+            <div class='row g-0' data-masonry='{"percentPosition": true }'>
+              <?php if( count($finalLoc)>0 ){?>
+                <div class='card card-primary my-3 col-12 col-lg-3'>
+                    <?php \singleton\bootstrap::getInstance( )->card_header( 'Map' );?>
+                    <div class='card-body bg-darker'>
+                        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
+                        <script type="text/javascript">
+                            var map;
+                            function initialize() {
+                                map = new google.maps.Map(
+                                    document.getElementById( 'location_map' ),
+                                    {
+                                        zoom: 1,
+                                        center: new google.maps.LatLng( 0, 0 ),
+                                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                                    }
+                                );
+                                /* Map Bound */
+                                var markers = [];
+                                <?php /* For Each Location Create a Marker. */
+                                foreach( $finalLoc as $location ){
+                                $name = $location['Tag'];
+                                $addr = $location['Tag'];
+                                $map_lat = $location['Latitude'];
+                                $map_lng = $location['Longitude'];
+                                if( !in_array( $map_lat, array( null, 0 ) ) && !in_array( $map_lng, array( null, 0 ) ) ){
+                                ?>
 
-                              markersNew = new google.maps.Marker({
-                                  position: {
-                                      lat: <?php echo $map_lat; ?>,
-                                      lng: <?php echo $map_lng; ?>,
-                                      title: '<?php echo $name; ?>',
-                                  },
-                                  map: map,
-                                  title: '<?php echo $name; ?>',
-                                  infoWindow: {
-                                      content: '<p><?php echo $name; ?></p>'
-                                  }
-                              });
-                              markers.push(markersNew);
-                              /* Set Bound Marker */
-                              var latlng = new google.maps.LatLng(<?php echo $map_lat; ?>, <?php echo $map_lng; ?>);
-                              bounds.push(latlng);
-                              /* Add Marker */
-                              map.addMarker({
-                                  lat: <?php echo $map_lat; ?>,
-                                  lng: <?php echo $map_lng; ?>,
-                                  title: '<?php echo $name; ?>',
-                                  infoWindow: {
-                                      content: '<p><?php echo $name; ?></p>'
-                                  }
-                              });
-                              <?php } } //end foreach locations ?>
-                          }
-                          $(document).ready(function(){ initialize(); });
-                      </script>
-                      <div class='card-body'>
-                          <div id='location_map' class='map'>&nbsp;</div>
-                      </div>
-                  </div>
-              </div>
-            <?php }?>
-            <div class='card card-primary my-3 col-12 col-lg-3'> 
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php 
-                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Route[ 'Name' ] );
-                  \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Route[ 'Employee_ID' ], $Route[ 'Employee_Name' ] );
-                ?>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Route', $Route[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Route=' . $Route[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Route[ 'Tickets_Open' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] . '&Status=0');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Route[ 'Tickets_Assigned' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=1';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En_Route', $Route[ 'Tickets_En_Route' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=2';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On_Site', $Route[ 'Tickets_On_Site' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=3';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Route[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=6';?>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violation', 'Violations', 'Route', $Route[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route=' . $Route[ 'ID' ] );?>
-                <div class='row g-0'>
-                  <?php
-                    $result = \singleton\database::getInstance()->query(
-                      null,
-                      " SELECT Violation.Status FROM Violation GROUP BY Status;",
-                    );
-                    if( $result ){ while ($row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){ ?>
-                      <div class='col-1'>&nbsp;</div>
-                      <div class='col-3 border-bottom border-white my-auto'><?php  echo $row['Status']; ?></div>
-                      <div class='col-6'>
-                        <?php
-                        $r = \singleton\database::getInstance( )->query(
-                          null,
-                          " SELECT  Count( Violation.ID ) AS Violations
-                            FROM    Violation
-                                    LEFT JOIN Loc AS Location ON Violation.Loc = Location.Loc
-                            WHERE       Location.Route = ?
-                                    AND Violation.Status = ?;",
-                          array(
-                            $_GET['ID'],
-                            $row[ 'Status' ]
-                          )
-                        );
-                        echo $r ? sqlsrv_fetch_array($r)['Violations'] : 0;?>
-                        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='violations.php?Route=<?php echo $_GET['ID'];?>&Status=<?php echo $row['Status'];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                      </div>
-                    <?php } ?>
-                  <?php } ?>
+                                markersNew = new google.maps.Marker({
+                                    position: {
+                                        lat: <?php echo $map_lat; ?>,
+                                        lng: <?php echo $map_lng; ?>,
+                                        title: '<?php echo $name; ?>',
+                                    },
+                                    map: map,
+                                    title: '<?php echo $name; ?>',
+                                    infoWindow: {
+                                        content: '<p><?php echo $name; ?></p>'
+                                    }
+                                });
+                                markers.push(markersNew);
+                                /* Set Bound Marker */
+                                var latlng = new google.maps.LatLng(<?php echo $map_lat; ?>, <?php echo $map_lng; ?>);
+                                bounds.push(latlng);
+                                /* Add Marker */
+                                map.addMarker({
+                                    lat: <?php echo $map_lat; ?>,
+                                    lng: <?php echo $map_lng; ?>,
+                                    title: '<?php echo $name; ?>',
+                                    infoWindow: {
+                                        content: '<p><?php echo $name; ?></p>'
+                                    }
+                                });
+                                <?php } } //end foreach locations ?>
+                            }
+                            $(document).ready(function(){ initialize(); });
+                        </script>
+                        <div class='card-body'>
+                            <div id='location_map' class='map'>&nbsp;</div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', 'Route', $Route[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Location' ] ) && $_SESSION[ 'Cards' ][ 'Location' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'locations.php?Route=' . $Route[ 'ID' ] );?>
-                <div class='row g-0'>
-                  <?php
-                  $currentMonth = date('Y-m').'-01';
-                  $r = \singleton\database::getInstance( )->query(
-                    null,
-                    " SELECT  Loc
-                      FROM    Loc
-                              LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) ) AS LastTicket
-                      WHERE   LastTicket  < = ?;",
-                      array(
-                        date( 'Y-m-01', strtotime( 'this month' ))
-                      )
-                    );
+              <?php }?>
+              <div class='card card-primary my-3 col-12 col-lg-3'> 
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php 
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Route[ 'Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Route[ 'Employee_ID' ], $Route[ 'Employee_Name' ] );
                   ?>
-                  <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Visited</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                    echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
-                  ?>' /></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <?php
-                  $lastDayMonth = date('Y-m-d', strtotime( 'last day of last month' ));
-                  $r = \singleton\database::getInstance( )->query(
-                    null,
-                    " SELECT  Loc
-                      FROM    Loc
-                              LEFT JOIN ( SELECT Max( Ticket ) FROM ( ( TicketO JOIN TicketDPDA ON TicketO.ID = TicketDPDA.ID ) UNION ALL ( TicketD ) ) ) AS LastTicket
-                      WHERE   LastTicket < = ?;",
-                    array(
-                      $lastDayMonth
-                    )
-                  );
-                  ?><div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>To Do</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                    echo $r ? sqlsrv_fetch_array($r)[ 'Ticket' ] : 0;
-                  ?>' /></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
                 </div>
               </div>
-            </div>
-            <div class='card card-primary my-3 col-12 col-lg-3'>
-              <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Route', $Route[ 'ID' ] );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Unit' ] ) && $_SESSION[ 'Cards' ][ 'Unit' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'units.php?Route=' . $Route[ 'ID' ] );?>
-                <div class='row g-0'>
-                  <?php
-                    $currentMonth = date('Y-m').'-01';
-                    $r = \singleton\database::getInstance( )->query(
-                      null,
-                      "	SELECT  Count( Unit.ID ) AS Unit
-                        FROM    Unit  
-                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                        WHERE  	    Location.Route = ?
-                                AND Unit.Type = 'Elevator' ;",
-                      array(
-                        $Route[ 'ID' ]
-                      )
-                    );
-                  ?><div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Elevator</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                    echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
-                  ?>' /></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo $Route[ 'ID' ];?>&Ticket_Last_Service_Start=<?php echo $currentMonth; ?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Route', $Route[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Route=' . $Route[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Route[ 'Units_Elevators' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] . '&Type=Elevator');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Route[ 'Units_Escalators' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] ) . '&Type=Escalator';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Route[ 'Units_Other' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] ) . '&Type=Other';?>
                 </div>
-                <div class='row g-0'>
-                  <?php
-                    $r = \singleton\database::getInstance( )->query(
-                      null,
-                      "	SELECT  Count( Unit.ID ) AS Unit
-                        FROM    Unit  
-                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                        WHERE  	    Location.Route = ?
-																AND Unit.Type = 'Escalator' ;",
-                      array(
-                        $Route[ 'ID' ]
-                      )
-                    );
-                  ?><div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Escalator</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                    echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
-                  ?>' /></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Route', $Route[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Route=' . $Route[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Route[ 'Tickets_Open' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Route[ 'Tickets_Assigned' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=1';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En_Route', $Route[ 'Tickets_En_Route' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=2';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On_Site', $Route[ 'Tickets_On_Site' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=3';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Route[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=6';?>
                 </div>
-                <div class='row g-0'>
-                  <?php
-                    $r = \singleton\database::getInstance( )->query(
-                      null,
-                      "	SELECT  Count( Unit.ID ) AS Unit
-                        FROM    Unit  
-                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                        WHERE  	Location.Route = ?
-																		AND Unit.Status = 0 ;",
-                      array(
-                        $Route[ 'ID' ]
-                      )
-                    );
-                  ?><div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'>Unmaintained</div>
-                  <div class='col-6'><input class='form-control' type='text' readonly name='Tickets' value='<?php
-                    echo $r ? sqlsrv_fetch_array($r)[ 'Unit' ] : 0;
-                  ?>' /></div>
-                  <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='tickets.php?Route=<?php echo  $Route[ 'ID' ];?>&Status=1';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Route', $Route[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route=' . $Route[ 'ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Route[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] . '&Status=Preliminary Report');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Route[ 'Violations_Job_Created' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] ) . '&Status=Job Created';?>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </div>

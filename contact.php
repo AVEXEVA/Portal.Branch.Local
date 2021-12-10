@@ -293,7 +293,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <input type='hidden' name='ID' value='<?php echo $Contact[ 'ID' ];?>' />
     		<?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Contact', 'Contacts', $Contact[ 'ID' ] );?>
     		<div class='card-body bg-dark text-white'>
-          <div class='row g-0'>
+          <div class='row g-0' data-masonry='{"percentPosition": true }'>
             <div class='card card-primary my-3 col-12 col-lg-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
