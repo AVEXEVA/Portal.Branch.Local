@@ -205,6 +205,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Forms_to_Customer' => null,
         'Recieved_from_Customer' => null,
         'Cancel_Contract' => null,
+        'Job' => null,
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -278,19 +279,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		null,
         		"	UPDATE 	Violation
         			SET     Violation.Job = (
-                        SELECT  Top 1 
+                        SELECT  Top 1
                                 Job.ID
                         FROM    Job
                         WHERE   Job.fDesc = ?
                       ),
         					    Violation.Loc = (
-                        SELECT  Top 1 
+                        SELECT  Top 1
                                 Loc.Loc
                         FROM    Loc
                         WHERE   Loc.Tag = ?
                       ),
         					    Violation.Elev = (
-                        SELECT  Top 1 
+                        SELECT  Top 1
                                 Elev.ID
                         FROM    Elev
                         WHERE   Elev.ID = ?
@@ -351,7 +352,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Proposal', 'Proposals', $Violation[ 'Proposal_ID' ], $Violation[ 'Proposal_ID' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Inspection', 'Inspections', $Violation[ 'Inspection_ID' ], $Violation[ 'Inspection_Name' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Price', $Violation[ 'Price' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Note', $Job[ 'Note' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Note', $Violation[ 'Note' ] );?>
               </div>
             </div>
             <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>

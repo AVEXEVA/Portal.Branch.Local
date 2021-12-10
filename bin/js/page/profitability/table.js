@@ -126,10 +126,10 @@ $( document ).ready( function( ){
                     document.location.href = 'Profitability.php?' + new URLSearchParams( d ).toString();
                 }
             },{
-                text : 'Create',
+                text : 'Chart',
                 className : 'form-control',
                 action : function( e, dt, node, config ){
-                    document.location.href='bin/php/reports/Profitability.php';
+                    //document.location.href='bin/php/reports/Profitability.php';//
                 }
             },
             {
