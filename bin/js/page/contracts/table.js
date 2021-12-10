@@ -10,6 +10,7 @@ function search( link ){
                     url : 'bin/php/get/search/Contracts.php',
                     method : 'GET',
                     data    : {
+                        ID : $('input:visible[name="ID"]').val(),
                         Customer : $('input:visible[name="Customer"]').val(),
                         Location :  $('input:visible[name="Location"]').val( ),
                         Job : $('input:visible[name="Job"]').val( ),
@@ -20,6 +21,8 @@ function search( link ){
                         Cycle : $('select:visible[name="Cycle"]').val( ),
                         Escalation_Factor : $('input:visible[name="Escalation_Factor"]').val( ),
                         Escalation_Date :  $('input:visible[name="Escalation_Date"]').val( ),
+                        Link :  $('input:visible[name="Link"]').val( ),
+                        Remarks :  $('input:visible[name="Remarks"]').val( ),
                     },
                     dataType : 'json',
                     success : function( data ){
@@ -68,21 +71,21 @@ $( document ).ready( function() {
               dir : d.order[0].dir
           }
         };
-        d.Search = $('input[name="Search"]').val( );
-        d.ID = $('input[name="ID"]').val( );
-        d.Customer = $('input[name="Customer"]').val( );
-        d.Location = $('input[name="Location"]').val( );
-        d.Job = $('input[name="Job"]').val( );
-        d.Start_Date = $('input[name="Start_Date"]').val( );
-        d.End_Date = $('input[name="End_Date"]').val( );
-        d.Length = $('input[name="Length"]').val( );
-        d.Amount = $('select[name="Amount"]').val( );
-        d.Cycle = $('select[name="Cycle"]').val( );
-        d.Escalation_Factor = $('input[name="Escalation_Factor"]').val( );
-        d.Escalation_Date = $('input[name="Escalation_Date"]').val( );
-        d.Escalation_Cycle = $('select[name="Escalation_Cycle"]').val( );
-        d.Link = $('input[name="Link"]').val( );
-        d.Remarks = $('input[name="Remarks"]').val( );
+        d.Search = $('input:visible[name="Search"]').val( );
+        d.ID = $('input:visible[name="ID"]').val( );
+        d.Customer = $('input:visible[name="Customer"]').val( );
+        d.Location = $('input:visible[name="Location"]').val( );
+        d.Job = $('input:visible[name="Job"]').val( );
+        d.BStart = $('input:visible[name="Start_Date"]').val( );
+        d.BFinish = $('input:visible[name="End_Date"]').val( );
+        d.BLenght = $('input:visible[name="Length"]').val( );
+        d.Amount = $('select:visible[name="Amount"]').val( );
+        d.BCycle = $('select:visible[name="Cycle"]').val( );
+        d.BEscFact = $('input:visible[name="Escalation_Factor"]').val( );
+        d.EscLast = $('input:visible[name="Escalation_Date"]').val( );
+        d.BEscCycle = $('select:visible[name="Escalation_Cycle"]').val( );
+        d.Custom15 = $('input:visible[name="Link"]').val( );
+        d.Remarks = $('input:visible[name="Remarks"]').val( );
         return d;
       }
     },
@@ -107,7 +110,7 @@ $( document ).ready( function() {
         render : function( data, type, row, meta ){
           switch( type ){
             case 'display' :
-              return  row.Customer_ID !== null
+              return  row.Customer_ID !== null && row.Customer_ID != ''
                 ?   "<div class='row'>" +
                         "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                     "</div>"
@@ -122,7 +125,7 @@ $( document ).ready( function() {
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.Location_ID !== null
+                      return  row.Location_ID !== null && row.Location_ID != ''
                           ?   "<div class='row'>" +
                                   "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
                                   "<div class='col-12'>" +
