@@ -175,7 +175,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Route_Name'           => null,
                 'Employee_ID'          => null,
                 'Employee_First_Name'  => null,
-                'Employee_Last_Name'   => null
+                'Employee_Last_Name'   => null,
         ) : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $Invoice[ 'Location_Name' ] = isset( $_POST[ 'Location' ] )  ? $_POST[ 'Location' ]       : $Invoice[ 'Location_Name' ];
