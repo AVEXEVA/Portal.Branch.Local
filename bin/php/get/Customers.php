@@ -94,6 +94,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $parameters[] = $_GET['Status'];
           $conditions[] = "Customer.Status LIKE '%' + ? + '%'";
         }
+        if( isset($_GET[ 'Units' ] ) && !in_array( $_GET[ 'Units' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Units'];
+          $conditions[] = "Customer.Unit LIKE '%' + ? + '%'";
+        }
+        if( isset($_GET[ 'Jobs' ] ) && !in_array( $_GET[ 'Jobs' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Jobs'];
+          $conditions[] = "Customer.Job LIKE '%' + ? + '%'";
+        }
+        if( isset($_GET[ 'Tickets' ] ) && !in_array( $_GET[ 'Tickets' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Tickets'];
+          $conditions[] = "Customer.Ticket LIKE '%' + ? + '%'";
+        }
+        if( isset($_GET[ 'Violations' ] ) && !in_array( $_GET[ 'Violations' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Violations'];
+          $conditions[] = "Customer.Violation LIKE '%' + ? + '%'";
+        }
+        if( isset($_GET[ 'Invoices' ] ) && !in_array( $_GET[ 'Invoices' ], array( '', ' ', null ) ) ){
+          $parameters[] = $_GET['Invoices'];
+          $conditions[] = "Customer.Invoice LIKE '%' + ? + '%'";
+        }
 
         if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
@@ -122,8 +142,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           4 =>  'Customer_Units.Count',
           5 =>  'Customer_Jobs.Count',
           6 =>  'Customer_Tickets.Count',
-          6 =>  'Customer_Violations.Count',
-          6 =>  'Customer_Invoices.Count'
+          7 =>  'Customer_Violations.Count',
+          8 =>  'Customer_Invoices.Count'
         );
         $Order = isset( $Columns[ $_GET['order']['column'] ] )
             ? $Columns[ $_GET['order']['column'] ]

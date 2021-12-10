@@ -1,3 +1,39 @@
+function search( link ){
+    var api = link.api();
+    $('input:visible[name="Search"]', api.table().container())
+        .typeahead({
+            minLength : 4,
+            highlight : 1,
+            displayKey : 'FieldValue',
+            source: function( query, result ){
+                $.ajax({
+                    url : 'bin/php/get/search/Employees.php',
+                    method : 'GET',
+                    data    : {
+                        ID : $('input:visible[name="ID"]').val(),
+                        First_Name : $('input:visible[name="First_Name"]').val(),
+                        Last_Name :  $('input:visible[name="Last_Name"]').val( ),
+                        Supervisor : $('input:visible[name="Supervisor"]').val( ),
+                        Latittude :  $('input:visible[name="Latittude"]').val( ),
+                        Longitude :  $('input:visible[name="Longitude"]').val( ),
+                    },
+                    dataType : 'json',
+                    success : function( data ){
+                        result( $.map( data, function( item ){
+                            return item.FieldName + ' => ' + item.FieldValue;
+                        } ) );
+                    }
+                });
+            },
+            afterSelect: function( value ){
+                var FieldName = value.split( ' => ' )[ 0 ];
+                var FieldValue = value.split( ' => ' )[ 1 ];
+                $( 'input:visible[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
+                $( 'input:visible[name="Search"]').val( '' );
+            }
+        }
+    );
+}
 $( document ).ready( function( ){
   var Editor_Employees = new $.fn.dataTable.Editor( {
       idSrc    : 'ID',
@@ -39,12 +75,12 @@ $( document ).ready( function( ){
                 dir : d.order[0].dir
             }
           };
-          d.ID = $('input[name="ID"]').val( );
-          d.Last_Name = $('input[name="Last_Name"]').val( );
-          d.First_Name = $('input[name="First_Name"]').val( );
-          d.Supervisor = $('input[name="Supervisor"]').val( );
-          d.Latittude = $('input[name="Latittude"]').val( );
-          d.Longitude = $('input[name="Longitude"]').val( );
+          d.ID = $('input:visible[name="ID"]').val( );
+          d.First_Name = $('input:visible[name="Last_Name"]').val( );
+          d.Last_Name = $('input:visible[name="First_Name"]').val( );
+          d.Supervisor = $('input:visible[name="Supervisor"]').val( );
+          d.Latittude = $('input:visible[name="Latittude"]').val( );
+          d.Longitude = $('input:visible[name="Longitude"]').val( );
           return d;
       }
     },
@@ -66,9 +102,9 @@ $( document ).ready( function( ){
 
           }
       },{
-          data : 'Last_Name'
-      },{
           data : 'First_Name'
+      },{
+          data : 'Last_Name'
       },{
           data : 'Supervisor'
       },{
@@ -97,7 +133,7 @@ $( document ).ready( function( ){
                 $( 'input, select' ).each( function( ){
                     $( this ).val( '' );
                 } );
-                Table_Bugs.draw( );
+                Table_Employees.draw( );
             }
         },{
             text : 'Get URL',

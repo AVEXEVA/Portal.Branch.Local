@@ -97,7 +97,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</h4></div>
-
                 <div class="card-body bg-dark">
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
                       <thead>
