@@ -100,8 +100,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    <div id='page-wrapper' class='content'>
 			<div class='card card-full card-primary border-0'>
 				<div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Users( );?> Contacts</h4></div>
-				<div class="form-mobile card-body bg-dark text-white"><form method='GET' action='contacts.php'>
-			        <div class='row'><div class='col-12'>&nbsp;</div></div>
+				<div class="mobile card-body bg-dark text-white"><form method='GET' action='contacts.php'>
 			        <div class='row'>
 			            <div class='col-4'>Search:</div>
 			            <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw form-input'/></div>

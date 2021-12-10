@@ -97,8 +97,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Route( 1 );?> Routes</h4></div>
-                <div class="form-mobile card-body bg-dark text-white"><form method='GET' action='routes.php'>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
+                <div class="mobile card-body bg-dark text-white"><form method='GET' action='routes.php'>
                     <div class='row'>
                         <div class='col-xs-4'>Search:</div>
                         <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>

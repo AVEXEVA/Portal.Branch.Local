@@ -101,8 +101,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       <div class="card card-full card-primary border-0">
         <form method='GET' action='locations.php'>
           <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Locations</h4></div>
-          <div class="form-mobile card-body bg-dark text-white">
-            <div class='row'><div class='col-12'>&nbsp;</div></div>
+          <div class="mobile card-body bg-dark text-white">
             <div class='row'>
                 <div class='col-4'>Search:</div>
                 <div class='col-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
@@ -140,7 +139,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <option value='1'>Inactive</option>
                 </select></div>
             </div>
-            <div class='row'><div class='col-12'>&nbsp;</div></div> 
+            <div class='row'><div class='col-12'>&nbsp;</div></div>
             <div class='row'>
               <div class='col-12'><input type='submit' value='Submit' /></div>
             </div>

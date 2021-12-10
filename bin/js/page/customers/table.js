@@ -1,3 +1,43 @@
+function search( link ){
+    var api = link.api();
+    $('input:visible[name="Search"]', api.table().container())
+        .typeahead({
+            minLength : 4,
+            highlight : 1,
+            displayKey : 'FieldValue',
+            source: function( query, result ){
+                $.ajax({
+                    url : 'bin/php/get/search/Customers.php',
+                    method : 'GET',
+                    data    : {
+                        search : $('input:visible[name="Search"]').val(),
+                        ID :  $('input:visible[name="ID"]').val( ),
+                        Name :  $('input:visible[name="Contact"]:visible').val( ),
+                        Status :  $('select:visible[name="Contact"]:visible').val( ),
+                        Location :  $('Input:visible[name="Type"]:visible').val( ),
+                        Unit :  $('input:visible[name="Name"]:visible').val( ),
+                        Job : $('input:visible[name="Phone"]').val( ),
+                        Ticket :  $('input:visible[name="Customer"]').val( ),
+                        Violation : $('select:visible[name="Type"]').val( ),
+                        Invoice : $('select:visible[name="Division"]').val( ),
+                    },
+                    dataType : 'json',
+                    success : function( data ){
+                        result( $.map( data, function( item ){
+                            return item.FieldName + ' => ' + item.FieldValue;
+                        } ) );
+                    }
+                });
+            },
+            afterSelect: function( value ){
+                var FieldName = value.split( ' => ' )[ 0 ];
+                var FieldValue = value.split( ' => ' )[ 1 ];
+                $( 'input:visible[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
+                $( 'input:visible[name="Search"]').val( '' );
+            }
+        }
+    );
+}
 $( document ).ready( function( ){
     var Editor_Customers = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
@@ -33,10 +73,16 @@ $( document ).ready( function( ){
                         dir : d.order[0].dir
                     }
                 };
-                d.Search = $('input[name="Search"]').val( );
-                d.ID = $('input[name="ID"]').val( );
-                d.Name = $('input[name="Name"]').val( );
-                d.Status = $('select[name="Status"]').val( );
+                d.Search = $('input:visible[name="Search"]').val( );
+                d.ID = $('input:visible[name="ID"]').val( );
+                d.Name = $('input:visible[name="Name"]').val( );
+                d.Status = $('select:visible[name="Status"]').val( );
+                d.Location = $('select:visible[name="Location"]').val( );
+                d.Units = $('select:visible[name="Units"]').val( );
+                d.Jobs = $('select:visible[name="Jobs"]').val( );
+                d.Tickets = $('select:visible[name="Tickets"]').val( );
+                d.Violations = $('select:visible[name="Violations"]').val( );
+                d.Invoices = $('select:visible[name="Invoices"]').val( );
                 return d;
             }
         },
