@@ -5,195 +5,167 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
   //Connection
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    " SELECT  [Connection].[ID]
+      FROM    dbo.[Connection]
+      WHERE       [Connection].[User] = ?
+              AND [Connection].[Hash] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ],
+      $_SESSION[ 'Connection' ][ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array($result);
+  //User
+  $result = \singleton\database::getInstance( )->query(
+      null,
+      " SELECT  Emp.fFirst  AS First_Name,
+                Emp.Last    AS Last_Name,
+                Emp.fFirst + ' ' + Emp.Last AS Name,
+                Emp.Title AS Title,
+                Emp.Field   AS Field
+        FROM  Emp
+        WHERE   Emp.ID = ?;",
+      array(
+          $_SESSION[ 'Connection' ][ 'User' ]
+      )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      "   SELECT  [Privilege].[Access],
+                  [Privilege].[Owner],
+                  [Privilege].[Group],
+                  [Privilege].[Department],
+                  [Privilege].[Database],
+                  [Privilege].[Server],
+                  [Privilege].[Other],
+                  [Privilege].[Token],
+                  [Privilege].[Internet]
+        FROM      dbo.[Privilege]
+        WHERE     Privilege.[User] = ?;",
+      array(
+          $_SESSION[ 'Connection' ][ 'User' ],
+      )
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+
+      $key = $Privilege['Access'];
+      unset( $Privilege[ 'Access' ] );
+      $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+      ) );
+  }}
+  if(     !isset( $Connection[ 'ID' ] )
+      ||  !isset( $Privileges[ 'Unit' ] )
+      ||  !check( privilege_read, level_group, $Privileges[ 'User' ] )
+  ){ ?><?php require('404.html');?><?php }
+  else {
+    $ID = isset( $_GET[ 'ID' ] )
+      ? $_GET[ 'ID' ]
+      : (
+        isset( $_POST[ 'ID' ] )
+          ? $_POST[ 'ID' ]
+          : null
+        );
+    $Email = isset( $_GET[ 'Email' ] )
+      ? $_GET[ 'Email' ]
+      : (
+        isset( $_POST[ 'Email' ] )
+          ? $_POST[ 'Email' ]
+          : null
+        );
     $result = \singleton\database::getInstance( )->query(
       'Portal',
-      " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
-        WHERE       [Connection].[User] = ?
-                AND [Connection].[Hash] = ?;",
+      "   SELECT  Top 1
+                  [User].[ID] AS ID,
+                  [User].[Email] AS Email,
+                  [User].[Password] AS Password,
+                  [User].[Verified] AS Verified,
+                  [User].[Branch] AS Branch,
+                  [User].[Branch_Type] AS Branch_Type,
+                  [User].[Branch_ID] AS Branch_ID,
+                  [User].[Picture] AS Picture,
+                  [User].[Picture_Type] AS Picture_Type
+          FROM    dbo.[User]
+          WHERE       [User].[ID] = ?
+                  OR  [User].Email = ?;",
       array(
-        $_SESSION[ 'Connection' ][ 'User' ],
-        $_SESSION[ 'Connection' ][ 'Hash' ]
+        $ID,
+        $Email
       )
     );
-    $Connection = sqlsrv_fetch_array($result);
-    //User
-    $result = \singleton\database::getInstance( )->query(
-        null,
-        " SELECT  Emp.fFirst  AS First_Name,
-                  Emp.Last    AS Last_Name,
-                  Emp.fFirst + ' ' + Emp.Last AS Name,
-                  Emp.Title AS Title,
-                  Emp.Field   AS Field
-          FROM  Emp
-          WHERE   Emp.ID = ?;",
-        array(
-            $_SESSION[ 'Connection' ][ 'User' ]
-        )
-    );
-    $User   = sqlsrv_fetch_array( $result );
-    //Privileges
-    $Access = 0;
-    $Hex = 0;
-    $result = \singleton\database::getInstance( )->query(
-        'Portal',
-        "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner],
-                    [Privilege].[Group],
-                    [Privilege].[Department],
-                    [Privilege].[Database],
-                    [Privilege].[Server],
-                    [Privilege].[Other],
-                    [Privilege].[Token],
-                    [Privilege].[Internet]
-          FROM      dbo.[Privilege]
-          WHERE     Privilege.[User] = ?;",
-        array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-        )
-    );
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-            dechex( $Privilege[ 'Owner' ] ),
-            dechex( $Privilege[ 'Group' ] ),
-            dechex( $Privilege[ 'Department' ] ),
-            dechex( $Privilege[ 'Database' ] ),
-            dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ),
-            dechex( $Privilege[ 'Token' ] ),
-            dechex( $Privilege[ 'Internet' ] )
+    $User =   (       empty( $ID )
+                &&    !empty( $Name )
+                &&    !$result
+              ) || (  empty( $ID )
+                &&    empty( $Name )
+              )  ? array(
+                'ID' => null,
+                'Email' => null,
+                'Password' => null,
+                'Verified' => null,
+                'Branch' => null,
+                'Branch_Type' => null,
+                'Branch_ID' => null,
+                'Picture' => null,
+                'Picture_Type' => null
+    ) : sqlsrv_fetch_array( $result );
+    $result = \singleton\database::getInstance( )->query(
+      $User[ 'Branch' ],
+      " SELECT  Employee.ID                           AS Employee_ID,
+                Employee.fWork                        AS Employee_Work_ID,
+                Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
+                Employee.fFirst                       AS Employee_First_Name,
+                Employee.Last                         AS Employee_Last_Name
+        FROM    Emp AS Employee 
+        WHERE   Employee.ID = ?;",
+      array( 
+        $User[ 'Branch_ID' ]
+      )
+    );
+    //var_dump( sqlsrv_errors( ) );
+    $User = ( !empty( $User[ 'Branch_ID' ] ) && $result ) 
+      ? array_merge( $User, sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) )
+      : array_merge( $User, array( 
+          'Employee_ID' => null,
+          'Employee_Work_ID' => null,
+          'Employee_Name' => null,
+          'Employee_First_Name' => null,
+          'Employee_Last_Name' => null
         ) );
-    }}
-    if(     !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Unit' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'User' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-         $ID = isset( $_GET[ 'ID' ] )
-            ? $_GET[ 'ID' ]
-            : (
-                isset( $_POST[ 'ID' ] )
-                    ? $_POST[ 'ID' ]
-                    : null
-                );
-        $Email = isset( $_GET[ 'Email' ] )
-            ? $_GET[ 'Email' ]
-            : (
-                isset( $_POST[ 'Email' ] )
-                    ? $_POST[ 'Email' ]
-                    : null
-            );
+    if( isset( $_POST ) && count( $_POST ) > 0 ){
+      $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
+      $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
+      $User[ 'Verified' ] = isset( $_POST[ 'Verified' ] ) ? $_POST[ 'Verified' ] : $User[ 'Verified' ];
+      $User[ 'Branch' ] = isset( $_POST[ 'Branch' ] ) ? $_POST[ 'Branch' ] : $User[ 'Branch' ];
+      $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
+      $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
+      $User[ 'Picture' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? base64_encode( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) ) : $User[ 'Picture' ];
+      $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $User[ 'Picture_Type' ];
+      if( empty( $_POST[ 'ID' ] ) ){
         $result = \singleton\database::getInstance( )->query(
-            'Portal',
-            "   SELECT  Top 1
-                        [User].[ID] AS ID,
-                        [User].[Email] AS Email,
-                        [User].[Password] AS Password,
-                        [User].[Verified] AS Verified,
-                        [User].[Branch] AS Branch,
-                        [User].[Branch_Type] AS Branch_Type,
-                        [User].[Branch_ID] AS Branch_ID,
-                        [User].[Picture] AS Picture,
-                        [User].[Picture_Type] AS Picture_Type
-                FROM    dbo.[User]
-                WHERE       [User].[ID] = ?
-                        OR  [User].Email = ?;",
-          array(
-            $ID,
-            $Email
-          )
-        );
-        $User =   (       empty( $ID )
-                        &&    !empty( $Name )
-                        &&    !$result
-                      ) || (  empty( $ID )
-                        &&    empty( $Name )
-                      )  ? array(
-            'ID' => null,
-            'Email' => null,
-            'Password' => null,
-            'Verified' => null,
-            'Branch' => null,
-            'Branch_Type' => null,
-            'Branch_ID' => null,
-            'Picture' => null,
-            'Picture_Type' => null
-        ) : sqlsrv_fetch_array( $result );
-        $result = \singleton\database::getInstance( )->query(
-          $User[ 'Branch' ],
-          " SELECT  Employee.ID                           AS Employee_ID,
-                    Employee.fWork                        AS Employee_Work_ID,
-                    Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
-                    Employee.fFirst                       AS Employee_First_Name,
-                    Employee.Last                         AS Employee_Last_Name
-            FROM    Emp AS Employee 
-            WHERE   Employee.ID = ?;",
-          array( 
-            $User[ 'Branch_ID' ]
-          )
-        );
-        //var_dump( sqlsrv_errors( ) );
-        $User = ( !$result ) 
-          ? array_merge( $User, array( 
-            'Employee_ID' => null,
-            'Employee_Work_ID' => null,
-            'Employee_Name' => null,
-            'Employee_First_Name' => null,
-            'Employee_Last_Name' => null
-          ) )
-          : array_merge( $User, sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) );
-        if( isset( $_POST ) && count( $_POST ) > 0 ){
-            $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
-            $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
-            $User[ 'Verified' ] = isset( $_POST[ 'Verified' ] ) ? $_POST[ 'Verified' ] : $User[ 'Verified' ];
-            $User[ 'Branch' ] = isset( $_POST[ 'Branch' ] ) ? $_POST[ 'Branch' ] : $User[ 'Branch' ];
-            $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
-            $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
-            $User[ 'Picture' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? base64_encode( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) ) : $User[ 'Picture' ];
-            $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $User[ 'Picture_Type' ];
-            if( empty( $_POST[ 'ID' ] ) ){
-	            $result = \singleton\database::getInstance( )->query(
-	              'Portal',
-	              " INSERT INTO dbo.[User]( Email, Password, Verified, Branch, Branch_Type, Branch_ID, Picture, Picture_Type )
-	                VALUES( ?, ?, ?, ?, ?, ?, ? , ? );
-	                SELECT Max( ID ) FROM dbo.[User];",
-	                array(
-	                    $User[ 'Email' ],
-	                    $User[ 'Password' ],
-                      is_null( $User[ 'Verified' ] ) ? 0 : $User[ 'Verified' ],
-                      $User[ 'Branch' ],
-                      $User[ 'Branch_Type' ],
-                      $User[ 'Branch_ID' ],
-                      array(
-                        $User[ 'Picture' ],
-                        SQLSRV_PARAM_IN,
-                        SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
-                        SQLSRV_SQLTYPE_VARBINARY('max')
-                      ),
-                      $User[ 'Picture_Type' ]
-	                )
-	            );
-	            sqlsrv_next_result( $result );
-	            $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-	            header( 'Location: user.php?ID=' . $User[ 'ID' ] );
-	            exit;
-	        } else {
-            $result = \singleton\database::getInstance( )->query(
-              'Portal',
-              " UPDATE  [User]
-                SET     [User].[Email] = ?,
-                        [User].[Branch] = ?,
-                        [User].[Branch_Type] = ?,
-                        [User].[Branch_ID] = ?,
-                        [User].[Picture] = ?,
-                        [User].[Picture_Type] = ?
-                WHERE   [User].[ID] = ?;",
-              array(
+          'Portal',
+          " INSERT INTO dbo.[User]( Email, Password, Verified, Branch, Branch_Type, Branch_ID, Picture, Picture_Type )
+            VALUES( ?, ?, ?, ?, ?, ?, ? , ? );
+            SELECT Max( ID ) FROM dbo.[User];",
+            array(
                 $User[ 'Email' ],
+                $User[ 'Password' ],
+                is_null( $User[ 'Verified' ] ) ? 0 : $User[ 'Verified' ],
                 $User[ 'Branch' ],
                 $User[ 'Branch_Type' ],
                 $User[ 'Branch_ID' ],
@@ -203,23 +175,52 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
                   SQLSRV_SQLTYPE_VARBINARY('max')
                 ),
-                $User[ 'Picture_Type' ],
-                $User[ 'ID' ]
-              )
-            ) or die(print_r(sqlsrv_errors()));
-            if( isset( $_POST[ 'Privilege' ][ 'Access' ] ) ){
-              $result = \singleton\database::getInstance( )->query(
-                'Portal',
-                " INSERT INTO dbo.Privilege( [User], [Access] )
-                  VALUES( ?, ? );",
-                array(
-                  $User[ 'ID' ],
-                  $_POST[ 'Privilege' ][ 'Access' ]
-                )
-              );
-            }
-	        }
-	    }
+                $User[ 'Picture_Type' ]
+            )
+        );
+        sqlsrv_next_result( $result );
+        $User[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+        header( 'Location: user.php?ID=' . $User[ 'ID' ] );
+        exit;
+      } else {
+        $result = \singleton\database::getInstance( )->query(
+          'Portal',
+          " UPDATE  [User]
+            SET     [User].[Email] = ?,
+                    [User].[Branch] = ?,
+                    [User].[Branch_Type] = ?,
+                    [User].[Branch_ID] = ?,
+                    [User].[Picture] = ?,
+                    [User].[Picture_Type] = ?
+            WHERE   [User].[ID] = ?;",
+          array(
+            $User[ 'Email' ],
+            $User[ 'Branch' ],
+            $User[ 'Branch_Type' ],
+            $User[ 'Branch_ID' ],
+            array(
+              $User[ 'Picture' ],
+              SQLSRV_PARAM_IN,
+              SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY),
+              SQLSRV_SQLTYPE_VARBINARY('max')
+            ),
+            $User[ 'Picture_Type' ],
+            $User[ 'ID' ]
+          )
+        ) or die(print_r(sqlsrv_errors()));
+        if( isset( $_POST[ 'Privilege' ][ 'Access' ] ) ){
+          $result = \singleton\database::getInstance( )->query(
+            'Portal',
+            " INSERT INTO dbo.Privilege( [User], [Access] )
+              VALUES( ?, ? );",
+            array(
+              $User[ 'ID' ],
+              $_POST[ 'Privilege' ][ 'Access' ]
+            )
+          );
+        }
+      }
+    }
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -237,39 +238,31 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <div id="wrapper">
     <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
     <div id="page-wrapper" class='content'>
-      <div class='card card-primary'><form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST' enctype="multipart/form-data">
-        <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
-        <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'User', 'Users', $User[ 'ID' ] );?>
-        <div class='card-body bg-dark text-white'>
-          <div class='row g-1' >
-            <div class='card card-primary my-3 col-3'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $User[ 'Email' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_password( 'Password', $User[ 'Password' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Branch', $User[ 'Branch' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Branch_Type', $User[ 'Branch_Type' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $User[ 'Employee_ID' ], $User[ 'Employee_Name' ] );?>
-                <div class='row'>
-                  <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Image:</div>
-                  <div class='col-8'><?php if(isset($User['Picture']) && strlen($User['Picture']) > 0){?><img width='100%' src="<?php
-                    print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];
-                  ?>" /><?php }?><input type='file' name='Picture' class='form-control edit' /></div><?php ?>
-                </div>
-              </div>
-            </div>
-            <div class='card card-primary my-y col-9'>
-                <div class='card-heading'>
-                  <div class='row g-0 px-3 py-2'>
-                    <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Privileges</span></h5></div>
-                    <div class='col-2'>&nbsp;</div>
+      <div class='card card-primary'>
+        <form action='user.php?ID=<?php echo $User[ 'ID' ];?>' method='POST' enctype="multipart/form-data">
+          <input type='hidden' value='<?php echo $User[ 'ID' ];?>' name='ID' />
+          <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'User', 'Users', $User[ 'ID' ] );?>
+          <div class='card-body bg-dark text-white'>
+            <div class='row g-0' data-masonry='{"percentPosition": true }'>
+              <div class='card card-primary my-3 col-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $User[ 'Email' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input_password( 'Password', $User[ 'Password' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Branch', $User[ 'Branch' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Branch_Type', $User[ 'Branch_Type' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $User[ 'Employee_ID' ], $User[ 'Employee_Name' ] );?>
+                  <div class='row'>
+                    <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Image:</div>
+                    <div class='col-8'><?php 
+                      if(isset($User['Picture']) && strlen($User['Picture']) > 0){
+                        ?><img width='100%' src="<?php print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];?>" /><?php 
+                      }?><input type='file' name='Picture' class='form-control edit' /></div>
                   </div>
                 </div>
+              </div>
+              <div class='card card-primary my-y col-9'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Privileges' );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Privileges' ] ) && $_SESSION[ 'Cards' ][ 'Privileges' ] == 0 ? "style='display:none;'" : null;?>>
                   <table id='Table_Privileges' class='display' cellspacing='0' width='100%'>
                     <thead><tr>
@@ -332,8 +325,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </div>
           </div>
-        </div>
-      </form></div>
+        </form>
+      </div>
     </div>
   </div>
 </body>

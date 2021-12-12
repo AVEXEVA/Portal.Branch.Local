@@ -4,7 +4,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-  //Connection
+	//Connection
     $result = \singleton\database::getInstance( )->query(
       'Portal',
       " SELECT  [Connection].[ID]

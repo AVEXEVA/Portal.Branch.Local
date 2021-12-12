@@ -107,6 +107,7 @@ table.display.dataTable td {
   color: #FFF;
   transition: all 0.5s;
   position: relative;
+  cursor:pointer;
 }
 .link-page::before {
   content: '';

@@ -95,20 +95,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <link rel='stylesheet' href='bin/libraries/timepicker/jquery.timepicker.min.css' />
     <script src='bin/libraries/timepicker/jquery.timepicker.min.js'></script>
 	<style>
-		.panel {background-color:transparent !important;}
-		.panel > div.panel-body.white-background {background-color:rgba(255,255,255,.7) !important;}
-		.nav-tabs > li:not(.active) {background-color:rgba(255,255,255,.6) !important;}
-		.panel-heading {font-family: 'BankGothic' !important;}
-		.shadow {box-shadow:0px 5px 5px 0px;}
-		<?php if(isMobile()){?>
-		.panel-body {padding:0px !important;}
-		<?php }?>
-
-			div#wrapper {
-				overflow:scroll;
-			}
+		.card { background-color:transparent !important; }
+		.card > div.card-body.white-background { background-color:rgba(255,255,255,.7) !important; }
+		.nav-tabs > li:not(.active) { background-color:rgba(255,255,255,.6) !important; }
+		.card-heading { font-family: 'BankGothic' !important; }
+		.shadow { box-shadow:0px 5px 5px 0px; }
+        div#wrapper { overflow:scroll; }
 		@media print {
-			div#wrapper {overflow:visible;}
+            div#wrapper {overflow:visible;}
 		}
 	</style>
 </head>
@@ -118,33 +112,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php require( bin_php . 'element/navigation.php');?>
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
-                <div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Users( );?> Attendance</h4>
+                <div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Attendance( );?> Attendance</h4>
                     <div class="row">
-                        <form action='scheduler.php?<?php echo isset($_GET['Year'],$_GET['Month']) ? "Year={$_GET['Year']}&Month={$_GET['Month']}" : '';?>'>
-                            <?php if(isset($_GET['Year'],$_GET['Month'])){?>
-                                <input type='hidden' name='Year' value='<?php echo $_GET['Year'];?>' />
-                                <input type='hidden' name='Month' value='<?php echo $_GET['Month'];?>' />
-                            <?php }?>
-                            <div class="row col-12"><div class='col-1'>Supervisor: <select name='Supervisor'><?php
-                                        $r = $database->query(null,"SELECT tblWork.Super FROM tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
-                                        if($r){while($row = sqlsrv_fetch_array($r)){
-                                            ?><option value='<?php echo $row['Super'];?>' <?php if(isset($_GET['Supervisor']) && $_GET['Supervisor'] == $row['Super']){?>selected<?php }?>><?php echo $row['Super'];?></option><?php
-                                        }}
-                                        ?></select></div>
-                                <div class='col-1'><input type='submit' value='Search' /></div>
-                            </div>
-
-                        </form> </div><br>
+                        <form action='attendance.php' method='GET'>
+                            <input type='hidden' name='Year' value='<?php echo $_GET['Year'];?>' />
+                            <input type='hidden' name='Month' value='<?php echo $_GET['Month'];?>' />
+                        </form>
+                        <div class="row col-12">
+                            <div class='col-1'>Supervisor: <select name='Supervisor'><?php
+                                $r = $database->query(null,"SELECT tblWork.Super FROM tblWork GROUP BY tblWork.Super ORDER BY tblWork.Super ASC;");
+                                if($r){while($row = sqlsrv_fetch_array($r)){
+                                    ?><option value='<?php echo $row['Super'];?>' <?php if(isset($_GET['Supervisor']) && $_GET['Supervisor'] == $row['Super']){?>selected<?php }?>><?php echo $row['Super'];?></option><?php
+                                }}
+                            ?></select></div>
+                            <div class='col-1'><input type='submit' value='Search' /></div>
+                        </div> 
+                    </div>
                 </div>
-
                 <div class='card-body bg-darker'>
-                    <div class="card" style="width: 103rem;">
-                        <div class="card-body">
-                            <div class="row"><div class='col-2'><h3><a href='scheduler.php?Year=<?php echo date("Y",strtotime("now"));?>&Month=<?php echo date("m",strtotime("now"));?><?php echo isset($_GET['Supervisor']) ? '&Supervisor=' . $_GET['Supervisor'] : '';?>'><?php echo date("F",strtotime("now"));?></a></h3></h3></div>
-                                <div class='col-3'><h3><a href='scheduler.php?Year=<?php echo date("Y",strtotime("+1 months"));?>&Month=<?php echo date("m",strtotime("+1 months"));?><?php echo isset($_GET['Supervisor']) ? '&Supervisor=' . $_GET['Supervisor'] : '';?>'><?php echo date("F",strtotime("+1 months"));?></a></h3></div>
+                    <div class='card' style="width: 103rem;">
+                        <div class='card-body'>
+                            <div class='row'>
+                                <div class='col-2'>
+                                    <h3><a href='scheduler.php?Year=<?php echo date("Y",strtotime("now"));?>&Month=<?php echo date("m",strtotime("now"));?><?php echo isset($_GET['Supervisor']) ? '&Supervisor=' . $_GET['Supervisor'] : '';?>'><?php echo date("F",strtotime("now"));?></a></h3>
+                                </div>
+                                <div class='col-3'>
+                                    <h3><a href='scheduler.php?Year=<?php echo date("Y",strtotime("+1 months"));?>&Month=<?php echo date("m",strtotime("+1 months"));?><?php echo isset($_GET['Supervisor']) ? '&Supervisor=' . $_GET['Supervisor'] : '';?>'><?php echo date("F",strtotime("+1 months"));?></a></h3>
+                                </div>
                             </div>
                             <div class='row'>
-
                                 <div class='col-2' style='background-color:gold;'>Clocked In</div>
                                 <div class='col-2' style='background-color:green;color:white;'>Worked Day</div>
                                 <div class='col-2' style='background-color:orange;color:white;'>Worked Under 7.75 Hours</div>
