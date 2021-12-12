@@ -1,116 +1,7 @@
 <?php
 namespace singleton;
 class fontawesome extends \singleton\index {
-	//Data columns
-	public function Name($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Type($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Status($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Description($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-
-	//Address columns
-	public function Street($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function City($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function State($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Zip($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-
-	//Table names
-	public function Contact($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }	
-	public function Requisition($Size=null){?><i class='fa fa-barcode fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-
-	//Input Types
-	public function Check($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Checkbox($Size=null){?><i class='fa fa-check fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-
-	
-	public function Sitemap($Size=null){?><i class='fa fa-sitemap fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	
-	
-	public function Home($Size=null){?><i class='fa fa-home fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Personnel_Request($Size=null){?><i class='fa fa-users fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function User($Size=null){?><i class='fa fa-user fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Users($Size=null){?><i class='fa fa-users fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Safety_Report($Size=null){?><i class='fa fa-exclamation fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Requisitions($Size=null){?><i class='fa fa-cubes fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Delivery($Size=null){?><i class='fa fa-truck fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i></i><?php }
-	public function Customer($Size=null){?><i class='fa fa-link fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Archive($Size=null){?><i class='fa fa-archive fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Info($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-
-	public function Information($Size=null){?><i class='fa fa-info fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Human_Resources($Size=null){?><i class='fa fa-child fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Book($Size=null){?><i class='fa fa-book fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Field($Size=null){?><i class='fa fa-bolt fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Unit($Size=null){?><i class='fa fa-cogs fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Job($Size=null){?><i class='fa fa-suitcase fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Violation($Size=null){?><i class='fa fa-warning fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Location($Size=null){?><i class='fa fa-building fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Route($Size=null){?><i class='fa fa-road fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Map($Size=null){?><i class='fa fa-map fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Dispatch($Size=null){?><i class='fa fa-headphones fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Phone($Size=null){?><i class='fa fa-phone fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Service($Size=null){?><i class='fa fa-phone fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Review($Size=null){?><i class='fa fa-book fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Admin($Size=null){?><i class='fa fa-eye fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Connection($Size=null){?><i class='fa fa-exchange fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Update($Size=null){?><i class='fa fa-compass fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Payroll($Size=null){?><i class='fa fa-money fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Timesheet($Size=null){?><i class='fa fa-clock-o fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Time($Size=null){?><i class='fa fa-clock-o fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Ticket($Size=null){?><i class='fa fa-ticket fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Invoice($Size=null){?><i class='fa fa-stack-overflow fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Activities($Size=null){?><i class='fa fa-feed fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Collection($Size=null){?><i class='fa fa-dollar fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Dollar($Size=null){?><i class='fa fa-dollar fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Proposal($Size=null){?><i class='fa fa-folder-open fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Search($Size=null){?><i class='fa fa-search fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Contract($Size=null){?><i class='fa fa-pencil fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Financial($Size=null){?><i class='fa fa-bar-chart-o fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Pnl($Size=null){?><i class='fa fa-bar-chart-o fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Chart($Size=null){?><i class='fa fa-bar-chart-o fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Maintenance($Size=null){?><i class='fa fa-wrench fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Division($Size=null){?><i class='fa fa-sitemap fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function DOB($Size=null){?><i class='fa fa-eye fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Legal($Size=null){?><i class='fa fa-legal fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Modernization($Size=null){?><i class='fa fa-cogs fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Testing($Size=null){?><i class='fa fa-cogs fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Add($Size=null){?><i class='fa fa-plus-circle fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Edit($Size=null){?><i class='fa fa-edit fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Delete($Size=null){?><i class='fa fa-trash fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Save($Size=null){?><i class='fa fa-save fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Dashboard($Size=null){?><i class='fa fa-dashboard fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Calendar($Size=null){?><i class='fa fa-calendar fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Calendar_Plus($Size=null){?><i class='fa fa-calendar-plus-o fa-fw'></i><?php }
-	public function Clock($Size=null){?><i class='fa fa-clock-o fa-fw'></i><?php }
-	public function Note($Size=null){?><i class='fa fa-sticky-note-o fa-fw'></i><?php }
-	public function Territory($Size=null){?><i class='fa fa-black-tie fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Sales($Size=null){?><i class='fa fa-black-tie fa-fw'></i><?php }
-	public function Operations($Size=null){?><i class='fa fa-cogs fa-fw'></i> <?php }
-	public function Table($Size=null){?><i class='fa fa-table fa-fw'></i> <?php }
-	public function Website($Size=null){?><i class='fa fa-external-link fa-fw'></i> <?php }
-	public function List1($Size=null){?><i class='fa fa-list fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Birthday($Size=null){?><i class='fa fa-birthday-cake fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function History($Size=null){?><i class='fa fa-history fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Repair($Size=null){?><i class='fa fa-wrench fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Controls($Size=null){?><i class='fa fa-user-secret fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Email($Size=null){?><i class='fa fa-envelope fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Back($Size=null){?><i class='fa fa-arrow-left'></i><?php }
-	public function Print1($Size=null){?><i class='fa fa-print fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Address($Size=null){?><i class='fa fa-map-signs fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Blank($Size=null){?><i class='fa fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Resident($Size=null){?><i class='fa fa-flag fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Logout($Size=null){?><i class='fa fa-sign-out fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Hours($Size=null){?><i class='fa fa-hourglass fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Web($Size=null){?><i class='fa fa-bookmark fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Purchase($Size=null){?><i class='fa fa-shopping-cart fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Privilege($Size=null){?><i class='fa fa-codepen fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Report($Size=null){?><i class='fa fa-paperclip fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Inspection($Size=null){?><i class='fa fa-paperclip fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Github($Size=null){?><i class='fa fa-github fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Paragraph($Size=null){?><i class='fa fa-paragraph fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>'></i><?php }
-	public function Refresh($Size=null){?><i class="fa fa-refresh fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
-	public function Next($Size=null){?><i class="fa fa-arrow-right fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
-	public function Previous($Size=null){?><i class="fa fa-arrow-left fa-fw fa-<?php if(!is_null($Size)){echo $Size;?>x<?php }?>"></i><?php }
-	public function icon( $icon, $size ){?><i class='fa fa-<?php echo $icon;?> fa-fw fa-<?php echo $size;?>x'></i><?php }
+	//Helpers
 	public function __call( $function, $_args){
 	    if( method_exists( $this, $function ) ){
 	    	$this->$function($_args);
@@ -118,4 +9,147 @@ class fontawesome extends \singleton\index {
 			$this->icon( $function, 1 );
 		}
 	}
+	public function icon( $icon, $size ){		?><i class='fa fa-<?php echo $icon;?> fa-fw fa-<?php echo $size;?>x'></i><?php }
+	public function blank($size=null){ 			self::icon( 'blank', $size ); }
+
+	//Data columns
+	public function Field($size=null){			self::icon( 'bolt', $size ); }
+	public function Name( $size = 1 ){ 			self::icon( 'Name', $size ); }
+	public function Type( $size = 1 ){ 			self::icon( 'Type', $size ); }
+	public function Status( $size = 1 ){ 		self::icon( 'Status', $size ); }
+	public function Description( $size = 1 ){ 	self::icon( 'paragraph', $size ); }
+	public function Note( $size = 1 ){ 			self::icon( 'sticky-note-o', $size ); }
+	public function Notes( $size = 1 ){         self::Note( $size ); }
+
+	//DataTypes
+	public function Currency( $size = 1 ){ 		self::icon( 'dollar', $size ); }
+	public function Date( $size = 1 ){ 			self::icon( 'calendar', $size ); }
+	public function Email($size=null){			self::icon( 'envelope', $size ); }
+	public function Phone($size=null){			self::icon( 'phone', $size ); }
+	public function Time( $size = 1 ){ 			self::icon( 'clock-o', $size ); }
+
+	//Address columns
+	public function Address($size=null){		self::icon( 'map-signs', $size ); }
+	public function Street( $size = 1 ){ 		self::icon( 'info', $size ); }
+	public function City( $size = 1 ){ 			self::icon( 'info', $size ); }
+	public function State( $size = 1 ){ 		self::icon( 'info', $size ); }
+	public function Zip( $size = 1 ){ 			self::icon( 'city', $size ); }
+
+	//TS Table Names
+	
+	public function Contact( $size = 1 ){ 		self::icon( 'address-card', $size ); }
+	public function Contacts( $size = 1 ){ 		self::Contact( $size ); }
+	public function Contract( $size = 1 ){ 		self::icon( 'file-signature', $size ); }
+	public function Collection( $size = 1 ){ 	self::icon( 'file-invoice-dollar', $size ); }
+	public function Customer( $size = 1 ){ 		self::icon( 'industry', $size ); }
+	public function Division( $size = 1 ){ 		self::icon( 'sitemap', $size ); }
+	public function Employee( $size = 1 ){ 		self::icon( 'user', $size ); }
+	public function Employees( $size = 1 ){ 	self::icon( 'users', $size ); }
+	public function Invoice( $size = 1 ){ 		self::icon( 'stack-overflow', $size ); }
+	public function Job( $size = 1 ){ 			self::icon( 'suitcase', $size ); }
+	public function Lead( $size = 1 ){ 			self::icon( 'project-diagram', $size ); }
+	public function Leads( $size = 1 ){ 		self::Lead( $size ); }
+	public function Location( $size = 1 ){ 		self::icon( 'building', $size ); }
+	public function Proposal( $size = 1 ){ 		self::icon( 'pencil', $size ); }
+	public function Requisition( $size = 1 ){ 	self::icon( 'barcode', $size ); }
+	public function Requisitions( $size = 1 ){ 	self::Requisition( $size ); }
+	public function Route( $size = 1 ){ 		self::icon( 'route', $size ); }
+	public function Supervisor( $size= 1 ){     self::icon( 'chalkboard-teacher', $size ); }
+	public function Territory( $size = 1 ){ 	self::icon( 'black-tie', $size ); }
+	public function Ticket( $size = 1 ){ 		self::icon( 'ticket', $size ); }
+	public function Unit( $size = 1 ){ 			self::icon( 'cogs', $size ); }
+	public function Violation( $size = 1 ){ 	self::icon( 'warning', $size ); }
+
+	//Portal Table Names
+	public function Connection( $size = 1 ){ 	self::icon( 'exchange', $size ); }
+	public function Error( $size = 1 ){ 		self::icon( 'exclamation-triangle', $size ); }
+	public function User( $size = 1 ){ 			self::icon( 'user-shield', $size ); }
+	public function Users( $size = 1 ){ 		self::icon( 'user-shield', $size ); }
+
+	//Extended Business Logic
+	public function Attendance($size=null){		self::icon( 'calendar', $size ); }
+	public function DOB($size=null){			self::icon( 'eye', $size ); }
+	public function Maintenance($size=null){	self::icon( 'wrench', $size ); }
+	public function Modernization($size=null){	self::icon( 'hammer', $size ); }
+	public function Operations($size=null){		self::icon( 'cogs', $size ); }
+	public function Repair($size=null){			self::icon( 'wrench', $size ); }
+	public function Resident($size=null){		self::icon( 'flag', $size ); }
+	public function Sales($size=null){			self::icon( 'black-tie', $size ); }
+	public function Tasks($size=null){			self::icon( 'tasks', $size ); }
+	public function Testing($size=null){		self::icon( 'cogs', $size ); }
+
+	//Input Types
+	public function Check($size=null){			self::icon( 'check', $size ); }
+	public function Checkbox($size=null){		self::icon( 'check', $size ); }
+
+
+	//Card Types
+	public function Info( $size=null ){			self::icon( 'info', $size ); }
+	public function Information( $size=null ){	self::Info( $size ); }
+
+	//Page Links
+	public function Archive($size=null){		self::icon( 'archive', $size ); }
+	public function Dispatch($size=null){		self::icon( 'headphones', $size ); }
+	public function Home($size=null){			self::icon( 'home', $size ); }
+	public function Human_Resources($size=null){self::icon( 'child', $size ); }
+	public function Map($size=null){			self::icon( 'map', $size ); }
+	public function Payroll($size=null){		self::icon( 'money', $size ); }
+	public function Profile($size=null){		self::icon( 'user-circle', $size ); }
+	public function Sitemap($size=null){		self::icon( 'sitemap', $size ); }
+	public function Safety_Report($size=null){	self::icon( 'exclamation', $size ); }
+	
+	//Smart Elements
+	public function Chart($size=null){			self::icon( 'bar-chart-o', $size ); }
+	public function Calendar($size=null){		self::icon( 'calendar', $size ); }
+	public function Calendar_Plus($size=null){	self::icon( 'calendar-plus-o', $size ); }
+	public function List($size=null){			self::icon( 'list', $size ); }
+	public function Table($size=null){			self::icon( 'table', $size ); }
+
+	//Navigation Buttons
+	public function Back($size=null){			self::Previous( $size ); }
+	public function Next($size=null){			self::icon( 'arrow-right', $size ); }
+	public function Previous($size=null){		self::icon( 'arrow-left', $size ); }
+	public function Refresh($size=null){		self::icon( 'refresh', $size ); }
+	public function Search($size=null){			self::icon( 'search', $size ); }
+	
+	//Form Buttons
+	public function Add($size=null){			self::icon( 'plus-circle', $size ); }
+	public function Edit($size=null){			self::icon( 'edit', $size ); }
+	public function Delete($size=null){			self::icon( 'trash', $size ); }
+	public function Save($size=null){			self::icon( 'save', $size ); }
+
+	//Other Buttons
+	public function Logout($size=null){			self::icon( 'sign-out', $size ); }
+	public function Print($size=null){			self::icon( 'print', $size ); }
+	public function Controls($size=null){		self::icon( 'user-secret', $size ); }
+
+	//Other
+	public function Activities($size=null){		self::icon( 'feed', $size ); }
+	public function Admin($size=null){			self::icon( 'eye', $size ); }
+	public function Birthday($size=null){		self::icon( 'birthday-cake', $size ); }
+	public function Book($size=null){			self::icon( 'book', $size ); }
+	public function Dashboard($size=null){		self::icon( 'dashboard', $size ); }
+	public function Delivery($size=null){		self::icon( 'truck', $size ); }
+	public function Financial($size=null){		self::icon( 'bar-chart-o', $size ); }
+	public function History($size=null){		self::icon( 'history', $size ); }
+	public function Legal($size=null){			self::icon( 'legal', $size ); }
+	public function Request($size=null){		self::icon( 'info', $size ); }
+	public function Pnl($size=null){			self::icon( 'bar-chart-o', $size ); }
+	public function Review($size=null){			self::icon( 'book', $size ); }
+	public function Service($size=null){		self::icon( 'phone', $size ); }
+	public function Work($size=null){			self::icon( 'bolt', $size ); }
+	public function Timesheet($size=null){		self::icon( 'clock-o', $size ); }
+	public function Update($size=null){			self::icon( 'compass', $size ); }
+	public function Website($size=null){		self::icon( 'external-link', $size ); }
+	
+	//ETC
+	public function Clock($size=null){			self::icon( 'clock-o', $size ); }
+	public function Hours($size=null){			self::icon( 'hourglass', $size ); }
+	public function Web($size=null){			self::icon( 'bookmark', $size ); }
+	public function Purchase($size=null){		self::icon( 'shopping-cart', $size ); }
+	public function Privilege($size=null){		self::icon( 'codepen', $size ); }
+	public function Report($size=null){			self::icon( 'paperclip', $size ); }
+	public function Inspection($size=null){		self::icon( 'paperclip', $size ); }
+	public function Github($size=null){			self::icon( 'github', $size ); }
+	public function Paragraph($size=null){		self::icon( 'paragraph', $size ); }
 }?>

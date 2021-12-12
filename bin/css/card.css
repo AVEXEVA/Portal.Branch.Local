@@ -4,7 +4,7 @@
 .card.card-full>form {
   height : inherit;
 }
-.card.card-full>form>.card-body {
+.card.card-full>form>.card-body:not( .mobile ) {
   height : 90%;
 }
 @media only screen and ( min-width : 1024px ){

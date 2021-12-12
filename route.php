@@ -68,7 +68,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   if(     !isset( $Connection[ 'ID' ] )
       ||  !isset( $Privileges[ 'Route' ] )
       ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
-  ){ ?><?php require('404.html');?><?php }
+  ){ require('404.html');?><?php }
   else {
     \singleton\database::getInstance( )->query(
       null,
@@ -81,19 +81,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       )
     );
     $ID = isset( $_GET[ 'ID' ] )
-    ? $_GET[ 'ID' ]
-    : (
-      isset( $_POST[ 'ID' ] )
-      ? $_POST[ 'ID' ]
-      : null
-    );
+      ? $_GET[ 'ID' ]
+      : (
+        isset( $_POST[ 'ID' ] )
+        ? $_POST[ 'ID' ]
+        : null
+      );
     $Name = isset( $_GET[ 'Name' ] )
       ? $_GET[ 'Name' ]
       : (
         isset( $_POST[ 'Name' ] )
         ? $_POST[ 'Name' ]
         : null
-    );
+      );
     $result = \singleton\database::getInstance( )->query(
       null,
       " SELECT  Route.ID              AS ID,
@@ -244,8 +244,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Employee_ID' => null,
         'Employee_Name' => null
       ) : sqlsrv_fetch_array($result);
-
-
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
         $Route[ 'Name' ]      = isset( $_POST[ 'Name' ] )    ? $_POST[ 'Name' ]    : $Route[ 'Name' ];

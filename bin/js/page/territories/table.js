@@ -49,7 +49,7 @@ $( document ).ready( function( ){
         table    : '#Table_Territories'
     } );
     var Table_Territories = $('#Table_Territories').DataTable( {
-        dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+        dom            : "<'row'<'col-sm-9'B><'col-sm-12 col-lg-3 search'>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
         searching      : false,
@@ -96,7 +96,7 @@ $( document ).ready( function( ){
                           case 'display' :
                               return  row.ID !== null
                                   ?   "<div class='row'>" +
-                                          "<div class='col-12'><a href='territories.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
+                                          "<div class='col-12'><a href='territory.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
                                       "</div>"
                                   :   null;
                           default :
@@ -110,7 +110,7 @@ $( document ).ready( function( ){
                         case 'display' :
                             return  row.ID !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                        "<div class='col-12'><a href='territory.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -171,7 +171,7 @@ $( document ).ready( function( ){
                        case 'display' :
                            return  row.Proposal !== null
                                ?   "<div class='row'>" +
-                                       "<div class='col-12'><a href='proposal.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Proposal + " invoices</a></div>" +
+                                       "<div class='col-12'><a href='proposal.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i><span " + row.Proposal + " invoices</a></div>" +
                                    "</div>"
                                :   null;
                        default :
@@ -209,7 +209,13 @@ $( document ).ready( function( ){
         }],
         buttons: [
             {
-                text: 'Reset Search',
+                text: "<i class='fa fa-refresh fa-fw fa-1x'></i><span class='desktop'>Refresh</span>",
+                className : 'form-control',
+                action: function ( e, dt, node, config ) {
+                    Table_Territories.draw( );
+                }
+            },{
+                text: "<i class='fa fa-undo fa-fw fa-1x'></i><span class='desktop'>Clear</span>",
                 className : 'form-control',
                 action: function ( e, dt, node, config ) {
                     $( 'input:visible, select:visible' ).each( function( ){
@@ -218,7 +224,7 @@ $( document ).ready( function( ){
                     Table_Territories.draw( );
                 }
             },{
-                text : 'Get URL',
+                text : "<i class='fas fa-bookmark'></i><span class='desktop'>Bookmark</span>",
                 className : 'form-control',
                 action : function( e, dt, node, config ){
                     d = { }
@@ -232,14 +238,14 @@ $( document ).ready( function( ){
                     document.location.href = 'territories.php?' + new URLSearchParams( d ).toString();
                 }
             },{
-                text : 'Create',
+                text : "<i class='fa fa-plus fa-fw fa-1x'></i><span class='desktop'>New</span>",
                 className : 'form-control',
                 action : function( e, dt, node, config ){
                     document.location.href='territory.php';
                 }
             },
             {
-                text : 'Delete',
+                text : "<i class='fa fa-trash fa-fw fa-1x'></i><span class='desktop'>Delete</span>",
                 className : 'form-control',
                 action : function( e, dt, node, config ){
                   var rows = dt.rows( { selected : true } ).indexes( );
@@ -258,20 +264,20 @@ $( document ).ready( function( ){
                 }
               },{
                 extend : 'print',
-                text : 'Print',
+                text : "<i class='fa fa-print fa-fw fa-1x'></i><span class='desktop'>Print</span>",
                 className : 'form-control'
             },{
                 extend : 'copy',
-                text : 'Copy',
+                text : "<i class='fa fa-copy fa-fw fa-1x'></i><span class='desktop'>Copy</span>",
                 className : 'form-control'
             },{
                 extend : 'csv',
-                text : 'CSV',
+                text : "<i class='fas fa-file-csv fa-fw fa-1x'></i><span class='desktop'>Export</span>",
                 className : 'form-control'
             }
         ],
         initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             //search( this );

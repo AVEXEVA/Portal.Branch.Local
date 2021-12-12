@@ -366,6 +366,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     	'Address' => null,
                       'TFMID' => null,
                     	'TFMSource' => null,
+                      //Totals
                       'Locations_Count' => null,
                       'Locations_Maintained' => null,
                       'Locations_Unmaintained' => null,
@@ -391,19 +392,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     //Binds $ID, $Name, $Territory and query values into the $resultesult variable
     if( isset( $_POST ) && count( $_POST ) > 0 ){
       // if the $_Post is set and the count is null, select if available
-      $Territory[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Territory[ 'ID' ];
-      $Territory[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Territory[ 'Name' ];
-      $Territory[ 'SMan' ] 		= isset( $_POST[ 'SMan' ] ) 	 ? $_POST[ 'SMan' ] 	 : $Territory[ 'SMan' ];
-      $Territory[ 'SDesc' ] 		= isset( $_POST[ 'SDesc' ] ) 	 ? $_POST[ 'SDesc' ] 	 : $Territory[ 'SDesc' ];
-      $Territory[ 'Remarks' ] 		= isset( $_POST[ 'Remarks' ] ) 	 ? $_POST[ 'Remarks' ] 	 : $Territory[ 'Remarks' ];
-      $Territory[ 'Count' ] = isset( $_POST[ 'Count' ] )  ? $_POST[ 'Count' ]  : $Territory[ 'Count' ];
-      $Territory[ 'Symbol' ] = isset( $_POST[ 'Symbol' ] )  ? $_POST[ 'Symbol' ]  : $Territory[ 'Symbol' ];
-      $Territory[ 'EN' ]     = isset( $_POST[ 'EN' ] ) 	   ? $_POST[ 'EN' ] 	   : $Territory[ 'EN' ];
-      $Territory[ 'Address' ] 	= isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
-      $Territory[ 'TFMID' ] 	= isset( $_POST[ 'TFMID' ] ) 	 ? $_POST[ 'TFMID' ] 	 : $Territory[ 'TFMID' ];
-      $Territory[ 'TFMSource' ] = isset( $_POST[ 'TFMSource' ] )  ? $_POST[ 'TFMSource' ]  : $Territory[ 'TFMSource' ];
-      $Territory[ 'Address' ] 	= isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
-      $Territory[ 'Price' ] 	= isset( $_POST[ 'Price' ] ) 	 ? $_POST[ 'Price' ] 	 : $Territory[ 'Price' ];
+      $Territory[ 'ID' ] 		     = isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Territory[ 'ID' ];
+      $Territory[ 'Name' ] 	     = isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Territory[ 'Name' ];
+      $Territory[ 'SMan' ] 		   = isset( $_POST[ 'SMan' ] ) 	 ? $_POST[ 'SMan' ] 	 : $Territory[ 'SMan' ];
+      $Territory[ 'SDesc' ] 	   = isset( $_POST[ 'SDesc' ] ) 	 ? $_POST[ 'SDesc' ] 	 : $Territory[ 'SDesc' ];
+      $Territory[ 'Remarks' ]    = isset( $_POST[ 'Remarks' ] ) 	 ? $_POST[ 'Remarks' ] 	 : $Territory[ 'Remarks' ];
+      $Territory[ 'Count' ]      = isset( $_POST[ 'Count' ] )  ? $_POST[ 'Count' ]  : $Territory[ 'Count' ];
+      $Territory[ 'Symbol' ]     = isset( $_POST[ 'Symbol' ] )  ? $_POST[ 'Symbol' ]  : $Territory[ 'Symbol' ];
+      $Territory[ 'EN' ]         = isset( $_POST[ 'EN' ] ) 	   ? $_POST[ 'EN' ] 	   : $Territory[ 'EN' ];
+      $Territory[ 'Address' ]    = isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
+      $Territory[ 'TFMID' ] 	   = isset( $_POST[ 'TFMID' ] ) 	 ? $_POST[ 'TFMID' ] 	 : $Territory[ 'TFMID' ];
+      $Territory[ 'TFMSource' ]  = isset( $_POST[ 'TFMSource' ] )  ? $_POST[ 'TFMSource' ]  : $Territory[ 'TFMSource' ];
+      $Territory[ 'Address' ] 	 = isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
+      $Territory[ 'Price' ] 	   = isset( $_POST[ 'Price' ] ) 	 ? $_POST[ 'Price' ] 	 : $Territory[ 'Price' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
