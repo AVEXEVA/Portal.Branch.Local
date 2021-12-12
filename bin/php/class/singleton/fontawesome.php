@@ -67,6 +67,7 @@ class fontawesome extends \singleton\index {
 	public function Users( $size = 1 ){ 		self::icon( 'user-shield', $size ); }
 
 	//Extended Business Logic
+	public function Attendance($size=null){		self::icon( 'calendar', $size ); }
 	public function DOB($size=null){			self::icon( 'eye', $size ); }
 	public function Maintenance($size=null){	self::icon( 'wrench', $size ); }
 	public function Modernization($size=null){	self::icon( 'hammer', $size ); }
@@ -136,6 +137,7 @@ class fontawesome extends \singleton\index {
 	public function Pnl($size=null){			self::icon( 'bar-chart-o', $size ); }
 	public function Review($size=null){			self::icon( 'book', $size ); }
 	public function Service($size=null){		self::icon( 'phone', $size ); }
+	public function Work($size=null){			self::icon( 'bolt', $size ); }
 	public function Timesheet($size=null){		self::icon( 'clock-o', $size ); }
 	public function Update($size=null){			self::icon( 'compass', $size ); }
 	public function Website($size=null){		self::icon( 'external-link', $size ); }

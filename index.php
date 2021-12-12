@@ -213,9 +213,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         </div><?php
       }?>
       <?php if( check( privilege_read, level_group, $Privileges[ 'Ticket' ] ) ){
-        ?><div class='link-page text-white col-xl-2 col-6 btn-two' onclick="document.location.href='schedule.php'">
+        ?><div class='link-page text-white col-xl-2 col-6 btn-two' onclick="document.location.href='attendance.php'">
           <div class='p-1 border'>
-            <div class='nav-icon'><i class="fa fa-question-circle fa-3x fa-fw" aria-hidden="true"></i></div>
+            <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Attendance( 3 );?></div>
             <div class ='nav-text'>Attendance</div>
           </div>
         </div><?php
@@ -352,7 +352,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       </div><?php } ?>
       <?php if( check( privilege_read, level_department, isset( $Privileges[ 'Time' ] ) ? $Privileges[ 'Time' ] : 0 ) ){?><div class='link-page text-white col-xl-2 col-6' onclick="document.location.href='review.php'">
         <div class='p-1 border'>
-          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Customer( 3 );?></div>
+          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Review( 3 );?></div>
           <div class ='nav-text'>Review</div>
         </div>
       </div><?php }?>
@@ -443,7 +443,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       </div>
       <div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='work4.php'">
         <div class='p-1 border'>
-          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
+          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Work(3);?></div>
           <div class ='nav-text'>Work</div>
         </div>
       </div>
