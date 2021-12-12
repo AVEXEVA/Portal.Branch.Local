@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Contact' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Contact' ] )
+        ||  !isset( $Privileges[ 'Territory' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Territory' ] )
     ){ ?><?php require('404.html');?><?php }
 	else {
 		$output = array(
@@ -93,37 +93,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['ID'];
-	      $conditions[] = "Contact.ID LIKE '%' + ? + '%'";
+	      $conditions[] = "Territory.ID LIKE '%' + ? + '%'";
 	    }
       if( isset( $_GET[ 'Contact' ] ) && !in_array(  $_GET[ 'Contact' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Contact'];
-      $conditions[] = "Contact.Contact LIKE '%' + ? + '%'";
+      $conditions[] = "Territory.Contact LIKE '%' + ? + '%'";
       }
-	    if( isset( $_GET[ 'Type' ] ) && !in_array(  $_GET[ 'Type' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Type'];
-	      $conditions[] = "Contact.Type LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Name' ] ) && !in_array(  $_GET[ 'Name' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Name'];
-	      $conditions[] = "Contact.Name LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Position' ] ) && !in_array( $_GET[ 'Position' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Position'];
-	      $conditions[] = "Contact.Position LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Phone' ] ) && !in_array( $_GET[ 'Phone' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Phone'];
-	      $conditions[] = "Contact.Phone LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Email' ] ) && !in_array( $_GET[ 'Email' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Email'];
-	      $conditions[] = "Contact.Email LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Address'];
-	      $conditions[] = "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
-	    }
-
+      if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Address'];
+        $conditions[] = "Territory.Address + ' ' + Territory.City + ' ' + Territory.State + ' ' + Territory.Zip LIKE '%' + ? + '%'";
+      }
 		/*Search Filters*/
 		//if( isset( $_GET[ 'search' ] ) ){ }
 
@@ -139,18 +118,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		/*Order && Direction*/
 		//update columns from bin/js/tickets/table.js
 		$Columns = array(
-			0 =>  'Contact.ID',
-			1 =>  'Contact.Contact',
-      2 =>  "Contact.Type",
-      3 =>  "Contact.Name",
-			4 =>  "Contact.Position",
-			5 =>  "Contact.[Phone]",
-			6 =>  "Contact.Email",
-			7 =>  "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip"
+			0 =>  'Territory.ID',
+			1 =>  'Territory.Contact'
 	    );
 	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
 	        ? $Columns[ $_GET['order']['column'] ]
-	        : "Contact.ID";
+	        : "Territory.ID";
 	    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
 	      ? $_GET['order']['dir']
 	      : 'ASC';
@@ -159,22 +132,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		$Query = "SELECT 	*
 			FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-						Contact.ID 						  AS ID,
-						Contact.Name 					  AS Name,
-						Contact.Contact 				AS Contact,
-						Contact.Position  		  AS Position,
-						Contact.Phone 					AS Phone,
-						Contact.Email 					AS Email,
-						Contact.Address 				AS Street,
-						Contact.City  					AS City,
-						Contact.State 					AS State,
-						Contact.Zip 					  AS Zip,
-						CASE 	WHEN Contact.[Type] = 0 THEN 	'Customer'
-								WHEN Contact.[Type] = 4 THEN  'Location'
-								WHEN Contact.[Type] = 5 THEN  'Employee'
-								ELSE 'Unknown'
-						END 	AS [Type]
-				FROM 	Rol AS Contact
+						Territory.ID 						        AS ID,
+						Territory.Name 					        AS Name,
+						Territory.SMan 			           	AS SMan,
+						Territory.SDesc  		            AS Description,
+						Territory.Remarks 					    AS Remarks,
+						Territory.Count 				   	    AS Count,
+						Territory.Symbol 			  	      AS Symbol,
+						Territory.EN  				   	      AS EN,
+						Territory.Address 				      AS Address,
+						Territory.TFMID 					      AS TFMID,
+            Territory.TFMSource 	   		    AS TFMSource
+				FROM 	Terr AS Territory
 				WHERE 	({$conditions}) AND ({$search})
 			) AS Tbl
 			WHERE 		Tbl.ROW_COUNT >= ?
@@ -189,8 +158,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      $output[ 'aaData' ][]   		= $Ticket;
 	    }
 
-		$sQueryRow = "	SELECT 	Count( Contact.ID ) AS Count
-						FROM 	Rol AS Contact
+		$sQueryRow = "	SELECT 	Count( Territory.ID ) AS Count
+						FROM 	Terr AS Territory
 						WHERE 	({$conditions}) AND ({$search})";
 
 	    $stmt = \singleton\database::getInstance( )->query(
@@ -202,8 +171,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
 	    sqlsrv_cancel( $stmt );
 
-	    $sQuery = " SELECT  COUNT(Contact.ID)
-	                FROM    Rol AS Contact;";
+	    $sQuery = " SELECT  COUNT(Territory.ID)
+	                FROM    Terr AS Territory;";
 	    $rResultTotal = \singleton\database::getInstance( )->query(
 	    	null,
 	    	$sQuery,

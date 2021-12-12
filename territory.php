@@ -100,11 +100,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	          Territory.Address        AS Address,
                 Territory.TFMID          AS TFMID,
                 Territory.TFMSource      AS TFMSource,
-                CASE    WHEN Locations.Count IS NULL THEN 0 
+                CASE    WHEN Locations.Count IS NULL THEN 0
                         ELSE Locations.Count END AS Locations_Count,
-                CASE    WHEN Locations.Maintained IS NULL THEN 0 
+                CASE    WHEN Locations.Maintained IS NULL THEN 0
                         ELSE Locations.Maintained END AS Locations_Maintained,
-                CASE    WHEN Locations.Unmaintained IS NULL THEN 0 
+                CASE    WHEN Locations.Unmaintained IS NULL THEN 0
                         ELSE Locations.Unmaintained END AS Locations_Unmaintained,
                 CASE    WHEN Units.Count IS NULL THEN 0
                         ELSE Units.Count END AS Units_Count,
@@ -147,19 +147,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     SELECT      Location.Terr AS Territory,
                                 Sum( Maintained.Count ) AS Maintained,
                                 Sum( Unmaintained.Count ) AS Unmaintained,
-                                Count( Location.Loc ) AS Count 
+                                Count( Location.Loc ) AS Count
                     FROM        Loc AS Location
                                 LEFT JOIN (
                                     SELECT      Location.Loc AS Location,
                                                 Count( Location.Loc ) AS Count
-                                    FROM        Loc AS Location 
+                                    FROM        Loc AS Location
                                     WHERE       Location.Maint = 1
                                     GROUP BY    Location.Loc
                                 ) AS Maintained ON Location.Loc = Maintained.Location
                                 LEFT JOIN (
                                     SELECT      Location.Loc AS Location,
                                                 Count( Location.Loc ) AS Count
-                                    FROM        Loc AS Location 
+                                    FROM        Loc AS Location
                                     WHERE       Location.Maint = 0
                                     GROUP BY    Location.Loc
                                 ) AS Unmaintained ON Location.Loc = Unmaintained.Location
@@ -200,7 +200,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   GROUP BY    Unit.Loc
                               ) AS Other ON Other.Location = Location.Loc
                   GROUP BY    Location.Terr
-              ) AS Units ON Units.Territory = Territory.ID 
+              ) AS Units ON Units.Territory = Territory.ID
               LEFT JOIN (
                       SELECT  Location.Terr AS Territory,
                               [Open].Count AS [Open],
@@ -209,22 +209,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       FROM    Loc AS Location
                               LEFT JOIN (
                                   SELECT      Job.Loc AS Location,
-                                              Count( Job.ID ) AS Count 
-                                  FROM        Job 
+                                              Count( Job.ID ) AS Count
+                                  FROM        Job
                                   WHERE       Job.Status = 0
                                   GROUP BY    Job.Loc
                               ) AS [Open] ON [Open].Location = Location.Loc
                               LEFT JOIN (
                                   SELECT      Job.Loc AS Location,
-                                              Count( Job.ID ) AS Count 
-                                  FROM        Job 
+                                              Count( Job.ID ) AS Count
+                                  FROM        Job
                                   WHERE       Job.Status = 2
                                   GROUP BY    Job.Loc
                               ) AS [On_Hold] ON [On_Hold].Location = Location.Loc
                               LEFT JOIN (
                                   SELECT      Job.Loc AS Location,
-                                              Count( Job.ID ) AS Count 
-                                  FROM        Job 
+                                              Count( Job.ID ) AS Count
+                                  FROM        Job
                                   WHERE       Job.Status = 1
                                   GROUP BY    Job.Loc
                               ) AS [Closed] ON [Closed].Location = Location.Loc
@@ -236,7 +236,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         En_Route.Count AS En_Route,
                         On_Site.Count AS On_Site,
                         Reviewing.Count AS Reviewing
-                FROM    Terr AS Territory 
+                FROM    Terr AS Territory
                         LEFT JOIN (
                           SELECT    Location.Terr AS Territory,
                                     Count( TicketO.ID ) AS Count
@@ -282,7 +282,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     SELECT  Location.Terr AS Territory,
                             Preliminary.Count AS Preliminary,
                             Job_Created.Count AS Job_Created
-                    FROM    Loc AS Location 
+                    FROM    Loc AS Location
                             LEFT JOIN (
                               SELECT    Location.Loc AS Location,
                                         Count( Violation.ID ) AS Count
@@ -311,14 +311,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   FROM      Invoice
                                   WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
                                   GROUP BY  Invoice.Loc
-                                ) AS [Open] ON Location.Loc = [Open].Location 
+                                ) AS [Open] ON Location.Loc = [Open].Location
                                 LEFT JOIN (
                                   SELECT    Invoice.Loc AS Location,
                                             Count( Invoice.Ref ) AS Count
                                   FROM      Invoice
                                   WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
                                   GROUP BY  Invoice.Loc
-                                ) AS [Closed] ON Location.Loc = [Closed].Location 
+                                ) AS [Closed] ON Location.Loc = [Closed].Location
                     GROUP BY    Location.Terr
                 ) AS Invoices ON Invoices.Territory = Territory.ID
                 LEFT JOIN (
@@ -332,14 +332,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               FROM      Estimate
                               WHERE     Estimate.Status = 0
                               GROUP BY  Estimate.LocID
-                            ) AS [Open] ON Location.ID = [Open].Location 
+                            ) AS [Open] ON Location.ID = [Open].Location
                             LEFT JOIN (
                               SELECT    Estimate.LocID AS Location,
                                         Count( Estimate.ID ) AS Count
                               FROM      Estimate
                               WHERE     Estimate.Status = 1
                               GROUP BY  Estimate.LocID
-                            ) AS [Closed] ON Location.ID = [Closed].Location 
+                            ) AS [Closed] ON Location.ID = [Closed].Location
                 ) AS Proposals ON Proposals.Territory = Territory.ID
         WHERE       Territory.ID = ?
                 OR 	Territory.Name = ?;",
@@ -365,7 +365,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     	'EN' => null,
                     	'Address' => null,
                       'TFMID' => null,
-                    	'TFMSource' => null
+                    	'TFMSource' => null,
+                      'Locations_Count' => null,
+                      'Locations_Maintained' => null,
+                      'Locations_Unmaintained' => null,
+                      'Units_Count' => null,
+                      'Units_Elevators' => null,
+                      'Units_Escalators' => null,
+                      'Units_Other' => null,
+                      'Jobs_Open' => null,
+                      'Jobs_On_Hold' => null,
+                      'Jobs_Closed' => null,
+                      'Tickets_Open' => null,
+                      'Tickets_Assigned' => null,
+                      'Tickets_En_Route' => null,
+                      'Tickets_On_Site' => null,
+                      'Tickets_Reviewing' => null,
+                      'Violations_Preliminary_Report' => null,
+                      'Violations_Job_Created' => null,
+                      'Invoices_Open' => null,
+                      'Invoices_Closed' => null,
+                      'Proposals_Open' => null,
+                      'Proposals_Closed' => null
     ) : sqlsrv_fetch_array($result);
     //Binds $ID, $Name, $Territory and query values into the $resultesult variable
     if( isset( $_POST ) && count( $_POST ) > 0 ){
