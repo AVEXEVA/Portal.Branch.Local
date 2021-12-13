@@ -1,7 +1,23 @@
 <?php
 namespace singleton;
 class datatables extends \singleton\index {
-	public function ID( ){
+	public function ID($module){
+        $url = "customer.php";
+        $moduleName = "Customer";
+        switch (strtolower($module)) {
+            case 'customer':
+                $this->url = "customer.php";
+                $this->moduleName = "Customer";
+                break;
+            case 'employee':
+                $this->url = "employee.php";
+                $this->moduleName = "Employee";
+                break;
+            
+            default:
+                # code...
+                break;
+        }
 		?>{
           className : 'ID',
           data : 'ID',
@@ -10,7 +26,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.ID !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo $this->url;?>?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> <?php echo $this->moduleName;?> #" + row.ID + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -19,6 +35,25 @@ class datatables extends \singleton\index {
           }
       }<?php
 	}
+
+    public function FirstName( ){
+		?>{
+            data : 'First_Name'            
+        }<?php
+	}
+
+    public function LastName( ){
+		?>{
+            data : 'Last_Name'            
+        }<?php
+	}
+
+    public function Supervisor( ){
+		?>{
+            data : 'Supervisor'            
+        }<?php
+	}
+
 	public function Name( ){
 		?>{
             data : 'Name',
@@ -146,5 +181,27 @@ class datatables extends \singleton\index {
 
             }
         }<?php
+	}
+
+    public function GPSLocation( ){
+		?>
+            {
+            className : 'GPSLocation',
+            searchable: false,
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  (row.Latittude !== null && row.Longitude !== null)
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='https://www.google.com/maps/search/?api=1&query=" + row.Latitude + "," + row.Longitude + "' target='_blank' ><i class='fa fa-map-marker'></i> GPS </a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }
+    <?php
 	}
 }?>
