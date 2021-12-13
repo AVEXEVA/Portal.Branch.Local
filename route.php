@@ -154,7 +154,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     GROUP BY    Unit.Loc
                                 ) AS Other ON Other.Location = Location.Loc
                     GROUP BY    Location.Route
-                ) AS Units ON Units.Route = Route.ID 
+                ) AS Units ON Units.Route = Route.ID
                 LEFT JOIN (
                   SELECT  Route.ID AS Route,
                           Unassigned.Count AS Unassigned,
@@ -162,7 +162,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           En_Route.Count AS En_Route,
                           On_Site.Count AS On_Site,
                           Reviewing.Count AS Reviewing
-                  FROM    Route 
+                  FROM    Route
                           LEFT JOIN (
                             SELECT    Location.Route AS Route,
                                       Count( TicketO.ID ) AS Count
@@ -208,7 +208,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       SELECT  Location.Route AS Route,
                               Preliminary.Count AS Preliminary,
                               Job_Created.Count AS Job_Created
-                      FROM    Loc AS Location 
+                      FROM    Loc AS Location
                               LEFT JOIN (
                                 SELECT    Location.Loc AS Location,
                                           Count( Violation.ID ) AS Count
@@ -241,8 +241,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     )  ? array(
         'ID' => null,
         'Name' => null,
-        'Employee_ID' => null,
-        'Employee_Name' => null
+        'Employee_ID' => isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null,
+        'Employee_Name' => isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null,
+        'Units_Elevators' => isset( $_GET[ 'Units_Elevators' ] ) ? $_GET[ 'Units_Elevators' ] : null,
+        'Units_Escalators' => isset( $_GET[ 'Units_Escalators' ] ) ? $_GET[ 'Units_Escalators' ] : null,
+        'Units_Other' => isset( $_GET[ 'Units_Other' ] ) ? $_GET[ 'Units_Other' ] : null,
+        'Tickets_Open' => isset( $_GET[ 'Tickets_Open' ] ) ? $_GET[ 'Tickets_Open' ] : null,
+        'Tickets_Assigned' => isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null,
+        'Tickets_En_Route' => isset( $_GET[ 'Tickets_En_Route' ] ) ? $_GET[ 'Tickets_En_Route' ] : null,
+        'Tickets_On_Site' => isset( $_GET[ 'Tickets_On_Site' ] ) ? $_GET[ 'Tickets_On_Site' ] : null,
+        'Tickets_Reviewing' => isset( $_GET[ 'Tickets_Reviewing' ] ) ? $_GET[ 'Tickets_Reviewing' ] : null,
+        'Violations_Preliminary_Report' => isset( $_GET[ 'Violations_Preliminary_Report' ] ) ? $_GET[ 'Violations_Preliminary_Report' ] : null,
+        'Violations_Job_Created' => isset( $_GET[ 'Violations_Job_Created' ] ) ? $_GET[ 'Violations_Job_Created' ] : null
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -293,11 +303,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 $locations = \singleton\database::getInstance( )->query(
 
     null,
-    "
-	   SELECT Loc,Tag,fLong,Latt
-     FROM   Loc
-     WHERE  Loc.Route = ?
-	;",array($_GET['ID'])
+      " SELECT Loc,Tag,fLong,Latt
+        FROM   Loc
+        WHERE  Loc.Route = ?
+	;",array( isset ( $_GET ['ID'] ) ? $_GET['ID'] : null)
 );
 $locationArr = array();
 $finalLoc= [];
@@ -322,7 +331,7 @@ if( $locations ) {
 </head>
 <body>
   <div id="wrapper">
-    <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+    <?php require(bin_php.'element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
       <div class='card card-primary'>
         <form action='route.php?ID=<?php echo $Route[ 'ID' ];?>' method='POST'>
@@ -392,10 +401,10 @@ if( $locations ) {
                     </div>
                 </div>
               <?php }?>
-              <div class='card card-primary my-3 col-12 col-lg-3'> 
+              <div class='card card-primary my-3 col-12 col-lg-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php 
+                  <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Route[ 'Name' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Route[ 'Employee_ID' ], $Route[ 'Employee_Name' ] );
                   ?>

@@ -213,7 +213,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                       GROUP BY    Unit.Loc
                                   ) AS Other ON Other.Location = Location.Loc
                       GROUP BY    Location.Loc
-                  ) AS Units ON Units.Location = Location.Loc 
+                  ) AS Units ON Units.Location = Location.Loc
                   LEFT JOIN (
                       SELECT  Location.Loc AS Location,
                               [Open].Count AS [Open],
@@ -222,22 +222,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       FROM    Loc AS Location
                               LEFT JOIN (
                                   SELECT      Job.Loc AS Location,
-                                              Count( Job.ID ) AS Count 
-                                  FROM        Job 
+                                              Count( Job.ID ) AS Count
+                                  FROM        Job
                                   WHERE       Job.Status = 0
                                   GROUP BY    Job.Loc
                               ) AS [Open] ON [Open].Location = Location.Loc
                               LEFT JOIN (
                                   SELECT      Job.Loc AS Location,
-                                              Count( Job.ID ) AS Count 
-                                  FROM        Job 
+                                              Count( Job.ID ) AS Count
+                                  FROM        Job
                                   WHERE       Job.Status = 2
                                   GROUP BY    Job.Loc
                               ) AS [On_Hold] ON [On_Hold].Location = Location.Loc
                               LEFT JOIN (
                                   SELECT      Job.Loc AS Location,
-                                              Count( Job.ID ) AS Count 
-                                  FROM        Job 
+                                              Count( Job.ID ) AS Count
+                                  FROM        Job
                                   WHERE       Job.Status = 1
                                   GROUP BY    Job.Loc
                               ) AS [Closed] ON [Closed].Location = Location.Loc
@@ -249,7 +249,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               En_Route.Count AS En_Route,
                               On_Site.Count AS On_Site,
                               Reviewing.Count AS Reviewing
-                      FROM    Loc AS Location 
+                      FROM    Loc AS Location
                               LEFT JOIN (
                                 SELECT    Location.Loc AS Location,
                                           Count( TicketO.ID ) AS Count
@@ -295,7 +295,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       SELECT  Location.Loc AS Location,
                               Preliminary.Count AS Preliminary,
                               Job_Created.Count AS Job_Created
-                      FROM    Loc AS Location 
+                      FROM    Loc AS Location
                               LEFT JOIN (
                                 SELECT    Location.Loc AS Location,
                                           Count( Violation.ID ) AS Count
@@ -324,14 +324,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 FROM      Invoice
                                 WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
                                 GROUP BY  Invoice.Loc
-                              ) AS [Open] ON Location.Loc = [Open].Location 
+                              ) AS [Open] ON Location.Loc = [Open].Location
                               LEFT JOIN (
                                 SELECT    Invoice.Loc AS Location,
                                           Count( Invoice.Ref ) AS Count
                                 FROM      Invoice
                                 WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
                                 GROUP BY  Invoice.Loc
-                              ) AS [Closed] ON Location.Loc = [Closed].Location 
+                              ) AS [Closed] ON Location.Loc = [Closed].Location
                   ) AS Invoices ON Invoices.Location = Location.Loc
                   LEFT JOIN (
                     SELECT    Location.ID AS Location,
@@ -344,14 +344,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 FROM      Estimate
                                 WHERE     Estimate.Status = 0
                                 GROUP BY  Estimate.LocID
-                              ) AS [Open] ON Location.ID = [Open].Location 
+                              ) AS [Open] ON Location.ID = [Open].Location
                               LEFT JOIN (
                                 SELECT    Estimate.LocID AS Location,
                                           Count( Estimate.ID ) AS Count
                                 FROM      Estimate
                                 WHERE     Estimate.Status = 1
                                 GROUP BY  Estimate.LocID
-                              ) AS [Closed] ON Location.ID = [Closed].Location 
+                              ) AS [Closed] ON Location.ID = [Closed].Location
                   ) AS Proposals ON Proposals.Location = Location.Loc
 
             WHERE   	Location.Loc = ?
@@ -374,17 +374,33 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	'Longitude' => null,
     	'Maintenance' => null,
     	'Geofence' => null,
-    	'Sales_Tax' => null,
     	'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
     	'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
-    	'Division_ID' => null,
+    	'Division_ID' => isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null,
     	'Division_Name' => isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null,
-    	'Route_ID' => null,
-    	'Route_Name' => isset( $_GET[ 'Route' ] ) ? $_GET[ 'Route' ] : null,
-    	'Territory_ID' => null,
-    	'Territory_Name' => isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null,
-    	'Sales_Tax' => null,
-    	'In_Use' => null
+    	'Route_ID' => isset( $_GET[ 'Route_ID' ] ) ? $_GET[ 'Route_ID' ] : null,
+    	'Route_Name' => isset( $_GET[ 'Route_Name' ] ) ? $_GET[ 'Route_Name' ] : null,
+    	'Territory_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
+    	'Territory_Name' => isset( $_GET[ 'Territory_Name' ] ) ? $_GET[ 'Territory_Name' ] : null,
+    	'Sales_Tax' => isset( $_GET[ 'Sales_Tax' ] ) ? $_GET[ 'Sales_Tax' ] : null,
+    	'In_Use' => isset( $_GET[ 'In_Use' ] ) ? $_GET[ 'In_Use' ] : null,
+      'Violations_Preliminary_Report' => isset( $_GET[ 'Violations_Preliminary_Report' ] ) ? $_GET[ 'Violations_Preliminary_Report' ] : null,
+      'Violations_Job_Created' => isset( $_GET[ 'Violations_Job_Created' ] ) ? $_GET[ 'Violations_Job_Created' ] : null,
+      'Jobs_On_Hold' => isset( $_GET[ 'Jobs_On_Hold' ] ) ? $_GET[ 'Jobs_On_Hold' ] : null,
+      'Jobs_Open' => isset( $_GET[ 'Jobs_Open' ] ) ? $_GET[ 'Jobs_Open' ] : null,
+      'Jobs_Closed' => isset( $_GET[ 'Jobs_Closed' ] ) ? $_GET[ 'Jobs_Closed' ] : null,
+      'Invoices_Open' => isset( $_GET[ 'Invoices_Open' ] ) ? $_GET[ 'Invoices_Open' ] : null,
+      'Invoices_Closed' => isset( $_GET[ 'Invoices_Closed' ] ) ? $_GET[ 'Invoices_Closed' ] : null,
+      'Tickets_Open' => isset( $_GET[ 'Tickets_Open' ] ) ? $_GET[ 'Tickets_Open' ] : null,
+      'Tickets_Assigned' => isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null,
+      'Tickets_En_Route' => isset( $_GET[ 'Tickets_En_Route' ] ) ? $_GET[ 'Tickets_En_Route' ] : null,
+      'Tickets_On_Site' => isset( $_GET[ 'Tickets_On_Site' ] ) ? $_GET[ 'Tickets_On_Site' ] : null,
+      'Tickets_Reviewing' => isset( $_GET[ 'Tickets_Reviewing' ] ) ? $_GET[ 'Tickets_Reviewing' ] : null,
+      'Units_Elevators' => isset( $_GET[ 'Units_Elevators' ] ) ? $_GET[ 'Units_Elevators' ] : null,
+      'Units_Escalators' => isset( $_GET[ 'Units_Escalators' ] ) ? $_GET[ 'Units_Escalators' ] : null,
+      'Units_Other' => isset( $_GET[ 'Units_Other' ] ) ? $_GET[ 'Units_Other' ] : null,
+      'Proposals_Open' => isset( $_GET[ 'Proposals_Open' ] ) ? $_GET[ 'Proposals_Open' ] : null,
+      'Proposals_Closed' => isset( $_GET[ 'Proposals_Closed' ] ) ? $_GET[ 'Proposals_Closed' ] : null
     ) : sqlsrv_fetch_array( $result );
 
 
@@ -529,7 +545,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='card card-primary my-3 col-12 col-lg-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php 
+                  <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Location[ 'Name' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Location[ 'Customer_ID' ], $Location[ 'Customer_Name' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Location[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );
@@ -547,7 +563,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   					 <div class='card card-primary my-3 col-12 col-lg-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Maintenance' );?>
   						<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-  							<?php 
+  							<?php
                   \singleton\bootstrap::getInstance( )->card_row_form_select( 'Maintenance', $Location[ 'Maintenance' ], array(
                       0 => 'Disabled',
                       1 => 'Enabled'
