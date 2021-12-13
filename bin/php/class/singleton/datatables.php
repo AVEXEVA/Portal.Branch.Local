@@ -132,6 +132,25 @@ class datatables extends \singleton\index {
 	        }
 	    }<?php
 	}
+
+	public function Unit( ){
+		?>{
+            data : 'Units',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Units !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " </a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+      }<?php
+	}
+
 	public function Jobs( ){
 		?>{
             data : 'Jobs',
