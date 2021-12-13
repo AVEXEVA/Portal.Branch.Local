@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(     !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Route' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
+        ||  !isset( $Privileges[ 'Unit' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Unit' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
 
@@ -142,7 +142,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       4 =>  'Unit.Type',
       5 =>  'Unit.Status'
     );
-
         $Direction = 'ASC';
         $Order = isset( $_GET['order']['column'] ) ? $Columns[ $_GET['order']['column'] ] : "[Unit].[ID]";
         if(isset($_GET['order']['dir'])){
@@ -150,7 +149,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 ? $_GET['order']['dir']
                 : 'ASC';
         }
-
       $sQuery = " SELECT 		Top 10
                 tbl.FieldName,
                 tbl.FieldValue

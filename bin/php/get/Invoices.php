@@ -76,6 +76,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $conditions = array( );
     $search = array( );
     $parameters = array( );
+    if( isset($_GET[ 'ID' ] ) && !in_array( $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['ID'];
+        $conditions[] = "Invoice.Ref LIKE '%' + ? + '%'";
+    }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Customer'];
         $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
@@ -86,31 +90,29 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Job'];
+        $conditions[] = "Job.Job LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Type'];
+        $conditions[] = "Job.Type LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Date' ] ) && !in_array( $_GET[ 'Date' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Date'];
+        $conditions[] = "Invoice.fDate LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Original' ] ) && !in_array( $_GET[ 'Original' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Job'];
+        $conditions[] = "Job.Original LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Balance' ] ) && !in_array( $_GET[ 'Balance' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Balance'];
+        $conditions[] = "Job.Balance LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Description' ] ) && !in_array( $_GET[ 'Description' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Description'];
         $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
     }
-    /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
-      $parameters[] = $_GET['Search'];
-      $search[] = "Invoice.Ref LIKE '%' + ? + '%'";
-
-      $parameters[] = $_GET['Search'];
-      $search[] = "Invoice.fDesc LIKE '%' + ? + '%'";
-
-      $parameters[] = $_GET['Search'];
-      $search[] = "Customer.Name LIKE '%' + ? + '%'";
-
-      $parameters[] = $_GET['Search'];
-      $search[] = "Location.Tag LIKE '%' + ? + '%'";
-
-      $parameters[ ] = $_GET[ 'Search' ];
-      $search[ ] = "Job.ID LIKE '%' + ? + '%'";
-
-      $parameters[ ] = $_GET[ 'Search' ];
-      $search[ ] = "Job.fDesc LIKE '%' + ? + '%'";
-
-      $parameters[ ] = $_GET[ 'Search' ];
-      $search[ ] = "JobType.Type LIKE '%' + ? + '%'";
-    }*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 

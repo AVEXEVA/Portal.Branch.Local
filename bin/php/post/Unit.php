@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 foreach($_POST['data'] as $ID){
                     $database->query(
                         null,
-                        "	DELETE FROM dbo.[Unit] 
+                        "	DELETE FROM dbo.[Unit]
 							WHERE 		[Unit].[ID] = ?;",
                         array(
                             $ID
@@ -101,20 +101,62 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             if(isset($_POST['data']) && count($_POST['data']) > 0){
                 $data = array();
                 foreach($_POST['data'] as $ID){
-                    $r = $database->query(null,"
-						SELECT *
-						FROM   dbo.[Unit] 
-						WHERE  [Unit].[ID] = ?
+                    $r = $database->query(null,
+                      " SELECT *
+            						FROM   [Unit]
+            						WHERE  [Unit].[ID] = ?
 					;",array($ID));
                     if($r){$Unit = sqlsrv_fetch_array($r);}
 
-                    $resource = $database->query(null,"SELECT Max(Unit.ID) AS ID FROM demo.dbo.Unit;");
+                    $resource = $database->query(null,"SELECT Max(Unit.ID) AS ID FROM Unit;");
                     $Unit_Primary_Key = sqlsrv_fetch_array($resource)['ID'];
                     $Unit_Primary_Key++;
-                    $resource = $database->query(null,"
-						INSERT INTO Unit(ID, fDesc, Remarks, Building_ID, City_ID, Loc, Cat, Type, Location_Category, Manuf, Install, InstallBy, Since, Last, Price, Owner, fGroup, Serial, Template, Status, TFMID, TFMSource)
+                    $resource = $database->query(null,
+                    " INSERT INTO
+                        Unit(ID,
+                        fDesc,
+                        Remarks,
+                        Building_ID,
+                        City_ID,
+                        Loc,
+                        Cat,
+                        Type,
+                        Location_Category,
+                        Manuf, Install,
+                        InstallBy,
+                        Since,
+                        Last,
+                        Price,
+                        Owner,
+                        fGroup,
+                        Serial,
+                        Template,
+                        Status,
+                        TFMID,
+                        TFMSource)
 						VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-					;",array($Unit_Primary_Key, $Unit['fDesc'], $Unit['Remarks'],$Unit['Building_ID'],$Unit['City_ID'],$Unit['Loc'],$Unit['Cat'],$Unit['Type'],$Unit['Location_Category'],$Unit['Manuf'],$Unit['Install'],$Unit['InstallBy'],$Unit['Since'],$Unit['Last'],$Unit['Price'],$Unit['Owner'],$Unit['fGroup'],$Unit['Serial'],$Unit['Template'],$Unit['Status'],$Unit['TFMID'],$Unit['TFMSource']));
+					;",array($Unit_Primary_Key,
+                   $Unit['fDesc'],
+                   $Unit['Remarks'],
+                   $Unit['Building_ID'],
+                   $Unit['City_ID'],
+                   $Unit['Loc'],
+                   $Unit['Cat'],
+                   $Unit['Type'],
+                   $Unit['Location_Category'],
+                   $Unit['Manuf'],
+                   $Unit['Install'],
+                   $Unit['InstallBy'],
+                   $Unit['Since'],
+                   $Unit['Last'],
+                   $Unit['Price'],
+                   $Unit['Owner'],
+                   $Unit['fGroup'],
+                   $Unit['Serial'],
+                   $Unit['Template'],
+                   $Unit['Status'],
+                   $Unit['TFMID'],
+                   $Unit['TFMSource']));
                     if( ($errors = sqlsrv_errors() ) != null) {
                         foreach( $errors as $error ) {
                             echo "SQLSTATE: ".$error[ 'SQLSTATE']."<br />";

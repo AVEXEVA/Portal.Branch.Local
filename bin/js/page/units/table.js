@@ -22,7 +22,7 @@ function search( link ){
                             Status                :  $('input:visible[name="Status"]').val( ),
 
                         },
-				
+
                     dataType : 'json',
                     beforeSend : function( ){
                         abort( );
@@ -83,7 +83,7 @@ $( document ).ready( function( ){
 	            d.Name 			= $('input[name="Name"]').val( );
 	            d.Customer 		= $('input[name="Customer"]').val( );
 	            d.Location 		= $('input[name="Location"]').val( );
-	        
+
 	            d.Type 			= $('select[name="Type"]').val( );
 	            d.Status 		= $('select[name="Status"]').val( );
 	                d.Ticket_ID 		= $('select[name="Ticket_ID"]').val( );
@@ -230,7 +230,7 @@ $( document ).ready( function( ){
 				  var dte = dt.cells( rows, 0 ).data( ).toArray( );
 
 				  $.ajax ({
-					  url    : 'bin/php/post/unit.php',
+					  url    : 'bin/php/post/Unit.php',
 					  method : 'POST',
 					  data   : {
 						  action : 'delete',
@@ -250,7 +250,7 @@ $( document ).ready( function( ){
 				  var dte = dt.cells( rows, 0 ).data( ).toArray( );
 
 				  $.ajax ({
-					  url    : 'bin/php/post/unit.php',
+					  url    : 'bin/php/post/Unit.php',
 					  method : 'POST',
 					  data   : {
 						  action : 'create',

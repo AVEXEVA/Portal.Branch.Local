@@ -24,7 +24,7 @@ style : 'multi',
 selector : 'td.ID'
 },
 ajax: {
-url     : 'bin/php/get/divisions.php',
+url     : 'bin/php/get/Divisions.php',
 data : function( d ){
       d = {
           start : d.start,
