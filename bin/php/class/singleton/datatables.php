@@ -38,7 +38,7 @@ class datatables extends \singleton\index {
         }<?php
 	}
 
-	public function Name( ){
+	public function Name($url){
 		?>{
             data : 'Name',
             render : function( data, type, row, meta ){
@@ -46,7 +46,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.ID !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                    "<div class='col-12'><a href='<?php echo $url;?>?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -313,7 +313,76 @@ class datatables extends \singleton\index {
 
             }
         }<?php
-	}    
+	}  
+    public function TerritoryUnit( ){
+		?>{
+            data : 'Unit',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Unit !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='unit.php?Territory=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Unit + " Unit</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}  
+    public function TerritoryProposal( ){
+		?>{ data : 'Proposal',
+            render : function( data, type, row, meta ){
+               switch( type ){
+                   case 'display' :
+                       return  row.Proposal !== null
+                           ?   "<div class='row'>" +
+                                   "<div class='col-12'><a href='proposal.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i><span " + row.Proposal + " invoices</a></div>" +
+                               "</div>"
+                           :   null;
+                   default :
+                       return data;
+            }
+        }
+      }<?php
+	}  
+    public function TerritoryCollections( ){
+		?>{
+            data : 'Collection',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Collection !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='collections.php?Territory=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Collection + " Collection</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+          }<?php
+	}
+
+    public function TerritoryInvoices( ){
+		?>{
+            data : 'Invoices',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Invoice !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='invoices.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoice + " invoices</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                    }
+            }
+
+        }<?php
+	}
 
     public function JobID( ){
 		?>{

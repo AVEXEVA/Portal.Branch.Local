@@ -1,3 +1,10 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
+
 function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
@@ -88,125 +95,14 @@ $( document ).ready( function( ){
             }
         },
         columns: [
-            {
-                  className : 'ID',
-                  data : 'ID',
-                  render : function( data, type, row, meta ){
-                      switch( type ){
-                          case 'display' :
-                              return  row.ID !== null
-                                  ?   "<div class='row'>" +
-                                          "<div class='col-12'><a href='territory.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
-                                      "</div>"
-                                  :   null;
-                          default :
-                              return data;
-                      }
-                  }
-              },{
-                data : 'Name',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='territory.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-                  data : 'Location',
-                  render : function( data, type, row, meta ){
-                      switch( type ){
-                          case 'display' :
-                              return  row.Location_ID !== null
-                                  ?   "<div class='row'>" +
-                                          "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Tag + "</a></div>" +
-                                          "<div class='col-12'>" +
-                                              "<div class='row'>" +
-                                                  "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
-                                                  "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
-                                              "</div>" +
-                                          "</div>" +
-                                      "</div>"
-                                  :   null;
-                          default :
-                              return data;
-                      }
-                  }
-            },{
-                data : 'Unit',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Unit !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='unit.php?Territory=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Unit + " Unit</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-                data : 'Leads',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Lead !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='leads.php?Territory=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Lead + " Leads</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{ data : 'Proposal',
-                render : function( data, type, row, meta ){
-                   switch( type ){
-                       case 'display' :
-                           return  row.Proposal !== null
-                               ?   "<div class='row'>" +
-                                       "<div class='col-12'><a href='proposal.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i><span " + row.Proposal + " invoices</a></div>" +
-                                   "</div>"
-                               :   null;
-                       default :
-                           return data;
-                }
-            }
-          },{
-              data : 'Collection',
-              render : function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display' :
-                          return  row.Collection !== null
-                              ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='collections.php?Territory=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Collection + " Collection</a></div>" +
-                                  "</div>"
-                              :   null;
-                      default :
-                          return data;
-                  }
-              }
-            },{
-                data : 'Invoices',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Invoice !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='invoices.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoice + " invoices</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                  }
-            }
-        }],
+            <?php \singleton\datatables::getInstance( )->ID('territory.php','Customer');?>,
+            <?php \singleton\datatables::getInstance( )->Name('territory.php');?>,
+            <?php \singleton\datatables::getInstance( )->LocationID();?>,
+            <?php \singleton\datatables::getInstance( )->TerritoryUnit();?>,
+            <?php \singleton\datatables::getInstance( )->TerritoryProposal();?>,
+            <?php \singleton\datatables::getInstance( )->TerritoryCollections();?>,
+            <?php \singleton\datatables::getInstance( )->TerritoryInvoices();?>        
+        ],
         buttons: [
             {
                 text: "<i class='fa fa-refresh fa-fw fa-1x'></i><span class='desktop'>Refresh</span>",
