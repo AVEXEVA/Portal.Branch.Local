@@ -13,7 +13,10 @@ class datatables extends \singleton\index {
                 $this->url = "employee.php";
                 $this->moduleName = "Employee";
                 break;
-            
+            case 'unit':
+                $this->url = "unit.php";
+                $this->moduleName = "Unit";
+                break;
             default:
                 # code...
                 break;
@@ -204,4 +207,44 @@ class datatables extends \singleton\index {
         }
     <?php
 	}
+
+    public function CustomerID( ){
+		?>{
+            data : 'Customer_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Customer_ID !== null
+                            ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
+                            "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+	}
+
+    public function LocationID( ){
+		?>{
+            data : 'Location_ID',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Location_ID !== null
+                            ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
+                            "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+	}
+
 }?>
