@@ -158,14 +158,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     FROM      Invoice
                                     WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
                                     GROUP BY  Invoice.Job
-                                  ) AS [Open] ON Job.ID = [Open].Job 
+                                  ) AS [Open] ON Job.ID = [Open].Job
                                   LEFT JOIN (
                                     SELECT    Invoice.Job AS Job,
                                               Count( Invoice.Ref ) AS Count
                                     FROM      Invoice
                                     WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
                                     GROUP BY  Invoice.Job
-                                  ) AS [Closed] ON Job.ID = [Closed].Job 
+                                  ) AS [Closed] ON Job.ID = [Closed].Job
                       ) AS Invoices ON Invoices.Job = Job.ID
             WHERE   	[Contract].ID = ?;",
       array(
@@ -175,16 +175,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     //var_dump( sqlsrv_errors( ) );
     $Contract =   (       empty( $ID )
                     &&    !$result
-                  ) || (  empty( $ID ) )  
+                  ) || (  empty( $ID ) )
                   ? array(
                       'ID' => null,
                       //Foreign Keys
-                      'Customer_ID' => null,
-                      'Customer_Name' => null,
-                      'Location_ID' => null,
-                      'Location_Name' => null,
-                      'Job_ID' => null,
-                      'Job_Name' => null,
+                      'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                      'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
+                      'Location_ID' => isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                      'Location_Name' => isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null,
+                      'Job_ID' => isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+                      'Job_Name' => isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null,
                       //Columns
                       'Review' => null,
                       'Discount_1' => null,
@@ -193,16 +193,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       'Discount_4' => null,
                       'Discount_5' => null,
                       'Discount_6' => null,
-                      'Discount_Type' => null,
-                      'Discount_Rate' => null,
-                      'Billing_Cycle' => null,
-                      'Billing_Start' => null,
-                      'Billing_Length' => null,
-                      'Billing_Finish' => null,
-                      'Billing_Amount' => null,
-                      'Billing_Escalation_Type' => null,
-                      'Billing_Escalation_Cycle' => null,
-                      'Billing_Escalation_Factor' => null,
+                      'Discount_Type' => isset( $_GET[ 'Discount_Type' ] ) ? $_GET[ 'Discount_Type' ] : null,
+                      'Discount_Rate' => isset( $_GET[ 'Discount_Rate' ] ) ? $_GET[ 'Discount_Rate' ] : null,
+                      'Billing_Cycle' => isset( $_GET[ 'Billing_Cycle' ] ) ? $_GET[ 'Billing_Cycle' ] : null,
+                      'Billing_Start' => isset( $_GET[ 'Billing_Start' ] ) ? $_GET[ 'Billing_Start' ] : null,
+                      'Billing_Length' => isset( $_GET[ 'Billing_Length' ] ) ? $_GET[ 'Billing_Length' ] : null,
+                      'Billing_Finish' => isset( $_GET[ 'Billing_Finish' ] ) ? $_GET[ 'Billing_Finish' ] : null,
+                      'Billing_Amount' => isset( $_GET[ 'Billing_Amount' ] ) ? $_GET[ 'Billing_Amount' ] : null,
+                      'Billing_Escalation_Type' => isset( $_GET[ 'Billing_Escalation_Type' ] ) ? $_GET[ 'Billing_Escalation_Type' ] : null,
+                      'Billing_Escalation_Cycle' => isset( $_GET[ 'Billing_Escalation_Cycle' ] ) ? $_GET[ 'Billing_Escalation_Cycle' ] : null,
+                      'Billing_Escalation_Factor' => isset( $_GET[ 'Billing_Escalation_Factor' ] ) ? $_GET[ 'Billing_Escalation_Factor' ] : null,
+                      'Invoices_Open' => isset( $_GET[ 'Invoices_Open' ] ) ? $_GET[ 'Invoices_Open' ] : null,
+                      'Invoices_Closed' => isset( $_GET[ 'Invoices_Closed' ] ) ? $_GET[ 'Invoices_Closed' ] : null,
                       'Scheduling_Cycle' => null,
                       'Scheduling_Type' => null,
                       'Scheduling_Day' => null,
@@ -221,7 +223,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       'Hour' => null,
                       'Terms' => null,
                       'Off_Service' => null
-                    ) 
+                    )
                   : sqlsrv_fetch_array($result);
 
 
@@ -233,7 +235,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Contract[ 'Location_Name' ]              = isset( $_POST[ 'Location_Name' ] )             ? $_POST[ 'Location_Name' ]                                             : $Contract[ 'Location_Name' ];
       $Contract[ 'Job_ID' ]                     = isset( $_POST[ 'Job_ID' ] )                    ? $_POST[ 'Job_ID' ]                                                    : $Contract[ 'Job_ID' ];
       $Contract[ 'Job_Name' ]                   = isset( $_POST[ 'Job_Name' ] )                  ? $_POST[ 'Job_Name' ]                                                  : $Contract[ 'Job_Name' ];
-      //Columns        
+      //Columns
       $Contract[ 'Review' ]                     = isset( $_POST[ 'Review' ] ) 	                 ? $_POST[ 'Review' ] 	                                                 : $Contract[ 'Review' ];
       $Contract[ 'Discount_1' ] 	              = isset( $_POST[ 'Discount_1' ] ) 	             ? $_POST[ 'Discount_1' ] 	                                             : $Contract[ 'Discount_1' ];
       $Contract[ 'Discount_2' ] 	              = isset( $_POST[ 'Discount_2' ] ) 	             ? $_POST[ 'Discount_2' ] 	                                             : $Contract[ 'Discount_2' ];
@@ -402,7 +404,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php  
+  <?php
     $_GET[ 'Bootstrap' ] = '5.1';
     $_GET[ 'Entity_CSS' ] = 1;
     require( bin_meta . 'index.php');
@@ -431,7 +433,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='card card-primary my-3 col-12 col-lg-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Accounting' ); ?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Billing' ] ) && $_SESSION[ 'Cards' ][ 'Billing' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php 
+                  <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Start', $Contract[ 'Billing_Start' ], 'Start' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Finish', $Contract[ 'Billing_Finish' ], 'Finish' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Length', $Contract[ 'Billing_Length' ] );
@@ -444,7 +446,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='card card-primary my-3 col-12 col-lg-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Escalation' ); ?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Escalation' ] ) && $_SESSION[ 'Cards' ][ 'Escalation' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php 
+                  <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Escalation_Last', $Contract[ 'Escalation_Last' ], 'Escalated' );
                     \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Escalation_Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Escalation_Factor', $Contract[ 'Billing_Escalation_Factor' ], 'Factor' );

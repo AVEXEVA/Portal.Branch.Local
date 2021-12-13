@@ -168,8 +168,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Profit' => null,
                 'SubTotal_1' => null,
                 'SubTotal_2' => null,
-                'Job_ID' => null,
-                'Job_Name' => null,
+                'Employee' => null,
+                'Remarks' => null,
+                'Proposal' => null,
+                'Job_ID' => isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+                'Job_Name' => isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null,
                 'EstTemplate' => null,
                 'Sales_Tax_Rate' => null,
                 'Sales_Tax' => null,
@@ -177,19 +180,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Quoted' => null,
                 'Phase' => null,
                 'Probability' => null,
-                'Location_ID' => null,
-                'Location_Name' => null,
+                'Location_ID' => isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                'Location_Name' => isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null,
                 'Street' => null,
                 'State' => null,
                 'City' => null,
                 'Zip' => null,
-                'Customer_ID' => null,
-                'Customer_Name' => null,
+                'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
                 'Fax' => null,
                 'Phone' => null,
                 'Email' => null,
-                'Employee_ID' => null,
-                'Employee_Name' => null
+                'Employee_ID' => isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null,
+                'Employee_Name' => isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null,
+                'Contact_Name' => isset( $_GET[ 'Contact_Name' ] ) ? $_GET[ 'Contact_Name' ] : null,
+                'Contact_ID' => isset( $_GET[ 'Contact_ID' ] ) ? $_GET[ 'Contact_ID' ] : null
             )
             : sqlsrv_fetch_array($result);
 
@@ -209,6 +214,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Proposal[ 'Overhead' ]         = isset( $_POST[ 'Overhead' ] )    ? $_POST[ 'Overhead' ]     : $Proposal[ 'Overhead' ];
           $Proposal[ 'Price' ]            = isset( $_POST[ 'Price' ] )       ? $_POST[ 'Price' ]        : $Proposal[ 'Price' ];
           $Proposal[ 'Profit' ]           = isset( $_POST[ 'Profit' ] )      ? $_POST[ 'Profit' ]       : $Proposal[ 'Profit' ];
+          $Proposal[ 'Remarks' ]          = isset( $_POST[ 'Remarks' ] )     ? $_POST[ 'Remarks' ]      : $Proposal[ 'Remarks' ];
           /*$Proposal[ 'Sales_Tax_Rate' ]      = isset( $_POST[ 'Sales_Tax_Rate' ] )    ? $_POST[ 'Sales_Tax_Rate' ]    : $Proposal[ 'Sales_Tax_Rate' ];
           $Proposal[ 'Sales_Tax' ]      = isset( $_POST[ 'Sales_Tax' ] )    ? $_POST[ 'Sales_Tax' ]    : $Proposal[ 'Sales_Tax' ];*/
 
@@ -228,11 +234,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   ID,
                   Job,
                   RolID,
-                  LocID,
+                  Name,
                   fDesc,
                   fDate,
                   Type,
                   Remarks,
+                  LocID,
+                  Category,
+                  fFor,
                   Cost,
                   Hours,
                   Labor,
@@ -240,13 +249,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Price,
                   Profit
                 )
-                VALUES ( @MAXID + 1, @Job, @Contact, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+                VALUES ( @MAXID + 1, @Job, @Contact, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
                 SELECT @MAXID + 1;",
               array(
+                $Proposal[ 'ID' ],
                 $Proposal[ 'Job_Name' ],
                 $Proposal[ 'Contact' ],
                 $Proposal[ 'Location_Name' ],
-                $Porposal[ 'Employee' ],
+                $Proposal[ 'Employee' ],
                 $Proposal[ 'Name' ],
                 $Proposal[ 'Date' ],
                 $Proposal[ 'Type' ],
@@ -262,8 +272,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             );
             sqlsrv_next_result( $result );
             $Proposal[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
             header( 'Location: proposal.php?ID=' . $Proposal[ 'ID' ] );
+            var_dump(sqlsrv_errors ( ) );
             exit;
           } else {
             \singleton\database::getInstance( )->query(
