@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -87,126 +93,15 @@ $( document ).ready( function( ){
             }
         },
         columns: [
-            {
-                  className : 'ID',
-                  data : 'ID',
-                  render : function( data, type, row, meta ){
-                      switch( type ){
-                          case 'display' :
-                              return  row.ID !== null
-                                  ?   "<div class='row'>" +
-                                          "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
-                                      "</div>"
-                                  :   null;
-                          default :
-                              return data;
-                      }
-                  }
-              },{
-                data : 'Name',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-              data : 'Status'
-            },{
-                data : 'Locations',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Locations !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },{
-                data : 'Units',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Units !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-                data : 'Jobs',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Jobs !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },{
-                data : 'Tickets',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Tickets !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },{
-                data : 'Violations',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Tickets !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-                data : 'Invoices',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Tickets !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            }
+            <?php \singleton\datatables::getInstance( )->ID( );?>,
+            <?php \singleton\datatables::getInstance( )->Name( );?>,
+            <?php \singleton\datatables::getInstance( )->Status( );?>,
+            <?php \singleton\datatables::getInstance( )->Locations( );?>,
+            <?php \singleton\datatables::getInstance( )->Units( );?>,
+            <?php \singleton\datatables::getInstance( )->Jobs( );?>,
+            <?php \singleton\datatables::getInstance( )->Tickets( );?>,
+            <?php \singleton\datatables::getInstance( )->Violations( );?>,
+            <?php \singleton\datatables::getInstance( )->Invoices( );?>
         ],
         buttons: [
             {
