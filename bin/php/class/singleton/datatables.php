@@ -246,7 +246,7 @@ class datatables extends \singleton\index {
         }<?php
 	}
 
-    public function LocationID( ){
+    public function LocationID($extra){
 		?>{
             data : 'Location_ID',
             render : function( data, type, row, meta ){
@@ -255,6 +255,14 @@ class datatables extends \singleton\index {
                         return  row.Location_ID !== null
                             ?   "<div class='row'>" +
                             "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
+                            <?php if($extra ==1 ) { ?>
+                                "<div class='col-12'>" +
+                                    "<div class='row'>" +
+                                        "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
+                                        "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
+                                    "</div>" +
+                                "</div>" +
+                                <?php } ?>                    
                             "</div>"
                             :   null;
                     default :
@@ -264,6 +272,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
+    
 
     public function TicketID( ){
 		?>{
@@ -284,5 +293,179 @@ class datatables extends \singleton\index {
 			}*/
         }<?php
 	}
+
+
+    public function UnitID( ){
+		?>{
+            data : 'Unit_ID',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.Unit_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i>" + ( row.Unit_City_ID !== null && !row.Unit_City_ID.replace(/\s/g, '' ).length < 1 ? row.Unit_City_ID : 'Missing City ID' ) + "</a></div>" +
+                                    "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Unit_Building_ID + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+	}    
+
+    public function JobID( ){
+		?>{
+            data : 'Job_ID',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Job_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" +
+                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+                }
+            }
+        }<?php
+	}
+
+
+    public function TicketLevel( ){
+		?>{
+            data : 'Level',
+            render : function( data, type, row, meta ){
+                switch ( type ){
+                    case 'display':
+                        return row.Job_Type !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'>" + row.Job_Type + "</div>" +
+                                    "<div class='col-12'>" + row.Level + "</div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}
+
+    public function TicketDate( ){
+		?>{
+            data : 'Date',
+            render: function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Date !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+
+                }
+            }
+        }<?php
+	}
+
+    public function TicketTimeRoute( ){
+		?>{
+            data : 'Time_Route',
+            render: function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Date !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Route + "</div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+
+                }
+            }
+        }<?php
+	}
+
+    public function TicketTimeSite( ){
+		?>{
+            data : 'Time_Site',
+            render: function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Date !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Site + "</div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+
+                }
+            }
+        }<?php
+	}
+
+    public function TicketTimeCompleted( ){
+		?>{
+            data : 'Time_Completed',
+            render: function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Date !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Completed + "</div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+
+                }
+            }
+        }<?php
+	}
+
+    public function TicketHours( ){
+		?>{
+            data : 'Hours',
+            defaultContent :"0"
+        }<?php
+	}
+
+    public function TicketLSD( ){
+		?>{
+            data : 'LSD',
+            render : function( data, type, row, meta ){
+                switch ( type ){
+                    case 'display':
+                        return row.LSD == 1
+                            ? 'LSD'
+                            : 'Running';
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}    
+    public function TicketPerson( ){
+		?>{
+            data : 'Person',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Employee_ID !== null
+                            ?   "<a href='user.php?ID=" + row.Employee_ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Person + "</a>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}    
 
 }?>
