@@ -55,9 +55,46 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
+    public function UnitName( ){
+		?>{
+            data : 'Name',
+            render : function ( data, type, row, meta ){
+                switch ( type ) {
+                    case 'display':
+                        if( row.City_ID === null && row.Building_ID === null ){
+                            return null;
+                        } else {
+                            return "<div class='row'>" +
+                                ( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
+                                ( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
+                                "</div>";
+                        }
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}
 	public function Status( ){
 		?>{
           data : 'Status'
+        }<?php
+	}
+    public function UnitStatus( ){
+		?>{
+            data : 'Status',
+            render:function(data){
+                switch(data){
+                    case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+                    case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+                    case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
+                }
+            }
+        }<?php
+	}
+    public function UnitType( ){
+		?>{
+          data : 'Type'
         }<?php
 	}
 	public function Locations( ){
@@ -225,6 +262,26 @@ class datatables extends \singleton\index {
                 }
 
             }
+        }<?php
+	}
+
+    public function TicketID( ){
+		?>{
+            data : 'Ticket_ID',
+            /*	render : function( data, type, row, meta ){
+					switch ( type ){
+						case 'display' :
+							return row.Ticket_ID !== null
+								?	"<div class='row'>" +
+								"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #" + row.Ticket_ID + "</a></div>" +
+								"<div class='col-12'>" + row.Ticket_Date + "</div>" +
+								"</div>"
+								: 	null;
+						default :
+							return data;
+
+					}
+			}*/
         }<?php
 	}
 
