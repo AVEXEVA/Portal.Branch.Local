@@ -92,7 +92,7 @@ $( document ).ready( function( ){
       }
     },
     columns: [
-        <?php \singleton\datatables::getInstance( )->ID('employee');?>,
+        <?php \singleton\datatables::getInstance( )->ID('employee.php','Employee');?>,
         <?php \singleton\datatables::getInstance( )->FirstName( );?>,
         <?php \singleton\datatables::getInstance( )->LastName( );?>,
         <?php \singleton\datatables::getInstance( )->Supervisor( );?>,

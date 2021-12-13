@@ -1,26 +1,7 @@
 <?php
 namespace singleton;
 class datatables extends \singleton\index {
-	public function ID($module){
-        $url = "customer.php";
-        $moduleName = "Customer";
-        switch (strtolower($module)) {
-            case 'customer':
-                $this->url = "customer.php";
-                $this->moduleName = "Customer";
-                break;
-            case 'employee':
-                $this->url = "employee.php";
-                $this->moduleName = "Employee";
-                break;
-            case 'unit':
-                $this->url = "unit.php";
-                $this->moduleName = "Unit";
-                break;
-            default:
-                # code...
-                break;
-        }
+	public function ID($url, $moduleName){       
 		?>{
           className : 'ID',
           data : 'ID',
@@ -29,7 +10,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.ID !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo $this->url;?>?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> <?php echo $this->moduleName;?> #" + row.ID + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo $url;?>?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> <?php echo $moduleName;?> #" + row.ID + "</a></div>" +
                               "</div>"
                           :   null;
                   default :

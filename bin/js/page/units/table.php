@@ -97,7 +97,7 @@ $( document ).ready( function( ){
 	        }
 	    },
 		columns   : [
-			<?php \singleton\datatables::getInstance( )->ID('unit');?>,
+			<?php \singleton\datatables::getInstance( )->ID('unit.php','Unit');?>,
 			{
 				data : 'Name',
 				render : function ( data, type, row, meta ){
