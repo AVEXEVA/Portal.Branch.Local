@@ -97,7 +97,7 @@ $( document ).ready( function( ){
         columns: [
             <?php \singleton\datatables::getInstance( )->ID('territory.php','Customer');?>,
             <?php \singleton\datatables::getInstance( )->Name('territory.php');?>,
-            <?php \singleton\datatables::getInstance( )->LocationID();?>,
+            <?php \singleton\datatables::getInstance( )->LocationID(1);?>,
             <?php \singleton\datatables::getInstance( )->TerritoryUnit();?>,
             <?php \singleton\datatables::getInstance( )->TerritoryProposal();?>,
             <?php \singleton\datatables::getInstance( )->TerritoryCollections();?>,
