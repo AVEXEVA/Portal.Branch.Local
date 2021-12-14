@@ -98,69 +98,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Collections</h4></div>
-				<div class="mobile card-body bg-darker text-white"><form method='GET' action='collections.php'>
-                    <div class='row'>
-                        <div class='col-4'>Search:</div>
-                        <div class='col-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null;?>'  /></div>
-                    </div>
-                    <div class='row'><div class='col-12'>&nbsp;</div></div>
-                    <div class='row'>
-                    	<div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Customer( 1 );?> Customer:</div>
-                    	<div class='col-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                    	<div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Location( 1 );?> Location:</div>
-                    	<div class='col-8'><input type='text' name='Location' placeholder='Location' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Job( 1 );?> Job:</div>
-                        <div class='col-8'><input type='text' name='Job' placeholder='Job' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Blank( 1 );?> Type:</div>
-                        <div class='col-8'><input type='text' name='Type' placeholder='Type' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Blank( 1 );?> Date:</div>
-                        <div class='col-8'><input type='text' name='Date' placeholder='Date' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Blank( 1 );?> Due:</div>
-                        <div class='col-8'><input type='text' name='Due' placeholder='Due' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Blank( 1 );?> Original:</div>
-                        <div class='col-8'><input type='text' name='Original' placeholder='Original' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null;?>' /></div>
-                    </div>
-
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Blank( 1 );?>Balance:</div>
-                        <div class='col-8'><input type='text' name='Balance' placeholder='Balance' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-4'><?php \singleton\fontawesome::getInstance( 1 )->Description( 1 );?>Description:</div>
-                        <div class='col-8'><input type='text' name='Description' placeholder='Description' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></div>
-                    </div>
-                    <div class='row'><div class='col-12'>&nbsp;</div></div>
+				<div class="mobile card-body bg-darker text-white">
+                    <?php 
+                        \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
+                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 
+                            'Customer', 'Customers', 
+                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
+                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                        );
+                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 
+                            'Location', 'Locations', 
+                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
+                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                        );
+                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 
+                            'Job', 'Jobs', 
+                            isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
+                            isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
+                        );
+                        \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
+                        \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                        \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
+                        \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                        \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                        \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );
+                    ?>
                     <div class='row'><div class='col-12'><input type='submit' value='Submit' /></div></div>
-                </form></div>
+                </div>
                 <div class='card-body card-body bg-darker'>
                     <table id='Table_Collections' class='display' cellspacing='0' width='100%'>
-                        <thead><tr class='text-white text-center'>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Proposal( 1 );?>ID</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Territory( 1 );?>Territory</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?>Customer</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Address( 1 );?>Location</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?>Job</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Note( );?>Type</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Calendar( );?>Date</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Calendar( );?>Due</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Dollar( );?>Original</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Dollar( );?>Balance</th>
-                            <th class='border border-white'><?php \singleton\fontawesome::getInstance( )->Description( );?>Description</th>
-                        </tr><tr class='form-desktop'>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                            <th class='border border-white'><select name='redraw form-control' name='Territory'>
+                        <thead><tr class='text-white text-center'><?php 
+                            \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                            \singleton\table::getInstance( )->th( 'Territory', 'Territory' );
+                            \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+                            \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                            \singleton\table::getInstance( )->th( 'Job', 'Job' );
+                            \singleton\table::getInstance( )->th( 'Type', 'Type' );
+                            \singleton\table::getInstance( )->th( 'Date', 'Date' );
+                            \singleton\table::getInstance( )->th( 'Original', 'Original' );
+                            \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
+                            \singleton\table::getInstance( )->th( 'Description', 'Description' );
+                        ?></tr><tr class='form-desktop'><?php
+                            \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                            ?><th class='border border-white'><select name='redraw form-control' name='Territory'>
                                 <option value=''>Select</option>
                                 <?php
                                 $result = \singleton\database::getInstance( )->query(
