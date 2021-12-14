@@ -213,7 +213,7 @@ $( document ).ready( function() {
           var rows = dt.rows( { selected : true } ).indexes( );
           var dte = dt.cells( rows, 0 ).data( ).toArray( );
           $.ajax ({
-            url    : 'bin/php/post/contract.php',
+            url    : 'bin/php/post/Contract.php',
             method : 'POST',
             data   : {
               action : 'delete' ,
