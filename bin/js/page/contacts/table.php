@@ -3,7 +3,8 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     session_start( [ 'read_and_close' => true ] );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
-header('Content-Type: text/javascript');?>
+header('Content-Type: text/javascript');
+?>
 $( document ).ready( function( ){
 function search( link ){
     var api = link.api();
@@ -54,109 +55,66 @@ function search( link ){
     );
 }
 $(document).ready(function( ){
-    var Editor_Contacts = new $.fn.dataTable.Editor( {
-        idSrc    : 'ID',
-        ajax     : 'index.php',
-        table    : '#Table_Contacts'
-    } );
     var Table_Contacts = $('#Table_Contacts').DataTable( {
-        dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
-        processing     : true,
-        serverSide     : true,
-        autoWidth      : false,
-        searching      : false,
-        lengthChange   : false,
-        scrollResize   : true,
-        scrollY        : 100,
-        scroller       : true,
-        scrollCollapse : true,
-        paging         : true,
-        orderCellsTop  : true,
-        autoWidth      : true,
-        responsive     : true,
-        select         : {
-          style : 'multi',
-          selector : 'td.ID'
-        },
+        <?php \singleton\datatables::getInstance( )->preferences( );?>,
         ajax: {
-                url : 'bin/php/get/Contacts.php',
-                data    : function(d){
-                    d = {
-                        draw : d.draw,
-                        start : d.start,
-                        length : d.length,
-                        order : {
-                            column : d.order[0].column,
-                            dir : d.order[0].dir
-                        },
-                        ID :  $('input:visible[name="ID"]').val( ),
-                        Contact :  $('input:visible[name="Contact"]').val( ),
-                        Type :  $('select:visible[name="Type"]').val( ),
-                        Name :  $('input:visible[name="Name"]').val( ),
-                        Position : $('input:visible[name="Position"]').val( ),
-                        Customer :  $('input:visible[name="Customer"]').val( ),
-                        Phone : $('input:visible[name="Phone"]').val( ),
-                        Email :  $('input:visible[name="Email"]').val( ),
-                        Address :  $('input:visible[name="Address"]').val( ),
-                    };
-                    return d;
-                }
+            url : 'bin/php/get/Contacts.php',
+            <?php \singleton\datatables::getInstance( )->ajax_data( );?>
         },
         columns: [
-            <?php \singleton\datatables::getInstance( )->ID('contact.php','Contact');?>,
-            <?php \singleton\datatables::getInstance( )->Contact();?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
-            <?php \singleton\datatables::getInstance( )->ContactName();?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Position');?>,
-            <?php \singleton\datatables::getInstance( )->Phone();?>,
-            <?php \singleton\datatables::getInstance( )->Email();?>,
-            <?php \singleton\datatables::getInstance( )->Street();?>        
-        ],
-        initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'
-            $('input.date').datepicker( { } );
-            $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-            search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Contacts.draw(); });
-        },
-        buttons: [
-            {
-                text: 'Reset Search',
-                className: 'form-control',
-                action: function ( e, dt, node, config ) {
-                    $( 'input:visible, select:visible' ).each( function( ){
-                        $( this ).val( '' );
-                    } );
-                    Table_Contacts.draw( );
-                }
-            },{
-            text : 'Create',
-            className: 'form-control',
-            action : function( e, dt, node, config ){
-                document.location.href='contact.php';}
-
-            },{ extend: 'edit',
-                editor: Editor_Contacts,
-                className: 'form-control',
-            },{
-                text : 'Delete',
-                className: 'form-control',
-                action : function( e, dt, node, config ){
-                  var rows = dt.rows( { selected : true } ).indexes( );
-                  var dte = dt.cells( rows, 0 ).data( ).toArray( );
-                  $.ajax ({
-                    url    : 'bin/php/post/contact.php',
-                    method : 'POST',
-                    data   : {
-                      action : 'delete' ,
-                      data : dte
-                    },
-                    success : function(response){
-                      Table_Contacts.draw();
+	       <?php \singleton\datatables::getInstance( )->ID( 'Contact' );?>,
+           {
+                data : 'Contact',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            return  row.ID !== null
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><?php \singleton\fontawesome::getInstance( )->Contact( 1 );?> " + row.Contact + "</a></div>" +
+                                    "</div>"
+                                :   null;
+                        default :
+                            return data;
                     }
-                  })
                 }
-              },
+            },
+            <?php \singleton\datatables::getInstance( )->Type( );?>,
+            {
+              data : 'Entity_Name',
+                render : function( data, type, row, meta ){
+                    switch( type ){
+                        case 'display' :
+                            switch( row.Entity_Type ){
+                                case 'Customer':
+                                    return "<div class='row'>" +
+                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Entity_Name + "</a></div>" +
+                                            "</div>";
+                                case 'Location':
+                                    return "<div class='row'>" +
+                                                "<div class='col-12'><a href='location.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Location( 1 );?>" + row.Entity_Name + "</a></div>" +
+                                            "</div>";
+                                case 'Employee':
+                                    return "<div class='row'>" +
+                                                "<div class='col-12'><a href='employee.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Entity_Name + "</a></div>" +
+                                            "</div>";
+                                default : 
+                                    return null;
+                            }
+                        default : 
+                            return data;
+                    }
+                }
+            },
+            <?php \singleton\datatables::getInstance( )->data_column( 'Position' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column_tel( 'Phone' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column_email( 'Email' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column_address( );?>
+        ],
+        <?php \singleton\datatables::getInstance( )->initComplete( 'Contacts' );?>,
+        buttons: [
+            <?php \singleton\datatables::getInstance( )->button_reset( 'contacts' );?>,
+            <?php \singleton\datatables::getInstance( )->button_create( 'contact' );?>,
+            <?php \singleton\datatables::getInstance( )->button_delete( 'contact', 'contacts' );?>
         ]
     });
   });

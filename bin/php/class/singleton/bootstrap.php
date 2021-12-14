@@ -124,11 +124,11 @@ class bootstrap extends \singleton\index {
       }?>
     </div><?php
 	}
-  public function card_row_form_input( $label, $value, $sub = false, $disabled = false, $onclick = false ){
+  public function card_row_form_input( $label, $value, $sub = false, $disabled = false, $onclick = false, $classes = 'edit' ){
     ?><div class='row g-0'>
       <?php echo $sub ? "<div class='col-1'>&nbsp;</div>" : null;?>
       <?php self::card_row_label( $label, $sub ? 3 : 4 );?>
-      <div class='col-<?php echo $onclick ? 6 : 8;?>'><input <?php echo $disabled ? 'disabled' : null;?> placeholder='<?php echo $label;?>' type='text' class='form-control edit' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
+      <div class='col-<?php echo $onclick ? 6 : 8;?>'><input <?php echo $disabled ? 'disabled' : null;?> placeholder='<?php echo $label;?>' type='text' class='form-control <?php echo $classes;?>' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
       <?php if( $onclick ){?>
         <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='<?php echo $onclick;?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
       <?php }?>
