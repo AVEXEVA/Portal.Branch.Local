@@ -144,31 +144,31 @@ class bootstrap extends \singleton\index {
 	public function card_row_form_input_url( $label, $value ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
-			<div class='col-8'><input placeholder='https://www.domain.com' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
+			<div class='col-8'><input placeholder='https://www.domain.com' type='text' class='form-control edit' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
         </div><?php
 	}
   public function card_row_form_input_checkbox( $label, $value ){
     ?><div class='row g-0'>
       <?php self::card_row_label( $label );?>
-      <div class='col-8'><input type='checkbox' class='form-input edit' name='<?php echo $key;?>' value='1' /></div>
+      <div class='col-8'><input type='checkbox' class='form-input edit' name='<?php echo $label;?>' value='1' /></div>
     </div><?php
   }
 	public function card_row_form_input_tel( $label, $value ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
-			<div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
+			<div class='col-8'><input placeholder='(XXX) XXX-XXXX' type='text' class='form-control edit' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
     </div><?php
 	}
 	public function card_row_form_input_email( $label, $value ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
-			<div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
+			<div class='col-8'><input placeholder='email@domain.com' type='text' class='form-control edit' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
     </div><?php
 	}
   public function card_row_form_input_password( $label, $value ){
     ?><div class='row g-0'>
       <?php self::card_row_label( $label );?>
-      <div class='col-8'><input placeholder='password' type='password' class='form-control edit' name='<?php echo $key;?>' value='<?php echo $value;?>' /></div>
+      <div class='col-8'><input placeholder='password' type='password' class='form-control edit' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
     </div><?php
   }
 	public function card_row_form_input_date( $singular, $value, $label = null ){
@@ -250,7 +250,7 @@ class bootstrap extends \singleton\index {
           display : 'FieldValue',
           source: function( query, result ){
             $.ajax({
-              url : 'bin/php/get/search/<?php echo $plural;?>.php',
+              url : 'bin/php/get/autocomplete/<?php echo $plural;?>.php',
               method : 'GET',
               data    : {
                 search :  $('input:visible[name="<?php echo $singular;?>_Name"]').val( )
@@ -261,14 +261,15 @@ class bootstrap extends \singleton\index {
               },
               success : function( data ){
                 result( $.map( data, function( item ){
-                    return item.FieldValue;
+                    return item;
                 } ) );
               }
             });
           },
-          afterSelect: function( value ){
-            $( 'input[name="<?php echo $singular;?>_Name"]').val( value );
-            $( 'input[name="<?php echo $singular;?>_Name"]').closest( 'form' ).submit( );
+					displayText: function(item) { return item.FieldValue; },
+          afterSelect: function( item ){
+            $( 'input[name="<?php echo $singular;?>_ID"]').val( item.ID );
+            $( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
           }
         }
       );
