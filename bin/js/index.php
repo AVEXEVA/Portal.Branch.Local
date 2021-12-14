@@ -12,7 +12,6 @@
 <script src="bin/js/onload.js"></script>
 <script src="https://kit.fontawesome.com/46bc044748.js" crossorigin="anonymous"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56288874-1"></script>
-<script src="bin/js/index.js"></script>
 <script src="bin/js/index.js?<?php echo rand( 1000, 9999999 );?>"></script>
 <script src='bin/js/function/columnVisibility.js?<?php echo rand( 1000, 99999 );?>'></script>
 <?php 
@@ -55,7 +54,7 @@ function hideError(error) {
       console.log("Location information is unavailable. You will not be able to start, edit or complete tickets until your location information is enabled.");
       break;
     case error.TIMEOUT:
-      console.log("The location permission has timed out. Please click again and click enable.");
+      console.log("The location permission has timed out. Please click again and click enable."); 
       break;
     case error.UNKNOWN_ERROR:
       console.log("An unknown error occurred. Please contact the ITHelpDesk@NouveauElevator.com");
@@ -65,4 +64,9 @@ function hideError(error) {
   }
 }
 navigator.geolocation.watchPosition(watchSuccess, hideError, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+$( document ).ready(function (){
+  $( 'form[method="get"]' ).on( 'submit', function( ){
+    document.location.href = this.action + '?' + $( this ).find( 'input:visible, select:visible, textarea:visible' ).fieldSerialize( );
+  });
+});
 </script>

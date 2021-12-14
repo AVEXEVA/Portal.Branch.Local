@@ -162,8 +162,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Unit.Type AS Type,
                           Unit.fDesc AS Name,
                           Ticket.ID AS Ticket_ID,
-                          Unit.Status AS Status
-
+                          CASE  WHEN Unit.Status = 0 THEN 'Enabled' 
+                                WHEN Unit.Status = 1 THEN 'Disabled'
+                                WHEN Unit.Status = 2 THEN 'Demolished'
+                                ELSE 'Other'
+                          END AS Status
                   FROM    Elev AS Unit
                           LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                           LEFT JOIN (
