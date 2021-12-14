@@ -3,7 +3,7 @@ namespace singleton;
 class datatables extends \singleton\index {
     //Helpers
     public function preferences( ){
-        ?>dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+        ?>dom            : "<'row'<'col-sm-9'B><'col-sm-3 search'>><'row'<'col-sm-12't>>",
         processing     : true,
         serverSide     : true,
         autoWidth      : false,
@@ -24,7 +24,7 @@ class datatables extends \singleton\index {
     }
     public function initComplete( $reference ){
         ?>initComplete : function( ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control redraw' />" );
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
             search( this );
@@ -50,6 +50,21 @@ class datatables extends \singleton\index {
             return d;
         }<?php
     }
+    public function button_url( $reference ){
+        ?>{
+            text : "<?php \singleton\fontawesome::getInstance( )->Refresh( 1 );?><span class='desktop'>Refresh</span>",
+            className : 'form-control',
+            action : function( e, dt, node, config ){
+                d = { }
+                $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){ 
+                    if( d[ $( this ).attr( 'Name' ) ] === undefined ){
+                        d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
+                    }
+                } );
+                document.location.href = '<?php echo $reference;?>.php?' + new URLSearchParams( d ).toString();
+            }
+        }<?php
+    }
     public function button_create( $reference ){
         ?>{
             text : "<?php \singleton\fontawesome::getInstance( )->Create( );?><span class='desktop'>Create</span>",
@@ -61,7 +76,7 @@ class datatables extends \singleton\index {
     }
     public function button_reset( $reference ){
         ?>{
-            text : "<?php \singleton\fontawesome::getInstance( )->Reset( );?><span class='desktop'>Reset</span>",
+            text : "<?php \singleton\fontawesome::getInstance( )->Eraser( );?><span class='desktop'>Reset</span>",
             className: 'form-control',
             action: function ( e, dt, node, config ) {
                 $( 'input:visible, select:visible' ).each( function( ){
@@ -92,6 +107,14 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
+    public function button_edit( $reference, $key ){ 
+        ?>{
+            text : "<?php \singleton\fontawesome::getInstance( )->Edit( );?><span class='desktop'>Edit</span>",
+            className: 'form-control',
+            action : function( e, dt, node, config ){ document.location.href='<?php echo $reference;?>.php?ID=' + row.<?php echo $key;?>; }
+        }<?php
+    }
+    public function button_export( ){ ?>{ extend: 'csv', className: 'form-control', text : "<?php \singleton\fontawesome::getInstance( )->Export( 1 );?><span class='desktop'>Export</span>" }<?php }
     //Helper for Columns
     public function data_column( $column ){?>{ data : '<?php echo $column;?>' }<?php }
 
@@ -105,7 +128,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.<?php echo $key;?> !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo $reference;?>?<?php $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   null;
                   default :

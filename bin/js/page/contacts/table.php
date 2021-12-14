@@ -112,9 +112,12 @@ $(document).ready(function( ){
         ],
         <?php \singleton\datatables::getInstance( )->initComplete( 'Contacts' );?>,
         buttons: [
+            <?php \singleton\datatables::getInstance( )->button_url( 'contacts' );?>,
             <?php \singleton\datatables::getInstance( )->button_reset( 'contacts' );?>,
             <?php \singleton\datatables::getInstance( )->button_create( 'contact' );?>,
-            <?php \singleton\datatables::getInstance( )->button_delete( 'contact', 'contacts' );?>
+            <?php \singleton\datatables::getInstance( )->button_edit( 'contact', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->button_delete( 'contact', 'contacts' );?>,
+            <?php \singleton\datatables::getInstance( )->button_export( );?>
         ]
     });
   });
