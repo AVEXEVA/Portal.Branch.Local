@@ -93,9 +93,9 @@ $( document ).ready( function( ){
     },
     columns: [
         <?php \singleton\datatables::getInstance( )->ID('employee.php','Employee');?>,
-        <?php \singleton\datatables::getInstance( )->FirstName( );?>,
-        <?php \singleton\datatables::getInstance( )->LastName( );?>,
-        <?php \singleton\datatables::getInstance( )->Supervisor( );?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('First_Name');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Last_Name');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Supervisor');?>,
         <?php \singleton\datatables::getInstance( )->GPSLocation( );?>,
     ],
     buttons: [
