@@ -1,16 +1,111 @@
 <?php
 namespace singleton;
 class datatables extends \singleton\index {
-	public function ID($url, $moduleName){       
-		?>{
-          className : 'ID',
-          data : 'ID',
+    //Helpers
+    public function preferences( ){
+        ?>dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
+        processing     : true,
+        serverSide     : true,
+        autoWidth      : false,
+        searching      : false,
+        lengthChange   : false,
+        scrollResize   : true,
+        scrollY        : 100,
+        scroller       : true,
+        scrollCollapse : true,
+        paging         : true,
+        orderCellsTop  : true,
+        autoWidth      : true,
+        responsive     : true,
+        select         : {
+          style : 'multi',
+          selector : 'td.ID'
+        }<?php
+    }
+    public function initComplete( $reference ){
+        ?>initComplete : function( ){
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
+            $('input.date').datepicker( { } );
+            $('input.time').timepicker( {  timeFormat : 'h:i A' } );
+            search( this );
+            $( '.redraw' ).bind( 'change', function(){ Table_<?php echo ucfirst( $reference );?>.draw(); });
+        }<?php
+    }
+    public function ajax_data( ){
+        ?>data    : function( d ){
+            d = {
+                draw : d.draw,
+                start : d.start,
+                length : d.length,
+                order : {
+                    column : d.order[0].column,
+                    dir : d.order[0].dir
+                }
+            };
+            $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){ 
+                if( d[ $( this ).attr( 'Name' ) ] === undefined ){
+                    d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
+                }
+            } );
+            return d;
+        }<?php
+    }
+    public function button_create( $reference ){
+        ?>{
+            text : "<?php \singleton\fontawesome::getInstance( )->Create( );?><span class='desktop'>Create</span>",
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+                document.location.href='<?php echo $reference;?>.php';
+            }
+        }<?php
+    }
+    public function button_reset( $reference ){
+        ?>{
+            text : "<?php \singleton\fontawesome::getInstance( )->Reset( );?><span class='desktop'>Reset</span>",
+            className: 'form-control',
+            action: function ( e, dt, node, config ) {
+                $( 'input:visible, select:visible' ).each( function( ){
+                    $( this ).val( '' );
+                } );
+                Table_<?php echo ucfirst( $reference );?>.draw( );
+            }
+        }<?php
+    }
+    public function button_delete( $singular, $plural ){
+        ?>{
+            text : "<?php \singleton\fontawesome::getInstance( )->Delete( );?><span class='desktop'>Delete</span>",
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                $.ajax ({
+                    url    : 'bin/php/post/<?php echo $singular;?>.php',
+                    method : 'POST',
+                    data   : {
+                      action : 'delete' ,
+                      data : dte
+                    },
+                    success : function(response){
+                      Table_<?php echo ucfirst( $plural );?>.draw();
+                    }
+                })
+            }
+        }<?php
+    }
+    //Helper for Columns
+    public function data_column( $column ){?>{ data : '<?php echo $column;?>' }<?php }
+
+    //Columns
+    public function data_column_link( $reference, $key ){
+        ?>{
+          className : '<?php echo $key;?>',
+          data : '<?php echo $key;?>',
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.ID !== null
+                      return  row.<?php echo $key;?> !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo $url;?>?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> <?php echo $moduleName;?> #" + row.ID + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo $reference;?>?<?php $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -18,235 +113,82 @@ class datatables extends \singleton\index {
               }
           }
       }<?php
-	}
-
-    public function FirstName( ){
-		?>{
-            data : 'First_Name'            
-        }<?php
-	}
-
-    public function LastName( ){
-		?>{
-            data : 'Last_Name'            
-        }<?php
-	}
-
-    public function Supervisor( ){
-		?>{
-            data : 'Supervisor'            
-        }<?php
-	}
-
-	public function Name($url){
-		?>{
-            data : 'Name',
+    }
+    public function data_column_tel( $key ){
+        ?>{
+            data : '<?php echo $key;?>',
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return  row.ID !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='<?php echo $url;?>?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                                "</div>"
+                        return row.<?php echo $key;?> != ''
+                            ?   "<a href='tel:" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->Phone( );?>" + row.<?php echo $key;?> + "</a>"
                             :   null;
                     default :
                         return data;
                 }
             }
         }<?php
-	}
-    public function UnitName( ){
-		?>{
-            data : 'Name',
-            render : function ( data, type, row, meta ){
-                switch ( type ) {
+    }
+    public function data_column_email( $key ){
+        ?>{
+            data : '<?php echo $key;?>',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return row.<?php echo $key;?> != ''
+                            ?   "<a href='mailto:" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->Email( );?>" + row.<?php echo $key;?> + "</a>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+    }
+    public function data_column_address( ){
+        ?>{
+            data : 'Street',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  "<div class='row'>" +
+                                    "<div class='col-12'>" +
+                                        "<div class='row'>" +
+                                            "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
+                                            "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
+                                        "</div>" +
+                                    "</div>" +
+                                "</div>"
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+    }
+	
+    //Columns
+    public function ID( $reference ){ self::data_column_link( $reference, 'ID' ); }
+    public function Name( $reference ){ self::data_column_link( $reference, 'Name' ); }
+    public function Date( ){
+        ?>{
+            data : 'Date',
+            render: function( data, type, row, meta ){
+                switch( type ){
                     case 'display':
-                        if( row.City_ID === null && row.Building_ID === null ){
-                            return null;
-                        } else {
-                            return "<div class='row'>" +
-                                ( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
-                                ( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
-                                "</div>";
-                        }
-                    default :
-                        return data;
-                }
-            }
-        }<?php
-	}
-	public function Status( ){
-		?>{
-          data : 'Status'
-        }<?php
-	}
-    public function UnitStatus( ){
-		?>{
-            data : 'Status',
-            render:function(data){
-                switch(data){
-                    case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
-                    case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
-                    case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
-                }
-            }
-        }<?php
-	}
-    public function UnitType( ){
-		?>{
-          data : 'Type'
-        }<?php
-	}
-	public function Locations( ){
-		?>{
-            data : 'Locations',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Locations !== null
+                        return row.Date !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                                    "<div class='col-12'><?php \singleton\fontawesome::getInstance( )->Date( 1 );?>" + row.Date + "</div>" +
                                 "</div>"
                             :   null;
-                    default :
-                        return data;
-                }
+                        default :
+                            return data;
 
-            }
-        }<?php
-	}
-	public function Units( ){
-		?>{
-	        data : 'Units',
-	        render : function( data, type, row, meta ){
-	            switch( type ){
-	                case 'display' :
-	                    return  row.Units !== null
-	                        ?   "<div class='row'>" +
-	                                "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
-	                            "</div>"
-	                        :   null;
-	                default :
-	                    return data;
-	            }
-	        }
-	    }<?php
-	}
-
-	public function Unit( ){
-		?>{
-            data : 'Units',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Units !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='unit.php?ID=" + row.Unit_ID + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " </a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-                }
-            }
-      }<?php
-	}
-
-	public function Jobs( ){
-		?>{
-            data : 'Jobs',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Jobs !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-                }
-
-            }
-        }<?php
-	}
-	public function Tickets( ){
-		?>{
-            data : 'Tickets',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Tickets !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-                }
-
-            }
-        }<?php
-	}
-	public function Violations( ){
-		?>{
-            data : 'Violations',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Tickets !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
                 }
             }
         }<?php
-	}
-	public function Invoices( ){
-		?>{
-            data : 'Invoices',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Tickets !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-                }
-
-            }
-        }<?php
-	}
-
-    public function GPSLocation( ){
-		?>
-            {
-            className : 'GPSLocation',
-            searchable: false,
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  (row.Latittude !== null && row.Longitude !== null)
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='https://www.google.com/maps/search/?api=1&query=" + row.Latitude + "," + row.Longitude + "' target='_blank' ><i class='fa fa-map-marker'></i> GPS </a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-                }
-
-            }
-        }
-    <?php
-	}
-
-    public function CustomerID( ){
-		?>{
+    }
+    //Columns that are Foreign Keys
+    public function Customer( ){
+        ?>{
             data : 'Customer_ID',
             render : function( data, type, row, meta ){
 
@@ -263,10 +205,9 @@ class datatables extends \singleton\index {
 
             }
         }<?php
-	}
-
-    public function LocationID($extra){
-		?>{
+    }
+    public function Location( ){
+        ?>{
             data : 'Location_ID',
             render : function( data, type, row, meta ){
                 switch( type ){
@@ -290,32 +231,9 @@ class datatables extends \singleton\index {
 
             }
         }<?php
-	}
-    
-
-    public function TicketID( ){
-		?>{
-            data : 'Ticket_ID',
-            /*	render : function( data, type, row, meta ){
-					switch ( type ){
-						case 'display' :
-							return row.Ticket_ID !== null
-								?	"<div class='row'>" +
-								"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #" + row.Ticket_ID + "</a></div>" +
-								"<div class='col-12'>" + row.Ticket_Date + "</div>" +
-								"</div>"
-								: 	null;
-						default :
-							return data;
-
-					}
-			}*/
-        }<?php
-	}
-
-
-    public function UnitID( ){
-		?>{
+    }
+    public function Unit( ){
+        ?>{
             data : 'Unit_ID',
             render : function( data, type, row, meta ){
                 switch( type ){
@@ -332,9 +250,129 @@ class datatables extends \singleton\index {
 
             }
         }<?php
-	}  
+    } 
+    public function Ticket( ){
+        ?>{
+            data : 'Ticket_ID',
+            /*  render : function( data, type, row, meta ){
+                    switch ( type ){
+                        case 'display' :
+                            return row.Ticket_ID !== null
+                                ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?></i>Ticket #" + row.Ticket_ID + "</a></div>" +
+                                "<div class='col-12'>" + row.Ticket_Date + "</div>" +
+                                "</div>"
+                                :   null;
+                        default :
+                            return data;
+
+                    }
+            }*/
+        }<?php
+    }
+    public function Job( ){
+        ?>{
+            data : 'Job_ID',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Job_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?>" + row.Job_ID + "</a></div>" +
+                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+                }
+            }
+        }<?php
+    }
+    public function Employee( ){
+        ?>{
+            data : 'Employee_ID',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.Employee_ID !== null
+                            ?   "<a href='user.php?ID=" + row.Employee_ID + "'><?php \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Employee_Name + "</a>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+    } 
+    public function Time( $key ){
+        ?>{
+            data : '<?php echo $key;?>',
+            render: function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.<?php echo $key;?> !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><?php \singleton\fontawesome::getInstance( )->Time( 1 );?>" + row.<?php echo $key;?> + "</div>" +
+                                "</div>"
+                            :   null;
+                        default :
+                            return data;
+
+                }
+            }
+        }<?php
+    }
+
+    //Columns using Helpers
+    public function First_Name( ){ self::data_column( 'First_Name' ); }
+    public function Last_Name( ){ self::data_column( 'Last_Name' ); }
+    public function Supervisor( ){ self::data_column( 'Supervisor' ); }
+    public function Status( ){ self::data_column( 'Status' ); }
+    public function Type( ){ self::data_column( 'Type' ); }
+    public function TimeRoute( ){ self::Time( 'Time_Route' ); }
+    public function TimeSite( ){ self::Time( 'Time_Site' ); }
+    public function TimeCompleted( ){ self::Time( 'Time_Completed' ); }
+    
+
+    public function data_column_count( $key, $Reference, $Reference_Key, $icon = 'blank' ){
+        ?>{
+            data : '<?php echo $key;?>',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.<?php echo $key;?> !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo $key;?> + " </a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+      }<?php
+    }
+    //Columns that are counts
+    public function Units( $Reference, $Reference_Key ){ self::data_column_count( 'units', $Reference, $Reference_Key, 'Unit' ); }
+    public function Locations( $Reference, $Reference_Key ){ self::data_column_count( 'locations', $Reference, $Reference_Key, 'Location' ); }
+    public function Jobs( $Reference, $Reference_Key ){ self::data_column_count( 'jobs', $Reference, $Reference_Key, 'Job' ); }
+    public function Tickets( $Reference, $Reference_Key ){ self::data_column_count( 'tickets', $Reference, $Reference_Key, 'Ticket' ); }
+    public function Violations( $Reference, $Reference_Key){ self::data_column_count( 'violations', $Reference, $Reference_Key, 'Violation' ); }
+    public function Invoices( $Reference, $Reference_Key ){ self::data_column_count( 'invoices', $Reference, $Reference_Key, 'Invoice' ); }
+
+
+    //Columns need Rewrite
+    public function FirstName( ){ self::First_Name( );	}
+    public function LastName( ){ self::Last_Name( ); }
+    public function UnitType( ){ self::Type( ); }
+    public function LocationID( ){ self::Location( ); }
+    public function TicketID( ){ self::Ticket( ); }
+    public function CustomerID( ){ self::Customer( ); }
+    public function UnitID( ){ self::Unit( ); }
+    public function JobID( ){ self::Job( ); }
+    public function TicketTimeRoute( ){ self::TimeRoute( ); }
+    public function TicketTimeSite( ){ self::TimeSite( ); }
+    public function TicketTimeCompleted( ){ self::TimeCompleted( ); }
     public function TerritoryUnit( ){
-		?>{
+        ?>{
             data : 'Unit',
             render : function( data, type, row, meta ){
                 switch( type ){
@@ -349,9 +387,9 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-	}  
+    }  
     public function TerritoryProposal( ){
-		?>{ data : 'Proposal',
+        ?>{ data : 'Proposal',
             render : function( data, type, row, meta ){
                switch( type ){
                    case 'display' :
@@ -365,9 +403,9 @@ class datatables extends \singleton\index {
             }
         }
       }<?php
-	}  
+    }  
     public function TerritoryCollections( ){
-		?>{
+        ?>{
             data : 'Collection',
             render : function( data, type, row, meta ){
                 switch( type ){
@@ -382,8 +420,46 @@ class datatables extends \singleton\index {
                 }
             }
           }<?php
+    }	
+    public function UnitName( ){
+		?>{
+            data : 'Name',
+            render : function ( data, type, row, meta ){
+                switch ( type ) {
+                    case 'display':
+                        if( row.City_ID === null && row.Building_ID === null ){
+                            return null;
+                        } else {
+                            return "<div class='row'>" +
+                                ( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
+                                ( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
+                                "</div>";
+                        }
+                    default :
+                        return data;
+                }
+            }
+        }<?php
 	}
+    public function GPSLocation( ){
+		?>{
+            className : 'GPSLocation',
+            searchable: false,
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  (row.Latittude !== null && row.Longitude !== null)
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='https://www.google.com/maps/search/?api=1&query=" + row.Latitude + "," + row.Longitude + "' target='_blank' ><i class='fa fa-map-marker'></i> GPS </a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
 
+            }
+        }<?php
+	}
     public function TerritoryInvoices( ){
 		?>{
             data : 'Invoices',
@@ -402,27 +478,6 @@ class datatables extends \singleton\index {
 
         }<?php
 	}
-
-    public function JobID( ){
-		?>{
-            data : 'Job_ID',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display':
-                        return row.Job_ID !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" +
-                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
-                                "</div>"
-                            :   null;
-                        default :
-                            return data;
-                }
-            }
-        }<?php
-	}
-
-
     public function TicketLevel( ){
 		?>{
             data : 'Level',
@@ -441,90 +496,12 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-
-    public function TicketDate( ){
-		?>{
-            data : 'Date',
-            render: function( data, type, row, meta ){
-                switch( type ){
-                    case 'display':
-                        return row.Date !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" +
-                                "</div>"
-                            :   null;
-                        default :
-                            return data;
-
-                }
-            }
-        }<?php
-	}
-
-    public function TicketTimeRoute( ){
-		?>{
-            data : 'Time_Route',
-            render: function( data, type, row, meta ){
-                switch( type ){
-                    case 'display':
-                        return row.Date !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Route + "</div>" +
-                                "</div>"
-                            :   null;
-                        default :
-                            return data;
-
-                }
-            }
-        }<?php
-	}
-
-    public function TicketTimeSite( ){
-		?>{
-            data : 'Time_Site',
-            render: function( data, type, row, meta ){
-                switch( type ){
-                    case 'display':
-                        return row.Date !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Site + "</div>" +
-                                "</div>"
-                            :   null;
-                        default :
-                            return data;
-
-                }
-            }
-        }<?php
-	}
-
-    public function TicketTimeCompleted( ){
-		?>{
-            data : 'Time_Completed',
-            render: function( data, type, row, meta ){
-                switch( type ){
-                    case 'display':
-                        return row.Date !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><i class='fa fa-clock-o fa-fw fa-1x'></i>" + row.Time_Completed + "</div>" +
-                                "</div>"
-                            :   null;
-                        default :
-                            return data;
-
-                }
-            }
-        }<?php
-	}
-
     public function TicketHours( ){
 		?>{
             data : 'Hours',
             defaultContent :"0"
         }<?php
 	}
-
     public function TicketLSD( ){
 		?>{
             data : 'LSD',
@@ -540,20 +517,4 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}    
-    public function TicketPerson( ){
-		?>{
-            data : 'Person',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display':
-                        return row.Employee_ID !== null
-                            ?   "<a href='user.php?ID=" + row.Employee_ID + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Person + "</a>"
-                            :   null;
-                    default :
-                        return data;
-                }
-            }
-        }<?php
-	}    
-
 }?>

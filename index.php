@@ -99,9 +99,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();' >
+<body>
   <?php require( bin_php . 'element/navigation.php');?>
-  <?php require( bin_php . 'element/loading.php');?>
   <div id='page-wrapper' class='content'>
     <section id='account-menu' style='padding:50px;background-color:#0f0f0f;'>
       <div class='row'>

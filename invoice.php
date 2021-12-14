@@ -178,14 +178,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Employee_Last_Name'   => null,
         ) : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
-            $Invoice[ 'Location_Name' ] = isset( $_POST[ 'Location' ] )  ? $_POST[ 'Location' ]       : $Invoice[ 'Location_Name' ];
-            $Invoice[ 'Job_Name' ]      = isset( $_POST[ 'Job' ] )       ? $_POST[ 'Job' ]            : $Invoice[ 'Job_Name' ];
-            $Invoice[ 'Description' ] 	= isset( $_POST[ 'Description' ] ) ? $_POST[ 'Description' ]  : $Invoice[ 'Description' ];
-            $Invoice[ 'Date' ]          = isset( $_POST[ 'Date' ] )      ? $_POST[ 'Date' ]           : $Invoice[ 'Date' ];
-            $Invoice[ 'Amount' ] 		= isset( $_POST[ 'Amount' ] ) 	 ? $_POST[ 'Amount' ] 	      : $Invoice[ 'Amount' ];
-            $Invoice[ 'Taxable' ] 		= isset( $_POST[ 'Taxable' ] ) 	 ? $_POST[ 'Taxable' ] 	      : $Invoice[ 'Taxable' ];
-            $Invoice[ 'Sales_Tax' ]     = isset( $_POST[ 'Sales_Tax' ] ) ? $_POST[ 'Sales_Tax' ] 	  : $Invoice[ 'Sales_Tax' ];
-            $Invoice[ 'Total' ] 	    = isset( $_POST[ 'Total' ] ) 	 ? $_POST[ 'Total' ]          : $Invoice[ 'Total' ];
+            $Invoice[ 'Location_ID' ] 	= isset( $_POST[ 'Location_ID' ] )  	? $_POST[ 'Location_ID' ]       : $Invoice[ 'Location_ID' ];
+            $Invoice[ 'Location_Name' ] = isset( $_POST[ 'Location_Name' ] )  	? $_POST[ 'Location_Name' ]     : $Invoice[ 'Location_Name' ];
+            $Invoice[ 'Job_ID' ] 		= isset( $_POST[ 'Job_ID' ] )  			? $_POST[ 'Job_ID' ]       		: $Invoice[ 'Job_ID' ];
+            $Invoice[ 'Job_Name' ] 		= isset( $_POST[ 'Job_Name' ] )  		? $_POST[ 'Job_Name' ]       	: $Invoice[ 'Job_Name' ];
+            $Invoice[ 'Description' ] 	= isset( $_POST[ 'Description' ] ) 		? $_POST[ 'Description' ]  		: $Invoice[ 'Description' ];
+            $Invoice[ 'Date' ]          = isset( $_POST[ 'Date' ] )      		? $_POST[ 'Date' ]           	: $Invoice[ 'Date' ];
+            $Invoice[ 'Amount' ] 		= isset( $_POST[ 'Amount' ] ) 	 		? $_POST[ 'Amount' ] 	      	: $Invoice[ 'Amount' ];
+            $Invoice[ 'Taxable' ] 		= isset( $_POST[ 'Taxable' ] ) 	 		? $_POST[ 'Taxable' ] 	      	: $Invoice[ 'Taxable' ];
+            $Invoice[ 'Sales_Tax' ]     = isset( $_POST[ 'Sales_Tax' ] ) 		? $_POST[ 'Sales_Tax' ] 	  	: $Invoice[ 'Sales_Tax' ];
+            $Invoice[ 'Total' ] 	    = isset( $_POST[ 'Total' ] ) 	 		? $_POST[ 'Total' ]          	: $Invoice[ 'Total' ];
             if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
                 $result = \singleton\database::getInstance( )->query(
                     null,
@@ -206,8 +208,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         )
                         VALUES(
                             @MAXID + 1,
-                            ( SELECT Top 1 Loc.Loc  FROM Loc WHERE Loc.Tag = ? ),
-                            ( SELECT Top 1 Job.ID   FROM Job WHERE Job.fDesc = ? ),
+                            ?,
+                            ?,
                             ?,
                             ?,
                             ?,
@@ -219,8 +221,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         );
                         SELECT @MAXID + 1;",
                     array(
-                        $Invoice[ 'Location_Name' ],
-                        $Invoice[ 'Job_Name' ],
+                        $Invoice[ 'Location_ID' ],
+                        $Invoice[ 'Job_ID' ],
                         !empty( $Invoice[ 'Date' ] ) ? $Invoice[ 'Date' ] : date( 'Y-m-d h:i:s' ),
                         $Invoice[ 'Description' ],
                         !empty( $Invoice[ 'Amount' ] ) ? $Invoice[ 'Amount' ] : 0,
@@ -236,8 +238,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 \singleton\database::getInstance( )->query(
                     null,
                     "	UPDATE  Invoice
-                        SET     Invoice.Loc     =   ( SELECT Top 1 Loc.Loc  FROM Loc WHERE Loc.Tag = ? ),
-                                Invoice.Job     =   ( SELECT Top 1 Job.ID   FROM Job WHERE Job.fDesc = ? ),
+                        SET     Invoice.Loc     =   ?,
+                                Invoice.Job     =   ?,
                                 Invoice.fDesc 	=   ?,
                                 Invoice.STax 	  =   ?,
                                 Invoice.fDate   =   ?,
@@ -245,8 +247,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 Invoice.Total 	=   ?,
                         WHERE   Invoice.Ref     =   ?;",
                     array(
-                        $Invoice[ 'Location_Name' ],
-                        $Invoice[ 'Job_Name' ],
+                        $Invoice[ 'Location_ID' ],
+                        $Invoice[ 'Job_ID' ],
                         $Invoice[ 'Description' ],
                         $Invoice[ 'Date' ],
                         $Invoice[ 'Amount' ],
