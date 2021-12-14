@@ -277,95 +277,42 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
-          "	INSERT INTO Contract(
-              [Job],
-              [Loc],
-              [Owner],
-              [Review],
-              [Disc1],
-              [Disc2],
-              [Disc3],
-              [Disc4],
-              [Disc5],
-              [Disc6],
-              [DiscType],
-              [DiscRate],
-              [BCycle],
-              [BStart],
-              [BLenght],
-              [BFinish],
-              [BAmt],
-              [BEscType],
-              [BEscCycle],
-              [BEscFact],
-              [SCycle],
-              [SType],
-              [SDay],
-              [SDate],
-              [STime],
-              [SWE],
-              [SStart],
-              [Detail],
-              [Cycle],
-              [EscLast],
-              [OldAmt],
-              [WK],
-              [Skill],
-              [Status],
-              [Hours],
-              [Hour],
-              [Terms],
-              [OffService],
-              [TFMID],
-              [TFMSource]
+          "	DECLARE @MAXID INT;
+            SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Contract ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Contract ) END ;
+            INSERT INTO Contract(
+              ID,
+              Job,
+              Loc,
+              Owner,
+              Review,
+              BCycle,
+              BStart,
+              Blenght,
+              Bfinish,
+              BAmt,
+              BEscType,
+              BEscCycle,
+              BEscFact
             )
-            VALUES( " . implode( ',', array_fill( 0, 38, '?' ) ) . ", ' ', ' ' );
-            SELECT SCOPE_IDENTITY( );",
+            VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            SELECT @MAXID + 1;",
           array(
             $Contract[ 'Customer_ID' ],
-            $Contract[ 'Location_ID'],
+            $Contract[ 'Location_ID' ],
             $Contract[ 'Job_ID' ],
-            $Contract[ 'Review' ],
-            $Contract[ 'Discount_1' ],
-            $Contract[ 'Discount_2' ],
-            $Contract[ 'Discount_3' ],
-            $Contract[ 'Discount_4' ],
-            $Contract[ 'Discount_5' ],
-            $Contract[ 'Discount_6' ],
-            $Contract[ 'Discount_Type' ],
-            $Contract[ 'Discount_Rate' ],
             $Contract[ 'Billing_Cycle' ],
             $Contract[ 'Billing_Start' ],
             $Contract[ 'Billing_Length' ],
             $Contract[ 'Billing_Finish' ],
             $Contract[ 'Billing_Amount' ],
-            $Contract[ 'Billing_Escalation_Type' ],
             $Contract[ 'Billing_Escalation_Cycle' ],
-            $Contract[ 'Billing_Escalation_Factor' ],
-            $Contract[ 'Scheduling_Cycle' ],
-            $Contract[ 'Scheduling_Type' ],
-            $Contract[ 'Scheduling_Day' ],
-            $Contract[ 'Scheduling_Date' ],
-            $Contract[ 'Scheduling_Time' ],
-            is_null( $Contract[ 'Scheduling_Weekends' ] ) ? 0 : $Contract[ 'Scheduling_Weekends' ],
-            $Contract[ 'Scheduling_Start' ],
-            $Contract[ 'Detail' ],
-            $Contract[ 'Cycle' ],
-            is_null( $Contract[ 'Escalation_Last' ] ) ? '1969-12-30 00:00:00.000' : null,
-            $Contract[ 'Old_Amount' ],
-            $Contract[ 'Week'],
-            $Contract[ 'Skill' ],
-            $Contract[ 'Status' ],
-            $Contract[ 'Hours' ],
-            $Contract[ 'Hour' ],
-            $Contract[ 'Terms' ],
-            $Contract[ 'Off_Service']
+            $Contract[ 'Billing_Escalation_Factor' ]
           )
         );
         sqlsrv_next_result( $result );
         $Contract[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
-        header( 'Location: contract.php?ID=' . $Contract[ 'ID' ] );
+        var_dump(sqlsrv_errors( ) );
+        //header( 'Location: contract.php?ID=' . $Contract[ 'ID' ] );
         exit;
       } else {
         \singleton\database::getInstance( )->query(

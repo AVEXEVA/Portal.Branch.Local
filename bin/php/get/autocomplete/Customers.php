@@ -69,72 +69,82 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(   !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Location' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Location' ] )
+        ||  !isset( $Privileges[ 'Customer' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Customer' ] )
     ){ ?><?php print json_encode( array( 'data' => array( ) ) );?><?php }
     else {
 
     $conditions = array( );
     $search = array( );
     $parameters = array( );
-    if( isset($_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Street'];
-      $conditions[] = "Location.Address LIKE '%' + ? + '%'";
-    }
+
     if( isset( $_GET[ 'search'] ) ){
       $parameters[ ] = $_GET[ 'search' ];
-      $search[ ] = "Location.Tag LIKE '%' + ? + '%'";
+      $search[ ] = "Customer.Name LIKE '%' + ? + '%'";
     }
-
+    if( isset( $_GET[ 'ID'] ) ){
+      $parameters[ ] = $_GET[ 'ID' ];
+      $search[ ] = "Customer.ID LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Location'] ) ){
+      $parameters[ ] = $_GET[ 'Location' ];
+      $search[ ] = "Customer.Location LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Status'] ) ){
+      $parameters[ ] = $_GET[ 'Status' ];
+      $search[ ] = "Customer.Status LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Units'] ) ){
+      $parameters[ ] = $_GET[ 'Units' ];
+      $search[ ] = "Customer.Unit LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Jobs'] ) ){
+      $parameters[ ] = $_GET[ 'Jobs' ];
+      $search[ ] = "Customer.Job LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Tickets'] ) ){
+      $parameters[ ] = $_GET[ 'Tickets' ];
+      $search[ ] = "Customer.Ticket LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Violations'] ) ){
+      $parameters[ ] = $_GET[ 'Violations' ];
+      $search[ ] = "Customer.Violation LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Invoices'] ) ){
+      $parameters[ ] = $_GET[ 'Invoices' ];
+      $search[ ] = "Customer.Invoice LIKE '%' + ? + '%'";
+    }
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
     $parameters[ ] = $_GET[ 'search' ];
 
-    $sQuery = " SELECT  Top 10
-                        tbl.ID,
-                        tbl.FieldName,
-                        tbl.FieldValue
-      FROM    (
-                SELECT  insRowTbl.ID,
-                        attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+    $sQuery =
+      " SELECT  Top 10
+              tbl.ID,
+              tbl.FieldName,
+              tbl.FieldValue
+        FROM    (
+                SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                         attr.insRow.value('.', 'nvarchar(max)') as FieldValue
-                FROM    ( Select i.ID, convert(xml, (select i.* for xml raw)) as insRowCol
+                FROM    ( Select i.ID  convert(xml, (select i.* for xml raw)) as insRowCol
                           FROM ( (
-                            SELECT  Top 100
-                                    Location.Loc AS ID,
-                                    Location.Tag AS Name
-                            FROM    Loc AS Location
-                                    LEFT JOIN (
-                                        SELECT  Owner.ID,
-                                                Rol.Name,
-                                                Owner.Status
-                                        FROM    Owner
-                                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                                    ) AS Customer ON Location.Owner = Customer.ID
-                                    LEFT JOIN (
-                                      SELECT    Elev.Loc AS Location,
-                                                Max( Elev.Building ) AS Name
-                                      FROM      Elev
-                                      GROUP BY  Elev.Loc
-                                    ) AS Location_Type ON Location_Type.Location = Location.Loc
-                                    LEFT JOIN Zone ON Location.Zone = Zone.ID
-                                    LEFT JOIN Route ON Location.Route = Route.ID
-                                    LEFT JOIN (
-                                      SELECT    Elev.Loc AS Location,
-                                                Count( Elev.ID ) AS Count
-                                      FROM      Elev
-                                      GROUP BY  Elev.Loc
-                                    ) AS Location_Units ON Location_Units.Location = Location.Loc
-                                    LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
-
+                            SELECT  Customer.ID,
+                                    Customer.Name
+                        FROM    (
+                                    SELECT  Owner.ID,
+                                            Rol.Name,
+                                            Owner.Status
+                                    FROM    Owner
+                                            LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                                ) AS Customer
                             WHERE   ({$conditions}) AND ({$search})
                           ) ) as i
                    ) as insRowTbl
               CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
             ) AS tbl
       WHERE     tbl.FieldValue LIKE '%' + ? + '%'
-      GROUP BY  tbl.ID, tbl.FieldName, tbl.FieldValue;;";
+      GROUP BY tbl.ID,  tbl.FieldName, tbl.FieldValue;;";
 
     $rResult = $database->query(
       null,
