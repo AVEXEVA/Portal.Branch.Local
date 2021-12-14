@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
@@ -100,88 +106,16 @@ $( document ).ready( function( ){
       }
     },
     columns: [
-      {
-          className : 'ID',
-          data : 'ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='invoice.php?ID=" + row.ID + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> Invoice #" + row.ID + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-
-          }
-      },{
-          data : 'Customer_ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.Customer_ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-
-          }
-      },{
-          data : 'Location_ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.Location_ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
-                                  "<div class='col-12'>" +
-                                      "<div class='row'>" +
-                                          "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
-                                          "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
-                                      "</div>" +
-                                  "</div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-
-          }
-      },{
-          data : 'Job_ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display':
-                      return row.Job_ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><i class='fa fa-suitcase fa-fw fa-1x'></i>" + row.Job_ID + "</a></div>" +
-                                  "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
-                              "</div>"
-                          :   null;
-                      default :
-                          return data;
-              }
-          }
-      },{
-        data : 'Type'
-      },{
-        data   : 'Date'
-      },{
-        data   : 'Due'
-      },{
-        data      : 'Original',
-        className :'sum'
-      },{
-        data      : 'Balance',
-        className : 'sum'
-      },{
-        data : 'Description'
-      }
+        <?php \singleton\datatables::getInstance( )->ID('invoice.php','Invoice');?>,
+        <?php \singleton\datatables::getInstance( )->CustomerID();?>,
+        <?php \singleton\datatables::getInstance( )->LocationID();?>,
+        <?php \singleton\datatables::getInstance( )->JobID();?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Date');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Due');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Original','sum');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Balance','sum');?>,
+        <?php \singleton\datatables::getInstance( )->DataElement('Description');?>      
     ],
     initComplete : function( ){
         $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
