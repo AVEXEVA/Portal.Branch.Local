@@ -14,11 +14,11 @@ function search( link ){
                         Customer : $('input:visible[name="Customer"]').val(),
                         Location :  $('input:visible[name="Location"]').val( ),
                         Job : $('input:visible[name="Job"]').val( ),
-                        Start_Date :  $('input:visible[name="Start_Date"]').val( ),
-                        End_Date :  $('input:visible[name="End_Date"]:visible').val( ),
+                        Start_Date :  $('select:visible[name="Start_Date"]').val( ),
+                        End_Date :  $('select:visible[name="End_Date"]:visible').val( ),
                         Length : $('select:visible[name="Length"]').val( ),
-                        Amount : $('select:visible[name="Amount"]').val( ),
-                        Cycle : $('select:visible[name="Cycle"]').val( ),
+                        Amount : $('input:visible[name="Amount"]').val( ),
+                        Cycle : $('input:visible[name="Cycle"]').val( ),
                         Escalation_Factor : $('input:visible[name="Escalation_Factor"]').val( ),
                         Escalation_Date :  $('input:visible[name="Escalation_Date"]').val( ),
                         Link :  $('input:visible[name="Link"]').val( ),
@@ -213,7 +213,7 @@ $( document ).ready( function() {
           var rows = dt.rows( { selected : true } ).indexes( );
           var dte = dt.cells( rows, 0 ).data( ).toArray( );
           $.ajax ({
-            url    : 'bin/php/post/contract.php',
+            url    : 'bin/php/post/Contract.php',
             method : 'POST',
             data   : {
               action : 'delete' ,

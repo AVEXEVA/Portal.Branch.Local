@@ -189,15 +189,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Location_Longitude' => null,
         'Unit_ID' => null,
         'Unit_Name' => isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null,
-        'Proposal_ID' => null,
-        'Proposal_Name' => isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null,
-        'Quote_ID' => null,
-        'Quote_Name' => isset( $_GET[ 'Quote' ] ) ? $_GET[ 'Quote' ] : null,
-        'Job_ID' => null,
-        'Job_Name' => isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null,
-        'Ticket_ID' => null,
-        'Inspection_ID' => null,
-        'Inspection_Name' => isset( $_GET[ 'Inspection' ] ) ? $_GET[ 'Inspection' ] : null,
+        'Proposal_ID' => isset( $_GET[ 'Proposal_ID' ] ) ? $_GET[ 'Proposal_ID' ] : null,
+        'Proposal_Name' => isset( $_GET[ 'Proposal_Name' ] ) ? $_GET[ 'Proposal_Name' ] : null,
+        'Quote_ID' => isset( $_GET[ 'Quote_ID' ] ) ? $_GET[ 'Quote_ID' ] : null,
+        'Quote_Name' => isset( $_GET[ 'Quote_Name' ] ) ? $_GET[ 'Quote_Name' ] : null,
+        'Job_ID' => isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+        'Job_Name' => isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null,
+        'Ticket_ID' => isset( $_GET[ 'Ticket_ID' ] ) ? $_GET[ 'Ticket_ID' ] : null,
+        'Inspection_ID' => isset( $_GET[ 'Inspection_ID' ] ) ? $_GET[ 'Inspection_ID' ] : null,
+        'Inspection_Name' => isset( $_GET[ 'Inspection_Name' ] ) ? $_GET[ 'Inspection_Name' ] : null,
       	'Date' => null,
       	'Status' => null,
       	'Note' => null,
@@ -215,7 +215,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Forms_to_Customer' => null,
         'Recieved_from_Customer' => null,
         'Cancel_Contract' => null,
-        'Job' => null,
+        'Created' => null,
+        'Code' => null,
+        'Division_1' => null,
+        'Division_2' => null,
+        'Division_3' => null,
+        'Division_4' => null,
+        'Sales' => null,
+        'Repair' => null,
+        'Modernization' => null,
+        'Complete' => null,
+        'Custom21' => null,
+        'Custom22' => null,
+        'Custom23' => null,
+        'Custom24' => null,
+        'Custom25' => null,
+        'Custom26' => null,
+        'Custom27' => null,
+        'Custom28' => null,
+        'Custom29' => null,
+        'Custom30' => null
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -334,7 +353,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang="en">
 <head>
   	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php  	
+    <?php
       $_GET[ 'Bootstrap' ] = '5.1';
       $_GET[ 'Entity_CSS' ] = 1;
       require( bin_meta . 'index.php');

@@ -197,7 +197,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 En_Route.Count AS En_Route,
                                 On_Site.Count AS On_Site,
                                 Reviewing.Count AS Reviewing
-                        FROM    Job AS Job 
+                        FROM    Job AS Job
                                 LEFT JOIN (
                                   SELECT    Job.ID AS Job,
                                             Count( TicketO.ID ) AS Count
@@ -250,14 +250,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   FROM      Invoice
                                   WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
                                   GROUP BY  Invoice.Job
-                                ) AS [Open] ON Job.ID = [Open].Job 
+                                ) AS [Open] ON Job.ID = [Open].Job
                                 LEFT JOIN (
                                   SELECT    Invoice.Job,
                                             Count( Invoice.Ref ) AS Count
                                   FROM      Invoice
                                   WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
                                   GROUP BY  Invoice.Job
-                                ) AS [Closed] ON Job.ID = [Closed].Job 
+                                ) AS [Closed] ON Job.ID = [Closed].Job
                     ) AS Invoices ON Invoices.Job = Job.ID
                     LEFT JOIN (
                       SELECT    Job.ID AS Job,
@@ -270,14 +270,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   FROM      Contract
                                   WHERE     Contract.Status = 0
                                   GROUP BY  Contract.Job
-                                ) AS [Open] ON Job.ID = [Open].Job 
+                                ) AS [Open] ON Job.ID = [Open].Job
                                 LEFT JOIN (
                                   SELECT    Contract.Job,
                                             Count( Contract.ID ) AS Count
                                   FROM      Contract
                                   WHERE     Contract.Status = 1
                                   GROUP BY  Contract.Job
-                                ) AS [Closed] ON Job.ID = [Closed].Job 
+                                ) AS [Closed] ON Job.ID = [Closed].Job
                     ) AS Contracts ON Contracts.Job = Job.ID
                     LEFT JOIN (
                       SELECT    Job.ID AS Job,
@@ -290,14 +290,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   FROM      Estimate
                                   WHERE     Estimate.Status = 0
                                   GROUP BY  Estimate.Job
-                                ) AS [Open] ON Job.ID = [Open].Job 
+                                ) AS [Open] ON Job.ID = [Open].Job
                                 LEFT JOIN (
                                   SELECT    Estimate.Job,
                                             Count( Estimate.ID ) AS Count
                                   FROM      Estimate
                                   WHERE     Estimate.Status = 1
                                   GROUP BY  Estimate.Job
-                                ) AS [Closed] ON Job.ID = [Closed].Job 
+                                ) AS [Closed] ON Job.ID = [Closed].Job
                     ) AS Proposals ON Proposals.Job = Job.ID
           	WHERE      Job.ID = ?
                     OR Job.fDesc = ?;",
@@ -319,22 +319,33 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Type' => null,
           'Notes' => null,
           'Status' => null,
-          'Location_ID' => null,
-          'Location_Name' => isset( $_GET [ 'Location' ] ) ? $_GET ['Location'] : null,
+          'Location_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
+          'Location_Name' => isset( $_GET [ 'Location_Name' ] ) ? $_GET ['Location_Name'] : null,
           'Location_Street' => null,
           'Location_City' => null,
           'Location_State' => null,
           'Location_Zip' => null,
           'Location_Latitude' => null,
           'Location_Longitude' => null,
-          'Customer_ID' =>  null,
-          'Customer_Name' => isset( $_GET [ 'Location' ] ) ? $_GET ['Location'] : null,
-          'Unit_ID' => null,
-          'Unit_Name' => isset( $_GET [ 'Unit' ] ) ? $_GET ['Unit'] : null,
-          'Violation_ID' => null,
-          'Violation_Name' => isset( $_GET [ 'Violation' ] ) ? $_GET ['Violation'] : null,
-          'Division_ID' => null,
-          'Division_Name' => isset( $_GET [ 'Division' ] ) ? $_GET ['Division'] : null
+          'Customer_ID' =>  isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+          'Customer_Name' => isset( $_GET [ 'Customer_Name' ] ) ? $_GET ['Customer_Name'] : null,
+          'Unit_ID' => isset( $_GET[ 'Unit_ID' ] ) ? $_GET[ 'Unit_ID' ] : null,
+          'Unit_Name' => isset( $_GET [ 'Unit_Name' ] ) ? $_GET ['Unit_Name'] : null,
+          'Violation_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
+          'Violation_Name' => isset( $_GET [ 'Violation_Name' ] ) ? $_GET ['Violation_Name'] : null,
+          'Division_ID' => isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null,
+          'Division_Name' => isset( $_GET [ 'Division_Name' ] ) ? $_GET ['Division_Name'] : null,
+          'Tickets_Open' => isset( $_GET[ 'Tickets_Open' ] ) ? $_GET[ 'Tickets_Open' ] : null,
+          'Tickets_Assigned' => isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null,
+          'Tickets_En_Route' => isset( $_GET[ 'Tickets_En_Route' ] ) ? $_GET[ 'Tickets_En_Route' ] : null,
+          'Tickets_On_Site' => isset( $_GET[ 'Tickets_On_Site' ] ) ? $_GET[ 'Tickets_On_Site' ] : null,
+          'Tickets_Reviewing' => isset( $_GET[ 'Tickets_Reviewing' ] ) ? $_GET[ 'Tickets_Reviewing' ] : null,
+          'Invoices_Open' => isset( $_GET[ 'Invoices_Open' ] ) ? $_GET[ 'Invoices_Open' ] : null,
+          'Invoices_Closed' => isset( $_GET[ 'Invoices_Closed' ] ) ? $_GET[ 'Invoices_Closed' ] : null,
+          'Proposals_Open' => isset( $_GET[ 'Proposals_Open' ] ) ? $_GET[ 'Proposals_Open' ] : null,
+          'Proposals_Closed' => isset( $_GET[ 'Proposals_Closed' ] ) ? $_GET[ 'Proposals_Closed' ] : null,
+          'Contracts_Open' => isset( $_GET[ 'Contracts_Open' ] ) ? $_GET[ 'Contracts_Open' ] : null,
+          'Contracts_Closed' => isset( $_GET[ 'Contracts_Closed' ] ) ? $_GET[ 'Contracts_Closed' ] : null
         ) : sqlsrv_fetch_array($result);
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){

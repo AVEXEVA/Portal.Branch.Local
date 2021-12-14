@@ -1,5 +1,51 @@
+function search( link ){
+    var api = link.api();
+    $('input[name="Search"]', api.table().container())
+        .typeahead({
+            minLength : 4,
+            hint: true,
+            highlight: true,
+            limit : 5,
+            display : 'FieldValue',
+            source: function( query, result ){
+                $.ajax({
+                    url : 'bin/php/get/search/Invoices.php',
+                    method : 'GET',
+                    data    : {
+                        ID                :  $('input:visible[name="ID"]').val( ),
+                        Customer          :  $('input:visible[name="Customer"]').val( ),
+                        Location          :  $('input:visible[name="Location"]').val( ),
+                        Job               :  $('input:visible[name="Job"]').val( ),
+                        Unit              :  $('input:visible[name="Unit"]').val( ),
+                        Type              :  $('input:visible[name="Type"]').val( ),
+                        Date              :  $('input:visible[name="Date"]').val( ),
+                        Original          :  $('input:visible[name="Original"]').val( ),
+                        Balance           :  $('input:visible[name="Balance"]').val( ),
+                        Description       :  $('input:visible[name="Description"]').val( ),
+                    },
+                    dataType : 'json',
+                    beforeSend : function( ){
+                        abort( );
+                    },
+                    success : function( data ){
+                        result( $.map( data, function( item ){
+                            return item.FieldName + ' => ' + item.FieldValue;
+                        } ) );
+                    }
+                });
+            },
+            afterSelect: function( value ){
+                var FieldName = value.split( ' => ' )[ 0 ];
+                var FieldValue = value.split( ' => ' )[ 1 ];
+                $( 'input[name="' + FieldName.split( '_' )[ 0 ] + '"]' ).val ( FieldValue ).change( );
+                $( 'input[name="Search"]').val( '' );
+            }
+        }
+    );
+}
+
 $( document ).ready( function( ){
-    var Editor_Customers = new $.fn.dataTable.Editor( {
+    var Editor_Invoices = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
         ajax     : 'index.php',
         table    : '#Table_Invoices'
@@ -40,9 +86,16 @@ $( document ).ready( function( ){
           }
         };
         d.Search = $("input[name='Search']").val( );
+        d.ID = $("input[name='ID']").val( );
         d.Customer = $("input[name='Customer']").val( );
         d.Location = $("input[name='Location']").val( );
         d.Job = $("input[name='Job']").val( );
+        d.Type = $("input[name='Type']").val( );
+        d.Date = $("input[name='Date']").val( );
+        d.Due = $("input[name='Due']").val( );
+        d.Original_Sum = $("input[name='Original_Sum']").val( );
+        d.Balance_Sum = $("input[name='Balance_Sum']").val( );
+        d.Description = $("input[name='Description']").val( );
         return d;
       }
     },
@@ -135,7 +188,7 @@ $( document ).ready( function( ){
         $('input.date').datepicker( { } );
         $('input.time').timepicker( {  timeFormat : 'h:i A' } );
         //search( this );
-        $( '.redraw' ).bind( 'change', function(){ Table_Tickets.draw(); });
+        $( '.redraw' ).bind( 'change', function(){ Table_Invoices.draw(); });
     },
     buttons: [
         {
@@ -161,7 +214,7 @@ $( document ).ready( function( ){
                 $( 'input, select' ).each( function( ){
                     $( this ).val( '' );
                 } );
-                Table_Tickets.draw( );
+                Table_Invoices.draw( );
             }
         },{
             text : 'Get URL',
@@ -186,7 +239,7 @@ $( document ).ready( function( ){
                 d.Time_Completed_Start     = $('input[name="Time_Completed_Start"]').val( );
                 d.Time_Completed_End       = $('input[name="Time_Completed_End"]').val( );
                 d.LSD       = $('select[name="LSD"]').val( );
-                document.location.href = 'tickets.php?' + new URLSearchParams( d ).toString();
+                document.location.href = 'invoices.php?' + new URLSearchParams( d ).toString();
             }
           },{
           text : 'Create',

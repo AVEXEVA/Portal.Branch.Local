@@ -199,7 +199,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Tickets_Assigned' => null,
         'Tickets_En_Route' => null,
         'Tickets_On_Site' => null,
-        'Tickets_Reviewing' => null
+        'Tickets_Reviewing' => null,
+        'Surcharge' => null,
+        'TFMSouce' => null
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){

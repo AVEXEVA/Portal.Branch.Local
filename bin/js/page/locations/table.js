@@ -186,10 +186,10 @@ $(document).ready(function( ){
             },{
                 data : 'Units'
             },{
-                data : 'Status'
-            },{
                 data : 'Maintained'
-            }
+            },{
+                data : 'Status'
+          },
         ],
         initComplete : function( settings, json ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );'
@@ -257,7 +257,7 @@ $(document).ready(function( ){
                     data : dte
                   },
                   success : function(response){
-                    Table_Leads.draw();
+                    Table_Locations.draw();
                   }
                 })
               }
