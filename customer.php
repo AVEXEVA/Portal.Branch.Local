@@ -78,9 +78,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Customer' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Customer' ] )
-    ){ 
+    ){
         //If privleges dont check, 404s out
-        ?><?php require('404.html');?><?php 
+        ?><?php require('404.html');?><?php
     } else {
         \singleton\database::getInstance( )->query(
             null,
@@ -117,16 +117,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Rolodex.Latt 	   AS Latitude,
                         Rolodex.fLong      AS Longitude,
                         Customer.Status    AS Status,
-						Rolodex.Website    AS Website,
-						Customer.Internet  AS Internet,
-						Customer.fLogin    AS Login,
-						Customer.Password  AS Password,
-						Rolodex.Geolock    AS Geofence,
-                        CASE    WHEN Locations.Count IS NULL THEN 0 
+            						Rolodex.Website    AS Website,
+            						Customer.Internet  AS Internet,
+            						Customer.fLogin    AS Login,
+            						Customer.Password  AS Password,
+            						Rolodex.Geolock    AS Geofence,
+                        CASE    WHEN Locations.Count IS NULL THEN 0
                                 ELSE Locations.Count END AS Locations_Count,
-                        CASE    WHEN Locations.Maintained IS NULL THEN 0 
+                        CASE    WHEN Locations.Maintained IS NULL THEN 0
                                 ELSE Locations.Maintained END AS Locations_Maintained,
-                        CASE    WHEN Locations.Unmaintained IS NULL THEN 0 
+                        CASE    WHEN Locations.Unmaintained IS NULL THEN 0
                                 ELSE Locations.Unmaintained END AS Locations_Unmaintained,
                         CASE    WHEN Units.Count IS NULL THEN 0
                                 ELSE Units.Count END AS Units_Count,
@@ -170,20 +170,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             SELECT      Owner.ID AS Customer,
                                         Sum( Maintained.Count ) AS Maintained,
                                         Sum( Unmaintained.Count ) AS Unmaintained,
-                                        Count( Location.Loc ) AS Count 
-                            FROM        Owner 
+                                        Count( Location.Loc ) AS Count
+                            FROM        Owner
                                         LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner
                                         LEFT JOIN (
                                             SELECT      Location.Loc AS Location,
                                                         Count( Location.Loc ) AS Count
-                                            FROM        Loc AS Location 
+                                            FROM        Loc AS Location
                                             WHERE       Location.Maint = 1
                                             GROUP BY    Location.Loc
                                         ) AS Maintained ON Location.Loc = Maintained.Location
                                         LEFT JOIN (
                                             SELECT      Location.Loc AS Location,
                                                         Count( Location.Loc ) AS Count
-                                            FROM        Loc AS Location 
+                                            FROM        Loc AS Location
                                             WHERE       Location.Maint = 0
                                             GROUP BY    Location.Loc
                                         ) AS Unmaintained ON Location.Loc = Unmaintained.Location
@@ -195,8 +195,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         Sum( Elevators.Count) AS Elevators,
                                         Sum( Escalators.Count ) AS Escalators,
                                         Sum( Other.Count ) AS Other
-                            FROM        Owner 
-                                        LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner 
+                            FROM        Owner
+                                        LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
@@ -225,7 +225,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             GROUP BY    Unit.Loc
                                         ) AS Other ON Other.Location = Location.Loc
                             GROUP BY    Owner.ID
-                        ) AS Units ON Units.Customer = Customer.ID 
+                        ) AS Units ON Units.Customer = Customer.ID
                         LEFT JOIN (
                             SELECT  Owner.ID AS Customer,
                                     [Open].Count AS [Open],
@@ -234,22 +234,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM    Owner
                                     LEFT JOIN (
                                         SELECT      Job.Owner AS Customer,
-                                                    Count( Job.ID ) AS Count 
-                                        FROM        Job 
+                                                    Count( Job.ID ) AS Count
+                                        FROM        Job
                                         WHERE       Job.Status = 0
                                         GROUP BY    Job.Owner
                                     ) AS [Open] ON [Open].Customer = Owner.ID
                                     LEFT JOIN (
                                         SELECT      Job.Owner AS Customer,
-                                                    Count( Job.ID ) AS Count 
-                                        FROM        Job 
+                                                    Count( Job.ID ) AS Count
+                                        FROM        Job
                                         WHERE       Job.Status = 2
                                         GROUP BY    Job.Owner
                                     ) AS [On_Hold] ON [On_Hold].Customer = Owner.ID
                                     LEFT JOIN (
                                         SELECT      Job.Owner AS Customer,
-                                                    Count( Job.ID ) AS Count 
-                                        FROM        Job 
+                                                    Count( Job.ID ) AS Count
+                                        FROM        Job
                                         WHERE       Job.Status = 1
                                         GROUP BY    Job.Owner
                                     ) AS [Closed] ON [Closed].Customer = Owner.ID
@@ -261,7 +261,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     En_Route.Count AS En_Route,
                                     On_Site.Count AS On_Site,
                                     Reviewing.Count AS Reviewing
-                            FROM    Owner 
+                            FROM    Owner
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -307,7 +307,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             SELECT  Owner.ID AS Customer,
                                     Preliminary.Count AS Preliminary,
                                     Job_Created.Count AS Job_Created
-                            FROM    Owner 
+                            FROM    Owner
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( Violation.ID ) AS Count
@@ -336,14 +336,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           FROM      Invoice
                                           WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
                                           GROUP BY  Invoice.Loc
-                                        ) AS [Open] ON Location.Loc = [Open].Location 
+                                        ) AS [Open] ON Location.Loc = [Open].Location
                                         LEFT JOIN (
                                           SELECT    Invoice.Loc AS Location,
                                                     Count( Invoice.Ref ) AS Count
                                           FROM      Invoice
                                           WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
                                           GROUP BY  Invoice.Loc
-                                        ) AS [Closed] ON Location.Loc = [Closed].Location 
+                                        ) AS [Closed] ON Location.Loc = [Closed].Location
                             GROUP BY    Location.Owner
                         ) AS Invoices ON Invoices.Customer = Customer.ID
                         LEFT JOIN (
@@ -357,14 +357,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           FROM      Estimate
                                           WHERE     Estimate.Status = 0
                                           GROUP BY  Estimate.LocID
-                                        ) AS [Open] ON Location.Loc = [Open].Location 
+                                        ) AS [Open] ON Location.Loc = [Open].Location
                                         LEFT JOIN (
                                           SELECT    Estimate.LocID AS Location,
                                                     Count( Estimate.ID ) AS Count
                                           FROM      Estimate
                                           WHERE     Estimate.Status = 1
                                           GROUP BY  Estimate.LocID
-                                        ) AS [Closed] ON Location.Loc = [Closed].Location 
+                                        ) AS [Closed] ON Location.Loc = [Closed].Location
                             GROUP BY    Location.Owner
                         ) AS Proposals ON Proposals.Customer = Customer.ID
                 WHERE   Customer.ID = ?;",
@@ -373,52 +373,52 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             )
         );
         //var_dump( sqlsrv_errors( ) );//
-        $Customer = (  !$result )    
+        $Customer = (  !$result )
             ? array(
-            	'ID'        => null,
-            	'Name'      => isset( $_GET [ 'Name' ] ) ? $_GET ['Name'] : null,
-            	'Login'     => null,
-            	'Password'  => null,
-            	'Geofence'  => null,
-            	'Type'      => null,
-            	'Status'    => null,
-            	'Website'   => null,
-            	'Internet'  => null,
-            	'Street'    => null,
-            	'City'      => null,
-            	'State'     => null,
-            	'Zip'       => null,
-            	'Latitude'  => isset( $_GET [ 'Latitude' ] ) ? $_GET ['Latitude'] : null,
-            	'Longitude' => isset( $_GET [ 'Longitude' ] ) ? $_GET ['Longitude'] : null,
-                'Phone'     =>  null,
-                'Email'     =>  null,
-                'Rolodex'   => isset( $_GET [ 'Rolodex' ] ) ? $_GET ['Rolodex'] : null,
-                'Phone'     => null,
-                'Email'     => null,
-                'Contact'   => isset( $_GET [ 'Contact' ] ) ? $_GET [ 'Contact' ] : null
-            ) 
+            	'ID'        => isset( $_GET [ 'ID' ] )         ? $_GET ['ID'] : null,
+            	'Name'      => isset( $_GET [ 'Name' ] )       ? $_GET ['Name'] : null,
+            	'Login'     => isset( $_GET [ 'Login' ] )      ? $_GET ['Login'] : null,
+            	'Password'  => isset( $_GET [ 'Password' ] )   ? $_GET ['Password'] : null,
+            	'Geofence'  => isset( $_GET [ 'Geofence' ] )   ? $_GET ['Geofence'] : null,
+            	'Type'      => isset( $_GET [ 'Type' ] )       ? $_GET ['Type'] : null,
+            	'Status'    => isset( $_GET [ 'Status' ] )     ? $_GET ['Status'] : null,
+            	'Website'   => isset( $_GET [ 'Website' ] )    ? $_GET ['Website'] : null,
+            	'Internet'  => isset( $_GET [ 'Internet' ] )   ? $_GET ['Internet'] : null,
+            	'Street'    => isset( $_GET [ 'Street' ] )     ? $_GET ['Street'] : null,
+            	'City'      => isset( $_GET [ 'City' ] )       ? $_GET ['City'] : null,
+            	'State'     => isset( $_GET [ 'State' ] )      ? $_GET ['State'] : null,
+            	'Zip'       => isset( $_GET [ 'Zip' ] )        ? $_GET ['Zip'] : null,
+            	'Latitude'  => isset( $_GET [ 'Latitude' ] )   ? $_GET ['Latitude'] : null,
+            	'Longitude' => isset( $_GET [ 'Longitude' ] )  ? $_GET ['Longitude'] : null,
+              'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
+              'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
+              'Rolodex'   => isset( $_GET [ 'Rolodex' ] )    ? $_GET ['Rolodex'] : null,
+              'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
+              'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
+              'Contact'   => isset( $_GET [ 'Contact' ] )    ? $_GET [ 'Contact' ] : null
+            )
             : sqlsrv_fetch_array($result);
         //Binds $ID, $Name, $Customer and query values into the $result variable
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             // if the $_Post is set and the count is null, select if available
-        	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
-            $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ]     : $Customer[ 'Contact' ];
-        	$Customer[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Customer[ 'Phone' ];
-        	$Customer[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Customer[ 'Email' ];
-        	$Customer[ 'Login' ] 		= isset( $_POST[ 'Login' ] ) 	 ? $_POST[ 'Login' ] 	 : $Customer[ 'Login' ];
+        	$Customer[ 'Name' ] 		    = isset( $_POST[ 'Name' ] ) 	   ? $_POST[ 'Name' ] 	   : $Customer[ 'Name' ];
+          $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] )   ? $_POST[ 'Contact' ]   : $Customer[ 'Contact' ];
+        	$Customer[ 'Phone' ] 		    = isset( $_POST[ 'Phone' ] ) 	   ? $_POST[ 'Phone' ] 	   : $Customer[ 'Phone' ];
+        	$Customer[ 'Email' ] 		    = isset( $_POST[ 'Email' ] ) 	   ? $_POST[ 'Email' ] 	   : $Customer[ 'Email' ];
+        	$Customer[ 'Login' ] 		    = isset( $_POST[ 'Login' ] ) 	   ? $_POST[ 'Login' ] 	   : $Customer[ 'Login' ];
         	$Customer[ 'Password' ]     = isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Customer[ 'Password' ];
         	$Customer[ 'Geofence' ]     = isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Customer[ 'Geofence' ];
-        	$Customer[ 'Type' ]         = isset( $_POST[ 'Type' ] ) 	 ? $_POST[ 'Type' ] 	 : $Customer[ 'Type' ];
+        	$Customer[ 'Type' ]         = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Customer[ 'Type' ];
         	$Customer[ 'Status' ] 	    = isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Customer[ 'Status' ];
-        	$Customer[ 'Website' ] 	    = isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Customer[ 'Website' ]; 
+        	$Customer[ 'Website' ] 	    = isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Customer[ 'Website' ];
         	$Customer[ 'Internet' ]     = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Customer[ 'Internet' ];
         	$Customer[ 'Street' ] 	    = isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Customer[ 'Street' ];
-        	$Customer[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Customer[ 'City' ];
-        	$Customer[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Customer[ 'State' ];
-        	$Customer[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Customer[ 'Zip' ];
-        	$Customer[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Customer[ 'Latitude' ];
-        	$Customer[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Customer[ 'Longitude' ];
+        	$Customer[ 'City' ] 		    = isset( $_POST[ 'City' ] ) 	   ? $_POST[ 'City' ] 	   : $Customer[ 'City' ];
+        	$Customer[ 'State' ] 		    = isset( $_POST[ 'State' ] ) 	   ? $_POST[ 'State' ] 	   : $Customer[ 'State' ];
+        	$Customer[ 'Zip' ] 			    = isset( $_POST[ 'Zip' ] ) 		   ? $_POST[ 'Zip' ] 		   : $Customer[ 'Zip' ];
+        	$Customer[ 'Latitude' ]    	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Customer[ 'Latitude' ];
+        	$Customer[ 'Longitude' ] 	  = isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Customer[ 'Longitude' ];
 
         	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         		$result = \singleton\database::getInstance( )->query(
@@ -462,7 +462,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Owner ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Owner ) END ;
         				INSERT INTO Owner(
         					ID,
-                            Status,
+                  Status,
         					Locs,
         					Elevs,
         					Balance,
@@ -511,10 +511,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		null,
 	        		"	UPDATE 	Owner
 	        			SET     Owner.Status = ?,
-	        					Owner.Internet = ?,
-	        					Owner.fLogin = ?,
-	        					Owner.Password = ?,
-	        					Owner.Type = ?
+    	        					Owner.Internet = ?,
+    	        					Owner.fLogin = ?,
+    	        					Owner.Password = ?,
+    	        					Owner.Type = ?
 	        			WHERE 	Owner.ID = ?;",
 	        		array(
 	        			$Customer[ 'Status' ],
@@ -529,15 +529,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		null,
 	        		"	UPDATE 	Rol
 	        			SET 	Rol.Name = ?,
-	        					Rol.Website = ?,
-	        					Rol.Address = ?,
-	        					Rol.City = ?,
-	        					Rol.State = ?,
-	        					Rol.Zip = ?,
-	        					Rol.Latt = ?,
-	        					Rol.fLong = ?,
-                                Rol.Phone = ?,
-                                Rol.EMail = ?
+  	        					Rol.Website = ?,
+  	        					Rol.Address = ?,
+  	        					Rol.City = ?,
+  	        					Rol.State = ?,
+  	        					Rol.Zip = ?,
+  	        					Rol.Latt = ?,
+  	        					Rol.fLong = ?,
+                      Rol.Phone = ?,
+                      Rol.EMail = ?
 	        			WHERE 	Rol.ID = ?;",
 	        		array(
 	        			$Customer[ 'Name' ],
@@ -548,8 +548,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        			$Customer[ 'Zip' ],
 	        			$Customer[ 'Latitude' ],
 	        			$Customer[ 'Longitude' ],
-                        $Customer[ 'Phone' ],
-                        $Customer[ 'Email' ],
+                $Customer[ 'Phone' ],
+                $Customer[ 'Email' ],
 	        			$Customer[ 'Rolodex' ]
 	        		)
 	        	);
@@ -560,7 +560,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang="en">
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php   
+    <?php
         $_GET[ 'Bootstrap' ] = '5.1';
         $_GET[ 'Entity_CSS' ] = 1;
         require( bin_meta . 'index.php');
@@ -584,7 +584,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php 
+                                    <?php
                                         \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Customer[ 'Name' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Customer[ 'Type' ], array(
                                             'General' => 'General',
@@ -599,8 +599,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             0 => 'Disabled',
                                             1 => 'Enabled'
                                         ) );
-    								    \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Customer[ 'Website' ] );
-    								    \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Customer['Street'].' '.$Customer['City'].' '.$Customer[ 'State' ].' '.$Customer[ 'Zip' ] );
+                    								    \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Customer[ 'Website' ] );
+                    								    \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Customer['Street'].' '.$Customer['City'].' '.$Customer[ 'State' ].' '.$Customer[ 'Zip' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Customer[ 'Street' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Customer[ 'City' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Customer[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
@@ -656,9 +656,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
                                                 class='form-control edit'
                                                 name='Geofence' >
-                                                    <option value=''>Select</option>
-                                                    <option value='0' <?php echo $Customer[ 'Geofence' ] == 0 ? 'selected' : null;?>>Disabled</option>
-                                                    <option value='1' <?php echo $Customer[ 'Geofence' ] == 1 ? 'selected' : null;?>>Enabled</option>
+                                                  <option value=''>Select</option>
+                                                  <option value='0' <?php echo $Customer[ 'Geofence' ] == 0 ? 'selected' : null;?>>Disabled</option>
+                                                  <option value='1' <?php echo $Customer[ 'Geofence' ] == 1 ? 'selected' : null;?>>Enabled</option>
                                             </select>
                                         </div>
                                     </div>
@@ -727,11 +727,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             </div>
                         </div>
                     </div>
-				</form>
-			</div>
-		</div>
-  	</div>
-</body>
+				         </form>
+			        </div>
+		      </div>
+  	  </div>
+  </body>
 </html>
 <?php
     }

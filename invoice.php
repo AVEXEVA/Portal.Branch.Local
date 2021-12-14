@@ -104,6 +104,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Customer.State            AS Customer_State,
                     Customer.Zip              AS Customer_Zip,
                     Customer.Contact          AS Customer_Contact,
+                    Location.Loc              AS Location,
                     Location.Loc              AS Location_ID,
                     Location.Tag              AS Location_Name,
                     Location.Address          AS Location_Street,
@@ -122,7 +123,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Employee.Last             AS Employee_Last_Name
             FROM    Invoice
                     LEFT JOIN Loc             AS Location ON Invoice.Loc      = Location.Loc
-                    LEFT JOIN Job 	          AS Job	  ON Invoice.Job      = Job.ID
+                    LEFT JOIN Job 	          AS Job	    ON Invoice.Job      = Job.ID
                     LEFT JOIN Zone 	          AS Division ON Location.Zone    = Division.ID
                     LEFT JOIN Route           AS Route	  ON Location.Route   = Route.ID
                     LEFT JOIN (
@@ -160,6 +161,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Customer_State'       => null,
                 'Customer_Zip'         => null,
                 'Customer_Contact'     => null,
+                'Location'             => null,
                 'Location_ID'          => null,
                 'Location_Name'        => null,
                 'Location_Street'      => null,

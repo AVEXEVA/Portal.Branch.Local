@@ -1,1 +1,1 @@
-<script src='bin/js/page/departments/table.js'></script>
+<script src='bin/js/page/departments/table.php'></script>

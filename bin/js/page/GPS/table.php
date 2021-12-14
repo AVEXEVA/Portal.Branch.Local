@@ -1,5 +1,11 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
-var Table_Faults = $('#Table_Faults').DataTable( {
+var Table_GPS = $('#Table_GPS').DataTable( {
 dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
 processing     : true,
 serverSide     : true,
@@ -24,7 +30,7 @@ style : 'multi',
 selector : 'td.ID'
 },
 ajax: {
-url     : 'bin/php/get/Faults.php',
+url     : 'bin/php/get/GPS.php',
 data : function( d ){
       d = {
           start : d.start,
@@ -42,19 +48,14 @@ data : function( d ){
       }
 },
 columns: [
-{
-  data : 'ID' ,
-},{
-  data   : 'Location'
-},{
-  data    :  'Unit'
-},{
-  data      : 'Date',
-},{
-  data      : 'Fault',
-},{
-  data      : 'Status',
-},{
+  <?php \singleton\datatables::getInstance( )->DataElement('ID');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Employee_ID');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Latitude');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Longitude');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Altitude');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Accuracy');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Time_Stamp');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Type');?>
 ]
 } );
 }

@@ -211,7 +211,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Since,
                 Last
               )
-              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ? );
+              VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
               SELECT @MAXID + 1;",
             array(
               $Contact[ 'Type' ],
