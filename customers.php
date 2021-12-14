@@ -97,34 +97,42 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
-                <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customers</h4></div>
-                <div class='card-body bg-dark'>
+                <div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customers</h4></div>
+                <div class="mobile card-body bg-dark text-white">
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Jobs', isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Violations', isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Invoices', isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null, false, false, false, 'redraw' );?>
+                </div>
+                  <div class='card-body bg-darker'>
                     <table id='Table_Customers' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
-                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-                            <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->Customer();?>Name</th>
-                            <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
-                            <th class='text-white border border-white' title='Locations'><?php \singleton\fontawesome::getInstance( )->Address();?>Locations</th>
-                            <th class='text-white border border-white' title='Units'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
-                            <th class='text-white border border-white' title='Jobs'><?php \singleton\fontawesome::getInstance( )->Job();?>Jobs</th>
-                            <th class='text-white border border-white' title='Tickets'><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</th>
-                            <th class='text-white border border-white' title='Violations'><?php \singleton\fontawesome::getInstance( )->Violation();?>Violations</th>
-                            <th class='text-white border border-white' title='Invoices'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</th>
-                        </tr><tr>
-                            <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
-                            <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>
-                            <th class='text-white border border-white' title='Status'><select class='redraw form-control'  name='Status'>
-                                <option value=''>Select</option>
-                                <option value='0'>Enabled</option>
-                                <option value='1'>Disabled</option>
-                            </select></th>
-                            <th class='text-white border border-white' title='Locations'><input class='redraw form-control' type='text' name='Locations' value='<?php echo isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null; ?>' placeholder='Locations' /></th>
-                            <th class='text-white border border-white' title='Units'><input class='redraw form-control' type='text' name='Units' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null; ?>' placeholder='Units' /></th>
-                            <th class='text-white border border-white' title='Jobs'><input class='redraw form-control' type='text' name='Jobs' value='<?php echo isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null; ?>' placeholder='Jobs' /></th>
-                            <th class='text-white border border-white' title='Tickets'><input class='redraw form-control' type='text' name='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null; ?>' placeholder='Tickets' /></th>
-                            <th class='text-white border border-white' title='Violations'><input class='redraw form-control' type='text' name='Violations' value='<?php echo isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null; ?>' placeholder='Violations' /></th>
-                            <th class='text-white border border-white' title='Invoices'><input class='redraw form-control' type='text' name='Invoices' value='<?php echo isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null; ?>' placeholder='Invoices' /></th>
-                        </tr></thead>
+                        <thead class='text-white border border-white'><tr><?php
+                        	\singleton\table::getInstance( )->th( 'ID', 'ID' );
+                        	\singleton\table::getInstance( )->th( 'Name', 'Name' );
+                        	\singleton\table::getInstance( )->th( 'Status', 'Status' );
+                        	\singleton\table::getInstance( )->th( 'Locations', 'Locations' );
+                          \singleton\table::getInstance( )->th( 'Units', 'Units' );
+                          \singleton\table::getInstance( )->th( 'Jobs', 'Jobs' );
+                          \singleton\table::getInstance( )->th( 'Tickets', 'Tickets' );
+                          \singleton\table::getInstance( )->th( 'Violations', 'Violations' );
+                          \singleton\table::getInstance( )->th( 'Invoices', 'Invoices' );
+                      ?></tr>
+                          <tr class='desktop'><?php
+                          \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'name', isset( $_GET[ 'name' ] ) ? $_GET[ 'name' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Jobs', isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Violations', isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Invoices', isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null );
+                        ?></tr></thead>
                     </table>
                 </div>
             </div>

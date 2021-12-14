@@ -99,22 +99,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class='card card-full card-primary border-0'>
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Collections</h4></div>
 				<div class="mobile card-body bg-darker text-white">
-                    <?php 
+                    <?php
                         \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
-                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 
-                            'Customer', 'Customers', 
-                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
-                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+                            'Customer', 'Customers',
+                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
                         );
-                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 
-                            'Location', 'Locations', 
-                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
-                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+                            'Location', 'Locations',
+                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
                         );
-                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 
-                            'Job', 'Jobs', 
-                            isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
-                            isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
+                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+                            'Job', 'Jobs',
+                            isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+                            isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null
                         );
                         \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
                         \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
@@ -127,7 +127,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class='card-body card-body bg-darker'>
                     <table id='Table_Collections' class='display' cellspacing='0' width='100%'>
-                        <thead><tr class='text-white text-center'><?php 
+                        <thead><tr class='text-white text-center'><tr><?php
                             \singleton\table::getInstance( )->th( 'ID', 'ID' );
                             \singleton\table::getInstance( )->th( 'Territory', 'Territory' );
                             \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
@@ -138,43 +138,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Original', 'Original' );
                             \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
                             \singleton\table::getInstance( )->th( 'Description', 'Description' );
-                        ?></tr><tr class='form-desktop'><?php
-                            \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                            ?><th class='border border-white'><select name='redraw form-control' name='Territory'>
-                                <option value=''>Select</option>
-                                <?php
-                                $result = \singleton\database::getInstance( )->query(
-                                    null,
-                                    "   SELECT  Territory.ID,
-                                                Territory.Name
-                                        FROM    Terr AS Territory
-                                    ;",
-                                    array( )
-                                );
-                                if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row[ 'Name' ];?>' name'Te><?php echo $row[ 'Name' ];?></option><?php } }?>
-                            </select></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
-                            <th class='border border-white'><div class='row g-0'>
-                                <div class='col-12'><input class='redraw date' type='text' name='Date_Start' placeholder='Date Start' value='<?php echo isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null;?>' /></div>
-                                <div class='col-12'><input class='redraw date' type='text' name='Date_End' placeholder='Date End' value='<?php echo isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null;?>' /></div>
-                            </div></th>
-                            <th class='border border-white'><div class='row g-0'>
-                                <div class='col-12'><input class='redraw date' type='text' name='Due_Start' placeholder='Due Start' value='<?php echo isset( $_GET[ 'Due_Start' ] ) ? $_GET[ 'Due_Start' ] : null;?>' /></div>
-                                <div class='col-12'><input class='redraw date' type='text' name='Due_End' placeholder='Due End' value='<?php echo isset( $_GET[ 'Due_End' ] ) ? $_GET[ 'Due_End' ] : null;?>' /></div>
-                            </div></th>
-                            <th class='border border-white'><div class='row g-0'>
-                                <div class='col-12'><input class='redraw' type='text' name='Original_Start' placeholder='OriginalStart' value='<?php echo isset( $_GET[ 'Original_Start' ] ) ? $_GET[ 'Original_Start' ] : null;?>' /></div>
-                                <div class='col-12'><input class='redraw' type='text' name='Original_End' placeholder='Original End' value='<?php echo isset( $_GET[ 'Original_End' ] ) ? $_GET[ 'Original_End' ] : null;?>' /></div>
-                            </div></th>
-                            <th class='border border-white'><div class='row g-0'>
-                                <div class='col-12'><input class='redraw' type='text' name='Balance_Start' placeholder='Balance Start' value='<?php echo isset( $_GET[ 'Balance_Start' ] ) ? $_GET[ 'Balance_Start' ] : null;?>' /></div>
-                                <div class='col-12'><input class='redraw' type='text' name='Balance_End' placeholder='Balance End' value='<?php echo isset( $_GET[ 'Balance_End' ] ) ? $_GET[ 'Balance_End' ] : null;?>' /></div>
-                            </div></th>
-                            <th class='border border-white'><input class='redraw form-control' type='text' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></th>
-                        </tr></thead>
+                        ?></tr>
+                              <tr class='desktop'><?php
+                                \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Territory', isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
+                            ?> </th>
+                        </tr></thead>?>
                     </table>
                 </div>
             </div>
