@@ -73,51 +73,8 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
       <?php \singleton\datatables::getInstance( )->DataElement('Date');?>,
       <?php \singleton\datatables::getInstance( )->DataElement('Due');?>,
-     {
-        data      : 'Original',
-        render : function( data, type, row, meta ){
-          switch( type ){
-            case 'display':
-              if( row.Original > 0 ){
-                return "<div class='row'>" +
-                  "<div class='col-12'>" + row.Original + "</div>" +
-                "</div>"
-              } else if( row.Original < 0 ){
-                return "<div class='row'>" +
-                  "<div class='col-12'>" + row.Original + "</div>" +
-                "</div>"
-              } else if( row.Original == 0 ){
-                return "<div class='row'>" +
-                  "<div class='col-12'>" + row.Original + "</div>" +
-                "</div>"
-              }
-            default :
-              return null;
-          }
-        }
-      },{
-        data      : 'Original',
-        render : function( data, type, row, meta ){
-          switch( type ){
-            case 'display':
-              if( row.Original > 0 ){
-                return "<div class='row'>" +
-                  "<div class='col-12'>" + row.Original + "</div>" +
-                "</div>"
-              } else if( row.Original < 0 ){
-                return "<div class='row'>" +
-                  "<div class='col-12'>" + row.Original + "</div>" +
-                "</div>"
-              } else if( row.Original == 0 ){
-                return "<div class='row'>" +
-                  "<div class='col-12'>" + row.Original + "</div>" +
-                "</div>"
-              }
-            default :
-              return null;
-          }
-        }
-      },
+      <?php \singleton\datatables::getInstance( )->CollectionOriginal();?>,
+      <?php \singleton\datatables::getInstance( )->CollectionOriginal();?>,      
       <?php \singleton\datatables::getInstance( )->DataElement('Description');?>
     ],
     initComplete : function( ){

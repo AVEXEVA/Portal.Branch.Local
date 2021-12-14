@@ -51,78 +51,12 @@ data : function( d ){
       }
 },
 columns: [
-  <?php \singleton\datatables::getInstance( )->ID('divisions.php','Customer');?>,
-  {
-        data : 'Name',
-        render : function( data, type, row, meta ){
-            switch( type ){
-                case 'display' :
-                    return  row.ID !== null
-                        ?   "<div class='row'>" +
-                                "<div class='col-12'><a href='divisions.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                            "</div>"
-                        :   null;
-                default :
-                    return data;
-              }
-        }
-        },{
-        data : 'Locations',
-        render : function( data, type, row, meta ){
-            switch( type ){
-                case 'display' :
-                    return  row.Locations !== null
-                        ?   "<div class='row'>" +
-                                "<div class='col-12'><a href='locations.php?Division=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
-                            "</div>"
-                        :   null;
-                default :
-                    return data;
-            }
-        }
-      },{
-        data : 'Units',
-        render : function( data, type, row, meta ){
-            switch( type ){
-                case 'display' :
-                    return  row.Units !== null
-                        ?   "<div class='row'>" +
-                                "<div class='col-12'><a href='units.php?Division=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
-                            "</div>"
-                        :   null;
-                default :
-                    return data;
-            }
-        }
-      },{
-          data : 'Violations',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.Tickets !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='violations.php?Division=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-          }
-        },{
-            data : 'Tickets',
-            render : function( data, type, row, meta ){
-                switch( type ){
-                    case 'display' :
-                        return  row.Tickets !== null
-                            ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='tickets.php?Division=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
-                                "</div>"
-                            :   null;
-                    default :
-                        return data;
-        }
-      }
-    }
+  <?php \singleton\datatables::getInstance( )->ID('divisions.php','Customer');?>,  
+  <?php \singleton\datatables::getInstance( )->Name('divisions.php');?>,
+  <?php \singleton\datatables::getInstance( )->Locations('Division');?>,
+  <?php \singleton\datatables::getInstance( )->Units('Division');?>,
+  <?php \singleton\datatables::getInstance( )->Violations('Division');?>,
+  <?php \singleton\datatables::getInstance( )->Tickets('Division');?>        
 ],
 buttons: [
   {

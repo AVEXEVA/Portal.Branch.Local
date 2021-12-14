@@ -103,97 +103,14 @@ $(document).ready(function( ){
                 }
         },
         columns: [
-        <?php \singleton\datatables::getInstance( )->ID('contact.php','Contact');?>,
-          {
-                data : 'Contact',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Contact + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },
+            <?php \singleton\datatables::getInstance( )->ID('contact.php','Contact');?>,
+            <?php \singleton\datatables::getInstance( )->Contact();?>,
             <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
-            {
-              data : 'Name',
-              render : function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display' :
-                        return row.Name !== null
-                            ?   (
-                                    row.Type == 'Customer'
-                                        ?   "<div class='row'>" +
-                                                "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
-                                            "</div>"
-                                        :   (
-                                                row.Type == 'Location'
-                                                    ?   "<div class='row'>" +
-                                                            "<div class='col-12'><a href='location.php?Name=" + row.Name + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
-                                                        "</div>"
-                                                    :   (
-                                                            row.Type == 'Employee'
-                                                                ?   "<div class='row'>" +
-                                                                        "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><i class='fa fa-users fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
-                                                                    "</div>"
-                                                                : null
-                                                        )
-                                            )
-                                )
-                            :   null;
-                      default :
-                          return data;
-                  }
-
-              }
-            },<?php \singleton\datatables::getInstance( )->DataElement('Position');?>,
-            {
-                data : 'Phone',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return row.Email !== null && row.Phone != ''
-                                ?   "<a href='tel:" + row.Phone + "'><i class='fa fa-phone fa-fw fa-1x'></i>" + row.Phone + "</a>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-                data : 'Email',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return row.Email !== null && row.Email != ''
-                                ?   "<a href='mailto:" + row.Email + "'><i class='fa fa-envelope fa-fw fa-1x'></i>" + row.Email + "</a>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },{
-                data : 'Street',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  "<div class='row'>" +
-                                        "<div class='col-12'>" +
-                                            "<div class='row'>" +
-                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
-                                                "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
-                                            "</div>" +
-                                        "</div>" +
-                                    "</div>"
-                        default :
-                            return data;
-                    }
-                }
-            }
+            <?php \singleton\datatables::getInstance( )->ContactName();?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('Position');?>,
+            <?php \singleton\datatables::getInstance( )->Phone();?>,
+            <?php \singleton\datatables::getInstance( )->Email();?>,
+            <?php \singleton\datatables::getInstance( )->Street();?>        
         ],
         initComplete : function( ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'
