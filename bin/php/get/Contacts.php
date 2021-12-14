@@ -159,16 +159,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		$Query = "SELECT 	*
 			FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-						Contact.ID 						  AS ID,
-						Contact.Name 					  AS Name,
+						Contact.ID 						AS ID,
+						Contact.Name 					AS Name,
 						Contact.Contact 				AS Contact,
-						Contact.Position  		  AS Position,
+						Contact.Position  		  		AS Position,
 						Contact.Phone 					AS Phone,
 						Contact.Email 					AS Email,
 						Contact.Address 				AS Street,
 						Contact.City  					AS City,
 						Contact.State 					AS State,
-						Contact.Zip 					  AS Zip,
+						Contact.Zip 					AS Zip,
 						CASE 	WHEN Contact.[Type] = 0 THEN 	'Customer'
 								WHEN Contact.[Type] = 4 THEN  'Location'
 								WHEN Contact.[Type] = 5 THEN  'Employee'

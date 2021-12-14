@@ -100,7 +100,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
       null,
       "	SELECT 	Top 1
-            Contact.*
+                Contact.*
         FROM    (
               SELECT 	Rol.ID 		  AS ID,
                       Rol.Name    AS Name,
@@ -118,19 +118,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       Rol.Geolock AS Geofence
             FROM      Rol
                 ) AS Contact
-        WHERE   	Contact.ID = ?
-            OR 	Contact.Name = ?;",
+        WHERE   	Contact.ID = ?;",
       array(
-        $ID,
-        $Name
+        $ID
       )
     );
-    $Contact =   (       empty( $ID )
-                    &&    !empty( $Name )
-                    &&    !$result
-                  ) || (  empty( $ID )
-                    &&    empty( $Name )
-                  )  ? array(
+    $Contact = empty( $ID ) ? array(
       'ID' => null,
       'Name' => null,
       'Contact' => null,
@@ -219,21 +212,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         \singleton\database::getInstance( )->query(
           null,
           "	UPDATE 	Rol
-            SET 	Rol.Name = ?,
-                Rol.Contact = ?,
-                Rol.Type = ?,
-                Rol.Website = ?,
-                Rol.Address = ?,
-                Rol.City = ?,
-                Rol.State = ?,
-                Rol.Zip = ?,
-                Rol.Latt = ?,
-                Rol.fLong = ?,
-                Rol.Phone = ?,
-                Rol.EMail = ?,
-                Rol.Last = ?
-
-
+            SET 	  Rol.Name = ?,
+                    Rol.Contact = ?,
+                    Rol.Type = ?,
+                    Rol.Website = ?,
+                    Rol.Address = ?,
+                    Rol.City = ?,
+                    Rol.State = ?,
+                    Rol.Zip = ?,
+                    Rol.Latt = ?,
+                    Rol.fLong = ?,
+                    Rol.Phone = ?,
+                    Rol.EMail = ?,
+                    Rol.Last = ?
             WHERE 	Rol.ID = ?;",
           array(
             $Contact[ 'Name' ],

@@ -50,6 +50,24 @@ class datatables extends \singleton\index {
             return d;
         }<?php
     }
+    public function buttons( $singular, $plural, $key ){
+        ?>buttons: [
+            <?php \singleton\datatables::getInstance( )->button_url( $plural );?>,
+            <?php \singleton\datatables::getInstance( )->button_print( );?>,
+            <?php \singleton\datatables::getInstance( )->button_reset( $plural );?>,
+            <?php \singleton\datatables::getInstance( )->button_create( $singular );?>,
+            <?php \singleton\datatables::getInstance( )->button_edit( $singular, $key );?>,
+            <?php \singleton\datatables::getInstance( )->button_delete( $singular, $plural );?>,
+            <?php \singleton\datatables::getInstance( )->button_export( );?>
+        ]<?php
+    }
+    public function button_print( ){
+        ?>{
+            extend : 'print',
+            text : "<?php \singleton\fontawesome::getInstance( )->Print( 1 );?><span class='desktop'>Print</span>",
+            className : 'form-control'
+        }<?php
+    }
     public function button_url( $reference ){
         ?>{
             text : "<?php \singleton\fontawesome::getInstance( )->Refresh( 1 );?><span class='desktop'>Refresh</span>",
@@ -128,7 +146,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.<?php echo $key;?> !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -237,16 +255,14 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Location_ID !== null
                             ?   "<div class='row'>" +
-                            "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
-                            <?php if($extra ==1 ) { ?>
-                                "<div class='col-12'>" +
-                                    "<div class='row'>" +
-                                        "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
-                                        "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
+                                    "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
+                                    "<div class='col-12'>" +
+                                        "<div class='row'>" +
+                                            "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
+                                            "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
+                                        "</div>" +
                                     "</div>" +
-                                "</div>" +
-                                <?php } ?>                    
-                            "</div>"
+                                "</div>"
                             :   null;
                     default :
                         return data;
@@ -326,6 +342,25 @@ class datatables extends \singleton\index {
             }
         }<?php
     } 
+    public function Territory( ){
+        ?>{
+            data : 'Territory_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Territory_ID !== null
+                            ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" +
+                            "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
     public function Time( $key ){
         ?>{
             data : '<?php echo $key;?>',
