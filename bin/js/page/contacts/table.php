@@ -70,7 +70,7 @@ $(document).ready(function( ){
                         case 'display' :
                             return  row.ID !== null
                                 ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Contact + "</a></div>" +
+                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><?php \singleton\fontawesome::getInstance( )->Contact( 1 );?> " + row.Contact + "</a></div>" +
                                     "</div>"
                                 :   null;
                         default :
@@ -80,22 +80,22 @@ $(document).ready(function( ){
             },
             <?php \singleton\datatables::getInstance( )->Type( );?>,
             {
-              data : 'Name',
+              data : 'Entity_Name',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            switch( row.Type ){
+                            switch( row.Entity_Type ){
                                 case 'Customer':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Entity_Name + "</a></div>" +
                                             "</div>";
                                 case 'Location':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='location.php?Name=" + row.Name + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='location.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Location( 1 );?>" + row.Entity_Name + "</a></div>" +
                                             "</div>";
                                 case 'Employee':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><i class='fa fa-users fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='employee.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Entity_Name + "</a></div>" +
                                             "</div>";
                                 default : 
                                     return null;
