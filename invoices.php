@@ -101,114 +101,50 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class='card card-full card-primary bg-dark text-white'>
                 <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</h4></div>
         				<div class='card-body mobile'><form action='invoices.php'>
-                  <div class='row'>
-                      <div class='col-4'>Search:</div>
-                      <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'><div class='col-12'>&nbsp;</div></div>
-                  <div class='row'>
-                    <div class='col-4'>Customer:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Locaton:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Locaton' ] ) ? $_GET[ 'Locaton' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Job:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Type:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Date:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Due:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Original:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Balance:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Description:</div>
-                    <div class='col-8'><input class='redraw form-control' type='text' name='Search' placeholder='Search' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></div>
-                  </div>
-                  <div class='row'><div class='col-12'>&nbsp;</div></div>
-                </form></div>
-                <div class='card-body'>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );?>
+                </div>
+                <div class='card-body bg-darker'>
                     <table id='Table_Invoices' class='display' cellspacing='0' width='100%'>
-                        <thead>
-                          <tr>
-                            <th class='text-white border border-white' title='Invoice#'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoice #</th>
-                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
-                            <th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Job</th>
-							              <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
-                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
-                            <th class='text-white border border-white' title='Due'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Due</th>
-                            <th class='text-white border border-white' title='Original'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Original</th>
-                            <th class='text-white border border-white' title='Balanace'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Balance</th>
-                            <th class='text-white border border-white' title='Description'><?php \singleton\fontawesome::getInstance( )->Description();?>Description</th>
-                        </tr>
-                        <tr class='form-desktop'>
-                          <th><input class='redraw form-control' type='text' name='Invoice #' placeholder='Invoice #' value='<?php echo isset( $_GET[ 'Invoice #' ] ) ? $_GET[ 'Invoice #' ] : null;?>' /></th>
-                          <th class='text-white border border-white' title='Customer'><div><input type='text' autocomplete='off' class='redraw form-control' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
-                          <script>
-                            $( 'input:visible[name="Customer"]' )
-                                .typeahead({
-                                    minLength : 4,
-                                    hint: true,
-                                    highlight: true,
-                                    limit : 5,
-                                    display : 'FieldValue',
-                                    source: function( query, result ){
-                                        $.ajax({
-                                            url : 'bin/php/get/search/Customers.php',
-                                            method : 'GET',
-                                            data    : {
-                                                search :  $('input:visible[name="Customer"]').val( )
-                                            },
-                                            dataType : 'json',
-                                            beforeSend : function( ){
-                                                abort( );
-                                            },
-                                            success : function( data ){
-                                                result( $.map( data, function( item ){
-                                                    return item.FieldValue;
-                                                } ) );
-                                            }
-                                        });
-                                    },
-                                    afterSelect: function( value ){
-                                        $( 'input:visible[name="Customer"]').val( value );
-                                    }
-                                }
-                            );
-                          </script></th>
-                          <th><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Type' placeholder='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Due' placeholder='Due' value='<?php echo isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Original' placeholder='Original' value='<?php echo isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Balance' placeholder='Balance' value='<?php echo isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null;?>' /></th>
-                          <th><input class='redraw form-control' type='text' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></th>
-                      </tr>
-                     </thead>
-                  </table>
-              </div>
-          </div>
-      </div>
-  </div>
+                        <thead class='text-white border border-white'>
+                          <?php<tr>
+                          \singleton\table::getInstance( )->th( 'Invoice', 'Invoice' );
+                          \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+                          \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                          \singleton\table::getInstance( )->th( 'Job', 'Job' );
+                          \singleton\table::getInstance( )->th( 'Type', 'Type' );
+                          \singleton\table::getInstance( )->th( 'Date', 'Date' );
+                          \singleton\table::getInstance( )->th( 'Due', 'Due' );
+                          \singleton\table::getInstance( )->th( 'Original', 'Original' );
+                          \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
+                          \singleton\table::getInstance( )->th( 'Description', 'Description' );
+                        ?></tr>
+                        <tr class='desktop'><?php
+                        \singleton\table::getInstance( )->th_input( 'Invoice #', isset( $_GET[ 'Invoice #' ] ) ? $_GET[ 'Invoice #' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                  ?></tr></thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
 <?php

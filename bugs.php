@@ -99,26 +99,39 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
           <div class='card card-full card-primary'>
-            <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Bugs</h4></div>
-            <div class='card-body bg-dark'>
-                <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
-                    <thead><tr>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Customer();?>Name</th>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Description();?>Description</th>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Violation();?>Severity</th>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Note();?>Suggestion</th>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Safety_Report();?>Resolution</th>
-                        <th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->Description();?>Fixed</th>
-                    </tr><tr>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null;?>' /></th>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Severity' placeholder='Severity' value='<?php echo isset( $_GET[ 'Severity' ] ) ? $_GET[ 'Severity' ] : null;?>' /></th>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Suggestion' placeholder='Suggestion' value='<?php echo isset( $_GET[ 'Suggestion' ] ) ? $_GET[ 'Suggestion' ] : null;?>' /></th>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Resolution' placeholder='Resolution' value='<?php echo isset( $_GET[ 'Resolution' ] ) ? $_GET[ 'Resolution' ] : null;?>' /></th>
-                        <th class='text-white border border-white'><input class='redraw form-control' type='text' name='Fixed' placeholder='Fixed' value='<?php echo isset( $_GET[ 'Fixed' ] ) ? $_GET[ 'Fixed' ] : null;?>' /></th>
-                    </tr></thead>
+            <div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Bugs</h4></div>
+            <div class='mobile card-body bg-dark'>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                  </div>
+          <div class='card-body bg-darker'>
+            <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
+              <thead class='text-white border border-white'><tr><?php
+                \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                \singleton\table::getInstance( )->th( 'Name', 'Name' );
+                \singleton\table::getInstance( )->th( 'Description', 'Description' );
+                \singleton\table::getInstance( )->th( 'Severity', 'Severity' );
+                \singleton\table::getInstance( )->th( 'Suggestion', 'Suggestion' );
+                \singleton\table::getInstance( )->th( 'Resolution', 'Resolution' );
+                \singleton\table::getInstance( )->th( 'Fixed', 'Fixed' );
+              ?></tr>
+                  <tr class='desktop'><?php
+                    \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                    \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
+                    \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
+                    \singleton\table::getInstance( )->th_input( 'Severity', isset( $_GET[ 'Severity' ] ) ? $_GET[ 'Severity' ] : null );
+                    \singleton\table::getInstance( )->th_input( 'Suggestion', isset( $_GET[ 'Suggestion' ] ) ? $_GET[ 'Suggestion' ] : null );
+                    \singleton\table::getInstance( )->th_input( 'Resolution', isset( $_GET[ 'Resolution' ] ) ? $_GET[ 'Resolution' ] : null );
+                    \singleton\table::getInstance( )->th_input( 'Fixed', isset( $_GET[ 'Fixed' ] ) ? $_GET[ 'Fixed' ] : null );
+                  ?></tr></thead>
                 </table>
             </div>
         </div>
