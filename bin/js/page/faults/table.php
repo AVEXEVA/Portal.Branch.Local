@@ -1,5 +1,11 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
-var Table_Departments = $('#Table_Departments').DataTable( {
+var Table_Faults = $('#Table_Faults').DataTable( {
 dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
 processing     : true,
 serverSide     : true,
@@ -24,7 +30,7 @@ style : 'multi',
 selector : 'td.ID'
 },
 ajax: {
-url     : 'bin/php/get/Departments.php',
+url     : 'bin/php/get/Faults.php',
 data : function( d ){
       d = {
           start : d.start,
@@ -42,10 +48,12 @@ data : function( d ){
       }
 },
 columns: [
-{
-  data : 'ID' ,
-},{
-  data   : 'Name'
+  <?php \singleton\datatables::getInstance( )->DataElement('ID');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Location');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Unit');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Date');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Fault');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Status');?>
 ]
 } );
 }

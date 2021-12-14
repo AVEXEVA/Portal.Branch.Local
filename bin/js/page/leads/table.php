@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
   var Editor_Leads = new $.fn.dataTable.Editor({
     idSrc    : 'ID',
@@ -52,22 +58,8 @@ var Table_Leads = $('#Table_Leads').DataTable( {
     }
   },
   columns: [
+    <?php \singleton\datatables::getInstance( )->ID('lead.php','Lead');?>,
     {
-          className : 'ID',
-          data : 'ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='lead.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Lead #" + row.ID + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-          }
-        },{
           data : 'Name',
           render : function( data, type, row, meta ){
               switch( type ){
@@ -81,9 +73,9 @@ var Table_Leads = $('#Table_Leads').DataTable( {
                       return data;
               }
           }
-      },{
-      data : 'Type'
-      },{
+      },
+      <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
+      {
       data : 'Customer_ID',
       render : function( data, type, row, meta ){
           switch( type ){
@@ -130,13 +122,10 @@ var Table_Leads = $('#Table_Leads').DataTable( {
                return data;
        }
    }
- },{
-   data : 'Probability'
- },{
-   data : 'Level'
- },{
-   data : 'Status'
- }
+ },
+ <?php \singleton\datatables::getInstance( )->DataElement('Probability');?>,
+ <?php \singleton\datatables::getInstance( )->DataElement('Level');?>,
+ <?php \singleton\datatables::getInstance( )->DataElement('Status');?>
   ],
   initComplete : function( ){
       $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'

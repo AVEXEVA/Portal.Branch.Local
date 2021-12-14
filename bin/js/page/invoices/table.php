@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
@@ -100,23 +106,8 @@ $( document ).ready( function( ){
       }
     },
     columns: [
+        <?php \singleton\datatables::getInstance( )->ID('invoice.php','Invoice');?>,
       {
-          className : 'ID',
-          data : 'ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='invoice.php?ID=" + row.ID + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> Invoice #" + row.ID + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-
-          }
-      },{
           data : 'Customer_ID',
           render : function( data, type, row, meta ){
               switch( type ){
@@ -167,21 +158,14 @@ $( document ).ready( function( ){
                           return data;
               }
           }
-      },{
-        data : 'Type'
-      },{
-        data   : 'Date'
-      },{
-        data   : 'Due'
-      },{
-        data      : 'Original',
-        className :'sum'
-      },{
-        data      : 'Balance',
-        className : 'sum'
-      },{
-        data : 'Description'
-      }
+      },
+      
+      <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Date');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Due');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Original','sum');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Balance','sum');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Description');?>      
     ],
     initComplete : function( ){
         $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'

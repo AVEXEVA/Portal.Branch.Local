@@ -20,23 +20,15 @@ class datatables extends \singleton\index {
       }<?php
 	}
 
-    public function FirstName( ){
+    public function DataElement($data,$className){
 		?>{
-            data : 'First_Name'            
+            data : '<?php echo $data;?>'    
+            <?php if(!empty($className) || $className != null) {
+                echo ", className :".$className;
+            } ?>        
         }<?php
 	}
 
-    public function LastName( ){
-		?>{
-            data : 'Last_Name'            
-        }<?php
-	}
-
-    public function Supervisor( ){
-		?>{
-            data : 'Supervisor'            
-        }<?php
-	}
 
 	public function Name($url){
 		?>{
@@ -75,11 +67,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-	public function Status( ){
-		?>{
-          data : 'Status'
-        }<?php
-	}
+	
     public function UnitStatus( ){
 		?>{
             data : 'Status',
@@ -401,6 +389,24 @@ class datatables extends \singleton\index {
             }
 
         }<?php
+	}
+
+    public function TerritoryID( ){
+		?>{
+            data : 'Territory_ID',
+            render : function( data, type, row, meta ){
+              switch( type ){
+                case 'display' :
+                    return  row.Territory_ID !== null
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-black-tie fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" +
+                            "</div>"
+                        :   null;
+                default :
+                    return data;
+              }
+            }
+          }<?php
 	}
 
     public function JobID( ){

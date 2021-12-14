@@ -1,3 +1,10 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
+
 $( document ).ready( function( ){
 var Table_Divisions = $('#Table_Divisions').DataTable( {
 dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
@@ -44,22 +51,8 @@ data : function( d ){
       }
 },
 columns: [
+  <?php \singleton\datatables::getInstance( )->ID('divisions.php','Customer');?>,
   {
-    className : 'ID',
-    data : 'ID',
-    render : function( data, type, row, meta ){
-        switch( type ){
-            case 'display' :
-                return  row.ID !== null
-                    ?   "<div class='row'>" +
-                            "<div class='col-12'><a href='divisions.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
-                        "</div>"
-                    :   null;
-            default :
-                return data;
-          }
-        }
-        },{
         data : 'Name',
         render : function( data, type, row, meta ){
             switch( type ){

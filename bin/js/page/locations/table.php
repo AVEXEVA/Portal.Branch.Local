@@ -97,22 +97,8 @@ $(document).ready(function( ){
                 }
         },
         columns: [
+            <?php \singleton\datatables::getInstance( )->ID('location.php','Location');?>,
             {
-              className : 'ID',
-              data : 'ID',
-              render : function( data, type, row, meta ){
-                  switch( type ){
-                      case 'display' :
-                          return  row.ID !== null
-                              ?   "<div class='row'>" +
-                                      "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Location #" + row.ID + "</a></div>" +
-                                  "</div>"
-                              :   null;
-                      default :
-                          return data;
-                    }
-                }
-            },{
                 data : 'Name',
                 render : function( data, type, row, meta ){
                     switch( type ){
@@ -142,9 +128,8 @@ $(document).ready(function( ){
                     }
 
                 }
-            },{
-                data : 'Type'
-            },{
+            },<?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
+            {
                 data : 'Division_ID',
                 render : function( data, type, row, meta ){
                     switch( type ){
@@ -175,21 +160,14 @@ $(document).ready(function( ){
                     }
 
                 }
-            },{
-                data : 'Street'
-            },{
-                data : 'City'
-            },{
-                data : 'State'
-            },{
-                data : 'Zip'
-            },{
-                data : 'Units'
-            },{
-                data : 'Maintained'
-            },{
-                data : 'Status'
-          },
+            },
+            <?php \singleton\datatables::getInstance( )->DataElement('Street');?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('City');?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('State');?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('Zip');?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('Units');?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('Maintained');?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('Status');?>            
         ],
         initComplete : function( settings, json ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );'
