@@ -98,37 +98,9 @@ $(document).ready(function( ){
         },
         columns: [
             <?php \singleton\datatables::getInstance( )->ID('location.php','Location');?>,
-            {
-                data : 'Name',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },{
-                data : 'Customer_ID',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Customer_ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },<?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
+            <?php \singleton\datatables::getInstance( )->Name('location.php');?>,
+            <?php \singleton\datatables::getInstance( )->CustomerID();?>,
+            <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
             {
                 data : 'Division_ID',
                 render : function( data, type, row, meta ){

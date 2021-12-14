@@ -80,6 +80,39 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
+
+    public function Status($module = "Unit"){
+        if($module == "Unit") {
+            ?>{
+                data : 'Status',
+                render:function(data){
+                    switch(data){
+                        case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+                        case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+                        case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
+                    }
+                }
+            }<?php
+        }
+        if($module == "Job") {
+            ?>{
+                data : 'Status',
+                render : function( data, type, row, meta ){
+                  switch( type ){
+                    case 'display' :
+                      switch( data ){
+                        case 0: return 'Open';
+                        case 1: return 'Closed';
+                        case 2: return 'On Hold';
+                      }
+                    default :
+                      return data;
+                  }
+                }
+              }<?php
+        }
+	}
+
     public function UnitType( ){
 		?>{
           data : 'Type'

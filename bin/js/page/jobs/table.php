@@ -51,85 +51,12 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->ID('job.php','Job');?>,
       <?php \singleton\datatables::getInstance( )->DataElement('Name');?>,
       <?php \singleton\datatables::getInstance( )->DataElement('Date');?>,
-      {
-          data : 'Customer_ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.Customer_ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-          }
-      },{
-          data : 'Location_ID',
-          render : function( data, type, row, meta ){
-            switch( type ){
-              case 'display' :
-                  return  row.Location_ID !== null
-                      ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
-                              "<div class='col-12'>" +
-                                  "<div class='row'>" +
-                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Location_Street + "</div>" +
-                                      "<div class='col-12'>" + row.Location_City + ", " + row.Location_State + " " + row.Location_Zip + "</div>" +
-                                  "</div>" +
-                              "</div>" +
-                          "</div>"
-                      :   null;
-              default :
-                  return data;
-            }
-          }
-      },
+      <?php \singleton\datatables::getInstance( )->CustomerID();?>,
+      <?php \singleton\datatables::getInstance( )->LocationID(1);?>,      
       <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
-      {
-        data : 'Status',
-        render : function( data, type, row, meta ){
-          switch( type ){
-            case 'display' :
-              switch( data ){
-                case 0: return 'Open';
-                case 1: return 'Closed';
-                case 2: return 'On Hold';
-              }
-            default :
-              return data;
-          }
-        }
-      },{
-        data : 'Tickets',
-        render : function( data, type, row, meta ){
-          switch( type ){
-            case 'display' :
-              return  row.Tickets !== null
-                  ?   "<div class='row'>" +
-                          "<div class='col-12'><a href='tickets.php?Job=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i>" + row.Tickets + " tickets</a></div>" +
-                      "</div>"
-                  :   null;
-            default :
-              return data;
-          }
-        }
-      },{
-        data : 'Invoices',
-        render : function( data, type, row, meta ){
-          switch( type ){
-            case 'display' :
-              return  row.Invoices !== null
-                  ?   "<div class='row'>" +
-                          "<div class='col-12'><a href='invoices.php?Job=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i>" + row.Invoices + " invoices</a></div>" +
-                      "</div>"
-                  :   null;
-            default :
-              return data;
-          }
-        }
-      }
+      <?php \singleton\datatables::getInstance( )->Status('Job');?>,
+      <?php \singleton\datatables::getInstance( )->Tickets('Job');?>,
+      <?php \singleton\datatables::getInstance( )->Invoices('Job');?>      
     ],
     buttons: [
       {

@@ -58,74 +58,15 @@ var Table_Leads = $('#Table_Leads').DataTable( {
     }
   },
   columns: [
-    <?php \singleton\datatables::getInstance( )->ID('lead.php','Lead');?>,
-    {
-          data : 'Name',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.Name !== null && row.Name != ''
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='lead.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-          }
-      },
+      <?php \singleton\datatables::getInstance( )->ID('lead.php','Lead');?>,
+      <?php \singleton\datatables::getInstance( )->Name('lead.php');?>,    
       <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
-      {
-      data : 'Customer_ID',
-      render : function( data, type, row, meta ){
-          switch( type ){
-              case 'display' :
-                  return  row.Customer_ID !== null && row.Customer_ID != ''
-                      ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
-                          "</div>"
-                      :   null;
-              default :
-                  return data;
-          }
-      }
-  },{
-      data : 'Street',
-      render : function( data, type, row, meta ){
-          switch( type ){
-              case 'display' :
-                  return  row.Street !== null && row.Street != ''
-                            ? "<div class='row'>" +
-                                "<div class='col-12'>" +
-                                  "<div class='row'>" +
-                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
-                                      "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
-                                  "</div>" +
-                                "</div>" +
-                              "</div>"
-                            : null;
-              default :
-                  return data;
-          }
-      }
- },{
-   data : 'Contact_ID',
-   render : function( data, type, row, meta ){
-       switch( type ){
-           case 'display' :
-               return  row.Customer_ID !== null
-                   ?   "<div class='row'>" +
-                           "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Contact_Name + "</a></div>" +
-                       "</div>"
-                   :   null;
-           default :
-               return data;
-       }
-   }
- },
- <?php \singleton\datatables::getInstance( )->DataElement('Probability');?>,
- <?php \singleton\datatables::getInstance( )->DataElement('Level');?>,
- <?php \singleton\datatables::getInstance( )->DataElement('Status');?>
+      <?php \singleton\datatables::getInstance( )->CustomerID();?>,
+      <?php \singleton\datatables::getInstance( )->Street();?>,
+      <?php \singleton\datatables::getInstance( )->Contact();?>,      
+      <?php \singleton\datatables::getInstance( )->DataElement('Probability');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Level');?>,
+      <?php \singleton\datatables::getInstance( )->DataElement('Status');?>
   ],
   initComplete : function( ){
       $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Contacts\").DataTable().ajax.reload( );'
