@@ -4,7 +4,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 header('Content-Type: text/javascript');?>
-$( document ).ready( function( ){
+<?php$( document ).ready( function( ){
   var Editor_Collections = new $.fn.dataTable.Editor( {
       idSrc    : 'ID',
       ajax     : 'index.php',
@@ -63,7 +63,7 @@ $( document ).ready( function( ){
           d.Description = $('input[name="Description"]').val( );
           return d;
       }
-    },
+    },?>
     columns: [
       <?php \singleton\datatables::getInstance( )->ID('collection.php','Invoice');?>,
       <?php \singleton\datatables::getInstance( )->TerritoryID();?>,
@@ -74,10 +74,10 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->DataElement('Date');?>,
       <?php \singleton\datatables::getInstance( )->DataElement('Due');?>,
       <?php \singleton\datatables::getInstance( )->CollectionOriginal();?>,
-      <?php \singleton\datatables::getInstance( )->CollectionOriginal();?>,      
+      <?php \singleton\datatables::getInstance( )->CollectionOriginal();?>,
       <?php \singleton\datatables::getInstance( )->DataElement('Description');?>
     ],
-    initComplete : function( ){
+    <?php initComplete : function( ){
         $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
         $('input.date').datepicker( { } );
         $('input.time').timepicker( {  timeFormat : 'h:i A' } );
@@ -159,4 +159,4 @@ $( document ).ready( function( ){
           }
       ],
   } );
-} );
+} );?>
