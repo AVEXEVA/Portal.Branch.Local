@@ -98,32 +98,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Collections</h4></div>
-				<div class="mobile card-body bg-darker text-white">
-                    <?php
-                        \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
-                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
-                            'Customer', 'Customers',
-                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
-                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
-                        );
-                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
-                            'Location', 'Locations',
-                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
-                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
-                        );
-                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
-                            'Job', 'Jobs',
-                            isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
-                            isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null
-                        );
-                        \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
-                        \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
-                        \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-                        \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
-                        \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
-                        \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );
-                    ?>
-                    <div class='row'><div class='col-12'><input type='submit' value='Submit' /></div></div>
+				<div class="mobile card-body bg-darker text-white"><?php
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+                        'Customer', 'Customers',
+                        isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                        isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
+                    );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+                        'Location', 'Locations',
+                        isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                        isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
+                    );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+                        'Job', 'Jobs',
+                        isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+                        isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null
+                    );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );
+                    ?><div class='row'><div class='col-12'><input type='submit' value='Submit' /></div></div>
                 </div>
                 <div class='card-body card-body bg-darker'>
                     <table id='Table_Collections' class='display' cellspacing='0' width='100%'>
@@ -135,11 +133,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Job', 'Job' );
                             \singleton\table::getInstance( )->th( 'Type', 'Type' );
                             \singleton\table::getInstance( )->th( 'Date', 'Date' );
+                            \singleton\table::getInstance( )->th( 'Due', 'Due' );
                             \singleton\table::getInstance( )->th( 'Original', 'Original' );
                             \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
                             \singleton\table::getInstance( )->th( 'Description', 'Description' );
-                        ?></tr>
-                              <tr class='desktop'><?php
+                        ?></tr><tr class='desktop'><?php
                                 \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Territory', isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
@@ -147,11 +145,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                                \singleton\table::getInstance( )->th_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
                                 \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
-                            ?> </th>
-                        </tr></thead>?>
+                        ?></tr></thead>
                     </table>
                 </div>
             </div>
@@ -161,5 +159,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </html>
 <?php
     }
-} else {?><html><head><script>document.location.href='../login.php?Forward=collections.php';</script></head></html><?php }?>,
-array( )
+} else {?><html><head><script>document.location.href='../login.php?Forward=collections.php';</script></head></html><?php }?>

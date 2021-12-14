@@ -53,237 +53,209 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		  	$_SESSION[ 'Connection' ][ 'User' ],
 		)
 	);
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
-        $key = $Privilege['Access'];
-        unset( $Privilege[ 'Access' ] );
-        $Privileges[ $key ] = implode( '', array(
-        	dechex( $Privilege[ 'Owner' ] ),
-        	dechex( $Privilege[ 'Group' ] ),
-        	dechex( $Privilege[ 'Department' ] ),
-        	dechex( $Privilege[ 'Database' ] ),
-        	dechex( $Privilege[ 'Server' ] ),
-        	dechex( $Privilege[ 'Other' ] ),
-        	dechex( $Privilege[ 'Token' ] ),
-        	dechex( $Privilege[ 'Internet' ] )
-        ) );
-    }}
-
-    //function for get the next and previous button max and min value.
-    $unitPagination = \singleton\database::getInstance( )->query(
-        null,
-        "SELECT MIN(ID), MAX(ID)
-                    FROM      Rol
-                         AS Contact;",
-       []
-
-    );
-    $finalResult = sqlsrv_fetch_array($unitPagination);
-    $previous = 1;
-    $next = 2;
-
-    if($finalResult && isset( $_GET[ 'ID' ] )){
-        $previous = ($_GET[ 'ID' ]==1? 1  : $_GET[ 'ID' ]-1);
-        $next = $_GET[ 'ID' ]+1;
-    }
-    //end
-
-    if( 	!isset( $Connection[ 'ID' ] )
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+    $key = $Privilege['Access'];
+    unset( $Privilege[ 'Access' ] );
+    $Privileges[ $key ] = implode( '', array(
+    	dechex( $Privilege[ 'Owner' ] ),
+    	dechex( $Privilege[ 'Group' ] ),
+    	dechex( $Privilege[ 'Department' ] ),
+    	dechex( $Privilege[ 'Database' ] ),
+    	dechex( $Privilege[ 'Server' ] ),
+    	dechex( $Privilege[ 'Other' ] ),
+    	dechex( $Privilege[ 'Token' ] ),
+    	dechex( $Privilege[ 'Internet' ] )
+    ) );
+  }}
+  if( 	!isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Contact' ] )
         || 	!check( privilege_read, level_group, $Privileges[ 'Contact' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
-      \singleton\database::getInstance( )->query(
-        null,
-        " INSERT INTO Activity([User], [Date], [Page] )
-          VALUES( ?, ?, ? );",
-        array(
-          $_SESSION[ 'Connection' ][ 'User' ],
-          date('Y-m-d H:i:s'),
-          'contact.php'
-        )
-      );
-      $ID = isset( $_GET[ 'ID' ] )
-  			? $_GET[ 'ID' ]
-  			: (
-  				isset( $_POST[ 'ID' ] )
-  					? $_POST[ 'ID' ]
-  					: null
-  			);
-		  $Name = isset( $_GET[ 'Name' ] )
-    		? $_GET[ 'Name' ]
-    		: (
-    			isset( $_POST[ 'Name' ] )
-    				? $_POST[ 'Name' ]
-    				: null
-    		);
-      $result = \singleton\database::getInstance( )->query(
-        null,
-        "	SELECT 	Top 1
-              Contact.*
-          FROM    (
-                SELECT 	Rol.ID 		  AS ID,
-                        Rol.Name    AS Name,
-                        Rol.Contact AS Contact,
-                        Rol.Type    AS Type,
-                        Rol.Phone   AS Phone,
-                        Rol.Email   AS Email,
-                        Rol.Address AS Street,
-                        Rol.City    AS City,
-                        Rol.State   AS State,
-                        Rol.Zip     AS Zip,
-                        Rol.Latt 	  AS Latitude,
-                        Rol.fLong   AS Longitude,
-                        Rol.Website AS Website,
-                        Rol.Geolock AS Geofence
-              FROM      Rol
-                  ) AS Contact
-          WHERE   	Contact.ID = ?
-              OR 	Contact.Name = ?;",
-        array(
-          $ID,
-          $Name
-        )
-      );
-      $Contact =   (       empty( $ID )
-                      &&    !empty( $Name )
-                      &&    !$result
-                    ) || (  empty( $ID )
-                      &&    empty( $Name )
-                    )  ? array(
-        'ID' => null,
-        'Name' => null,
-        'Contact' => null,
-        'Geofence' => null,
-        'Type' => null,
-        'Status' => null,
-        'Website' => null,
-        'Internet' => null,
-        'Street' => null,
-        'City' => null,
-        'State' => null,
-        'Zip' => null,
-        'Latitude' => null,
-        'Longitude' => null,
-        'Phone'   =>  null,
-        'Email'   =>  null,
-        'Rolodex' => null,
-        'Phone' => null,
-        'Email' => null
-      ) : sqlsrv_fetch_array($result);
+  ){ ?><?php require('404.html');?><?php }
+  else {
+    \singleton\database::getInstance( )->query(
+      null,
+      " INSERT INTO Activity([User], [Date], [Page] )
+        VALUES( ?, ?, ? );",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        date('Y-m-d H:i:s'),
+        'contact.php'
+      )
+    );
+    $ID = isset( $_GET[ 'ID' ] )
+			? $_GET[ 'ID' ]
+			: (
+				isset( $_POST[ 'ID' ] )
+					? $_POST[ 'ID' ]
+					: null
+			);
+	  $Name = isset( $_GET[ 'Name' ] )
+  		? $_GET[ 'Name' ]
+  		: (
+  			isset( $_POST[ 'Name' ] )
+  				? $_POST[ 'Name' ]
+  				: null
+  		);
+    $result = \singleton\database::getInstance( )->query(
+      null,
+      "	SELECT 	Top 1
+                Contact.*
+        FROM    (
+              SELECT 	Rol.ID 		  AS ID,
+                      Rol.Name    AS Name,
+                      Rol.Contact AS Contact,
+                      Rol.Type    AS Type,
+                      Rol.Phone   AS Phone,
+                      Rol.Email   AS Email,
+                      Rol.Address AS Street,
+                      Rol.City    AS City,
+                      Rol.State   AS State,
+                      Rol.Zip     AS Zip,
+                      Rol.Latt 	  AS Latitude,
+                      Rol.fLong   AS Longitude,
+                      Rol.Website AS Website,
+                      Rol.Geolock AS Geofence
+            FROM      Rol
+                ) AS Contact
+        WHERE   	Contact.ID = ?;",
+      array(
+        $ID
+      )
+    );
+    $Contact = empty( $ID ) ? array(
+      'ID' => null,
+      'Name' => null,
+      'Contact' => null,
+      'Geofence' => null,
+      'Type' => null,
+      'Status' => null,
+      'Website' => null,
+      'Internet' => null,
+      'Street' => null,
+      'City' => null,
+      'State' => null,
+      'Zip' => null,
+      'Latitude' => null,
+      'Longitude' => null,
+      'Phone'   =>  null,
+      'Email'   =>  null,
+      'Rolodex' => null,
+      'Phone' => null,
+      'Email' => null
+    ) : sqlsrv_fetch_array($result);
 
 
-      if( isset( $_POST ) && count( $_POST ) > 0 ){
-        $Contact[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Contact[ 'Name' ];
-        $Contact[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Contact[ 'Contact' ];
-        $Contact[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Contact[ 'Phone' ];
-        $Contact[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Contact[ 'Email' ];
-        $Contact[ 'Type' ]     = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Contact[ 'Type' ];
-        $Contact[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Contact[ 'Website' ];
-        $Contact[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Contact[ 'Street' ];
-        $Contact[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Contact[ 'City' ];
-        $Contact[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Contact[ 'State' ];
-        $Contact[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Contact[ 'Zip' ];
-        $Contact[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Contact[ 'Latitude' ];
-        $Contact[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Contact[ 'Longitude' ];
+    if( isset( $_POST ) && count( $_POST ) > 0 ){
+      $Contact[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Contact[ 'Name' ];
+      $Contact[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Contact[ 'Contact' ];
+      $Contact[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Contact[ 'Phone' ];
+      $Contact[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Contact[ 'Email' ];
+      $Contact[ 'Type' ]     = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Contact[ 'Type' ];
+      $Contact[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Contact[ 'Website' ];
+      $Contact[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Contact[ 'Street' ];
+      $Contact[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Contact[ 'City' ];
+      $Contact[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Contact[ 'State' ];
+      $Contact[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Contact[ 'Zip' ];
+      $Contact[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Contact[ 'Latitude' ];
+      $Contact[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Contact[ 'Longitude' ];
 
-        if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
-          $result = \singleton\database::getInstance( )->query(
-            null,
-            "	DECLARE @MAXID INT;
-              SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
-              INSERT INTO Rol(
-                ID,
-                Type,
-                Name,
-                Website,
-                Phone,
-                Contact,
-                Email,
-                Address,
-                City,
-                State,
-                Zip,
-                Latt,
-                fLong,
-                Geolock,
-                Since,
-                Last
-              )
-              VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
-              SELECT @MAXID + 1;",
-            array(
-              $Contact[ 'Type' ],
-              $Contact[ 'Name' ],
-              $Contact[ 'Website' ],
-              $Contact[ 'Phone' ],
-              $Contact[ 'Contact'],
-              $Contact[ 'Email' ],
-              $Contact[ 'Street' ],
-              $Contact[ 'City' ],
-              $Contact[ 'State' ],
-              $Contact[ 'Zip' ],
-              $Contact[ 'Latitude' ],
-              $Contact[ 'Longitude' ],
-              !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0,
-              date("Y-m-d H:i:s"),
-              date("Y-m-d H:i:s")
+      if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
+        $result = \singleton\database::getInstance( )->query(
+          null,
+          "	DECLARE @MAXID INT;
+            SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
+            INSERT INTO Rol(
+              ID,
+              Type,
+              Name,
+              Website,
+              Phone,
+              Contact,
+              Email,
+              Address,
+              City,
+              State,
+              Zip,
+              Latt,
+              fLong,
+              Geolock,
+              Since,
+              Last
             )
-          );
-          sqlsrv_next_result( $result );
-          $Contact[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+            VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            SELECT @MAXID + 1;",
+          array(
+            $Contact[ 'Type' ],
+            $Contact[ 'Name' ],
+            $Contact[ 'Website' ],
+            $Contact[ 'Phone' ],
+            $Contact[ 'Contact'],
+            $Contact[ 'Email' ],
+            $Contact[ 'Street' ],
+            $Contact[ 'City' ],
+            $Contact[ 'State' ],
+            $Contact[ 'Zip' ],
+            $Contact[ 'Latitude' ],
+            $Contact[ 'Longitude' ],
+            !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0,
+            date("Y-m-d H:i:s"),
+            date("Y-m-d H:i:s")
+          )
+        );
+        sqlsrv_next_result( $result );
+        $Contact[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
-          header( 'Location: contact.php?ID=' . $Contact[ 'ID' ] );
-          exit;
-        } else {
-          \singleton\database::getInstance( )->query(
-            null,
-            "	UPDATE 	Rol
-              SET 	Rol.Name = ?,
-                  Rol.Contact = ?,
-                  Rol.Type = ?,
-                  Rol.Website = ?,
-                  Rol.Address = ?,
-                  Rol.City = ?,
-                  Rol.State = ?,
-                  Rol.Zip = ?,
-                  Rol.Latt = ?,
-                  Rol.fLong = ?,
-                  Rol.Phone = ?,
-                  Rol.EMail = ?,
-                  Rol.Last = ?
-
-
-              WHERE 	Rol.ID = ?;",
-            array(
-              $Contact[ 'Name' ],
-              $Contact[ 'Contact' ],
-              $Contact[ 'Type' ],
-              $Contact[ 'Website' ],
-              $Contact[ 'Street' ],
-              $Contact[ 'City' ],
-              $Contact[ 'State' ],
-              $Contact[ 'Zip' ],
-              $Contact[ 'Latitude' ],
-              $Contact[ 'Longitude' ],
-              $Contact[ 'Phone' ],
-              $Contact[ 'Email' ],
-              date("Y-m-d H:i:s"),
-              $Contact[ 'ID' ]
-            )
-          );
-        }
+        header( 'Location: contact.php?ID=' . $Contact[ 'ID' ] );
+        exit;
+      } else {
+        \singleton\database::getInstance( )->query(
+          null,
+          "	UPDATE 	Rol
+            SET 	  Rol.Name = ?,
+                    Rol.Contact = ?,
+                    Rol.Type = ?,
+                    Rol.Website = ?,
+                    Rol.Address = ?,
+                    Rol.City = ?,
+                    Rol.State = ?,
+                    Rol.Zip = ?,
+                    Rol.Latt = ?,
+                    Rol.fLong = ?,
+                    Rol.Phone = ?,
+                    Rol.EMail = ?,
+                    Rol.Last = ?
+            WHERE 	Rol.ID = ?;",
+          array(
+            $Contact[ 'Name' ],
+            $Contact[ 'Contact' ],
+            $Contact[ 'Type' ],
+            $Contact[ 'Website' ],
+            $Contact[ 'Street' ],
+            $Contact[ 'City' ],
+            $Contact[ 'State' ],
+            $Contact[ 'Zip' ],
+            $Contact[ 'Latitude' ],
+            $Contact[ 'Longitude' ],
+            $Contact[ 'Phone' ],
+            $Contact[ 'Email' ],
+            date("Y-m-d H:i:s"),
+            $Contact[ 'ID' ]
+          )
+        );
       }
+    }
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-     <?php	require( bin_meta . 'index.php');?>
-     <?php	require( bin_css  . 'index.php');?>
-     <?php  require( bin_js   . 'index.php');?>
+  <?php  
+    $_GET[ 'Bootstrap' ] = '5.1';
+    $_GET[ 'Entity_CSS' ] = 1;
+    require( bin_meta . 'index.php');
+    require( bin_css  . 'index.php');
+    require( bin_js   . 'index.php');
+  ?>
 </head>
 <body>
   <div id="wrapper">

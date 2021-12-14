@@ -6,7 +6,7 @@ class fontawesome extends \singleton\index {
 	    if( method_exists( $this, $function ) ){
 	    	$this->$function($_args);
 	    } else {
-			$this->icon( $function, 1 );
+			$this->icon( strtolower( $function ), 1 );
 		}
 	}
 	public function icon( $icon, $size ){		?><i class='fa fa-<?php echo $icon;?> fa-fw fa-<?php echo $size;?>x'></i><?php }
@@ -114,9 +114,12 @@ class fontawesome extends \singleton\index {
 	
 	//Form Buttons
 	public function Add($size=null){			self::icon( 'plus-circle', $size ); }
+	public function Create($size=null){			self::icon( 'plus-circle', $size ); }
 	public function Edit($size=null){			self::icon( 'edit', $size ); }
 	public function Delete($size=null){			self::icon( 'trash', $size ); }
 	public function Save($size=null){			self::icon( 'save', $size ); }
+	public function CSV($size=null){			self::icon( 'file-csv', $size ); }
+	public function Export($size=null){			self::CSV( $size ); }
 
 	//Other Buttons
 	public function Logout($size=null){			self::icon( 'sign-out', $size ); }
