@@ -20,23 +20,15 @@ class datatables extends \singleton\index {
       }<?php
 	}
 
-    public function FirstName( ){
+    public function DataElement($data,$className){
 		?>{
-            data : 'First_Name'            
+            data : '<?php echo $data;?>'    
+            <?php if(!empty($className) || $className != null) {
+                echo ", className :".$className;
+            } ?>        
         }<?php
 	}
 
-    public function LastName( ){
-		?>{
-            data : 'Last_Name'            
-        }<?php
-	}
-
-    public function Supervisor( ){
-		?>{
-            data : 'Supervisor'            
-        }<?php
-	}
 
 	public function Name($url){
 		?>{
@@ -75,11 +67,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-	public function Status( ){
-		?>{
-          data : 'Status'
-        }<?php
-	}
+	
     public function UnitStatus( ){
 		?>{
             data : 'Status',
@@ -92,12 +80,45 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
+
+    public function Status($module = "Unit"){
+        if($module == "Unit") {
+            ?>{
+                data : 'Status',
+                render:function(data){
+                    switch(data){
+                        case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
+                        case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
+                        case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
+                    }
+                }
+            }<?php
+        }
+        if($module == "Job") {
+            ?>{
+                data : 'Status',
+                render : function( data, type, row, meta ){
+                  switch( type ){
+                    case 'display' :
+                      switch( data ){
+                        case 0: return 'Open';
+                        case 1: return 'Closed';
+                        case 2: return 'On Hold';
+                      }
+                    default :
+                      return data;
+                  }
+                }
+              }<?php
+        }
+	}
+
     public function UnitType( ){
 		?>{
           data : 'Type'
         }<?php
 	}
-	public function Locations( ){
+	public function Locations($redirect='Customer'){
 		?>{
             data : 'Locations',
             render : function( data, type, row, meta ){
@@ -105,7 +126,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Locations !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='locations.php?Customer=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
+                                    "<div class='col-12'><a href='locations.php?<?php echo $redirect;?>=" + row.Name + "'><i class='fa fa-link fa-building fa-fw fa-1x'></i> " + row.Locations + " locations</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -115,7 +136,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-	public function Units( ){
+	public function Units($redirect='Customer'){
 		?>{
 	        data : 'Units',
 	        render : function( data, type, row, meta ){
@@ -123,7 +144,7 @@ class datatables extends \singleton\index {
 	                case 'display' :
 	                    return  row.Units !== null
 	                        ?   "<div class='row'>" +
-	                                "<div class='col-12'><a href='units.php?Customer=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
+	                                "<div class='col-12'><a href='units.php?<?php echo $redirect;?>=" + row.Name + "'><i class='fa fa-cogs fa-fw fa-1x'></i> " + row.Units + " units</a></div>" +
 	                            "</div>"
 	                        :   null;
 	                default :
@@ -151,7 +172,7 @@ class datatables extends \singleton\index {
       }<?php
 	}
 
-	public function Jobs( ){
+	public function Jobs($redirect='Customer' ){
 		?>{
             data : 'Jobs',
             render : function( data, type, row, meta ){
@@ -159,7 +180,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Jobs !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='jobs.php?Customer=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" +
+                                    "<div class='col-12'><a href='jobs.php?<?php echo $redirect;?>=" + row.Name + "'><i class='fa fa-suitcase fa-fw fa-1x'></i> " + row.Jobs + " jobs</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -169,7 +190,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-	public function Tickets( ){
+	public function Tickets($redirect='Customer' ){
 		?>{
             data : 'Tickets',
             render : function( data, type, row, meta ){
@@ -177,7 +198,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Tickets !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='tickets.php?Customer=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
+                                    "<div class='col-12'><a href='tickets.php?<?php echo $redirect;?>=" + row.Name + "'><i class='fa fa-ticket fa-fw fa-1x'></i> " + row.Tickets + " tickets</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -187,7 +208,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-	public function Violations( ){
+	public function Violations($redirect='Customer' ){
 		?>{
             data : 'Violations',
             render : function( data, type, row, meta ){
@@ -195,7 +216,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Tickets !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='violations.php?Customer=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
+                                    "<div class='col-12'><a href='violations.php?<?php echo $redirect;?>=" + row.Name + "'><i class='fa fa-warning fa-fw fa-1x'></i> " + row.Violations + " violations</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -204,7 +225,7 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}
-	public function Invoices( ){
+	public function Invoices($redirect='Customer'){
 		?>{
             data : 'Invoices',
             render : function( data, type, row, meta ){
@@ -212,7 +233,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Tickets !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='invoices.php?Customer=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" +
+                                    "<div class='col-12'><a href='invoices.php?<?php echo $redirect;?>=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i> " + row.Invoices + " invoices</a></div>" +
                                 "</div>"
                             :   null;
                     default :
@@ -403,6 +424,24 @@ class datatables extends \singleton\index {
         }<?php
 	}
 
+    public function TerritoryID( ){
+		?>{
+            data : 'Territory_ID',
+            render : function( data, type, row, meta ){
+              switch( type ){
+                case 'display' :
+                    return  row.Territory_ID !== null
+                        ?   "<div class='row'>" +
+                                "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-black-tie fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" +
+                            "</div>"
+                        :   null;
+                default :
+                    return data;
+              }
+            }
+          }<?php
+	}
+
     public function JobID( ){
 		?>{
             data : 'Job_ID',
@@ -555,5 +594,136 @@ class datatables extends \singleton\index {
             }
         }<?php
 	}    
+
+
+    public function ContactName( ){
+		?>{
+            data : 'Name',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                      return row.Name !== null
+                          ?   (
+                                  row.Type == 'Customer'
+                                      ?   "<div class='row'>" +
+                                              "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><i class='fa fa-user fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                          "</div>"
+                                      :   (
+                                              row.Type == 'Location'
+                                                  ?   "<div class='row'>" +
+                                                          "<div class='col-12'><a href='location.php?Name=" + row.Name + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                                      "</div>"
+                                                  :   (
+                                                          row.Type == 'Employee'
+                                                              ?   "<div class='row'>" +
+                                                                      "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><i class='fa fa-users fa-fw fa-1x'></i>" + row.Name + "</a></div>" +
+                                                                  "</div>"
+                                                              : null
+                                                      )
+                                          )
+                              )
+                          :   null;
+                    default :
+                        return data;
+                }
+
+            }
+          }<?php
+	}
+    public function Email( ){
+		?>{
+            data : 'Email',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return row.Email !== null && row.Email != ''
+                            ?   "<a href='mailto:" + row.Email + "'><i class='fa fa-envelope fa-fw fa-1x'></i>" + row.Email + "</a>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}
+    public function Phone( ){
+		?>{
+            data : 'Phone',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return row.Email !== null && row.Phone != ''
+                            ?   "<a href='tel:" + row.Phone + "'><i class='fa fa-phone fa-fw fa-1x'></i>" + row.Phone + "</a>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}
+
+    public function Street( ){
+		?>{
+            data : 'Street',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  "<div class='row'>" +
+                                    "<div class='col-12'>" +
+                                        "<div class='row'>" +
+                                            "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
+                                            "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
+                                        "</div>" +
+                                    "</div>" +
+                                "</div>"
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}
+
+    public function Contact( ){
+		?>{
+            data : 'Contact',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Contact + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+	}
+
+    public function CollectionOriginal( ){
+		?>{
+            data      : 'Original',
+            render : function( data, type, row, meta ){
+              switch( type ){
+                case 'display':
+                  if( row.Original > 0 ){
+                    return "<div class='row'>" +
+                      "<div class='col-12'>" + row.Original + "</div>" +
+                    "</div>"
+                  } else if( row.Original < 0 ){
+                    return "<div class='row'>" +
+                      "<div class='col-12'>" + row.Original + "</div>" +
+                    "</div>"
+                  } else if( row.Original == 0 ){
+                    return "<div class='row'>" +
+                      "<div class='col-12'>" + row.Original + "</div>" +
+                    "</div>"
+                  }
+                default :
+                  return null;
+              }
+            }
+          }<?php
+	}
 
 }?>

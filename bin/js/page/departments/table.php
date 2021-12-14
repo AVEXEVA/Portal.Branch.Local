@@ -1,5 +1,11 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
-var Table_Feed = $('#Table_Feed').DataTable( {
+var Table_Departments = $('#Table_Departments').DataTable( {
 dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
 processing     : true,
 serverSide     : true,
@@ -24,7 +30,7 @@ style : 'multi',
 selector : 'td.ID'
 },
 ajax: {
-url     : 'bin/php/get/Feed.php',
+url     : 'bin/php/get/Departments.php',
 data : function( d ){
       d = {
           start : d.start,
@@ -42,35 +48,8 @@ data : function( d ){
       }
 },
 columns: [
-{
-  data : 'ID' ,
-},{
-  data   : 'Description'
-},{
-  data    :  'TimeRoute'
-},{
-  data      : 'TimeSite',
-},{
-  data      : 'TimeComp',
-},{
-  data      : 'Regular',
-},{
-  data      : 'Overtime',
-},{
-  data      : 'Doubletime',
-},{
-  data      : 'Night_Differential',
-},{
-  data      : 'Travel_Time',
-},{
-  data      : 'Location_Tag',
-},{
-  data      : 'Unit_State',
-},{
-  data      : 'Full_Name',
-},{
-  data      : 'Employee_ID',
-},{
-]
+  <?php \singleton\datatables::getInstance( )->DataElement('ID');?>,
+  <?php \singleton\datatables::getInstance( )->DataElement('Name');?>
+  ]
 } );
 }

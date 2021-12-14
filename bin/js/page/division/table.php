@@ -24,7 +24,7 @@ style : 'multi',
 selector : 'td.ID'
 },
 ajax: {
-url     : 'bin/php/get/Divisions.php',
+url     : 'bin/php/get/divisions.php',
 data : function( d ){
       d = {
           start : d.start,
@@ -52,7 +52,7 @@ columns: [
             case 'display' :
                 return  row.ID !== null
                     ?   "<div class='row'>" +
-                            "<div class='col-12'><a href='divisions.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
+                            "<div class='col-12'><a href='division.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
                         "</div>"
                     :   null;
             default :
@@ -66,7 +66,7 @@ columns: [
                 case 'display' :
                     return  row.ID !== null
                         ?   "<div class='row'>" +
-                                "<div class='col-12'><a href='divisions.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
+                                "<div class='col-12'><a href='division.php?ID=" + row.ID + "'><i class='fa fa-link fa-fw fa-1x'></i> " + row.Name + "</a></div>" +
                             "</div>"
                         :   null;
                 default :
@@ -127,59 +127,54 @@ columns: [
                             :   null;
                     default :
                         return data;
+            }
+          }
         }
-      }
-    }
 ],
-buttons: [
-  {
-    text: 'Reset Search',
-    className: 'form-control',
-    action: function ( e, dt, node, config ) {
-      $( 'input, select' ).each( function( ){
-        $( this ).val( '' );
-      } );
-      Table_Divisions.draw( );
-    }
-  },{
-    text : 'Get URL',
-    className: 'form-control',
-    action : function( e, dt, node, config ){
-      var d = { };
-      d.ID = $("input[name='ID']").val( );
-      d.Name = $("input[name='Name']").val( );
-      d.Date = $("input[name='Date']").val( );
-      d.Customer = $("input[name='Customer']").val( );
-      d.Locaton = $("input[name='Location']").val( );
-      d.Type = $("select[name='Type']").val( );
-      d.Status = $("select[name='Status']").val( );
-      d.Tickets = $("input[name='Tickets']").val( );
-      d.Invoices = $("input[name='Invoices']").val( );
-      document.location.href = 'divisions.php?' + new URLSearchParams( d ).toString();
-    }
-  },{
-    text : 'Create',
-    className: 'form-control',
-    action : function( e, dt, node, config ){
-      document.location.href='division.php';
-    }
-  },{
-    text: 'Print',
-    className: 'form-control',
-    action: function ( e, dt, node, config ) {
-        var rows = dt.rows( { selected : true } ).indexes( );
-        var dte = dt.cells( rows, 0 ).data( ).toArray( );
-        document.location.href = 'divisions.php?Divisions=' + dte.join( ',' );
-    }
-  },{
-    extend : 'copy',
-    text : 'Copy',
-    className : 'form-control'
-  },{
-    extend : 'csv',
-    text : 'CSV',
-    className : 'form-control'
-  }
+  initComplete : function( ){
+    $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );
+    $('input.date').datepicker( { } );
+    $('input.time').timepicker( {  timeFormat : 'h:i A' } );
+    search( this );
+    $( '.redraw' ).bind( 'change', function(){ Table_Divisions.draw(); });
+},
+        buttons: [
+        {
+            text: 'Reset Search',
+            className: 'form-control',
+            action: function ( e, dt, node, config ) {
+                $( 'input:visible, select:visible' ).each( function( ){
+                    $( this ).val( '' );
+                } );
+                Table_Divisions.draw( );
+            }
+        },{
+        text : 'Create',
+        className: 'form-control',
+        action : function( e, dt, node, config ){
+            document.location.href='contact.php';}
+
+        },{ extend: 'edit',
+            editor: Editor_Divisions,
+            className: 'form-control',
+        },{
+            text : 'Delete',
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+              var rows = dt.rows( { selected : true } ).indexes( );
+              var dte = dt.cells( rows, 0 ).data( ).toArray( );
+              $.ajax ({
+                url    : 'bin/php/post/division.php',
+                method : 'POST',
+                data   : {
+                  action : 'delete' ,
+                  data : dte
+                },
+                success : function(response){
+                  Table_Divisions.draw();
+                }
+              })
+            }
+          },
 ]
-} );
 } );

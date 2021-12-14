@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
 var Table_Bugs = $('#Table_bugs').DataTable( {
 dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
@@ -46,48 +52,13 @@ data : function( d ){
       }
 },
 columns: [
-      {
-      className : 'ID',
-      data : 'ID',
-      render : function( data, type, row, meta ){
-          switch( type ){
-              case 'display' :
-                  return  row.ID !== null
-                      ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Customer #" + row.ID + "</a></div>" +
-                          "</div>"
-                      :   null;
-              default :
-                  return data;
-          }
-
-      }
-    },{
-        data : 'Date',
-        render: function( data, type, row, meta ){
-            switch( type ){
-                case 'display':
-                    return row.Date !== null
-                        ?   "<div class='row'>" +
-                                "<div class='col-12'><i class='fa fa-calendar fa-fw fa-1x'></i>" + row.Date + "</div>" +
-                            "</div>"
-                        :   null;
-                    default :
-                        return data;
-
-                    }
-                }
-          },{
-            data    :  'Description'
-          },{
-            data      : 'Severity',
-          },{
-            data      : 'Suggestion',
-          },{
-            data      : 'Resolution',
-          },{
-            data      : 'Fixed',
-          }
+    <?php \singleton\datatables::getInstance( )->ID('customer.php','Customer');?>,
+    <?php \singleton\datatables::getInstance( )->TicketDate();?>,
+    <?php \singleton\datatables::getInstance( )->DataElement('Description');?>,
+    <?php \singleton\datatables::getInstance( )->DataElement('Severity');?>,
+    <?php \singleton\datatables::getInstance( )->DataElement('Suggestion');?>,
+    <?php \singleton\datatables::getInstance( )->DataElement('Resolution');?>,
+    <?php \singleton\datatables::getInstance( )->DataElement('Fixed');?>
 ],
 buttons: [
     {

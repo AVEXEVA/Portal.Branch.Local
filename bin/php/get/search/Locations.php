@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   $result = \singleton\database::getInstance( )->query(
     'Portal',
     "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           dechex( $Privilege[ 'Department' ] ),
           dechex( $Privilege[ 'Database' ] ),
           dechex( $Privilege[ 'Server' ] ),
-          dechex( $Privilege[ 'Other' ] ), 
+          dechex( $Privilege[ 'Other' ] ),
           dechex( $Privilege[ 'Token' ] ),
           dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -80,7 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( isset($_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Street'];
       $conditions[] = "Location.Address LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset( $_GET[ 'search'] ) ){
       $parameters[ ] = $_GET[ 'search' ];
       $search[ ] = "Location.Tag LIKE '%' + ? + '%'";
@@ -91,39 +91,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     $parameters[ ] = $_GET[ 'search' ];
 
-    $sQuery = " 
-      SELECT  Top 10
-              tbl.FieldName,
-              tbl.FieldValue
+    $sQuery = " SELECT  Top 10
+                        tbl.ID,
+                        tbl.FieldName,
+                        tbl.FieldValue
       FROM    (
-                SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+                SELECT  insRowTbl.ID,
+                        attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                         attr.insRow.value('.', 'nvarchar(max)') as FieldValue
-                FROM    ( Select  convert(xml, (select i.* for xml raw)) as insRowCol
+                FROM    ( Select i.ID, convert(xml, (select i.* for xml raw)) as insRowCol
                           FROM ( (
                             SELECT  Top 100
-                                    Location.Tag           AS Name,
-                                    Customer.Name           AS Customer_Name,
-                                    Location_Type.Name   AS Type,
-                                    Zone.Name            AS Division_Name,
-                                    Route.Name           AS Route_Name,
-                                    Employee.fFirst + ' ' + Employee.Last AS Mechanic_Name,
-                                    Location.Address     AS Street,
-                                    Location.City          AS City,
-                                    Location.State         AS State,
-                                    Location.Zip           AS Zip,
-                                    CASE  WHEN  Location_Units.Count IS NULL THEN 0
-                                          ELSE  Location_Units.Count 
-                                    END AS Units,
-                                    CASE  WHEN Location.Maint = 0 THEN 'Active' 
-                                          ELSE 'Inactive' END AS Maintained,
-                                    CASE  WHEN Location.Status = 0 THEN 'Active' 
-                                          ELSE 'Inactive' END AS Status
+                                    Location.Loc AS ID,
+                                    Location.Tag AS Name
                             FROM    Loc AS Location
                                     LEFT JOIN (
                                         SELECT  Owner.ID,
                                                 Rol.Name,
-                                                Owner.Status 
-                                        FROM    Owner 
+                                                Owner.Status
+                                        FROM    Owner
                                                 LEFT JOIN Rol ON Owner.Rol = Rol.ID
                                     ) AS Customer ON Location.Owner = Customer.ID
                                     LEFT JOIN (
@@ -132,23 +118,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                       FROM      Elev
                                       GROUP BY  Elev.Loc
                                     ) AS Location_Type ON Location_Type.Location = Location.Loc
-                                    LEFT JOIN Zone ON Location.Zone = Zone.ID 
+                                    LEFT JOIN Zone ON Location.Zone = Zone.ID
                                     LEFT JOIN Route ON Location.Route = Route.ID
                                     LEFT JOIN (
                                       SELECT    Elev.Loc AS Location,
                                                 Count( Elev.ID ) AS Count
-                                      FROM      Elev 
+                                      FROM      Elev
                                       GROUP BY  Elev.Loc
                                     ) AS Location_Units ON Location_Units.Location = Location.Loc
                                     LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
-                                    
+
                             WHERE   ({$conditions}) AND ({$search})
                           ) ) as i
                    ) as insRowTbl
               CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
             ) AS tbl
       WHERE     tbl.FieldValue LIKE '%' + ? + '%'
-      GROUP BY  tbl.FieldName, tbl.FieldValue;;";
+      GROUP BY  tbl.ID, tbl.FieldName, tbl.FieldValue;;";
 
     $rResult = $database->query(
       null,
