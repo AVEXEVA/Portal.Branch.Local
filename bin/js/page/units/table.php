@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
@@ -91,98 +97,13 @@ $( document ).ready( function( ){
 	        }
 	    },
 		columns   : [
-			{
-				data : 'ID',
-                className : 'ID',
-				render : function( data, type, row, meta ){
-					switch( type ){
-						case 'display' :
-							return  row.ID !== null
-								?   "<div class='row'>" +
-								"<div class='col-12'><a href='unit.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Unit #" + row.ID + "</a></div>" +
-								"</div>"
-								:   null;
-						default :
-							return data;
-					}
-
-				}
-			},{
-				data : 'Name',
-				render : function ( data, type, row, meta ){
-					switch ( type ) {
-						case 'display':
-							if( row.City_ID === null && row.Building_ID === null ){
-								return null;
-							} else {
-								return "<div class='row'>" +
-									( row.City_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.City_ID + "</a></div>" : null ) +
-									( row.Building_ID !== null ? "<div class='col-12'><a href='unit.php?ID=" + row.ID + "'>" + row.Building_ID + "</a></div>" : null ) +
-									"</div>";
-							}
-						default :
-							return data;
-					}
-				}
-			},{
-				data : 'Customer_ID',
-				render : function( data, type, row, meta ){
-
-					switch( type ){
-						case 'display' :
-							return  row.Customer_ID !== null
-								?   "<div class='row'>" +
-								"<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
-								"</div>"
-								:   null;
-						default :
-							return data;
-					}
-
-				}
-			},{
-				data : 'Location_ID',
-				render : function( data, type, row, meta ){
-					switch( type ){
-						case 'display' :
-							return  row.Location_ID !== null
-								?   "<div class='row'>" +
-								"<div class='col-12'><a href='location.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Location_Name + "</a></div>" +
-								"</div>"
-								:   null;
-						default :
-							return data;
-					}
-
-				}
-			},{
-				data : 'Type'
-			},{
-				data : 'Status',
-				render:function(data){
-					switch(data){
-						case '0': return "<div class='row'><div class='col-12'>Active<div></div>";
-						case '1': return "<div class='row'><div class='col-12'>InActive<div></div>";
-						case '2': return "<div class='row'><div class='col-12'>Demolished<div></div>";
-					}
-				}
-			},{
-				data : 'Ticket_ID',
-			/*	render : function( data, type, row, meta ){
-					switch ( type ){
-						case 'display' :
-							return row.Ticket_ID !== null
-								?	"<div class='row'>" +
-								"<div class='col-12'><a href='ticket.php?ID=" + row.Ticket_ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i>Ticket #" + row.Ticket_ID + "</a></div>" +
-								"<div class='col-12'>" + row.Ticket_Date + "</div>" +
-								"</div>"
-								: 	null;
-						default :
-							return data;
-
-					}
-				}*/
-			}
+			<?php \singleton\datatables::getInstance( )->ID('unit.php','Unit');?>,
+			<?php \singleton\datatables::getInstance( )->UnitName();?>,			
+			<?php \singleton\datatables::getInstance( )->CustomerID();?>,
+			<?php \singleton\datatables::getInstance( )->LocationID();?>,
+			<?php \singleton\datatables::getInstance( )->UnitType();?>,
+			<?php \singleton\datatables::getInstance( )->UnitStatus();?>,
+			<?php \singleton\datatables::getInstance( )->TicketID();?>
 		],
 	    initComplete : function( ){
 	        $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'

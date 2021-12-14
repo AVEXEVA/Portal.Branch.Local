@@ -1,3 +1,10 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
+
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -85,45 +92,11 @@ $( document ).ready( function( ){
       }
     },
     columns: [
-      {
-          className : 'ID',
-          data : 'ID',
-          render : function( data, type, row, meta ){
-              switch( type ){
-                  case 'display' :
-                      return  row.ID !== null
-                          ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='employee.php?ID=" + row.ID + "'><i class='fa fa-folder-open fa-fw fa-1x'></i> Employee #" + row.ID + "</a></div>" +
-                              "</div>"
-                          :   null;
-                  default :
-                      return data;
-              }
-
-          }
-      },{
-          data : 'First_Name'
-      },{
-          data : 'Last_Name'
-      },{
-          data : 'Supervisor'
-      },{
-        className : 'GPSLocation',
-        searchable: false,
-        render : function( data, type, row, meta ){
-            switch( type ){
-                case 'display' :
-                    return  (row.Latittude !== null && row.Longitude !== null)
-                        ?   "<div class='row'>" +
-                                "<div class='col-12'><a href='https://www.google.com/maps/search/?api=1&query=" + row.Latitude + "," + row.Longitude + "' target='_blank' ><i class='fa fa-map-marker'></i> GPS </a></div>" +
-                            "</div>"
-                        :   null;
-                default :
-                    return data;
-            }
-
-        }
-    }
+        <?php \singleton\datatables::getInstance( )->ID('employee.php','Employee');?>,
+        <?php \singleton\datatables::getInstance( )->FirstName( );?>,
+        <?php \singleton\datatables::getInstance( )->LastName( );?>,
+        <?php \singleton\datatables::getInstance( )->Supervisor( );?>,
+        <?php \singleton\datatables::getInstance( )->GPSLocation( );?>,
     ],
     buttons: [
         {
