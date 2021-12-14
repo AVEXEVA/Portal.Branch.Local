@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php  
+  <?php
     $_GET[ 'Bootstrap' ] = '5.1';
     $_GET[ 'Entity_CSS' ] = 1;
     require( bin_meta . 'index.php');
@@ -148,14 +148,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <th class='text-white border border-white' title='Collection'><?php \singleton\fontawesome::getInstance( )->Collection();?>Collection</th>
                 <th class='text-white border border-white' title='Invoices'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</th>
     			    </tr><tr class='form-desktop'>
-  							<th class='text-white border border-white' title='ID'><input class='redraw' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                <th class='text-white border border-white' title='Name'><input class='redraw' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-  							<th class='text-white border border-white' title='Location'><input class='redraw' type='text' name='Location' placeholder='Locatins' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
-  							<th class='text-white border border-white' title='Unit'><input class='redraw' type='text' name='Unit' placeholder='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null;?>' /></th>
-  							<th class='text-white border border-white' title='Lead'><input class='redraw' type='text' name='Lead' placeholder='Leads' value='<?php echo isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null;?>' /></th>
-                <th class='text-white border border-white' title='Proposal'><input class='redraw' type='text' name='Proposal' placeholder='Proposal' value='<?php echo isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null;?>' /></th>
-                <th class='text-white border border-white' title='Collection'><input class='redraw' type='text' name='Collection' placeholder='Collection' value='<?php echo isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null;?>' /></th>
-                <th class='text-white border border-white' title='Invoice'><input class='redraw' type='text' name='Invoice' placeholder='Invoice' value='<?php echo isset( $_GET[ 'Invoice' ] ) ? $_GET[ 'Invoice' ] : null;?>' /></th>
+    							<th class='text-white border border-white' title='ID'><input class='redraw' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
+                  <th class='text-white border border-white' title='Name'><input class='redraw' type='text' name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
+    							<th class='text-white border border-white' title='Location'><input class='redraw' type='text' name='Location' placeholder='Locatins' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
+    							<th class='text-white border border-white' title='Unit'><input class='redraw' type='text' name='Unit' placeholder='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null;?>' /></th>
+    							<th class='text-white border border-white' title='Lead'><input class='redraw' type='text' name='Lead' placeholder='Leads' value='<?php echo isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null;?>' /></th>
+                  <th class='text-white border border-white' title='Proposal'><input class='redraw' type='text' name='Proposal' placeholder='Proposal' value='<?php echo isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null;?>' /></th>
+                  <th class='text-white border border-white' title='Collection'><input class='redraw' type='text' name='Collection' placeholder='Collection' value='<?php echo isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null;?>' /></th>
+                  <th class='text-white border border-white' title='Invoice'><input class='redraw' type='text' name='Invoice' placeholder='Invoice' value='<?php echo isset( $_GET[ 'Invoice' ] ) ? $_GET[ 'Invoice' ] : null;?>' /></th>
+
               </tr></thead>
             </table>
     		  </div>

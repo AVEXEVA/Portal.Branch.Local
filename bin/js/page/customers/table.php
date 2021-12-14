@@ -93,7 +93,7 @@ $( document ).ready( function( ){
             }
         },
         columns: [
-            <?php \singleton\datatables::getInstance( )->ID( );?>,
+            <?php \singleton\datatables::getInstance( )->ID('customer.php','Customer');?>,
             <?php \singleton\datatables::getInstance( )->Name( );?>,
             <?php \singleton\datatables::getInstance( )->Status( );?>,
             <?php \singleton\datatables::getInstance( )->Locations( );?>,
