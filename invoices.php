@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='card-body bg-darker'>
                     <table id='Table_Invoices' class='display' cellspacing='0' width='100%'>
                         <thead class='text-white border border-white'>
-                          <?php<tr>
+                          <?php
                           \singleton\table::getInstance( )->th( 'Invoice', 'Invoice' );
                           \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
                           \singleton\table::getInstance( )->th( 'Location', 'Location' );
