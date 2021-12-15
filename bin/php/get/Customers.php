@@ -138,12 +138,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           0 =>  'Customer.ID',
           1 =>  'Customer.Name',
           2 =>  'Customer.Status',
-          3 =>  'Customer_Locations.Count',
-          4 =>  'Customer_Units.Count',
-          5 =>  'Customer_Jobs.Count',
-          6 =>  'Customer_Tickets.Count',
-          7 =>  'Customer_Violations.Count',
-          8 =>  'Customer_Invoices.Count'
+          3 =>  'Locations.Count',
+          4 =>  'Units.Count',
+          5 =>  'Jobs.Count',
+          6 =>  'Tickets.Count',
+          7 =>  'Violations.Count',
+          8 =>  'Invoices.Count'
         );
         $Order = isset( $Columns[ $_GET['order']['column'] ] )
             ? $Columns[ $_GET['order']['column'] ]
@@ -159,13 +159,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 Customer.Name,
                                 CASE    WHEN Customer.Status = 0 THEN 'Enabled'
                                         WHEN Customer.Status = 1 THEN 'Disabled'
-                                END AS Status,
-                                Customer_Locations.Count AS Locations,
-                                Customer_Units.Count AS Units,
-                                Customer_Jobs.Count AS Jobs,
-                                Customer_Tickets.Count AS Tickets,
-                                Customer_Violations.Count AS Violations,
-                                Customer_Invoices.Count AS Invoices
+                                        ELSE 'Error' END AS Status,
+                                CASE    WHEN Locations.Count IS NULL THEN 0 
+                                        ELSE Locations.Count END AS Locations,
+                                CASE    WHEN Units.Count IS NULL THEN 0
+                                        ELSE Units.Count END AS Units,
+                                CASE    WHEN Jobs.Count IS NULL THEN 0 
+                                        ELSE Jobs.Count END AS Jobs,
+                                CASE    WHEN Tickets.Count IS NULL THEN 0
+                                        ELSE Tickets.Count END AS Tickets,
+                                CASE    WHEN Violations.Count IS NULL THEN 0
+                                        ELSE Violations.Count END AS Violations,
+                                CASE    WHEN Invoices.Count IS NULL THEN 0
+                                        ELSE Invoices.Count END AS Invoices
                         FROM    (
                                     SELECT  Owner.ID,
                                             Rol.Name,
@@ -178,40 +184,40 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 COUNT( Location.Loc ) AS Count
                                     FROM        Loc AS Location
                                     GROUP BY    Location.Owner
-                                ) AS Customer_Locations ON Customer_Locations.Customer = Customer.ID
+                                ) AS Locations ON Locations.Customer = Customer.ID
                                 LEFT JOIN (
                                     SELECT      Unit.Owner  AS Customer,
                                                 COUNT( Unit.ID ) AS Count
                                     FROM        Elev AS Unit
                                     GROUP BY    Unit.Owner
-                                ) AS Customer_Units ON Customer_Units.Customer = Customer.ID
+                                ) AS Units ON Units.Customer = Customer.ID
                                 LEFT JOIN (
                                     SELECT      Job.Owner  AS Customer,
                                                 COUNT( Job.ID ) AS Count
                                     FROM        Job AS Job
                                     GROUP BY    Job.Owner
-                                ) AS Customer_Jobs ON Customer_Jobs.Customer = Customer.ID
+                                ) AS Jobs ON Jobs.Customer = Customer.ID
                                 LEFT JOIN (
                                     SELECT      Job.Owner  AS Customer,
                                                 COUNT( Ticket.ID ) AS Count
                                     FROM        TicketD AS Ticket
                                                 LEFT JOIN Job ON Ticket.Job = Job.ID
                                     GROUP BY    Job.Owner
-                                ) AS Customer_Tickets ON Customer_Tickets.Customer = Customer.ID
+                                ) AS Tickets ON Tickets.Customer = Customer.ID
                                 LEFT JOIN (
                                     SELECT      Job.Owner  AS Customer,
                                                 COUNT( Violation.ID ) AS Count
                                     FROM        Violation AS Violation
                                                 LEFT JOIN Job ON Violation.Job = Job.ID
                                     GROUP BY    Job.Owner
-                                ) AS Customer_Violations ON Customer_Violations.Customer = Customer.ID
+                                ) AS Violations ON Violations.Customer = Customer.ID
                                 LEFT JOIN (
                                     SELECT      Job.Owner  AS Customer,
                                                 COUNT( Invoice.Ref ) AS Count
                                     FROM        Invoice AS Invoice
                                                 LEFT JOIN Job ON Invoice.Job = Job.ID
                                     GROUP BY    Job.Owner
-                                ) AS Customer_Invoices ON Customer_Invoices.Customer = Customer.ID
+                                ) AS Invoices ON Invoices.Customer = Customer.ID
                         WHERE   {$conditions}
                     ) AS Tbl
                     WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
@@ -236,40 +242,40 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     COUNT( Location.Loc ) AS Count
                         FROM        Loc AS Location
                         GROUP BY    Location.Owner
-                    ) AS Customer_Locations ON Customer_Locations.Customer = Customer.ID
+                    ) AS Locations ON Locations.Customer = Customer.ID
                     LEFT JOIN (
                         SELECT      Unit.Owner  AS Customer,
                                     COUNT( Unit.ID ) AS Count
                         FROM        Elev AS Unit
                         GROUP BY    Unit.Owner
-                    ) AS Customer_Units ON Customer_Units.Customer = Customer.ID
+                    ) AS Units ON Units.Customer = Customer.ID
                     LEFT JOIN (
                         SELECT      Job.Owner  AS Customer,
                                     COUNT( Job.ID ) AS Count
                         FROM        Job AS Job
                         GROUP BY    Job.Owner
-                    ) AS Customer_Jobs ON Customer_Jobs.Customer = Customer.ID
+                    ) AS Jobs ON Jobs.Customer = Customer.ID
                     LEFT JOIN (
                         SELECT      Job.Owner  AS Customer,
                                     COUNT( Ticket.ID ) AS Count
                         FROM        TicketD AS Ticket
                                     LEFT JOIN Job ON Ticket.Job = Job.ID
                         GROUP BY    Job.Owner
-                    ) AS Customer_Tickets ON Customer_Tickets.Customer = Customer.ID
+                    ) AS Tickets ON Tickets.Customer = Customer.ID
                     LEFT JOIN (
                         SELECT      Job.Owner  AS Customer,
                                     COUNT( Violation.ID ) AS Count
                         FROM        Violation AS Violation
                                     LEFT JOIN Job ON Violation.Job = Job.ID
                         GROUP BY    Job.Owner
-                    ) AS Customer_Violations ON Customer_Violations.Customer = Customer.ID
+                    ) AS Violations ON Violations.Customer = Customer.ID
                     LEFT JOIN (
                         SELECT      Job.Owner  AS Customer,
                                     COUNT( Invoice.Ref ) AS Count
                         FROM        Invoice AS Invoice
                                     LEFT JOIN Job ON Invoice.Job = Job.ID
                         GROUP BY    Job.Owner
-                    ) AS Customer_Invoices ON Customer_Invoices.Customer = Customer.ID
+                    ) AS Invoices ON Invoices.Customer = Customer.ID
             WHERE   {$conditions};";
 
         $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
