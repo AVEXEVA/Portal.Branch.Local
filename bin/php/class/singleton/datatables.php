@@ -27,7 +27,7 @@ class datatables extends \singleton\index {
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control redraw' />" );
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-            search( this );
+            //search( this );
             $( '.redraw' ).bind( 'change', function(){ Table_<?php echo ucfirst( $reference );?>.draw(); });
         }<?php
     }
@@ -137,7 +137,7 @@ class datatables extends \singleton\index {
     public function data_column( $column ){?>{ data : '<?php echo $column;?>' }<?php }
 
     //Columns
-    public function data_column_link( $reference, $key ){
+    public function data_column_id( $reference, $key ){
         ?>{
           className : '<?php echo $key;?>',
           data : '<?php echo $key;?>',
@@ -147,6 +147,24 @@ class datatables extends \singleton\index {
                       return  row.<?php echo $key;?> !== null
                           ?   "<div class='row'>" +
                                   "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
+      }<?php
+    }
+    public function data_column_link( $reference, $key ){
+        ?>{
+          className : '<?php echo $key;?>',
+          data : '<?php echo $key;?>',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.<?php echo $key;?> !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -207,7 +225,7 @@ class datatables extends \singleton\index {
     }
 	
     //Columns
-    public function ID( $reference ){ self::data_column_link( $reference, 'ID' ); }
+    public function ID( $reference ){ self::data_column_id( $reference, 'ID' ); }
     public function Name( $reference ){ self::data_column_link( $reference, 'Name' ); }
     public function Date( ){
         ?>{
@@ -351,7 +369,26 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Territory_ID !== null
                             ?   "<div class='row'>" +
-                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" +
+                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><?php \singleton\fontawesome::getInstance( )->territory( 1 );?>" + row.Territory_Name + "</a></div>" +
+                            "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
+    public function Contact( ){
+        ?>{
+            data : 'Contact_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Contact_ID !== null
+                            ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><?php \singleton\fontawesome::getInstance( )->Contact( 1 );?>" + row.Contact_Name + "</a></div>" +
                             "</div>"
                             :   null;
                     default :

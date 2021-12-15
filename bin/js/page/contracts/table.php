@@ -55,7 +55,7 @@ $( document ).ready( function() {
       <?php \singleton\datatables::getInstance( )->ajax_data( );?>
     },
     columns: [
-      <?php \singleton\datatables::getInstance( )->ID('contract.php','Contract');?>,
+      <?php \singleton\datatables::getInstance( )->ID( 'Contact' );?>,
       <?php \singleton\datatables::getInstance( )->Customer( );?>,
       <?php \singleton\datatables::getInstance( )->Location( );?>,
       <?php \singleton\datatables::getInstance( )->Job( );?>,
