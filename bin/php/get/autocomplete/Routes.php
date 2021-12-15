@@ -94,7 +94,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   tbl.FieldName,
                   tbl.FieldValue
           FROM    (
-                    SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+                    SELECT  insRowTbl.ID,
+                            attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                             attr.insRow.value('.', 'nvarchar(max)') as FieldValue
                     FROM    ( Select i.ID,  convert(xml, (select i.* for xml raw)) as insRowCol
                               FROM ( (

@@ -42,7 +42,7 @@ class datatables extends \singleton\index {
                     dir : d.order[0].dir
                 }
             };
-            $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){
+            $( "input:visible, input[type='hidden'], select:visible, textarea:visible" ).each( function( ){ 
                 if( d[ $( this ).attr( 'Name' ) ] === undefined ){
                     d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
                 }
@@ -468,13 +468,13 @@ class datatables extends \singleton\index {
 
     public function data_column_count( $key, $Reference, $Reference_Key, $icon = 'blank' ){
         ?>{
-            data : '<?php echo $key;?>',
+            data : '<?php echo ucfirst( $key );?>',
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return  row.<?php echo $key;?> !== null
+                        return  row.<?php echo ucfirst( $key );?> !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo $key;?> + " </a></div>" +
+                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $key;?></a></div>" +
                                 "</div>"
                             :   null;
                     default :
