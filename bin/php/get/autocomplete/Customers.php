@@ -121,30 +121,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     $sQuery =
       " SELECT  Top 10
-              tbl.ID,
-              tbl.FieldName,
-              tbl.FieldValue
+                tbl.ID,
+                tbl.FieldName,
+                tbl.FieldValue
         FROM    (
-                SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+                SELECT  insRowTbl.ID,
+                        attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                         attr.insRow.value('.', 'nvarchar(max)') as FieldValue
-                FROM    ( Select i.ID  convert(xml, (select i.* for xml raw)) as insRowCol
+                FROM    ( Select  i.ID,
+                                  convert(xml, (select i.* for xml raw)) as insRowCol
                           FROM ( (
                             SELECT  Customer.ID,
                                     Customer.Name
-                        FROM    (
-                                    SELECT  Owner.ID,
-                                            Rol.Name,
-                                            Owner.Status
-                                    FROM    Owner
-                                            LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                                ) AS Customer
-                            WHERE   ({$conditions}) AND ({$search})
+                            FROM    (
+                                      SELECT  Owner.ID,
+                                              Rol.Name,
+                                              Owner.Status
+                                      FROM    Owner
+                                              LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                                    ) AS Customer
+                            WHERE     ({$conditions}) 
+                                  AND ({$search})
                           ) ) as i
                    ) as insRowTbl
-              CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
-            ) AS tbl
+                  CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
+                ) AS tbl
       WHERE     tbl.FieldValue LIKE '%' + ? + '%'
-      GROUP BY tbl.ID,  tbl.FieldName, tbl.FieldValue;;";
+      GROUP BY  tbl.ID,  
+                tbl.FieldName, 
+                tbl.FieldValue;";
 
     $rResult = $database->query(
       null,

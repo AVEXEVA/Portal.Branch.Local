@@ -369,8 +369,46 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Territory_ID !== null
                             ?   "<div class='row'>" +
-                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><?php \singleton\fontawesome::getInstance( )->territory( 1 );?>" + row.Territory_Name + "</a></div>" +
-                            "</div>"
+                                    "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><?php \singleton\fontawesome::getInstance( )->Territory( 1 );?>" + row.Territory_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
+    public function Division( ){
+        ?>{
+            data : 'Division_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Division_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'><?php \singleton\fontawesome::getInstance( )->Division( 1 );?>" + row.Division_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
+    public function Route( ){
+        ?>{
+            data : 'Route_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Route_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='route.php?ID=" + row.Route_ID + "'><?php \singleton\fontawesome::getInstance( )->Route( 1 );?>" + row.Route_Name + "</a></div>" +
+                                "</div>"
                             :   null;
                     default :
                         return data;
