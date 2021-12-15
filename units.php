@@ -93,53 +93,45 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
     <div id='wrapper'>
         <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
       <div class="card card-full card-primary border-0">
         <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?> Units</h4></div>
+        <div class='mobile card-body bg-dark text-white'><form action='units.php'>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Last_Ticket', isset( $_GET[ 'Last_Ticket' ] ) ? $_GET[ 'Last_Ticket' ] : null, false, false, false, 'redraw' );?>
+        </div>
         <div class='card-body bg-dark'>
           <table id='Table_Units' class='display' cellspacing='0' width='100%'>
-            <thead><tr class='text-center'>
-              <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-              <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->User();?>Name</th>
-              <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-              <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
-              <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
-              <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
-              <th class='text-white border border-white' title='Last Ticket'><?php \singleton\fontawesome::getInstance( )->Ticket();?>Last Ticket</th>
-            </tr><tr>
-              <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID'  /></th>
-              <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text' name='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null; ?>' placeholder='Name' /></th>
-              <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null; ?>' placeholder='Customer' /></th>
-              <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null; ?>' placeholder='Location' /></th>
-              <th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
-                                <option value=''>Select</option>
-                                <?php
-                                  $result = \singleton\database::getInstance()->query(
-                                    null,
-                                    " SELECT    Elev.Type
-                                      FROM    Elev
-                                      GROUP BY  Elev.Type;",
-                                  );
-                                  if( $result ){while ($row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){?><option value='<?php echo $row['Type'];?>'><?php echo $row['Type'];?></option><?php }}
-                                ?>
-                            </select></th>
-              <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
-                <option value=''>Select</option>
-                <option value='0'>Active</option>
-                <option value='1'>Inactive</option>
-                <option value='2'>Demolished</option>
-              </select></th>
-              <th><input class='form-control' type='text' value='disabled' disabled='disabled' name='Ticket_ID'/></th>
-            </tr></thead>
+            <thead class='text-white border border-white'> <?php
+            \singleton\table::getInstance( )->th( 'ID', 'ID' );
+            \singleton\table::getInstance( )->th( 'Name', 'Name' );
+            \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+            \singleton\table::getInstance( )->th( 'Location', 'Location' );
+            \singleton\table::getInstance( )->th( 'Type', 'Type' );
+            \singleton\table::getInstance( )->th( 'Status', 'Status' );
+            \singleton\table::getInstance( )->th( 'Last_Ticket', 'Last_Ticket' );
+            ?><tr class='desktop'><?php
+            \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Ticket_ID', isset( $_GET[ 'Ticket_ID' ] ) ? $_GET[ 'Ticket_ID' ] : null );
+            ?> </tr></thead>
           </table>
-        </div>
-            </div>
-        </div>
+        </form></div>
+      </div>
     </div>
+  </div>
 </body>
 </html>
 <?php
