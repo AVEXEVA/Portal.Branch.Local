@@ -86,12 +86,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-  <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-     <?php	require( bin_meta . 'index.php');?>
-     <?php	require( bin_css  . 'index.php');?>
-     <?php  require( bin_js   . 'index.php');?>
+    <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
+    <?php 
+        $_GET[ 'Bootstrap' ] = '5.1';
+        $_GET[ 'Entity_CSS' ] = 1;
+        require( bin_meta . 'index.php');
+        require( bin_css  . 'index.php');
+        require( bin_js   . 'index.php');
+    ?>
 </head>
 <body>
     <div id='wrapper'>
@@ -100,36 +102,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Users( 1 );?> Employees</h4></div>
                 <div class="mobile card-body bg-dark text-white"><form method='GET' action='routes.php'>
-                    <div class='row'>
-                        <div class='col-xs-4'>Search:</div>
-                        <div class='col-xs-8'><input type='text' name='Search' placeholder='Search' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Name:</div>
-                        <div class='col-xs-8'><input type='text' name='Name' placeholder='Name' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-4'>Person:</div>
-                        <div class='col-xs-8'><input type='text' name='Person' placeholder='Person' onChange='redraw( );' /></div>
-                    </div>
-                    <div class='row'><div class='col-xs-12'>&nbsp;</div></div>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
                 </form></div>
                 <div class="card-body bg-dark">
                     <table id='Table_Employees' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
-                            <th class='text-white border border-white' title='Work_ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>Work ID</th>
-                            <th class='text-white border border-white' title='First Name'><?php \singleton\fontawesome::getInstance( )->User();?>First Name</th>
-                            <th class='text-white border border-white' title='Last Name'><?php \singleton\fontawesome::getInstance( )->User();?>Last Name</th>
-                            <th class='text-white border border-white' title='Supervisor'><?php \singleton\fontawesome::getInstance( )->Admin();?>Supervisor</th>
-                            <th class='text-white border border-white' title='GPSLocation'><?php \singleton\fontawesome::getInstance( )->Admin();?>GPS</th>
-                        </tr><tr class='desktop'>
-                            <th title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' placeholder='ID' /></th>
-                            <th title='Last Name'><input class='redraw form-control' type='text' name='Last_Name' value='<?php echo isset( $_GET[ 'Last Name' ] ) ? $_GET[ 'Last Name' ] : null; ?>' placeholder='First Name' /></th>
-                            <th title='First Name'><input class='redraw form-control' type='text' name='First_Name' value='<?php echo isset( $_GET[ 'First Name' ] ) ? $_GET[ 'First Name' ] : null; ?>' placeholder='Last Name' /></th>
-                            <th title='Supervisor'><input class='redraw form-control' type='text' name='Supervisor' value='<?php echo isset( $_GET[ 'Supervisor' ] ) ? $_GET[ 'Supervisor' ] : null; ?>' placeholder='Supervisor' /></th>
-                            <th title='GPSLocation'><input class='redraw form-control' type='text' name='GPSLocation' value='<?php echo isset( $_GET[ 'GPSLocation' ] ) ? $_GET[ 'GPSLocation' ] : null; ?>' placeholder='GPSLocation' /></th>
-                        </tr></thead>
+                        <thead><tr><?php 
+                            \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                            \singleton\table::getInstance( )->th( 'First_Name', 'First_Name' );
+                            \singleton\table::getInstance( )->th( 'Last_Name', 'Last_Name' );
+                            \singleton\table::getInstance( )->th( 'Supervisor', 'Supervisor' );
+                            \singleton\table::getInstance( )->th( 'GPSLocation', 'GPSLocation' );
+                        ?></tr><tr class='desktop'><?php 
+                            \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'First_Name', isset( $_GET[ 'First_Name' ] ) ? $_GET[ 'First_Name' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Last_Name', isset( $_GET[ 'Last_Name' ] ) ? $_GET[ 'Last_Name' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Supervisor', isset( $_GET[ 'Supervisor' ] ) ? $_GET[ 'Supervisor' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'GPSLocation', isset( $_GET[ 'GPSLocation' ] ) ? $_GET[ 'GPSLocation' ] : null );
+                        ?></tr></thead>
                     </table>
                 </div>
             </div>

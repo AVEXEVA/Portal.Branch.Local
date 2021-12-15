@@ -149,7 +149,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			            	            Customer.Name 	  	AS Customer_Name,
 			            	            Lead.Probability  	AS Probability,
 			            	            Lead.Level        	AS Level,
-			            	            Lead.Status 		AS Status,
 			            	            CASE  	WHEN Lead.Status = 0 THEN 'Open'
 			            	            		WHEN Lead.Status = 1 THEN 'Canceled'
 			            	            		WHEN Lead.Status = 2 THEN 'Withdrawn'
@@ -158,10 +157,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			            	            		WHEN Lead.Status = 5 THEN 'Award Competitor'
 			            	            END AS Status,
 			            	            Lead.Type 		    AS Type,
-			            	            Lead.Address      AS Street,
-			            	            Lead.City         AS City,
-			            	            Lead.State        AS State,
-			            	            Lead.Zip          AS Zip
+			            	            Lead.Address      	AS Street,
+			            	            Lead.City         	AS City,
+			            	            Lead.State        	AS State,
+			            	            Lead.Zip          	AS Zip
 			                  	FROM    Lead
 			                  			LEFT JOIN (
 					                        SELECT  Owner.ID,
@@ -170,8 +169,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					                        FROM    Owner
 					                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
 					                    ) AS Customer ON Lead.Owner = Customer.ID
-                              LEFT JOIN Rol AS Rolodex ON Lead.Rol = Rolodex.ID
-			                  	WHERE   ({$conditions}) AND ({$search})
+					                    LEFT JOIN Rol AS Rolodex ON Lead.Rol = Rolodex.ID
+			                  	WHERE   	({$conditions}) 
+			                  			AND ({$search})
 		             		) AS Tbl
 		            WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
 		$rResult = \singleton\database::getInstance( )->query(
@@ -181,7 +181,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    ) or die(print_r(sqlsrv_errors()));
 
 	    $sQueryRow = "	SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-	            	            Lead.ID           AS ID,
+	            	            Lead.ID           AS ID
 	                  	FROM    Lead
 	                  			LEFT JOIN (
 			                        SELECT  Owner.ID,

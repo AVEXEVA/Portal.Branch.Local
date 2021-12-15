@@ -91,10 +91,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
     <div id='wrapper'>
         <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
                 <div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Customers</h4></div>
@@ -124,7 +123,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       ?></tr>
                           <tr class='desktop'><?php
                           \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'name', isset( $_GET[ 'name' ] ) ? $_GET[ 'name' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
