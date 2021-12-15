@@ -100,136 +100,46 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id="page-wrapper" class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Tickets</h4></div>
-                <div class="mobile card-body bg-dark text-white"><form method='GET' action='locations.php'>                  
-                  <div class='row'>
-                      <div class='col-4'>Search:</div>
-                      <div class='col-8'><input type='text' name='Search' placeholder='Search' class='redraw form-input' /></div>
-                  </div>
-                  <div class='row'><div class='col-12'>&nbsp;</div></div>
-                  <div class='row'>
-                    <div class='col-4'>Person:</div>
-                    <div class='col-8'><input type='text' name='Person' placeholder='Person' class='redraw form-input' value='<?php echo $_GET[ 'Person' ];?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Customer:</div>
-                    <div class='col-8'><input type='text' name='Customer' placeholder='Customer' class='redraw form-input' value='<?php echo $_GET[ 'Customer' ];?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Location:</div>
-                    <div class='col-8'><input type='text' name='Location' placeholder='Location' class='redraw form-input' value='<?php echo $_GET[ 'Location' ];?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Unit:</div>
-                    <div class='col-8'><input type='text' name='Unit' placeholder='Unit' class='redraw form-input' value='<?php echo $_GET[ 'Unit' ];?>' /></div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-4'>Job:</div>
-                    <div class='col-8'><input type='text' name='Job' placeholder='Job' class='redraw form-input' value='<?php echo $_GET[ 'Job' ];?>' /></div>
-                  </div>
-                </form></div>
+                <div class="mobile card-body bg-dark text-white"><form action='locations.php'>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Person', isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Unit', isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null, false, false, false, 'redraw' );?>
+                </div>
                 <div class="card-body bg-dark">
                     <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
-                        <thead><tr class='text-center'>
-                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-                            <th class='text-white border border-white' title='Person'><?php \singleton\fontawesome::getInstance( )->User();?>Person</th>
-                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
-                            <th class='text-white border border-white' title='Unit'><?php \singleton\fontawesome::getInstance( )->Unit();?>Unit</th>
-                            <th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Job</th>
-                            <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
-                            <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
-                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
-                            <th class='text-white border border-white' title='En Route'><?php \singleton\fontawesome::getInstance( )->Route();?>En Route</th>
-                            <th class='text-white border border-white' title='On Site'><?php \singleton\fontawesome::getInstance( )->Sitemap();?>On Site</th>
-                            <th class='text-white border border-white' title='Completed'><?php \singleton\fontawesome::getInstance( )->Description();?>Completed</th>
-                            <th class='text-white border border-white' title='Hours'><?php \singleton\fontawesome::getInstance( )->Hours();?>Hours</th>
-                            <th class='text-white border border-white' title='LSD'><?php \singleton\fontawesome::getInstance( )->Violation();?>LSD</th>
-
-                        </tr><tr class='form-desktop'>
-                            <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Person'><input class='redraw form-control' type='text' placeholder='Person' name='Person' value='<?php echo isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text' placeholder='Customer' name='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text'  placeholder='Location ' name='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Unit'><input class='redraw form-control' type='text' placeholder='Unit'  name='Unit' value='<?php echo isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Job'><input class='redraw form-control' type='text' name='Job'  placeholder='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Type'>
-                                <div class='row'>
-                                    <div class='col-12'><select class='redraw form-control' name='Type'>
-                                        <option value=''>Select</option><?php
-                                        $Types = array( );
-                                        $result = $database->query(
-                                            null,
-                                            "   SELECT  JobType.ID,
-                                                        JobType.Type
-                                                FROM    JobType;",
-                                        );
-                                        if( $result ) { while( $row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-                                            ?><option value='<?php echo $row[ 'ID' ];?>' <?php echo isset( $_GET[ 'Type' ] ) && !empty( $_GET[ 'Type' ] )  && $_GET[ 'Type' ] == $row[ 'ID' ] ? "selected='selected'" : null;?>><?php echo $row[ 'Type' ];?></option><?php
-                                        }}
-                                    ?></select></div>
-                                    <div class='col-12'><select class='redraw form-control' name='Level'>
-                                        <option value=''>Select</option><?php
-                                        $Levels = array(
-                                            1  => 'Service Call',
-                                            2  => 'Trucking',
-                                            3  => 'Modernization',
-                                            4  => 'Violations',
-                                            5  => 'Level 5',
-                                            6  => 'Repair',
-                                            7  => 'Annual',
-                                            8  => 'Escalator',
-                                            9  => 'Email',
-                                            10 => 'Maintenance',
-                                            11 => 'Survey',
-                                            12 => 'Engineering',
-                                            13 => 'Support',
-                                            14 => "M/R"
-                                        );
-                                        foreach( $Levels as $ID => $Level ){?><option value='<?php echo $ID;?>' <?php echo isset( $_GET[ 'Level' ] ) && !empty( $_GET[ 'Level' ] ) && $_GET[ 'Level' ] == $row[ 'ID' ] ? "selected='selected'" : null;?>><?php echo $Level;?></option><?php }
-                                    ?></select></div>
-                                </div>
-                            </th>
-                            <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
-                                <option value=''>Select</option>
-                                <option value='0' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 0 ? "selected='selected'" : null;?>>Unassigned</option>
-                                <option value='1' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 1 ? "selected='selected'" : null;?>>Assigned</option>
-                                <option value='2' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 2 ? "selected='selected'" : null;?>>En Route</option>
-                                <option value='3' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 3 ? "selected='selected'" : null;?>>On Site</option>
-                                <option value='6' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 6 ? "selected='selected'" : null;?>>Reviewing</option>
-                                <option value='4' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 4 ? "selected='selected'" : null;?>>Completed</option>
-                                <option value='5' <?php echo isset( $_GET[ 'Status' ] ) && !empty( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 5 ? "selected='selected'" : null;?>>On Hold</option>
-                            </select></th>
-                            <th class='text-white border border-white' title='Date'>
-                                <div class='row g-0'>
-                                    <input class='col-12 date redraw form-control' type='text' placeholder='Start Date' name='Start_Date' value='<?php echo isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null;?>' />
-                                    <input class='col-12 date redraw form-control' type='text' placeholder='End Date' name='End_Date' value='<?php echo isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null;?>' />
-                                </div>
-                            </th>
-                            <th class='text-white border border-white' title='Time Route'>
-                                <div class='row g-0'>
-                                    <div class='col-12'><input class='redraw time form-control' placeholder='Start Route Time' type='text' name='Time_Route_Start' value='<?php echo isset( $_GET[ 'Time_Route_Start' ] ) ? $_GET[ 'Time_Route_Start' ] : null;?>' /></div>
-                                    <div class='col-12'><input class='redraw time form-control' placeholder='End Route Time' type='text' name='Time_Route_End' value='<?php echo isset( $_GET[ 'Time_Route_End' ] ) ? $_GET[ 'Time_Route_End' ] : null;?>' /></div>
-                                </div>
-                            </th>
-                            <th class='text-white border border-white' title='Time Site'>
-                                <div class='row g-0'>
-                                    <div class='col-12'><input class='redraw time form-control' placeholder='Start Site Time' type='text' name='Time_Site_Start' value='<?php echo isset( $_GET[ 'Time_Site_Start' ] ) ? $_GET[ 'Time_Site_Start' ] : null;?>' /></div>
-                                    <div class='col-12'><input class='redraw time form-control' placeholder='End Site Time' type='text' name='Time_Site_End' value='<?php echo isset( $_GET[ 'Time_Site_End' ] ) ? $_GET[ 'Time_Site_End' ] : null;?>' /></div>
-                                </div>
-                            </th>
-                            <th class='text-white border border-white' title='Time Completed'>
-                                <div class='row g-0'>
-                                    <div class='col-12'><input class='redraw time form-control' placeholder='Start Completed Time' type='text' name='Time_Completed_Start' value='<?php echo isset( $_GET[ 'Time_Completed_Start' ] ) ? $_GET[ 'Time_Completed_Start' ] : null;?>' /></div>
-                                    <div class='col-12'><input class='redraw time form-control' placeholder='End Completed Time' type='text' name='Time_Completed_End' value='<?php echo isset( $_GET[ 'Time_Completed_End' ] ) ? $_GET[ 'Time_Completed_End' ] : null;?>' /></div>
-                                </div>
-                            </th>
-                            <th class='text-white border border-white' title='Hours'><input class='redraw form-control ' placeholder='Hours' type='text' name='Hours' /></th>
-                            <th class='text-white border border-white' title='Hours'><select class='redraw form-control' name='LSD'>
-                                <option value=''>Select</option>
-                                <option value='0' <?php echo isset( $_GET[ 'LSD' ] ) && $_GET[ 'LSD' ] && $_GET[ 'LSD' ] == 0 ? "selected='selected'" : null;?>>Running</option>
-                                <option value='1' <?php echo isset( $_GET[ 'LSD' ] ) && $_GET[ 'LSD' ] && $_GET[ 'LSD' ] == 0 ? "selected='selected'" : null;?>>Left Shutdown</option>
-                            </select></th>
-                        </tr></thead>
+                        <thead><tr class='text-center'><?php
+                          \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                          \singleton\table::getInstance( )->th( 'Person', 'Person' );
+                          \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+                          \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                          \singleton\table::getInstance( )->th( 'Unit', 'Unit' );
+                          \singleton\table::getInstance( )->th( 'Job', 'Job' );
+                          \singleton\table::getInstance( )->th( 'Type', 'Type' );
+                          \singleton\table::getInstance( )->th( 'Date', 'Date' );
+                          \singleton\table::getInstance( )->th( 'En_Route', 'En_Route' );
+                          \singleton\table::getInstance( )->th( 'On_Site', 'On_Site' );
+                          \singleton\table::getInstance( )->th( 'Completed', 'Completed' );
+                          \singleton\table::getInstance( )->th( 'Hours', 'Hours' );
+                          \singleton\table::getInstance( )->th( 'LSD', 'LSD' );
+                        ?></tr><tr class='desktop'><?php
+                        \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Person', isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Unit', isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'En_Route', isset( $_GET[ 'En_Route' ] ) ? $_GET[ 'En_Route' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'On_Site', isset( $_GET[ 'On_Site' ] ) ? $_GET[ 'On_Site' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Completed', isset( $_GET[ 'Completed' ] ) ? $_GET[ 'Completed' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Hours', isset( $_GET[ 'Hours' ] ) ? $_GET[ 'Hours' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'LSD', isset( $_GET[ 'LSD' ] ) ? $_GET[ 'LSD' ] : null );
+                        ?></tr></thead>
                     </table>
                 </div>
             </div>

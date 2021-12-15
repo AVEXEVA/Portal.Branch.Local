@@ -87,75 +87,61 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php
-    $_GET[ 'Bootstrap' ] = '5.1';
-    $_GET[ 'Entity_CSS' ] = 1;
-    require( bin_meta . 'index.php');
-    require( bin_css  . 'index.php');
-    require( bin_js   . 'index.php');
-  ?>
+     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
+     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
+     <?php	require( bin_meta . 'index.php');?>
+     <?php	require( bin_css  . 'index.php');?>
+     <?php  require( bin_js   . 'index.php');?>
 </head>
-<body>
-  <div id='wrapper'>
-    <?php require(bin_php . 'element/navigation.php');?>
-    <div id='page-wrapper' class='content'>
-      <div class='card card-full card-primary bg-dark text-white'>
-        <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</h4></div>
-				<div class='card-body mobile'><?php 
-          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
-          \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
-              'Customer', 'Customers',
-              isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
-              isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
-          );
-          \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
-              'Location', 'Locations',
-              isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
-              isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
-          );
-          \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
-              'Job', 'Jobs',
-              isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
-              isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null
-          );
-          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
-          \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
-          \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-          \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
-          \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
-          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );
-        ?></div>
-        <div class='card-body'>
-          <table id='Table_Invoices' class='display' cellspacing='0' width='100%'>
-            <thead>
-              <tr><?php
-                \singleton\table::getInstance( )->th( 'ID', 'ID' );
-                \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
-                \singleton\table::getInstance( )->th( 'Location', 'Location' );
-                \singleton\table::getInstance( )->th( 'Job', 'Job' );
-                \singleton\table::getInstance( )->th( 'Type', 'Type' );
-                \singleton\table::getInstance( )->th( 'Date', 'Date' );
-                \singleton\table::getInstance( )->th( 'Due', 'Due' );
-                \singleton\table::getInstance( )->th( 'Original', 'Original' );
-                \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
-                \singleton\table::getInstance( )->th( 'Description', 'Description' );
-              ?></tr><tr class='desktop'><?php
-                \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
-              ?></tr>
-            </thead>
-          </table>
-        </div>
+<body onload='finishLoadingPage();'>
+    <div id='wrapper'>
+        <?php require(bin_php.'element/navigation.php');?>
+        <?php require( bin_php . 'element/loading.php');?>
+        <div id='page-wrapper' class='content'>
+            <div class='card card-full card-primary bg-dark text-white'>
+                <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Invoices</h4></div>
+        				<div class='card-body mobile'><form action='invoices.php'>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null, false, false, false, 'redraw' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );?>
+                </div>
+                <div class='card-body bg-darker'>
+                    <table id='Table_Invoices' class='display' cellspacing='0' width='100%'>
+                        <thead class='text-white border border-white'>
+                          <?php
+                          \singleton\table::getInstance( )->th( 'Invoice', 'Invoice' );
+                          \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+                          \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                          \singleton\table::getInstance( )->th( 'Job', 'Job' );
+                          \singleton\table::getInstance( )->th( 'Type', 'Type' );
+                          \singleton\table::getInstance( )->th( 'Date', 'Date' );
+                          \singleton\table::getInstance( )->th( 'Due', 'Due' );
+                          \singleton\table::getInstance( )->th( 'Original', 'Original' );
+                          \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
+                          \singleton\table::getInstance( )->th( 'Description', 'Description' );
+                        ?><tr class='desktop'><?php
+                          \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                    ?></tr></thead>
+                  </table>
+              </div>
+          </div>
       </div>
-    </div>
   </div>
 </body>
 </html>
