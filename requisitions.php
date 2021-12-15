@@ -97,32 +97,44 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
     <?php require(bin_php . 'element/navigation.php');?>
     <div id='page-wrapper' class='content'>
-      <div class='card card-full card-primary border-0'>
+      <div class='card card-full card-primary bg-dark text-white'>
         <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?> Requisitions</h4></div>
-        <div class='card-body bg-dark'>
+        <div class='card-body mobile'><form action='requisitions.php'>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'User', isset( $_GET[ 'User' ] ) ? $_GET[ 'User' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Items', isset( $_GET[ 'Items' ] ) ? $_GET[ 'Items' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Required', isset( $_GET[ 'Required' ] ) ? $_GET[ 'Required' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Drop Off', isset( $_GET[ 'Drop Off' ] ) ? $_GET[ 'Drop Off' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Jobs', isset( $_GET[ 'Jobs' ] ) ? $_GET[ 'Jobs' ] : null, false, false, false, 'redraw' );?>
+        </div>
+        <div class='card-body bg-darker'>
           <table id='Table_Requisitions' class='display' cellspacing='0' width='100%'>
-              <thead><tr>
-  							<th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-  							<th class='text-white border border-white' title='User'><?php \singleton\fontawesome::getInstance( )->User();?>User</th>
-                <th class='text-white border border-white' title='Item'><?php \singleton\fontawesome::getInstance( )->List1();?>Items</th>
-  							<th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
-  							<th class='text-white border border-white' title='Required'><?php \singleton\fontawesome::getInstance( )->Description();?>Required</th>
-  							<th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
-  							<th class='text-white border border-white' title='Drop Off'><?php \singleton\fontawesome::getInstance( )->Location();?>Drop Off</th>
-  							<th class='text-white border border-white' title='Unit'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
-  							<th class='text-white border border-white' title='Job'><?php \singleton\fontawesome::getInstance( )->Job();?>Jobs</th>
-              </tr><tr>
-                <th><input type='text' class='form-control edit' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID'] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='User' placeholder='User' value='<?php echo isset( $_GET[ 'User'] ) ? $_GET[ 'User' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Item' placeholder='Item' value='<?php echo isset( $_GET[ 'Item'] ) ? $_GET[ 'Item' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date'] ) ? $_GET[ 'Date' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Required' placeholder='Required' value='<?php echo isset( $_GET[ 'Required'] ) ? $_GET[ 'Required' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location'] ) ? $_GET[ 'Location' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Drop Off' placeholder='Drop Off' value='<?php echo isset( $_GET[ 'Drop Off'] ) ? $_GET[ 'Drop Off' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Unit' placeholder='Unit' value='<?php echo isset( $_GET[ 'Unit'] ) ? $_GET[ 'Unit' ] : null;?>' /></th>
-                <th><input type='text' class='form-control edit' name='Job' placeholder='Job' value='<?php echo isset( $_GET[ 'Job'] ) ? $_GET[ 'Job' ] : null;?>' /></th>
-              </tr>
-						</thead>
+              <thead class='text-white border border-white'>
+                <?php
+                \singleton\table::getInstance( )->th( 'Proposal', 'Proposal' );
+                \singleton\table::getInstance( )->th( 'User', 'User' );
+                \singleton\table::getInstance( )->th( 'Item', 'Item' );
+                \singleton\table::getInstance( )->th( 'Calendar', 'Calendar' );
+                \singleton\table::getInstance( )->th( 'Description', 'Description' );
+                \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                \singleton\table::getInstance( )->th( 'Drop Off', 'Drop Off' );
+                \singleton\table::getInstance( )->th( 'Units', 'Units' );
+                \singleton\table::getInstance( )->th( 'Jobs', 'Jobs' );
+              ?></tr>
+              <tr class='desktop'><?php
+                \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                \singleton\table::getInstance( )->th_input( 'User', isset( $_GET[ 'User' ] ) ? $_GET[ 'User' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Item', isset( $_GET[ 'Item' ] ) ? $_GET[ 'Item' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Required', isset( $_GET[ 'Required' ] ) ? $_GET[ 'Required' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Drop Off', isset( $_GET[ 'Drop Off' ] ) ? $_GET[ 'Drop Off' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Unit', isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
+          ?></tr></thead>
           </table>
         </div>
       </div>
