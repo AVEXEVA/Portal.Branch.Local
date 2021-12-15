@@ -99,10 +99,10 @@ $( document ).ready( function( ){
       columns    : [
         <?php \singleton\datatables::getInstance( )->ID('violation.php','Violation');?>,
         <?php \singleton\datatables::getInstance( )->CustomerID();?>,
-        <?php \singleton\datatables::getInstance( )->Locations();?>,
+        <?php \singleton\datatables::getInstance( )->Locations('location.php','location');?>,
         <?php \singleton\datatables::getInstance( )->TicketDate();?>,
-        <?php \singleton\datatables::getInstance( )->Unit();?>,     
-        <?php \singleton\datatables::getInstance( )->UnitStatus();?>        
+        <?php \singleton\datatables::getInstance( )->Unit();?>,
+        <?php \singleton\datatables::getInstance( )->UnitStatus();?>
     ],
 
     initComplete : function( ){

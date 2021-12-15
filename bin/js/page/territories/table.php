@@ -85,6 +85,7 @@ $( document ).ready( function( ){
                     }
                 };
                 d.ID = $('input[name="ID"]').val( );
+                d.Name = $('input[name="Name"]').val( );
                 d.Location = $('input[name="Location"]').val( );
                 d.Unit = $('input[name="Unit"]').val( );
                 d.Lead = $('input[name="Lead"]').val( );
@@ -100,8 +101,9 @@ $( document ).ready( function( ){
             <?php \singleton\datatables::getInstance( )->LocationID(1);?>,
             <?php \singleton\datatables::getInstance( )->TerritoryUnit();?>,
             <?php \singleton\datatables::getInstance( )->TerritoryProposal();?>,
+            <?php \singleton\datatables::getInstance( )->TerritoryLeads();?>,
             <?php \singleton\datatables::getInstance( )->TerritoryCollections();?>,
-            <?php \singleton\datatables::getInstance( )->TerritoryInvoices();?>        
+            <?php \singleton\datatables::getInstance( )->TerritoryInvoices();?>
         ],
         buttons: [
             {
@@ -125,6 +127,7 @@ $( document ).ready( function( ){
                 action : function( e, dt, node, config ){
                     d = { }
                     d.ID = $('input[name="ID"]').val( );
+                    d.Name = $('input[name="Name"]').val( );
                     d.Location = $('input[name="Location"]').val( );
                     d.Unit = $('input[name="Unit"]').val( );
                     d.Lead = $('input[name="Lead"]').val( );
