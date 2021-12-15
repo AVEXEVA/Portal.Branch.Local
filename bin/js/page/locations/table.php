@@ -1,3 +1,10 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');
+?>
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -50,180 +57,27 @@ $(document).ready(function( ){
         table    : '#Table_Locations'
     } );
     var Table_Locations = $('#Table_Locations').DataTable( {
-        dom            : "<'row'<'col-sm-3 search'><'col-sm-6'B><'col-sm-3 columns-visibility'>><'row'<'col-sm-12't>>",
-        processing     : true,
-        serverSide     : true,
-        autoWidth      : false,
-        searching      : false,
-        lengthChange   : false,
-        scrollResize   : true,
-        scrollY        : 100,
-        scroller       : true,
-        scrollCollapse : true,
-        orderCellsTop  : true,
-        autoWidth      : true,
-        responsive     : true,
-        select         : {
-          style : 'multi',
-          selector : 'td.ID'
-        },
+        <?php \singleton\datatables::getInstance( )->preferences( );?>,
         ajax: {
                 url : 'bin/php/get/Locations.php',
-                data    : function(d){
-                    d = {
-                        draw : d.draw,
-                        start : d.start,
-                        length : d.length,
-                        order : {
-                            column : d.order[0].column,
-                            dir : d.order[0].dir
-                        },
-                        ID :  $('input:visible[name="ID"]').val( ),
-                        Name :  $('input:visible[name="Name"]').val( ),
-                        Customer_ID :  $('input:visible[name="Customer_ID"]').val( ),
-                        Customer_Name :  $('input:visible[name="Customer_Name"]').val( ),
-                        Type : $('select:visible[name="Type"]').val( ),
-                        Division : $('select:visible[name="Division"]').val( ),
-                        Route : $('select:visible[name="Route"]').val( ),
-                        Street : $('input:visible[name="Street"]').val( ),
-                        City :  $('input:visible[name="City"]').val( ),
-                        Street :  $('input:visible[name="Street"]').val( ),
-                        State :  $('input:visible[name="State"]').val( ),
-                        Zip :  $('input:visible[name="Zip"]').val( ),
-                        Status : $('select:visible[name="Status"]').val( ),
-                        Maintained : $('select:visible[name="Maintained"]').val( )
-                    };
-                    return d;
-                }
+                <?php \singleton\datatables::getInstance( )->ajax_data( );?>
         },
         columns: [
-            <?php \singleton\datatables::getInstance( )->ID('location.php','Location');?>,
-            <?php \singleton\datatables::getInstance( )->Name('location.php');?>,
-            <?php \singleton\datatables::getInstance( )->CustomerID();?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
-            {
-                data : 'Division_ID',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Division_ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'><i class='fa fa-divide fa-fw fa-1x'></i>" + row.Division_Name + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },{
-                data : 'Route_ID',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.Route_ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='route.php?ID=" + row.Route_ID + "'>" + row.Route_Name + "</a></div>" +
-                                        "<div class='col-12'><a href='user.php?ID=" + row.Mechanic_ID + "'>" + row.Mechanic_Name + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-
-                }
-            },
-            <?php \singleton\datatables::getInstance( )->DataElement('Street');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('City');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('State');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Zip');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Units');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Maintained');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Status');?>            
+            <?php \singleton\datatables::getInstance( )->ID( 'Location' );?>,
+            <?php \singleton\datatables::getInstance( )->Name( 'Location' );?>,
+            <?php \singleton\datatables::getInstance( )->Customer( );?>,
+            <?php \singleton\datatables::getInstance( )->Type( );?>,
+            <?php \singleton\datatables::getInstance( )->Division( );?>,
+            <?php \singleton\datatables::getInstance( )->Route( );?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Street');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('City');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('State');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Zip');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Units');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Maintained');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Status');?>            
         ],
-        initComplete : function( settings, json ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );'
-            $("div.columns-visibility").html(
-                "<div class='desktop bg-dark'>" +
-                  "<div class='row'>" +
-                    "<div class='col-3'>Toggle Columns:</div>" +
-                    "<div class='col-9'>" +
-                      "<a class='toggle-vis text-white' data-column='0'>ID</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='1'>Name</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='2'>Customer</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='3'>Type</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='4'>Division</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='5'>Route</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='6'>Street</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='7'>City</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='8'>State</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='9'>Zip</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='10'>Units</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='11'>Maintained</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='12'>Status</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='13'>Labor</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='14'>Revenue</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='15'>Net Income</a>" +
-                    "</div>" +
-                  "</div>" +
-                "</div>"
-            );
-            $('input.date').datepicker( { } );
-            $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-            search( this );
-            $( '.redraw' ).bind( 'change', function(){ Table_Locations.draw(); });
-            $('a.toggle-vis').bind( 'click', function( e ){
-                e.preventDefault();
-                columnVisibility( this, Table_Locations );
-            });
-        },
-        buttons: [
-            {
-                text: 'Reset Search',
-                className : 'form-control',
-                action: function ( e, dt, node, config ) {
-                    $( 'input, select' ).each( function( ){
-                        $( this ).val( '' );
-                    } );
-                    Table_Locations.draw( );
-                }
-            },{
-                text : 'Create',
-                className : 'form-control',
-                action : function( e, dt, node, config ){
-                    document.location.href='location.php';
-                }
-              },{
-              text : 'Delete',
-              className : 'form-control',
-              action : function( e, dt, node, config ){
-                var rows = dt.rows( { selected : true } ).indexes( );
-                var dte = dt.cells( rows, 0 ).data( ).toArray( );
-                $.ajax ({
-                  url    : 'bin/php/post/Location.php',
-                  method : 'POST',
-                  data   : {
-                    action : 'delete' ,
-                    data : dte
-                  },
-                  success : function(response){
-                    Table_Locations.draw();
-                  }
-                })
-              }
-            },{
-              extend : 'print',
-              text : 'Print',
-              className : 'form-control'
-            },{
-              extend : 'copy',
-              text : 'Copy',
-              className : 'form-control'
-            },{
-              extend : 'csv',
-              text : 'CSV',
-              className : 'form-control'
-            }
-        ]
+        <?php \singleton\datatables::getInstance( )->initComplete( 'locations' );?>,
+        <?php \singleton\datatables::getInstance( )->buttons( 'location', 'locations', 'ID' );?>
     } );
-    });
+});
