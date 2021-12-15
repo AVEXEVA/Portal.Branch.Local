@@ -92,64 +92,64 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_meta . 'index.php');?>
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
-<body onload='finishLoadingPage();'>
-    <div id='wrapper'>
-        <?php require( bin_php . 'element/navigation.php'); ?>
-        <div id='page-wrapper' class='content'>
-    			<div class='card card-full card-primary'>
-    				<div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Job( 1 );?> Jobs</h4></div>
-    				<div class='card-body bg-dark'>
-    					<table id='Table_Jobs' class='display' cellspacing='0' width='100%'>
-    						<thead><tr class='text-align:center;'>
-                      <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-                      <th class='text-white border border-white' title='Name'><?php \singleton\fontawesome::getInstance( )->Customer();?>Name</th>
-                      <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
-                      <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-                      <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
-                      <th class='text-white border border-white' title='Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
-                      <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
-                      <th class='text-white border border-white' title='Tickets'><?php \singleton\fontawesome::getInstance( )->Ticket();?>Tickets</th>
-                      <th class='text-white border border-white' title='Invoices'><?php \singleton\fontawesome::getInstance( )->Invoice();?>Invoices</th>
-                  </tr><tr>
-                      <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                      <th class='text-white border border-white' title='Name'><input class='redraw form-control' type='text'name='Name' placeholder='Name' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null;?>' /></th>
-                      <th class='border border-white'><div class='row g-0'>
-                          <div class='col-12'><input class='redraw date form-control' type='text' name='Date_Start' placeholder='Date Start' value='<?php echo isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null;?>' /></div>
-                          <div class='col-12'><input class='redraw date form-control' type='text' name='Date_End' placeholder='Date End' value='<?php echo isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null;?>' /></div>
-                      </div></th>
-                      <th class='text-white border border-white' title='Customer'><input class='redraw form-control' type='text'name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
-                      <th class='text-white border border-white' title='Location'><input class='redraw form-control' type='text'name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
-                      <th class='text-white border border-white' title='Type'><select class='redraw form-control' name='Type'>
-                          <option value=''>Select</option>
-                          <?php
-                              $result = \singleton\database::getInstance( )->query(
-                                  null,
-                                  "   SELECT  JobType.ID,
-                                              JobType.Type
-                                      FROM    JobType
-                                      WHERE   Type <> 'LAWSUITS';",
-                                  array( )
-                              );
-                              if( $result ){while ($row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Type'];?></option><?php }}
-                          ?>
-                      </select></th>
-                      <th class='text-white border border-white' title='Status'><select class='form-control' name='Status'>
-                        <option value=''>Select</option>
-                        <option value='0' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 0 ? 'selected' : null;?>>Disabled</option>
-                        <option value='1' <?php echo isset( $_GET[ 'Status' ] ) && $_GET[ 'Status' ] == 1 ? 'selected' : null;?>>Enabled</option>
-                      </select></th>
-                      <th class='text-white border border-white' title='Tickets'><input class='form-control' type='text'name='Tickets' placeholder='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null;?>' /></th>
-                      <th class='text-white border border-white' title='Invoices'><input class='form-control' type='text'name='Invoices' placeholder='Invoices' value='<?php echo isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null;?>' /></th>
-                  </tr></thead>
-    				   </table>
-    			    </div>
-            </div>
+<body>
+  <div id='wrapper'>
+    <?php require( bin_php . 'element/navigation.php'); ?>
+    <div id='page-wrapper' class='content'>
+			<div class='card card-full card-primary bg-dark text-white'>
+				<div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Job( 1 );?> Jobs</h4></div>
+        <div class='card-body mobile'><?php 
+          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
+          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );
+          \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date_Start', isset( $_GET[ 'Date_Start' ] ) ? $_GET[ 'Date_Start' ] : null );
+          \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date_End', isset( $_GET[ 'Date_End' ] ) ? $_GET[ 'Date_End' ] : null );
+          \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+              'Customer', 'Customers',
+              isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+              isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
+          );
+          \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
+              'Location', 'Locations',
+              isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+              isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
+          );
+          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
+          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, false, false, false, 'redraw' );
+          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null, false, false, false, 'redraw' );
+          \singleton\bootstrap::getInstance( )->card_row_form_input( 'Invoices', isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null, false, false, false, 'redraw' );
+        ?></div>
+				<div class='card-body bg-dark'>
+					<table id='Table_Jobs' class='display' cellspacing='0' width='100%'>
+						<thead><tr class='text-align:center;'><?php
+              \singleton\table::getInstance( )->th( 'ID', 'ID' );
+              \singleton\table::getInstance( )->th( 'Name', 'Name' );
+              \singleton\table::getInstance( )->th( 'Date', 'Date' );
+              \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+              \singleton\table::getInstance( )->th( 'Location', 'Location' );
+              \singleton\table::getInstance( )->th( 'Type', 'Type' );
+              \singleton\table::getInstance( )->th( 'Status', 'Status' );
+              \singleton\table::getInstance( )->th( 'Tickets', 'Tickets' );
+              \singleton\table::getInstance( )->th( 'Invoices', 'Invoices' );
+            ?></tr><tr><?php
+              \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Invoices', isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null );
+            ?></tr></thead>
+				  </table>
         </div>
+      </div>
     </div>
+  </div>
 </body>
 </html>
 <?php
-    }
+}
 } else {?><html><head><script>document.location.href='../login.php?Forward=jobs.php';</script></head></html><?php }?>

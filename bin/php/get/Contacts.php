@@ -78,7 +78,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        'iTotalRecords'     	=>  0,
 	        'iTotalDisplayRecords'  =>  0,
 	        'aaData'        		=>  array(),
-	        'options' 				=> array( )
+	        'options' 				=> 	array( )
 	    );
 
 		/*Parse GET*/
@@ -92,36 +92,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['ID'];
-	      $conditions[] = "Contact.ID LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['ID'];
+	    	$conditions[] = "Contact.ID LIKE '%' + ? + '%'";
 	    }
-      if( isset( $_GET[ 'Contact' ] ) && !in_array(  $_GET[ 'Contact' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Contact'];
-      $conditions[] = "Contact.Contact LIKE '%' + ? + '%'";
-      }
+		if( isset( $_GET[ 'Contact' ] ) && !in_array(  $_GET[ 'Contact' ], array( '', ' ', null ) ) ){
+			$parameters[] = $_GET['Contact'];
+			$conditions[] = "Contact.Contact LIKE '%' + ? + '%'";
+		}
 	    if( isset( $_GET[ 'Type' ] ) && !in_array(  $_GET[ 'Type' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Type'];
-	      $conditions[] = "Contact.Type LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['Type'];
+	    	$conditions[] = "Contact.Type LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Name' ] ) && !in_array(  $_GET[ 'Name' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Name'];
-	      $conditions[] = "Contact.Name LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['Name'];
+	    	$conditions[] = "Contact.Name LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Position' ] ) && !in_array( $_GET[ 'Position' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Position'];
-	      $conditions[] = "Contact.Position LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['Position'];
+	    	$conditions[] = "Contact.Position LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Phone' ] ) && !in_array( $_GET[ 'Phone' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Phone'];
-	      $conditions[] = "Contact.Phone LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['Phone'];
+	    	$conditions[] = "Contact.Phone LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Email' ] ) && !in_array( $_GET[ 'Email' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Email'];
-	      $conditions[] = "Contact.Email LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['Email'];
+	    	$conditions[] = "Contact.Email LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Address'];
-	      $conditions[] = "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
+	    	$parameters[] = $_GET['Address'];
+	    	$conditions[] = "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip LIKE '%' + ? + '%'";
 	    }
 
 		/*Search Filters*/
@@ -141,8 +141,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		$Columns = array(
 			0 =>  'Contact.ID',
 			1 =>  'Contact.Contact',
-      2 =>  "Contact.Type",
-      3 =>  "Contact.Name",
+			2 =>  "Contact.Type",
+			3 =>  "Contact.Name",
 			4 =>  "Contact.Position",
 			5 =>  "Contact.[Phone]",
 			6 =>  "Contact.Email",
@@ -152,8 +152,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        ? $Columns[ $_GET['order']['column'] ]
 	        : "Contact.ID";
 	    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
-	      ? $_GET['order']['dir']
-	      : 'ASC';
+			? $_GET['order']['dir']
+			: 'ASC';
 
 		/*Perform Query*/
 		$Query = "SELECT 	*
@@ -169,13 +169,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						Contact.City  					AS City,
 						Contact.State 					AS State,
 						Contact.Zip 					AS Zip,
-						CASE 	WHEN Contact.[Type] = 0 THEN 	'Customer'
-								WHEN Contact.[Type] = 4 THEN  'Location'
-								WHEN Contact.[Type] = 5 THEN  'Employee'
-								ELSE 'Unknown'
+						CASE 	WHEN Contact.[Type] = 0 THEN 'Customer'
+								WHEN Contact.[Type] = 4 THEN 'Location'
+								WHEN Contact.[Type] = 5 THEN 'Employee'
+														ELSE 'Unknown'
 						END 	AS [Type]
 				FROM 	Rol AS Contact
-				WHERE 	({$conditions}) AND ({$search})
+				WHERE 		({$conditions}) 
+						AND ({$search})
 			) AS Tbl
 			WHERE 		Tbl.ROW_COUNT >= ?
 					AND Tbl.ROW_COUNT <= ?;";
@@ -185,22 +186,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			$parameters
 		) or die(print_r(sqlsrv_errors()));
 
-		while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
-	      $output[ 'aaData' ][]   		= $Ticket;
+		while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
+			$output[ 'aaData' ][]   		= $Row;
 	    }
 
-		$sQueryRow = "	SELECT 	Count( Contact.ID ) AS Count
-						FROM 	Rol AS Contact
-						WHERE 	({$conditions}) AND ({$search})";
+		$sQueryRow = "	SELECT  [Contact].[ID]
+						FROM    Rol AS Contact
+						WHERE   	({$conditions}) 
+								AND ({$search});";
 
-	    $stmt = \singleton\database::getInstance( )->query(
-	    	null,
-	    	$sQueryRow,
-	    	$parameters
-	    ) or die(print_r(sqlsrv_errors()));
+        $fResult = \singleton\database::getInstance( )->query(
+            null,
+            $sQueryRow ,
+            $parameters
+        ) or die(print_r(sqlsrv_errors()));
 
-	    $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
-	    sqlsrv_cancel( $stmt );
+        $iFilteredTotal = 0;
+        $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+        $_SESSION[ 'Tables' ][ 'Contacts' ] = isset( $_SESSION[ 'Tables' ][ 'Contacts' ]  ) ? $_SESSION[ 'Tables' ][ 'Contacts' ] : array( );
+        if( count( $_SESSION[ 'Tables' ][ 'Contacts' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Contacts' ] as &$Value ){ $Value = false; } }
+        $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] = $_GET;
+        while( $Row = sqlsrv_fetch_array( $fResult ) ){
+            $_SESSION[ 'Tables' ][ 'Contacts' ][ $Row[ 'ID' ] ] = true;
+            $iFilteredTotal++;
+        }
 
 	    $sQuery = " SELECT  COUNT(Contact.ID)
 	                FROM    Rol AS Contact;";
