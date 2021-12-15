@@ -175,7 +175,7 @@ class bootstrap extends \singleton\index {
     $label = is_null( $label ) ? $singular : $label;
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label, 4, 'Date' );?>
-			<div class='col-8'><input placeholder='mm/dd/yy' class='form-control date edit' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) || $value == '1969-12-30 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $value ) );?>' /></div>
+			<div class='col-8'><input placeholder='mm/dd/yy' class='form-control date edit' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) || $value == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $value ) );?>' /></div>
     </div><?php
 	}
 	public function card_row_form_input_currency( $singular, $value ){
