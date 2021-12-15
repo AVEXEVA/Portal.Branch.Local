@@ -104,7 +104,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
                 <div class="card-body bg-dark">
                     <table id='Table_Routes' class='display' cellspacing='0' width='100%'>
-                        <thead class='text-white border border-white'> <?php
+                        <thead class='text-white border border-white'><?php
                           \singleton\table::getInstance( )->th( 'ID', 'ID' );
                           \singleton\table::getInstance( )->th( 'Route Name', 'Route Name' );
                           \singleton\table::getInstance( )->th( 'Person', 'Person' );
@@ -122,7 +122,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           \singleton\table::getInstance( )->th_input( 'Mech', isset( $_GET[ 'Mech' ] ) ? $_GET[ 'Mech' ] : null );
                       ?></tr></thead>
                     </table>
-                </div>
+                </form></div>
             </div>
         </div>
     </div>

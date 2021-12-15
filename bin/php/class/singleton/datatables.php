@@ -42,7 +42,7 @@ class datatables extends \singleton\index {
                     dir : d.order[0].dir
                 }
             };
-            $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){ 
+            $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){
                 if( d[ $( this ).attr( 'Name' ) ] === undefined ){
                     d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
                 }
@@ -74,7 +74,7 @@ class datatables extends \singleton\index {
             className : 'form-control',
             action : function( e, dt, node, config ){
                 d = { }
-                $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){ 
+                $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){
                     if( d[ $( this ).attr( 'Name' ) ] === undefined ){
                         d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
                     }
@@ -125,7 +125,7 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
-    public function button_edit( $reference, $key ){ 
+    public function button_edit( $reference, $key ){
         ?>{
             text : "<?php \singleton\fontawesome::getInstance( )->Edit( );?><span class='desktop'>Edit</span>",
             className: 'form-control',
@@ -223,7 +223,7 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
-	
+
     //Columns
     public function ID( $reference ){ self::data_column_id( $reference, 'ID' ); }
     public function Name( $reference ){ self::data_column_link( $reference, 'Name' ); }
@@ -307,7 +307,7 @@ class datatables extends \singleton\index {
 
             }
         }<?php
-    } 
+    }
     public function Ticket( ){
         ?>{
             data : 'Ticket_ID',
@@ -359,7 +359,7 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-    } 
+    }
     public function Territory( ){
         ?>{
             data : 'Territory_ID',
@@ -464,7 +464,7 @@ class datatables extends \singleton\index {
     public function TimeRoute( ){ self::Time( 'Time_Route' ); }
     public function TimeSite( ){ self::Time( 'Time_Site' ); }
     public function TimeCompleted( ){ self::Time( 'Time_Completed' ); }
-    
+
 
     public function data_column_count( $key, $Reference, $Reference_Key, $icon = 'blank' ){
         ?>{
@@ -496,6 +496,7 @@ class datatables extends \singleton\index {
     public function FirstName( ){ self::First_Name( );	}
     public function LastName( ){ self::Last_Name( ); }
     public function UnitType( ){ self::Type( ); }
+    public function UnitStatus( ){ self::Status( ); }
     public function LocationID( ){ self::Location( ); }
     public function TicketID( ){ self::Ticket( ); }
     public function CustomerID( ){ self::Customer( ); }
@@ -520,7 +521,7 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-    }  
+    }
     public function TerritoryProposal( ){
         ?>{ data : 'Proposal',
             render : function( data, type, row, meta ){
@@ -536,7 +537,7 @@ class datatables extends \singleton\index {
             }
         }
       }<?php
-    }  
+    }
     public function TerritoryCollections( ){
         ?>{
             data : 'Collection',
@@ -553,7 +554,7 @@ class datatables extends \singleton\index {
                 }
             }
           }<?php
-    }	
+    }
     public function UnitName( ){
 		?>{
             data : 'Name',
@@ -649,5 +650,5 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-	}    
+	}
 }?>

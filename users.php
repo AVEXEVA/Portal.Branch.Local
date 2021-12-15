@@ -98,35 +98,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
     <div id="wrapper">
         <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Users( 1 );?> Users</h4></div>
-                  <div class="card-body bg-dark">
-                    <table id='Table_Users' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
-                            <th class='text-white border border-white'  title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-                            <th class='text-white border border-white'  title='Email'><?php \singleton\fontawesome::getInstance( )->Email();?>Email</th>
-                            <th class='text-white border border-white'  title='Verified'><?php \singleton\fontawesome::getInstance( )->Description();?>Verified</th>
-                            <th class='text-white border border-white'  title='Branch'><?php \singleton\fontawesome::getInstance( )->Division();?>Branch</th>
-                            <th class='text-white border border-white'  title='Branch_Type'><?php \singleton\fontawesome::getInstance( )->Note();?>Type</th>
-                            <th class='text-white border border-white'  title='Branch_ID'><?php \singleton\fontawesome::getInstance( )->Review();?>Reference</th>
-                            <th class='text-white border border-white'  title='Picture'><?php \singleton\fontawesome::getInstance( )->Birthday();?>Picture</th>
-                        </tr><tr>
-                            <th class='text-white border border-white' title='ID'><input class='redraw form-control' type='text' name='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null; ?>' /></th>
-                            <th class='text-white border border-white' title='Email'><input class='redraw form-control' type='text' name='Email' value='<?php echo isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null; ?>' /></th>
-                            <th class='text-white border border-white'  title='Verified'><input class='redraw form-control' type='text' name='Verified' value='<?php echo isset( $_GET[ 'Verified' ] ) ? $_GET[ 'Verified' ] : null; ?>' /></th>
-                            <th class='text-white border border-white'  title='Branch'><input class='redraw form-control' type='text' name='Branch' value='<?php echo isset( $_GET[ 'Branch' ] ) ? $_GET[ 'Branch' ] : null; ?>' /></th>
-                            <th class='text-white border border-white'  title='Branch_Type'><input class='redraw form-control' type='text' name='Type' value='<?php echo isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null; ?>' /></th>
-                            <th class='text-white border border-white'  title='Branch_ID'><input class='redraw form-control' type='text' name='Reference' value='<?php echo isset( $_GET[ 'Reference' ] ) ? $_GET[ 'Reference' ] : null; ?>' /></th>
-                              <th class='text-white border border-white'  title='Branch_ID'><input class='redraw form-control' type='text' /></th>
-                        </tr></thead>
+                  <div class="mobile card-body bg-dark  text-white"><form action='users.php'>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Email', isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
+                  </div>
+                    <div class='card-body bg-dark'>
+                      <table id='Table_Users' class='display' cellspacing='0' width='100%'>
+                        <thead class='text-white border border-white'><?php
+                          \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                          \singleton\table::getInstance( )->th( 'Email', 'Email' );
+                          \singleton\table::getInstance( )->th( 'Verified', 'Verified' );
+                          \singleton\table::getInstance( )->th( 'Branch', 'Branch' );
+                          \singleton\table::getInstance( )->th( 'Branch_Type', 'Branch_Type' );
+                          \singleton\table::getInstance( )->th( 'Branch_ID', 'Branch_ID' );
+                          \singleton\table::getInstance( )->th( 'Picture', 'Picture' );
+                        ?><tr class='desktop'><?php
+                        \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Email', isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Verified', isset( $_GET[ 'Verified' ] ) ? $_GET[ 'Verified' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Branch', isset( $_GET[ 'Branch' ] ) ? $_GET[ 'Branch' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Branch_Type', isset( $_GET[ 'Branch_Type' ] ) ? $_GET[ 'Branch_Type' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Branch_ID', isset( $_GET[ 'Branch_ID' ] ) ? $_GET[ 'Branch_ID' ] : null );
+                        \singleton\table::getInstance( )->th_input( 'Picture', isset( $_GET[ 'Picture' ] ) ? $_GET[ 'Picture' ] : null );
+                        ?></tr></thead>
                     </table>
                   </div>
-                </div>
+                </form></div>
             </div>
         </div>
     </div>
