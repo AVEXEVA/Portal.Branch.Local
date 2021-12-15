@@ -103,16 +103,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id='page-wrapper' class='content'>
       <div class='card card-full card-primary border-0'>
         <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?> Profitability</h4></div>
-        <div class='card-body bg-dark'>
+        <div class='mobile card-body bg-dark'>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Profit', isset( $_GET[ 'Profit' ] ) ? $_GET[ 'Profit' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Profit %', isset( $_GET[ 'Profit %' ] ) ? $_GET[ 'Profit %' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Revenue', isset( $_GET[ 'Revenue' ] ) ? $_GET[ 'Revenue' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Material', isset( $_GET[ 'Material' ] ) ? $_GET[ 'Material' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Labor', isset( $_GET[ 'Labor' ] ) ? $_GET[ 'Labor' ] : null, false, false, false, 'redraw' );?>
+        </div>
           <table id='Table_Profitability' class='display' cellspacing='0' width='100%'>
-              <thead><tr>
-  							<th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-  							<th class='text-white border border-white' title='Profit'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit</th>
-                <th class='text-white border border-white' title='Profit%'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Profit %</th>
-  							<th class='text-white border border-white' title='Revenue'><?php \singleton\fontawesome::getInstance( )->Dollar();?>Revenue</th>
-  							<th class='text-white border border-white' title='Material'><?php \singleton\fontawesome::getInstance( )->List1();?>Material</th>
-  							<th class='text-white border border-white' title='Labor'><?php \singleton\fontawesome::getInstance( )->Hours();?>Labor</th>
-              </tr><tr class='form-desktop'>
+              <thead class='text-white border border-white'>
+                <tr><?php
+                \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+                \singleton\table::getInstance( )->th( 'Profit', 'Profit' );
+                \singleton\table::getInstance( )->th( 'Profit %', 'Profit %' );
+                \singleton\table::getInstance( )->th( 'Revenue', 'Revenue' );
+                \singleton\table::getInstance( )->th( 'Material', 'Material' );
+                \singleton\table::getInstance( )->th( 'Labor', 'Labor' );
+              ?></tr><tr class='form-desktop'>
                 <th><input type='text' class='form-control edit' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer'] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Profit' placeholder='Profit' value='<?php echo isset( $_GET[ 'Profit'] ) ? $_GET[ 'Profit' ] : null;?>' /></th>
                 <th><input type='text' class='form-control edit' name='Profit_Percentage' placeholder='Profit_Percentage' value='<?php echo isset( $_GET[ 'Profit_Percentage'] ) ? $_GET[ 'Profit_Percentage' ] : null;?>' /></th>
