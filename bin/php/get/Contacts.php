@@ -73,22 +73,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         || 	!check( privilege_read, level_group, $Privileges[ 'Contact' ] )
     ){ ?><?php require('404.html');?><?php }
 	else {
-		$output = array(
+
+				$output = array(
 	        'sEcho'         		=> isset( $_GET[ 'draw' ] ) ? intval( $_GET[ 'draw' ] ) : 1,
 	        'iTotalRecords'     	=>  0,
 	        'iTotalDisplayRecords'  =>  0,
 	        'aaData'        		=>  array(),
 	        'options' 				=> array( )
 	    );
+				
+			\singleton\database::getInstance( )->query(
+        null,
+        " INSERT INTO Activity([User], [Date], [Page] )
+          VALUES( ?, ?, ? );",
+        array(
+          $_SESSION[ 'Connection' ][ 'User' ],
+          date('Y-m-d H:i:s'),
+          'get/contacts.php'
+        )
+      );
+      $conditions = array( );
+      $search = array( );
+      $parameters = array( );
 
-		/*Parse GET*/
-		/*None*/
-
-		$conditions = array( );
-		$search 	= array( );
-
-		/*Default Filters*/
-		/*NONE*/
+	
 
 
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
@@ -161,6 +169,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
 						Contact.ID 						AS ID,
 						Contact.Name 					AS Name,
+						Contact.Name 					AS Entity_Name,
 						Contact.Contact 				AS Contact,
 						Contact.Position  		  		AS Position,
 						Contact.Phone 					AS Phone,
@@ -184,6 +193,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			$Query,
 			$parameters
 		) or die(print_r(sqlsrv_errors()));
+
+		$sQueryRow = "SELECT  [Contact].[ID]
+                  FROM    Rol AS Contact
+                  WHERE   ({$conditions}) AND ({$search});";
+
+        $fResult = \singleton\database::getInstance( )->query(
+            null,
+            $sQueryRow ,
+            $parameters
+        ) or die(print_r(sqlsrv_errors()));
+
+        $iFilteredTotal = 0;
+        $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
+        $_SESSION[ 'Tables' ][ 'Contacts' ] = isset( $_SESSION[ 'Tables' ][ 'Contacts' ]  ) ? $_SESSION[ 'Tables' ][ 'Contacts' ] : array( );
+        if( count( $_SESSION[ 'Tables' ][ 'Contacts' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Contacts' ] as &$Value ){ $Value = false; } }
+        $_SESSION[ 'Tables' ][ 'Contacts' ][ 0 ] = $_GET;
+        while( $Row = sqlsrv_fetch_array( $fResult ) ){
+            $_SESSION[ 'Tables' ][ 'Contacts' ][ $Row[ 'ID' ] ] = true;
+            $iFilteredTotal++;
+        }
 
 		while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
 	      $output[ 'aaData' ][]   		= $Ticket;
