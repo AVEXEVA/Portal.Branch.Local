@@ -99,7 +99,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Requisition.[LSD],
                 Requisition.[FRM],
                 Requisition.Notes,
-                DropOff.Tag       AS DropOff_Tag,
+                DropOff.Tag       AS DropOff_Name,
                 Unit.State        AS Unit_State,
                 Unit.Unit         AS Unit_Label,
                 Job.ID            AS Job_ID,
@@ -186,16 +186,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Requisition[ 'DropOff_Tag' ] 		= isset( $_POST[ 'DropOff_Tag' ] ) 	 ? $_POST[ 'DropOff_Tag' ] 	 : $Requisition[ 'DropOff_Tag' ];
       $Requisition[ 'Unit_State' ] 	    = isset( $_POST[ 'Unit_State' ] )    ? $_POST[ 'Unit_State' ]    : $Requisition[ 'Unit_State' ];
       $Requisition[ 'Unit_Label' ] 	    = isset( $_POST[ 'Unit_Label' ] )    ? $_POST[ 'Unit_Label' ]    : $Requisition[ 'Unit_Label' ];
-      $Requisition[ 'User' ] 		      = isset( $_POST[ 'User' ] ) 	     ? $_POST[ 'User' ] 	     : $Requisition[ 'User' ];
+      $Requisition[ 'User' ] 		        = isset( $_POST[ 'User' ] ) 	       ? $_POST[ 'User' ] 	       : $Requisition[ 'User' ];
       $Requisition[ 'Job_ID' ] 		      = isset( $_POST[ 'Job_ID' ] ) 	     ? $_POST[ 'Job_ID' ] 	     : $Requisition[ 'Job_ID' ];
-      $Requisition[ 'Job_Name' ] 		    = isset( $_POST[ 'Job' ] ) 	         ? $_POST[ 'Job' ] 	         : $Requisition[ 'Job_Name' ];
       $Requisition[ 'Job_Type' ]        = isset( $_POST[ 'Job_Type' ] )      ? $_POST[ 'Job_Type' ]      : $Requisition[ 'Job_Type' ];
       $Requisition[ 'Location_ID' ]     = isset( $_POST[ 'Location_ID' ] )   ? $_POST[ 'Location_ID' ]   : $Requisition[ 'Location_ID' ];
-      $Requisition[ 'Location_Name' ]   = isset( $_POST[ 'Location' ] )      ? $_POST[ 'Location' ]      : $Requisition[ 'Location_Name' ];
       $Requisition[ 'DropOff_ID' ]      = isset( $_POST[ 'DropOff_ID' ] )    ? $_POST[ 'DropOff_ID' ]    : $Requisition[ 'DropOff_ID' ];
-      $Requisition[ 'DropOff_Name' ]    = isset( $_POST[ 'DropOff_Name' ] )  ? $_POST[ 'DropOff_Name' ]  : $Requisition[ 'DropOff_Name' ];
       $Requisition[ 'Employee_ID' ]     = isset( $_POST[ 'Employee_ID' ] )   ? $_POST[ 'Employee_ID' ]   : $Requisition[ 'Employee_ID' ];
-      $Requisition[ 'Employee_Name' ]   = isset( $_POST[ 'Employee_Name' ] ) ? $_POST[ 'Employee_Name' ] : $Requisition[ 'Employee_Name' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
