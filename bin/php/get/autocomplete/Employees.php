@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(   !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Route' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
+        ||  !isset( $Privileges[ 'Employee' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Employee' ] )
     ){ ?><?php print json_encode( array( 'data' => array( ) ) );?><?php }
     else {
       $output = array(
@@ -84,10 +84,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $conditions = array( );
       $search   = array( );
 
-      if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['ID'];
-        $conditions[] = "Employee.ID LIKE '%' + ? + '%'";
-      }
       if( isset( $_GET[ 'First_Name' ] ) && !in_array( $_GET[ 'First_Name' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['First_Name'];
         $conditions[] = "Employee.fFirst LIKE '%' + ? + '%'";
@@ -96,18 +92,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters[] = $_GET['Last_Name'];
         $conditions[] = "Employee.Last LIKE '%' + ? + '%'";
       }
-      if( isset( $_GET[ 'Supervisor' ] ) && !in_array(  $_GET[ 'Supervisor' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Supervisor'];
-        $conditions[] = "Employee.Super LIKE '%' + ? + '%'";
-      }
-
       if( isset( $_GET[ 'search' ] ) ){
-
         $parameters[ ] = $_GET[ 'search' ];
-        $search[ ] = "Contact.Name LIKE '%' + ? + '%'";
-
-        $parameters[ ] = $_GET[ 'search' ];
-        $search[ ] = "Contact.Contact LIKE '%' + ? + '%'";
+        $search[ ] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
       }
 
 
@@ -121,18 +108,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       /*Order && Direction*/
       //update columns from bin/js/tickets/table.js
       $Columns = array(
-        0 =>  'Contact.ID',
-        1 =>  'Contact.Contact',
-        2 =>  'Contact.Type',
-        3 =>  'Contact.name',
-        4 =>  "Contact.Position",
-        5 =>  "Contact.Phone",
-        6 =>  "Contact.Email",
-        7 =>  "Contact.Address + ' ' + Contact.City + ' ' + Contact.State + ' ' + Contact.Zip"
+        0 =>  'Employee.ID'
       );
       $Order = isset( $_GET[ 'order' ] ) && isset( $Columns[ $_GET['order']['column'] ] )
           ? $Columns[ $_GET['order']['column'] ]
-          : "Contact.ID";
+          : "Employee.ID";
       $Direction = isset( $_GET[ 'order' ] ) && in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
         ? $_GET['order']['dir']
         : 'ASC';
@@ -145,7 +125,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               tbl.FieldName,
               tbl.FieldValue
           FROM    (
-                SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+                SELECT  insRowTbl.ID,
+                        attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                         attr.insRow.value('.', 'nvarchar(max)') as FieldValue
                 FROM    ( Select i.ID,  convert(xml, (select i.* for xml raw)) as insRowCol
                           FROM ( (
