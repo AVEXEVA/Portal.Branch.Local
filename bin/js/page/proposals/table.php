@@ -132,6 +132,25 @@ $( document ).ready( function( ){
     },{
       data : 'Contact_Email'
     },{
+      data : 'Address',
+      render : function( data, type, row, meta ){
+          switch( type ){
+              case 'display' :
+                  return  row.Contact_Street !== null && row.Contact_Street != ''
+                      ?   "<div class='row'>" +
+                              "<div class='col-12'>" +
+                                  "<div class='row' onClick=\"document.location.href='https://www.google.com/maps/search/?api=1&query=" + encodeURI( row.Contact_Street + ' ' + row.Contact_City + ' ' + row.Contact_State + ' ' + row.Contact_Zip ) + "';\">" +
+                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Contact_Street + "</div>" +
+                                      "<div class='col-12'>" + row.Contact_City + ", " + row.Contact_State + " " + row.Contact_Zip + "</div>" +
+                                  "</div>" +
+                              "</div>" +
+                          "</div>"
+                      :   null;
+              default :
+                  return data;
+          }
+        }
+    },{
       data   : 'Date'
     },{
         data : 'Job_ID',

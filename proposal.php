@@ -122,7 +122,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Loc.Zip                 AS  Zip,
                         Customer.ID             AS  Customer_ID,
                         Customer.Name           AS  Customer_Name,
-                        Rol.ID 					AS  Contact_ID,
+                        Rol.ID 					        AS  Contact_ID,
                         Rol.Contact             AS  Contact_Name,
                         Rol.Fax                 AS  Contact_Fax,
                         Rol.Phone               AS  Contact_Phone,
@@ -197,12 +197,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Contact_ID' => isset( $_GET[ 'Contact_ID' ] ) ? $_GET[ 'Contact_ID' ] : null
             )
             : sqlsrv_fetch_array($result);
-
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           $Proposal[ 'Name' ]             = isset( $_POST[ 'Name' ] )        ? $_POST[ 'Name' ]         : $Proposal[ 'Name' ];
-          $Proposal[ 'Contact' ]          = isset( $_POST[ 'Contact' ] )     ? $_POST[ 'Contact' ]      : $Proposal[ 'Contact' ];
+          $Proposal[ 'Contact_ID' ]       = isset( $_POST[ 'Contact' ] )     ? $_POST[ 'Contact' ]      : $Proposal[ 'Contact_ID' ];
+          $Proposal[ 'Contact_Name' ]     = isset( $_POST[ 'Contact' ] )     ? $_POST[ 'Contact' ]      : $Proposal[ 'Contact_Name' ];
+          $Proposal[ 'Job_ID' ]           = isset( $_POST[ 'Job' ] )         ? $_POST[ 'Job' ]          : $Proposal[ 'Job_ID' ];
           $Proposal[ 'Job_Name' ]         = isset( $_POST[ 'Job' ] )         ? $_POST[ 'Job' ]          : $Proposal[ 'Job_Name' ];
+          $Proposal[ 'Location_ID' ]      = isset( $_POST[ 'Location' ] )    ? $_POST[ 'Location' ]     : $Proposal[ 'Location_ID' ];
           $Proposal[ 'Location_Name' ]    = isset( $_POST[ 'Location' ] )    ? $_POST[ 'Location' ]     : $Proposal[ 'Location_Name' ];
+          $Proposal[ 'Employee_ID' ]      = isset( $_POST[ 'Employee' ] )    ? $_POST[ 'Employee' ]     : $Proposal[ 'Employee_ID' ];
           $Proposal[ 'Employee_Name' ]    = isset( $_POST[ 'Employee' ] )    ? $_POST[ 'Employee' ]     : $Proposal[ 'Employee_Name' ];
           $Proposal[ 'Date' ]             = isset( $_POST[ 'Date' ] )        ? $_POST[ 'Date' ]         : $Proposal[ 'Date' ];
           $Proposal[ 'Type' ]             = isset( $_POST[ 'Type' ] )        ? $_POST[ 'Type' ]         : $Proposal[ 'Type' ];
@@ -214,10 +217,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Proposal[ 'Overhead' ]         = isset( $_POST[ 'Overhead' ] )    ? $_POST[ 'Overhead' ]     : $Proposal[ 'Overhead' ];
           $Proposal[ 'Price' ]            = isset( $_POST[ 'Price' ] )       ? $_POST[ 'Price' ]        : $Proposal[ 'Price' ];
           $Proposal[ 'Profit' ]           = isset( $_POST[ 'Profit' ] )      ? $_POST[ 'Profit' ]       : $Proposal[ 'Profit' ];
-          $Proposal[ 'Remarks' ]          = isset( $_POST[ 'Remarks' ] )     ? $_POST[ 'Remarks' ]      : $Proposal[ 'Remarks' ];
+          $Proposal[ 'Notes' ]            = isset( $_POST[ 'Remarks' ] )     ? $_POST[ 'Remarks' ]      : $Proposal[ 'Notes' ];
           /*$Proposal[ 'Sales_Tax_Rate' ]      = isset( $_POST[ 'Sales_Tax_Rate' ] )    ? $_POST[ 'Sales_Tax_Rate' ]    : $Proposal[ 'Sales_Tax_Rate' ];
           $Proposal[ 'Sales_Tax' ]      = isset( $_POST[ 'Sales_Tax' ] )    ? $_POST[ 'Sales_Tax' ]    : $Proposal[ 'Sales_Tax' ];*/
-
           if( empty( $_POST[ 'ID' ] ) ){
 
             $result = \singleton\database::getInstance( )->query(
@@ -229,7 +231,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 SET @Job = ( SELECT Top 1 Job.ID FROM Job WHERE Job.fDesc = ? );
                 SET @Contact = ( SELECT Top 1 Rol.ID FROM Rol WHERE Rol.Contact = ? );
                 SET @Location = ( SELECT Top 1 Loc.Loc FROM Loc WHERE Loc.Tag = ? );
-                SET @Employee = ( SELECT Top 1 Emp.ID FROM Emp WHERE Emp.fFrist + ' ' + Emp.Last = ? );
+                SET @Employee = ( SELECT Top 1 Emp.ID FROM Emp AS  WHERE Emp.fFrist + ' ' + Emp.Last = ? );
                 INSERT INTO Estimate(
                   ID,
                   Job,
@@ -249,14 +251,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Price,
                   Profit
                 )
-                VALUES ( @MAXID + 1, @Job, @Contact, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+                VALUES ( @MAXID + 1, @Job, @Contact, @Employee, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
                 SELECT @MAXID + 1;",
               array(
                 $Proposal[ 'ID' ],
                 $Proposal[ 'Job_Name' ],
-                $Proposal[ 'Contact' ],
+                $Proposal[ 'Job_ID' ],
+                $Proposal[ 'Contact_Name' ],
+                $Proposal[ 'Contact_ID' ],
                 $Proposal[ 'Location_Name' ],
-                $Proposal[ 'Employee' ],
+                $Proposal[ 'Location_ID' ],
+                $Proposal[ 'Employee_Name' ],
+                $Proposal[ 'Employee_ID' ],
                 $Proposal[ 'Name' ],
                 $Proposal[ 'Date' ],
                 $Proposal[ 'Type' ],
@@ -273,7 +279,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             sqlsrv_next_result( $result );
             $Proposal[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
             header( 'Location: proposal.php?ID=' . $Proposal[ 'ID' ] );
-            var_dump(sqlsrv_errors ( ) );
             exit;
           } else {
             \singleton\database::getInstance( )->query(
@@ -302,27 +307,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Estimate.Price = ?,
                         Estimate.Profit = ?
                 WHERE   Estimate.ID = ?;",
-              array(
-                $Proposal[ 'Job_Name' ],
-                $Proposal[ 'Contact' ],
-                $Proposal[ 'Location_Name' ],
-                $Proposal[ 'Employee_Name'],
-                $Proposal[ 'Name' ],
-                $Proposal[ 'Contact' ],
-                $Proposal[ 'Date' ],
-                $Proposal[ 'Type' ],
-                $Proposal[ 'Notes' ],
-                $Proposal[ 'Cost' ],
-                $Proposal[ 'Hours' ],
-                $Proposal[ 'Labor' ],
-                $Proposal[ 'Overhead' ],
-                $Proposal[ 'Price' ],
-                $Proposal[ 'Profit' ],
-                $Proposal[ 'ID' ]
-              )
-            );
+                array(
+                  $Proposal[ 'Job_ID' ],
+                  $Proposal[ 'Job_Name' ],
+                  $Proposal[ 'Contact_ID' ],
+                  $Proposal[ 'Contact_Name' ],
+                  $Proposal[ 'Location_ID' ],
+                  $Proposal[ 'Location_Name' ],
+                  $Proposal[ 'Employee_ID'],
+                  $Proposal[ 'Employee_Name'],
+                  $Proposal[ 'Name' ],
+                  $Proposal[ 'Date' ],
+                  $Proposal[ 'Type' ],
+                  $Proposal[ 'Notes' ],
+                  $Proposal[ 'Cost' ],
+                  $Proposal[ 'Hours' ],
+                  $Proposal[ 'Labor' ],
+                  $Proposal[ 'Overhead' ],
+                  $Proposal[ 'Price' ],
+                  $Proposal[ 'Profit' ],
+                  $Proposal[ 'ID' ]
+                )
+              );
+            }
           }
-        }
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,7 +341,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
     <div id="wrapper">
         <?php require(bin_php.'element/navigation.php');?>
         <div id="page-wrapper" class='content'>

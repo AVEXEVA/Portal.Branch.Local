@@ -87,18 +87,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang="en">
 <head>
 	<title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal </title>
-	<?php $_GET[ 'Bootstrap' ] = '5.1';?>
-    <?php require( bin_meta . 'index.php' );?>
-    <?php require( bin_css  . 'index.php' );?>
-    <?php require( bin_js   . 'index.php' );?>
+  <?php
+   $_GET[ 'Bootstrap' ] = '5.1';
+   $_GET[ 'Entity_CSS' ] = 1;
+   require( bin_meta . 'index.php');
+   require( bin_css  . 'index.php');
+   require( bin_js   . 'index.php');
+  ?>
 </head>
 <body>
     <div id="wrapper" class="<?php echo isset($_SESSION[ 'Toggle_Menu' ]) ? $_SESSION[ 'Toggle_Menu' ] : null;?>">
         <?php require( bin_php.'element/navigation.php');?>
         <div id="page-wrapper" class='content'>
-            <div class="card card-full card-primary bg-dark text-white">
-                <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Proposal();?> Proposals</h4></div>
-                <div class="mobile card-body bg-dark text-white"><form action='locations.php'>
+            <div class="card card-full card-primary border-0">
+                <div class="card-heading bg-white text-black"><h4><?php \singleton\fontawesome::getInstance( )->Proposal();?> Proposals</h4></div>
+                <div class="mobile card-body bg-dark text-white"><form action='proposals.php'>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Contact', isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null, false, false, false, 'redraw' );?>
@@ -107,10 +110,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null, false, false, false, 'redraw' );?>
                 </div>
-                <div class="card-body bg-dark text-white">
+                <div class="card-body bg-darker ">
                     <table id='Table_Proposals' class='display' cellspacing='0' width='100%'>
-                        <thead class='text-white border border-white'>
-                          <?php
+                        <thead class='text-white border border-white'><?php
                           \singleton\table::getInstance( )->th( 'ID', 'ID' );
                           \singleton\table::getInstance( )->th( 'Territory', 'Territory' );
                           \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
