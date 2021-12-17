@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset( $_SESSION ) ) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
   var Table_Proposals = $('#Table_Proposals').DataTable( {
   dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",

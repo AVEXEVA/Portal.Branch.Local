@@ -1,3 +1,8 @@
+let dollarUSLocale = Intl.NumberFormat('en-US', {
+  style : 'currency',
+  currency : 'USD'
+});
+
 (function($) {
   var xhrPool = [];
   $(document).ajaxSend(function(e, jqXHR, options){

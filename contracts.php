@@ -123,8 +123,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
                             \singleton\table::getInstance( )->th( 'Location', 'Location' );
                             \singleton\table::getInstance( )->th( 'Job', 'Job' );
-                            \singleton\table::getInstance( )->th( 'Start', 'Start' );
-                            \singleton\table::getInstance( )->th( 'End', 'End' );
+                            \singleton\table::getInstance( )->th( 'Start_Date', 'Start_Date' );
+                            \singleton\table::getInstance( )->th( 'End_Date', 'End_Date' );
                             \singleton\table::getInstance( )->th( 'Length', 'Length' );
                             \singleton\table::getInstance( )->th( 'Amount', 'Amount' );
                             \singleton\table::getInstance( )->th( 'Cycle', 'Cycle' );
@@ -139,8 +139,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Start', isset( $_GET[ 'Start' ] ) ? $_GET[ 'Start' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'End', isset( $_GET[ 'End' ] ) ? $_GET[ 'End' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Start_Date', isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'End_Date', isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Length', isset( $_GET[ 'Length' ] ) ? $_GET[ 'Length' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Amount', isset( $_GET[ 'Amount' ] ) ? $_GET[ 'Amount' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Cycle', isset( $_GET[ 'Cycle' ] ) ? $_GET[ 'Cycle' ] : null );
