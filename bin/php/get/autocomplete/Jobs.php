@@ -170,40 +170,42 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   tbl.FieldName,
                   tbl.FieldValue
           FROM    (
-                    SELECT  attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
+                    SELECT  insRowTbl.ID,
+                            attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                             attr.insRow.value('.', 'nvarchar(max)') as FieldValue
                     FROM    ( Select i.ID,  convert(xml, (select i.* for xml raw)) as insRowCol
-                              FROM ( SELECT  *
-          FROM  (
-                  SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                          Job.ID                AS ID,
-                          Job.fDesc             AS Name
-                  FROM    Job
-                          LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
-                          LEFT JOIN (
-                              SELECT  Owner.ID,
-                                      Rol.Name
-                              FROM    Owner
-                                      LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                          ) AS Customer ON Job.Owner = Customer.ID
-                          LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
-                          LEFT JOIN (
-                            SELECT    TicketD.Job,
-                                      Count( TicketD.ID ) AS Count
-                            FROM      TicketD
-                            GROUP BY  TicketD.Job
-                          ) AS Job_Tickets ON Job_Tickets.Job = Job.ID
-                          LEFT JOIN (
-                            SELECT    Invoice.Job,
-                                      Count( Invoice.Ref ) AS Count
-                            FROM      Invoice
-                            GROUP BY  Invoice.Job
-                          ) AS Job_Invoices ON Job_Invoices.Job = Job.ID
-                  WHERE   ({$conditions}) AND ({$search})
-                ) AS Tbl
-          WHERE     Tbl.ROW_COUNT >= ?
-                AND Tbl.ROW_COUNT <= ?
-                )  as i
+                              FROM ( 
+                                SELECT  *
+                                FROM  (
+                                        SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                                                Job.ID                AS ID,
+                                                Job.fDesc             AS Name
+                                        FROM    Job
+                                                LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
+                                                LEFT JOIN (
+                                                    SELECT  Owner.ID,
+                                                            Rol.Name
+                                                    FROM    Owner
+                                                            LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                                                ) AS Customer ON Job.Owner = Customer.ID
+                                                LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
+                                                LEFT JOIN (
+                                                  SELECT    TicketD.Job,
+                                                            Count( TicketD.ID ) AS Count
+                                                  FROM      TicketD
+                                                  GROUP BY  TicketD.Job
+                                                ) AS Job_Tickets ON Job_Tickets.Job = Job.ID
+                                                LEFT JOIN (
+                                                  SELECT    Invoice.Job,
+                                                            Count( Invoice.Ref ) AS Count
+                                                  FROM      Invoice
+                                                  GROUP BY  Invoice.Job
+                                                ) AS Job_Invoices ON Job_Invoices.Job = Job.ID
+                                        WHERE   ({$conditions}) AND ({$search})
+                                      ) AS Tbl
+                                WHERE     Tbl.ROW_COUNT >= ?
+                                      AND Tbl.ROW_COUNT <= ?
+                            )  as i
                        ) as insRowTbl
                   CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)
                 ) AS tbl
