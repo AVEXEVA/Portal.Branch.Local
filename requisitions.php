@@ -101,7 +101,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Requisition( 1 );?> Requisitions</h4></div>
         <div class='card-body mobile'><form action='requisitions.php'>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'User', isset( $_GET[ 'User' ] ) ? $_GET[ 'User' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Employee', isset( $_GET[ 'User' ] ) ? $_GET[ 'User' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Items', isset( $_GET[ 'Items' ] ) ? $_GET[ 'Items' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Required', isset( $_GET[ 'Required' ] ) ? $_GET[ 'Required' ] : null, false, false, false, 'redraw' );?>
@@ -114,12 +114,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <table id='Table_Requisitions' class='display' cellspacing='0' width='100%'>
               <thead class='text-white border border-white'>
                 <?php
-                \singleton\table::getInstance( )->th( 'Proposal', 'Proposal' );
-                \singleton\table::getInstance( )->th( 'User', 'User' );
-                \singleton\table::getInstance( )->th( 'Item', 'Item' );
+                \singleton\table::getInstance( )->th( 'ID', 'Proposal' );
+                \singleton\table::getInstance( )->th( 'Employee', 'User' );
+                \singleton\table::getInstance( )->th( 'Items', 'Item' );
                 \singleton\table::getInstance( )->th( 'Calendar', 'Calendar' );
                 \singleton\table::getInstance( )->th( 'Description', 'Description' );
-                \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                \singleton\table::getInstance( )->th( 'Locations', 'Location' );
                 \singleton\table::getInstance( )->th( 'Drop Off', 'Drop Off' );
                 \singleton\table::getInstance( )->th( 'Units', 'Units' );
                 \singleton\table::getInstance( )->th( 'Jobs', 'Jobs' );
