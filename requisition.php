@@ -147,7 +147,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'ID' => null,
       'Date' => null,
       'Required' => null,
-      'User' => null,
+      '[User]' => null,
       'Location' => null,
       'DropOff' => null,
       'Unit' => null,
@@ -182,55 +182,48 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'Employee_ID' => null,
       'Employee_Name' => null
     ) : sqlsrv_fetch_array($result);
-    if( isset( $_POST ) && count( $_POST ) > 0 ){
-      $Requisition[ 'DropOff_Tag' ] 		= isset( $_POST[ 'DropOff_Tag' ] ) 	 ? $_POST[ 'DropOff_Tag' ] 	 : $Requisition[ 'DropOff_Tag' ];
-      $Requisition[ 'Unit_State' ] 	    = isset( $_POST[ 'Unit_State' ] )    ? $_POST[ 'Unit_State' ]    : $Requisition[ 'Unit_State' ];
-      $Requisition[ 'Unit_Label' ] 	    = isset( $_POST[ 'Unit_Label' ] )    ? $_POST[ 'Unit_Label' ]    : $Requisition[ 'Unit_Label' ];
-      $Requisition[ 'User' ] 		        = isset( $_POST[ 'User' ] ) 	       ? $_POST[ 'User' ] 	       : $Requisition[ 'User' ];
+    if( isset( $_POST ) && count( $_POST ) > 0  ){
+      $Requisition[ 'Employee_ID' ]     = isset( $_POST[ 'Employee_ID' ] )   ? $_POST[ 'Employee_ID' ]   : $Requisition[ 'Employee_ID' ];
+      $Requisition[ 'Date' ]            = isset( $_POST[ 'Date' ] )          ? date('Y-m-d 00:00:00.000', strtotime($_POST[ 'Date' ])) : $Requisition[ 'Date' ];
+      $Requisition[ 'Unit_ID' ] 	      = isset( $_POST[ 'Unit_ID' ] )       ? $_POST[ 'Unit_ID' ]       : $Requisition[ 'Unit_ID' ];
       $Requisition[ 'Job_ID' ] 		      = isset( $_POST[ 'Job_ID' ] ) 	     ? $_POST[ 'Job_ID' ] 	     : $Requisition[ 'Job_ID' ];
-      $Requisition[ 'Job_Type' ]        = isset( $_POST[ 'Job_Type' ] )      ? $_POST[ 'Job_Type' ]      : $Requisition[ 'Job_Type' ];
       $Requisition[ 'Location_ID' ]     = isset( $_POST[ 'Location_ID' ] )   ? $_POST[ 'Location_ID' ]   : $Requisition[ 'Location_ID' ];
       $Requisition[ 'DropOff_ID' ]      = isset( $_POST[ 'DropOff_ID' ] )    ? $_POST[ 'DropOff_ID' ]    : $Requisition[ 'DropOff_ID' ];
-      $Requisition[ 'Employee_ID' ]     = isset( $_POST[ 'Employee_ID' ] )   ? $_POST[ 'Employee_ID' ]   : $Requisition[ 'Employee_ID' ];
+      $Requisition[ 'Shutdown' ]        = isset( $_POST[ 'Shutdown' ] )      ? $_POST[ 'Shutdown' ]      : $Requisition[ 'Shutdown' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
-          "	DECLARE @MAXID INT;
-            SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Requisition ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Requisition ) END ;
-            INSERT INTO Zone(
-              ID,
-              User,
+          "	INSERT INTO Requisition (
+              [User],
               Date,
               Required,
               Location,
               DropOff,
               Unit,
               Job,
-              Shutdown,
+              [Shutdown],
               ASAP,
               Rush,
               LSD,
               FRM,
-              Notes,
+              Notes
             )
-            VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
-            SELECT @MAXID + 1;",
+            VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            SELECT  SCOPE_IDENTITY( );",
           array(
-            $Requisition[ 'ID' ],
-            $Requisition[ 'User' ],
-            $Requisition[ 'Date'],
-            $Requisition[ 'Required' ],
-            $Requisition[ 'Location' ],
-            $Requisition[ 'DropOff' ],
-            $Requisition[ 'Unit' ],
-            $Requisition[ 'Job' ],
-            $Requisition[ 'Shutdown' ],
-            $Requisition[ 'ASAP' ],
-            $Requisition[ 'Rush' ],
-            $Requisition[ 'LSD' ],
-            $Requisition[ 'FRM' ],
-            $Requisition[ 'Notes'],
-            isset( $Requisition[ 'Geofence' ] ) ? $Requisition[ 'Geofence' ] : 0
+            !empty( $Requisition[ 'User' ] )        ? $Requisition[ 'User' ] : null,
+            !empty( $Requisition[ 'Date' ] )        ? $Requisition[ 'Date' ] : null,
+            !empty( $Requisition[ 'Required' ] )    ? $Requisition[ 'Required' ] : null,
+            !empty( $Requisition[ 'Location_ID' ] ) ? $Requisition[ 'Location_ID' ] : null,
+            !empty( $Requisition[ 'DropOff_ID' ] )  ? $Requisition[ 'DropOff_ID' ] : null,
+            !empty( $Requisition[ 'Unit_ID' ] )     ? $Requisition[ 'Unit_ID' ] : null,
+            !empty( $Requisition[ 'Job_ID' ] )      ? $Requisition[ 'Job_ID' ] : null,
+            !empty( $Requisition[ 'Shutdown' ] )    ? $Requisition[ 'Shutdown' ] : null,
+            !empty( $Requisition[ 'ASAP' ] )        ? $Requisition[ 'ASAP' ] : null,
+            !empty( $Requisition[ 'Rush' ] )        ? $Requisition[ 'Rush' ] : null,
+            !empty( $Requisition[ 'LSD' ] )         ? $Requisition[ 'LSD' ] : null,
+            !empty( $Requisition[ 'FRM' ] )         ? $Requisition[ 'FRM' ] : null,
+            !empty( $Requisition[ 'Notes' ] )       ? $Requisition[ 'Notes' ] : null
           )
         );
         var_dump(sqlsrv_errors ( ) );
@@ -276,7 +269,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       );
     }
   }
-  var_dump(sqlsrv_errors ( ) );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
