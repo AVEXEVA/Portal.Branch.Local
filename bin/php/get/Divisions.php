@@ -1,170 +1,205 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('index.php');
-setlocale(LC_MONETARY, 'en_US');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $result = \singleton\database::getInstance( )->query(
-        null,
-      " SELECT *
-        FROM   Connection
-        WHERE  Connection.Connector = ?
-               AND Connection.Hash = ?
-    ;", array($_SESSION['User'],$_SESSION['Hash']));
-    $Connection = sqlsrv_fetch_array($result);
-    $User    = \singleton\database::getInstance( )->query(
-        null,
-      " SELECT Emp.*,
-               Emp.fFirst AS First_Name,
-               Emp.Last   AS Last_Name
-        FROM   Emp
-        WHERE  Emp.ID = ?
-    ;", array($_SESSION['User']));
-    $User = sqlsrv_fetch_array($User);
-    $Field = ($User['Field'] == 1 && $User['Title'] != "OFFICE") ? True : False;
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
     $result = \singleton\database::getInstance( )->query(
       'Portal',
-      "   SELECT  [Privilege].[Access],
-                  [Privilege].[Owner],
-                  [Privilege].[Group],
-                  [Privilege].[Other]
-        FROM      dbo.[Privilege]
-        WHERE     Privilege.[User] = ?;",
+      " SELECT  [Connection].[ID]
+        FROM        [Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
       array(
-        $_SESSION[ 'Connection' ][ 'User' ]
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
       )
     );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+  $result = \singleton\database::getInstance( )->query(
+    null,
+    " SELECT  Emp.fFirst  AS First_Name,
+              Emp.Last    AS Last_Name,
+              Emp.fFirst + ' ' + Emp.Last AS Name,
+              Emp.Title AS Title,
+              Emp.Field   AS Field
+      FROM  Emp
+      WHERE   Emp.ID = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ]
+    )
+  );
+  $User   = sqlsrv_fetch_array( $result );
+  //Privileges
+  $Access = 0;
+  $Hex = 0;
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    "   SELECT  [Privilege].[Access],
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Department],
+                [Privilege].[Database],
+                [Privilege].[Server],
+                [Privilege].[Other],
+                [Privilege].[Token],
+                [Privilege].[Internet]
+        FROM    [Privilege]
+        WHERE   Privilege.[User] = ?;",
+    array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+    )
+  );
     $Privileges = array();
-    while($array2 = sqlsrv_fetch_array($result)){$Privileges[$array2['Access_Table']] = $array2;}
-    $Privileged = False;
-    if( isset($Privileges['Legal'])
-        && (
-				$Privileges['Divisions']['Other_Privilege'] >= 4
-		)
-	 ){
-            $Privileged = True;}
-    if(!isset($Connection['ID']) || !$Privileged){print json_encode(array('data'=>array()));}
-    else {
-        $data = array();
-        $result = \singleton\database::getInstance( )->query(
-            null,
-          " SELECT *
-            FROM (
-                SELECT ROW_NUMBER() OVER ($Order) ($Direction) AS ROW_COUNT,
-                Zone.ID,
-                Zone.Name,
-                Locations.Count  AS Location,
-                Units.Count     AS Units,
-                Violation.Count AS Violation,
-                Tickets.Count   AS tickets
-            FROM (
-                 SELECT  Zone.ID
-                         Rol.Name,
-                 FROM    Zone
-                         LEFT JOIN
-           ) AS Zone
-            LEFT JOIN (
-              SELECT     Location.Zone AS Zone,
-                         COUNT( Location.Loc ) AS Count
-              FROM       Loc AS Location
-              GROUP BY   Location.Zone
-          ) AS Locations ON Locations.Zone = Zone.ID
-            LEFT JOIN (
-              SELECT     Loc.Zone AS Zone,
-                        COUNT ( Unit.ID ) AS Count
-              FROM       Elev AS Unit
-                         LEFT JOIN Loc ON Elev.Loc = Loc.Loc
-              GROUP BY   Loc.Zone
-          ) AS    Units ON Units.Zone = Zone.ID
-            LEFT JOIN (
-              SELECT     Loc.Zone      AS Zone,
-                         COUNT ( Violation.ID ) AS Count
-              FROM       Violation AS Violation
-                         LEFT JOIN Job ON Violation.Job = Job.ID
-                         LEFT JOIN Loc ON Loc.Loc = Job.Loc
-              GROUP BY   Loc.Zone
-          ) AS Violations ON Violations.Zone = Zone.ID
-            LEFT JOIN (
-              SELECT     Loc.Zone      AS Zone,
-                         COUNT ( Tickets.ID ) AS Count
-              FROM       Tickets AS Tickets
-                         LEFT JOIN Job ON Violation.Job = Job.ID
-                         LEFT JOIN Loc ON Loc.Loc = Job.Loc
-              GROUP BY   Loc.Zone
-          ) AS Tickets ON Tickets.Zone = Zone.ID
-      WHERE {$conditions}
-   ) AS Tbl
-   WHERE tbl.ROW_COUNT BETWEEN ? AND ?;";
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
-   $sQueryRow =
-     " SELECT Zone.ID
-       FROM (
-            SELECT  Zone.ID
-                    Rol.Name,
-            FROM    Zone
-                    LEFT JOIN
-      ) AS Zone
-       LEFT JOIN (
-         SELECT     Location.Zone AS Zone,
-                    COUNT( Location.Loc ) AS Count
-         FROM       Loc AS Location
-         GROUP BY   Location.Zone
-     ) AS Locations ON Locations.Zone = Zone.ID
-       LEFT JOIN (
-         SELECT     Loc.Zone AS Zone,
-                   COUNT ( Unit.ID ) AS Count
-         FROM       Elev AS Unit
-                    LEFT JOIN Loc ON Elev.Loc = Loc.Loc
-         GROUP BY   Loc.Zone
-     ) AS    Units ON Units.Zone = Zone.ID
-       LEFT JOIN (
-         SELECT     Loc.Zone      AS Zone,
-                    COUNT ( Violation.ID ) AS Count
-         FROM       Violation AS Violation
-                    LEFT JOIN Job ON Violation.Job = Job.ID
-                    LEFT JOIN Loc ON Loc.Loc = Job.Loc
-         GROUP BY   Loc.Zone
-     ) AS Violations ON Violations.Zone = Zone.ID
-       LEFT JOIN (
-         SELECT     Loc.Zone      AS Zone,
-                    COUNT ( Tickets.ID ) AS Count
-         FROM       Tickets AS Tickets
-                    LEFT JOIN Job ON Violation.Job = Job.ID
-                    LEFT JOIN Loc ON Loc.Loc = Job.Loc
-         GROUP BY   Loc.Zone
-     ) AS Tickets ON Tickets.Zone = Zone.ID
- WHERE {$conditions};";
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+          dechex( $Privilege[ 'Owner' ] ),
+          dechex( $Privilege[ 'Group' ] ),
+          dechex( $Privilege[ 'Department' ] ),
+          dechex( $Privilege[ 'Database' ] ),
+          dechex( $Privilege[ 'Server' ] ),
+          dechex( $Privilege[ 'Other' ] ),
+          dechex( $Privilege[ 'Token' ] ),
+          dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(   !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Division' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Division' ] )
+    ){ ?><?php require('404.html');?><?php }
+  else {
+    $output = array(
+        'sEcho'             => isset( $_GET[ 'draw' ] ) ? intval( $_GET[ 'draw' ] ) : 1,
+        'iTotalRecords'       =>  0,
+        'iTotalDisplayRecords'  =>  0,
+        'aaData'            =>  array(),
+        'options'         => array( )
+    );
 
- $fResult = \singleton\database::getInstance( )->query( null, $sQueryRow , $parameters ) or die(print_r(sqlsrv_errors()));
+    /*Parse GET*/
+    /*None*/
 
+    $conditions = array( );
+    $search   = array( );
 
- $iFilteredTotal = 0;
- $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
- $_SESSION[ 'Tables' ][ 'Divisions' ] = isset( $_SESSION[ 'Tables' ][ 'Divisions' ]  ) ? $_SESSION[ 'Tables' ][ 'Divisions' ] : array( );
- if( count( $_SESSION[ 'Tables' ][ 'Divisions' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Divisions' ] as &$Value ){ $Value = false; } }
- $_SESSION[ 'Tables' ][ 'Divisions' ][ 0 ] = $_GET;
- while( $Row = sqlsrv_fetch_array( $fResult ) ){
-     $_SESSION[ 'Tables' ][ 'Divisions' ][ $Row[ 'ID' ] ] = true;
-     $iFilteredTotal++;
- }
+    /*Default Filters*/
+    /*NONE*/
 
- $parameters = array( );
- $sQuery = " SELECT  COUNT(Zone.ID)
-             FROM    Zone;";
- $rResultTotal = \singleton\database::getInstance( )->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
- $aResultTotal = sqlsrv_fetch_array($rResultTotal);
- $iTotal = $aResultTotal[0];
+    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['ID'];
+      $conditions[] = "Division.ID LIKE '%' + ? + '%'";
+    }
+    if( isset( $_GET[ 'Name' ] ) && !in_array(  $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Contact'];
+      $conditions[] = "Division.Name LIKE '%' + ? + '%'";
+    }
 
- $output = array(
-     'sEcho'         =>  intval( $_GET[ 'draw' ] ),
-     'iTotalRecords'     =>  $iTotal,
-     'iTotalDisplayRecords'  =>  $iFilteredTotal,
-     'aaData'        =>  array()
- );
+    /*Search Filters*/
+    //if( isset( $_GET[ 'search' ] ) ){ }
 
- while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-   $output['aaData'][]       = $Row;
- }
- echo json_encode( $output );
-}
-}
-?>
+    /*Concatenate Filters*/
+    $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+    $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+
+    /*ROW NUMBER*/
+    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
+    $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
+
+    /*Order && Direction*/
+    //update columns from bin/js/tickets/table.js
+    $Columns = array(
+      0 =>  'Division.ID',
+      1 =>  'Division.Name'
+    );
+    $Order = isset( $Columns[ $_GET['order']['column'] ] )
+      ? $Columns[ $_GET['order']['column'] ]
+      : "Division.ID";
+    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
+      ? $_GET['order']['dir']
+      : 'ASC';
+
+    /*Perform Query*/
+    $Query = "SELECT  *
+              FROM  (
+                      SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+                              Division.ID                AS ID,
+                              Division.Name              AS Name,
+                              Locations.Count            AS Locations,
+                              Units.Count                AS Units,
+                              Violations.Count           AS Violations,
+                              Tickets.Count              AS Tickets
+                      FROM    Zone AS Division
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( Loc.Loc ) AS Count
+                                FROM      Loc 
+                                GROUP BY  Loc.Zone
+                              ) AS Locations ON Locations.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( Elev.ID ) AS Count 
+                                FROM      Elev 
+                                          LEFT JOIN Loc ON Elev.Loc = Loc.Loc
+                                GROUP BY  Loc.Zone
+                              ) AS Units ON Units.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( Violation.ID ) AS Count 
+                                FROM      Violation 
+                                          LEFT JOIN Loc ON Violation.Loc = Loc.Loc
+                                GROUP BY  Loc.Zone
+                              ) AS Violations ON Violations.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( TicketD.ID ) AS Count 
+                                FROM      TicketD 
+                                          LEFT JOIN Loc ON TicketD.Loc = Loc.Loc
+                                GROUP BY  Loc.Zone
+                              ) AS Tickets ON Tickets.Division = Division.ID
+                      WHERE   ({$conditions}) AND ({$search})
+                    ) AS Tbl
+              WHERE     Tbl.ROW_COUNT >= ?
+                    AND Tbl.ROW_COUNT <= ?;";
+    $rResult = \singleton\database::getInstance( )->query(
+      null,
+      $Query,
+      $parameters
+    ) or die(print_r(sqlsrv_errors()));
+
+    while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
+        $output[ 'aaData' ][]       = $Ticket;
+      }
+
+    $sQueryRow = "  SELECT  Count( Territory.ID ) AS Count
+            FROM  Terr AS Territory
+            WHERE   ({$conditions}) AND ({$search})";
+
+      $stmt = \singleton\database::getInstance( )->query(
+        null,
+        $sQueryRow,
+        $parameters
+      ) or die(print_r(sqlsrv_errors()));
+
+      $iFilteredTotal = sqlsrv_fetch_array( $stmt )[ 'Count' ];
+      sqlsrv_cancel( $stmt );
+
+      $sQuery = " SELECT  COUNT(Territory.ID)
+                  FROM    Terr AS Territory;";
+      $rResultTotal = \singleton\database::getInstance( )->query(
+        null,
+        $sQuery,
+        array( )
+      ) or die(print_r(sqlsrv_errors()));
+      $aResultTotal = sqlsrv_fetch_array($rResultTotal);
+      $iTotal = $aResultTotal[0];
+
+      $output[ 'iTotalRecords' ] = $iTotal;
+      $output[ 'iTotalDisplayRecords' ] = $iFilteredTotal;
+      echo json_encode( $output );
+    }
+}?>
