@@ -99,7 +99,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 
       $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
-        $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
+      $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
       /*ROW NUMBER*/
       //$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;

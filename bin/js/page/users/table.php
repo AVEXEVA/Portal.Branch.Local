@@ -62,7 +62,7 @@ $(document).ready(function( ){
         <?php \singleton\datatables::getInstance( )->ajax_data( );?>
       },
       columns: [
-          <?php \singleton\datatables::getInstance( )->ID( 'Route' );?>,
+          <?php \singleton\datatables::getInstance( )->ID( 'User' );?>,
           <?php \singleton\datatables::getInstance( )->data_column_email( 'Email' );?>,
           <?php \singleton\datatables::getInstance( )->data_column( 'Verified' );?>,
           <?php \singleton\datatables::getInstance( )->data_column( 'Branch' );?>,

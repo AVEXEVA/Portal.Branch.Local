@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(     !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Route' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
+        ||  !isset( $Privileges[ 'User' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'User' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
       \singleton\database::getInstance( )->query(
