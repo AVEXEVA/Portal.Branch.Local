@@ -233,7 +233,7 @@ $( document ).ready( function( ){
         }
     ],
     initComplete : function( ){
-        $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
+        $("div.search").html( "<input type='text' name='Search' class='form-control' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'
         $('input.date').datepicker( { } );
         $('input.time').timepicker( {  timeFormat : 'h:i A' } );
         //search( this );

@@ -171,6 +171,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Contact.Name      AS Contact_Name,
                           Contact.EMail     AS Contact_Email,
                           Contact.Cellular  AS Contact_Phone,
+                          Contact.Address   AS Address,
                           Contact.Address   AS Contact_Street,
                           Contact.City      AS Contact_City,
                           Contact.State     AS Contact_State,
