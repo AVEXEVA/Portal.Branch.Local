@@ -68,8 +68,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Job' ] )
-        || 	!check( privilege_delete, level_group, $Privileges[ 'Job' ] )
+        ||  !isset( $Privileges[ 'Division' ] )
+        || 	!check( privilege_delete, level_group, $Privileges[ 'Division' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -79,13 +79,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'post/Job.php'
+            'post/Division.php'
         )
       );
 		if(isset($_POST['action']) && $_POST['action'] == 'delete'){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID){
-					$database->query(null,"DELETE FROM dbo.Job WHERE Job.ID = ?;",array($ID));
+					$database->query(null,"DELETE FROM dbo.Zone WHERE Zone.ID = ?;",array($ID));
 				}
 				print json_encode(array('data'=>array()));
 			}

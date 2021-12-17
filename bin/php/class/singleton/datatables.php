@@ -134,18 +134,32 @@ class datatables extends \singleton\index {
     }
     public function button_export( ){ ?>{ extend: 'csv', className: 'form-control', text : "<?php \singleton\fontawesome::getInstance( )->Export( 1 );?><span class='desktop'>Export</span>" }<?php }
     //Helper for Columns
-    public function data_column( $column ){?>{ data : '<?php echo $column;?>' }<?php }
-    public function data_column_currency( $column ){
+    public function data_column( $key ){
+        ?>{ 
+            data : '<?php echo $key;?>',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.<?php echo $key;?> != null && row.<?php echo $key;?> != ''
+                            ?   row.<?php echo $key;?>
+                            :   '';
+                    default:
+                        return '';
+                }
+            } 
+        }<?php 
+    }
+    public function data_column_currency( $key ){
     	?>{
-    		data : '<?php echo $column;?>',
+    		data : '<?php echo $key;?>',
     		render : function( data, type, row, meta ){
     			switch( type ){
     				case 'display':
-    					return 	row.<?php echo $column;?> !== null && row.<?php echo $column;?> != 0
-    						?	dollarUSLocale.format(row.<?php echo $column;?>)
-    						:	''
+    					return 	row.<?php echo $key;?> !== null && row.<?php echo $key;?> != 0 && row.<?php echo $key;?> != '.00'
+    						?	dollarUSLocale.format(row.<?php echo $key;?>)
+    						:	'';
     				deafult : 
-    					return data;
+    					return '';
     			}
     		}
     	}<?php
@@ -163,9 +177,9 @@ class datatables extends \singleton\index {
                           ?   "<div class='row'>" +
                                   "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
-                          :   null;
+                          :   '';
                   default :
-                      return data;
+                      return '';
               }
           }
       }<?php
@@ -177,13 +191,13 @@ class datatables extends \singleton\index {
           render : function( data, type, row, meta ){
               switch( type ){
                   case 'display' :
-                      return  row.<?php echo $key;?> !== null
+                      return  row.<?php echo $key;?> !== null && row.<?php echo $key;?> != ''
                           ?   "<div class='row'>" +
                                   "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
-                          :   null;
+                          :   '';
                   default :
-                      return data;
+                      return '';
               }
           }
       }<?php
@@ -194,11 +208,11 @@ class datatables extends \singleton\index {
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return row.<?php echo $key;?> != ''
+                        return row.<?php echo $key;?> !== null && row.<?php echo $key;?> != ''
                             ?   "<a href='tel:" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->Phone( );?>" + row.<?php echo $key;?> + "</a>"
-                            :   null;
+                            :   '';
                     default :
-                        return data;
+                        return '';
                 }
             }
         }<?php
@@ -209,11 +223,11 @@ class datatables extends \singleton\index {
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return row.<?php echo $key;?> != ''
+                        return row.<?php echo $key;?> !== null && row.<?php echo $key;?> != ''
                             ?   "<a href='mailto:" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->Email( );?>" + row.<?php echo $key;?> + "</a>"
-                            :   null;
+                            :   '';
                     default :
-                        return data;
+                        return '';
                 }
             }
         }<?php
@@ -224,16 +238,18 @@ class datatables extends \singleton\index {
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return  "<div class='row'>" +
-                                    "<div class='col-12'>" +
-                                        "<div class='row'>" +
-                                            "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
-                                            "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
+                        return  row.Street !== null && row.Street != ''
+                                ?   "<div class='row'>" +
+                                        "<div class='col-12'>" +
+                                            "<div class='row'>" +
+                                                "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Street + "</div>" +
+                                                "<div class='col-12'>" + row.City + ", " + row.State + " " + row.Zip + "</div>" +
+                                            "</div>" +
                                         "</div>" +
-                                    "</div>" +
-                                "</div>"
+                                    "</div>"
+                                :   '';
                     default :
-                        return data;
+                        return '';
                 }
             }
         }<?php
@@ -250,7 +266,7 @@ class datatables extends \singleton\index {
                                 "</div>"
                             :   null;
                     default :
-                        return data;
+                        return '';
                 }
             }
         }<?php
@@ -453,14 +469,13 @@ class datatables extends \singleton\index {
         ?>{
             data : 'Contact_ID',
             render : function( data, type, row, meta ){
-
                 switch( type ){
                     case 'display' :
-                        return  row.Contact_ID !== null
+                        return  row.Contact_ID !== null && row.Contact_ID != ''
                             ?   "<div class='row'>" +
                             "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><?php \singleton\fontawesome::getInstance( )->Contact( 1 );?>" + row.Contact_Name + "</a></div>" +
                             "</div>"
-                            :   null;
+                            :   '';
                     default :
                         return data;
                 }

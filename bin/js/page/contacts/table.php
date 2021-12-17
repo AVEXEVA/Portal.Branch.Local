@@ -63,39 +63,25 @@ $(document).ready(function( ){
         },
         columns: [
 	       <?php \singleton\datatables::getInstance( )->ID( 'Contact' );?>,
-           {
-                data : 'Contact',
-                render : function( data, type, row, meta ){
-                    switch( type ){
-                        case 'display' :
-                            return  row.ID !== null
-                                ?   "<div class='row'>" +
-                                        "<div class='col-12'><a href='contact.php?ID=" + row.ID + "'><?php \singleton\fontawesome::getInstance( )->Contact( 1 );?> " + row.Contact + "</a></div>" +
-                                    "</div>"
-                                :   null;
-                        default :
-                            return data;
-                    }
-                }
-            },
+           <?php \singleton\datatables::getInstance( )->Name( 'Contact' );?>,
             <?php \singleton\datatables::getInstance( )->Type( );?>,
             {
-              data : 'Entity_Name',
+              data : 'Name',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
                             switch( row.Entity_Type ){
                                 case 'Customer':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='customer.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Entity_Name + "</a></div>" +
+                                                "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
                                 case 'Location':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='location.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Location( 1 );?>" + row.Entity_Name + "</a></div>" +
+                                                "<div class='col-12'><a href='location.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Location( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
                                 case 'Employee':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='employee.php?Name=" + row.Entity_Name + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Entity_Name + "</a></div>" +
+                                                "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
                                 default : 
                                     return null;
@@ -110,7 +96,7 @@ $(document).ready(function( ){
             <?php \singleton\datatables::getInstance( )->data_column_email( 'Email' );?>,
             <?php \singleton\datatables::getInstance( )->data_column_address( );?>
         ],
-        <?php \singleton\datatables::getInstance( )->initComplete( 'Contacts' );?>,
+        <?php \singleton\datatables::getInstance( )->initComplete( 'contacts' );?>,
         <?php \singleton\datatables::getInstance( )->buttons( 'contact', 'contacts', 'ID' );?>
     });
   });
