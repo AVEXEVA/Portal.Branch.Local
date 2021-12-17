@@ -132,7 +132,7 @@ $( document ).ready( function( ){
     },{
       data : 'Contact_Email'
     },{
-      data : 'Contact_Street',
+      data : 'Address',
       render : function( data, type, row, meta ){
           switch( type ){
               case 'display' :
@@ -149,8 +149,7 @@ $( document ).ready( function( ){
               default :
                   return data;
           }
-
-      }
+        }
     },{
       data   : 'Date'
     },{
