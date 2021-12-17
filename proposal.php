@@ -106,6 +106,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Estimate.Profit         AS  Profit,
                         Estimate.SubTotal1      AS  SubTotal_1,
                         Estimate.SubTotal2      AS  SubTotal_2,
+                        Estimate.fFor           AS  For,
+                        Estimate.Category       AS  Category,
                         Job.ID                  AS  Job_ID,
                         Job.fDesc               AS  Job_Name,
                         Estimate.EstTemplate    AS  EstTemplate,
@@ -170,6 +172,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Profit' => null,
                 'SubTotal_1' => null,
                 'SubTotal_2' => null,
+                'For' => null,
+                'Category' => null,
                 'Employee' => null,
                 'Remarks' => null,
                 'Proposal' => null,
@@ -225,10 +229,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               " DECLARE @MAXID INT;
                 SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Estimate ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Estimate ) END ;
                 INSERT INTO Estimate(
+                  ID,
                   Job,
                   RolID,
                   LocID,
                   EmpID,
+                  Name,
                   fDesc,
                   fDate,
                   Type,
@@ -242,24 +248,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Price,
                   Profit
                 )
-                VALUES ( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+                VALUES ( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
                 SELECT @MAXID + 1;",
               array(
-
-                $Proposal[ 'Job_ID' ],
-                $Proposal[ 'Contact_ID' ],
-                $Proposal[ 'Location_ID' ],
-                $Proposal[ 'Employee_ID' ],
-                $Proposal[ 'Date' ],
-                $Proposal[ 'Type' ],
-                $Proposal[ 'Remarks' ],
-                $Proposal[ 'Notes' ],
-                $Proposal[ 'Cost' ],
-                $Proposal[ 'Hours' ],
-                $Proposal[ 'Labor' ],
-                $Proposal[ 'Overhead' ],
-                $Proposal[ 'Price' ],
-                $Proposal[ 'Profit' ]
+                !empty( $Proposal[ 'Job_ID' ] )       ? $Proposal[ 'Job_ID' ] : null,
+                !empty( $Proposal[ 'Contact_ID' ] )   ? $Proposal[ 'Contact_ID' ] : null,
+                !empty( $Proposal[ 'Location_ID' ] )  ? $Proposal[ 'Location_ID' ] : null,
+                !empty( $Proposal[ 'Employee_ID' ] )  ? $Proposal[ 'Employee_ID' ] : null,
+                !empty( $Proposal[ 'Name' ] )         ? $Proposal[ 'Name' ] : null,
+                !empty( $Proposal[ 'Description' ] )  ? $Proposal[ 'Description' ] : null,
+                !empty( $Proposal[ 'Date' ] )         ? $Proposal[ 'Date' ] : null,
+                !empty( $Proposal[ 'Type' ] )         ? $Proposal[ 'Type' ] : null,
+                !empty( $Proposal[ 'Notes' ] )        ? $Proposal[ 'Notes' ] : null,
+                !empty( $Proposal[ 'Category' ] )     ? $Proposal[ 'Category' ] : null,
+                !empty( $Proposal[ 'For' ] )          ? $Proposal[ 'For' ] : null,
+                !empty( $Proposal[ 'Cost' ] )         ? $Proposal[ 'Cost' ] : null,
+                !empty( $Proposal[ 'Hours' ] )        ? $Proposal[ 'Hours' ] : null,
+                !empty( $Proposal[ 'Labor' ] )        ? $Proposal[ 'Labor' ] : null,
+                !empty( $Proposal[ 'Overhead' ] )     ? $Proposal[ 'Overhead' ] : null,
+                !empty( $Proposal[ 'Price' ] )        ? $Proposal[ 'Price' ] : null,
+                !empty( $Proposal[ 'Profit' ] )       ? $Proposal[ 'Profit' ] : null
               )
             );
             sqlsrv_next_result( $result );
@@ -311,11 +319,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang="en">
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-     <?php	require( bin_meta . 'index.php');?>
-     <?php	require( bin_css  . 'index.php');?>
-     <?php  require( bin_js   . 'index.php');?>
+  <?php  
+    $_GET[ 'Bootstrap' ] = '5.1';
+    $_GET[ 'Entity_CSS' ] = 1;
+    require( bin_meta . 'index.php');
+    require( bin_css  . 'index.php');
+    require( bin_js   . 'index.php');
+  ?>
 </head>
 <body>
     <div id="wrapper">
