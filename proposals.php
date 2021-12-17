@@ -120,6 +120,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           \singleton\table::getInstance( )->th( 'Status', 'Status' );
                           \singleton\table::getInstance( )->th( 'Phone', 'Phone' );
                           \singleton\table::getInstance( )->th( 'Email', 'Email' );
+                          \singleton\table::getInstance( )->th( 'Address', 'Address' );
                           \singleton\table::getInstance( )->th( 'Date', 'Date' );
                           \singleton\table::getInstance( )->th( 'Job', 'Job' );
                           \singleton\table::getInstance( )->th( 'Cost', 'Cost' );
@@ -133,6 +134,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           \singleton\table::getInstance( )->th_input( 'Title', isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Email', isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Address', isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Phone', isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
