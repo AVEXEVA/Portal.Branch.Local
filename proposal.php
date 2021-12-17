@@ -106,7 +106,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Estimate.Profit         AS  Profit,
                         Estimate.SubTotal1      AS  SubTotal_1,
                         Estimate.SubTotal2      AS  SubTotal_2,
-                        Estimate.fFor           AS  For,
+                        Estimate.fFor           AS  [For],
                         Estimate.Category       AS  Category,
                         Job.ID                  AS  Job_ID,
                         Job.fDesc               AS  Job_Name,
@@ -156,6 +156,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         &&    empty( $Name )
                       )
             ? array(
+
                 'ID' => null,
                 'Name' => null,
                 'Description' => null,
@@ -201,14 +202,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Employee_Name' => isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null,
                 'Contact_ID' => isset( $_GET[ 'Contact_ID' ] ) ? $_GET[ 'Contact_ID' ] : null,
                 'Contact_Name' => isset( $_GET[ 'Contact_Name' ] ) ? $_GET[ 'Contact_Name' ] : null
+
             )
             : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           $Proposal[ 'Name' ]             = isset( $_POST[ 'Name' ] )        ? $_POST[ 'Name' ]         : $Proposal[ 'Name' ];
-          $Proposal[ 'Contact_ID' ]       = isset( $_POST[ 'Contact' ] )     ? $_POST[ 'Contact' ]      : $Proposal[ 'Contact_ID' ];
-          $Proposal[ 'Job_ID' ]           = isset( $_POST[ 'Job' ] )         ? $_POST[ 'Job' ]          : $Proposal[ 'Job_ID' ];
-          $Proposal[ 'Location_ID' ]      = isset( $_POST[ 'Location' ] )    ? $_POST[ 'Location' ]     : $Proposal[ 'Location_ID' ];
-          $Proposal[ 'Employee_ID' ]      = isset( $_POST[ 'Employee' ] )    ? $_POST[ 'Employee' ]     : $Proposal[ 'Employee_ID' ];
+          $Proposal[ 'Contact_ID' ]       = isset( $_POST[ 'Contact_ID' ] )     ? $_POST[ 'Contact_ID' ]      : $Proposal[ 'Contact_ID' ];
+          $Proposal[ 'Job_ID' ]           = isset( $_POST[ 'Job_ID' ] )         ? $_POST[ 'Job_ID' ]          : $Proposal[ 'Job_ID' ];
+          $Proposal[ 'Location_ID' ]      = isset( $_POST[ 'Location_ID' ] )    ? $_POST[ 'Location_ID' ]     : $Proposal[ 'Location_ID' ];
+          $Proposal[ 'Employee_ID' ]      = isset( $_POST[ 'Employee_ID' ] )    ? $_POST[ 'Employee_ID' ]     : $Proposal[ 'Employee_ID' ];
           $Proposal[ 'Date' ]             = isset( $_POST[ 'Date' ] )        ? $_POST[ 'Date' ]         : $Proposal[ 'Date' ];
           $Proposal[ 'Type' ]             = isset( $_POST[ 'Type' ] )        ? $_POST[ 'Type' ]         : $Proposal[ 'Type' ];
           $Proposal[ 'Notes' ]            = isset( $_POST[ 'Notes' ] )       ? $_POST[ 'Notes' ]        : $Proposal[ 'Notes' ];
@@ -304,12 +306,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   $Proposal[ 'Date' ],
                   $Proposal[ 'Type' ],
                   $Proposal[ 'Notes' ],
-                  $Proposal[ 'Cost' ],
-                  $Proposal[ 'Hours' ],
-                  $Proposal[ 'Labor' ],
-                  $Proposal[ 'Overhead' ],
-                  $Proposal[ 'Price' ],
-                  $Proposal[ 'Profit' ],
+                  !empty($Proposal['Cost']) ?  $Proposal[ 'Cost' ] : null,
+                  !empty($Proposal['Hours']) ?  $Proposal[ 'Hours' ] : null,
+                  !empty($Proposal['Labor']) ?  $Proposal[ 'Labor' ] : null,
+                  !empty($Proposal['Overhead']) ?  $Proposal[ 'Overhead' ] : null,
+                  !empty($Proposal['Price']) ?  $Proposal[ 'Price' ] : null,
+                  !empty($Proposal['Profit']) ?  $Proposal[ 'Profit' ] : null,
                   $Proposal[ 'ID' ]
                 )
               );
@@ -319,7 +321,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang="en">
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php  
+  <?php
     $_GET[ 'Bootstrap' ] = '5.1';
     $_GET[ 'Entity_CSS' ] = 1;
     require( bin_meta . 'index.php');
