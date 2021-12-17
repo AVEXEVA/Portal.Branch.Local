@@ -157,6 +157,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Violation.ID        AS ID,
                           Violation.Name      AS Name,
                           Violation.fDate     AS Date,
+                          Violation.Ticket    AS Ticket_ID,
                           Customer.ID         AS Customer_ID,
                           Customer.Name       AS Customer_Name,
                           Customer.Name       AS Customer,
