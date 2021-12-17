@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(   !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Route' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Route' ] )
+        ||  !isset( $Privileges[ 'Employee' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Employee' ] )
     ){ ?><?php print json_encode( array( 'data' => array( ) ) );?><?php }
     else {
       $output = array(
