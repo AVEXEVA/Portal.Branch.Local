@@ -86,7 +86,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	<?php require( bin_php . 'element/navigation.php');?>
     	<div id="page-wrapper" class='content' >
             <div class="card card-primary text-white"><form action='map.php' method='GET'>
-                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+            
         		<div class='card-heading'>
 					<div class='row g-0 px-3 py-2'>
 						<div class='col-12 col-lg-6'>
@@ -138,7 +138,54 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						</div>
 					</div>
 				</div>
+				<div class='card card-body bg-dark' >
+					<div class=''>
+					 <form name="map" action="map.php" method='get'>
+					<div class='row g-0 px-3 py-2'>
+						
+         <?php $terr= isset($_GET['Territory']) ? $_GET['Territory']:0;
+         $route= isset($_GET['route']) ? $_GET['route']:0;
+         $divison= isset($_GET['divison']) ? $_GET['divison']:0; ?>
+            <div class='col-3'>Territory: <select name='Territory' class="form-control">
+              <option value=''>Select Territory</option>
+              <?php
+                $r = \singleton\database::getInstance( )->query(null,"SELECT * FROM Terr;");
+                if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>' <?php if($terr == $row['ID']) echo 'selected'; ?> ><?php echo $row['Name'];?></option><?php }}
+              ?>
+            </select>
+         
+           </div>
+           <div class='col-1'></div>
+            <div class='col-3'>Route: <select name='route' class="form-control">
+              <option value=''>Select Route</option>
+              <?php
+                $r = \singleton\database::getInstance( )->query(null,"SELECT * FROM Route;");
+                if($r){while($row = sqlsrv_fetch_array($r)){?>
+                	<option value='<?php echo $row['ID'];?>' <?php if($route==$row['ID']) echo 'selected'; ?>><?php echo $row['Name'];?></option><?php }}
+              ?>
+            </select>
+          </div>
+          <div class='col-1'></div>
+           <div class='col-2'>Division<select name='divison' class="form-control">
+              <option value=''>Select Divison</option>
+              <?php
+                $r = \singleton\database::getInstance( )->query(null,"SELECT * FROM Zone;");
+                if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>' <?php if($divison==$row['ID']) echo 'selected'; ?> ><?php echo $row['Name'];?></option><?php }}
+              ?>
+            </select>
+          </div>
+         <div class='col-1'></div>
+          <div class='col-1'>  search<button
+										class='form-control rounded'
+										type='submit'
+									><?php \singleton\fontawesome::getInstance( 1 )->search( 1 );?><span class='desktop'> Search</span></button></div>
+     
+          </div>
+           </form>
+          </div>
+		 </div>	
 				<div class='card-body bg-dark'>
+
 					<div class='row g-0'>
 						<div class='col-4'>
 							<div class='row g-0'>
@@ -456,23 +503,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					</div>
 				</div>
 				<div class='card-body'>
-					<div id='map' style='height:750px;'>&nbsp;</div>
+					<div id='map' style='height:450px;'>&nbsp;</div>
 				</div>
 			</form></div>
 		</div>
 	</div>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 	<script type="text/javascript">
-		function pinSymbol(color) {
-		    return {
-		        path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
-		        fillColor: color,
-		        fillOpacity: 1,
-		        strokeColor: '#000',
-		        strokeWeight: 2,
-		        scale: 1,
-		   };
-		}
+		
 		var marker = new Array( );
 		var markers = new Array( );
 		var map;
@@ -492,35 +530,40 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				myOptions
 			);
 		  	$(document).ready(function(){
-		    	getGPS( );
-		    	setInterval(
-		    		getGPS,
-		    		15000
-		    	);
+		    	getLocations( );
+		    	
 		  	});
 		}
 		var GETTING_GPS = 0;
-		function rad( x ) { return x * Math.PI / 180; }
-		function getGPS( ){
+		function pinSymbol(color) {
+		    return {
+		        path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+		        fillColor: color,
+		        fillOpacity: 1,
+		        strokeColor: '#000',
+		        strokeWeight: 2,
+		        scale: 1,
+		   };
+		}
+		function getLocations( ){
 		  if( GETTING_GPS == 0 ){
-		    GETTING_GPS = 1;
+		  
 		    $.ajax({
-		      url:"bin/php/get/GPS.php",
+		      url:"bin/php/get/Map.php",
 		      method:"GET",
+		      data:{
+		                Territory:'<?php echo isset($_GET['Territory']) ? $_GET['Territory'] : 0;?>',
+		                route:'<?php echo isset($_GET['route']) ? $_GET['route'] : 0;?>',
+		                division:'<?php echo isset($_GET['division']) ? $_GET['division'] : 0;?>'
+		              },
 		      success:function(json){
 		        var GPS_Data = JSON.parse(json);
 		        for(i in GPS_Data){
 		          if(marker[i] && marker[i]['Color'] && marker[i]['Color'] == 'black'){
 		            var Color = 'black';
-		          } else if(moment().diff(moment(GPS_Data[i].Time_Stamp,'YYYY-MM-DD HH:mm:ss'), 'minutes') < 30){
+		          } else if(GPS_Data[i].Type=='Employee'){
 		            var ClassName = 'New-GPS';
 		            var Color = 'green';
-		          } else if(moment().diff(moment(GPS_Data[i].Time_Stamp,'YYYY-MM-DD HH:mm:ss'), 'minutes') < 120) {
-		            var ClassName = 'Old-GPS';
-		            var Color = 'yellow';
-		          } else if(moment().diff(moment(GPS_Data[i].Time_Stamp,'YYYY-MM-DD HH:mm:ss'), 'minutes') < 550) {
-		            var ClassName = 'Ancient-GPS';
-		            var Color = 'orange';
 		          } else {
 		            var ClassName ='Dead-GPS';
 		            var Color = 'brown';
@@ -531,7 +574,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		            marker[i].setIcon(pinSymbol(Color));
 		            marker[i]['Color'] = Color;
 		            marker[i]['Employee_ID'] = i;
-		            marker[i]['Ticket_ID'] = GPS_Data[i].Ticket_ID;
+		            
 		          } else {
 		            marker[i] = new google.maps.Marker({
 		              map: map,
@@ -547,7 +590,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		              id:i,
 		              Color:Color,
 		              Employee_ID:i,
-		              Ticket_ID:GPS_Data[i].Ticket_ID,
+		            
 		              icon:pinSymbol(Color)
 		            });
 		          }
@@ -572,7 +615,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    });
 		  }
 		}
-		function codeAddress(address) {
+		
+	
+		
+		/*function not used*/
+			function codeAddress(address) {
 		    geocoder = new google.maps.Geocoder();
 		    geocoder.geocode({
 		        'address': address
@@ -597,9 +644,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		          });
 		        }
 		    });
+	}
 
-		}
-		function takeServiceCall(){
+		    	function takeServiceCall(){
 		  $.ajax({
 		    url:"bin/php/element/map/Service_Call.php",
 		    method:"GET",
@@ -608,6 +655,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    }
 		  });
 		}
+
+
 		function zoomUser(link){
 		  var val = $(link).val();
 		  for ( i in marker ){
@@ -624,6 +673,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    }
 		  }
 		}
+
+
 		function breadcrumbUser(link){
 		  var val = $(link).val();
 		  document.location.href='map3.php?ID=' + val;
@@ -638,6 +689,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    entrapments[i].setMap(mapped);
 		  //marker = new Array();
 		}
+
 		function clearMarkers() {
 		  setMapOnAll(toggle == 0 ? null : map);
 		  toggle = toggle == 0 ? 1 : 0;
@@ -647,15 +699,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		  TIMELINE = new Array();
 		  getTimeline();
 		}
-		$(document).on('click',function(e){
-			if($(e.target).closest('.popup:not([class*="directions"])').length === 0){
-				$('.popup:not([class*="directions"])').fadeOut(300);
-				$('.popup:not([class*="directions"])').remove();
-			}
-		});
+		
+	
+
 	</script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g&callback=renderMap"></script>
-<script type='text/javascript' src='https://maps.googleapis.com/maps/api/directions/json?origin=43.65077%2C-79.378425&destination=43.63881%2C-79.42745&key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g'></script>
+<!--script type='text/javascript' src='https://maps.googleapis.com/maps/api/directions/json?origin=43.65077%2C-79.378425&destination=43.63881%2C-79.42745&key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g'></script -->
 
 </body>
 <?php
