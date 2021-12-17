@@ -80,13 +80,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           ? $_POST[ 'ID' ]
           : null
         );
-    $Email = isset( $_GET[ 'Email' ] )
-      ? $_GET[ 'Email' ]
-      : (
-        isset( $_POST[ 'Email' ] )
-          ? $_POST[ 'Email' ]
-          : null
-        );
     $result = \singleton\database::getInstance( )->query(
       'Portal',
       "   SELECT  Top 1
@@ -100,20 +93,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   [User].[Picture] AS Picture,
                   [User].[Picture_Type] AS Picture_Type
           FROM    dbo.[User]
-          WHERE       [User].[ID] = ?
-                  OR  [User].Email = ?;",
+          WHERE   [User].[ID] = ?;",
       array(
-        $ID,
-        $Email
+        $ID
       )
     );
 
-    $User =   (       empty( $ID )
-                &&    !empty( $Name )
-                &&    !$result
-              ) || (  empty( $ID )
-                &&    empty( $Name )
-              )  ? array(
+    $User = empty( $ID )  ? array(
                 'ID' => null,
                 'Email' => null,
                 'Password' => null,
@@ -138,15 +124,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       )
     );
     //var_dump( sqlsrv_errors( ) );
-    $User = ( !empty( $User[ 'Branch_ID' ] ) && $result ) 
-      ? array_merge( $User, sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) )
+    $Employee = $result ? sqlsrv_fetch_array( $result ) : array( 
+      'Employee_ID' => null,
+      'Employee_Work_ID' => null,
+      'Employee_Name' => null,
+      'Employee_First_Name' => null,
+      'Employee_Last_Name' => null
+    );
+    $User = ( !empty( $User[ 'Branch_ID' ] ) && is_array( $Employee ) && count( $Employee ) > 0 ) 
+      ? array_merge( $User, $Employee )
       : array_merge( $User, array( 
-          'Employee_ID' => null,
-          'Employee_Work_ID' => null,
-          'Employee_Name' => null,
-          'Employee_First_Name' => null,
-          'Employee_Last_Name' => null
-        ) );
+      'Employee_ID' => null,
+      'Employee_Work_ID' => null,
+      'Employee_Name' => null,
+      'Employee_First_Name' => null,
+      'Employee_Last_Name' => null
+    ) );
     if( isset( $_POST ) && count( $_POST ) > 0 ){
       $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
       $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
