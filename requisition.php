@@ -161,15 +161,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'Notes' => null,
       'Unit_State' => null,
       'Unit_Label' => null,
-      'Job_ID' => null,
-      'Job_Name' => null,
-      'Job_Type' => null,
       'Location_ID' => null,
       'Location_Name' => null,
       'Location_Street' => null,
       'Location_City' => null,
       'Location_State' => null,
       'Location_Zip' => null,
+      'DropOff_Tag' => null,
       'DropOff_ID' => null,
       'DropOff_Name' => null,
       'DropOff_Street' => null,
@@ -178,6 +176,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'DropOff_Zip' => null,
       'Job_ID' => null,
       'Job_Name' => null,
+      'Job_Type' => null,
       'Unit_Name' => null,
       'Unit_ID' => null,
       'Employee_ID' => null,
@@ -187,13 +186,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Requisition[ 'DropOff_Tag' ] 		= isset( $_POST[ 'DropOff_Tag' ] ) 	 ? $_POST[ 'DropOff_Tag' ] 	 : $Requisition[ 'DropOff_Tag' ];
       $Requisition[ 'Unit_State' ] 	    = isset( $_POST[ 'Unit_State' ] )    ? $_POST[ 'Unit_State' ]    : $Requisition[ 'Unit_State' ];
       $Requisition[ 'Unit_Label' ] 	    = isset( $_POST[ 'Unit_Label' ] )    ? $_POST[ 'Unit_Label' ]    : $Requisition[ 'Unit_Label' ];
+      $Requisition[ 'User' ] 		      = isset( $_POST[ 'User' ] ) 	     ? $_POST[ 'User' ] 	     : $Requisition[ 'User' ];
       $Requisition[ 'Job_ID' ] 		      = isset( $_POST[ 'Job_ID' ] ) 	     ? $_POST[ 'Job_ID' ] 	     : $Requisition[ 'Job_ID' ];
       $Requisition[ 'Job_Name' ] 		    = isset( $_POST[ 'Job' ] ) 	         ? $_POST[ 'Job' ] 	         : $Requisition[ 'Job_Name' ];
       $Requisition[ 'Job_Type' ]        = isset( $_POST[ 'Job_Type' ] )      ? $_POST[ 'Job_Type' ]      : $Requisition[ 'Job_Type' ];
       $Requisition[ 'Location_ID' ]     = isset( $_POST[ 'Location_ID' ] )   ? $_POST[ 'Location_ID' ]   : $Requisition[ 'Location_ID' ];
       $Requisition[ 'Location_Name' ]   = isset( $_POST[ 'Location' ] )      ? $_POST[ 'Location' ]      : $Requisition[ 'Location_Name' ];
-      $Requisition[ 'Dropoff_ID' ]      = isset( $_POST[ 'Dropoff_ID' ] )    ? $_POST[ 'Dropoff_ID' ]    : $Requisition[ 'Dropoff_ID' ];
-      $Requisition[ 'Dropoff_Name' ]    = isset( $_POST[ 'Dropoff_Name' ] )  ? $_POST[ 'Dropoff_Name' ]  : $Requisition[ 'Dropoff_Name' ];
+      $Requisition[ 'DropOff_ID' ]      = isset( $_POST[ 'DropOff_ID' ] )    ? $_POST[ 'DropOff_ID' ]    : $Requisition[ 'DropOff_ID' ];
+      $Requisition[ 'DropOff_Name' ]    = isset( $_POST[ 'DropOff_Name' ] )  ? $_POST[ 'DropOff_Name' ]  : $Requisition[ 'DropOff_Name' ];
       $Requisition[ 'Employee_ID' ]     = isset( $_POST[ 'Employee_ID' ] )   ? $_POST[ 'Employee_ID' ]   : $Requisition[ 'Employee_ID' ];
       $Requisition[ 'Employee_Name' ]   = isset( $_POST[ 'Employee_Name' ] ) ? $_POST[ 'Employee_Name' ] : $Requisition[ 'Employee_Name' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
@@ -204,6 +204,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             INSERT INTO Zone(
               ID,
               User,
+              Date,
               Required,
               Location,
               DropOff,
@@ -216,11 +217,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               FRM,
               Notes,
             )
-            VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
             SELECT @MAXID + 1;",
           array(
             $Requisition[ 'ID' ],
             $Requisition[ 'User' ],
+            $Requisition[ 'Date'],
             $Requisition[ 'Required' ],
             $Requisition[ 'Location' ],
             $Requisition[ 'DropOff' ],
@@ -235,15 +237,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             isset( $Requisition[ 'Geofence' ] ) ? $Requisition[ 'Geofence' ] : 0
           )
         );
+        var_dump(sqlsrv_errors ( ) );
         sqlsrv_next_result( $result );
         $Requisition [ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-        header( 'Location: lead.php?ID=' . $Division [ 'ID' ] );
+        //header( 'Location: requisition.php?ID=' . $Division [ 'ID' ] );
       } else {
         \singleton\database::getInstance( )->query(
           null,
           "	UPDATE 	Requisition
             SET       Requisition.ID   = ?,
                       Requisition.User = ?,
+                      Requisition.Date = ?,
                       Requisition.Required = ?,
                       Requisition.Location = ?,
                       Requisition.DropOff = ?,
@@ -259,6 +263,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
           $Requisition[ 'ID' ],
           $Requisition[ 'User' ],
+          $Requisition[ 'Date' ],
           $Requisition[ 'Required' ],
           $Requisition[ 'Location' ],
           $Requisition[ 'DropOff' ],
@@ -275,6 +280,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       );
     }
   }
+  var_dump(sqlsrv_errors ( ) );
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,9 +291,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <?php	require( bin_css  . 'index.php');?>
   <?php require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
     <div id='wrapper'>
-      <?php require(PROJECT_ROOT.'php/element/navigation.php');?>
+      <?php require(bin_php .'element/navigation.php');?>
       <div id="page-wrapper" class='content'>
         <div class='card card-primary'>
           <form action='requisition.php?ID=<?php echo $Requisition[ 'ID' ];?>' method='POST'>
@@ -316,24 +322,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='card-heading'>
                   <div class='row g-0 px-3 py-2'>
                     <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Items</span></h5></div>
-                    <div class='col-2'>&nbsp;</div>
                   </div>
                 </div>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                   <div class='row g-0'>
                     <div class='col-12'>
                       <table id='Table_Requisition_Items' class='display' cellspacing='0' width='100%'>
-                        <thead><tr>
-                          <th>ID</th>
-                          <th>Quantity</th>
-                          <th>Description</th>
-                          <th>Image</th>
-                        </tr><tr>
-                          <th><input type='text' class='form-control redraw' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID'] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                          <th><input type='text' class='form-control redraw' name='Quantity' placeholder='Quantity' value='<?php echo isset( $_GET[ 'Quantity'] ) ? $_GET[ 'Quantity' ] : null;?>' /></th>
-                          <th><input type='text' class='form-control redraw' name='Description' placeholder='Description' value='<?php echo isset( $_GET[ 'Description'] ) ? $_GET[ 'Description' ] : null;?>' /></th>
-                          <th><input type='text' class='form-control redraw' name='Image' placeholder='Image' disabled /></th>
-                        </tr></thead>
+                        <thead class='text-white border border-white'><tr><?php
+                        \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                        \singleton\table::getInstance( )->th( 'Quantity', 'Quantity' );
+                        \singleton\table::getInstance( )->th( 'Description', 'Description' );
+                        \singleton\table::getInstance( )->th( 'Image', 'Image' );
+                      ?></tr>
+                         <tr class='desktop'><?php
+                         \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                         \singleton\table::getInstance( )->th_input( 'Quantity', isset( $_GET[ 'Quantity' ] ) ? $_GET[ 'Quantity' ] : null );
+                         \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
+                         \singleton\table::getInstance( )->th_input( 'Image', isset( $_GET[ 'Image' ] ) ? $_GET[ 'Image' ] : null );
+                        ?></tr></thead>
                       </table>
                     </div>
                   </div>
