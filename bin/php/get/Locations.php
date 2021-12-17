@@ -199,7 +199,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           CASE  WHEN Location.Maint = 0 THEN 'Active' 
                                 ELSE 'Inactive' END AS Maintained,
                           CASE  WHEN Location.Status = 0 THEN 'Active' 
-                                ELSE 'Inactive' END AS Status
+                                ELSE 'Inactive' END AS Status,
+                          CASE  WHEN  Job_Units.JobCount IS NULL THEN 0
+                                ELSE  Job_Units.JobCount 
+                          END AS Job,
+                           CASE  WHEN  Tickets.Count_of_Tickets IS NULL THEN 0
+                                    ELSE  Tickets.Count_of_Tickets 
+                                      END AS Tickets,
+                          
+                          CASE  WHEN  Collection.Count_of_OpenAR IS NULL THEN 0
+                                ELSE  Collection.Count_of_OpenAR
+                          END AS Collection
                   FROM    Loc AS Location
                           LEFT JOIN (
                               SELECT  Owner.ID,
@@ -222,6 +232,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM      Elev 
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
+                           LEFT JOIN (
+                             SELECT    Job.Loc AS Location,
+                                        Count( Job.ID ) AS JobCount
+                              FROM      Job 
+                              GROUP BY  Job.Loc
+                            ) AS Job_Units ON Job_Units.Location = Location.Job
+                            LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( TicketD.ID ) AS Count_of_Tickets
+                              FROM      TicketD 
+                              GROUP BY  TicketD.Loc
+                            ) AS Tickets on  Tickets.Loc= Location.Loc
+                            LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( OpenAR.Loc ) AS Count_of_OpenAR
+                              FROM      OpenAR 
+                              GROUP BY  OpenAR.Loc
+                            ) AS Collection on  Collection.Loc= Location.Loc
                           LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
                           
                   WHERE   ({$conditions}) AND ({$search})
@@ -299,11 +327,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.City        AS City,
                           Location.State       AS State,
                           Location.Zip         AS Zip,
-                          CASE  WHEN  Location_Units.Count IS NULL THEN 0
+                         CASE  WHEN  Location_Units.Count IS NULL THEN 0
                                 ELSE  Location_Units.Count 
                           END AS Units,
                           Location.Maint       AS Maintained,
-                          Location.Status      AS Status
+                          Location.Status      AS Status,
+                          CASE  WHEN  Job_Units.JobCount IS NULL THEN 0
+                                ELSE  Job_Units.JobCount 
+                          END AS Job,
+                           CASE  WHEN  Tickets.Count_of_Tickets IS NULL THEN 0
+                                    ELSE  Tickets.Count_of_Tickets 
+                                      END AS Tickets,
+                          
+                          CASE  WHEN  Collection.Count_of_OpenAR IS NULL THEN 0
+                                ELSE  Collection.Count_of_OpenAR
+                          END AS Collection
                   FROM    Loc AS Location
                           LEFT JOIN (
                               SELECT  Owner.ID,
@@ -320,6 +358,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           ) AS Location_Type ON Location_Type.Location = Location.Loc
                           LEFT JOIN Zone ON Location.Zone = Zone.ID 
                           LEFT JOIN Route ON Location.Route = Route.ID
+                           LEFT JOIN (
+                             SELECT    Job.Loc AS Location,
+                                        Count( Job.ID ) AS JobCount
+                              FROM      Job 
+                              GROUP BY  Job.Loc
+                            ) AS Job_Units ON Job_Units.Location = Location.Job
+                            LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( TicketD.ID ) AS Count_of_Tickets
+                              FROM      TicketD 
+                              GROUP BY  TicketD.Loc
+                            ) AS Tickets on  Tickets.Loc= Location.Loc
+                            LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( OpenAR.Loc ) AS Count_of_OpenAR
+                              FROM      OpenAR 
+                              GROUP BY  OpenAR.Loc
+                            ) AS Collection on  Collection.Loc= Location.Loc
                           LEFT JOIN (
                             SELECT    Elev.Loc AS Location,
                                       Count( Elev.ID ) AS Count

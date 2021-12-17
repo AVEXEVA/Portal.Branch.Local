@@ -115,6 +115,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             \singleton\bootstrap::getInstance( )->card_row_form_input( 'Zip', isset( $_GET[ 'Zip' ] ) ? $_GET[ 'Zip' ] : null, false, false, false, 'redraw' );
             \singleton\bootstrap::getInstance( )->card_row_form_input( 'Maintained', isset( $_GET[ 'Maintained' ] ) ? $_GET[ 'Maintained' ] : null, false, false, false, 'redraw' );
             \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, array( 0 => 'Disabled', 1 => 'Enabled' ) );
+            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );
+            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null, false, false, false, 'redraw' );
+            \singleton\bootstrap::getInstance( )->card_row_form_input( 'collection', isset( $_GET[ 'collection' ] ) ? $_GET[ 'collection' ] : null, false, false, false, 'redraw' );
           ?></div>
           <div class="card-body bg-dark">
             <table id='Table_Locations' class='display' cellspacing='0' width='100%'>
@@ -132,6 +135,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 \singleton\table::getInstance( )->th( 'Units', 'Units' );
                 \singleton\table::getInstance( )->th( 'Maintained', 'Maintained' );
                 \singleton\table::getInstance( )->th( 'Status', 'Status' );
+                \singleton\table::getInstance( )->th( 'Job', 'Job' );
+                \singleton\table::getInstance( )->th( 'Tickets', 'Tickets' );
+                 \singleton\table::getInstance( )->th( 'Collection', 'Collection' );
               ?></tr><tr class='form-desktop'><?php 
                 \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
                 \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
@@ -158,6 +164,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
                 \singleton\table::getInstance( )->th_select( 'Maintained', isset( $_GET[ 'Maintained' ] ) ? $_GET[ 'Maintained' ] : null, array( 0 => 'Disabled', 1 => 'Enabled' ) );
                 \singleton\table::getInstance( )->th_select( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, array( 0 => 'Disabled', 1 => 'Enabled' ) );
+                \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null );
+                \singleton\table::getInstance( )->th_input( 'collection', isset( $_GET[ 'collection' ] ) ? $_GET[ 'collection' ] : null );
               ?></tr></thead>
             </table>
           </div>

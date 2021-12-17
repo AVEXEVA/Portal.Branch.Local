@@ -126,6 +126,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                       FROM      Elev
                                       GROUP BY  Elev.Loc
                                     ) AS Location_Units ON Location_Units.Location = Location.Loc
+                                     LEFT JOIN (
+                                           SELECT    Job.Loc AS Location,
+                                                      Count( Job.ID ) AS JobCount
+                                            FROM      Job 
+                                            GROUP BY  Job.Loc
+                                          ) AS Job_Units ON Job_Units.Location = Location.Job
+                                          LEFT JOIN (
+                                           SELECT    Loc,
+                                                      Count( TicketD.ID ) AS Count_of_Tickets
+                                            FROM      TicketD 
+                                            GROUP BY  TicketD.Loc
+                                          ) AS Tickets on  Tickets.Loc= Location.Loc
+                                          LEFT JOIN (
+                                           SELECT    Loc,
+                                                      Count( OpenAR.Loc ) AS Count_of_OpenAR
+                                            FROM      OpenAR 
+                                            GROUP BY  OpenAR.Loc
+                                          ) AS Collection on  Collection.Loc= Location.Loc
                                     LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
 
                             WHERE   ({$conditions}) AND ({$search})

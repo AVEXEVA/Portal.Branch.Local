@@ -5,6 +5,7 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 header('Content-Type: text/javascript');
 ?>
+   $( document ).ready( function( ){
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -31,7 +32,10 @@ function search( link ){
                         State :  $('input:visible[name="State"]').val( ),
                         Zip :  $('select:visible[name="Zip"]').val( ),
                         Status : $('select:visible[name="Status"]').val( ),
-                        Maintaiend : $('select:visible[name="Maintained"]').val( )
+                        Maintaiend : $('select:visible[name="Maintained"]').val( ),
+                        Job :  $('input:visible[name="Job"]').val( ),
+                        Tickets :  $('input:visible[name="Tickets"]').val( ),
+                        collection :  $('input:visible[name="collection"]').val( ),
                     },
                     dataType : 'json',
                     success : function( data ){
@@ -75,9 +79,13 @@ $(document).ready(function( ){
             <?php \singleton\datatables::getInstance( )->data_column('Zip');?>,
             <?php \singleton\datatables::getInstance( )->data_column('Units');?>,
             <?php \singleton\datatables::getInstance( )->data_column('Maintained');?>,
-            <?php \singleton\datatables::getInstance( )->data_column('Status');?>            
+            <?php \singleton\datatables::getInstance( )->data_column('Status');?> ,
+            <?php \singleton\datatables::getInstance( )->data_column('Job');?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Tickets');?> , 
+            <?php \singleton\datatables::getInstance( )->data_column('Collection');?>             
         ],
         <?php \singleton\datatables::getInstance( )->initComplete( 'locations' );?>,
         <?php \singleton\datatables::getInstance( )->buttons( 'location', 'locations', 'ID' );?>
     } );
+});
 });
