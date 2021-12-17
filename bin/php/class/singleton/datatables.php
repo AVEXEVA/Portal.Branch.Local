@@ -135,6 +135,21 @@ class datatables extends \singleton\index {
     public function button_export( ){ ?>{ extend: 'csv', className: 'form-control', text : "<?php \singleton\fontawesome::getInstance( )->Export( 1 );?><span class='desktop'>Export</span>" }<?php }
     //Helper for Columns
     public function data_column( $column ){?>{ data : '<?php echo $column;?>' }<?php }
+    public function data_column_currency( $column ){
+    	?>{
+    		data : '<?php echo $column;?>',
+    		render : function( data, type, row, meta ){
+    			switch( type ){
+    				case 'display':
+    					return 	row.<?php echo $column;?> !== null && row.<?php echo $column;?> != 0
+    						?	dollarUSLocale.format(row.<?php echo $column;?>)
+    						:	''
+    				deafult : 
+    					return data;
+    			}
+    		}
+    	}<?php
+    }
 
     //Columns
     public function data_column_id( $reference, $key ){
@@ -227,15 +242,15 @@ class datatables extends \singleton\index {
     //Columns
     public function ID( $reference ){ self::data_column_id( $reference, 'ID' ); }
     public function Name( $reference ){ self::data_column_link( $reference, 'Name' ); }
-    public function Date( ){
+    public function Date( $key = 'Date' ){
         ?>{
-            data : 'Date',
+            data : '<?php echo $key;?>',
             render: function( data, type, row, meta ){
                 switch( type ){
                     case 'display':
-                        return row.Date !== null
+                        return row.<?php echo $key;?> !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><?php \singleton\fontawesome::getInstance( )->Date( 1 );?>" + row.Date + "</div>" +
+                                    "<div class='col-12'><?php \singleton\fontawesome::getInstance( )->Date( 1 );?>" + row.<?php echo $key;?> + "</div>" +
                                 "</div>"
                             :   null;
                         default :
@@ -335,10 +350,10 @@ class datatables extends \singleton\index {
                     case 'display':
                         return row.Job_ID !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?>" + row.Job_ID + "</a></div>" +
-                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
+                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?>Job #" + row.Job_ID + "</a></div>" +
+                                    ( row.Job_Name !== null ? "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" : '' ) +
                                 "</div>"
-                            :   null;
+                            :   '';
                         default :
                             return data;
                 }
@@ -472,11 +487,11 @@ class datatables extends \singleton\index {
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return  row.<?php echo ucfirst( $key );?> !== null
+                        return  row.<?php echo ucfirst( $key );?> !== null && row.<?php echo ucfirst( $key );?> != 0
                             ?   "<div class='row'>" +
                                     "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $key;?></a></div>" +
                                 "</div>"
-                            :   null;
+                            :   '';
                     default :
                         return data;
                 }

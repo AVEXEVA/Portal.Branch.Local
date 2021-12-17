@@ -291,9 +291,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'options'       => array( )
     );
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      $Row[ 'Start_Date' ]      = is_null( $Row[ 'Start_Date' ] )       ? null : date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
-      $Row[ 'End_Date' ]        = is_null( $Row[ 'End_Date' ] )         ? null : date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
-      $Row[ 'Escalation_Date' ] = is_null( $Row[ 'Escalation_Date' ] )  ? null : date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
+      $Row[ 'Start_Date' ]      = is_null( $Row[ 'Start_Date' ] )      || $Row[ 'Start_Date' ]      == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
+      $Row[ 'End_Date' ]        = is_null( $Row[ 'End_Date' ] )        || $Row[ 'End_Date' ]        == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
+      $Row[ 'Escalation_Date' ] = is_null( $Row[ 'Escalation_Date' ] ) || $Row[ 'Escalation_Date' ] == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
       $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
       //preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
       //$Row[ 'Link' ]            = $matches[ 0 ];
