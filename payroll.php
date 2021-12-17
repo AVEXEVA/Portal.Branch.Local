@@ -92,17 +92,20 @@ if($Mechanic > 0){
     $Alias = $array['fFirst'][0] . $array['Last'];
     $Employee_ID = $array['fWork'];
     while($array = sqlsrv_fetch_array($result)){}
-
+        $Start_Date ="";
+    $End_Date="";
     //GET TICKETS
-    if($_GET['Start_Date'] > 0){$Start_Date = DateTime::createFromFormat('m/d/Y', $_GET['Start_Date'])->format("Y-m-d 00:00:00.000");}
+    if(isset($_GET['Start_Date'])&&($_GET['Start_Date'] > 0))
+    {
+        $Start_Date = DateTime::createFromFormat('m/d/Y', $_GET['Start_Date'])->format("Y-m-d 00:00:00.000");}
     else{$Start_Date = DateTime::createFromFormat('m/d/Y',"1/1/2017")->format("Y-m-d 00:00:00.000");}
 
-    if($_GET['End_Date'] > 0){$End_Date = DateTime::createFromFormat('m/d/Y', $_GET['End_Date'])->format("Y-m-d 23:59:59.999");}
+    if(isset($_GET['End_Date'])&&($_GET['End_Date'] > 0)){$End_Date = DateTime::createFromFormat('m/d/Y', $_GET['End_Date'])->format("Y-m-d 23:59:59.999");}
     else{$End_Date = DateTime::createFromFormat('m/d/Y',"1/1/3000")->format("Y-m-d 23:59:59.999");}
-
+    $Location_Tag="";
     if(!isset($_GET['Location_Tag']) || $_GET['Location_Tag'] == "All" || $_GET['Location_Tag'] == ""){$Location_Tag = "' OR '1'='1";}
     else {$Location_Tag = addslashes($_GET['Location_Tag']);}
-
+    $Status="";
     if(!isset($_GET['Status']) || $_GET['Status'] == 'All' || $_GET['Status'] == ""){$Status = "' OR '1'='1";}
     else{$Status = $_GET['Status'];}
     //$prepared = odbc_prepare($c,"select TicketO.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State, TickOStatus.Type as Status from (((((TicketO LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketO.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON TicketO.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketO.LElev = Elev.ID) LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref where TicketO.DWork='" . $Call_Sign . "' AND CDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "' AND Loc.Loc = ?");
@@ -110,19 +113,23 @@ if($Mechanic > 0){
 
     $result = $database->query(null,"select TicketO.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State, TickOStatus.Type as Status from (((((TicketO LEFT JOIN nei.dbo.Loc ON TicketO.LID = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketO.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON TicketO.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketO.LElev = Elev.ID) LEFT JOIN nei.dbo.TickOStatus ON TicketO.Assigned = TickOStatus.Ref where TicketO.fWork='" . $Employee_ID . "' AND ((EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "') OR Assigned=3 OR Assigned=1) AND (Tag = '" . $Location_Tag . "') AND (Assigned = '" . $Status .  "');");
     $Tickets = array();
-    while($array = sqlsrv_fetch_array($result)){
-        $Tickets[$array['ID']] = $array;
-    }
-
-    if($Status == "4" || $_GET['Status'] == "" || !isset($_GET['Status'])){
-        $result = $database->query(null,"select TicketD.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State from ((((TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON Loc.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketD.Elev = Elev.ID where TicketD.fWork='" . $Employee_ID . "' AND EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "' AND (Tag = '" . $Location_Tag . "');");
+    if(!empty($result)){
         while($array = sqlsrv_fetch_array($result)){
             $Tickets[$array['ID']] = $array;
-            $Tickets[$array['ID']]['Status'] = "Completed";
+        }
+    }
+
+    if($Status == "4"  || !isset($_GET['Status'])){
+        $result = $database->query(null,"select TicketD.*, Loc.Tag as Tag, Loc.Address as Address, Loc.City as City, Loc.State as State, Loc.Zip as Zip, Job.ID as Job_ID, Job.fDesc as Job_Description, OwnerWithRol.ID as Owner_ID, OwnerWithRol.Name as Customer, JobType.Type as Job_Type, Elev.Unit as Unit_Label, Elev.State as Unit_State from ((((TicketD LEFT JOIN nei.dbo.Loc ON TicketD.Loc = Loc.Loc) LEFT JOIN nei.dbo.Job ON TicketD.Job = Job.ID) LEFT JOIN nei.dbo.OwnerWithRol ON Loc.Owner = OwnerWithRol.ID) LEFT JOIN nei.dbo.JobType ON Job.Type = JobType.ID) LEFT JOIN nei.dbo.Elev ON TicketD.Elev = Elev.ID where TicketD.fWork='" . $Employee_ID . "' AND EDate >= '" . $Start_Date . "' AND EDate <= '" . $End_Date . "' AND (Tag = '" . $Location_Tag . "');");
+        if(!empty($result)){
+            while($array = sqlsrv_fetch_array($result)){
+                $Tickets[$array['ID']] = $array;
+                $Tickets[$array['ID']]['Status'] = "Completed";
+            }
         }
     }
     $_SESSION['Tickets'] = $Tickets;
-    if(strlen($_GET['Start_Date']) > 0 || strlen($_GET['End_Date']) > 0 || strlen($_GET['Location_Tag']) > 0 || $Status > 0){
+    if((isset($_GET['Start_Date']) && strlen($_GET['Start_Date']) > 0) || (isset($_GET['End_Date']) && strlen($_GET['End_Date']) > 0) || (isset($_GET['Location_Tag']) && strlen($_GET['Location_Tag']) > 0) || $Status > 0){
         $_SESSION['Last_Search'] = "tickets.php?Dashboard=Mechanic&Start_Date=" . $_GET['Start_Date'] . "&End_Date=" . $_GET['End_Date'] . "&Location_Tag=" . $_GET['Location_Tag'] . "&Status=" . $_GET['Status'] . "&Show_Hours=" . $_GET['show_hours'] . "&Show_Tickets=" . $_GET['show_Tickets'];
     }
 }?><!DOCTYPE html>
@@ -140,10 +147,9 @@ if($Mechanic > 0){
        <?php	require( bin_css  . 'index.php');?>
        <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload="finishLoadingPage();">
+<body>
     <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
         <?php require( bin_php . 'element/navigation.php');?>
-        <?php require( bin_php . 'element/loading.php');?>
         <div id="page-wrapper" class='content'>
             <div class="row">
                 <div class="col-lg-12">
