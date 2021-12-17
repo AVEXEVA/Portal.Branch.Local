@@ -102,6 +102,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Customer_Name'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
+     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer'];
+      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+    }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Type'];
       $conditions[] = "Location_Type.Name LIKE '%' + ? + '%'";
@@ -185,6 +189,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.City          AS City,
                           Location.State         AS State,
                           Location.Zip           AS Zip,
+                          CASE  WHEN  Tickets.Count_of_Tickets IS NULL THEN 0
+                                    ELSE  Tickets.Count_of_Tickets 
+                                      END AS TicketCount,
+                          CASE  WHEN  Job_Units.JobCount IS NULL THEN 0
+                                ELSE  Job_Units.JobCount 
+                          END AS Job,
+                          CASE  WHEN  Collection.Count_of_OpenAR IS NULL THEN 0
+                                ELSE  Collection.Count_of_OpenAR
+                          END AS Collection,
                           CASE  WHEN  Location_Units.Count IS NULL THEN 0
                                 ELSE  Location_Units.Count 
                           END AS Units,
@@ -214,6 +227,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM      Elev 
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
+                           LEFT JOIN (
+                             SELECT    Job.Loc AS Location,
+                                        Count( Job.ID ) AS JobCount
+                              FROM      Job 
+                              GROUP BY  Job.Loc
+                            ) AS Job_Units ON Job_Units.Location = Location.Job
+                            LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( TicketD.ID ) AS Count_of_Tickets
+                              FROM      TicketD 
+                              GROUP BY  TicketD.Loc
+                            ) AS Tickets on  Tickets.Loc= Location.Loc
+                            LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( OpenAR.Loc ) AS Count_of_OpenAR
+                              FROM      OpenAR 
+                              GROUP BY  OpenAR.Loc
+                            ) AS Collection on  Collection.Loc= Location.Loc
                           LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
                           
                   WHERE   ({$conditions}) AND ({$search})
@@ -291,9 +322,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.City        AS City,
                           Location.State       AS State,
                           Location.Zip         AS Zip,
+                          Tickets.Count_of_Tickets AS TicketCount,
                           CASE  WHEN  Location_Units.Count IS NULL THEN 0
                                 ELSE  Location_Units.Count 
                           END AS Units,
+                          CASE  WHEN  Job_Units.JobCount IS NULL THEN 0
+                                    ELSE  Job_Units.JobCount 
+                                    END AS Job,
+                          CASE  WHEN  Collection.Count_of_OpenAR IS NULL THEN 0
+                                ELSE  Collection.Count_of_OpenAR
+                                 END AS Collection,
                           Location.Maint       AS Maintained,
                           Location.Status      AS Status
                   FROM    Loc AS Location
@@ -318,6 +356,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM      Elev 
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
+                           LEFT JOIN (
+                                       SELECT    Job.Loc AS Location,
+                                                  Count( Job.ID ) AS JobCount
+                                        FROM      Job 
+                                        GROUP BY  Job.Loc
+                                      ) AS Job_Units ON Job_Units.Location = Location.Job
+                          LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( TicketD.ID ) AS Count_of_Tickets
+                              FROM      TicketD 
+                              GROUP BY  TicketD.Loc
+                            ) AS Tickets on  Tickets.Loc= Location.Loc
+                           LEFT JOIN (
+                             SELECT    Loc,
+                                        Count( OpenAR.Loc ) AS Count_of_OpenAR
+                              FROM      OpenAR 
+                              GROUP BY  OpenAR.Loc
+                            ) AS Collection on  Collection.Loc= Location.Loc
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl";
 

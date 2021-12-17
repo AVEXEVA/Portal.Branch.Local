@@ -1,3 +1,11 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');
+?>
+    $( document ).ready( function( ){
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -12,6 +20,7 @@ function search( link ){
                     data    : {
                         search : $('input:visible[name="Search"]').val(),
                         ID :  $('input:visible[name="ID"]').val( ),
+                        Customer :  $('input:visible[name="Customer"]').val( ),
                         Customer_ID :  $('input:visible[name="Customer_ID"]').val( ),
                         Customer_Name :  $('input:visible[name="Customer_Name"]').val( ),
                         Name :  $('input:visible[name="Name"]:visible').val( ),
@@ -24,7 +33,8 @@ function search( link ){
                         State :  $('input:visible[name="State"]').val( ),
                         Zip :  $('select:visible[name="Zip"]').val( ),
                         Status : $('select:visible[name="Status"]').val( ),
-                        Maintaiend : $('select:visible[name="Maintained"]').val( )
+                        Maintaiend : $('select:visible[name="Maintained"]').val( ),
+                        Job :  $('input:visible[name="Job"]:visible').val( ),
                     },
                     dataType : 'json',
                     success : function( data ){
@@ -43,6 +53,7 @@ function search( link ){
         }
     );
 }
+  
 $(document).ready(function( ){
     var Editor_Locations = new $.fn.dataTable.Editor( {
         idSrc    : 'ID',
@@ -80,6 +91,7 @@ $(document).ready(function( ){
                         },
                         ID :  $('input:visible[name="ID"]').val( ),
                         Name :  $('input:visible[name="Name"]').val( ),
+                        Customer :  $('input:visible[name="Customer"]').val( ),
                         Customer_ID :  $('input:visible[name="Customer_ID"]').val( ),
                         Customer_Name :  $('input:visible[name="Customer_Name"]').val( ),
                         Type : $('select:visible[name="Type"]').val( ),
@@ -91,16 +103,49 @@ $(document).ready(function( ){
                         State :  $('input:visible[name="State"]').val( ),
                         Zip :  $('input:visible[name="Zip"]').val( ),
                         Status : $('select:visible[name="Status"]').val( ),
-                        Maintained : $('select:visible[name="Maintained"]').val( )
+                        Maintained : $('select:visible[name="Maintained"]').val( ),
+                        Customer :  $('input:visible[name="Customer"]').val( ),
+                         Collection : $('input:visible[name="collection"]').val( ),
                     };
                     return d;
                 }
         },
         columns: [
-            <?php \singleton\datatables::getInstance( )->ID('location.php','Location');?>,
-            <?php \singleton\datatables::getInstance( )->Name('location.php');?>,
-            <?php \singleton\datatables::getInstance( )->CustomerID();?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Type');?>,
+           
+            {   
+                className : 'ID',   
+                data : 'ID' 
+            },{ 
+                data : 'Name',  
+                render : function( data, type, row, meta ){ 
+                    switch( type ){ 
+                        case 'display' :    
+                            return  row.ID !== null     
+                                ?   "<div class='row'>" +   
+                                        "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><i class='fa fa-building fa-fw fa-1x'></i>" + row.Name + "</a></div>" +   
+                                    "</div>"    
+                                :   null;   
+                        default :   
+                            return data;    
+                    }   
+                }   
+            },{ 
+                data : 'Customer_ID',   
+                render : function( data, type, row, meta ){ 
+                    switch( type ){ 
+                        case 'display' :    
+                            return  row.Customer_ID !== null    
+                                ?   "<div class='row'>" +   
+                                        "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +     
+                                    "</div>"    
+                                :   null;   
+                        default :   
+                            return data;    
+                    }   
+                }   
+            },{ 
+                data : 'Type'   
+            },
             {
                 data : 'Division_ID',
                 render : function( data, type, row, meta ){
@@ -133,16 +178,30 @@ $(document).ready(function( ){
 
                 }
             },
-            <?php \singleton\datatables::getInstance( )->DataElement('Street');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('City');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('State');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Zip');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Units');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Maintained');?>,
-            <?php \singleton\datatables::getInstance( )->DataElement('Status');?>            
+           {
+                data : 'Street'
+            },{
+                data : 'City'
+            },{
+                data : 'State'
+            },{
+                data : 'Zip'
+            },{
+                data : 'Units'
+            },{
+                data : 'Status'
+            },{
+                data : 'Maintained'
+            },{
+                data : 'Job'
+            },{
+                data : 'TicketCount'
+            },{
+                data : 'Collection'
+            },       
         ],
         initComplete : function( settings, json ){
-            $("div.search").html( "<input type='text' name='Search' placeholder='Search' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );'
+            $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control' style='width: 100%;' />" );//onChange='$(\"#Table_Locations\").DataTable().ajax.reload( );'
             $("div.columns-visibility").html(
                 "<div class='desktop bg-dark'>" +
                   "<div class='row'>" +
@@ -161,9 +220,10 @@ $(document).ready(function( ){
                       "<a class='toggle-vis text-white' data-column='10'>Units</a>" + ' ' +
                       "<a class='toggle-vis text-white' data-column='11'>Maintained</a>" + ' ' +
                       "<a class='toggle-vis text-white' data-column='12'>Status</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='13'>Labor</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='14'>Revenue</a>" + ' ' +
-                      "<a class='toggle-vis text-white' data-column='15'>Net Income</a>" +
+                      "<a class='toggle-vis text-white' data-column='13'>Job</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='14'>Tickets</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='15'>Collection</a>" + ' ' +
+                      "<a class='toggle-vis text-white' data-column='16'>Net Income</a>" +
                     "</div>" +
                   "</div>" +
                 "</div>"
@@ -227,3 +287,4 @@ $(document).ready(function( ){
         ]
     } );
     });
+  });;

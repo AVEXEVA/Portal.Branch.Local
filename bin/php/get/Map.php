@@ -73,7 +73,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       ||  !check( privilege_read, level_group, $Privileges[ 'Map' ] )
   ){ ?><?php require('404.html');?><?php }
   else {
-  
+    $conditions=array();
+    $parameters=array();
+     if( isset( $_GET[ 'Territory' ] ) && (  $_GET[ 'Territory' ]>0 ) ){
+        $parameters[] = $_GET['Territory'];
+        $conditions[] = "Location.Terr = ? ";
+      }
+      if( isset( $_GET[ 'route' ] ) &&  ($_GET[ 'route' ]>0) ){
+      $parameters[] = $_GET['route'];
+      $conditions[] = "Location.Route = ? ";
+      }
+      if( isset( $_GET[ 'division' ] ) && (  $_GET[ 'division' ]>0) ){
+        $parameters[] = $_GET['division'];
+        $conditions[] = "Location.Zone = ?";
+      }
+    /*Concatenate Filters*/
+    $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $rows = array( );
     $r = $database->query(null,"
       SELECT 
@@ -86,21 +101,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       Emp.fWork  AS Employee_Work_ID,
       Emp.ID as Employee_ID
     FROM
-      Rol
-      LEFT JOIN Emp ON Rol.ID = Emp.Rol where Rol.Latt > 0;",array());
+      Emp
+      Inner JOIN Rol ON Rol.ID = Emp.Rol where Rol.Latt > 0;",array());
   
   while($row = sqlsrv_fetch_array($r)){
   
      
-        $row['Time_Stamp'] = date('Y-m-d H:i:s',strtotime('-5 hours',strtotime($row['Last'])));
+        $row['Time_Stamp'] = '';
 
-        $row['Title'] = $row['First_Name'] . " " . $row['Last_Name'] . " - " . date('m/d/Y h:i A', strtotime($row['Last']));
-         if($row['First_Name'] =="" || $row['First_Name']==NULL){
-          $row['Title'] =$row['Name'];
+        $row['Title'] = $row['First_Name'] . " " . $row['Last_Name'] ;
+        $row['Type'] ='Employee';
+        $rows[ ] = $row;
+      }
+
+
+ $query=" SELECT 
+      Location.fLong as Longitude,
+      Location.Latt as Latitude,
+      Location.Tag as Name
+     FROM Loc as Location
+        LEFT JOIN Zone            AS Division ON Location.Zone    = Division.ID
+         LEFT JOIN Route           AS Route    ON Location.Route   = Route.ID
+      LEFT JOIN Terr               ON Terr.ID    = Location.Terr
+      where ({$conditions}) AND Location.Latt > 0";
+      $filter = $database->query(null,$query,$parameters);
+  
+  while($row = sqlsrv_fetch_array($filter)){
+  
+     
+        $row['Time_Stamp'] = '';
+
+        $row['Title'] =$row['Name'];
            $row['Type'] ='Location';
-        }else{
-           $row['Type'] ='Employee';
-        }
         $rows[ ] = $row;
       }
       print json_encode( $rows );

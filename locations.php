@@ -93,13 +93,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body >
   <div id="wrapper">
     <?php require( bin_php . 'element/navigation.php');?>
-    <?php require( bin_php . 'element/loading.php');?>
+    
     <div id="page-wrapper" class='content'>
       <div class="card card-full card-primary border-0">
-        <form method='GET' action='locations.php'>
+     
           <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Location( 1 );?> Locations</h4></div>
           <div class="mobile card-body bg-dark text-white">
             <div class='row'>
@@ -113,15 +113,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             </div>
             <div class='row'>
               <div class='col-4'>Customer:</div>
-              <div class='col-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
+              <div class='col-8'><input type='text' name='Customer' placeholder='Customer' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>City:</div>
-              <div class='col-8'><input type='text' name='City' placeholder='City' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'City' ] : null;?>' /></div>
+              <div class='col-8'><input type='text' name='City' placeholder='City' onChange='redraw( );' value='<?php echo isset( $_GET[ 'City' ] ) ? $_GET[ 'City' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Street:</div>
-              <div class='col-8'><input type='text' name='Street' placeholder='Street' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Name' ] ) ? $_GET[ 'Street' ] : null;?>' /></div>
+              <div class='col-8'><input type='text' name='Street' placeholder='Street' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Street' ] ) ? $_GET[ 'Street' ] : null;?>' /></div>
             </div>
             <div class='row'>
               <div class='col-4'>Maintained:</div>
@@ -139,6 +139,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <option value='1'>Inactive</option>
                 </select></div>
             </div>
+            <div class='row'> 
+            <div class='col-4'>Job:</div> 
+            <div class='col-8'><input type='text' name='Job' placeholder='Job' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></div>  
+          </div>
+          <div class='row'> 
+            <div class='col-4'>Ticket:</div> 
+             <div class='col-8'><input type='text' name='Tickets' placeholder='Tickets' onChange='redraw( );' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null;?>' /></div>
+           </div>
+           <div class='row'> 
+            <div class='col-4'>Collection:</div> 
+             <div class='col-8'><input type='text' name='collection' placeholder='collection' onChange='redraw( );' value='<?php echo isset( $_GET[ 'collection' ] ) ? $_GET[ 'collection' ] : null;?>' /></div>
+           </div>
             <div class='row'><div class='col-12'>&nbsp;</div></div>
             <div class='row'>
               <div class='col-12'><input type='submit' value='Submit' /></div>
@@ -160,6 +172,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <th class='text-white border border-white' title='Units'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
                 <th class='text-white border border-white' title='Maintained'><?php \singleton\fontawesome::getInstance( )->Maintenance();?>Maintained</th>
                 <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
+                <th class='text-white border border-white' title='Job'>Job</th>
+              <th class='text-white border border-white' title='Tickets'>Tickets</th>
+               <th class='text-white border border-white' title='Collection'>Collection</th>
                 <!--<th class='text-white border border-white' title='Labor'>Labor</th>
                 <th class='text-white border border-white' title='Revenue'>Revenue</th>
                 <th class='text-white border border-white' title='Net Income'>Net Income</th>-->
@@ -224,6 +239,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <option value='1'>Active</option>
                   <option value='0'>Inactive</option>
                 </select></th>
+                 <th class='text-white border border-white' title='Job'><input disabled class='redraw form-control' type='text' name='Job' value='<?php echo isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Job'><input disabled class='redraw form-control' type='text' name='Tickets' value='<?php echo isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null;?>' /></th>
+              <th class='text-white border border-white' title='Collection'><input disabled class='redraw form-control' type='text' name='Collection' value='<?php echo isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null;?>' /></th>
                 <!--<th class='text-white border border-white' title='Zip'>
                   <input class='redraw form-control' type='text' name='Revenue_Start' value='<?php echo isset( $_GET[ 'Revenue_Start' ] ) ? $_GET[ 'Revenue_Start' ] : null;?>' />
                   <input class='redraw form-control' type='text' name='Revenue_End' value='<?php echo isset( $_GET[ 'Revenue_Start' ] ) ? $_GET[ 'Revenue_End' ] : null;?>' />
@@ -239,8 +257,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </tr></thead>
             </table>
           </div>
-        </div>
-      </form>
+  
     </div>
   </div>
 </body>

@@ -86,7 +86,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	<?php require( bin_php . 'element/navigation.php');?>
     	<div id="page-wrapper" class='content' >
             <div class="card card-primary text-white"><form action='map.php' method='GET'>
-                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+            
         		<div class='card-heading'>
 					<div class='row g-0 px-3 py-2'>
 						<div class='col-12 col-lg-6'>
@@ -138,31 +138,52 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						</div>
 					</div>
 				</div>
-				<div class='card-body bg-dark' >
-					<div class='row g-0'>
-          <form name="map" action="map.php" method='get'>
-            <div class='col-3'><select name='Territory'>
+				<div class='card card-body bg-dark' >
+					<div class=''>
+					 <form name="map" action="map.php" method='get'>
+					<div class='row g-0 px-3 py-2'>
+						
+         <?php $terr= isset($_GET['Territory']) ? $_GET['Territory']:0;
+         $route= isset($_GET['route']) ? $_GET['route']:0;
+         $divison= isset($_GET['divison']) ? $_GET['divison']:0; ?>
+            <div class='col-3'>Territory: <select name='Territory' class="form-control">
               <option value=''>Select Territory</option>
               <?php
-                $r = $database->query(null,"SELECT * FROM Terr;");
-                if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>'><?php echo $row['Name'];?></option><?php }}
+                $r = \singleton\database::getInstance( )->query(null,"SELECT * FROM Terr;");
+                if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>' <?php if($terr == $row['ID']) echo 'selected'; ?> ><?php echo $row['Name'];?></option><?php }}
               ?>
             </select>
          
            </div>
-            <div class='col-3'><select name='route'>
+           <div class='col-1'></div>
+            <div class='col-3'>Route: <select name='route' class="form-control">
               <option value=''>Select Route</option>
               <?php
-                $r = $database->query(null,"SELECT * FROM Route;");
-                if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['Loc'];?>'><?php echo $row['Name'];?></option><?php }}
+                $r = \singleton\database::getInstance( )->query(null,"SELECT * FROM Route;");
+                if($r){while($row = sqlsrv_fetch_array($r)){?>
+                	<option value='<?php echo $row['ID'];?>' <?php if($route==$row['ID']) echo 'selected'; ?>><?php echo $row['Name'];?></option><?php }}
               ?>
             </select>
           </div>
-          <div class='col-2'> <input type="submit" name='submit' value="search">  </div>
-      </form>
+          <div class='col-1'></div>
+           <div class='col-2'>Division<select name='divison' class="form-control">
+              <option value=''>Select Divison</option>
+              <?php
+                $r = \singleton\database::getInstance( )->query(null,"SELECT * FROM Zone;");
+                if($r){while($row = sqlsrv_fetch_array($r)){?><option value='<?php echo $row['ID'];?>' <?php if($divison==$row['ID']) echo 'selected'; ?> ><?php echo $row['Name'];?></option><?php }}
+              ?>
+            </select>
           </div>
+         <div class='col-1'></div>
+          <div class='col-1'>  search<button
+										class='form-control rounded'
+										type='submit'
+									><?php \singleton\fontawesome::getInstance( 1 )->search( 1 );?><span class='desktop'> Search</span></button></div>
+     
           </div>
-			
+           </form>
+          </div>
+		 </div>	
 				<div class='card-body bg-dark'>
 
 					<div class='row g-0'>
@@ -482,7 +503,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					</div>
 				</div>
 				<div class='card-body'>
-					<div id='map' style='height:750px;'>&nbsp;</div>
+					<div id='map' style='height:450px;'>&nbsp;</div>
 				</div>
 			</form></div>
 		</div>
@@ -530,6 +551,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    $.ajax({
 		      url:"bin/php/get/Map.php",
 		      method:"GET",
+		      data:{
+		                Territory:'<?php echo isset($_GET['Territory']) ? $_GET['Territory'] : 0;?>',
+		                route:'<?php echo isset($_GET['route']) ? $_GET['route'] : 0;?>',
+		                division:'<?php echo isset($_GET['division']) ? $_GET['division'] : 0;?>'
+		              },
 		      success:function(json){
 		        var GPS_Data = JSON.parse(json);
 		        for(i in GPS_Data){
@@ -675,9 +701,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		}
 		
 	
+
 	</script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g&callback=renderMap"></script>
-<script type='text/javascript' src='https://maps.googleapis.com/maps/api/directions/json?origin=43.65077%2C-79.378425&destination=43.63881%2C-79.42745&key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g'></script>
+<!--script type='text/javascript' src='https://maps.googleapis.com/maps/api/directions/json?origin=43.65077%2C-79.378425&destination=43.63881%2C-79.42745&key=AIzaSyAJwGnwOrNUvlYnmB5sdJGkXy8CQsTA46g'></script -->
 
 </body>
 <?php
