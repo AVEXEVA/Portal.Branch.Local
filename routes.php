@@ -110,16 +110,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           \singleton\table::getInstance( )->th( 'Person', 'Person' );
                           \singleton\table::getInstance( )->th( 'Locations', 'Locations' );
                           \singleton\table::getInstance( )->th( 'Units', 'Units' );
-                          \singleton\table::getInstance( )->th( 'Violation', 'Violation' );
-                          \singleton\table::getInstance( )->th( 'Mechanic', 'Mechanic' );
+                          \singleton\table::getInstance( )->th( 'Violations', 'Violations' );
                         ?><tr class='desktop'><?php
                           \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Person', isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Violation', isset( $_GET[ 'Violation' ] ) ? $_GET[ 'Violation' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Mech', isset( $_GET[ 'Mech' ] ) ? $_GET[ 'Mech' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Violations', isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null );
                       ?></tr></thead>
                     </table>
                 </form></div>

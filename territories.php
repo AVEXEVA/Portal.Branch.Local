@@ -106,7 +106,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null, false, false, false, 'redraw' );?>
-            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Unit', isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null, false, false, false, 'redraw' );?>
+            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Leads', isset( $_GET[ 'Leads' ] ) ? $_GET[ 'Leads' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Proposals', isset( $_GET[ 'Proposals' ] ) ? $_GET[ 'Proposals' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Collections', isset( $_GET[ 'Collections' ] ) ? $_GET[ 'Collections' ] : null, false, false, false, 'redraw' );?>
@@ -117,8 +117,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     					<thead class='text-white border border-white'><?php
                 \singleton\table::getInstance( )->th( 'ID', 'ID' );
                 \singleton\table::getInstance( )->th( 'Name', 'Name' );
-                \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
-                \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                \singleton\table::getInstance( )->th( 'Locations', 'Locations' );
+                \singleton\table::getInstance( )->th( 'Units', 'Units' );
                 \singleton\table::getInstance( )->th( 'Leads', 'Leads' );
                 \singleton\table::getInstance( )->th( 'Proposal', 'Proposal' );
                 \singleton\table::getInstance( )->th( 'Collection', 'Collection' );
@@ -126,8 +126,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     			    ?><tr class='desktop'><?php
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
               \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
-              \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
-              \singleton\table::getInstance( )->th_input( 'Unit', isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
               \singleton\table::getInstance( )->th_input( 'Lead', isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null );
               \singleton\table::getInstance( )->th_input( 'Proposal', isset( $_GET[ 'Proposal' ] ) ? $_GET[ 'Proposal' ] : null );
               \singleton\table::getInstance( )->th_input( 'Collection', isset( $_GET[ 'Collection' ] ) ? $_GET[ 'Collection' ] : null );

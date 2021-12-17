@@ -4,7 +4,6 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 header('Content-Type: text/javascript');?>
-
 function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
@@ -96,14 +95,14 @@ $( document ).ready( function( ){
             }
         },
         columns: [
-            <?php \singleton\datatables::getInstance( )->ID('territory.php','Customer');?>,
-            <?php \singleton\datatables::getInstance( )->Name('territory.php');?>,
-            <?php \singleton\datatables::getInstance( )->LocationID(1);?>,
-            <?php \singleton\datatables::getInstance( )->TerritoryUnit();?>,
-            <?php \singleton\datatables::getInstance( )->TerritoryProposal();?>,
-            <?php \singleton\datatables::getInstance( )->TerritoryLeads();?>,
-            <?php \singleton\datatables::getInstance( )->TerritoryCollections();?>,
-            <?php \singleton\datatables::getInstance( )->TerritoryInvoices();?>
+            <?php \singleton\datatables::getInstance( )->ID( 'Territory' );?>,
+            <?php \singleton\datatables::getInstance( )->Name( 'Territory' );?>,
+            <?php \singleton\datatables::getInstance( )->Locations( 'Territory', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Units( 'Territory', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Proposals( 'Territory', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Leads( 'Territory', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Collections( 'Territory', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Invoices( 'Territory', 'ID' );?>
         ],
         buttons: [
             {
