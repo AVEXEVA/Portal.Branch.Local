@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $(document).ready(function( ){
     var Table_Requisition_Items = $('#Table_Requisition_Items').DataTable( {
         dom            : "<'row'<'col-sm-12't>>",
@@ -36,15 +42,10 @@ $(document).ready(function( ){
                 }
         },
         columns: [
-            {
-                data : 'ID'
-            },{
-                data : 'Description'
-            },{
-                data : 'Quantity'
-            },{
-                data : 'Image'
-            }
+            <?php \singleton\datatables::getInstance( )->ID('Requisition' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Description' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column('Quantity' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column_image( 'Image' );?>
         ],
         initComplete : function( ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' autocomplete='off' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'

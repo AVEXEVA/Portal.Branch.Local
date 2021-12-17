@@ -93,7 +93,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
        <?php	require( bin_css  . 'index.php');?>
        <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();' style='background-color:#1d1d1d;'>
+<body>
   <div id="wrapper" class="<?php echo isset($_SESSION['Toggle_Menu']) ? $_SESSION['Toggle_Menu'] : null;?>">
     <?php require(bin_php . 'element/navigation.php');?>
     <div id='page-wrapper' class='content'>
