@@ -97,35 +97,33 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div id='page-wrapper' class='content'>
             <div class="card card-full card-primary border-0">
                 <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Violation( 1 );?> Violations</h4></div>
-                <div class="card-body bg-dark">
+                <div class="mobile card-body bg-dark text-white"><form action='violations.php'>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                  </div>
+                  <div class='card-body bg-dark'>
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
-                      <thead>
-                        <tr>
-                            <th class='text-white border border-white' title='ID'><?php \singleton\fontawesome::getInstance( )->Proposal();?>ID</th>
-                            <th class='text-white border border-white' title='Customer'><?php \singleton\fontawesome::getInstance( )->Customer();?>Customer</th>
-                            <th class='text-white border border-white' title='Location'><?php \singleton\fontawesome::getInstance( )->Location();?>Location</th>
-                            <th class='text-white border border-white' title='Date'><?php \singleton\fontawesome::getInstance( )->Calendar();?>Date</th>
-                            <th class='text-white border border-white' title='Units'><?php \singleton\fontawesome::getInstance( )->Unit();?>Units</th>
-                            <th class='text-white border border-white' title='Status'><?php \singleton\fontawesome::getInstance( )->Update();?>Status</th>
-                        </tr><tr class='form-desktop'>
-                            <th title='ID'><input class='redraw form-control' type='text' name='ID' placeholder='ID' value='<?php echo isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null;?>' /></th>
-                            <th title='Customer'><input class='redraw form-control' type='text' name='Customer' placeholder='Customer' value='<?php echo isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null;?>' /></th>
-                            <th title='Location'><input class='redraw form-control' type='text' name='Location' placeholder='Location' value='<?php echo isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null;?>' /></th>
-                            <th title="Date"><input class='redraw form-control' type='text' name='Date' placeholder='Date' value='<?php echo isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null;?>' /></th>
-                               <th title="Units"><input class='redraw form-control' type='text' name='Units' placeholder='Unit' value='<?php echo isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null;?>' /></th>
-                            <th class='text-white border border-white' title='Status'><select class='redraw form-control' name='Status'>
-                            <option value=''>Select</option>
-                            <option value='0'>Active</option>
-                            <option value='1'>Inactive</option>
-                            <option value='2'>Demolished</option>
-                          </select></th>
-                        </tr>
-                      </thead>
-                    </table>
+                      <thead class='text-white border border-white'><?php
+                          \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                          \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
+                          \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                          \singleton\table::getInstance( )->th( 'Date', 'Locations' );
+                          \singleton\table::getInstance( )->th( 'Units', 'Units' );
+                          \singleton\table::getInstance( )->th( 'Status', 'Status' );
+                          ?><tr class='desktop'><?php
+                          \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
+                        ?></tr></thead>
+                  </form></table>
                 </div>
             </div>
         </div>
-    </div>
+      </div>
 </body>
 </html>
 <?php

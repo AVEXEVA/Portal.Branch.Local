@@ -1,3 +1,9 @@
+<?php
+if( session_id( ) == '' || !isset( $_SESSION ) ) {
+    session_start( [ 'read_and_close' => true ] );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+}
+header('Content-Type: text/javascript');?>
 $( document ).ready( function( ){
   var Table_Proposals = $('#Table_Proposals').DataTable( {
   dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
@@ -125,26 +131,6 @@ $( document ).ready( function( ){
       data : 'Contact_Phone'
     },{
       data : 'Contact_Email'
-    },{
-      data : 'Contact_Street',
-      render : function( data, type, row, meta ){
-          switch( type ){
-              case 'display' :
-                  return  row.Contact_Street !== null && row.Contact_Street != ''
-                      ?   "<div class='row'>" +
-                              "<div class='col-12'>" +
-                                  "<div class='row' onClick=\"document.location.href='https://www.google.com/maps/search/?api=1&query=" + encodeURI( row.Contact_Street + ' ' + row.Contact_City + ' ' + row.Contact_State + ' ' + row.Contact_Zip ) + "';\">" +
-                                      "<div class='col-12'><i class='fa fa-map-signs fa-fw fa-1x'></i>" + row.Contact_Street + "</div>" +
-                                      "<div class='col-12'>" + row.Contact_City + ", " + row.Contact_State + " " + row.Contact_Zip + "</div>" +
-                                  "</div>" +
-                              "</div>" +
-                          "</div>"
-                      :   null;
-              default :
-                  return data;
-          }
-
-      }
     },{
       data   : 'Date'
     },{

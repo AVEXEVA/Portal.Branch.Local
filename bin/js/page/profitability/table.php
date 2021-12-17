@@ -35,7 +35,7 @@ $( document ).ready( function( ){
                 };
                 d.Customer = $('input[name="Customer"]').val( );
                 d.Profit = $('input[name="Profit"]').val( );
-                d.Profit_Percentage = $('input[name="Profit_Percentage="]')
+                d.Profit_Percentage = $('input[name="Profit_Percentage="]').val( );
                 d.Revenue = $('input[name="Revenue"]').val( );
                 d.Material = $('select[name="Material"]').val( );
                 d.Labor = $('select[name="Labor"]').val( );

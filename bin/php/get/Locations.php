@@ -110,13 +110,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Type'];
       $conditions[] = "Location_Type.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Division' ] ) && !in_array( $_GET[ 'Division' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Division'];
+    if( isset($_GET[ 'Division_ID' ] ) && !in_array( $_GET[ 'Division_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Division_ID'];
       $conditions[] = "Zone.ID = ?";
     }
-    if( isset($_GET[ 'Route' ] ) && !in_array( $_GET[ 'Route' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Route'];
+    if( isset($_GET[ 'Division_Name' ] ) && !in_array( $_GET[ 'Division_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Division_Name'];
+      $conditions[] = "Zone.Name = ?";
+    }
+    if( isset($_GET[ 'Route_ID' ] ) && !in_array( $_GET[ 'Route_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Route_ID'];
       $conditions[] = "Route.ID = ?";
+    }
+    if( isset($_GET[ 'Route_Name' ] ) && !in_array( $_GET[ 'Route_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Route_Name'];
+      $conditions[] = "Route.Name = ?";
     }
     if( isset($_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Street'];

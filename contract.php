@@ -277,42 +277,44 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
-          "	DECLARE @MAXID INT;
-            SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Contract ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Contract ) END ;
-            INSERT INTO Contract(
-              ID,
-              Job,
-              Loc,
+          "	INSERT INTO Contract(
               Owner,
+              Loc,
+              Job,
               Review,
               BCycle,
               BStart,
               Blenght,
               Bfinish,
               BAmt,
+              EscLast,
               BEscType,
               BEscCycle,
-              BEscFact
+              BEscFact,
+              SWE
             )
-            VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
-            SELECT @MAXID + 1;",
+            VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            SELECT SCOPE_IDENTITY( );",
           array(
-            $Contract[ 'Customer_ID' ],
-            $Contract[ 'Location_ID' ],
-            $Contract[ 'Job_ID' ],
-            $Contract[ 'Billing_Cycle' ],
-            $Contract[ 'Billing_Start' ],
-            $Contract[ 'Billing_Length' ],
-            $Contract[ 'Billing_Finish' ],
-            $Contract[ 'Billing_Amount' ],
-            $Contract[ 'Billing_Escalation_Cycle' ],
-            $Contract[ 'Billing_Escalation_Factor' ]
+            !empty( $Contract[ 'Customer_ID' ] ) ? $Contract[ 'Customer_ID' ] : null,
+            !empty( $Contract[ 'Location_ID' ] ) ? $Contract[ 'Location_ID' ] : null,
+            !empty( $Contract[ 'Job_ID' ] ) ? $Contract[ 'Job_ID' ] : null,
+            !empty( $Contract[ 'Review' ] ) ? $Contract[ 'Review' ] : null,
+            !empty( $Contract[ 'Billing_Cycle' ] ) ? $Contract[ 'Billing_Cycle' ] : null,
+            !empty( $Contract[ 'Billing_Start' ] ) ? $Contract[ 'Billing_Start' ] : null,
+            !empty( $Contract[ 'Billing_Length' ] ) ? $Contract[ 'Billing_Length' ] : null,
+            !empty( $Contract[ 'Billing_Finish' ] ) ? $Contract[ 'Billing_Finish' ] : null,
+            !empty( $Contract[ 'Billing_Amount' ] ) ? $Contract[ 'Billing_Amount' ] : null,
+            !empty( $Contract[ 'Billing_Escalation_Last' ] ) ? $Contract[ 'Billing_Escalation_Last' ] : date( 'Y-m-d h:i:s' ),
+            !empty( $Contract[ 'Billing_Escalation_Type' ] ) ? $Contract[ 'Billing_Escalation_Type' ] : null,
+            !empty( $Contract[ 'Billing_Escalation_Cycle' ] ) ? $Contract[ 'Billing_Escalation_Cycle' ] : null,
+            !empty( $Contract[ 'Billing_Escalation_Factor' ] ) ? $Contract[ 'Billing_Escalation_Factor' ] : null,
+            !empty( $Contract[ 'Starting_Weekday' ] ) ? $Contract[ 'Starting_Weekday' ] : 0
           )
         );
         sqlsrv_next_result( $result );
         $Contract[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-        var_dump(sqlsrv_errors( ) );
-        //header( 'Location: contract.php?ID=' . $Contract[ 'ID' ] );
+        header( 'Location: contract.php?ID=' . $Contract[ 'ID' ] );
         exit;
       } else {
         \singleton\database::getInstance( )->query(
@@ -331,17 +333,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Contract.BEscFact = ?
             WHERE Contract.ID = ?;",
           array(
-            $Contract[ 'Customer_ID' ],
-            $Contract[ 'Location_ID' ],
-            $Contract[ 'Job_ID' ],
-            $Contract[ 'Billing_Cycle' ],
-            $Contract[ 'Billing_Start' ],
-            $Contract[ 'Billing_Length' ],
-            $Contract[ 'Billing_Finish' ],
-            $Contract[ 'Billing_Amount' ],
-            $Contract[ 'Escalation_Last' ],
-            $Contract[ 'Billing_Escalation_Cycle' ],
-            $Contract[ 'Billing_Escalation_Factor' ],
+            !empty( $Contract[ 'Customer_ID' ] ) ? $Contract[ 'Customer_ID' ] : null,
+            !empty( $Contract[ 'Location_ID' ] ) ? $Contract[ 'Location_ID' ] : null,
+            !empty( $Contract[ 'Job_ID' ] ) ? $Contract[ 'Job_ID' ] : null,
+            !empty( $Contract[ 'Billing_Cycle' ] ) ? $Contract[ 'Billing_Cycle' ] : null,
+            !empty( $Contract[ 'Billing_Start' ] ) ? $Contract[ 'Billing_Start' ] : null,
+            !empty( $Contract[ 'Billing_Length' ] ) ? $Contract[ 'Billing_Length' ] : null,
+            !empty( $Contract[ 'Billing_Finish' ] ) ? $Contract[ 'Billing_Finish' ] : null,
+            !empty( $Contract[ 'Billing_Amount' ] ) ? $Contract[ 'Billing_Amount' ] : null,
+            !empty( $Contract[ 'Escalation_Last' ] ) ? date( 'Y-m-d h:i:s', strtotime( $Contract[ 'Escalation_Last' ] ) ) : null,
+            !empty( $Contract[ 'Billing_Escalation_Cycle' ] ) ? $Contract[ 'Billing_Escalation_Cycle' ] : null,
+            !empty( $Contract[ 'Billing_Escalation_Factor' ] ) ? $Contract[ 'Billing_Escalation_Factor' ] : null,
             $Contract[ 'ID' ]
           )
         );
@@ -383,7 +385,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Start', $Contract[ 'Billing_Start' ], 'Start' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Finish', $Contract[ 'Billing_Finish' ], 'Finish' );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Length', $Contract[ 'Billing_Length' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Length', $Contract[ 'Billing_Length' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Billing_Amount', $Contract[ 'Billing_Amount' ] );

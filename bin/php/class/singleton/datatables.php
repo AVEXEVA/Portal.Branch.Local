@@ -27,7 +27,7 @@ class datatables extends \singleton\index {
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control redraw' />" );
             $('input.date').datepicker( { } );
             $('input.time').timepicker( {  timeFormat : 'h:i A' } );
-            search( this );
+            //search( this );
             $( '.redraw' ).bind( 'change', function(){ Table_<?php echo ucfirst( $reference );?>.draw(); });
         }<?php
     }
@@ -42,7 +42,7 @@ class datatables extends \singleton\index {
                     dir : d.order[0].dir
                 }
             };
-            $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){ 
+            $( "input:visible, input[type='hidden'], select:visible, textarea:visible" ).each( function( ){
                 if( d[ $( this ).attr( 'Name' ) ] === undefined ){
                     d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
                 }
@@ -74,7 +74,7 @@ class datatables extends \singleton\index {
             className : 'form-control',
             action : function( e, dt, node, config ){
                 d = { }
-                $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){ 
+                $( 'input, select, textarea' ).filter( ':visible' ).each( function( ){
                     if( d[ $( this ).attr( 'Name' ) ] === undefined ){
                         d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
                     }
@@ -125,7 +125,7 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
-    public function button_edit( $reference, $key ){ 
+    public function button_edit( $reference, $key ){
         ?>{
             text : "<?php \singleton\fontawesome::getInstance( )->Edit( );?><span class='desktop'>Edit</span>",
             className: 'form-control',
@@ -135,9 +135,24 @@ class datatables extends \singleton\index {
     public function button_export( ){ ?>{ extend: 'csv', className: 'form-control', text : "<?php \singleton\fontawesome::getInstance( )->Export( 1 );?><span class='desktop'>Export</span>" }<?php }
     //Helper for Columns
     public function data_column( $column ){?>{ data : '<?php echo $column;?>' }<?php }
+    public function data_column_currency( $column ){
+    	?>{
+    		data : '<?php echo $column;?>',
+    		render : function( data, type, row, meta ){
+    			switch( type ){
+    				case 'display':
+    					return 	row.<?php echo $column;?> !== null && row.<?php echo $column;?> != 0
+    						?	dollarUSLocale.format(row.<?php echo $column;?>)
+    						:	''
+    				deafult : 
+    					return data;
+    			}
+    		}
+    	}<?php
+    }
 
     //Columns
-    public function data_column_link( $reference, $key ){
+    public function data_column_id( $reference, $key ){
         ?>{
           className : '<?php echo $key;?>',
           data : '<?php echo $key;?>',
@@ -147,6 +162,24 @@ class datatables extends \singleton\index {
                       return  row.<?php echo $key;?> !== null
                           ?   "<div class='row'>" +
                                   "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
+                              "</div>"
+                          :   null;
+                  default :
+                      return data;
+              }
+          }
+      }<?php
+    }
+    public function data_column_link( $reference, $key ){
+        ?>{
+          className : '<?php echo $key;?>',
+          data : '<?php echo $key;?>',
+          render : function( data, type, row, meta ){
+              switch( type ){
+                  case 'display' :
+                      return  row.<?php echo $key;?> !== null
+                          ?   "<div class='row'>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   null;
                   default :
@@ -205,19 +238,19 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
-	
+
     //Columns
-    public function ID( $reference ){ self::data_column_link( $reference, 'ID' ); }
+    public function ID( $reference ){ self::data_column_id( $reference, 'ID' ); }
     public function Name( $reference ){ self::data_column_link( $reference, 'Name' ); }
-    public function Date( ){
+    public function Date( $key = 'Date' ){
         ?>{
-            data : 'Date',
+            data : '<?php echo $key;?>',
             render: function( data, type, row, meta ){
                 switch( type ){
                     case 'display':
-                        return row.Date !== null
+                        return row.<?php echo $key;?> !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><?php \singleton\fontawesome::getInstance( )->Date( 1 );?>" + row.Date + "</div>" +
+                                    "<div class='col-12'><?php \singleton\fontawesome::getInstance( )->Date( 1 );?>" + row.<?php echo $key;?> + "</div>" +
                                 "</div>"
                             :   null;
                         default :
@@ -289,7 +322,7 @@ class datatables extends \singleton\index {
 
             }
         }<?php
-    } 
+    }
     public function Ticket( ){
         ?>{
             data : 'Ticket_ID',
@@ -317,10 +350,10 @@ class datatables extends \singleton\index {
                     case 'display':
                         return row.Job_ID !== null
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?>" + row.Job_ID + "</a></div>" +
-                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" +
+                                    "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'><?php \singleton\fontawesome::getInstance( )->Job( 1 );?>Job #" + row.Job_ID + "</a></div>" +
+                                    ( row.Job_Name !== null ? "<div class='col-12'><a href='job.php?ID=" + row.Job_ID   + "'>" + row.Job_Name + "</a></div>" : '' ) +
                                 "</div>"
-                            :   null;
+                            :   '';
                         default :
                             return data;
                 }
@@ -341,7 +374,7 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-    } 
+    }
     public function Territory( ){
         ?>{
             data : 'Territory_ID',
@@ -351,7 +384,64 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.Territory_ID !== null
                             ?   "<div class='row'>" +
-                            "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Territory_Name + "</a></div>" +
+                                    "<div class='col-12'><a href='territory.php?ID=" + row.Territory_ID + "'><?php \singleton\fontawesome::getInstance( )->Territory( 1 );?>" + row.Territory_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
+    public function Division( ){
+        ?>{
+            data : 'Division_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Division_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='division.php?ID=" + row.Division_ID + "'><?php \singleton\fontawesome::getInstance( )->Division( 1 );?>" + row.Division_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
+    public function Route( ){
+        ?>{
+            data : 'Route_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Route_ID !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='route.php?ID=" + row.Route_ID + "'><?php \singleton\fontawesome::getInstance( )->Route( 1 );?>" + row.Route_Name + "</a></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+
+            }
+        }<?php
+    }
+    public function Contact( ){
+        ?>{
+            data : 'Contact_ID',
+            render : function( data, type, row, meta ){
+
+                switch( type ){
+                    case 'display' :
+                        return  row.Contact_ID !== null
+                            ?   "<div class='row'>" +
+                            "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><?php \singleton\fontawesome::getInstance( )->Contact( 1 );?>" + row.Contact_Name + "</a></div>" +
                             "</div>"
                             :   null;
                     default :
@@ -389,19 +479,19 @@ class datatables extends \singleton\index {
     public function TimeRoute( ){ self::Time( 'Time_Route' ); }
     public function TimeSite( ){ self::Time( 'Time_Site' ); }
     public function TimeCompleted( ){ self::Time( 'Time_Completed' ); }
-    
+
 
     public function data_column_count( $key, $Reference, $Reference_Key, $icon = 'blank' ){
         ?>{
-            data : '<?php echo $key;?>',
+            data : '<?php echo ucfirst( $key );?>',
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display' :
-                        return  row.<?php echo $key;?> !== null
+                        return  row.<?php echo ucfirst( $key );?> !== null && row.<?php echo ucfirst( $key );?> != 0
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo $key;?> + " </a></div>" +
+                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $key;?></a></div>" +
                                 "</div>"
-                            :   null;
+                            :   '';
                     default :
                         return data;
                 }
@@ -421,8 +511,10 @@ class datatables extends \singleton\index {
     public function FirstName( ){ self::First_Name( );	}
     public function LastName( ){ self::Last_Name( ); }
     public function UnitType( ){ self::Type( ); }
+    public function UnitStatus( ){ self::Status( ); }
     public function LocationID( ){ self::Location( ); }
     public function TicketID( ){ self::Ticket( ); }
+    public function TicketDate( ){ self::Date( ); }
     public function CustomerID( ){ self::Customer( ); }
     public function UnitID( ){ self::Unit( ); }
     public function JobID( ){ self::Job( ); }
@@ -445,7 +537,7 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-    }  
+    }
     public function TerritoryProposal( ){
         ?>{ data : 'Proposal',
             render : function( data, type, row, meta ){
@@ -461,7 +553,23 @@ class datatables extends \singleton\index {
             }
         }
       }<?php
-    }  
+    }
+    public function TerritoryLeads( ){
+        ?>{ data : 'Proposal',
+            render : function( data, type, row, meta ){
+               switch( type ){
+                   case 'display' :
+                       return  row.Proposal !== null
+                           ?   "<div class='row'>" +
+                                   "<div class='col-12'><a href='leads.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i><span " + row.Leads + " leads</a></div>" +
+                               "</div>"
+                           :   null;
+                   default :
+                       return data;
+            }
+        }
+      }<?php
+    }
     public function TerritoryCollections( ){
         ?>{
             data : 'Collection',
@@ -478,7 +586,7 @@ class datatables extends \singleton\index {
                 }
             }
           }<?php
-    }	
+    }
     public function UnitName( ){
 		?>{
             data : 'Name',
@@ -574,5 +682,5 @@ class datatables extends \singleton\index {
                 }
             }
         }<?php
-	}    
+	}
 }?>

@@ -175,7 +175,7 @@ class bootstrap extends \singleton\index {
     $label = is_null( $label ) ? $singular : $label;
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label, 4, 'Date' );?>
-			<div class='col-8'><input placeholder='mm/dd/yy' class='form-control date edit' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) || $value == '1969-12-30 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $value ) );?>' /></div>
+			<div class='col-8'><input placeholder='mm/dd/yy' class='form-control date edit' autocomplete='off' name='<?php echo $singular;?>' value='<?php echo empty( $value ) || $value == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $value ) );?>' /></div>
     </div><?php
 	}
 	public function card_row_form_input_currency( $singular, $value ){
@@ -226,7 +226,7 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
       <?php self::card_row_label( $singular, 4 );?>
       <div class='col-6'>
-        <?php self::autocomplete( $singular, $plural, $id, $name );?>
+        <?php self::autocomplete( $singular, $plural, $id, $name, 'form' );?>
       </div>
       <div class='col-2'><button class='h-100 w-100' type='button' <?php
         if( in_array( $id, array( null, 0, '', ' ') ) ){
@@ -237,9 +237,18 @@ class bootstrap extends \singleton\index {
       ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
     </div><?php
 	}
-  public function autocomplete( $singular, $plural, $id, $name ){
-    ?><input placeholder='<?php echo $singular;?>' type='hidden' autocomplete='off' class='form-control edit' name='<?php echo $singular;?>_ID' value='<?php echo $id;?>' />
-    <input placeholder='<?php echo $singular;?>' type='text' autocomplete='off' class='form-control edit' name='<?php echo $singular;?>_Name' value='<?php echo $name;?>' />
+  public function autocomplete( $singular, $plural, $id, $name, $type ){
+  	$class = '';
+  	switch( $type ){
+  		case 'form':
+  			$class = 'edit';
+  			break;
+  		case 'datatable':
+  			$class = 'redraw';
+  			break;
+  	}
+    ?><input placeholder='<?php echo $singular;?>' type='hidden' autocomplete='off' class='form-control <?php echo $class;?>' name='<?php echo $singular;?>_ID' value='<?php echo $id;?>' />
+    <input placeholder='<?php echo $singular;?>' type='text' autocomplete='off' class='form-control' name='<?php echo $singular;?>_Name' value='<?php echo $name;?>' />
     <script>
       $( 'input[name="<?php echo $singular;?>_Name"]' )
         .typeahead({
@@ -266,10 +275,16 @@ class bootstrap extends \singleton\index {
               }
             });
           },
-					displayText: function(item) { return item.FieldValue; },
-          afterSelect: function( item ){
-            $( 'input[name="<?php echo $singular;?>_ID"]').val( item.ID );
-            $( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
+			displayText: function(item) { return item.FieldValue; },
+          	afterSelect: function( item ){<?php 
+          	switch( $type ){
+          		case 'form':?>
+          			$( 'input[name="<?php echo $singular;?>_ID"]').val( item.ID );
+            		$( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
+            		<?php break;
+            	case 'datatable':
+            		break;
+          	}?>
           }
         }
       );

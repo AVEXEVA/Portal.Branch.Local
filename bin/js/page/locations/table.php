@@ -5,7 +5,9 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 header('Content-Type: text/javascript');
 ?>
-    $( document ).ready( function( ){
+
+$( document ).ready( function( ){
+
 function search( link ){
     var api = link.api();
     $('input:visible[name="Search"]', api.table().container())
@@ -61,23 +63,7 @@ $(document).ready(function( ){
         table    : '#Table_Locations'
     } );
     var Table_Locations = $('#Table_Locations').DataTable( {
-        dom            : "<'row'<'col-sm-3 search'><'col-sm-6'B><'col-sm-3 columns-visibility'>><'row'<'col-sm-12't>>",
-        processing     : true,
-        serverSide     : true,
-        autoWidth      : false,
-        searching      : false,
-        lengthChange   : false,
-        scrollResize   : true,
-        scrollY        : 100,
-        scroller       : true,
-        scrollCollapse : true,
-        orderCellsTop  : true,
-        autoWidth      : true,
-        responsive     : true,
-        select         : {
-          style : 'multi',
-          selector : 'td.ID'
-        },
+        <?php \singleton\datatables::getInstance( )->preferences( );?>,
         ajax: {
                 url : 'bin/php/get/Locations.php',
                 data    : function(d){
@@ -288,3 +274,4 @@ $(document).ready(function( ){
     } );
     });
   });;
+

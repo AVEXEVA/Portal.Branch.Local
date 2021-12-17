@@ -96,7 +96,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <body >
   <div id="wrapper">
     <?php require( bin_php . 'element/navigation.php');?>
-    
+
     <div id="page-wrapper" class='content'>
       <div class="card card-full card-primary border-0">
      
@@ -255,6 +255,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <input class='redraw form-control' type='text' name='Net_Income_End' value='<?php echo isset( $_GET[ 'Net_Income_End' ] ) ? $_GET[ 'Net_Income_End' ] : null;?>' />
                 </th>-->
               </tr></thead>
+
             </table>
           </div>
   
