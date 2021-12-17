@@ -405,7 +405,7 @@ if( $locations ) {
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                   <?php
-                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Route[ 'Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Route Name', $Route[ 'Name' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Route[ 'Employee_ID' ], $Route[ 'Employee_Name' ] );
                   ?>
                 </div>
