@@ -238,6 +238,23 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
+    public function data_column_image( $key = 'Picture' ){
+        ?>{
+            data:'Picture',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return   row.<?php echo $key;?>_Type !== null
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><img src=data:"+row.<?php echo $key;?>_Type +";base64,"+row.<?php echo $key;?> +" width='100px;' height='100px;'></div>" +
+                                "</div>"
+                            :   null;
+                    default :
+                        return data;
+                }
+            }
+        }<?php
+    }
 
     //Columns
     public function ID( $reference ){ self::data_column_id( $reference, 'ID' ); }
@@ -366,7 +383,7 @@ class datatables extends \singleton\index {
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display':
-                        return row.Employee_ID !== null
+                        return row.Employee_ID !== null 
                             ?   "<a href='user.php?ID=" + row.Employee_ID + "'><?php \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Employee_Name + "</a>"
                             :   null;
                     default :
@@ -505,6 +522,9 @@ class datatables extends \singleton\index {
     public function Tickets( $Reference, $Reference_Key ){ self::data_column_count( 'tickets', $Reference, $Reference_Key, 'Ticket' ); }
     public function Violations( $Reference, $Reference_Key){ self::data_column_count( 'violations', $Reference, $Reference_Key, 'Violation' ); }
     public function Invoices( $Reference, $Reference_Key ){ self::data_column_count( 'invoices', $Reference, $Reference_Key, 'Invoice' ); }
+    public function Proposals( $Reference, $Reference_Key ){ self::data_column_count( 'proposals', $Reference, $Reference_Key, 'Proposal' ); }
+    public function Collections( $Reference, $Reference_Key ){ self::data_column_count( 'collections', $Reference, $Reference_Key, 'Collection' ); }
+    public function Leads( $Reference, $Reference_Key ){ self::data_column_count( 'leads', $Reference, $Reference_Key, 'Lead' ); }
 
 
     //Columns need Rewrite

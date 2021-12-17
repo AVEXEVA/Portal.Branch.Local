@@ -202,8 +202,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Unit.Unit AS Building_ID,
                             Unit.Type AS Type,
                             Ticket.ID AS Ticket_ID,
+                            Ticket.Date AS Ticket_Date,
                             Unit.Status AS Status
-
                     FROM    Elev AS Unit
                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                             LEFT JOIN (

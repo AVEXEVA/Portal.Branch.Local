@@ -231,6 +231,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Customers</div>
         </div>
       </div><?php } ?>
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Division' ] ) ? $Privileges[ 'Division' ] : 0 ) ){
+        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='divisions.php'">
+        <div class='p-1 border'>
+          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Web(3);?></div>
+          <div class ='nav-text'>Divisions</div>
+        </div>
+      </div><?php } ?>
       <?php if( check( privilege_read, level_group, isset( $Privileges[ 'User' ] ) ? $Privileges[ 'User' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='employees.php'">
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Employees(3);?></div>
@@ -317,19 +324,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Violation(3);?></div>
           <div class ='nav-text'>Violations</div>
-        </div>
-      </div><?php } ?>
-      <?php if( check( privilege_read, level_group, $Privileges[ 'Admin' ] ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='reports.php'">
-          <div class='p-1 border'>
-              <div class='nav-icon'><i class="fa fa-file fa-3x fa-fw" aria-hidden="true"></i></div>
-              <div class ='nav-text'>Reports</div>
-          </div>
-      </div><?php }?>
-      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Division' ] ) ? $Privileges[ 'Division' ] : 0 ) ){
-        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='divisions.php'">
-        <div class='p-1 border'>
-          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Web(3);?></div>
-          <div class ='nav-text'>Divisions</div>
         </div>
       </div><?php } ?>
     </section>

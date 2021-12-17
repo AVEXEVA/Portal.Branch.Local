@@ -1,1 +1,1 @@
-<script src='bin/js/page/users/table.js?<?php echo rand( 1000, 99999999 );?>'></script>
+<script src='bin/js/page/users/table.php?<?php echo rand( 1000, 99999999 );?>'></script>

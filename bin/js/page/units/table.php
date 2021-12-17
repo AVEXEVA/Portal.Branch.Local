@@ -97,13 +97,13 @@ $( document ).ready( function( ){
 	        }
 	    },
 		columns   : [
-			<?php \singleton\datatables::getInstance( )->ID('unit.php','Unit');?>,
-			<?php \singleton\datatables::getInstance( )->UnitName();?>,
-			<?php \singleton\datatables::getInstance( )->CustomerID();?>,
-			<?php \singleton\datatables::getInstance( )->LocationID();?>,
-			<?php \singleton\datatables::getInstance( )->UnitType();?>,
-			<?php \singleton\datatables::getInstance( )->UnitStatus();?>,
-			<?php \singleton\datatables::getInstance( )->TicketID();?>
+			<?php \singleton\datatables::getInstance( )->ID( 'Unit' );?>,
+			<?php \singleton\datatables::getInstance( )->Name( 'Unit' );?>,
+			<?php \singleton\datatables::getInstance( )->Customer( );?>,
+			<?php \singleton\datatables::getInstance( )->Location( );?>,
+			<?php \singleton\datatables::getInstance( )->Type();?>,
+			<?php \singleton\datatables::getInstance( )->Status();?>,
+			<?php \singleton\datatables::getInstance( )->Ticket( 'Last_Ticket' );?>,
 		],
 	    initComplete : function( ){
 	        $("div.search").html( "<input type='text' name='Search' placeholder='Search' />" );//onChange='$(\"#Table_Tickets\").DataTable().ajax.reload( );'

@@ -132,10 +132,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     SELECT  ROW_NUMBER() OVER (ORDER BY Route.Name asc) AS ROW_COUNT,
                             Route.ID      AS ID,
                             Route.Name      AS Name,
-                            Employee.fFirst + ' ' + Employee.Last AS Person,
+                            Employee.ID AS Employee_ID,
+                            Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
                             Locations.Count AS Locations,
                             Units.Count AS Units,
-                            Violation.Count As Violation,
+                            Violation.Count As Violations,
                             Ticket.Assigned,
                             Attendance.[End] ,
                             Attendance.[Start]
@@ -169,9 +170,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               GROUP BY  Loc.Route
                             ) AS Units ON Route.ID = Locations.Route
                             LEFT JOIN (
-                             SELECT Loc.Route,  COUNT( Violation.ID ) AS Count 
-                  FROM Violation 
-              LEFT JOIN Loc ON Violation.Loc = Loc.ID GROUP BY Loc.Route
+                              SELECT  Loc.Route,  
+                                      COUNT( Violation.ID ) AS Count 
+                              FROM Violation 
+                              LEFT JOIN Loc ON Violation.Loc = Loc.ID GROUP BY Loc.Route
                             ) AS Violation ON Route.ID = Locations.Route
                           WHERE   ({$conditions}) AND ({$search})
                                ) AS Tbl
