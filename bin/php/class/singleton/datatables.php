@@ -42,7 +42,7 @@ class datatables extends \singleton\index {
                     dir : d.order[0].dir
                 }
             };
-            $( "input:visible, input[type='hidden'], select:visible, textarea:visible" ).each( function( ){ 
+            $( "input:visible, input[type='hidden'], select:visible, textarea:visible" ).each( function( ){
                 if( d[ $( this ).attr( 'Name' ) ] === undefined ){
                     d[ $( this ).attr( 'Name' ) ] = $( this ).val( );
                 }
@@ -514,6 +514,7 @@ class datatables extends \singleton\index {
     public function UnitStatus( ){ self::Status( ); }
     public function LocationID( ){ self::Location( ); }
     public function TicketID( ){ self::Ticket( ); }
+    public function TicketDate( ){ self::Date( ); }
     public function CustomerID( ){ self::Customer( ); }
     public function UnitID( ){ self::Unit( ); }
     public function JobID( ){ self::Job( ); }
@@ -545,6 +546,22 @@ class datatables extends \singleton\index {
                        return  row.Proposal !== null
                            ?   "<div class='row'>" +
                                    "<div class='col-12'><a href='proposal.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i><span " + row.Proposal + " invoices</a></div>" +
+                               "</div>"
+                           :   null;
+                   default :
+                       return data;
+            }
+        }
+      }<?php
+    }
+    public function TerritoryLeads( ){
+        ?>{ data : 'Proposal',
+            render : function( data, type, row, meta ){
+               switch( type ){
+                   case 'display' :
+                       return  row.Proposal !== null
+                           ?   "<div class='row'>" +
+                                   "<div class='col-12'><a href='leads.php?Territory=" + row.Name + "'><i class='fa fa-stack-overflow fa-fw fa-1x'></i><span " + row.Leads + " leads</a></div>" +
                                "</div>"
                            :   null;
                    default :

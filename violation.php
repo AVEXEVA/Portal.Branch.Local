@@ -373,7 +373,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		<div class='row g-0' data-masonry='{"percentPosition": true }'>
           		<div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
-            		<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
+            		<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>
               		<?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Violation[ 'Name' ] );?>
                 	<?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Violation[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );?>
                 	<?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Violation[ 'Date' ] );?>
@@ -389,7 +389,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
               <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Dates' );?>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'File_Permit', $Violation[ 'File_Permit' ] );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Permit_Approved', $Violation[ 'Permit_Approved' ] );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date_Sent', $Violation[ 'Date_Sent' ] );?>
@@ -404,7 +404,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Assignments' );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Assignments' ] ) && $_SESSION[ 'Cards' ][ 'Assignments' ] == 0 ? "style='display:none;'" : null;?>>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Assignments' ] ) && $_SESSION[ 'Cards' ][ 'Assignments' ] == 0 ? "style='display:none;'" : null;?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Created', $Violation[ 'Created' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Code', $Violation[ 'Code' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_checkbox( 'Sales', $Violation[ 'Sales' ] );?>
@@ -419,7 +419,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             </div>
             <div class='card card-primary col-12 col-md-6 col-lg-4 col-xl-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Custom Fields' );?>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Dates' ] ) && $_SESSION[ 'Cards' ][ 'Dates' ] == 0 ? "style='display:none;'" : null;?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom21', $Violation[ 'Custom21' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom22', $Violation[ 'Custom22' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Custom23', $Violation[ 'Custom23' ] );?>
