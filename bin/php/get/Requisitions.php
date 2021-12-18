@@ -155,12 +155,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Location.Tag                AS Location,
                             DropOff.Tag                 AS DropOff,
                             Unit.State                  AS Unit,
-                            Job.fDesc                   AS Job
+                            Unit.State                  AS Unit_City_ID,
+                            Job.fDesc                   AS Job,
+                            Requisition_Item.Count      AS Item
                     FROM    Requisition
                             LEFT JOIN Loc   AS Location ON Requisition.Location = Location.Loc
                             LEFT JOIN Loc   AS DropOff  ON Requisition.DropOff = DropOff.Loc
                             LEFT JOIN Elev  AS Unit     ON Requisition.Unit = Unit.ID
                             LEFT JOIN Job   AS Job      ON Requisition.Job = Job.ID
+                            LEFT JOIN (
+                            SELECT    Requisition_Item.Requisition,
+                                      Count( Requisition_Item.ID ) AS Count
+                            FROM      Requisition_Item 
+                            GROUP BY  Requisition_Item.Requisition
+                          ) AS Requisition_Item ON Requisition_Item.Requisition = Requisition.ID
                             LEFT JOIN Emp   AS Employee ON Employee.ID = Requisition.[User]
                     WHERE   {$conditions}
                 ) AS Tbl
@@ -180,12 +188,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Location.Tag                AS Location,
                             DropOff.Tag                 AS DropOff,
                             Unit.State                  AS Unit,
-                            Job.fDesc                   AS Job
+                            Unit.State                  AS Unit_City_ID,
+                            Job.fDesc                   AS Job,
+                            Requisition_Item.Count      AS Item
                     FROM    Requisition
                             LEFT JOIN Loc   AS Location ON Requisition.Location = Location.Loc
                             LEFT JOIN Loc   AS DropOff  ON Requisition.DropOff = DropOff.Loc
                             LEFT JOIN Elev  AS Unit     ON Requisition.Unit = Unit.ID
                             LEFT JOIN Job   AS Job      ON Requisition.Job = Job.ID
+                            LEFT JOIN (
+                            SELECT    Requisition_Item.Requisition,
+                                      Count( Requisition_Item.ID ) AS Count
+                            FROM      Requisition_Item 
+                            GROUP BY Requisition_Item.Requisition
+                          ) AS Requisition_Item ON Requisition_Item.Requisition = Requisition.ID
                             LEFT JOIN Emp   AS Employee ON Employee.ID = Requisition.[User]
                     WHERE   {$conditions};";
 
