@@ -566,6 +566,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         require( bin_meta . 'index.php');
         require( bin_css  . 'index.php');
         require( bin_js   . 'index.php');
+
     ?>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
@@ -665,7 +666,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
-                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', 'Customer', $Customer[ 'ID' ] );?>
+                                <?php 
+                                $reference='';
+                                $id='?';
+                                if($Customer[ 'ID' ]>0){
+                                    $reference='Customer';
+                                    $id=$Customer[ 'ID' ];
+                                }
+                                 \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', $reference,$id  );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Locations' ] ) && $_SESSION[ 'Cards' ][ 'Locations' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Locations', 'locations.php?Customer=' . $Customer[ 'ID' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Maintain', $Customer[ 'Locations_Maintained' ], true, true, 'locations.php?Customer=' . $Customer[ 'ID' ] . '&Maintained=1');?>
@@ -673,7 +681,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
-                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Customer', $Customer[ 'ID' ] );?>
+                                <?php $reference='';
+                                $id='?';
+                                if($Customer[ 'ID' ]>0){
+                                    $reference='Customer';
+                                    $id=$Customer[ 'ID' ];
+                                }
+                                \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', $reference, $id );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Customer=' . $Customer[ 'ID' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Customer[ 'Units_Elevators' ], true, true, 'units.php?Customer=' . $Customer[ 'ID' ] . '&Type=Elevator');?>
@@ -682,7 +696,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
-                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Jobs', 'Job', 'Jobs', 'Customer', $Customer[ 'ID' ] );?>
+                                <?php 
+                                    $reference='';
+                                    $id='?';
+                                    if($Customer[ 'ID' ]>0){
+                                        $reference='Customer';
+                                        $id=$Customer[ 'ID' ];
+                                    }
+                                \singleton\bootstrap::getInstance( )->card_header( 'Jobs', 'Job', 'Jobs', $reference, $id );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Jobs' ] ) && $_SESSION[ 'Cards' ][ 'Jobs' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'jobs.php?Customer=' . $Customer[ 'ID' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Jobs_Open' ], true, true, 'jobs.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
@@ -691,7 +712,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
-                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Customer', $Customer[ 'ID' ] );?>
+                                <?php 
+                                $reference ='';
+                                    $id ='?';
+                                    if($Customer[ 'ID' ]>0){
+                                        $reference ='Customer';
+                                        $id = $Customer[ 'ID' ];
+                                    }
+                                \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', $reference, $id );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Customer=' . $Customer[ 'ID' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Tickets_Open' ], true, true, 'tickets.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
@@ -702,7 +730,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
-                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Customer', $Customer[ 'ID' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', $reference, $id);?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Customer=' . $Customer[ 'ID' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Customer[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Customer=' . $Customer[ 'ID' ] . '&Status=Preliminary Report');?>
@@ -710,7 +738,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
-                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Proposals', 'Proposal', 'Proposals', 'Customer', $Customer[ 'ID' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_header( 'Proposals', 'Proposal', 'Proposals', $reference, $id );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Customer=' . $Customer[ 'ID' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Proposals_Open' ], true, true, 'proposals.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
