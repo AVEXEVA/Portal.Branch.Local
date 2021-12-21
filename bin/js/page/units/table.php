@@ -98,7 +98,7 @@ $( document ).ready( function( ){
 	    },
 		columns   : [
 			<?php \singleton\datatables::getInstance( )->ID( 'Unit' );?>,
-			<?php \singleton\datatables::getInstance( )->Name( 'Unit' );?>,
+			<?php \singleton\datatables::getInstance( )->Unit( );?>,
 			<?php \singleton\datatables::getInstance( )->Customer( );?>,
 			<?php \singleton\datatables::getInstance( )->Location( );?>,
 			<?php \singleton\datatables::getInstance( )->Type();?>,

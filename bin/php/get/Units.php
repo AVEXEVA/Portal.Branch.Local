@@ -153,14 +153,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Unit.ID AS ID,
+                          Unit.ID AS Unit_ID,
                           Unit.State As City_ID,
+                          Unit.State As Unit_City_ID,
                           Customer.ID AS Customer_ID,
                           Customer.Name AS Customer_Name,
                           Location.Loc AS Location_ID,
                           Location.Tag AS Location_Name,
                           Unit.Unit AS Building_ID,
+                          Unit.Unit AS Unit_Building_ID,
                           Unit.Type AS Type,
-                          Unit.fDesc AS Name,
+                          Unit.State AS Name,
                           Ticket.ID AS Ticket_ID,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled' 
                                 WHEN Unit.Status = 1 THEN 'Disabled'
