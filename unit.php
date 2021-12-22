@@ -87,9 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 ? $_POST[ 'City_ID' ]
                 : null
             );
-		$result = \singleton\database::getInstance( )->query(
-		    null,
-		    " 	SELECT  TOP 1
+        $squery="SELECT  TOP 1
 	                    Unit.ID,
 	                    CASE 	WHEN Unit.State IS NULL AND Unit.Unit IS NULL THEN ''
 	                    		WHEN Unit.State IS NULL THEN Unit.Unit 
@@ -124,7 +122,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	                    CASE    WHEN Invoices.[Open] IS NULL THEN 0
                                 ELSE Invoices.[Open] END AS Invoices_Open,
                         CASE    WHEN Invoices.[Closed] IS NULL THEN 0
-                                ELSE Invoices.[Closed] END AS Invoices_Closed
+                                ELSE Invoices.[Closed] END AS Invoices_Closed,
+                       	Tickets.Unassigned AS Tickets_Open,
+	                    Tickets.Assigned AS Tickets_Assigned,
+	                    Tickets.En_Route AS Tickets_En_Route,
+	                    Tickets.On_Site AS Tickets_On_Site,
+	                    Tickets.Reviewing AS Tickets_Reviewing,
+	                    Violations.Preliminary AS Violations_Preliminary_Report,
+	                    Violations.Job_Created AS Violations_Job_Created
 	            FROM    Elev AS Unit
 	                    LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
 	                    LEFT JOIN (
@@ -207,19 +212,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                     Count( Invoice.Ref ) AS Count
                                           FROM      Invoice
                                           WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
-                                          GROUP BY  Invoice.Loc
+                                          GROUP BY  Invoice.Job
                                         ) AS [Open] ON Job.ID = [Open].Job 
                                         LEFT JOIN (
-                                          SELECT    Invoice.Loc AS Location,
+                                          SELECT    Invoice.Job AS Job,
                                                     Count( Invoice.Ref ) AS Count
                                           FROM      Invoice
                                           WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
-                                          GROUP BY  Invoice.Loc
+                                          GROUP BY  Invoice.Job
                                         ) AS [Closed] ON Job.ID = [Closed].Job 
-                            GROUP BY    Job.ID
+                            GROUP BY    Job.Elev
                         ) AS Invoices ON Invoices.Unit = Unit.ID
 	            WHERE      Unit.ID = ?
-	                    OR Unit.State = ?;",
+	                    OR Unit.State = ?;";
+		$result = \singleton\database::getInstance( )->query(
+		    null,
+		    $squery,
             array(
                 $ID,
                 $City_ID
@@ -244,23 +252,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						'Location_Longitude' => null,
 					    'Building_ID' => null,
 					    'City_ID' => null,
-					    'Description' => null,
+					    'Description' => '',
 					    'Bank' => null,
-					    'Note' => null,
+					    'Note' => '',
 					    'Type' => null,
 					    'Category' => null,
-					    'Environment' => null,
-					    'Manufacturer' => null,
-					    'Installation' => null,
+					    'Environment' => '',
+					    'Manufacturer' => '',
+					    'Installation' => '',
 					    'Installer'   =>  null,
-					    'Created' => null,
-					    'Maintained'   =>  null,
+					    'Created' => '',
+					    'Maintained'   =>  '',
 					    'Price' => null,
 					    'Serial' => null,
-					    'Template' => null,
+					    'Template' => '',
 					    'Status' => null,
-					    'TFMID' => null,
-					    'TFMSource' => null,
+					    'TFMID' => '',
+					    'TFMSource' => '',
 					    //Totals
 					    'Tickets_Open' => null,
 					    'Tickets_Assigned' => null,
@@ -268,7 +276,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					    'Tickets_On_Site' => null,
 					    'Tickets_Reviewing' => null,
 					    'Violations_Preliminary_Report' => null,
-					    'Violations_Job_Created' => null,
+					    'Violations_Job_Created' => '',
 					    'Invoices_Open' => null,
 					    'Invoices_Closed' => null
 					) 
@@ -298,36 +306,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		  	$Unit[ 'Template' ]  		= isset( $_POST[ 'Template' ] ) 	 	? $_POST[ 'Template' ] 	 	: $Unit[ 'Template' ];
 
 		  	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
+		  	
+		  		
 		      	$result = \singleton\database::getInstance( )->query(
             		null,
 		            "	DECLARE @MAXID INT;
-		            	SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Unit ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Unit ) END ;
-		            	INSERT INTO Elev(
-		            		ID,
-		            		Owner,
-		            		Loc,
-		            		Unit,
-		            		State,
-		            		fDesc,
-		            		fGroup,
-		            		Remarks,
-		            		Type,
-		            		Cat,
-		            		Building,
-		            		Manuf,
-		            		Install,
-		            		InstallBy,
-		            		Since,
-		            		Last,
-		            		Price,
-		            		Serial,
-		            		Template,
-		            		Status,
-		            		TFMID,
-		            		TFMSource
-		            	)
-		            	VALUES( 
-		            		@MAXID + 1 , 
+		            	SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Elev ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Elev ) END ;
+INSERT INTO Elev(ID,Owner,Loc,Unit,State,fDesc,fGroup,Remarks,Type,Cat,Building,Manuf,Install,
+	InstallBy,Since,Last,Price,Serial,Template,Status,TFMID,TFMSource)
+VALUES( @MAXID + 1 , 
 		            		?,
 		            		?,
 		            		?,
@@ -351,7 +338,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		            		? 
 		            	);
 		            	SELECT @MAXID + 1;",
-			        array(
+		            	array(
 		                $Unit[ 'Customer_ID' ],
 		                $Unit[ 'Location_ID' ],
 		                $Unit[ 'Building_ID' ],
@@ -361,51 +348,29 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		                $Unit[ 'Note' ],
 		                $Unit[ 'Type' ],
 		                $Unit[ 'Category' ],
-		                $Unit[ 'Environment' ],
-		                $Unit[ 'Manufacturer' ],
-		                $Unit[ 'Installation' ],
-		                $Unit[ 'Installer' ],
-		                $Unit[ 'Created' ],
-		                $Unit[ 'Maintained' ],
-		                $Unit[ 'Price' ],
-		                $Unit[ 'Serial' ],
-		                $Unit[ 'Template' ],
-		                $Unit[ 'Status' ],
-		                $Unit[ 'TFMID' ],
-		                $Unit[ 'TFMSource' ]
+		                !empty( $Unit[ 'Environment' ] ) ? $Unit[ 'Environment' ]: '',
+		                !empty( $Unit[ 'Manufacturer' ] ) ? $Unit[ 'Manufacturer' ]: '',
+		                !empty( $Unit[ 'Installation' ] ) ? $Unit[ 'Installation' ]: '',
+		                !empty( $Unit[ 'Installer' ] ) ? $Unit[ 'Installer' ]: '',
+		                
+		                 !empty( $Unit[ 'Created' ] ) ? $Unit[ 'Created' ]: date( 'Y-m-d h:i:s' ),
+		               !empty( $Unit[ 'Maintained' ] ) ? $Unit[ 'Maintained' ]: date( 'Y-m-d h:i:s' ),
+		             
+		                !empty( $Unit[ 'Price' ] ) ? $Unit[ 'Price' ]: 0,
+		                !empty( $Unit[ 'Serial' ] ) ? $Unit[ 'Serial' ]: '',
+		                !empty( $Unit[ 'Template' ] ) ? $Unit[ 'Template' ]: '',
+		                !empty( $Unit[ 'Status' ] ) ? $Unit[ 'Status' ]: '',
+		               !empty( $Unit[ 'TFMID' ] ) ? $Unit[ 'TFMID' ]: '', 
+		               !empty( $Unit[ 'TFMSource' ] ) ? $Unit[ 'TFMSource' ]: ''
 		            )
-			    );
+			        
+			    )or die(print_r(sqlsrv_errors()));;
 	        	sqlsrv_next_result( $result );
 	        	$Unit[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 	        	header( 'Location: unit.php?ID=' . $Unit[ 'ID' ] );
 	        	exit;
 		    } else{
-	        	\singleton\database::getInstance( )->query(
-            		null,
-            		"	UPDATE 	Elev AS Unit
-    				    SET 	Unit.Owner = ?,
-    				    		Unit.Loc = ?,
-    				    		Unit.Unit = ?,
-							    Unit.State = ?,
-    						    Unit.fDesc  = ?,
-    						    Unit.fGroup  = ?,
-							    Unit.Remarks = ?,
-							    Unit.Type = ?,
-							    Unit.Cat = ?,
-							    Unit.Building = ?,
-							    Unit.Manuf = ?,
-							    Unit.Install = ?,
-							    Unit.InstallBy = ?,
-							    Unit.Since = ?,
-							    Unit.Last = ?,
-							    Unit.Price = ?,
-							    Unit.Serial = ?,
-							    Unit.Template = ?,
-							    Unit.Status = ?,
-							    Unit.TFMID = ?,
-							    Unit.TFMSource  = ?
-    				    WHERE 	Unit.ID = ?;",
-            		array(
+		    	$parameters=array(
             			$Unit[ 'Customer_ID' ],
             			$Unit[ 'Location_ID' ],
 						$Unit[ 'Building_ID' ],
@@ -415,21 +380,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						$Unit[ 'Note' ],
 						$Unit[ 'Type' ],
 						$Unit[ 'Category' ],
-						$Unit[ 'Environment' ],
-						$Unit[ 'Manufacturer' ],
-						$Unit[ 'Installation' ],
-						$Unit[ 'Installer' ],
-						$Unit[ 'Created' ],
-						$Unit[ 'Maintained' ],
-						$Unit[ 'Price' ],
+						  !empty( $Unit[ 'Environment' ] ) ? $Unit[ 'Environment' ]: '',
+		                !empty( $Unit[ 'Manufacturer' ] ) ? $Unit[ 'Manufacturer' ]: '',
+		                !empty( $Unit[ 'Installation' ] ) ? $Unit[ 'Installation' ]: '',
+		                !empty( $Unit[ 'Installer' ] ) ? $Unit[ 'Installer' ]: '',
+		                !empty( $Unit[ 'Created' ] ) ? date('Y-m-d h:i:s',strtotime($Unit[ 'Created' ])): date( 'Y-m-d h:i:s' ),
+		               !empty( $Unit[ 'Maintained' ] ) ? date('Y-m-d h:i:s',strtotime($Unit[ 'Maintained' ])): date( 'Y-m-d h:i:s' ),
+						
+						!empty( $Unit[ 'Price' ] ) ? $Unit[ 'Price' ]: 0,
 						$Unit[ 'Serial' ],
 						$Unit[ 'Template' ],
 						$Unit[ 'Status' ],
 						$Unit[ 'TFMID' ],
 						$Unit[ 'TFMSource' ],
 						$Unit[ 'ID' ]
-            		)
-	        	);
+            		);
+		    	print_r($parameters);  
+	        	\singleton\database::getInstance( )->query(
+            		null,
+            		"	UPDATE 	Elev 
+    				    SET 	Elev.Owner = ?,
+    				    		Elev.Loc = ?,
+    				    		Elev.Unit = ?,
+							    Elev.State = ?,
+    						    Elev.fDesc  = ?,
+    						    Elev.fGroup  = ?,
+							    Elev.Remarks = ?,
+							    Elev.Type = ?,
+							    Elev.Cat = ?,
+							    Elev.Building = ?,
+							    Elev.Manuf = ?,
+							    Elev.Install = ?,
+							    Elev.InstallBy = ?,
+							    Elev.Since = ?,
+							    Elev.Last = ?,
+							    Elev.Price = ?,
+							    Elev.Serial = ?,
+							    Elev.Template = ?,
+							    Elev.Status = ?,
+							    Elev.TFMID = ?,
+							    Elev.TFMSource  = ?
+    				    WHERE 	Elev.ID = ?;",
+            		$parameters
+	        	)or die(print_r(sqlsrv_errors()));;
 	        	header( 'Location: unit.php?ID=' . $Unit[ 'ID' ] );
 		    }
 		}
@@ -443,7 +436,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php	require( bin_css  . 'index.php');?>
     <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
 	<div id="wrapper">
 		<?php require( bin_php . 'element/navigation.php'); ?>
 		<div id="page-wrapper" class='content'>
