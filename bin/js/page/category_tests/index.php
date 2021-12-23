@@ -1,1 +1,1 @@
-<script src='bin/js/page/category_test/table.php?<?php echo rand( 0, 999999999 );?>'></script>
+<script src='bin/js/page/category_tests/table.php?<?php echo rand( 0, 999999999 );?>'></script>

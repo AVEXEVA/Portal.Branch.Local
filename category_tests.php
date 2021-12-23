@@ -100,35 +100,44 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <body>
   <div id="wrapper">
     <?php require( bin_php . 'element/navigation.php');?>
-    <div id="page-wrapper" class='content'>
+    
+     <div id='page-wrapper' class='content'>
       <div class="card card-full card-primary border-0">
-        <form method='GET' action='category_tests.php'>
-          <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Inspection( 1 );?> Category Tests</h4></div>
-          <div class="mobile card-body bg-dark text-white"><?php 
-            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
-            \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );
-            \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );
-            
-          ?></div>
-          <div class="card-body bg-dark">
-            <table id='Table_Category_Tests' class='display' cellspacing='0' width='100%'>
-              <thead><tr class='text-center'><?php 
-                \singleton\table::getInstance( )->th( 'ID', 'ID' );
-                \singleton\table::getInstance( )->th( 'Name', 'Name' );
-                
-              ?></tr><tr class='form-desktop'><?php 
-                \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
-               
-              ?></tr></thead>
-            </table>
-          </div>
+        <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
+        <div class="mobile card-body bg-dark text-white">
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Start_Date', isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'End_Date', isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Amount', isset( $_GET[ 'Amount' ] ) ? $_GET[ 'Amount' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Cycle', isset( $_GET[ 'Cycle' ] ) ? $_GET[ 'Cycle' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Factor', isset( $_GET[ 'Esc. Factor' ] ) ? $_GET[ 'Esc. Factor' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Date', isset( $_GET[ 'Esc. Date' ] ) ? $_GET[ 'Esc. Date' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Type', isset( $_GET[ 'Esc. Type' ] ) ? $_GET[ 'Esc. Type' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Cycle', isset( $_GET[ 'Esc. Cycle' ] ) ? $_GET[ 'Esc. Cycle' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Remarks', isset( $_GET[ 'Remarks' ] ) ? $_GET[ 'Remarks' ] : null, false, false, false, 'redraw' );?>
+                </div>
+                <div class="card-body bg-dark">
+          <table id='Table_Category_Tests' class='display' cellspacing='0' width='100%'>
+            <thead class='text-white border border-white'><tr><?php
+                            \singleton\table::getInstance( )->th( 'ID', 'ID' );
+                            \singleton\table::getInstance( )->th( 'Name', 'Name' );
+                            \singleton\table::getInstance( )->th( 'Deficiency', 'Deficiency' );
+                  ?></tr><tr class='form-desktop'><?php
+                            \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Deficiency', isset( $_GET[ 'Deficiency' ] ) ? $_GET[ 'Deficiency' ] : null );
+                           ;
+                        ?></tr></thead>
+                    </table>
+                </div>
+            </div>
         </div>
-      </form>
-    </div>
   </div>
 </body>
 </html>
 
 <?php /*}*/
-} else {?><script>document.location.href='../login.php?Forward=Category_Tests.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>
+} else {?><script>document.location.href='../login.php?Forward=category_tests.php&<?php echo http_build_query( $_GET );?>';</script><?php }?>
