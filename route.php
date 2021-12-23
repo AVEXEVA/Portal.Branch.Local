@@ -94,9 +94,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ? $_POST[ 'Name' ]
         : null
       );
-    $result = \singleton\database::getInstance( )->query(
-      null,
-      " SELECT  Route.ID              AS ID,
+       $Start_Time= "'".date('Y-m-1', strtotime( 'this month' ) )."'";
+      $lastTicketTime="'".date('Y-m-d', strtotime( 'last day of last month' ) )."'";
+      $query="SELECT  Route.ID   AS ID,
                 Route.Name            AS Name,
                 Employee.ID           AS Employee_ID,
                 Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
@@ -116,7 +116,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 CASE    WHEN Violations.Preliminary IS NULL THEN 0
                         ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
                 CASE    WHEN Violations.Job_Created IS NULL THEN 0
-                        ELSE Violations.Job_Created END AS Violations_Job_Created
+                        ELSE Violations.Job_Created END AS Violations_Job_Created,
+                 CASE    WHEN LastTicket.vistied IS NULL THEN 0
+                        ELSE LastTicket.vistied END AS Visited,
+                CASE    WHEN LastTicket.alreadyVisited IS NULL THEN 0
+                        ELSE LastTicket.alreadyVisited END AS AllReadyVisited        
         FROM    Route
                 LEFT JOIN Emp  AS Employee  ON  Route.Mech = Employee.fWork
                 LEFT JOIN (
@@ -226,13 +230,48 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 GROUP BY  Location.Loc
                               ) AS Job_Created ON Job_Created.Location = Location.Loc
                   ) AS Violations ON Violations.Route = Route.ID
-          WHERE       Route.ID =   ?
-                  OR  Route.Name = ?;",
-        array(
-          $ID,
-          $Name
-        )
-      );
+                  LEFT JOIN (SELECT  Location.Route AS Route,
+                              vistied. Location AS vistied ,
+                              todo.Location As alreadyVisited
+                      FROM    Loc AS Location
+                              LEFT JOIN ( SELECT  Location,Date FROM 
+                              ( (SELECT   TicketO.ID        AS Ticket,
+                                    TicketO.EDate       AS Date,
+                                TicketO.LID         AS Location
+                                FROM    TicketO
+                                  LEFT JOIN TicketDPDA  ON TicketDPDA.ID  = TicketO.ID ) 
+                                  UNION ALL (
+                                      SELECT  TicketD.ID        AS Ticket,
+                                          TicketD.EDate       AS Date,
+                                          TicketD.Loc     AS Location
+                                      FROM    TicketD
+                                    )  
+                              ) AS vistied ) vistied ON Location.Loc = vistied.Location and vistied.Date < $Start_Time
+                                                                LEFT JOIN ( SELECT  Location,Date FROM 
+                              ( (SELECT   TicketO.ID        AS Ticket,
+                                    TicketO.EDate       AS Date,
+                                TicketO.LID         AS Location
+                                FROM    TicketO
+                                  LEFT JOIN TicketDPDA  ON TicketDPDA.ID  = TicketO.ID ) 
+                                  UNION ALL (
+                                      SELECT  TicketD.ID        AS Ticket,
+                                          TicketD.EDate       AS Date,
+                                          TicketD.Loc     AS Location
+                                      FROM    TicketD
+                                    )  
+                              ) AS todo ) todo ON Location.Loc = todo.Location and todo.Date < $lastTicketTime
+                                                ) AS LastTicket ON LastTicket.Route = Route.ID
+                                  WHERE       Route.ID =   ?
+                                          OR  Route.Name = ? ";
+    $result = \singleton\database::getInstance( )->query(
+      null,
+      $query,
+                                array(
+                                  $ID,
+                                  $Name
+                                )
+                              )or die(print_r(sqlsrv_errors()));
+ //   print_r( $result); die();
       $Route =   (          empty( $ID )
                       &&    !empty( $Name )
                       &&    !$result
@@ -252,6 +291,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Tickets_On_Site' => isset( $_GET[ 'Tickets_On_Site' ] ) ? $_GET[ 'Tickets_On_Site' ] : null,
         'Tickets_Reviewing' => isset( $_GET[ 'Tickets_Reviewing' ] ) ? $_GET[ 'Tickets_Reviewing' ] : null,
         'Violations_Preliminary_Report' => isset( $_GET[ 'Violations_Preliminary_Report' ] ) ? $_GET[ 'Violations_Preliminary_Report' ] : null,
+         'Visited' => isset( $_GET[ 'Visited' ] ) ? $_GET[ 'Visited' ] : null,
+         'AllReadyVisited' => isset( $_GET[ 'AllReadyVisited' ] ) ? $_GET[ 'AllReadyVisited' ] : null,
         'Violations_Job_Created' => isset( $_GET[ 'Violations_Job_Created' ] ) ? $_GET[ 'Violations_Job_Created' ] : null
       ) : sqlsrv_fetch_array($result);
 
@@ -436,6 +477,15 @@ if( $locations ) {
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route=' . $Route[ 'ID' ] );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Route[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] . '&Status=Preliminary Report');?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Route[ 'Violations_Job_Created' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] ) . '&Status=Job Created';?>
+                </div>
+              </div>
+
+               <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', 'Route', $Route[ 'ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Locations' ] ) && $_SESSION[ 'Cards' ][ 'Locations' ] == 0 ? "style='display:none;'" : null;?>>
+                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Visited', $Route[ 'Visited' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] . '&Ticket_Last_Service_Start=$Start_Time)');?>
+                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'To Do', $Route[ 'AllReadyVisited' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] . '&Ticket_Last_Service_Start=$lastTicketTime');?>
+                
                 </div>
               </div>
             </div>
