@@ -178,11 +178,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     $iFilteredTotal = 0;
     $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) ? $_SESSION[ 'Tables' ] : array( );
-    $_SESSION[ 'Tables' ][ 'TestCategories' ] = isset( $_SESSION[ 'Tables' ][ 'TestCategories' ]  ) ? $_SESSION[ 'Tables' ][ 'TestCategories' ] : array( );
-    if( count( $_SESSION[ 'Tables' ][ 'TestCategories' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'TestCategories' ] as &$Value ){ $Value = false; } }
-    $_SESSION[ 'Tables' ][ 'TestCategories' ][ 0 ] = $_GET;
+    $_SESSION[ 'Tables' ][ 'Category_Tests' ] = isset( $_SESSION[ 'Tables' ][ 'Category_Tests' ]  ) ? $_SESSION[ 'Tables' ][ 'Category_Tests' ] : array( );
+    if( count( $_SESSION[ 'Tables' ][ 'Category_Tests' ] ) > 0 ){ foreach( $_SESSION[ 'Tables' ][ 'Category_Tests' ] as &$Value ){ $Value = false; } }
+    $_SESSION[ 'Tables' ][ 'Category_Tests' ][ 0 ] = $_GET;
     while( $Row = sqlsrv_fetch_array( $fResult ) ){
-        $_SESSION[ 'Tables' ][ 'TestCategories' ][ $Row[ 'ID' ] ] = true;
+        $_SESSION[ 'Tables' ][ 'Category_Tests' ][ $Row[ 'ID' ] ] = true;
         $iFilteredTotal++;
     }
 

@@ -103,21 +103,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     
      <div id='page-wrapper' class='content'>
       <div class="card card-full card-primary border-0">
-        <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Contract( );?> Contracts</h4></div>
+        <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Category_Tests( );?> Category_Tests</h4></div>
         <div class="mobile card-body bg-dark text-white">
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Start_Date', isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'End_Date', isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Amount', isset( $_GET[ 'Amount' ] ) ? $_GET[ 'Amount' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Cycle', isset( $_GET[ 'Cycle' ] ) ? $_GET[ 'Cycle' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Factor', isset( $_GET[ 'Esc. Factor' ] ) ? $_GET[ 'Esc. Factor' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Date', isset( $_GET[ 'Esc. Date' ] ) ? $_GET[ 'Esc. Date' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Type', isset( $_GET[ 'Esc. Type' ] ) ? $_GET[ 'Esc. Type' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Cycle', isset( $_GET[ 'Esc. Cycle' ] ) ? $_GET[ 'Esc. Cycle' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Remarks', isset( $_GET[ 'Remarks' ] ) ? $_GET[ 'Remarks' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Deficiency', isset( $_GET[ 'Deficiency' ] ) ? $_GET[ 'Deficiency' ] : null, false, false, false, 'redraw' );?>
+                   
                 </div>
                 <div class="card-body bg-dark">
           <table id='Table_Category_Tests' class='display' cellspacing='0' width='100%'>

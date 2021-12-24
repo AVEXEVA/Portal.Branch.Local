@@ -6,7 +6,12 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 header('Content-Type: text/javascript');?>
 
        $(document).ready(function( ){
-    var Table_Contacts = $('#Table_Category_Tests').DataTable( {
+         var Editor_Users = new $.fn.dataTable.Editor( {
+        idSrc    : 'ID',
+        ajax     : 'index.php',
+        table    : '#Table_Category_Tests'
+    } );
+    var Table_Category_Tests = $('#Table_Category_Tests').DataTable( {
         <?php \singleton\datatables::getInstance( )->preferences( );?>,
         ajax: {
             url : 'bin/php/get/Category_Tests.php',
@@ -19,7 +24,7 @@ header('Content-Type: text/javascript');?>
           ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'Category_Tests' );?>, 
            
-        <?php \singleton\datatables::getInstance( )->buttons( 'Category_Test', 'Category_Tests', 'ID' );?>
+        <?php \singleton\datatables::getInstance( )->buttons( 'category_test', 'Category_Tests', 'ID' );?>
     });
   });           
 
