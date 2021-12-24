@@ -105,14 +105,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
                       <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
                       <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                   
                   </div>
           <div class='card-body bg-darker'>
-            <table id='Table_Bugs' class='display' cellspacing='0' width='100%'>
+            <table id='Table_bugs' class='display' cellspacing='0' width='100%'>
               <thead class='text-white border border-white'><tr><?php
                 \singleton\table::getInstance( )->th( 'ID', 'ID' );
                 \singleton\table::getInstance( )->th( 'Name', 'Name' );
@@ -135,61 +131,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             </div>
         </div>
     </div>
-    <script>
-    var Table_Bugs = $('#Table_Bugs').DataTable( {
-        dom            : "<'row'<'col-sm-3 search'><'col-sm-9'B>><'row'<'col-sm-12't>>",
-        processing     : true,
-        serverSide     : true,
-        searching      : false,
-        lengthChange   : false,
-        scrollResize   : true,
-        scrollY        : 100,
-        scroller       : true,
-        scrollCollapse : true,
-        paging         : true,
-        orderCellsTop  : true,
-        autoWidth      : true,
-        ajax       : {
-            url : 'bin/php/get/Bugs.php',
-            data : function( d ){
-                d = {
-                    start : d.start,
-                    length : d.length,
-                    order : {
-                    column : d.order[0].column,
-                    dir : d.order[0].dir
-                }
-                };
-                d.ID = $('input[name="ID"]').val( );
-                d.Name = $('input[name="Name"]').val( );
-                d.Description = $('input[name="Description"]').val( );
-                d.Severity = $('input[name="Severity"]').val( );
-                d.Suggestion = $('input[name="Suggestion"]').val( );
-                d.Resolution = $('input[name="Resolution"]').val( );
-                d.Fixed = $('input[name="Fixed"]').val( );
-                return d;
-            }
-        },
-        columns: [
-            {
-                data    : 'ID'
-            },{
-                data    : 'Name'
-            },{
-                data    : 'Description'
-            },{
-                data    : 'Severity'
-            },{
-                data    : 'Suggestion'
-            },{
-                data    : 'Resolution'
-            },{
-                data    : 'Fixed'
-            }
-        ]
-    } );
-    </script>
-</body>
+ </body>
 </html>
  <?php
     }
