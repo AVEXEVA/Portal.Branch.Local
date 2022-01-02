@@ -7,13 +7,13 @@ class database extends \singleton\index {
 		'Portal',
 		'Demo'
 	);
-	private $host = '52.191.64.69';
-	private $user = 'development';
-	private $password = '484138thstreetLongislandcity';
+	private $host = '20.124.200.54';
+	private $user = 'sa';
+	private $password = '007!Youknowwhattodo!';
 	private $options = array(
 		'Database' 				=> 	null,
-	    'Uid' 					=> 	'development',
-	    'PWD' 					=> 	'484138thstreetLongislandcity',
+	    'Uid' 					=> 	'sa',
+	    'PWD' 					=> 	'007!Youknowwhattodo!',
 	    'ReturnDatesAsStrings'	=>	true,
 	    'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 	    'TraceOn' 				=> 	false
@@ -24,9 +24,9 @@ class database extends \singleton\index {
 				if( is_string( $database ) && strlen( $database ) > 0 ){
 					$options = $this->options;
 					$options[ 'Database' ] = $database;
-					$this->resources[ $database ] = sqlsrv_connect( $this->host, $options );	
+					$this->resources[ $database ] = sqlsrv_connect( $this->host, $options );
 				}
-			}	
+			}
 		}
 	}
 	public function query( $database, $query, $parameters = array( ) ){
