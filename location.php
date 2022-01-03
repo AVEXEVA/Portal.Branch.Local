@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [ 'read_and_close' => true ] );
+    session_start(  );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){

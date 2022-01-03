@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [ 'read_and_close' => true ] );
+    session_start( );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
@@ -149,41 +149,67 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Reviewing.Count AS Reviewing
                 FROM    Zone AS Division
           LEFT JOIN (
-            SELECT      Location.Zone AS Division,
+            SELECT      Division.ID AS Division,
                         Sum( Units.Count ) AS Count,
                         Sum( Elevators.Count) AS Elevators,
                         Sum( Escalators.Count ) AS Escalators,
                         Sum( Other.Count ) AS Other
             FROM        Zone AS Division
-                        LEFT JOIN (
-                            SELECT      Unit.Loc AS Division,
-                                        Count( Unit.ID ) AS Count
-                            FROM        Elev AS Unit
-                            GROUP BY    Unit.Loc
-                        ) AS Units ON Units.Division = Division.ID
-                        LEFT JOIN (
-                            SELECT      Unit.Loc AS Division,
-                                        Count( Unit.ID ) AS Count
-                            FROM        Elev AS Unit
-                            WHERE       Unit.Type = 'Elevator'
-                            GROUP BY    Unit.Loc
-                        ) AS Elevators ON Elevators.Division = Division.ID
-                        LEFT JOIN (
-                            SELECT      Unit.Loc AS Division,
-                                        Count( Unit.ID ) AS Count
-                            FROM        Elev AS Unit
-                            WHERE       Unit.Type = 'Escalator'
-                            GROUP BY    Unit.Loc
-                        ) AS Escalators ON Escalators.Division = Division.ID
-                        LEFT JOIN (
-                            SELECT      Unit.Loc AS Division,
-                                        Count( Unit.ID ) AS Count
-                            FROM        Elev AS Unit
-                            WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
-                            GROUP BY    Unit.Loc
-                        ) AS Other ON Other.Location = Location.Loc
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          GROUP BY    Location.Zone
+                      ) AS Units ON Units.Division = Division.ID
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE       Unit.Type = 'Elevator'
+                          GROUP BY    Location.Zone
+                      ) AS Elevators ON Elevators.Division = Division.ID
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE       Unit.Type = 'Escalator'
+                          GROUP BY    Location.Zone
+                      ) AS Escalators ON Escalators.Division = Division.ID
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                          GROUP BY    Location.Zone
+                      ) AS Other ON Other.Location = Division.ID
               GROUP BY    Location.Loc
           ) AS Units ON Units.Location = Division.ID
+              LEFT JOIN (
+                  SELECT  Location.Zone AS Division,
+                          Preliminary.Count AS Preliminary,
+                          Job_Created.Count AS Job_Created
+                  FROM    Zone AS Division
+                          LEFT JOIN (
+                            SELECT    Location.Zone AS Division,
+                                      Count( Violation.ID ) AS Count
+                            FROM      Violation
+                                      LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                            WHERE     Violation.Status = 'Preliminary Report'
+                            GROUP BY  Location.Zone
+                          ) AS Preliminary ON Preliminary.Division = Division.ID
+                          LEFT JOIN (
+                            SELECT    Location.Zone AS Division,
+                                      Count( Violation.ID ) AS Count
+                            FROM      Violation
+                                      LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                            WHERE     Violation.Status = 'Job Created'
+                            GROUP BY  Location.Zone
+                          ) AS Job_Created ON Job_Created.Division = Division.ID
+                        ) AS Violations ON Violations.Division = Division.ID
                           LEFT JOIN (
                             SELECT    Location.Zone AS Division,
                                       Count( TicketO.ID ) AS Count
@@ -231,7 +257,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Name
         )
       );
-      //var_dump( sqlsrv_errors( ) );
+      var_dump( sqlsrv_errors( ) );
       $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
         'ID' => null,
         'Name' => null,
@@ -286,6 +312,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Division[ 'Tickets_En_Route' ] 	= isset( $_POST[ 'Tickets_En_Route' ] )  ? $_POST[ 'Tickets_En_Route' ]  : $Division[ 'Tickets_En_Route' ];
         $Division[ 'Tickets_On_Site' ] 	= isset( $_POST[ 'Tickets_On_Site' ] )  ? $_POST[ 'Tickets_On_Site' ]  : $Division[ 'Tickets_On_Site' ];
         $Division[ 'Tickets_Reviewing' ] 	= isset( $_POST[ 'Tickets_Reviewing' ] )  ? $_POST[ 'Tickets_Reviewing' ]  : $Division[ 'Tickets_Reviewing' ];
+        $Division[ 'Units_Elevators' ] 	= isset( $_POST[ 'Units_Elevators' ] )  ? $_POST[ 'Units_Elevators' ]  : $Division[ 'Units_Elevators' ];
+        $Division[ 'Units_Escalators' ] 	= isset( $_POST[ 'Units_Escalators' ] )  ? $_POST[ 'Units_Escalators' ]  : $Division[ 'Units_Escalators' ];
+        $Division[ 'Units_Other' ] 	= isset( $_POST[ 'Units_Other' ] )  ? $_POST[ 'Units_Other' ]  : $Division[ 'Units_Other' ];
+        $Division[ 'Violations_Preliminary_Report' ] 	= isset( $_POST[ 'Violations_Preliminary_Report' ] )  ? $_POST[ 'Violations_Preliminary_Report' ]  : $Division[ 'Violations_Preliminary_Report' ];
+        $Division[ 'Violations_Job_Created' ] 	= isset( $_POST[ 'Violations_Job_Created' ] )  ? $_POST[ 'Violations_Job_Created' ]  : $Division[ 'Violations_Job_Created' ];
         if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
           $result = \singleton\database::getInstance( )->query(
             null,
@@ -306,30 +337,34 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 ODistance,
                 Color,
                 fDesc,
-                Tax
+                Tax,
+                TFMID,
+                TFMSource
               )
-              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
               SELECT @MAXID + 1;",
             array(
-              $Division[ 'ID' ],
               $Division[ 'Name' ],
               $Division[ 'Bonus' ],
               $Division[ 'Count' ],
               $Division[ 'Notes' ],
               $Division[ 'Price1' ],
+              $Division[ 'Price2' ],
+              $Division[ 'Price3' ],
+              $Division[ 'Price4' ],
+              $Division[ 'Price5' ],
               $Division[ 'IDistance' ],
               $Division[ 'ODistance' ],
               $Division[ 'Color' ],
               $Division[ 'Description' ],
               $Division[ 'Tax' ],
               $Division[ 'TFMID' ],
-              $Division[ 'TFMSource'],
-              isset( $Division[ 'Geofence' ] ) ? $Division[ 'Geofence' ] : 0
+              $Division[ 'TFMSource']
             )
           );
           sqlsrv_next_result( $result );
           $Division [ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-          header( 'Location: division.php?ID=' . $Division [ 'ID' ] );
+          //header( 'Location: division.php?ID=' . $Division [ 'ID' ] );
         } else {
           \singleton\database::getInstance( )->query(
             null,
@@ -339,7 +374,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Zone.Bonus = ?,
                         Zone.Count = ?,
                         Zone.Remarks = ?,
+                        Zone.Price1   = ?,
+                        Zone.Price2   = ?,
+                        Zone.Price3   = ?,
+                        Zone.Price4   = ?,
+                        Zone.Price5   = ?,
+                        zone.IDistance   = ?,
+                        zone.ODistance   = ?,
+                        zone.Color   = ?,
                         Zone.fDesc   = ?,
+                        zone.Tax   = ?,
                         zone.TFMID   = ?,
                         zone.TFMSource = ?
               WHERE 	  Zone.ID = ?;",
@@ -359,7 +403,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Division[ 'Color' ],
               $Division[ 'Description' ],
               $Division[ 'Tax' ],
-              !empty( $Division [ 'GeoLock' ] ) ? $Division [ 'GeoLock' ] : 0
+              $Division[ 'TFMID' ],
+              $Division[ 'TFMSource' ]
             )
           );
         }
