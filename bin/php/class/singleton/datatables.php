@@ -166,7 +166,8 @@ class datatables extends \singleton\index {
     }
 
     //Columns
-    public function data_column_id( $reference, $key ){
+    public function data_column_id( $reference, $key, $page = null ){
+        $page = is_null( $page ) ? $reference : $page;
         ?>{
           className : '<?php echo $key;?>',
           data : '<?php echo $key;?>',
@@ -175,7 +176,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.<?php echo $key;?> !== null
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $page );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> <?php echo ucfirst( $reference );?> #" + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   '';
                   default :
@@ -184,7 +185,8 @@ class datatables extends \singleton\index {
           }
       }<?php
     }
-    public function data_column_link( $reference, $key ){
+    public function data_column_link( $reference, $key, $page = null ){
+        $page = is_null( $page ) ? $reference : $page;
         ?>{
           className : '<?php echo $key;?>',
           data : '<?php echo $key;?>',
@@ -193,7 +195,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.<?php echo $key;?> !== null && row.<?php echo $key;?> != ''
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo strtolower( $reference );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $page );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   '';
                   default :
@@ -273,8 +275,8 @@ class datatables extends \singleton\index {
     }
 
     //Columns
-    public function ID( $reference ){ self::data_column_id( $reference, 'ID' ); }
-    public function Name( $reference ){ self::data_column_link( $reference, 'Name' ); }
+    public function ID( $reference, $page = null ){ self::data_column_id( $reference, 'ID', $page ); } 
+    public function Name( $reference, $page = null ){ self::data_column_link( $reference, 'Name', $page ); }
     public function Date( $key = 'Date' ){
         ?>{
             data : '<?php echo $key;?>',

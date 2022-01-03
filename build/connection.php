@@ -2,7 +2,6 @@
 if( session_id( ) == '' || !isset($_SESSION)) { session_destroy( ); }
 session_start( );
 
-$db = 'Portal';
 $sql = "INSERT INTO [Connection]( [User], [Hash], [Created], [Timestamp], [IP], [Agent] )
         VALUES( ?, ?, ?, ?, ?, ?);
         SELECT SCOPE_IDENTITY( ) AS ID;";
@@ -17,7 +16,7 @@ $parameters = array(
 $_SESSION[ 'Connection' ] = $parameters;
 
 $result = \singleton\database::getInstance()->query(
-  $db,
+  Portal,
   $sql,
   array_values( $_SESSION[ 'Connection' ] )
 );

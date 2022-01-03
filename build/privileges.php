@@ -1,6 +1,5 @@
 <?php
 //Statics
-$db   = 'Portal';
 $sql  = " INSERT INTO [Privilege] ([User], [Access], [Owner], [Group], [Department], [Database], [Server], [Other], [Token], [Internet])
           VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 $accesses = array(
@@ -45,7 +44,7 @@ foreach( $accesses as $access ){
     15
   );
   \singleton\database::getInstance()->query(
-    $db,
+    Portal,
     $sql,
     $parameters
   );

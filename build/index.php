@@ -1,21 +1,20 @@
 <?php
-/*********APP**********/
-if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [ 'read_and_close' => true ] );
-    require( __DIR__ . '/../bin/php/index.php' );
-}
-
 /*********SCHEMA*******/
-//require( 'database.php' );
-//require( 'schema.php' );
+//require( 'sql/index.php' );
+
+/*********ACTIONS******/
+require( 'build/truncation.php' );
 
 /*********DATA*********/
-require( 'truncation.php' );
-require( 'user.php' );
-require( 'privileges.php' );
-require( 'connection.php' );
+require( 'build/databases.php' );
+require( 'build/user.php' );
+require( 'build/privileges.php' );
+require( 'build/connection.php' );
+
+/*********FORM*********/
+require( 'build/form.php' );
 
 /*********REDIRECT*****/
-header( 'Location: ../index.php' );
+//header( 'Location: ../index.php' );
 exit;
 ?>
