@@ -5,7 +5,8 @@ class database extends \singleton\index {
 	private $resources = array( );
 	private $databases = array(
 		'Portal',
-		'Demo'
+		'Demo',
+		'Development'
 	);
 	private $host = '20.124.200.54';
 	private $user = 'sa';
@@ -43,7 +44,7 @@ class database extends \singleton\index {
 				);
 	}
 	public function changeDefault( $database = 'Demo' ){
-		if( in_array( $database, $this->databaess ) ){
+		if( in_array( $database, $this->databases ) ){
 			$this->default = $database;
 		}
 	}
