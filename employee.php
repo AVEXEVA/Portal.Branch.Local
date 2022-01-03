@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Employee.fFirst + ' ' + Employee.Last AS Name,
         				Employee.fFirst                       AS First_Name,
         				Employee.Last                         AS Last_Name,
-                        Employee.Title                        AS Title,
+                Employee.Title                        AS Title,
         				Rolodex.Address                       AS Street,
         				Rolodex.City                          AS City,
         				Rolodex.State                         AS State,
@@ -111,11 +111,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.Latt                          AS Latitude,
         				Rolodex.fLong                         AS Longitude,
         				Rolodex.Geolock                       AS Geofence,
-        				Rolodex.ID 		                      AS Rolodex,
+        				Rolodex.ID 		                        AS Rolodex,
         				Rolodex.Name                          AS Name,
-                        Rolodex.Phone                         AS Phone,
-                        Rolodex.Email                         AS Email,
-                        Rolodex.Contact                       AS Contact,
+                Rolodex.Phone                         AS Phone,
+                Rolodex.Email                         AS Email,
+                Rolodex.Contact                       AS Contact,
         				tblWork.Super                         AS Supervisor,
         				[User].ID                             AS User_ID,
         				[User].Email 	                      AS User_Email,
@@ -128,7 +128,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         CASE    WHEN Tickets.On_Site IS NULL THEN 0
                                 ELSE Tickets.On_Site END AS Tickets_On_Site,
                         CASE    WHEN Tickets.Reviewing IS NULL THEN 0
-                                ELSE Tickets.Reviewing END AS Tickets_Reviewing
+                                ELSE Tickets.Reviewing END AS Tickets_Reviewing,
+                        CASE    WHEN Tickets.Completed IS NULL THEN 0
+                                ELSE Tickets.Completed END AS Tickets_Completed
         		FROM 	dbo.Emp AS Employee
         				LEFT JOIN dbo.tblWork       AS tblWork  ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
         				LEFT JOIN dbo.Rol           AS Rolodex  ON Employee.Rol = Rolodex.ID
@@ -139,43 +141,50 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     Assigned.Count AS Assigned,
                                     En_Route.Count AS En_Route,
                                     On_Site.Count AS On_Site,
-                                    Reviewing.Count AS Reviewing
+                                    Reviewing.Count AS Reviewing,
+                                    Completed.Count AS Completed
                             FROM    Emp AS Employee
                                     LEFT JOIN (
-                                      SELECT    TicketO.fWork AS Work_ID,
-                                                Count( TicketO.ID ) AS Count
-                                      FROM      TicketO
-                                      WHERE     TicketO.Assigned = 0
-                                      GROUP BY  TicketO.fWork
-                                    ) AS Unassigned ON Unassigned.Work_ID = Employee.fWork
+                                        SELECT    TicketO.fWork AS Work_ID,
+                                                  Count( TicketO.ID ) AS Count
+                                        FROM      TicketO
+                                        WHERE     TicketO.Assigned = 0
+                                        GROUP BY  TicketO.fWork
+                                    ) AS [Unassigned] ON Unassigned.Work_ID = Employee.fWork
                                     LEFT JOIN (
-                                      SELECT    TicketO.fWork AS Work_ID,
-                                                Count( TicketO.ID ) AS Count
-                                      FROM      TicketO
-                                      WHERE     TicketO.Assigned = 1
-                                      GROUP BY  TicketO.fWork
-                                    ) AS Assigned ON Assigned.Work_ID = Employee.fWork
+                                        SELECT    TicketO.fWork AS Work_ID,
+                                                  Count( TicketO.ID ) AS Count
+                                        FROM      TicketO
+                                        WHERE     TicketO.Assigned = 1
+                                        GROUP BY  TicketO.fWork
+                                    ) AS [Assigned] ON Assigned.Work_ID = Employee.fWork
                                     LEFT JOIN (
-                                      SELECT    TicketO.fWork AS Work_ID,
-                                                Count( TicketO.ID ) AS Count
-                                      FROM      TicketO
-                                      WHERE     TicketO.Assigned = 2
-                                      GROUP BY  TicketO.fWork
-                                    ) AS En_Route ON En_Route.Work_ID = Employee.fWork
+                                        SELECT    TicketO.fWork AS Work_ID,
+                                                  Count( TicketO.ID ) AS Count
+                                        FROM      TicketO
+                                        WHERE     TicketO.Assigned = 2
+                                        GROUP BY  TicketO.fWork
+                                    ) AS [En_Route] ON En_Route.Work_ID = Employee.fWork
                                     LEFT JOIN (
-                                      SELECT    TicketO.fWork AS Work_ID,
-                                                Count( TicketO.ID ) AS Count
-                                      FROM      TicketO
-                                      WHERE     TicketO.Assigned = 3
-                                      GROUP BY  TicketO.fWork
-                                    ) AS On_Site ON On_Site.Work_ID = Employee.fWork
+                                        SELECT    TicketO.fWork AS Work_ID,
+                                                  Count( TicketO.ID ) AS Count
+                                        FROM      TicketO
+                                        WHERE     TicketO.Assigned = 3
+                                        GROUP BY  TicketO.fWork
+                                    ) AS [On_Site] ON On_Site.Work_ID = Employee.fWork
                                     LEFT JOIN (
-                                      SELECT    TicketO.fWork AS Work_ID,
-                                                Count( TicketO.ID ) AS Count
-                                      FROM      TicketO
-                                      WHERE     TicketO.Assigned = 6
-                                      GROUP BY  TicketO.fWork
-                                    ) AS Reviewing ON Reviewing.Work_ID = Employee.fWork
+                                        SELECT    TicketO.fWork AS Work_ID,
+                                                  Count( TicketO.ID ) AS Count
+                                        FROM      TicketO
+                                        WHERE     TicketO.Assigned = 6
+                                        GROUP BY  TicketO.fWork
+                                    ) AS [Reviewing] ON Reviewing.Work_ID = Employee.fWork
+                                    LEFT JOIN (
+                                        SELECT  TicketD.fWork AS Work_ID,
+                                                Count( TicketD.ID ) AS Count
+                                        FROM    TicketD
+                                        GROUP BY    TicketD.fWork
+                                    ) AS [Completed] ON Completed.Work_ID = Employee.fWork
                         ) AS Tickets ON Tickets.Employee = Employee.ID
         		WHERE 	Employee.ID = ?
         				OR Employee.fFirst + ' ' + Employee.Last = ?;",
@@ -195,7 +204,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Name' => null,
         	'First_Name' => null,
         	'Last_Name' => null,
-            'Title' => null,
+          'Title' => null,
         	'Sales' => null,
         	'Field' => null,
         	'In_Use' => null,
@@ -210,8 +219,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Geofence' => null,
         	'Rolodex' => null,
         	'Supervisor' => null,
-        	'Name' => null,
-        	'Email' => null,
+        	'Tickets_Open' => null,
+        	'Tickets_Assigned' => null,
+          'Tickets_En_Route' => null,
+          'Tickets_On_Site' => null,
+          'Tickets_Reviewing' => null,
+          'Email' => null,
         	'Phone' => null
         ) : sqlsrv_fetch_array($result);
 
@@ -364,7 +377,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card card-primary my-3 col-12 col-lg-3'>
                         <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                         <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                            <?php 
+                            <?php
                                 \singleton\bootstrap::getInstance( )->card_row_form_input( 'First_Name', $Employee[ 'First_Name' ] );
                                 \singleton\bootstrap::getInstance( )->card_row_form_input( 'Last_Name', $Employee[ 'Last_Name' ] );
                                 \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', $Employee[ 'Title' ] );
@@ -390,6 +403,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Employee[ 'Tickets_En_Route' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=2';?>
                             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Employee[ 'Tickets_On_Site' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=3';?>
                             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Employee[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=6';?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Completed', $Employee[ 'Tickets_Completed' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=4';?>
                         </div>
                     </div>
                 </div>

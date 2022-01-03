@@ -67,8 +67,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Customer' ] )
-        || 	!check( privilege_read, level_group, $Privileges[ 'Customer' ] )
+        ||  !isset( $Privileges[ 'Ticket' ] )
+        || 	!check( privilege_read, level_group, $Privileges[ 'Ticket' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
@@ -78,7 +78,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $_SESSION[ 'Connection' ][ 'User' ],
             date('Y-m-d H:i:s'),
-            'customer.php'
+            'ticket.php?ID=' . ( isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null )
         )
       );
     	$ID = isset( $_GET[ 'ID' ] )

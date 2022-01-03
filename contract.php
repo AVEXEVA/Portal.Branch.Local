@@ -409,6 +409,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Contract[ 'Invoices_Closed' ], true, true, 'invoices.php?Contract=' . $Contract[ 'ID' ] ) . '&Status=1';?>
                 </div>
               </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Collections', 'Collection', 'Collections', 'Contract', $Contract[ 'ID' ] );?>
+             
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
+                <?php if(isset($Privileges['Collection']) && $Privileges['Collection']['Customer'] >= 4) {?>
+                <div class='row g-0'>
+                    <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
+                    <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
+                    $r = \singleton\database::getInstance( )->query(null,"
+                      SELECT Sum( OpenAR.Balance ) AS Balance
+                      FROM   OpenAR
+                           LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
+                      WHERE  Location.Owner = ?
+                    ;",array($Contract[ 'Owner' ]));
+                    $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
+                    echo money_format('%(n',$Balance);
+                  ?>' /></div>
+                  <div class='col-2'>&nbsp;</div>
+                </div>
+                <?php }?>
+              </div>
+            </div>
             </div>
           </div>
         </form>

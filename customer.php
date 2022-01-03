@@ -117,11 +117,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Rolodex.Latt 	   AS Latitude,
                         Rolodex.fLong      AS Longitude,
                         Customer.Status    AS Status,
-            						Rolodex.Website    AS Website,
-            						Customer.Internet  AS Internet,
-            						Customer.fLogin    AS Login,
-            						Customer.Password  AS Password,
-            						Rolodex.Geolock    AS Geofence,
+						Rolodex.Website    AS Website,
+						Customer.Internet  AS Internet,
+						Customer.fLogin    AS Login,
+						Customer.Password  AS Password,
+						Rolodex.Geolock    AS Geofence,
                         CASE    WHEN Locations.Count IS NULL THEN 0
                                 ELSE Locations.Count END AS Locations_Count,
                         CASE    WHEN Locations.Maintained IS NULL THEN 0
@@ -134,6 +134,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 ELSE Units.Elevators END AS Units_Elevators,
                         CASE    WHEN Units.Escalators IS NULL THEN 0
                                 ELSE Units.Escalators END AS Units_Escalators,
+                        CASE    WHEN Units.Moving_Walk IS NULL THEN 0
+                                ELSE Units.Moving_Walk END AS Units_Moving_Walk,
                         CASE    WHEN Units.Other IS NULL THEN 0
                                 ELSE Units.Other END AS Units_Other,
                         CASE    WHEN Jobs.[Open] IS NULL THEN 0
@@ -156,6 +158,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
                         CASE    WHEN Violations.Job_Created IS NULL THEN 0
                                 ELSE Violations.Job_Created END AS Violations_Job_Created,
+                        CASE    WHEN Violations.Closed IS NULL THEN 0
+                                ELSE Violations.Closed END AS Violations_Closed,
                         CASE    WHEN Invoices.[Open] IS NULL THEN 0
                                 ELSE Invoices.[Open] END AS Invoices_Open,
                         CASE    WHEN Invoices.[Closed] IS NULL THEN 0
@@ -179,14 +183,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             FROM        Loc AS Location
                                             WHERE       Location.Maint = 1
                                             GROUP BY    Location.Loc
-                                        ) AS Maintained ON Location.Loc = Maintained.Location
+                                        ) AS [Maintained] ON Location.Loc = Maintained.Location
                                         LEFT JOIN (
                                             SELECT      Location.Loc AS Location,
                                                         Count( Location.Loc ) AS Count
                                             FROM        Loc AS Location
                                             WHERE       Location.Maint = 0
                                             GROUP BY    Location.Loc
-                                        ) AS Unmaintained ON Location.Loc = Unmaintained.Location
+                                        ) AS [Unmaintained] ON Location.Loc = Unmaintained.Location
                             GROUP BY    Owner.ID
                         ) AS Locations ON Locations.Customer = Customer.ID
                         LEFT JOIN (
@@ -194,6 +198,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         Sum( Units.Count ) AS Count,
                                         Sum( Elevators.Count) AS Elevators,
                                         Sum( Escalators.Count ) AS Escalators,
+                                        SUM( Moving_Walk.Count ) AS Moving_Walk,
                                         Sum( Other.Count ) AS Other
                             FROM        Owner
                                         LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner
@@ -202,28 +207,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
                                             GROUP BY    Unit.Loc
-                                        ) AS Units ON Units.Location = Location.Loc
+                                        ) AS [Units] ON Units.Location = Location.Loc
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
-                                            WHERE       Unit.Type = 'Elevator'
+                                            WHERE       Unit.Type IN ( 'Elevator', 'Roped Hydro', 'Hydraulic' )
                                             GROUP BY    Unit.Loc
-                                        ) AS Elevators ON Elevators.Location = Location.Loc
+                                        ) AS [Elevators] ON Elevators.Location = Location.Loc
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
                                             WHERE       Unit.Type = 'Escalator'
                                             GROUP BY    Unit.Loc
-                                        ) AS Escalators ON Escalators.Location = Location.Loc
+                                        ) AS [Escalators] ON Escalators.Location = Location.Loc
+                                        LEFT JOIN (
+                                            SELECT      Unit.Loc AS Location,
+                                                        Count( Unit.ID ) AS Count
+                                            FROM        Elev AS Unit
+                                            WHERE       Unit.Type = 'Moving Walk'
+                                            GROUP BY    Unit.Loc
+                                        ) AS [Moving_Walk] ON Escalators.Location = Location.Loc
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
                                             WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
                                             GROUP BY    Unit.Loc
-                                        ) AS Other ON Other.Location = Location.Loc
+                                        ) AS [Other] ON Other.Location = Location.Loc
                             GROUP BY    Owner.ID
                         ) AS Units ON Units.Customer = Customer.ID
                         LEFT JOIN (
@@ -269,7 +281,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 0
                                       GROUP BY  Location.Owner
-                                    ) AS Unassigned ON Unassigned.Customer = Owner.ID
+                                    ) AS [Unassigned] ON Unassigned.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -277,7 +289,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 1
                                       GROUP BY  Location.Owner
-                                    ) AS Assigned ON Assigned.Customer = Owner.ID
+                                    ) AS [Assigned] ON Assigned.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -285,7 +297,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 2
                                       GROUP BY  Location.Owner
-                                    ) AS En_Route ON En_Route.Customer = Owner.ID
+                                    ) AS [En_Route] ON En_Route.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -293,7 +305,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 3
                                       GROUP BY  Location.Owner
-                                    ) AS On_Site ON On_Site.Customer = Owner.ID
+                                    ) AS [On_Site] ON On_Site.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -301,12 +313,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 6
                                       GROUP BY  Location.Owner
-                                    ) AS Reviewing ON Reviewing.Customer = Owner.ID
+                                    ) AS [Reviewing] ON Reviewing.Customer = Owner.ID
                         ) AS Tickets ON Tickets.Customer = Customer.ID
                         LEFT JOIN (
                             SELECT  Owner.ID AS Customer,
                                     Preliminary.Count AS Preliminary,
-                                    Job_Created.Count AS Job_Created
+                                    Job_Created.Count AS Job_Created,
+                                    Closed.Count AS Closed
                             FROM    Owner
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
@@ -315,7 +328,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                                       WHERE     Violation.Status = 'Preliminary Report'
                                       GROUP BY  Location.Owner
-                                    ) AS Preliminary ON Preliminary.Customer = Owner.ID
+                                    ) AS [Preliminary] ON Preliminary.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( Violation.ID ) AS Count
@@ -323,7 +336,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                                       WHERE     Violation.Status = 'Job Created'
                                       GROUP BY  Location.Owner
-                                    ) AS Job_Created ON Job_Created.Customer = Owner.ID
+                                    ) AS [Job_Created] ON Job_Created.Customer = Owner.ID
+                                    LEFT JOIN (
+                                        SELECT  Location.Owner AS Customer,
+                                                Count( Violation.ID ) AS Count 
+                                        FROM    Violation 
+                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc 
+                                        WHERE   Violation.Status IN ( 'Completed', 'Dismissed' )
+                                        GROUP BY    Location.Owner
+                                    ) AS [Closed] ON Closed.Customer = Owner.ID
                         ) AS Violations ON Violations.Customer = Customer.ID
                         LEFT JOIN (
                             SELECT      Location.Owner          AS Customer,
@@ -372,7 +393,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	$ID
             )
         );
-        //var_dump( sqlsrv_errors( ) );//
         $Customer = (  !$result )
             ? array(
             	'ID'        => isset( $_GET [ 'ID' ] )         ? $_GET ['ID'] : null,
@@ -390,12 +410,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	'Zip'       => isset( $_GET [ 'Zip' ] )        ? $_GET ['Zip'] : null,
             	'Latitude'  => isset( $_GET [ 'Latitude' ] )   ? $_GET ['Latitude'] : null,
             	'Longitude' => isset( $_GET [ 'Longitude' ] )  ? $_GET ['Longitude'] : null,
-              'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
-              'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
-              'Rolodex'   => isset( $_GET [ 'Rolodex' ] )    ? $_GET ['Rolodex'] : null,
-              'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
-              'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
-              'Contact'   => isset( $_GET [ 'Contact' ] )    ? $_GET [ 'Contact' ] : null
+                'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
+                'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
+                'Rolodex'   => isset( $_GET [ 'Rolodex' ] )    ? $_GET ['Rolodex'] : null,
+                'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
+                'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
+                'Contact'   => isset( $_GET [ 'Contact' ] )    ? $_GET [ 'Contact' ] : null,
+                'Locations_Count ' => null,
+                'Locations_Maintained' => null,
+                'Locations_Unmaintained' => null,
+                'Units_Count' => null,
+                'Units_Elevators' => null,
+                'Units_Escalators' => null,
+                'Units_Moving_Walk' => null,
+                'Units_Other' => null,
+                'Jobs_Open' => null,
+                'Jobs_On_Hold' => null,
+                'Jobs_Closed' => null,
+                'Tickets_Open' => null,
+                'Tickets_Assigned' => null,
+                'Tickets_En_Route' => null,
+                'Tickets_On_Site' => null,
+                'Tickets_Reviewing' => null,
+                'Violations_Preliminary_Report' => null,
+                'Violations_Job_Created' => null,
+                'Violations_Closed' => null,
+                'Invoices_Open' => null,
+                'Invoices_Closed' => null,
+                'Proposals_Open' => null,
+                'Proposals_Closed' => null
             )
             : sqlsrv_fetch_array($result);
         //Binds $ID, $Name, $Customer and query values into the $result variable
@@ -403,7 +446,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             // if the $_Post is set and the count is null, select if available
         	$Customer[ 'Name' ] 		    = isset( $_POST[ 'Name' ] ) 	   ? $_POST[ 'Name' ] 	   : $Customer[ 'Name' ];
-          $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] )   ? $_POST[ 'Contact' ]   : $Customer[ 'Contact' ];
+            $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] )   ? $_POST[ 'Contact' ]   : $Customer[ 'Contact' ];
         	$Customer[ 'Phone' ] 		    = isset( $_POST[ 'Phone' ] ) 	   ? $_POST[ 'Phone' ] 	   : $Customer[ 'Phone' ];
         	$Customer[ 'Email' ] 		    = isset( $_POST[ 'Email' ] ) 	   ? $_POST[ 'Email' ] 	   : $Customer[ 'Email' ];
         	$Customer[ 'Login' ] 		    = isset( $_POST[ 'Login' ] ) 	   ? $_POST[ 'Login' ] 	   : $Customer[ 'Login' ];
@@ -429,6 +472,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     						  ID,
         					Type,
         					Name,
+                            Contact,
         					Website,
         					Address,
         					City,
@@ -442,6 +486,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SELECT @MAXID + 1;",
         			array(
         				$Customer[ 'Name' ],
+                        $Customer[ 'Contact' ],
         				$Customer[ 'Website' ],
         				$Customer[ 'Street' ],
         				$Customer[ 'City' ],
@@ -529,6 +574,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		null,
 	        		"	UPDATE 	Rol
 	        			SET 	Rol.Name = ?,
+                                Rol.Contact = ?,
   	        					Rol.Website = ?,
   	        					Rol.Address = ?,
   	        					Rol.City = ?,
@@ -541,6 +587,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        			WHERE 	Rol.ID = ?;",
 	        		array(
 	        			$Customer[ 'Name' ],
+                        $Customer[ 'Contact' ],
 	        			$Customer[ 'Website' ],
 	        			$Customer[ 'Street' ],
 	        			$Customer[ 'City' ],
@@ -667,62 +714,62 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Locations' ] ) && $_SESSION[ 'Cards' ][ 'Locations' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Locations', 'locations.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Maintain', $Customer[ 'Locations_Maintained' ], true, true, 'locations.php?Customer=' . $Customer[ 'ID' ] . '&Maintained=1');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Locations_Unmaintained' ], true, true, 'locations.php?Customer=' . $Customer[ 'ID' ] ) . '&Maintained=0';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Locations', 'locations.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ]);?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Maintain', $Customer[ 'Locations_Maintained' ], true, true, 'locations.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Maintained=1');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Locations_Unmaintained' ], true, true, 'locations.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Maintained=0' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Customer[ 'Units_Elevators' ], true, true, 'units.php?Customer=' . $Customer[ 'ID' ] . '&Type=Elevator');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Customer[ 'Units_Escalators' ], true, true, 'units.php?Customer=' . $Customer[ 'ID' ] ) . '&Type=Escalator';?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Customer[ 'Units_Other' ], true, true, 'units.php?Customer=' . $Customer[ 'ID' ] ) . '&Type=Other';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Customer[ 'Units_Elevators' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Elevator');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Customer[ 'Units_Escalators' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Escalator' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Customer[ 'Units_Other' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Other' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Jobs', 'Job', 'Jobs', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Jobs' ] ) && $_SESSION[ 'Cards' ][ 'Jobs' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'jobs.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Jobs_Open' ], true, true, 'jobs.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Hold', $Customer[ 'Jobs_On_Hold' ], true, true, 'jobs.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=2';?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Customer[ 'Jobs_Closed' ], true, true, 'jobs.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=1';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'jobs.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Jobs_Open' ], true, true, 'jobs.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=0');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Hold', $Customer[ 'Jobs_On_Hold' ], true, true, 'jobs.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=2' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Customer[ 'Jobs_Closed' ], true, true, 'jobs.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=1' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Tickets_Open' ], true, true, 'tickets.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Customer[ 'Tickets_Assigned' ], true, true, 'tickets.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=1';?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Customer[ 'Tickets_En_Route' ], true, true, 'tickets.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=2';?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Customer[ 'Tickets_On_Site' ], true, true, 'tickets.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=3';?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Customer[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=6';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Tickets_Open' ], true, true, 'tickets.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=0');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Customer[ 'Tickets_Assigned' ], true, true, 'tickets.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=1' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Customer[ 'Tickets_En_Route' ], true, true, 'tickets.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=2' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Customer[ 'Tickets_On_Site' ], true, true, 'tickets.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=3' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Customer[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=6' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Customer[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Customer=' . $Customer[ 'ID' ] . '&Status=Preliminary Report');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Customer[ 'Violations_Job_Created' ], true, true, 'violations.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=Job Created';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Customer[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=Preliminary Report');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Customer[ 'Violations_Job_Created' ], true, true, 'violations.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=Job Created' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Proposals', 'Proposal', 'Proposals', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Proposals_Open' ], true, true, 'proposals.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Customer[ 'Proposals_Closed' ], true, true, 'proposals.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=1';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Proposals_Open' ], true, true, 'proposals.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=0');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Customer[ 'Proposals_Closed' ], true, true, 'proposals.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=1' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Customer=' . $Customer[ 'ID' ] );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Invoices_Open' ], true, true, 'invoices.php?Customer=' . $Customer[ 'ID' ] . '&Status=0');?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Customer[ 'Invoices_Closed' ], true, true, 'invoices.php?Customer=' . $Customer[ 'ID' ] ) . '&Status=1';?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Customer[ 'Invoices_Open' ], true, true, 'invoices.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=0');?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Customer[ 'Invoices_Closed' ], true, true, 'invoices.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Status=1' );?>
                                 </div>
                             </div>
                         </div>

@@ -130,7 +130,7 @@ class bootstrap extends \singleton\index {
       <?php self::card_row_label( $label, $sub ? 3 : 4 );?>
       <div class='col-<?php echo $onclick ? 6 : 8;?>'><input <?php echo $disabled ? 'disabled' : null;?> placeholder='<?php echo $label;?>' type='text' class='form-control <?php echo $classes;?>' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
       <?php if( $onclick ){?>
-        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='<?php echo $onclick;?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+        <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='<?php echo $onclick;?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
       <?php }?>
     </div><?php
   }
@@ -150,7 +150,7 @@ class bootstrap extends \singleton\index {
   public function card_row_form_input_checkbox( $label, $value ){
     ?><div class='row g-0'>
       <?php self::card_row_label( $label );?>
-      <div class='col-8'><input type='checkbox' class='form-input edit' name='<?php echo $label;?>' value='1' /></div>
+      <div class='col-8'><input type='checkbox' class='form-input edit' name='<?php echo $label;?>' value='<?php echo $value ?>' <?php  echo $value == 1  ? 'checked' : ''; ?> /></div>
     </div><?php
   }
 	public function card_row_form_input_tel( $label, $value ){
@@ -202,7 +202,7 @@ class bootstrap extends \singleton\index {
 	public function card_row_form_select( $label, $value, $options ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
-			<div class='col-8'><select name='<?php echo $label;?>' class='form-control edit'>
+			<div class='col-8'><select name='<?php echo $label;?>' class='form-control'>
 				<option value=''>Select</option>
 				<?php if( is_array( $options ) && count( $options ) > 0 ){ foreach( $options as $k=>$v ){
 					?><option value='<?php echo $k;?>' <?php echo $value == $k ? 'selected' : null;?>><?php echo $v;?></option>
@@ -214,7 +214,7 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
 			<div class='col-1'>&nbsp;</div>
 			<?php self::card_row_label( $label, 3 );?>
-			<div class='col-8'><select name='<?php echo $label;?>' class='form-control edit'>
+			<div class='col-8'><select name='<?php echo $label;?>' class='form-control'>
 				<option value=''>Select</option>
 				<?php if( is_array( $options ) && count( $options ) > 0 ){ foreach( $options as $k=>$v ){
 					?><option value='<?php echo $k;?>' <?php echo $value == $k ? 'selected' : null;?>><?php echo $v;?></option>
@@ -222,11 +222,12 @@ class bootstrap extends \singleton\index {
 			</select></div>
 		</div><?php
 	}
-	public function card_row_form_autocomplete( $singular, $plural, $id, $name  ){
+	public function card_row_form_autocomplete( $singular, $plural, $id, $name, $requestTypes = ''  ){
+        $autocompleteRequest = !empty( $requestTypes ) ? 'notSubmitted' : 'form';
 		?><div class='row g-0'>
       <?php self::card_row_label( $singular, 4 );?>
       <div class='col-6'>
-        <?php self::autocomplete( $singular, $plural, $id, $name, 'form' );?>
+        <?php self::autocomplete( $singular, $plural, $id, $name, $autocompleteRequest );?>
       </div>
       <div class='col-2'><button class='h-100 w-100' type='button' <?php
         if( in_array( $id, array( null, 0, '', ' ') ) ){
@@ -243,6 +244,9 @@ class bootstrap extends \singleton\index {
   		case 'form':
   			$class = 'edit';
   			break;
+        case 'notSubmitted':
+            $class = 'edit';
+            break;
   		case 'datatable':
   			$class = 'redraw';
   			break;
@@ -276,12 +280,15 @@ class bootstrap extends \singleton\index {
             });
           },
 			displayText: function(item) { return item.FieldValue; },
-          	afterSelect: function( item ){<?php 
+          	afterSelect: function( item ){<?php
           	switch( $type ){
           		case 'form':?>
           			$( 'input[name="<?php echo $singular;?>_ID"]').val( item.ID );
-            		$( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
+            		//$( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
             		<?php break;
+                case 'notSubmitted':?>
+                $( 'input[name="<?php echo $singular;?>_ID"]').val( item.ID );
+                <?php break;
             	case 'datatable':
             		break;
           	}?>

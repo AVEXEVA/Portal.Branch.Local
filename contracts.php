@@ -136,9 +136,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Remarks', 'Remarks' );
             			?></tr><tr class='form-desktop'><?php
                             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
+                            \singleton\table::getInstance( )->th_autocomplete( 
+                              'Customer', 'Customers', 
+                              isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
+                              isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                            );
+                            \singleton\table::getInstance( )->th_autocomplete( 
+                              'Location', 'Locations', 
+                              isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
+                              isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                            );
+                            \singleton\table::getInstance( )->th_autocomplete( 
+                              'Job', 'Jobs', 
+                              isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
+                              isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
+                            );
                             \singleton\table::getInstance( )->th_input( 'Start_Date', isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null );
                             \singleton\table::getInstance( )->th_input( 'End_Date', isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Length', isset( $_GET[ 'Length' ] ) ? $_GET[ 'Length' ] : null );

@@ -63,14 +63,14 @@ $(document).ready(function( ){
         },
         columns: [
 	       <?php \singleton\datatables::getInstance( )->ID( 'Contact' );?>,
-           <?php \singleton\datatables::getInstance( )->Name( 'Contact' );?>,
+           <?php \singleton\datatables::getInstance( )->data_column_link( 'Contact', 'Contact' );?>,
             <?php \singleton\datatables::getInstance( )->Type( );?>,
             {
               data : 'Name',
                 render : function( data, type, row, meta ){
                     switch( type ){
                         case 'display' :
-                            switch( row.Entity_Type ){
+                            switch( row.Type ){
                                 case 'Customer':
                                     return "<div class='row'>" +
                                                 "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Name + "</a></div>" +
