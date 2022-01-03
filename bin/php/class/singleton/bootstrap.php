@@ -202,7 +202,7 @@ class bootstrap extends \singleton\index {
 	public function card_row_form_select( $label, $value, $options ){
 		?><div class='row g-0'>
 			<?php self::card_row_label( $label );?>
-			<div class='col-8'><select name='<?php echo $label;?>' class='form-control edit'>
+			<div class='col-8'><select name='<?php echo $label;?>' class='form-control'>
 				<option value=''>Select</option>
 				<?php if( is_array( $options ) && count( $options ) > 0 ){ foreach( $options as $k=>$v ){
 					?><option value='<?php echo $k;?>' <?php echo $value == $k ? 'selected' : null;?>><?php echo $v;?></option>
@@ -214,7 +214,7 @@ class bootstrap extends \singleton\index {
 		?><div class='row g-0'>
 			<div class='col-1'>&nbsp;</div>
 			<?php self::card_row_label( $label, 3 );?>
-			<div class='col-8'><select name='<?php echo $label;?>' class='form-control edit'>
+			<div class='col-8'><select name='<?php echo $label;?>' class='form-control'>
 				<option value=''>Select</option>
 				<?php if( is_array( $options ) && count( $options ) > 0 ){ foreach( $options as $k=>$v ){
 					?><option value='<?php echo $k;?>' <?php echo $value == $k ? 'selected' : null;?>><?php echo $v;?></option>
@@ -276,11 +276,11 @@ class bootstrap extends \singleton\index {
             });
           },
 			displayText: function(item) { return item.FieldValue; },
-          	afterSelect: function( item ){<?php 
+          	afterSelect: function( item ){<?php
           	switch( $type ){
           		case 'form':?>
           			$( 'input[name="<?php echo $singular;?>_ID"]').val( item.ID );
-            		$( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
+            		//$( 'input[name="<?php echo $singular;?>_ID"]').closest( 'form' ).submit( );
             		<?php break;
             	case 'datatable':
             		break;
