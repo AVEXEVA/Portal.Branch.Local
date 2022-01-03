@@ -66,8 +66,9 @@ $( document ).ready( function( ){
         <?php \singleton\datatables::getInstance( )->ID( 'Violation' );?>,
         <?php \singleton\datatables::getInstance( )->Customer( );?>,
         <?php \singleton\datatables::getInstance( )->Location( );?>,
+        <?php \singleton\datatables::getInstance( )->Date( );?>,
         <?php \singleton\datatables::getInstance( )->Unit();?>,
-        <?php \singleton\datatables::getInstance( )->Ticket( );?>,
+
         <?php \singleton\datatables::getInstance( )->Status();?>
     ],
     <?php \singleton\datatables::getInstance( )->buttons( 'violation', 'violations', 'ID' );?>,

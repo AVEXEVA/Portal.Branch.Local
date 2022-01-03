@@ -132,16 +132,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th( 'Status', 'Status' );
               \singleton\table::getInstance( )->th( 'Tickets', 'Tickets' );
               \singleton\table::getInstance( )->th( 'Invoices', 'Invoices' );
+              \singleton\table::getInstance( )->th( 'Hours', 'Hours' );
             ?></tr><tr><?php
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
               \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
               \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
-              \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
-              \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Customer', 'Customers', 
+                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
+                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+              );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Location', 'Locations', 
+                isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
+                isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+              );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
               \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
               \singleton\table::getInstance( )->th_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null );
               \singleton\table::getInstance( )->th_input( 'Invoices', isset( $_GET[ 'Invoices' ] ) ? $_GET[ 'Invoices' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Hours', isset( $_GET[ 'Hours' ] ) ? $_GET[ 'Hours' ] : null );
             ?></tr></thead>
 				  </table>
         </div>
