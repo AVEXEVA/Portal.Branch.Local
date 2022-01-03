@@ -100,11 +100,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-full card-primary'>
             <div class='card-heading bg-white text-black'><h4><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?> Bugs</h4></div>
             <div class='mobile card-body bg-dark'>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Severity', isset( $_GET[ 'Severity' ] ) ? $_GET[ 'Severity' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Suggestion', isset( $_GET[ 'Suggestion' ] ) ? $_GET[ 'Suggestion' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Resolution', isset( $_GET[ 'Resolution' ] ) ? $_GET[ 'Resolution' ] : null, false, false, false, 'redraw' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Fixed', isset( $_GET[ 'Fixed' ] ) ? $_GET[ 'Fixed' ] : null, false, false, false, 'redraw' );?>
                    
                   </div>
           <div class='card-body bg-darker'>
