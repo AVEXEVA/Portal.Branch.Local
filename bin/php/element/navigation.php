@@ -58,13 +58,28 @@ if( $result ){
 }
 ?>
 <nav class="navbar navbar-default navbar-static-top row" role="navigation">
-    <div class="navbar-header col-10">
-        <a class="navbar-brand BankGothic" href="index.php">
-            <img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='padding-right:5px;' align='left' />
-           	<span><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></span>
-        </a>
-    </div>
+  <div class="navbar-header col-10">
+    <a class="navbar-brand BankGothic" href="index.php">
+      <img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' style='padding-right:5px;' align='left' />
+     	<span><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?></span>
+    </a>
+  </div>
 	<div class='col-2'>
-		<a class='text-white' href='login.php?Logout'><span class='desktop'>Logout</span> <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a>
+    <div class='row'>
+      <div class='col-6'>
+        <form action='#' method='POST'>
+          <select name='Database' onChange="$( this ).closest( 'form' ).submit( );"><?php 
+            $result = \singleton\database::getInstance( )->query(
+              'Portal',
+              "   SELECT  [Database].[Name]
+                  FROM    [Database]
+                  WHERE   [Database].[Status] = 1;"
+            );
+            if( $result ){while( $row = sqlsrv_fetch_array( $result ) ){?><option value='<?php echo $row[ 'Name' ];?>' <?php echo $_SESSION[ 'Database' ] == $row[ 'Name' ] ? 'selected' : null;?>><?php echo $row[ 'Name' ];?></option><?php }}
+          ?></select>
+        </form>
+      </div>
+      <div class='col-6'><a class='text-white' href='login.php?Logout'><span class='desktop'>Logout</span> <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a></div>
+    </div>
 	</div>
 </nav>
