@@ -293,7 +293,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php  require( bin_js   . 'index.php');?>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCNrTryEaTEDRz-XDSg890ajL_JRPnLgzc"></script>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
   <div id="wrapper">
     <?php require( bin_php . 'element/navigation.php'); ?>
     <div id="page-wrapper" class='content'>

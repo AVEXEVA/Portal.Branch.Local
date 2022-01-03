@@ -319,6 +319,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Type' => null,
           'Notes' => null,
           'Status' => null,
+          'Job_Types' => null,
           'Location_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
           'Location_Name' => isset( $_GET [ 'Location_Name' ] ) ? $_GET ['Location_Name'] : null,
           'Location_Street' => null,
@@ -355,6 +356,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Job[ 'Unit_Name' ] = isset( $_POST[ 'Unit' ] ) ? $_POST[ 'Unit' ] : $Job[ 'Unit_Name' ];
           $Job[ 'Date' ] = isset( $_POST[ 'Date' ] ) ? date( 'Y-m-d h:i:s', strtotime( $_POST[ 'Date' ] ) ) : $Job[ 'Date' ];
           $Job[ 'Type' ] = isset( $_POST[ 'Type' ] ) ? $_POST[ 'Type' ] : $Job[ 'Type' ];
+          $Job[ 'Job_Types' ] = isset( $_POST[ 'Job_Types' ] ) ? $_POST[ 'Job_Types' ] : $Job[ 'Job_Types' ];
           $Job[ 'Notes' ] = isset( $_POST[ 'Notes' ] ) ? $_POST[ 'Notes' ] : $Job[ 'Notes' ];
           if( empty( $_POST[ 'ID' ] ) ){
             $result = \singleton\database::getInstance( )->query(
@@ -579,6 +581,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               	$Job[ 'Location_Name' ],
               	$Job[ 'Unit_Name' ],
               	$Job[ 'Type' ],
+                $Job[ 'Job_Types' ],
                 $Job[ 'Name' ],
                 $Job[ 'Date' ],
                 $Job[ 'Notes' ],
