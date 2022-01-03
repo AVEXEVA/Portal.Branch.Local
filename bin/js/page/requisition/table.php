@@ -14,12 +14,12 @@ $(document).ready(function( ){
               <?php \singleton\datatables::getInstance()->ajax_data( );?>
         },
         columns: [
-            <?php \singleton\datatables::getInstance( )->ID(' Requisition' );?>,
+            <?php \singleton\datatables::getInstance( )->ID(' Requisition_Item' );?>,
             <?php \singleton\datatables::getInstance( )->data_column( 'Description' );?>,
             <?php \singleton\datatables::getInstance( )->data_column( 'Quantity' );?>,
             <?php \singleton\datatables::getInstance( )->data_column_image( 'Image' );?>
         ],
-        <?php \singleton\datatables::getInstance()->initComplete( 'Requisition' ); ?>,
-        <?php \singleton\datatables::getInstance()->buttons( 'Requisition_Item', 'Requisition_Items', 'ID' )?>
+        <?php \singleton\datatables::getInstance()->initComplete( 'Requisition_Items' );?>,
+        <?php \singleton\datatables::getInstance()->buttons( 'Requisition_Item', 'Requisition_Items', 'ID' );?>
     } );
 } );

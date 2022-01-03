@@ -1,0 +1,1 @@
+<?php define( 'bin', __DIR__ . '/../bin/' ); ?>
