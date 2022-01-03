@@ -62,7 +62,7 @@ $( document ).ready( function() {
       <?php \singleton\datatables::getInstance( )->Date( 'Start_Date' );?>,
       <?php \singleton\datatables::getInstance( )->Date( 'End_Date' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Length' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Length' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Cycle' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Amount' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Escalation_Factor' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Escalation_Date' );?>,
