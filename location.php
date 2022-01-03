@@ -361,7 +361,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Name
         )
     );
-    var_dump(sqlsrv_errors ( ) );
     //var_dump( sqlsrv_errors( ) );
     $Location = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
     	'ID' => null,

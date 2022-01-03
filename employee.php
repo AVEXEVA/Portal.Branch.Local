@@ -103,7 +103,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Employee.fFirst + ' ' + Employee.Last AS Name,
         				Employee.fFirst                       AS First_Name,
         				Employee.Last                         AS Last_Name,
-                        Employee.Title                        AS Title,
+                Employee.Title                        AS Title,
         				Rolodex.Address                       AS Street,
         				Rolodex.City                          AS City,
         				Rolodex.State                         AS State,
@@ -111,11 +111,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.Latt                          AS Latitude,
         				Rolodex.fLong                         AS Longitude,
         				Rolodex.Geolock                       AS Geofence,
-        				Rolodex.ID 		                      AS Rolodex,
+        				Rolodex.ID 		                        AS Rolodex,
         				Rolodex.Name                          AS Name,
-                        Rolodex.Phone                         AS Phone,
-                        Rolodex.Email                         AS Email,
-                        Rolodex.Contact                       AS Contact,
+                Rolodex.Phone                         AS Phone,
+                Rolodex.Email                         AS Email,
+                Rolodex.Contact                       AS Contact,
         				tblWork.Super                         AS Supervisor,
         				[User].ID                             AS User_ID,
         				[User].Email 	                      AS User_Email,
@@ -195,7 +195,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Name' => null,
         	'First_Name' => null,
         	'Last_Name' => null,
-            'Title' => null,
+          'Title' => null,
         	'Sales' => null,
         	'Field' => null,
         	'In_Use' => null,
@@ -210,8 +210,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Geofence' => null,
         	'Rolodex' => null,
         	'Supervisor' => null,
-        	'Name' => null,
-        	'Email' => null,
+        	'Tickets_Open' => null,
+        	'Tickets_Assigned' => null,
+          'Tickets_En_Route' => null,
+          'Tickets_On_Site' => null,
+          'Tickets_Reviewing' => null,
+          'Email' => null,
         	'Phone' => null
         ) : sqlsrv_fetch_array($result);
 
@@ -364,7 +368,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card card-primary my-3 col-12 col-lg-3'>
                         <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                         <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                            <?php 
+                            <?php
                                 \singleton\bootstrap::getInstance( )->card_row_form_input( 'First_Name', $Employee[ 'First_Name' ] );
                                 \singleton\bootstrap::getInstance( )->card_row_form_input( 'Last_Name', $Employee[ 'Last_Name' ] );
                                 \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', $Employee[ 'Title' ] );
