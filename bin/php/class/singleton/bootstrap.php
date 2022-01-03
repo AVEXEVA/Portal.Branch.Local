@@ -130,7 +130,7 @@ class bootstrap extends \singleton\index {
       <?php self::card_row_label( $label, $sub ? 3 : 4 );?>
       <div class='col-<?php echo $onclick ? 6 : 8;?>'><input <?php echo $disabled ? 'disabled' : null;?> placeholder='<?php echo $label;?>' type='text' class='form-control <?php echo $classes;?>' name='<?php echo $label;?>' value='<?php echo $value;?>' /></div>
       <?php if( $onclick ){?>
-        <div class='col-2'><button class='h-100 w-100' onClick="document.location.href='<?php echo $onclick;?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
+        <div class='col-2'><button type='button' class='h-100 w-100' onClick="document.location.href='<?php echo $onclick;?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
       <?php }?>
     </div><?php
   }

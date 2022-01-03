@@ -127,8 +127,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             ?></tr><tr class='desktop'><?php
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
               \singleton\table::getInstance( )->th_autocomplete( 'Person', 'Persons', isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null, isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null );
-              \singleton\table::getInstance( )->th_autocomplete( 'Customer', 'Customers', isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null );
-              \singleton\table::getInstance( )->th_autocomplete( 'Location', 'Locations', isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Customer', 'Customers', 
+                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
+                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+              );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Location', 'Locations', 
+                isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
+                isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+              );
               \singleton\table::getInstance( )->th_autocomplete( 'Unit', 'Units', isset( $_GET[ 'Unit_ID' ] ) ? $_GET[ 'Unit_ID' ] : null, isset( $_GET[ 'Unit_Name' ] ) ? $_GET[ 'Unit_Name' ] : null );
               \singleton\table::getInstance( )->th_autocomplete( 'Job', 'Jobs', isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
