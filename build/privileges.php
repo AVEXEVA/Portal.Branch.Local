@@ -4,6 +4,7 @@ $sql  = " INSERT INTO [Privilege] ([User], [Access], [Owner], [Group], [Departme
           VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 $accesses = array(
   'Contact',
+  'Contract',
   'Collection',
   'Customer',
   'Division',
@@ -19,14 +20,8 @@ $accesses = array(
   'Code',
   'Unit',
   'Violation',
-  'Owner',
-  'Group',
-  'Department',
-  'Database',
-  'Server',
-  'Other',
-  'Token',
-  'Internet'
+  'Map',
+  'User'
   //etc
 );
 //Dynamic
