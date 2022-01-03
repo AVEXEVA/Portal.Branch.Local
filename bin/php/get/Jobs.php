@@ -174,7 +174,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Job_Type.Type         AS Type,
                           Job.Status            AS Status,
                           Job_Tickets.Count     AS Tickets,
-                          Job_Invoices.Count    AS Invoices
+                          Job_Invoices.Count    AS Invoices,
+                          Job_Tickets.Hours    AS Hours
                   FROM    Job
                           LEFT JOIN Loc AS Location ON Job.Loc = Location.Loc
                           LEFT JOIN (
@@ -186,7 +187,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
                           LEFT JOIN (
                             SELECT    TicketD.Job,
-                                      Count( TicketD.ID ) AS Count
+                                      Count( TicketD.ID ) AS Count,Sum( TicketD.Total ) AS Hours
                             FROM      TicketD
                             GROUP BY  TicketD.Job
                           ) AS Job_Tickets ON Job_Tickets.Job = Job.ID
@@ -219,7 +220,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 LEFT JOIN JobType AS Job_Type ON Job_Type.ID = Job.Type
                 LEFT JOIN (
                   SELECT    TicketD.Job,
-                            Count( TicketD.ID ) AS Count
+                            Count( TicketD.ID ) AS Count,Sum( TicketD.Total ) AS Hours
                   FROM      TicketD
                   GROUP BY  TicketD.Job
                 ) AS Job_Tickets ON Job_Tickets.Job = Job.ID
