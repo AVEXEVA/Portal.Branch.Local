@@ -144,9 +144,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $ID
             )
         );
-        $Invoice =   (  empty( $ID )
-                           &&  !$result
-                      )    || (empty( $ID ) )    ? array(
+        $Invoice =     ( empty( $ID ) &&  !$result) 
+                    || ( empty( $ID ) )   
+            ? array(
                 'ID'                   => null,
                 'Description'          => null,
                 'Date'                 => null,

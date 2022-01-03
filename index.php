@@ -68,7 +68,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	dechex( $Privilege[ 'Internet' ] )
         ) );
     }}
-    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php require('404.html');?><?php }
+    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php 
+      header( 'Location: ../index.php' );
+      exit;
+    ?><?php }
     else {
       \singleton\database::getInstance( )->query(
         null,

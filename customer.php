@@ -117,11 +117,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Rolodex.Latt 	   AS Latitude,
                         Rolodex.fLong      AS Longitude,
                         Customer.Status    AS Status,
-            						Rolodex.Website    AS Website,
-            						Customer.Internet  AS Internet,
-            						Customer.fLogin    AS Login,
-            						Customer.Password  AS Password,
-            						Rolodex.Geolock    AS Geofence,
+						Rolodex.Website    AS Website,
+						Customer.Internet  AS Internet,
+						Customer.fLogin    AS Login,
+						Customer.Password  AS Password,
+						Rolodex.Geolock    AS Geofence,
                         CASE    WHEN Locations.Count IS NULL THEN 0
                                 ELSE Locations.Count END AS Locations_Count,
                         CASE    WHEN Locations.Maintained IS NULL THEN 0
@@ -134,6 +134,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 ELSE Units.Elevators END AS Units_Elevators,
                         CASE    WHEN Units.Escalators IS NULL THEN 0
                                 ELSE Units.Escalators END AS Units_Escalators,
+                        CASE    WHEN Units.Moving_Walk IS NULL THEN 0
+                                ELSE Units.Moving_Walk END AS Units_Moving_Walk,
                         CASE    WHEN Units.Other IS NULL THEN 0
                                 ELSE Units.Other END AS Units_Other,
                         CASE    WHEN Jobs.[Open] IS NULL THEN 0
@@ -156,6 +158,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
                         CASE    WHEN Violations.Job_Created IS NULL THEN 0
                                 ELSE Violations.Job_Created END AS Violations_Job_Created,
+                        CASE    WHEN Violations.Closed IS NULL THEN 0
+                                ELSE Violations.Closed END AS Violations_Closed,
                         CASE    WHEN Invoices.[Open] IS NULL THEN 0
                                 ELSE Invoices.[Open] END AS Invoices_Open,
                         CASE    WHEN Invoices.[Closed] IS NULL THEN 0
@@ -179,14 +183,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             FROM        Loc AS Location
                                             WHERE       Location.Maint = 1
                                             GROUP BY    Location.Loc
-                                        ) AS Maintained ON Location.Loc = Maintained.Location
+                                        ) AS [Maintained] ON Location.Loc = Maintained.Location
                                         LEFT JOIN (
                                             SELECT      Location.Loc AS Location,
                                                         Count( Location.Loc ) AS Count
                                             FROM        Loc AS Location
                                             WHERE       Location.Maint = 0
                                             GROUP BY    Location.Loc
-                                        ) AS Unmaintained ON Location.Loc = Unmaintained.Location
+                                        ) AS [Unmaintained] ON Location.Loc = Unmaintained.Location
                             GROUP BY    Owner.ID
                         ) AS Locations ON Locations.Customer = Customer.ID
                         LEFT JOIN (
@@ -194,6 +198,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         Sum( Units.Count ) AS Count,
                                         Sum( Elevators.Count) AS Elevators,
                                         Sum( Escalators.Count ) AS Escalators,
+                                        SUM( Moving_Walk.Count ) AS Moving_Walk,
                                         Sum( Other.Count ) AS Other
                             FROM        Owner
                                         LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner
@@ -202,28 +207,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
                                             GROUP BY    Unit.Loc
-                                        ) AS Units ON Units.Location = Location.Loc
+                                        ) AS [Units] ON Units.Location = Location.Loc
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
-                                            WHERE       Unit.Type = 'Elevator'
+                                            WHERE       Unit.Type IN ( 'Elevator', 'Roped Hydro', 'Hydraulic' )
                                             GROUP BY    Unit.Loc
-                                        ) AS Elevators ON Elevators.Location = Location.Loc
+                                        ) AS [Elevators] ON Elevators.Location = Location.Loc
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
                                             WHERE       Unit.Type = 'Escalator'
                                             GROUP BY    Unit.Loc
-                                        ) AS Escalators ON Escalators.Location = Location.Loc
+                                        ) AS [Escalators] ON Escalators.Location = Location.Loc
+                                        LEFT JOIN (
+                                            SELECT      Unit.Loc AS Location,
+                                                        Count( Unit.ID ) AS Count
+                                            FROM        Elev AS Unit
+                                            WHERE       Unit.Type = 'Moving Walk'
+                                            GROUP BY    Unit.Loc
+                                        ) AS [Moving_Walk] ON Escalators.Location = Location.Loc
                                         LEFT JOIN (
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
                                             WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
                                             GROUP BY    Unit.Loc
-                                        ) AS Other ON Other.Location = Location.Loc
+                                        ) AS [Other] ON Other.Location = Location.Loc
                             GROUP BY    Owner.ID
                         ) AS Units ON Units.Customer = Customer.ID
                         LEFT JOIN (
@@ -269,7 +281,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 0
                                       GROUP BY  Location.Owner
-                                    ) AS Unassigned ON Unassigned.Customer = Owner.ID
+                                    ) AS [Unassigned] ON Unassigned.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -277,7 +289,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 1
                                       GROUP BY  Location.Owner
-                                    ) AS Assigned ON Assigned.Customer = Owner.ID
+                                    ) AS [Assigned] ON Assigned.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -285,7 +297,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 2
                                       GROUP BY  Location.Owner
-                                    ) AS En_Route ON En_Route.Customer = Owner.ID
+                                    ) AS [En_Route] ON En_Route.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -293,7 +305,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 3
                                       GROUP BY  Location.Owner
-                                    ) AS On_Site ON On_Site.Customer = Owner.ID
+                                    ) AS [On_Site] ON On_Site.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( TicketO.ID ) AS Count
@@ -301,12 +313,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
                                       WHERE     TicketO.Assigned = 6
                                       GROUP BY  Location.Owner
-                                    ) AS Reviewing ON Reviewing.Customer = Owner.ID
+                                    ) AS [Reviewing] ON Reviewing.Customer = Owner.ID
                         ) AS Tickets ON Tickets.Customer = Customer.ID
                         LEFT JOIN (
                             SELECT  Owner.ID AS Customer,
                                     Preliminary.Count AS Preliminary,
-                                    Job_Created.Count AS Job_Created
+                                    Job_Created.Count AS Job_Created,
+                                    Closed.Count
                             FROM    Owner
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
@@ -315,7 +328,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                                       WHERE     Violation.Status = 'Preliminary Report'
                                       GROUP BY  Location.Owner
-                                    ) AS Preliminary ON Preliminary.Customer = Owner.ID
+                                    ) AS [Preliminary] ON Preliminary.Customer = Owner.ID
                                     LEFT JOIN (
                                       SELECT    Location.Owner AS Customer,
                                                 Count( Violation.ID ) AS Count
@@ -323,7 +336,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                 LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                                       WHERE     Violation.Status = 'Job Created'
                                       GROUP BY  Location.Owner
-                                    ) AS Job_Created ON Job_Created.Customer = Owner.ID
+                                    ) AS [Job_Created] ON Job_Created.Customer = Owner.ID
+                                    LEFT JOIN (
+                                        SELECT  Location.Owner AS Customer,
+                                                Count( Violation.ID ) AS Count 
+                                        FROM    Violation 
+                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc 
+                                        WHERE   Violation.Status IN ( 'Completed', 'Dismissed' )
+                                    ) AS [Closed] ON Closed.Customer = Owner.ID
                         ) AS Violations ON Violations.Customer = Customer.ID
                         LEFT JOIN (
                             SELECT      Location.Owner          AS Customer,
