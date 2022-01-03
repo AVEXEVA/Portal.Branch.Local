@@ -1,6 +1,6 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [ 'read_and_close' => true ] );
+    session_start( );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
@@ -105,6 +105,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Division.Bonus      AS Bonus,
                 Division.Count      AS Count,
                 Division.Remarks    AS Notes,
+                Division.Price1     AS Price1,
+                Division.Price2     AS Price2,
+                Division.Price3     AS Price3,
+                Division.Price4     AS Price4,
+                Division.Price5     AS Price5,
+                Division.IDistance  AS IDistance,
+                Division.ODistance  AS ODistance,
+                Division.Color      AS Color,
+                Division.Tax        AS Tax,
                 Division.fDesc      AS Description,
                 Division.TFMID      AS TFMID,
                 Division.TFMSource  AS TFMsource,
@@ -117,16 +126,90 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 CASE    WHEN Tickets.On_Site IS NULL THEN 0
                         ELSE Tickets.On_Site END AS Tickets_On_Site,
                 CASE    WHEN Tickets.Reviewing IS NULL THEN 0
-                        ELSE Tickets.Reviewing END AS Tickets_Reviewing
-        FROM    Zone AS Division
-                LEFT JOIN (
-                  SELECT  Division.ID AS Division,
-                          Unassigned.Count AS Unassigned,
-                          Assigned.Count AS Assigned,
-                          En_Route.Count AS En_Route,
-                          On_Site.Count AS On_Site,
-                          Reviewing.Count AS Reviewing
+                        ELSE Tickets.Reviewing END AS Tickets_Reviewing,
+                CASE    WHEN Units.Count     IS NULL THEN 0
+                        ELSE Units.Count     END AS Units_Count,
+                CASE    WHEN Units.Elevators IS NULL THEN 0
+                        ELSE Units.Elevators END AS Units_Elevators,
+                CASE    WHEN Units.Escalators IS NULL THEN 0
+                        ELSE Units.Escalators END AS Units_Escalators,
+                CASE    WHEN Units.Other      IS NULL THEN 0
+                        ELSE Units.Other      END AS Units_Other,
+                CASE    WHEN Violations.Preliminary IS NULL THEN 0
+                        ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
+                CASE    WHEN Violations.Job_Created IS NULL THEN 0
+                        ELSE Violations.Job_Created ENd AS Violations_Job_Created
+                FROM    Zone AS Division
+              LEFT JOIN (
+                SELECT  Division.ID AS Division,
+                        Unassigned.Count AS Unassigned,
+                        Assigned.Count AS Assigned,
+                        En_Route.Count AS En_Route,
+                        On_Site.Count AS On_Site,
+                        Reviewing.Count AS Reviewing
+                FROM    Zone AS Division
+          LEFT JOIN (
+            SELECT      Division.ID AS Division,
+                        Sum( Units.Count ) AS Count,
+                        Sum( Elevators.Count) AS Elevators,
+                        Sum( Escalators.Count ) AS Escalators,
+                        Sum( Other.Count ) AS Other
+            FROM        Zone AS Division
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          GROUP BY    Location.Zone
+                      ) AS Units ON Units.Division = Division.ID
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE       Unit.Type = 'Elevator'
+                          GROUP BY    Location.Zone
+                      ) AS Elevators ON Elevators.Division = Division.ID
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE       Unit.Type = 'Escalator'
+                          GROUP BY    Location.Zone
+                      ) AS Escalators ON Escalators.Division = Division.ID
+                      LEFT JOIN (
+                          SELECT      Location.Zone AS Division,
+                                      Count( Unit.ID ) AS Count
+                          FROM        Elev AS Unit
+                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                          GROUP BY    Location.Zone
+                      ) AS Other ON Other.Location = Division.ID
+              GROUP BY    Location.Loc
+          ) AS Units ON Units.Location = Division.ID
+              LEFT JOIN (
+                  SELECT  Location.Zone AS Division,
+                          Preliminary.Count AS Preliminary,
+                          Job_Created.Count AS Job_Created
                   FROM    Zone AS Division
+                          LEFT JOIN (
+                            SELECT    Location.Zone AS Division,
+                                      Count( Violation.ID ) AS Count
+                            FROM      Violation
+                                      LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                            WHERE     Violation.Status = 'Preliminary Report'
+                            GROUP BY  Location.Zone
+                          ) AS Preliminary ON Preliminary.Division = Division.ID
+                          LEFT JOIN (
+                            SELECT    Location.Zone AS Division,
+                                      Count( Violation.ID ) AS Count
+                            FROM      Violation
+                                      LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                            WHERE     Violation.Status = 'Job Created'
+                            GROUP BY  Location.Zone
+                          ) AS Job_Created ON Job_Created.Division = Division.ID
+                        ) AS Violations ON Violations.Division = Division.ID
                           LEFT JOIN (
                             SELECT    Location.Zone AS Division,
                                       Count( TicketO.ID ) AS Count
@@ -174,7 +257,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Name
         )
       );
-      //var_dump( sqlsrv_errors( ) );
+      var_dump( sqlsrv_errors( ) );
       $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
         'ID' => null,
         'Name' => null,
@@ -190,7 +273,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'IDistance' => null,
         'ODistance' => null,
         'Color' => null,
-        'fDesc' => null,
         'Tax' => null,
         'Maintenance' => null,
         'Route_Name' => null,
@@ -201,30 +283,40 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Tickets_On_Site' => null,
         'Tickets_Reviewing' => null,
         'Surcharge' => null,
-        'TFMSouce' => null
+        'TFMID' => null,
+        'TFMSource' => null,
+        'Violations_Preliminary_Report' => isset( $_GET[ 'Violations_Preliminary_Report' ] ) ? $_GET[ 'Violations_Preliminary_Report' ] : null,
+        'Violations_Job_Created' => isset( $_GET[ 'Violations_Job_Created' ] ) ? $_GET[ 'Violations_Job_Created' ] : null,
+        'Units_Elevators' => isset( $_GET[ 'Units_Elevators' ] ) ? $_GET[ 'Units_Elevators' ] : null,
+        'Units_Escalators' => isset( $_GET[ 'Units_Escalators' ] ) ? $_GET[ 'Units_Escalators' ] : null,
+        'Units_Other' => isset( $_GET[ 'Units_Other' ] ) ? $_GET[ 'Units_Other' ] : null
       ) : sqlsrv_fetch_array($result);
 
       if( isset( $_POST ) && count( $_POST ) > 0 ){
         // if the $_Post is set and the count is null, select if available
-        $Divsion[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Divsion[ 'ID' ];
-        $Divsion[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Divsion[ 'Name' ];
-        $Divsion[ 'Surcharge' ] 	= isset( $_POST[ 'Surcharge' ] ) ? $_POST[ 'Surcharge' ] : $Divsion[ 'Surcharge' ];
-        $Divsion[ 'Bonus' ] 		= isset( $_POST[ 'Bonus' ] ) 	 ? $_POST[ 'Bonus' ] 	 : $Divsion[ 'Bonus' ];
-        $Divsion[ 'Count' ] 		= isset( $_POST[ 'Count' ] ) 	 ? $_POST[ 'Count' ] 	 : $Divsion[ 'Count' ];
-        $Divsion[ 'Notes' ] = isset( $_POST[ 'Remarks' ] )  ? $_POST[ 'Remarks' ]  : $Divsion[ 'Notes' ];
-        $Divsion[ 'Price1' ]     = isset( $_POST[ 'Price1' ] ) 	   ? $_POST[ 'Price1' ] 	   : $Divsion[ 'Price1' ];
-        $Divsion[ 'IDistance' ] 	= isset( $_POST[ 'IDistance' ] ) 	 ? $_POST[ 'IDistance' ] 	 : $Divsion[ 'IDistance' ];
-        $Divsion[ 'ODistance' ] 	= isset( $_POST[ 'ODistance' ] ) 	 ? $_POST[ 'ODistance' ] 	 : $Divsion[ 'ODistance' ];
-        $Divsion[ 'Internet' ] = isset( $_POST[ 'Internet' ] )  ? $_POST[ 'Internet' ]  : $Divsion[ 'Internet' ];
-        $Divsion[ 'Color' ] 	= isset( $_POST[ 'Color' ] ) 	 ? $_POST[ 'Color' ] 	 : $Divsion[ 'Color' ];
-        $Divsion[ 'fDesc' ] 		= isset( $_POST[ 'fDesc' ] ) 	 ? $_POST[ 'fDesc' ] 	 : $Divsion[ 'fDesc' ];
-        $Divsion[ 'Tax' ] 		= isset( $_POST[ 'Tax' ] ) 	 ? $_POST[ 'Tax' ] 	 : $Divsion[ 'Tax' ];
-        $Divsion[ 'TFMID' ] 			= isset( $_POST[ 'TFMID' ] ) 		 ? $_POST[ 'TFMID' ] 		 : $Divsion[ 'TFMID' ];
-        $Divsion[ 'Tickets_Open' ] 	= isset( $_POST[ 'Tickets_Open' ] )  ? $_POST[ 'Tickets_Open' ]  : $Divsion[ 'Tickets_Open' ];
-        $Divsion[ 'Tickets_Assigned' ] 	= isset( $_POST[ 'Tickets_Assigned' ] )  ? $_POST[ 'Tickets_Assigned' ]  : $Divsion[ 'Tickets_Assigned' ];
-        $Divsion[ 'Tickets_En_Route' ] 	= isset( $_POST[ 'Tickets_En_Route' ] )  ? $_POST[ 'Tickets_En_Route' ]  : $Divsion[ 'Tickets_En_Route' ];
-        $Divsion[ 'Tickets_On_Site' ] 	= isset( $_POST[ 'Tickets_On_Site' ] )  ? $_POST[ 'Tickets_On_Site' ]  : $Divsion[ 'Tickets_On_Site' ];
-        $Divsion[ 'Tickets_Reviewing' ] 	= isset( $_POST[ 'Tickets_Reviewing' ] )  ? $_POST[ 'Tickets_Reviewing' ]  : $Divsion[ 'Tickets_Reviewing' ];
+        $Division[ 'ID' ] 		= isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Division[ 'ID' ];
+        $Division[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Division[ 'Name' ];
+        $Division[ 'Surcharge' ] 	= isset( $_POST[ 'Surcharge' ] ) ? $_POST[ 'Surcharge' ] : $Division[ 'Surcharge' ];
+        $Division[ 'Bonus' ] 		= isset( $_POST[ 'Bonus' ] ) 	 ? $_POST[ 'Bonus' ] 	 : $Division[ 'Bonus' ];
+        $Division[ 'Count' ] 		= isset( $_POST[ 'Count' ] ) 	 ? $_POST[ 'Count' ] 	 : $Division[ 'Count' ];
+        $Division[ 'Notes' ] = isset( $_POST[ 'Remarks' ] )  ? $_POST[ 'Remarks' ]  : $Division[ 'Notes' ];
+        $Division[ 'Price1' ]     = isset( $_POST[ 'Price1' ] ) 	   ? $_POST[ 'Price1' ] 	   : $Division[ 'Price1' ];
+        $Division[ 'IDistance' ] 	= isset( $_POST[ 'IDistance' ] ) 	 ? $_POST[ 'IDistance' ] 	 : $Division[ 'IDistance' ];
+        $Division[ 'ODistance' ] 	= isset( $_POST[ 'ODistance' ] ) 	 ? $_POST[ 'ODistance' ] 	 : $Division[ 'ODistance' ];
+        $Division[ 'Color' ] 	= isset( $_POST[ 'Color' ] ) 	 ? $_POST[ 'Color' ] 	 : $Division[ 'Color' ];
+        $Division[ 'Description' ] 		= isset( $_POST[ 'Description' ] ) 	 ? $_POST[ 'Description' ] 	 : $Division[ 'Description' ];
+        $Division[ 'Tax' ] 		= isset( $_POST[ 'Tax' ] ) 	 ? $_POST[ 'Tax' ] 	 : $Division[ 'Tax' ];
+        $Division[ 'TFMID' ] 			= isset( $_POST[ 'TFMID' ] ) 		 ? $_POST[ 'TFMID' ] 		 : $Division[ 'TFMID' ];
+        $Division[ 'Tickets_Open' ] 	= isset( $_POST[ 'Tickets_Open' ] )  ? $_POST[ 'Tickets_Open' ]  : $Division[ 'Tickets_Open' ];
+        $Division[ 'Tickets_Assigned' ] 	= isset( $_POST[ 'Tickets_Assigned' ] )  ? $_POST[ 'Tickets_Assigned' ]  : $Division[ 'Tickets_Assigned' ];
+        $Division[ 'Tickets_En_Route' ] 	= isset( $_POST[ 'Tickets_En_Route' ] )  ? $_POST[ 'Tickets_En_Route' ]  : $Division[ 'Tickets_En_Route' ];
+        $Division[ 'Tickets_On_Site' ] 	= isset( $_POST[ 'Tickets_On_Site' ] )  ? $_POST[ 'Tickets_On_Site' ]  : $Division[ 'Tickets_On_Site' ];
+        $Division[ 'Tickets_Reviewing' ] 	= isset( $_POST[ 'Tickets_Reviewing' ] )  ? $_POST[ 'Tickets_Reviewing' ]  : $Division[ 'Tickets_Reviewing' ];
+        $Division[ 'Units_Elevators' ] 	= isset( $_POST[ 'Units_Elevators' ] )  ? $_POST[ 'Units_Elevators' ]  : $Division[ 'Units_Elevators' ];
+        $Division[ 'Units_Escalators' ] 	= isset( $_POST[ 'Units_Escalators' ] )  ? $_POST[ 'Units_Escalators' ]  : $Division[ 'Units_Escalators' ];
+        $Division[ 'Units_Other' ] 	= isset( $_POST[ 'Units_Other' ] )  ? $_POST[ 'Units_Other' ]  : $Division[ 'Units_Other' ];
+        $Division[ 'Violations_Preliminary_Report' ] 	= isset( $_POST[ 'Violations_Preliminary_Report' ] )  ? $_POST[ 'Violations_Preliminary_Report' ]  : $Division[ 'Violations_Preliminary_Report' ];
+        $Division[ 'Violations_Job_Created' ] 	= isset( $_POST[ 'Violations_Job_Created' ] )  ? $_POST[ 'Violations_Job_Created' ]  : $Division[ 'Violations_Job_Created' ];
         if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
           $result = \singleton\database::getInstance( )->query(
             null,
@@ -245,30 +337,34 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 ODistance,
                 Color,
                 fDesc,
-                Tax
+                Tax,
+                TFMID,
+                TFMSource
               )
-              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+              VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
               SELECT @MAXID + 1;",
             array(
-              $Divsion[ 'ID' ],
-              $Divsion[ 'Name' ],
-              $Divsion[ 'Bonus' ],
-              $Divsion[ 'Count' ],
-              $Divsion[ 'Notes' ],
-              $Divsion[ 'Price1' ],
-              $Divsion[ 'IDistance' ],
-              $Divsion[ 'ODistance' ],
-              $Divsion[ 'Color' ],
-              $Divsion[ 'fDesc' ],
-              $Divsion[ 'Tax' ],
-              $Divsion[ 'TFMID' ],
-              $Divsion[ 'TFMSource'],
-              isset( $Divsion[ 'Geofence' ] ) ? $Divsion[ 'Geofence' ] : 0
+              $Division[ 'Name' ],
+              $Division[ 'Bonus' ],
+              $Division[ 'Count' ],
+              $Division[ 'Notes' ],
+              $Division[ 'Price1' ],
+              $Division[ 'Price2' ],
+              $Division[ 'Price3' ],
+              $Division[ 'Price4' ],
+              $Division[ 'Price5' ],
+              $Division[ 'IDistance' ],
+              $Division[ 'ODistance' ],
+              $Division[ 'Color' ],
+              $Division[ 'Description' ],
+              $Division[ 'Tax' ],
+              $Division[ 'TFMID' ],
+              $Division[ 'TFMSource']
             )
           );
           sqlsrv_next_result( $result );
           $Division [ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-        //  header( 'Location: lead.php?ID=' . $Division [ 'ID' ] );
+          //header( 'Location: division.php?ID=' . $Division [ 'ID' ] );
         } else {
           \singleton\database::getInstance( )->query(
             null,
@@ -278,27 +374,37 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Zone.Bonus = ?,
                         Zone.Count = ?,
                         Zone.Remarks = ?,
+                        Zone.Price1   = ?,
+                        Zone.Price2   = ?,
+                        Zone.Price3   = ?,
+                        Zone.Price4   = ?,
+                        Zone.Price5   = ?,
+                        zone.IDistance   = ?,
+                        zone.ODistance   = ?,
+                        zone.Color   = ?,
                         Zone.fDesc   = ?,
+                        zone.Tax   = ?,
                         zone.TFMID   = ?,
                         zone.TFMSource = ?
               WHERE 	  Zone.ID = ?;",
             array(
-              $Divsion[ 'ID' ],
-              $Divsion[ 'Name' ],
-              $Divsion[ 'Bonus' ],
-              $Divsion[ 'Count' ],
-              $Divsion[ 'Notes' ],
-              $Divsion[ 'Price1' ],
-              $Divsion[ 'Price2' ],
-              $Divsion[ 'Price3' ],
-              $Divsion[ 'Price4' ],
-              $Divsion[ 'Price5' ],
-              $Divsion[ 'IDistance' ],
-              $Divsion[ 'ODistance' ],
-              $Divsion[ 'Color' ],
-              $Divsion[ 'fDesc' ],
-              $Divsion[ 'Tax' ],
-              !empty( $Division [ 'GeoLock' ] ) ? $Division [ 'GeoLock' ] : 0
+              $Division[ 'ID' ],
+              $Division[ 'Name' ],
+              $Division[ 'Bonus' ],
+              $Division[ 'Count' ],
+              $Division[ 'Notes' ],
+              $Division[ 'Price1' ],
+              $Division[ 'Price2' ],
+              $Division[ 'Price3' ],
+              $Division[ 'Price4' ],
+              $Division[ 'Price5' ],
+              $Division[ 'IDistance' ],
+              $Division[ 'ODistance' ],
+              $Division[ 'Color' ],
+              $Division[ 'Description' ],
+              $Division[ 'Tax' ],
+              $Division[ 'TFMID' ],
+              $Division[ 'TFMSource' ]
             )
           );
         }
@@ -330,6 +436,23 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Division[ 'Name' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Description', $Division[ 'Description' ] );?>
                 <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Notes', $Division[ 'Notes' ] );?>
+              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Location', $Division[ 'ID' ] );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Division=' . $Division[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Division[ 'Units_Elevators' ], true, true, 'units.php?Division=' . $Division[ 'ID' ] . '&Type=Elevator');?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Division[ 'Units_Escalators' ], true, true, 'units.php?Division=' . $Division[ 'ID' ] ) . '&Type=Escalator';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Division[ 'Units_Other' ], true, true, 'units.php?Division=' . $Division[ 'ID' ] ) . '&Type=Other';?>
+              </div>
+            </div>
+            <div class='card card-primary my-3 col-12 col-lg-3'>
+              <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Location', $Division[ 'ID' ] );?>
+              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Division=' . $Division[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Division[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Division=' . $Division[ 'ID' ] . '&Status=Preliminary Report');?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Division[ 'Violations_Job_Created' ], true, true, 'violations.php?Division=' . $Division[ 'ID' ] ) . '&Status=Job Created';?>
               </div>
             </div>
             <div class='card card-primary my-3 col-12 col-lg-3'>
