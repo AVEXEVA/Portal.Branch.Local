@@ -200,18 +200,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     )
                 );
                 foreach( array(
-                    'Route',
+                    'Contact',
+                    'Contract',
+                    'Collection',
                     'Customer',
-                    'Location',
-                    'Unit',
+                    'Division',
+                    'User',
                     'Job',
-                    'Ticket',
-                    'Violation',
-                    'Invoice',
                     'Lead',
+                    'Location',
                     'Proposal',
-                    'Map',
-                    'Time'
+                    'Requisition',
+                    'Route',
+                    'Ticket',
+                    'Territory',
+                    'Code',
+                    'Unit',
+                    'Violation',
+                    'Map'
                 ) AS $Access ){
                     \singleton\database::getInstance( )->query(
                         'Portal',
@@ -225,7 +231,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             14
                         )
                     );
-                    var_dump( sqlsrv_errors( ) );
                 }
             }
         } elseif(isset($_POST['action']) && $_POST['action'] == 'delete'){

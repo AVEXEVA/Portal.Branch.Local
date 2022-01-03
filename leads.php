@@ -121,7 +121,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
               \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
-              \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Customer', 'Customers', 
+                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
+                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+              );
               \singleton\table::getInstance( )->th_input( 'Address', isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null );
               \singleton\table::getInstance( )->th_input( 'Contact', isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null );
               \singleton\table::getInstance( )->th_input( 'Probability', isset( $_GET[ 'Probability' ] ) ? $_GET[ 'Probability' ] : null );

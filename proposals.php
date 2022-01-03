@@ -129,16 +129,32 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           \singleton\table::getInstance( )->th( 'Price', 'Price' );
                         ?></tr><tr class='form-desktop'><?php
                           \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Territory', isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Contact', isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null );
+                          \singleton\table::getInstance( )->th_autocomplete( 
+                            'Territory', 'Territorys', 
+                            isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null, 
+                            isset( $_GET[ 'Territory_Name' ] ) ? $_GET[ 'Territory_Name' ] : null 
+                          );
+                          \singleton\table::getInstance( )->th_autocomplete( 
+                            'Customer', 'Customers', 
+                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
+                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                          );
+                          \singleton\table::getInstance( )->th_autocomplete( 
+                            'Location', 'Locations', 
+                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
+                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                          );
+                          \singleton\table::getInstance( )->th_autocomplete( 
+                            'Contact', 'Contacts', 
+                            isset( $_GET[ 'Contact_ID' ] ) ? $_GET[ 'Contact_ID' ] : null, 
+                            isset( $_GET[ 'Contact_Name' ] ) ? $_GET[ 'Contact_Name' ] : null 
+                          );
                           \singleton\table::getInstance( )->th_input( 'Title', isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null );
                           \singleton\table::getInstance( )->th_select( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, array( 0 => 'Open', 1 => 'Canceled',2 => 'Withdrawn', 3 => 'Disqualified',4 => 'Award Successful') );
-                           \singleton\table::getInstance( )->th_input( 'Phone', isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Phone', isset( $_GET[ 'Phone' ] ) ? $_GET[ 'Phone' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Email', isset( $_GET[ 'Email' ] ) ? $_GET[ 'Email' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Address', isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null );
-                        \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Cost', isset( $_GET[ 'Cost' ] ) ? $_GET[ 'Cost' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Price', isset( $_GET[ 'Price' ] ) ? $_GET[ 'Price' ] : null );
