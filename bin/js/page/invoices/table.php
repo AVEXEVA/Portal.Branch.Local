@@ -4,6 +4,7 @@ if( session_id( ) == '' || !isset( $_SESSION ) ) {
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 header('Content-Type: text/javascript');?>
+$( document ).ready( function( ){
 function search( link ){
     var api = link.api();
     $('input[name="Search"]', api.table().container())
@@ -65,11 +66,12 @@ $( document ).ready( function( ){
             <?php \singleton\datatables::getInstance( )->Type('Type');?>,
             <?php \singleton\datatables::getInstance( )->Date('Date');?>,
             <?php \singleton\datatables::getInstance( )->data_column( 'Due' );?>,
-            <?php \singleton\datatables::getInstance( )->data_column_currency( 'Original' );?>,
-            <?php \singleton\datatables::getInstance( )->data_column_currency( 'Balance' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column( 'Original' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column( 'Balance' );?>,
             <?php \singleton\datatables::getInstance( )->data_column( 'Description' );?>
         ],
         <?php \singleton\datatables::getInstance( )->initComplete( 'invoices' );?>,
         <?php \singleton\datatables::getInstance( )->buttons( 'invoice', 'invoices', 'ID' );?>
     });
+});
 });

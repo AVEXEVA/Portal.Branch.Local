@@ -153,7 +153,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-    echo $sQuery;
+    //echo $sQuery;
     $resultResult = \singleton\database::getInstance( )->query(
       $conn,
       $sQuery,

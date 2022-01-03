@@ -101,8 +101,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $conditions[] = "Invoice.fDate LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Original' ] ) && !in_array( $_GET[ 'Original' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Job'];
-        $conditions[] = "Job.Original LIKE '%' + ? + '%'";
+        $parameters[] = $_GET['Original'];
+        $conditions[] = "Invoice.Amount LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Balance' ] ) && !in_array( $_GET[ 'Balance' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Balance'];
@@ -112,7 +112,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters[] = $_GET['Description'];
         $conditions[] = "Job.fDesc LIKE '%' + ? + '%'";
     }
+if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
+          $parameters[] = $_GET['Search'];
+          $search[] = "Job.fDesc LIKE '%' + ? + '%'";
+
+          $parameters[] = $_GET['Search'];
+          $search[] = "Customer.Name LIKE '%' + ? + '%'";
+
+          $parameters[] = $_GET['Search'];
+          $search[] = "Location.Tag LIKE '%' + ? + '%'";
+
+          $parameters[] = $_GET['Search'];
+          $search[] = "Job.Type LIKE '%' + ? + '%'";
+
+        }
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
@@ -218,6 +232,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
       $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
+        $Row[ 'Due' ] = date( 'm/d/Y', strtotime( $Row[ 'Due' ] ) );
+        $Row['Original'] = '$'.number_format( $Row[ 'Original' ], 2);
+        $Row[ 'Balance' ] = '$'.number_format( $Row[ 'Balance' ], 2);
       $output['aaData'][]       = $Row;
     }
     echo json_encode( $output );
