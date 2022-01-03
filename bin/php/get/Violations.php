@@ -165,7 +165,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Tag        AS Location_Name,
                           Location.Tag        AS Locations,
                           Unit.ID        AS Unit_ID,
-                          Unit.Unit        AS Units,
+                          Unit.Unit        AS Units,    
+                          Unit.State        AS Unit_City_ID,
+                          Unit.Unit        AS Unit_Building_ID,
                           Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
