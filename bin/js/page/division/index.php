@@ -1,1 +1,1 @@
-<script src='bin/js/entity.php'></script>
+<script src='bin/js/entity.js'></script>

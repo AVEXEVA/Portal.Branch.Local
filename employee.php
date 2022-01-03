@@ -114,7 +114,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.ID 		                        AS Rolodex,
         				Rolodex.Name                          AS Name,
                 Rolodex.Phone                         AS Phone,
-                Rolodex.Email                         AS Email,
+                Rolodex.EMail                         AS Email,
                 Rolodex.Contact                       AS Contact,
         				tblWork.Super                         AS Supervisor,
         				[User].ID                             AS User_ID,
@@ -224,6 +224,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Tickets_En_Route' => null,
           'Tickets_On_Site' => null,
           'Tickets_Reviewing' => null,
+          'Tickets_Completed' => null,
           'Email' => null,
         	'Phone' => null
         ) : sqlsrv_fetch_array($result);
@@ -232,6 +233,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Employee[ 'First_Name' ]      = isset( $_POST[ 'First_Name' ] )    ? $_POST[ 'First_Name' ]    : $Employee[ 'First_Name' ];
             $Employee[ 'Last_Name' ]        = isset( $_POST[ 'Last_Name' ] )     ? $_POST[ 'Last_Name' ]     : $Employee[ 'Last_Name' ];
             $Employee[ 'Title' ]        = isset( $_POST[ 'Title' ] )     ? $_POST[ 'Title' ]     : $Employee[ 'Title' ];
+            $Employee[ 'Email' ]       = isset( $_POST[ 'Email' ] )    ? $_POST[ 'Email' ]    : $Employee[ 'Email' ];
+            $Employee[ 'Phone' ]       = isset( $_POST[ 'Phone' ] )    ? $_POST[ 'Phone' ]    : $Employee[ 'Phone' ];
             $Employee[ 'Street' ]       = isset( $_POST[ 'Street' ] )    ? $_POST[ 'Street' ]    : $Employee[ 'Street' ];
             $Employee[ 'City' ]        = isset( $_POST[ 'City' ] )     ? $_POST[ 'City' ]     : $Employee[ 'City' ];
             $Employee[ 'State' ]       = isset( $_POST[ 'State' ] )    ? $_POST[ 'State' ]    : $Employee[ 'State' ];
@@ -247,8 +250,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     						ID,
         					Type,
         					Name,
-                            Contact,
-        					Website,
+                  Contact,
+        					EMail,
+                  Phone,
         					Address,
         					City,
         					State,
@@ -257,12 +261,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         					fLong,
         					Geolock
         				)
-        				VALUES( @MAXID + 1 , 5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        				VALUES( @MAXID + 1 , 5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
-                        $Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
-                        '',
+                $Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
+                '',
+                $Employee[ 'Email' ],
+                $Employee[ 'Phone' ],
         				$Employee[ 'Street' ],
         				$Employee[ 'City' ],
         				$Employee[ 'State' ],
@@ -283,27 +289,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         SET @MAXFWORK = CASE WHEN ( SELECT Max( fWork ) FROM Emp ) IS NULL THEN 1 ELSE ( SELECT Max( fWork ) FROM Emp ) END ;
         				INSERT INTO Emp(
         					ID,
-                            fWork,
+                  fWork,
         					fFirst,
         					Last,
-                            Title,
+                  Title,
         					Status,
         					Sales,
         					Field,
         					InUse ,
-                            Rol
+                  Rol
         				)
         				VALUES ( @MAXID + 1, @MAXFWORK + 1, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Employee[ 'First_Name' ],
         				$Employee[ 'Last_Name' ],
-                        $Employee[ 'Title' ],
+                $Employee[ 'Title' ],
         				$Employee[ 'Status' ],
         				!is_null( $Employee[ 'Sales' ] ) ? $Employee[ 'Sales' ] : 0,
         				!is_null( $Employee[ 'Field' ] ) ? $Employee[ 'Field' ] : 0,
         				!is_null( $Employee[ 'In_Use' ] ) ? $Employee[ 'In_Use' ] : 0,
-                        $Employee[ 'Rolodex' ]
+                $Employee[ 'Rolodex' ]
         			)
         		);
         		sqlsrv_next_result( $result );
@@ -315,15 +321,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		\singleton\database::getInstance( )->query(
 	        		null,
 	        		"	UPDATE 	Emp
-                        SET 	Emp.fFirst = ?,
-	        					Emp.Last = ?,
+                        SET 	  Emp.fFirst = ?,
+	        					            Emp.Last = ?,
                                 Emp.Title = ?
                         WHERE 	Emp.ID = ?;",
 	        		array(
 	        			$Employee[ 'First_Name' ],
-	        			$Employee[ 'Last_Name' ],
-                        $Employee[ 'Title' ],
-                        $Employee[ 'ID' ]
+                $Employee[ 'Last_Name' ],
+                $Employee[ 'Title' ],
+                $Employee[ 'ID' ]
 	        		)
 	        	);
 	        	\singleton\database::getInstance( )->query(
@@ -331,6 +337,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		"	UPDATE 	Rol
 	        			SET 	Rol.Name = ?,
 	        					Rol.Website = ?,
+                    Rol.EMail = ?,
+                    Rol.Phone = ?,
 	        					Rol.Address = ?,
 	        					Rol.City = ?,
 	        					Rol.State = ?,
@@ -341,6 +349,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		array(
 	        			$Employee[ 'Name' ],
 	        			'',
+                $Employee[ 'Email' ],
+                $Employee[ 'Phone' ],
 	        			$Employee[ 'Street' ],
 	        			$Employee[ 'City' ],
 	        			$Employee[ 'State' ],
@@ -368,7 +378,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require(bin_php .'element/navigation.php');?>
     <div id="page-wrapper" class='content' style='height:100%;overflow-y:scroll;'>
       <div class='card card-primary'>
-        <form action='job.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
+        <form action='employee.php?ID=<?php echo $Employee[ 'ID' ];?>' method='POST'>
             <input type='hidden' name='ID' value='<?php echo $Employee[ 'ID' ];?>' />
             <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Employee', 'Employees', $Employee[ 'ID' ] );?>
             <div class='card-body bg-dark text-white'>
