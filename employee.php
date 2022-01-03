@@ -100,7 +100,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $result = \singleton\database::getInstance( )->query(
         	null,
         	"	SELECT 	Employee.ID                           AS ID,
-        				Employee.fFirst + ' ' + Employee.Last AS Name,
         				Employee.fFirst                       AS First_Name,
         				Employee.Last                         AS Last_Name,
                 Employee.Title                        AS Title,
@@ -113,8 +112,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				Rolodex.Geolock                       AS Geofence,
         				Rolodex.ID 		                        AS Rolodex,
         				Rolodex.Name                          AS Name,
-                Rolodex.Phone                         AS Phone,
                 Rolodex.EMail                         AS Email,
+                Rolodex.Phone                         AS Phone,
                 Rolodex.Contact                       AS Contact,
         				tblWork.Super                         AS Supervisor,
         				[User].ID                             AS User_ID,
@@ -193,7 +192,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		$Name
         	)
         );
-        //var_dump( sqlsrv_errors( ) );
         $Employee =   (       empty( $ID )
                         &&    !empty( $Name )
                         &&    !$result
@@ -218,6 +216,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	'Longitude' => null,
         	'Geofence' => null,
         	'Rolodex' => null,
+          'Contact' => null,
         	'Supervisor' => null,
         	'Tickets_Open' => null,
         	'Tickets_Assigned' => null,
@@ -230,29 +229,31 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) : sqlsrv_fetch_array($result);
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
-        	$Employee[ 'First_Name' ]      = isset( $_POST[ 'First_Name' ] )    ? $_POST[ 'First_Name' ]    : $Employee[ 'First_Name' ];
+        	  $Employee[ 'First_Name' ]      = isset( $_POST[ 'First_Name' ] )    ? $_POST[ 'First_Name' ]    : $Employee[ 'First_Name' ];
             $Employee[ 'Last_Name' ]        = isset( $_POST[ 'Last_Name' ] )     ? $_POST[ 'Last_Name' ]     : $Employee[ 'Last_Name' ];
             $Employee[ 'Title' ]        = isset( $_POST[ 'Title' ] )     ? $_POST[ 'Title' ]     : $Employee[ 'Title' ];
-            $Employee[ 'Email' ]       = isset( $_POST[ 'Email' ] )    ? $_POST[ 'Email' ]    : $Employee[ 'Email' ];
-            $Employee[ 'Phone' ]       = isset( $_POST[ 'Phone' ] )    ? $_POST[ 'Phone' ]    : $Employee[ 'Phone' ];
             $Employee[ 'Street' ]       = isset( $_POST[ 'Street' ] )    ? $_POST[ 'Street' ]    : $Employee[ 'Street' ];
             $Employee[ 'City' ]        = isset( $_POST[ 'City' ] )     ? $_POST[ 'City' ]     : $Employee[ 'City' ];
             $Employee[ 'State' ]       = isset( $_POST[ 'State' ] )    ? $_POST[ 'State' ]    : $Employee[ 'State' ];
             $Employee[ 'Zip' ]        = isset( $_POST[ 'Zip' ] )     ? $_POST[ 'Zip' ]     : $Employee[ 'Zip' ];
             $Employee[ 'Latitude' ]       = isset( $_POST[ 'Latitude' ] )    ? $_POST[ 'Latitude' ]    : $Employee[ 'Latitude' ];
             $Employee[ 'Longitude' ]        = isset( $_POST[ 'Longitude' ] )     ? $_POST[ 'Longitude' ]     : $Employee[ 'Longitude' ];
+            $Employee[ 'Email' ]        = isset( $_POST[ 'Email' ] )     ? $_POST[ 'Email' ]     : $Employee[ 'Email' ];
+            $Employee[ 'Phone' ]        = isset( $_POST[ 'Phone' ] )     ? $_POST[ 'Phone' ]     : $Employee[ 'Phone' ];
+            $Employee[ 'Supervisor' ]        = isset( $_POST[ 'Supervisor' ] )     ? $_POST[ 'Supervisor' ]     : $Employee[ 'Supervisor' ];
         	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         		$result = \singleton\database::getInstance( )->query(
         			null,
         			"	DECLARE @MAXID INT;
         				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
         				INSERT INTO Rol(
-    						ID,
+    						  ID,
         					Type,
         					Name,
                   Contact,
-        					EMail,
                   Phone,
+                  EMail,
+        					Website,
         					Address,
         					City,
         					State,
@@ -261,14 +262,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         					fLong,
         					Geolock
         				)
-        				VALUES( @MAXID + 1 , 5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        				VALUES( @MAXID + 1 , 5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
-                $Employee[ 'First_Name' ] . ' ' . $Employee[ 'Last_Name' ],
-                '',
-                $Employee[ 'Email' ],
+                $Employee[ 'Contact' ],
                 $Employee[ 'Phone' ],
+                $Employee[ 'Email' ],
+                $Employee[ 'Website' ],
         				$Employee[ 'Street' ],
         				$Employee[ 'City' ],
         				$Employee[ 'State' ],
@@ -315,6 +316,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		sqlsrv_next_result( $result );
         		$Employee[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
+            $result = \singleton\database::getInstance( )->query(
+              null,
+              "	DECLARE @MAXID INT;
+                SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM tblWork ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM tblWork ) END ;
+                INSERT INTO tblWork(
+                  ID,
+                  Super,
+                  Members,
+                  GeoLock,
+                  TFMID,
+                  TFMSource
+                )
+                VALUES ( @MAXID + 1, ?, ?, ?, ?, ? );",
+              array(
+                $Employee[ 'Supervisor' ],
+                'A' . $Employee[ 'ID' ] . ',',
+                !is_null( $Employee[ 'Geofence' ] ) ? $Employee[ 'Geofence' ] : 0,
+                '',
+                ''
+              )
+            );
         		header( 'Location: employee.php?ID=' . $Employee[ 'ID' ] );
         		exit;
         	} else {
@@ -327,19 +349,29 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         WHERE 	Emp.ID = ?;",
 	        		array(
 	        			$Employee[ 'First_Name' ],
-                $Employee[ 'Last_Name' ],
+	        			$Employee[ 'Last_Name' ],
                 $Employee[ 'Title' ],
                 $Employee[ 'ID' ]
 	        		)
 	        	);
+            \singleton\database::getInstance( )->query(
+              null,
+              "	UPDATE 	tblWork
+                        SET 	  tblWork.Super = ?,
+                        WHERE 	tblWork.Members = ?;",
+              array(
+                $Employee[ 'Supervisor' ],
+                'A' . $Employee[ 'ID' ] . ','
+
+              )
+            );
 	        	\singleton\database::getInstance( )->query(
 	        		null,
 	        		"	UPDATE 	Rol
 	        			SET 	Rol.Name = ?,
-	        					Rol.Website = ?,
+	        					Rol.Address = ?,
                     Rol.EMail = ?,
                     Rol.Phone = ?,
-	        					Rol.Address = ?,
 	        					Rol.City = ?,
 	        					Rol.State = ?,
 	        					Rol.Zip = ?,
