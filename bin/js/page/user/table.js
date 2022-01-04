@@ -418,6 +418,20 @@ $(document).ready(function( ){
               success : function( code ){ document.location.href = 'user.php?ID=' + $( 'input[name="ID"]' ).val( ); }
             });
           }
+        },{
+          text : 'Access Admin',
+          className : 'form-control',
+          action : function( e, dt, node, config ){
+            $.ajax({
+              url : 'bin/php/post/privilege.php',
+              method : 'POST',
+              data : {
+                action : 'access_admin',
+                User : $( 'input[name="ID"]' ).val( ),
+              },
+              success : function( code ){ document.location.href = 'user.php?ID=' + $( 'input[name="ID"]' ).val( ); }
+            });
+          }
         }
       ]
   } );

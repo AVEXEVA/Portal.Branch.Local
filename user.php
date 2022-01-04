@@ -69,7 +69,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       ) );
   }}
   if(     !isset( $Connection[ 'ID' ] )
-      ||  !isset( $Privileges[ 'Unit' ] )
+      ||  !isset( $Privileges[ 'User' ] )
       ||  !check( privilege_read, level_group, $Privileges[ 'User' ] )
   ){ ?><?php require('404.html');?><?php }
   else {

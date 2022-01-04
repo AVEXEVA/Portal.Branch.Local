@@ -68,7 +68,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if( 	!isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Customer' ] )
+        ||  !isset( $Privileges[ 'User' ] )
         || 	!check( privilege_delete, level_group, $Privileges[ 'User' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
@@ -186,7 +186,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             12
                         )
                     );
-                    var_dump( sqlsrv_errors( ) );
                 }
             }
         } elseif(isset($_POST['action']) && $_POST['action'] == 'access_office'){
@@ -231,6 +230,57 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             14
                         )
                     );
+                }
+            }
+        } elseif(isset($_POST['action']) && $_POST['action'] == 'access_admin'){
+            if( isset( $_POST[ 'User' ] ) && is_numeric( $_POST[ 'User' ] ) ){
+                \singleton\database::getInstance( )->query(
+                    'Portal',
+                    "   DELETE FROM dbo.Privilege 
+                        WHERE       Privilege.[User] = ?;",
+                    array(
+                        $_POST[ 'User' ]
+                    )
+                );
+                foreach( array(
+                    'Contact',
+                    'Contract',
+                    'Collection',
+                    'Customer',
+                    'Division',
+                    'User',
+                    'Job',
+                    'Lead',
+                    'Location',
+                    'Proposal',
+                    'Requisition',
+                    'Route',
+                    'Ticket',
+                    'Territory',
+                    'Code',
+                    'Unit',
+                    'Violation',
+                    'Map',
+                    'User'
+                ) AS $Access ){
+                    \singleton\database::getInstance( )->query(
+                        'Portal',
+                        "   INSERT INTO dbo.Privilege( [User], [Access], [Owner], [Group], [Department], [Database], [Server], [Other], [Token], [Internet] )
+                            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );",
+                        array(
+                            $_POST[ 'User' ],
+                            $Access,
+                            15,
+                            15,
+                            15,
+                            15,
+                            15,
+                            15,
+                            15,
+                            15
+                        )
+                    );
+                    var_dump( sqlsrv_errors( ) );
                 }
             }
         } elseif(isset($_POST['action']) && $_POST['action'] == 'delete'){
