@@ -116,7 +116,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Division.Tax        AS Tax,
                 Division.fDesc      AS Description,
                 Division.TFMID      AS TFMID,
-                Division.TFMSource  AS TFMsource,
+                Division.TFMSource  AS TFMSource,
                 CASE    WHEN Tickets.Unassigned IS NULL THEN 0
                         ELSE Tickets.Unassigned END AS Tickets_Open,
                 CASE    WHEN Tickets.Assigned IS NULL THEN 0
@@ -140,124 +140,124 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 CASE    WHEN Violations.Job_Created IS NULL THEN 0
                         ELSE Violations.Job_Created ENd AS Violations_Job_Created
                 FROM    Zone AS Division
-              LEFT JOIN (
-                SELECT  Division.ID AS Division,
-                        Unassigned.Count AS Unassigned,
-                        Assigned.Count AS Assigned,
-                        En_Route.Count AS En_Route,
-                        On_Site.Count AS On_Site,
-                        Reviewing.Count AS Reviewing
-                FROM    Zone AS Division
-          LEFT JOIN (
-            SELECT      Division.ID AS Division,
-                        Sum( Units.Count ) AS Count,
-                        Sum( Elevators.Count) AS Elevators,
-                        Sum( Escalators.Count ) AS Escalators,
-                        Sum( Other.Count ) AS Other
-            FROM        Zone AS Division
-                      LEFT JOIN (
-                          SELECT      Location.Zone AS Division,
-                                      Count( Unit.ID ) AS Count
-                          FROM        Elev AS Unit
-                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                          GROUP BY    Location.Zone
-                      ) AS Units ON Units.Division = Division.ID
-                      LEFT JOIN (
-                          SELECT      Location.Zone AS Division,
-                                      Count( Unit.ID ) AS Count
-                          FROM        Elev AS Unit
-                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                          WHERE       Unit.Type = 'Elevator'
-                          GROUP BY    Location.Zone
-                      ) AS Elevators ON Elevators.Division = Division.ID
-                      LEFT JOIN (
-                          SELECT      Location.Zone AS Division,
-                                      Count( Unit.ID ) AS Count
-                          FROM        Elev AS Unit
-                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                          WHERE       Unit.Type = 'Escalator'
-                          GROUP BY    Location.Zone
-                      ) AS Escalators ON Escalators.Division = Division.ID
-                      LEFT JOIN (
-                          SELECT      Location.Zone AS Division,
-                                      Count( Unit.ID ) AS Count
-                          FROM        Elev AS Unit
-                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
-                          WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
-                          GROUP BY    Location.Zone
-                      ) AS Other ON Other.Location = Division.ID
-              GROUP BY    Location.Loc
-          ) AS Units ON Units.Location = Division.ID
-              LEFT JOIN (
-                  SELECT  Location.Zone AS Division,
-                          Preliminary.Count AS Preliminary,
-                          Job_Created.Count AS Job_Created
-                  FROM    Zone AS Division
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( Violation.ID ) AS Count
-                            FROM      Violation
-                                      LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                            WHERE     Violation.Status = 'Preliminary Report'
-                            GROUP BY  Location.Zone
-                          ) AS Preliminary ON Preliminary.Division = Division.ID
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( Violation.ID ) AS Count
-                            FROM      Violation
-                                      LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                            WHERE     Violation.Status = 'Job Created'
-                            GROUP BY  Location.Zone
-                          ) AS Job_Created ON Job_Created.Division = Division.ID
+                        LEFT JOIN (
+                          SELECT      Division.ID AS Division,
+                                      Sum( Units.Count ) AS Count,
+                                      Sum( Elevators.Count) AS Elevators,
+                                      Sum( Escalators.Count ) AS Escalators,
+                                      Sum( Other.Count ) AS Other
+                          FROM        Zone AS Division
+                                      LEFT JOIN (
+                                          SELECT      Location.Zone AS Division,
+                                                      Count( Unit.ID ) AS Count
+                                          FROM        Elev AS Unit
+                                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                                          GROUP BY    Location.Zone
+                                      ) AS Units ON Units.Division = Division.ID
+                                      LEFT JOIN (
+                                          SELECT      Location.Zone AS Division,
+                                                      Count( Unit.ID ) AS Count
+                                          FROM        Elev AS Unit
+                                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                                          WHERE       Unit.Type = 'Elevator'
+                                          GROUP BY    Location.Zone
+                                      ) AS Elevators ON Elevators.Division = Division.ID
+                                      LEFT JOIN (
+                                          SELECT      Location.Zone AS Division,
+                                                      Count( Unit.ID ) AS Count
+                                          FROM        Elev AS Unit
+                                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                                          WHERE       Unit.Type = 'Escalator'
+                                          GROUP BY    Location.Zone
+                                      ) AS Escalators ON Escalators.Division = Division.ID
+                                      LEFT JOIN (
+                                          SELECT      Location.Zone AS Division,
+                                                      Count( Unit.ID ) AS Count
+                                          FROM        Elev AS Unit
+                                                      LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                                          WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                                          GROUP BY    Location.Zone
+                                      ) AS Other ON Other.Division = Division.ID
+                            GROUP BY    Division.ID
+                        ) AS Units ON Units.Division = Division.ID
+                        LEFT JOIN (
+                          SELECT  Division.ID AS Division,
+                                  Unassigned.Count AS Unassigned,
+                                  Assigned.Count AS Assigned,
+                                  En_Route.Count AS En_Route,
+                                  On_Site.Count AS On_Site,
+                                  Reviewing.Count AS Reviewing
+                          FROM    Zone AS Division
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( TicketO.ID ) AS Count
+                                    FROM      TicketO
+                                              LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                    WHERE     TicketO.Assigned = 0
+                                    GROUP BY  Location.Zone
+                                  ) AS Unassigned ON Unassigned.Division = Division.ID
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( TicketO.ID ) AS Count
+                                    FROM      TicketO
+                                              LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                    WHERE     TicketO.Assigned = 1
+                                    GROUP BY  Location.Zone
+                                  ) AS Assigned ON Assigned.Division = Division.ID
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( TicketO.ID ) AS Count
+                                    FROM      TicketO
+                                              LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                    WHERE     TicketO.Assigned = 2
+                                    GROUP BY  Location.Zone
+                                  ) AS En_Route ON En_Route.Division = Division.ID
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( TicketO.ID ) AS Count
+                                    FROM      TicketO
+                                              LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                    WHERE     TicketO.Assigned = 3
+                                    GROUP BY  Location.Zone
+                                  ) AS On_Site ON On_Site.Division = Division.ID
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( TicketO.ID ) AS Count
+                                    FROM      TicketO
+                                              LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                    WHERE     TicketO.Assigned = 6
+                                    GROUP BY  Location.Zone
+                                  ) AS Reviewing ON Reviewing.Division = Division.ID
+                        ) AS Tickets ON Tickets.Division = Division.ID
+                        LEFT JOIN (
+                          SELECT  Division.ID AS Division,
+                                  Preliminary.Count AS Preliminary,
+                                  Job_Created.Count AS Job_Created
+                          FROM    Zone AS Division
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( Violation.ID ) AS Count
+                                    FROM      Violation
+                                              LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                    WHERE     Violation.Status = 'Preliminary Report'
+                                    GROUP BY  Location.Zone
+                                  ) AS Preliminary ON Preliminary.Division = Division.ID
+                                  LEFT JOIN (
+                                    SELECT    Location.Zone AS Division,
+                                              Count( Violation.ID ) AS Count
+                                    FROM      Violation
+                                              LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                    WHERE     Violation.Status = 'Job Created'
+                                    GROUP BY  Location.Zone
+                                  ) AS Job_Created ON Job_Created.Division = Division.ID
                         ) AS Violations ON Violations.Division = Division.ID
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( TicketO.ID ) AS Count
-                            FROM      TicketO
-                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                            WHERE     TicketO.Assigned = 0
-                            GROUP BY  Location.Zone
-                          ) AS Unassigned ON Unassigned.Division = Division.ID
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( TicketO.ID ) AS Count
-                            FROM      TicketO
-                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                            WHERE     TicketO.Assigned = 1
-                            GROUP BY  Location.Zone
-                          ) AS Assigned ON Assigned.Division = Division.ID
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( TicketO.ID ) AS Count
-                            FROM      TicketO
-                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                            WHERE     TicketO.Assigned = 2
-                            GROUP BY  Location.Zone
-                          ) AS En_Route ON En_Route.Division = Division.ID
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( TicketO.ID ) AS Count
-                            FROM      TicketO
-                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                            WHERE     TicketO.Assigned = 3
-                            GROUP BY  Location.Zone
-                          ) AS On_Site ON On_Site.Division = Division.ID
-                          LEFT JOIN (
-                            SELECT    Location.Zone AS Division,
-                                      Count( TicketO.ID ) AS Count
-                            FROM      TicketO
-                                      LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                            WHERE     TicketO.Assigned = 6
-                            GROUP BY  Location.Zone
-                          ) AS Reviewing ON Reviewing.Division = Division.ID
-              ) AS Tickets ON Tickets.Division = Division.ID
-        WHERE   Division.ID = ?;",
+                WHERE   Division.ID = ?;",
         array(
           $ID,
           $Name
         )
       );
-      var_dump( sqlsrv_errors( ) );
+
       $Division  = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
         'ID' => null,
         'Name' => null,
@@ -358,13 +358,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Division[ 'Color' ],
               $Division[ 'Description' ],
               $Division[ 'Tax' ],
-              $Division[ 'TFMID' ],
-              $Division[ 'TFMSource']
+              !is_null( $Division[ 'TFMID' ] ) ? $Division[ 'TFMID' ] : '',
+              !is_null( $Division[ 'TFMSource'] ) ? $Division[ 'TFMSource'] : ''
             )
           );
           sqlsrv_next_result( $result );
           $Division [ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-          //header( 'Location: division.php?ID=' . $Division [ 'ID' ] );
+          header( 'Location: division.php?ID=' . $Division [ 'ID' ] );
         } else {
           \singleton\database::getInstance( )->query(
             null,
@@ -403,8 +403,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $Division[ 'Color' ],
               $Division[ 'Description' ],
               $Division[ 'Tax' ],
-              $Division[ 'TFMID' ],
-              $Division[ 'TFMSource' ]
+              !is_null( $Division[ 'TFMID' ] ) ? $Division[ 'TFMID' ] : '',
+              !is_null( $Division[ 'TFMSource'] ) ? $Division[ 'TFMSource'] : ''
             )
           );
         }
@@ -441,29 +441,29 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <div class='card card-primary my-3 col-12 col-lg-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Location', $Division[ 'ID' ] );?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Division=' . $Division[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Division[ 'Units_Elevators' ], true, true, 'units.php?Division=' . $Division[ 'ID' ] . '&Type=Elevator');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Division[ 'Units_Escalators' ], true, true, 'units.php?Division=' . $Division[ 'ID' ] ) . '&Type=Escalator';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Division[ 'Units_Other' ], true, true, 'units.php?Division=' . $Division[ 'ID' ] ) . '&Type=Other';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Division[ 'Units_Elevators' ], true, true, 'units.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Type=Elevator' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Division[ 'Units_Escalators' ], true, true, 'units.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Type=Escalator' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Other', $Division[ 'Units_Other' ], true, true, 'units.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Type=Other' );?>
               </div>
             </div>
             <div class='card card-primary my-3 col-12 col-lg-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violations', 'Violations', 'Location', $Division[ 'ID' ] );?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Division=' . $Division[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Division[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Division=' . $Division[ 'ID' ] . '&Status=Preliminary Report');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Division[ 'Violations_Job_Created' ], true, true, 'violations.php?Division=' . $Division[ 'ID' ] ) . '&Status=Job Created';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Division[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=Preliminary Report' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Division[ 'Violations_Job_Created' ], true, true, 'violations.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=Job Created' );?>
               </div>
             </div>
             <div class='card card-primary my-3 col-12 col-lg-3'>
               <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Division', $Division[ 'ID' ] );?>
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Division=' . $Division[ 'ID' ] );?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Division[ 'Tickets_Open' ], true, true, 'tickets.php?Division=' . $Division[ 'ID' ] . '&Status=0');?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Division[ 'Tickets_Assigned' ], true, true, 'tickets.php?Division=' . $Division[ 'ID' ] ) . '&Status=1';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Division[ 'Tickets_En_Route' ], true, true, 'tickets.php?Division=' . $Division[ 'ID' ] ) . '&Status=2';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Division[ 'Tickets_On_Site' ], true, true, 'tickets.php?Division=' . $Division[ 'ID' ] ) . '&Status=3';?>
-                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Division[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Division=' . $Division[ 'ID' ] ) . '&Status=6';?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Division[ 'Tickets_Open' ], true, true, 'tickets.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=0' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Division[ 'Tickets_Assigned' ], true, true, 'tickets.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=1' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Division[ 'Tickets_En_Route' ], true, true, 'tickets.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=2' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Division[ 'Tickets_On_Site' ], true, true, 'tickets.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=3' );?>
+                <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Division[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Division_ID=' . $Division[ 'ID' ] . '&Division_Name=' . $Division[ 'Name' ] . '&Status=6' );?>
               </div>
             </div>
           </div>
