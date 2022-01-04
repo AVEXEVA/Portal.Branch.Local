@@ -306,7 +306,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Name
          )
        );
-      //var_dump( sqlsrv_errors( ) );
+      var_dump( sqlsrv_errors( ) );
        $Job =   (       empty( $ID )
                         &&    !empty( $Name )
                         &&    !$result
@@ -319,7 +319,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Type' => null,
           'Notes' => null,
           'Status' => null,
-          'Job_Types' => null,
+          'Job_Types' => isset( $_GET[ 'Job_Types' ] ) ? $_GET[ 'Job_Types' ] : null,
           'Location_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
           'Location_Name' => isset( $_GET [ 'Location_Name' ] ) ? $_GET ['Location_Name'] : null,
           'Location_Street' => null,
@@ -352,12 +352,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           $Job[ 'Name' ] = isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Job[ 'Name' ];
           $Job[ 'Customer_Name' ] = isset( $_POST[ 'Customer' ] ) ? $_POST[ 'Customer' ] : $Job[ 'Customer_Name' ];
+          $Job[ 'Customer_ID' ] = isset( $_POST[ 'Customer' ] ) ? $_POST[ 'Customer' ] : $Job[ 'Customer_ID' ];
           $Job[ 'Location_Name' ] = isset( $_POST[ 'Location' ] ) ? $_POST[ 'Location' ] : $Job[ 'Location_Name' ];
+          $Job[ 'Location_ID' ] = isset( $_POST[ 'Location' ] ) ? $_POST[ 'Location' ] : $Job[ 'Location_ID' ];
           $Job[ 'Unit_Name' ] = isset( $_POST[ 'Unit' ] ) ? $_POST[ 'Unit' ] : $Job[ 'Unit_Name' ];
+          $Job[ 'Unit_ID' ] = isset( $_POST[ 'Unit' ] ) ? $_POST[ 'Unit' ] : $Job[ 'Unit_ID' ];
           $Job[ 'Date' ] = isset( $_POST[ 'Date' ] ) ? date( 'Y-m-d h:i:s', strtotime( $_POST[ 'Date' ] ) ) : $Job[ 'Date' ];
           $Job[ 'Type' ] = isset( $_POST[ 'Type' ] ) ? $_POST[ 'Type' ] : $Job[ 'Type' ];
           $Job[ 'Job_Types' ] = isset( $_POST[ 'Job_Types' ] ) ? $_POST[ 'Job_Types' ] : $Job[ 'Job_Types' ];
           $Job[ 'Notes' ] = isset( $_POST[ 'Notes' ] ) ? $_POST[ 'Notes' ] : $Job[ 'Notes' ];
+          $Job[ 'Status' ] = isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Job[ 'Name' ];
+          $Job[ 'Location_Latitude' ] = isset( $_POST[ 'Location_Latitude' ] ) ? $_POST[ 'Location_Latitude' ] : $Job[ 'Location_Latitude' ];
+          $Job[ 'Location_Longitude' ] = isset( $_POST[ 'Location_Longitude' ] ) ? $_POST[ 'Location_Longitude' ] : $Job[ 'Location_Longitude' ];
           if( empty( $_POST[ 'ID' ] ) ){
             $result = \singleton\database::getInstance( )->query(
               null,
@@ -379,6 +385,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Type,
                   fDesc,
                   Status,
+                  JobType,
                   Remarks," .
                   /*,
                   PO,
@@ -473,6 +480,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $Job[ 'Notes' ],
                 $Job[ 'Location_Latitude'],
                 $Job[ 'Location_Longitude'],
+                $Job[ 'Job_Types'],
                 /*null,//PO
                 0,//Rev
                 0,//Mat
@@ -553,10 +561,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               )
             );
             //var_dump( sqlsrv_errors( ) ) ;
+            var_dump( sqlsrv_errors( ) );
             sqlsrv_next_result( $result );
             $Job[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
-            header( 'Location: job.php?ID=' . $Job[ 'ID' ] );
+            //header( 'Location: job.php?ID=' . $Job[ 'ID' ] );
             exit;
           } else {
             \singleton\database::getInstance( )->query(
@@ -623,8 +632,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   null,
                   " SELECT  Job_Type.ID   AS ID,
                             Job_Type.Type AS Name
-                    FROM    JobType AS Job_Type;"
+                    FROM    JobType AS Job_Types;"
                 );
+                $Job_Types = array();
                 if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){ $Job_Types[ $row[ 'ID' ] ] = $row[ 'Name' ]; } }
                 \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Job[ 'Type' ], $Job_Types );
               ?>
