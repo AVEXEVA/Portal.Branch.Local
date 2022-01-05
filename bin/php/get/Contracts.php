@@ -215,7 +215,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Job.fDesc           AS Job_Name,
                             Contract.BStart     AS Start_Date,
                             Contract.BFinish    AS End_Date,
-                            Contract.BAmt       AS Amount,
+                            CASE  WHEN Contract.BAmt IS NULL THEN 0
+                                  ELSE Contract.BAmt END AS Amount,
                             Contract.BLenght    AS Length,
                             CASE    WHEN Contract.BCycle = 0 THEN 'Monthly'
                                     WHEN Contract.BCycle = 1 THEN 'Bi-Monthly'
@@ -224,7 +225,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     WHEN Contract.BCycle = 4 THEN 'Semi-Annually'
                                     WHEN Contract.BCycle = 5 THEN 'Annually'
                                     WHEN Contract.BCycle = 6 THEN 'Never'
-                                    ELSE 'Error'
+                                    ELSE ''
                             END AS Cycle,
                             Contract.BEscFact   AS Escalation_Factor,
                             Contract.EscLast    AS Escalation_Date,
@@ -239,7 +240,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         Rol.Name
                                 FROM    Owner
                                         LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                            ) AS Customer ON Loc.Owner = Customer.ID
+                            ) AS Customer ON Contract.Owner = Customer.ID
                             LEFT JOIN Job          ON Contract.Job = Job.ID
                     WHERE   ({$conditions})  AND ({$search})
                 ) AS Tbl
@@ -290,11 +291,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'aaData'        =>  array(),
         'options'       => array( )
     );
-    while ( $Row = sqlsrv_fetch_array( $rResult ) ){
+    while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
       $Row[ 'Start_Date' ]      = is_null( $Row[ 'Start_Date' ] )      || $Row[ 'Start_Date' ]      == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Row[ 'Start_Date' ] ) );
       $Row[ 'End_Date' ]        = is_null( $Row[ 'End_Date' ] )        || $Row[ 'End_Date' ]        == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Row[ 'End_Date' ] ) );
       $Row[ 'Escalation_Date' ] = is_null( $Row[ 'Escalation_Date' ] ) || $Row[ 'Escalation_Date' ] == '1969-12-31 00:00:00.000' ? null : date( 'm/d/Y', strtotime( $Row[ 'Escalation_Date' ] ) );
-      $Row[ 'Amount' ]          = '$' . number_format( $Row[ 'Amount' ], 2 );
       //preg_match('(https:[/][/]bit[.]ly[/][a-zA-Z0-9]*)', $Row[ 'Remarks' ], $matches );
       //$Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
