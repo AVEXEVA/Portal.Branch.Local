@@ -90,9 +90,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $squery="SELECT  TOP 1
 	                    Unit.ID,
 	                    CASE 	WHEN Unit.State IS NULL AND Unit.Unit IS NULL THEN ''
-	                    		WHEN Unit.State IS NULL THEN Unit.Unit 
-	                    		WHEN Unit.Unit  IS NULL THEN Unit.State 
-	                    		ELSE Unit.State + ' - ' + Unit.Unit 
+	                    		WHEN Unit.State IS NULL THEN Unit.Unit
+	                    		WHEN Unit.Unit  IS NULL THEN Unit.State
+	                    		ELSE Unit.State + ' - ' + Unit.Unit
 	                    END AS Name,
 	                    Unit.Unit        		AS Building_ID,
 	                    Unit.State              AS City_ID,
@@ -213,14 +213,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           FROM      Invoice
                                           WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
                                           GROUP BY  Invoice.Job
-                                        ) AS [Open] ON Job.ID = [Open].Job 
+                                        ) AS [Open] ON Job.ID = [Open].Job
                                         LEFT JOIN (
                                           SELECT    Invoice.Job AS Job,
                                                     Count( Invoice.Ref ) AS Count
                                           FROM      Invoice
                                           WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
                                           GROUP BY  Invoice.Job
-                                        ) AS [Closed] ON Job.ID = [Closed].Job 
+                                        ) AS [Closed] ON Job.ID = [Closed].Job
                             GROUP BY    Job.Elev
                         ) AS Invoices ON Invoices.Unit = Unit.ID
 	            WHERE      Unit.ID = ?
@@ -233,14 +233,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $City_ID
             )
 		);
-		$Unit = (  		
+		$Unit = (
 						empty( $ID )
 		    		&&  !empty( $City_ID )
 		    		&&  !$result
 				) || (
 						empty( $ID )
 		    		&&  empty( $City_ID )
-				)    
+				)
 					? array(
 					    'ID' => null,
 					    'Name' => null,
@@ -279,42 +279,42 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					    'Violations_Job_Created' => '',
 					    'Invoices_Open' => null,
 					    'Invoices_Closed' => null
-					) 
+					)
 					: sqlsrv_fetch_array($result);
 
 		if( isset( $_POST ) && count( $_POST ) > 0 ){
 			//Foreign Keys
-			$Unit[ 'Customer_ID' ] 		= isset( $_POST[ 'Customer_ID' ] ) 	 	? $_POST[ 'Customer_ID' ] 	: $Unit[ 'Customer_ID' ];
-			$Unit[ 'Customer_Name' ] 	= isset( $_POST[ 'Customer_Name' ] )	? $_POST[ 'Customer_Name' ] : $Unit[ 'Customer_Name' ];
-			$Unit[ 'Location_ID' ] 		= isset( $_POST[ 'Location_ID' ] ) 		? $_POST[ 'Location_ID' ] 	: $Unit[ 'Location_ID' ];
-			$Unit[ 'Location_Name' ] 	= isset( $_POST[ 'Location' ] ) 		? $_POST[ 'Location' ] 	 	: $Unit[ 'Location_Name' ];
+  			$Unit[ 'Customer_ID' ] 		= isset( $_POST[ 'Customer_ID' ] ) 	? $_POST[ 'Customer_ID' ] 	: $Unit[ 'Customer_ID' ];
+  			$Unit[ 'Customer_Name' ] 	= isset( $_POST[ 'Customer_Name' ] )? $_POST[ 'Customer_Name' ] : $Unit[ 'Customer_Name' ];
+  			$Unit[ 'Location_ID' ] 		= isset( $_POST[ 'Location_ID' ] ) 	? $_POST[ 'Location_ID' ] 	: $Unit[ 'Location_ID' ];
+  			$Unit[ 'Location_Name' ] 	= isset( $_POST[ 'Location' ] ) 		? $_POST[ 'Location' ] 	 	  : $Unit[ 'Location_Name' ];
 			//Other
-		  	$Unit[ 'Building_ID' ] 		= isset( $_POST[ 'Building_ID' ] ) 		? $_POST[ 'Building_ID' ] 	: $Unit[ 'Building_ID' ];
-		  	$Unit[ 'City_ID' ] 			= isset( $_POST[ 'City_ID' ] )			? $_POST[ 'City_ID' ] 	 	: $Unit[ 'City_ID' ];
-			$Unit[ 'Description' ] 		= isset( $_POST[ 'Description' ] ) 	 	? $_POST[ 'Description' ] 	: $Unit[ 'Description' ];
-			$Unit[ 'Bank' ] 			= isset( $_POST[ 'Bank' ] ) 	 		? $_POST[ 'Bank' ] 	 		: $Unit[ 'Bank' ];
-			$Unit[ 'Note' ] 			=  isset( $_POST[ 'Note' ] ) 			? $_POST[ 'Note' ] 			: $Unit[ 'Note' ];
-			$Unit[ 'Type' ] 			= isset( $_POST[ 'Type' ] ) 	 		? $_POST[ 'Type' ] 	 		: $Unit[ 'Type' ];
-			$Unit[ 'Category' ] 		= isset( $_POST[ 'Category' ] ) 	 	? $_POST[ 'Category' ] 	 	: $Unit[ 'Category' ];
-		  	$Unit[ 'Environment' ] 		= isset( $_POST[ 'Environment' ] ) 		? $_POST[ 'Environment' ] 	: $Unit[ 'Environment' ];
-		  	$Unit[ 'Manufacturer' ] 	= isset( $_POST[ 'Manufacturer' ] ) 	? $_POST[ 'Manufacturer' ] 	: $Unit[ 'Manufacturer' ];
-		  	$Unit[ 'Installation' ] 	= isset( $_POST[ 'Installation' ] ) 	? $_POST[ 'Installation' ] 	: $Unit[ 'Installation' ];
-		  	$Unit[ 'Installer' ] 		= isset( $_POST[ 'Installer' ] ) 	 	? $_POST[ 'Installer' ] 	: $Unit[ 'Installer' ];
-		  	$Unit[ 'Maintained' ] 		= isset( $_POST[ 'Maintained' ] ) 	 	? $_POST[ 'Maintained' ] 	: $Unit[ 'Maintained' ];
-		  	$Unit[ 'Price' ] 			= isset( $_POST[ 'Price' ] ) 	 		? $_POST[ 'Price' ] 	 	: $Unit[ 'Price' ];
-		  	$Unit[ 'Serial' ] 			= isset( $_POST[ 'Serial' ] ) 	 		? $_POST[ 'Serial' ] 	 	: $Unit[ 'Serial' ];
-		  	$Unit[ 'Template' ]  		= isset( $_POST[ 'Template' ] ) 	 	? $_POST[ 'Template' ] 	 	: $Unit[ 'Template' ];
+		  	$Unit[ 'Building_ID' ] 		= isset( $_POST[ 'Building_ID' ] ) 	? $_POST[ 'Building_ID' ] 	: $Unit[ 'Building_ID' ];
+		  	$Unit[ 'City_ID' ] 		  	= isset( $_POST[ 'City_ID' ] )			? $_POST[ 'City_ID' ] 	 	  : $Unit[ 'City_ID' ];
+  			$Unit[ 'Description' ] 		= isset( $_POST[ 'Description' ] ) 	? $_POST[ 'Description' ] 	: $Unit[ 'Description' ];
+  			$Unit[ 'Bank' ] 		     	= isset( $_POST[ 'Bank' ] ) 	 		  ? $_POST[ 'Bank' ] 	 		    : $Unit[ 'Bank' ];
+  			$Unit[ 'Note' ] 		     	=  isset( $_POST[ 'Note' ] ) 			  ? $_POST[ 'Note' ] 			    : $Unit[ 'Note' ];
+  			$Unit[ 'Type' ] 			    = isset( $_POST[ 'Type' ] ) 	 		  ? $_POST[ 'Type' ] 	 		    : $Unit[ 'Type' ];
+  			$Unit[ 'Category' ] 		  = isset( $_POST[ 'Category' ] ) 	 	? $_POST[ 'Category' ] 	 	  : $Unit[ 'Category' ];
+		  	$Unit[ 'Environment' ] 		= isset( $_POST[ 'Environment' ] ) 	? $_POST[ 'Environment' ] 	: $Unit[ 'Environment' ];
+		  	$Unit[ 'Manufacturer' ] 	= isset( $_POST[ 'Manufacturer' ] ) ? $_POST[ 'Manufacturer' ] 	: $Unit[ 'Manufacturer' ];
+		  	$Unit[ 'Installation' ] 	= isset( $_POST[ 'Installation' ] ) ? $_POST[ 'Installation' ] 	: $Unit[ 'Installation' ];
+		  	$Unit[ 'Installer' ] 		  = isset( $_POST[ 'Installer' ] ) 	 	? $_POST[ 'Installer' ] 	  : $Unit[ 'Installer' ];
+		  	$Unit[ 'Maintained' ] 		= isset( $_POST[ 'Maintained' ] ) 	? $_POST[ 'Maintained' ]  	: $Unit[ 'Maintained' ];
+		  	$Unit[ 'Price' ] 			    = isset( $_POST[ 'Price' ] ) 	 		  ? $_POST[ 'Price' ] 	 	    : $Unit[ 'Price' ];
+		  	$Unit[ 'Serial' ] 			  = isset( $_POST[ 'Serial' ] ) 	 		? $_POST[ 'Serial' ] 	 	    : $Unit[ 'Serial' ];
+		  	$Unit[ 'Template' ]  		  = isset( $_POST[ 'Template' ] ) 	 	? $_POST[ 'Template' ] 	 	  : $Unit[ 'Template' ];
 
 		  	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
-		  	
-		  		
+
+
 		      	$result = \singleton\database::getInstance( )->query(
             		null,
 		            "	DECLARE @MAXID INT;
 		            	SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Elev ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Elev ) END ;
 INSERT INTO Elev(ID,Owner,Loc,Unit,State,fDesc,fGroup,Remarks,Type,Cat,Building,Manuf,Install,
 	InstallBy,Since,Last,Price,Serial,Template,Status,TFMID,TFMSource)
-VALUES( @MAXID + 1 , 
+VALUES( @MAXID + 1 ,
 		            		?,
 		            		?,
 		            		?,
@@ -335,7 +335,7 @@ VALUES( @MAXID + 1 ,
 		            		?,
 		            		?,
 		            		?,
-		            		? 
+		            		?
 		            	);
 		            	SELECT @MAXID + 1;",
 		            	array(
@@ -352,18 +352,18 @@ VALUES( @MAXID + 1 ,
 		                !empty( $Unit[ 'Manufacturer' ] ) ? $Unit[ 'Manufacturer' ]: '',
 		                !empty( $Unit[ 'Installation' ] ) ? $Unit[ 'Installation' ]: '',
 		                !empty( $Unit[ 'Installer' ] ) ? $Unit[ 'Installer' ]: '',
-		                
+
 		                 !empty( $Unit[ 'Created' ] ) ? $Unit[ 'Created' ]: date( 'Y-m-d h:i:s' ),
 		               !empty( $Unit[ 'Maintained' ] ) ? $Unit[ 'Maintained' ]: date( 'Y-m-d h:i:s' ),
-		             
+
 		                !empty( $Unit[ 'Price' ] ) ? $Unit[ 'Price' ]: 0,
 		                !empty( $Unit[ 'Serial' ] ) ? $Unit[ 'Serial' ]: '',
 		                !empty( $Unit[ 'Template' ] ) ? $Unit[ 'Template' ]: '',
 		                !empty( $Unit[ 'Status' ] ) ? $Unit[ 'Status' ]: '',
-		               !empty( $Unit[ 'TFMID' ] ) ? $Unit[ 'TFMID' ]: '', 
+		               !empty( $Unit[ 'TFMID' ] ) ? $Unit[ 'TFMID' ]: '',
 		               !empty( $Unit[ 'TFMSource' ] ) ? $Unit[ 'TFMSource' ]: ''
 		            )
-			        
+
 			    )or die(print_r(sqlsrv_errors()));;
 	        	sqlsrv_next_result( $result );
 	        	$Unit[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
@@ -386,7 +386,7 @@ VALUES( @MAXID + 1 ,
 		                !empty( $Unit[ 'Installer' ] ) ? $Unit[ 'Installer' ]: '',
 		                !empty( $Unit[ 'Created' ] ) ? date('Y-m-d h:i:s',strtotime($Unit[ 'Created' ])): date( 'Y-m-d h:i:s' ),
 		               !empty( $Unit[ 'Maintained' ] ) ? date('Y-m-d h:i:s',strtotime($Unit[ 'Maintained' ])): date( 'Y-m-d h:i:s' ),
-						
+
 						!empty( $Unit[ 'Price' ] ) ? $Unit[ 'Price' ]: 0,
 						$Unit[ 'Serial' ],
 						$Unit[ 'Template' ],
@@ -395,10 +395,10 @@ VALUES( @MAXID + 1 ,
 						$Unit[ 'TFMSource' ],
 						$Unit[ 'ID' ]
             		);
-		    	print_r($parameters);  
+		    	print_r($parameters);
 	        	\singleton\database::getInstance( )->query(
             		null,
-            		"	UPDATE 	Elev 
+            		"	UPDATE 	Elev
     				    SET 	Elev.Owner = ?,
     				    		Elev.Loc = ?,
     				    		Elev.Unit = ?,

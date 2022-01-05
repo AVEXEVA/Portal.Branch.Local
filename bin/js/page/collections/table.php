@@ -30,6 +30,6 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->data_column( 'Description' );?>
     ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'collections' );?>,
-    <?php \singleton\datatables::getInstance( )->buttons( 'collection', 'collections', 'ID' );?>
+    <?php \singleton\datatables::getInstance( )->buttons( 'invoice', 'collections', 'ID' );?>
   } );
 } );

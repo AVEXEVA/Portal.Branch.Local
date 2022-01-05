@@ -577,11 +577,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Location', $Location[ 'ID' ] );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Location=' . $Location[ 'ID' ] );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Tickets_Open' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] . '&Status=0');?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Location[ 'Tickets_Assigned' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=1';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Location[ 'Tickets_En_Route' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=2';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Location[ 'Tickets_On_Site' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=3';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Location[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Location=' . $Location[ 'ID' ] ) . '&Status=6';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Location[ 'Tickets_Open' ], true, true, 'tickets.php?Location_ID=' . $Location[ 'ID' ]  . '&Location_Name=' . $Location[ 'Name' ] . '&Status=0' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Location[ 'Tickets_Assigned' ], true, true, 'tickets.php?Location_ID=' . $Location[ 'ID' ] . '&Location_Name=' . $Location[ 'Name' ] . '&Status=1' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Location[ 'Tickets_En_Route' ], true, true, 'tickets.php?Location_ID=' . $Location[ 'ID' ] . '&Location_Name=' . $Location[ 'Name' ] . '&Status=2' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Location[ 'Tickets_On_Site' ], true, true, 'tickets.php?Location_ID=' . $Location[ 'ID' ] . '&Location_Name=' . $Location[ 'Name' ] . '&Status=3' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Location[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Location_ID=' . $Location[ 'ID' ] . '&Location_Name=' . $Location[ 'Name' ] . '&Status=6' );?>
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>

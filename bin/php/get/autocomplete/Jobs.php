@@ -69,8 +69,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ) );
     }}
     if(   !isset( $Connection[ 'ID' ] )
-        ||  !isset( $Privileges[ 'Contact' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Contact' ] )
+        ||  !isset( $Privileges[ 'Job' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Job' ] )
     ){ ?><?php require('404.html');?><?php }
   else {
     $output = array(
@@ -114,29 +114,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     //$conditions[] = "Job.Type <> 9";
 
-    if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
+    if( isset( $_GET[ 'search' ] ) && !in_array( $_GET[ 'search' ], array( '', ' ', null ) )  ){
 
-      $parameters[] = $_GET['Search'];
+      $parameters[] = $_GET['search'];
       $search[] = "Job.ID LIKE '%' + ? + '%'";
 
-      $parameters[] = $_GET['Search'];
+      $parameters[] = $_GET['search'];
       $search[] = "Job.fDesc LIKE '%' + ? + '%'";
 
-      $parameters[] = $_GET['Search'];
+      $parameters[] = $_GET['search'];
       $search[] = "Customer.Name LIKE '%' + ? + '%'";
 
-      $parameters[] = $_GET['Search'];
+      $parameters[] = $_GET['search'];
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
 
-      $parameters[] = $_GET['Search'];
+      $parameters[] = $_GET['search'];
       $search[] = "Job_Type.Type LIKE '%' + ? + '%'";
 
-      $parameters[] = $_GET['Search'];
+      $parameters[] = $_GET['search'];
       $search[] = "Job.Status LIKE '%' + ? + '%'";
-
-    }*/
-
-
+    }
     /*Concatenate Filters*/
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
       $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
@@ -211,7 +208,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 ) AS tbl
           WHERE     tbl.FieldValue LIKE '%' + ? + '%'
           GROUP BY  tbl.ID, tbl.FieldName, tbl.FieldValue;";
-    $rResult = $database->query(
+    $rResult = \singleton\database::getInstance( )->query(
       null,
       $sQuery,
       $parameters
