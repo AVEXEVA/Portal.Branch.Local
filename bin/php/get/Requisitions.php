@@ -85,6 +85,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET[ 'Employee' ];
       $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
     }
+    if( isset($_GET[ 'Item' ] ) && !in_array( $_GET[ 'Item' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Item'];
+      $conditions[] = "Requisition_Item.Count < ?";
+    }
     if( isset($_GET[ 'Date_Start' ] ) && !in_array( $_GET[ 'Date_Start' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Date_Start'];
       $conditions[] = "Requisition.[Date] >= ?";
@@ -131,12 +135,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $Columns = array(
       0 =>  "Requisition.ID",
       1 =>  "Employee.fFirst + ' ' + Employee.Last",
-      2 =>  'Requisition.Date',
-      3 =>  'Requisition.Required',
-      4 =>  'Customer.Name',
+      2 =>  'Requisition_Item.Count',
+      3 =>  'Requisition.Date',
+      4 =>  'Requisition.Required',
       5 =>  'Location.Tag',
-      6 =>  'Dropoff.Tag',
-      7 =>  "Unit.State + ' ' + Unit.Unit"
+      6 =>  'Location.Tag',
+      7 =>  'Dropoff.Tag',
+      8 =>  "Unit.State + ' ' + Unit.Unit"
     );
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
@@ -166,7 +171,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             LEFT JOIN (
                             SELECT    Requisition_Item.Requisition,
                                       Count( Requisition_Item.ID ) AS Count
-                            FROM      Requisition_Item 
+                            FROM      Requisition_Item
                             GROUP BY  Requisition_Item.Requisition
                           ) AS Requisition_Item ON Requisition_Item.Requisition = Requisition.ID
                             LEFT JOIN Emp   AS Employee ON Employee.ID = Requisition.[User]
@@ -199,7 +204,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             LEFT JOIN (
                             SELECT    Requisition_Item.Requisition,
                                       Count( Requisition_Item.ID ) AS Count
-                            FROM      Requisition_Item 
+                            FROM      Requisition_Item
                             GROUP BY Requisition_Item.Requisition
                           ) AS Requisition_Item ON Requisition_Item.Requisition = Requisition.ID
                             LEFT JOIN Emp   AS Employee ON Employee.ID = Requisition.[User]

@@ -156,8 +156,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Phone' => null,
           'Email' => null
         ) : sqlsrv_fetch_array($result);
-
-
         if( isset( $_POST ) && count( $_POST ) > 0 ){
         	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
   	      $Customer[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Customer[ 'Contact' ];
@@ -176,7 +174,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Customer[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Customer[ 'Zip' ];
         	$Customer[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Customer[ 'Latitude' ];
         	$Customer[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Customer[ 'Longitude' ];
-
         	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         		$result = \singleton\database::getInstance( )->query(
         			null,
@@ -210,7 +207,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				$Customer[ 'Geofence' ]
         			)
         		);
-
         		sqlsrv_next_result( $result );
         		$Customer[ 'Rolodex' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
@@ -262,7 +258,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		sqlsrv_next_result( $result );
         		$Customer[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
 
-        		header( 'Location: customer.php?ID=' . $Customer[ 'ID' ] );
+        		header( 'Location: ticket.php?ID=' . $Customer[ 'ID' ] );
         		exit;
         	} else {
         		\singleton\database::getInstance( )->query(
@@ -330,63 +326,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php require( bin_php . 'element/navigation.php'); ?>
         <div id="page-wrapper" class='content'>
         	<div class='card card-primary'>
-        		<div class='card-heading'>
-        			<div class='row g-0 px-3 py-2'>
-        				<div class='col-6'><h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='customers.php?<?php echo isset( $_SESSION[ 'Tables' ][ 'Customer' ][ 0 ] ) ? http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) ) : null;?>'>Customer</a>: <span><?php echo is_null( $Customer[ 'ID' ] ) ? 'New' : $Customer[ 'Name' ];?></span></h5></div>
-        				<div class='col-2'></div>
-        				<div class='col-2'>
-        					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php';">Create</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo $Customer[ 'ID' ];?>';">Refresh</button></div>
-        					</div>
-        				</div>
-        				<div class='col-2'>
-        					<div class='row g-0'>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true )[ array_search( $Customer[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true ) ) - 1 ] : null;?>';">Previous</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Customers' ][ 0 ] : array( ) );?>';">Table</button></div>
-        						<div class='col-4'><button class='form-control rounded' onClick="document.location.href='customer.php?ID=<?php echo !is_null( $Customer[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true )[ array_search( $Customer[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Customers' ], true ) ) + 1 ] : null;?>';">Next</button></div>
-        					</div>
-        				</div>
-        			</div>
-        		</div>
-        		<div class='card-body bg-dark text-white'>
-					<div class='card-columns'>
-						<?php if( !in_array( $Customer[ 'Latitude' ], array( null, 0 ) ) && !in_array( $Customer['Longitude' ], array( null, 0 ) ) ){
-							?><div class='card card-primary my-3'>
-								<div class='card-heading position-relative' style='z-index:1;'>
-									<div class='row g-0 px-3 py-2'>
-										<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Map</span></h5></div>
-										<div class='col-2'>&nbsp;</div>
-									</div>
-								</div>
-								<div id='customer_map' class='card-body p-0 bg-dark position-relative overflow-hidden' style='width:100%;height:350px;z-index:0;<?php echo isset( $_SESSION[ 'Cards' ][ 'Map' ] ) && $_SESSION[ 'Cards' ][ 'Map' ] == 0 ? 'display:none;' : null;?>'></div>
-								<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB05GymhObM_JJaRCC3F4WeFn3KxIOdwEU"></script>
-									<script type="text/javascript">
-						                var map;
-						                function initialize() {
-						                     map = new google.maps.Map(
-						                        document.getElementById( 'customer_map' ),
-						                        {
-						                          zoom: 10,
-						                          center: new google.maps.LatLng( <?php echo $Customer[ 'Latitude' ];?>, <?php echo $Customer[ 'Longitude' ];?> ),
-						                          mapTypeId: google.maps.MapTypeId.ROADMAP
-						                        }
-						                    );
-						                    var markers = [];
-						                    markers[0] = new google.maps.Marker({
-						                        position: {
-						                            lat:<?php echo $Customer['Latitude'];?>,
-						                            lng:<?php echo $Customer['Longitude'];?>
-						                        },
-						                        map: map,
-						                        title: '<?php echo $Customer[ 'Name' ];?>'
-						                    });
-						                }
-						                $(document).ready(function(){ initialize(); });
-						            </script>
-							</div><?php
-						}?>
-						<div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+              <form action='ticket.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+                <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
+                <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Customer', 'Customers', $Customer[ 'ID' ] );?>
+                <div class="card-body bg-dark text-white">
+                  <div class='row g-0' data-masonry='{"percentPosition": true }'>
+                    <div class='card card-primary my-3 col-12 col-lg-3'>
+                      <?php \singleton\bootstrap::getInstance( )->card_header( 'Ticket' );?>
+                      <div class='card-body bg-dark text-white'>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Customer[ 'Name' ] );?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Customer[ 'Type' ], array( 0 => 'General', 1 => 'Bank', 2 => 'Churches', 3 => 'Commercial', 4 => 'General', 5 => 'Property Manage', 6 => 'Restaraunts', 7 => 'Schools' ) );?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Customer[ 'Status' ], array( 0 => 'Inactive', 1 => 'Active') );?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Customer[ 'Website' ] );?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Customer['Street'].' '.$Customer['City'].' '.$Customer[ 'State' ].' '.$Customer[ 'Zip' ] ); ?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Customer[ 'Street' ] );?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Customer[ 'City' ] ); ?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Customer[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) ); ?>
+                        <?php \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Customer[ 'Zip' ] ); ?>
+                      </div>
+                  </div>
+                <div class='card card-primary my-3 col-12 col-lg-3'>
+						<div class='card card-primary my-3'><form action='ticket.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
@@ -520,7 +480,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   </div>
               </div>
 						</form></div>
-            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+            <div class='card card-primary my-3'><form action='ticket.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
                 <input type='hidden' name='ID' value='<?php echo $Customer[ 'ID' ];?>' />
               <div class='card-heading'>
                 <div class='row g-0 px-3 py-2'>
@@ -549,7 +509,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               </div>
             </form>
             </div>
-            <div class='card card-primary my-3'><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+            <div class='card card-primary my-3'><form action='ticket.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
 							<div class='card-heading'>
 								<div class='row g-0 px-3 py-2'>
 									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Privilege( 1 );?><span>Portal</span></h5></div>
@@ -639,7 +599,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         <div class='col-2'>&nbsp;</div>
                     </div>
                 </div>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Codes' ] ) && $_SESSION[ 'Cards' ][ 'Codes' ] == 0 || true ? "style='display:none;'" : null;?>><form action='customer.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Codes' ] ) && $_SESSION[ 'Cards' ][ 'Codes' ] == 0 || true ? "style='display:none;'" : null;?>><form action='ticket.php?ID=<?php echo $Customer[ 'ID' ];?>' method='POST'>
                     <div class='row'>
                         <div id='ticket-resolution-codes-pie-chart' class='col-xs-12'><div id='ticketResolutionCodes-flot-pie' style='width:100%;height:350px;'>&nbsp;</div></div>
                         <script>
@@ -1231,20 +1191,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 								<?php }?>
 							</div>
 						</div>
-						<div class='card card-primary my-3'>
-							<div class='card-heading'>
-								<div class='row g-0 px-3 py-2'>
-									<div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Profit</span></h5></div>
-									<div class='col-2'>&nbsp;</div>
-								</div>
-							</div>
-						 	<div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Profit' ] ) && $_SESSION[ 'Cards' ][ 'Profit' ] == 0 ? "style='display:none;'" : null;?>><?php require( 'bin/js/chart/customer_profit.php' );?></div>
-						 </div>
 					</div>
 				</div>
 			</div>
 		</div>
   	</div>
+
 </body>
 </html>
 <?php

@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Inspection.Type     AS Inspection_Name,
                   Violation.Ticket    AS Ticket_ID,
                   Violation.Ticket    AS Ticket_Name,
-                  Violation.Remarks   AS Note,
+                  Violation.Remarks   AS Notes,
                   Violation.Estimate  AS Proposal_ID,
                   Violation.Estimate  AS Proposal_Name,
                   Violation.Price     AS Price,
@@ -149,27 +149,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   Violation.Custom28  AS Custom28,
                   Violation.Custom29  AS Custom29,
                   Violation.Custom30  AS Custom30,
-                  Violation.Remarks  AS Remarks, 
-                  Violation.Remarks2  AS Remarks2,
-                  Violation.File_Permit  AS File_Permit,
-                  Violation.Permit_Approved  AS Permit_Approved,
-                  Violation.Date_Sent  AS Date_Sent,
-                     Violation.Forms_to_DOB  AS Forms_to_DOB,
-                     Violation.Inspection  AS Inspection,
-                     Violation.Hearing  AS Hearing,
-                     Violation.Due_Date  AS Due_Date,
-                     Violation.Forms_to_Customer  AS Forms_to_Customer,
-                     Violation.Recieved_from_Customer  AS Recieved_from_Customer,
-                     Violation.Created  AS Created,
-                     Violation.Code  AS Code,
-                     Violation.Division_1  AS Division_1,
-                     Violation.Division_2  AS Division_2,
-                     Violation.Division_3  AS Division_3,
-                     Violation.Division_4  AS Division_4,
-                     Violation.Sales  AS Sales,
-                     Violation.Repair  AS Repair,
-                     Violation.Modernization  AS Modernization
-                    
+                  Violation.idTestItem  AS idTestItem,
+                  Violation.Remarks2  AS Remarks
 		      FROM    Violation
                   LEFT JOIN Job                      ON Violation.Job   = Job.ID
                   LEFT JOIN (
@@ -181,6 +162,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   LEFT JOIN Loc        AS Location   ON Violation.Loc   = Location.Loc
                   LEFT JOIN Elev       AS Unit       ON Violation.Elev  = Unit.ID
                   LEFT JOIN Quote      AS Quote      ON Violation.Quote = Quote.Ref
+                  LEFT JOIN (
+                    (
+                      SELECT  TicketO.ID,
+                              TicketO.fDesc
+                      FROM    TicketO
+                    ) UNION ALL (
+                      SELECT  TicketD.ID,
+                              TicketD.fDesc
+                      FROM    TicketD
+                    )
+                  ) AS Ticket ON Violation.Ticket = Ticket.ID
                   LEFT JOIN Inspection AS Inspection ON Violation.ID    = Inspection.Violation
         	WHERE   	  Violation.ID = ?
                   OR 	Violation.Name = ?;",
@@ -189,9 +181,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Name
         )
       );
-
-
-      //var_dump( sqlsrv_errors( ) );
       $Violation =   (  empty( $ID )
                    &&  !empty( $Name )
                    &&  !$result
@@ -210,8 +199,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Location_Zip' => null,
         'Location_Latitude' => null,
         'Location_Longitude' => null,
-        'Unit_ID' => null,
-        'Unit_Name' => isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null,
+        'Unit_ID' => isset( $_GET[ 'Unit_ID' ] ) ? $_GET[ 'Unit_ID' ] : null,
+        'Unit_Name' => isset( $_GET[ 'Unit_Name' ] ) ? $_GET[ 'Unit_Name' ] : null,
         'Proposal_ID' => isset( $_GET[ 'Proposal_ID' ] ) ? $_GET[ 'Proposal_ID' ] : null,
         'Proposal_Name' => isset( $_GET[ 'Proposal_Name' ] ) ? $_GET[ 'Proposal_Name' ] : null,
         'Quote_ID' => isset( $_GET[ 'Quote_ID' ] ) ? $_GET[ 'Quote_ID' ] : null,
@@ -219,11 +208,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Job_ID' => isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
         'Job_Name' => isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null,
         'Ticket_ID' => isset( $_GET[ 'Ticket_ID' ] ) ? $_GET[ 'Ticket_ID' ] : null,
+        'Ticket_Name' => isset( $_GET[ 'Ticket_Name' ] ) ? $_GET[ 'Ticket_Name' ] : null,
         'Inspection_ID' => isset( $_GET[ 'Inspection_ID' ] ) ? $_GET[ 'Inspection_ID' ] : null,
         'Inspection_Name' => isset( $_GET[ 'Inspection_Name' ] ) ? $_GET[ 'Inspection_Name' ] : null,
       	'Date' => null,
       	'Status' => null,
-      	'Note' => null,
+      	'Notes' => null,
       	'Price' => null,
         'Address' => null,
         'Phone' => null,
@@ -259,44 +249,50 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Custom29' => null,
         'Custom30' => null,
         'Remarks' => null,
+        'idTestItem' => null,
         'Remarks2' => null
       ) : sqlsrv_fetch_array($result);
-
       if( isset( $_POST ) && count( $_POST ) > 0 ){
-
-      	$Violation[ 'Name' ] 		       = isset( $_POST[ 'Name' ] ) 	       ? $_POST[ 'Name' ] 	      : $Violation[ 'Name' ];
-        $Violation[ 'Status' ]         = isset( $_POST[ 'Status' ] )       ? $_POST[ 'Status' ]       : $Violation[ 'Status' ];
-        $Violation[ 'Date' ]           = isset( $_POST[ 'Date' ] )         ? $_POST[ 'Date' ]         : $Violation[ 'Date' ];
-        $Violation[ 'Location_Name' ]  = isset( $_POST[ 'Location_ID' ] )     ? $_POST[ 'Location_ID' ]     : $Violation[ 'Location_ID' ];
-        $Violation[ 'Customer_Name' ]  = isset( $_POST[ 'Customer' ] )     ? $_POST[ 'Customer' ]     : $Violation[ 'Customer_Name' ];
-        $Violation[ 'Job_Name' ]       = isset( $_POST[ 'Job_ID' ] )          ? $_POST[ 'Job_ID' ]          : $Violation[ 'Job_ID' ];
-        $Violation[ 'Ticket_ID' ]      = isset( $_POST[ 'Ticket_ID' ] )       ? $_POST[ 'Ticket_ID' ]       : $Violation[ 'Ticket_ID' ];
-        $Violation[ 'Unit_Name' ]      = isset( $_POST[ 'Unit_ID' ] )         ? $_POST[ 'Unit_ID' ]         : $Violation[ 'Unit_ID' ];
-        $Violation[ 'Proposal_Name' ]  = isset( $_POST[ 'Proposal_ID' ] )     ? $_POST[ 'Proposal_ID' ]     : $Violation[ 'Proposal_ID' ];
-        $Violation[ 'Inspection_ID' ]          = isset( $_POST[ 'Inspection_ID' ] )        ? $_POST[ 'Inspection_ID' ]        : $Violation[ 'Inspection_ID' ];
-        //$Violation[ 'Quote_Name' ]     = isset( $_POST[ 'Quote' ] )        ? $_POST[ 'Quote' ]        : $Violation[ 'Quote_Name' ];
-        $Violation[ 'Remarks' ]           = isset( $_POST[ 'Remarks' ] )         ? $_POST[ 'Remarks' ]         : $Violation[ 'Remarks' ];
-        $Violation[ 'Remarks2' ]           = isset( $_POST[ 'Remarks2' ] )         ? $_POST[ 'Remarks2' ]         : $Violation[ 'Remarks2' ];
-        $Violation[ 'Price' ]          = isset( $_POST[ 'Price' ] )        ? $_POST[ 'Price' ]        : $Violation[ 'Price' ];
-          $Violation[ 'File_Permit' ]          = isset( $_POST[ 'File_Permit' ] )        ? $_POST[ 'File_Permit' ]        : $Violation[ 'File_Permit' ];
-          $Violation[ 'Permit_Approved' ]          = isset( $_POST[ 'Permit_Approved' ] )        ? $_POST[ 'Permit_Approved' ]        : $Violation[ 'Permit_Approved' ];
-          $Violation[ 'Date_Sent' ]          = isset( $_POST[ 'Date_Sent' ] )        ? $_POST[ 'Date_Sent' ]        : $Violation[ 'Date_Sent' ];
-          $Violation[ 'Forms_to_DOB' ]          = isset( $_POST[ 'Forms_to_DOB' ] )        ? $_POST[ 'Forms_to_DOB' ]        : $Violation[ 'Forms_to_DOB' ];
-          $Violation[ 'Inspection' ]          = isset( $_POST[ 'Inspection' ] )        ? $_POST[ 'Inspection' ]        : $Violation[ 'Inspection' ];
-          $Violation[ 'Hearing' ]          = isset( $_POST[ 'Hearing' ] )        ? $_POST[ 'Hearing' ]        : $Violation[ 'Hearing' ];
+        	$Violation[ 'Name' ] 		          = isset( $_POST[ 'Name' ] ) 	       ? $_POST[ 'Name' ] 	      : $Violation[ 'Name' ];
+          $Violation[ 'Status' ]            = isset( $_POST[ 'Status' ] )       ? $_POST[ 'Status' ]       : $Violation[ 'Status' ];
+          $Violation[ 'Date' ]              = isset( $_POST[ 'Date' ] )         ? $_POST[ 'Date' ]         : $Violation[ 'Date' ];
+          $Violation[ 'Location_ID' ]     = isset( $_POST[ 'Location_ID' ] )     ? $_POST[ 'Location_ID' ]     : $Violation[ 'Location_ID' ];
+          $Violation[ 'Location_Name' ]     = isset( $_POST[ 'Location_Name' ] )     ? $_POST[ 'Location_Name' ]     : $Violation[ 'Location_Name' ];
+          $Violation[ 'Customer_ID' ]     = isset( $_POST[ 'Customer_ID' ] )     ? $_POST[ 'Customer_ID' ]           : $Violation[ 'Customer_ID' ];
+          $Violation[ 'Customer_Name' ]     = isset( $_POST[ 'Customer_Name' ] )     ? $_POST[ 'Customer_Name' ]           : $Violation[ 'Customer_Name' ];
+          $Violation[ 'Job_ID' ]          = isset( $_POST[ 'Job_ID' ] )          ? $_POST[ 'Job_ID' ]          : $Violation[ 'Job_ID' ];
+          $Violation[ 'Job_Name' ]          = isset( $_POST[ 'Job_Name' ] )          ? $_POST[ 'Job_Name' ]          : $Violation[ 'Job_Name' ];
+          $Violation[ 'Ticket_ID' ]         = isset( $_POST[ 'Ticket_ID' ] )       ? $_POST[ 'Ticket_ID' ]       : $Violation[ 'Ticket_ID' ];
+          $Violation[ 'Ticket_Name' ]         = isset( $_POST[ 'Ticket_Name' ] )       ? $_POST[ 'Ticket_Name' ]       : $Violation[ 'Ticket_Name' ];
+          $Violation[ 'Unit_ID' ]         = isset( $_POST[ 'Unit_ID' ] )         ? $_POST[ 'Unit_ID' ]         : $Violation[ 'Unit_ID' ];
+          $Violation[ 'Unit_Name' ]         = isset( $_POST[ 'Unit_Name' ] )         ? $_POST[ 'Unit_Name' ]         : $Violation[ 'Unit_Name' ];
+          $Violation[ 'Proposal_ID' ]     = isset( $_POST[ 'Proposal_ID' ] )     ? $_POST[ 'Proposal_ID' ]     : $Violation[ 'Proposal_ID' ];
+          $Violation[ 'Proposal_Name' ]     = isset( $_POST[ 'Proposal_Name' ] )     ? $_POST[ 'Proposal_Name' ]     : $Violation[ 'Proposal_Name' ];
+          $Violation[ 'Inspection_ID' ]     = isset( $_POST[ 'Inspection_ID' ] )        ? $_POST[ 'Inspection_ID' ]        : $Violation[ 'Inspection_ID' ];
+          $Violation[ 'Inspection_Name' ]   = isset( $_POST[ 'Inspection_Name' ] )    ? $_POST[ 'Inspection_Name' ]        : $Violation[ 'Inspection_Name' ];
+          //$Violation[ 'Quote_Name' ]     = isset( $_POST[ 'Quote' ] )        ? $_POST[ 'Quote' ]        : $Violation[ 'Quote_Name' ];
+          $Violation[ 'Notes' ]           = isset( $_POST[ 'Notes' ] )         ? $_POST[ 'Notes' ]         : $Violation[ 'Notes' ];
+          $Violation[ 'Remarks' ]          = isset( $_POST[ 'Remarks' ] )         ? $_POST[ 'Remarks' ]         : $Violation[ 'Remarks' ];
+          $Violation[ 'Price' ]             = isset( $_POST[ 'Price' ] )        ? $_POST[ 'Price' ]        : $Violation[ 'Price' ];
+          $Violation[ 'File_Permit' ]       = isset( $_POST[ 'File_Permit' ] )        ? $_POST[ 'File_Permit' ]        : $Violation[ 'File_Permit' ];
+          $Violation[ 'Permit_Approved' ]   = isset( $_POST[ 'Permit_Approved' ] )        ? $_POST[ 'Permit_Approved' ]        : $Violation[ 'Permit_Approved' ];
+          $Violation[ 'Date_Sent' ]         = isset( $_POST[ 'Date_Sent' ] )        ? $_POST[ 'Date_Sent' ]        : $Violation[ 'Date_Sent' ];
+          $Violation[ 'Forms_to_DOB' ]      = isset( $_POST[ 'Forms_to_DOB' ] )        ? $_POST[ 'Forms_to_DOB' ]        : $Violation[ 'Forms_to_DOB' ];
+          $Violation[ 'Inspection' ]        = isset( $_POST[ 'Inspection' ] )        ? $_POST[ 'Inspection' ]        : $Violation[ 'Inspection' ];
+          $Violation[ 'Hearing' ]           = isset( $_POST[ 'Hearing' ] )        ? $_POST[ 'Hearing' ]        : $Violation[ 'Hearing' ];
           $Violation[ 'Due_Date' ]          = isset( $_POST[ 'Due_Date' ] )        ? $_POST[ 'Due_Date' ]        : $Violation[ 'Due_Date' ];
-          $Violation[ 'Forms_to_Customer' ]          = isset( $_POST[ 'Forms_to_Customer' ] )        ? $_POST[ 'Forms_to_Customer' ]        : $Violation[ 'Forms_to_Customer' ];
+          $Violation[ 'Forms_to_Customer' ] = isset( $_POST[ 'Forms_to_Customer' ] )        ? $_POST[ 'Forms_to_Customer' ]        : $Violation[ 'Forms_to_Customer' ];
           $Violation[ 'Recieved_from_Customer' ]          = isset( $_POST[ 'Recieved_from_Customer' ] )        ? $_POST[ 'Recieved_from_Customer' ]        : $Violation[ 'Recieved_from_Customer' ];
-          $Violation[ 'Cancel_Contract' ]          = isset( $_POST[ 'Cancel_Contract' ] )        ? $_POST[ 'Cancel_Contract' ]        : $Violation[ 'Cancel_Contract' ];
-          $Violation[ 'Created' ]          = isset( $_POST[ 'Created' ] )        ? 1        : 0;
-          $Violation[ 'Code' ]          = isset( $_POST[ 'Code' ] )         ? 1        : 0;
-          $Violation[ 'Division_1' ]          = isset( $_POST[ 'Division_1' ] )         ? 1        : 0;
-          $Violation[ 'Division_2' ]          = isset( $_POST[ 'Division_2' ] )         ? 1        : 0;
-          $Violation[ 'Division_3' ]          = isset( $_POST[ 'Division_3' ] )        ? 1        : 0;
-          $Violation[ 'Division_4' ]          = isset( $_POST[ 'Division_4' ] )         ? 1        : 0;
-          $Violation[ 'Sales' ]          = isset( $_POST[ 'Sales' ] )         ? 1        : 0;
-          $Violation[ 'Repair' ]          = isset( $_POST[ 'Repair' ] )         ? 1        : 0;
-          $Violation[ 'Modernization' ]          = isset( $_POST[ 'Modernization' ] )   ? 1        : 0;
+          $Violation[ 'Cancel_Contract' ]   = isset( $_POST[ 'Cancel_Contract' ] )        ? $_POST[ 'Cancel_Contract' ]        : $Violation[ 'Cancel_Contract' ];
+          $Violation[ 'Created' ]           = isset( $_POST[ 'Created' ] )        ? 1        : 0;
+          $Violation[ 'Code' ]              = isset( $_POST[ 'Code' ] )         ? 1        : 0;
+          $Violation[ 'Division_1' ]        = isset( $_POST[ 'Division_1' ] )         ? 1        : 0;
+          $Violation[ 'Division_2' ]        = isset( $_POST[ 'Division_2' ] )         ? 1        : 0;
+          $Violation[ 'Division_3' ]        = isset( $_POST[ 'Division_3' ] )        ? 1        : 0;
+          $Violation[ 'Division_4' ]        = isset( $_POST[ 'Division_4' ] )         ? 1        : 0;
+          $Violation[ 'Sales' ]             = isset( $_POST[ 'Sales' ] )         ? 1        : 0;
+          $Violation[ 'Repair' ]            = isset( $_POST[ 'Repair' ] )         ? 1        : 0;
+          $Violation[ 'Modernization' ]     = isset( $_POST[ 'Modernization' ] )   ? 1        : 0;
           $Violation[ 'Custom21' ]          = isset( $_POST[ 'Custom21' ] )        ? $_POST[ 'Custom21' ]        : $Violation[ 'Custom21' ];
           $Violation[ 'Custom22' ]          = isset( $_POST[ 'Custom22' ] )        ? $_POST[ 'Custom22' ]        : $Violation[ 'Custom22' ];
           $Violation[ 'Custom23' ]          = isset( $_POST[ 'Custom23' ] )        ? $_POST[ 'Custom23' ]        : $Violation[ 'Custom23' ];
@@ -307,130 +303,92 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Violation[ 'Custom28' ]          = isset( $_POST[ 'Custom28' ] )        ? $_POST[ 'Custom28' ]        : $Violation[ 'Custom28' ];
           $Violation[ 'Custom29' ]          = isset( $_POST[ 'Custom29' ] )        ? $_POST[ 'Custom29' ]        : $Violation[ 'Custom29' ];
           $Violation[ 'Custom30' ]          = isset( $_POST[ 'Custom30' ] )        ? $_POST[ 'Custom30' ]        : $Violation[ 'Custom30' ];
+          $Violation[ 'idTestItem' ]        = isset( $_POST[ 'idTestItem' ] )      ? $_POST[ 'idTestItem' ]      : $Violation[ 'idTestItem' ];
           //print_r($Violation);die;
           if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
 
       		$result = \singleton\database::getInstance( )->query(
       			null,
       			"INSERT INTO Violation(
-                      
-                    Job,
-                    Name,
                     Loc,
+                    Job,
                     Elev,
                     Ticket,
-                    fDate,
-                    Status,
                     Quote,
+                    Estimate,
+                    Name,
+                    fdate,
+                    Status,
                     Remarks,
-                    Remarks2,      
+                    Custom1,
+                    Custom2,
+                    Custom3,
+                    Custom4,
+                    Custom5,
+                    Custom6,
+                    Custom7,
+                    Custom8,
+                    Custom9,
+                    Custom10,
+                    Custom11,
+                    Custom12,
+                    Custom13,
+                    Custom14,
+                    Custom15,
+                    Custom16,
+                    Custom17,
+                    Custom18,
+                    Custom19,
+                    Custom20,
+                    Custom21,
+                    Custom22,
+                    Custom23,
+                    Custom24,
+                    Custom25,
+                    Custom26,
+                    Custom27,
+                    Custom28,
+                    Custom29,
+                    Custom30,
+                    Remarks2,
+                    idTestItem,
                     Price,
-                      File_Permit,
-                      Permit_Approved,
-                      Date_Sent,
-                      Forms_to_DOB,
-                      Inspection,
-                      Hearing,
-                      Due_Date,
-                      Forms_to_Customer,
-                      Recieved_from_Customer,
-                      Cancel_Contract,
-                      Created,
-                      Code,
-                      Division_1,
-                      Division_2,
-                      Division_3,
-                      Division_4,
-                      Sales,
-                      Repair,
-                      Modernization,
-                      Custom21,
-                      Custom22,
-                      Custom23,
-                      Custom24,
-                      Custom25,
-                      Custom26,
-                      Custom27,
-                      Custom28,
-                      Custom29,
-                      Custom30
-                      
-                      
-      				)
-      				VALUES
-                ( 
-                ?,
-                ?,
-      			?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                 ?,
-                ?
-              );
+                    TFMID,
+                    TFMSource
+                  )
+      				VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
       				SELECT SCOPE_IDENTITY( );",
       			array(
-      				$Violation[ 'Job_Name' ],
-                    $Violation[ 'Name' ],
-                    $Violation[ 'Location_Name' ],
-                    $Violation[ 'Unit_Name' ],
+      				      $Violation[ 'Location_ID' ],
+                    $Violation[ 'Job_ID' ],
+                    $Violation[ 'Unit_ID' ],
                     empty( $Violation[ 'Ticket_ID' ] ) ? null : $Violation[ 'Ticket_ID' ],
+                    $Violation[ 'Quote_ID' ],
+                    $Violation[ 'Proposal_ID' ],
+                    $Violation[ 'Name' ],
                     empty( $Violation[ 'Date' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Date' ] ) ),
                     $Violation[ 'Status' ],
-                    $Violation[ 'Quote_ID' ],
-                    $Violation[ 'Remarks' ],
-                    $Violation[ 'Remarks2' ],
-                    empty( $Violation[ 'Price' ] ) ? 0 : $Violation[ 'Price' ],
+                    $Violation[ 'Notes' ],
                     empty( $Violation[ 'File_Permit' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'File_Permit' ] ) ),
                     empty( $Violation[ 'Permit_Approved' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Permit_Approved' ] ) ),
                     empty( $Violation[ 'Date_Sent' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Date_Sent' ] ) ),
                     empty( $Violation[ 'Forms_to_DOB' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Forms_to_DOB' ] ) ),
-                    empty( $Violation[ 'Inspection' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Inspection' ] ) ),
+                    $Violation[ 'Inspection' ],
                     empty( $Violation[ 'Hearing' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Hearing' ] ) ),
                     empty( $Violation[ 'Due_Date' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Due_Date' ] ) ),
                     empty( $Violation[ 'Forms_to_Customer' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Forms_to_Customer' ] ) ),
                     empty( $Violation[ 'Recieved_from_Customer' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Recieved_from_Customer' ] ) ),
                     empty( $Violation[ 'Cancel_Contract' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Cancel_Contract' ] ) ),
-                    empty( $Violation[ 'Code' ] ) ? 0 : $Violation[ 'Code' ],
-                    empty( $Violation[ 'Division_1' ] ) ? 0 : $Violation[ 'Division_1' ],
-                    empty( $Violation[ 'Division_2' ] ) ? 0 : $Violation[ 'Division_2' ],
-                    empty( $Violation[ 'Division_3' ] ) ? 0 : $Violation[ 'Division_3' ],
-                    empty( $Violation[ 'Division_4' ] ) ? 0 : $Violation[ 'Division_4' ],
                     empty( $Violation[ 'Sales' ] ) ? 0 : $Violation[ 'Sales' ],
-                    empty( $Violation[ 'Repair' ] ) ? 0 : $Violation[ 'Repair' ],
+                    empty( $Violation[ 'Division_2' ] ) ? 0 : $Violation[ 'Division_2' ],
+                    $Violation[ 'Created' ],
                     empty( $Violation[ 'Modernization' ] ) ? 0 : $Violation[ 'Modernization' ],
+                    empty( $Violation[ 'Division_1' ] ) ? 0 : $Violation[ 'Division_1' ],
+                    empty( $Violation[ 'Division_3' ] ) ? 0 : $Violation[ 'Division_3' ],
+                    empty( $Violation[ 'Repair' ] ) ? 0 : $Violation[ 'Repair' ],
+                    empty( $Violation[ 'Code' ] ) ? 0 : $Violation[ 'Code' ],
+                    empty( $Violation[ 'Division_4' ] ) ? 0 : $Violation[ 'Division_4' ],
+                    $Violation[ 'Complete' ],
                     empty( $Violation[ 'Custom21' ] ) ? null : $Violation[ 'Custom21' ],
                     empty( $Violation[ 'Custom22' ] ) ? null : $Violation[ 'Custom22' ],
                     empty( $Violation[ 'Custom23' ] ) ? null : $Violation[ 'Custom23' ],
@@ -440,10 +398,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     empty( $Violation[ 'Custom27' ] ) ? null : $Violation[ 'Custom27' ],
                     empty( $Violation[ 'Custom28' ] ) ? null : $Violation[ 'Custom28' ],
                     empty( $Violation[ 'Custom29' ] ) ? null : $Violation[ 'Custom29' ],
-                    empty( $Violation[ 'Custom30' ] ) ? null : $Violation[ 'Custom30' ]
+                    empty( $Violation[ 'Custom30' ] ) ? null : $Violation[ 'Custom30' ],
+                    $Violation[ 'Remarks' ],
+                    $Violation[ 'idTestItem' ],
+                    empty( $Violation[ 'Price' ] ) ? 0 : $Violation[ 'Price' ],
+                    empty($Violation[ 'TFMID' ] ) ? 0  : $Violation[ 'TFMID' ],
+                    empty($Violation[ 'TFMSource' ] ) ? 0 : $Violation[ 'TFMSource' ]
                 )
       		);
-              //var_dump( sqlsrv_errors( ) ) ;die;
       		sqlsrv_next_result( $result );
       		$Violation[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
       		header( 'Location: violation.php?ID=' . $Violation[ 'ID' ] );
@@ -453,16 +415,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         		null,
         		"	UPDATE 	Violation
         			SET     Violation.Job = ?,
-                    Violation.Name = ?,
-                    Violation.Loc = ?,
-                    Violation.Elev = ?,
-                    Violation.Ticket = ?,
-                    Violation.fDate = ?,
-                    Violation.Status = ?,
-                    Violation.Quote = ?,
-                    Violation.Remarks = ?,
-                    Violation.Remarks2 = ?,      
-                    Violation.Price = ?,
+                      Violation.Name = ?,
+                      Violation.Loc = ?,
+                      Violation.Elev = ?,
+                      Violation.Ticket = ?,
+                      Violation.fDate = ?,
+                      Violation.Status = ?,
+                      Violation.Quote = ?,
+                      Violation.Remarks = ?,
+                      Violation.Remarks2 = ?,
+                      Violation.Price = ?,
                       Violation.File_Permit = ?,
                       Violation.Permit_Approved = ?,
                       Violation.Date_Sent = ?,
@@ -484,28 +446,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       Violation.Modernization = ?,
                       Violation.Custom21 = ?,
                       Violation.Custom22 = ?,
-                     Violation.Custom23 = ?,
+                      Violation.Custom23 = ?,
                       Violation.Custom24 = ?,
                       Violation.Custom25 = ?,
                       Violation.Custom26 = ?,
                       Violation.Custom27 = ?,
                       Violation.Custom28 = ?,
                       Violation.Custom29 = ?,
-                      Violation.Custom30 = ?
-                     
+                      Violation.Custom30 = ?,
+                      Violation.idTestItem = ?
         			WHERE   Violation.ID = ?;",
         		array(
-                    $Violation[ 'Job_Name' ],
-                    $Violation[ 'Name' ],
-                    $Violation[ 'Location_Name' ],
-                    $Violation[ 'Unit_Name' ],
+                    $Violation[ 'Location_ID' ],
+                    $Violation[ 'Job_ID' ],
+                    $Violation[ 'Unit_ID' ],
                     empty( $Violation[ 'Ticket_ID' ] ) ? null : $Violation[ 'Ticket_ID' ],
+                    $Violation[ 'Quote_ID' ],
+                    $Violation[ 'Proposal_ID' ],
+                    $Violation[ 'Name' ],
                     empty( $Violation[ 'Date' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Date' ] ) ),
                     $Violation[ 'Status' ],
-                    $Violation[ 'Quote_ID' ],
-                    $Violation[ 'Remarks' ],
-                    $Violation[ 'Remarks2' ],
-                    empty( $Violation[ 'Price' ] ) ? 0 : $Violation[ 'Price' ],
+                    $Violation[ 'Notes' ],
                     empty( $Violation[ 'File_Permit' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'File_Permit' ] ) ),
                     empty( $Violation[ 'Permit_Approved' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Permit_Approved' ] ) ),
                     empty( $Violation[ 'Date_Sent' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Date_Sent' ] ) ),
@@ -516,14 +477,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     empty( $Violation[ 'Forms_to_Customer' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Forms_to_Customer' ] ) ),
                     empty( $Violation[ 'Recieved_from_Customer' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Recieved_from_Customer' ] ) ),
                     empty( $Violation[ 'Cancel_Contract' ] ) ? null : date( 'Y-m-d h:i:s', strtotime( $Violation[ 'Cancel_Contract' ] ) ),
-                    empty( $Violation[ 'Code' ] ) ? 0 : $Violation[ 'Code' ],
-                    empty( $Violation[ 'Division_1' ] ) ? 0 : $Violation[ 'Division_1' ],
-                    empty( $Violation[ 'Division_2' ] ) ? 0 : $Violation[ 'Division_2' ],
-                    empty( $Violation[ 'Division_3' ] ) ? 0 : $Violation[ 'Division_3' ],
-                    empty( $Violation[ 'Division_4' ] ) ? 0 : $Violation[ 'Division_4' ],
                     empty( $Violation[ 'Sales' ] ) ? 0 : $Violation[ 'Sales' ],
-                    empty( $Violation[ 'Repair' ] ) ? 0 : $Violation[ 'Repair' ],
+                    empty( $Violation[ 'Division_2' ] ) ? 0 : $Violation[ 'Division_2' ],
+                    $Violation[ 'Created' ],
                     empty( $Violation[ 'Modernization' ] ) ? 0 : $Violation[ 'Modernization' ],
+                    empty( $Violation[ 'Division_1' ] ) ? 0 : $Violation[ 'Division_1' ],
+                    empty( $Violation[ 'Division_3' ] ) ? 0 : $Violation[ 'Division_3' ],
+                    empty( $Violation[ 'Repair' ] ) ? 0 : $Violation[ 'Repair' ],
+                    empty( $Violation[ 'Code' ] ) ? 0 : $Violation[ 'Code' ],
+                    empty( $Violation[ 'Division_4' ] ) ? 0 : $Violation[ 'Division_4' ],
+                    $Violation[ 'Complete' ],
                     empty( $Violation[ 'Custom21' ] ) ? null : $Violation[ 'Custom21' ],
                     empty( $Violation[ 'Custom22' ] ) ? null : $Violation[ 'Custom22' ],
                     empty( $Violation[ 'Custom23' ] ) ? null : $Violation[ 'Custom23' ],
@@ -534,7 +497,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     empty( $Violation[ 'Custom28' ] ) ? null : $Violation[ 'Custom28' ],
                     empty( $Violation[ 'Custom29' ] ) ? null : $Violation[ 'Custom29' ],
                     empty( $Violation[ 'Custom30' ] ) ? null : $Violation[ 'Custom30' ],
-      				$Violation[ 'ID' ]
+                    empty( $Violation[ 'Price' ] ) ? 0 : $Violation[ 'Price' ],
+                    $Violation[ 'Remarks' ],
+                    empty( $Violation[ 'idTestItem' ] ) ? null : $Violation[ 'idTestItem' ],
+                    empty( $Violation[ 'Price' ] ) ? null : $Violation[ 'Price' ],
+                    empty( $Violation[ 'TFMID' ] ) ? null : $Violation[ 'TFMID' ],
+                    empty( $Violation[ 'TFMSource' ] ) ? null : $Violation[ 'TFMSource' ],
+            				$Violation[ 'ID' ]
         		)
         	);
       	}
@@ -564,9 +533,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card card-primary my-3 col-12 col-lg-3'>
                     <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                         <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Violation[ 'Name' ] );?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Violation[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Violation[ 'Date' ] );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Violation[ 'Name' ] );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Violation[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Violation[ 'Date' ] );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Violation[ 'Location_ID' ], $Violation[ 'Location_Name' ], empty( $Violation[ 'ID' ] )  ? 'notSubmitted' : 'form' );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Violation[ 'Job_ID' ], $Violation[ 'Job_Name' ], empty( $Violation[ 'ID' ] )  ? 'notSubmitted' : 'form' );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Ticket', 'Tickets', $Violation[ 'Ticket_ID' ], $Violation[ 'Ticket_ID' ] ,empty( $Violation[ 'ID' ] )  ? 'notSubmitted' : 'form' );?>
@@ -574,9 +543,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Proposal', 'Proposals', $Violation[ 'Proposal_ID' ], $Violation[ 'Proposal_ID' ] ,empty( $Violation[ 'ID' ] )  ? 'notSubmitted' : 'form' );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Inspection', 'Inspections', $Violation[ 'Inspection_ID' ], $Violation[ 'Inspection_Name' ] ,empty( $Violation[ 'ID' ] )  ? 'notSubmitted' : 'form' );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Price', $Violation[ 'Price' ] );?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_label( 'Notes' );?>
-                          <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Remarks', $Violation[ 'Remarks' ]  );?>
-                          <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Remarks2', $Violation[ 'Remarks2' ] );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_label( 'Notes' );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Notes', $Violation[ 'Notes' ]  );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Remarks', $Violation[ 'Remarks' ] );?>
                         </div>
                     </div>
                   <div class='card card-primary my-3 col-12 col-lg-3'>
