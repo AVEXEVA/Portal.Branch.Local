@@ -97,7 +97,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <?php require( bin_php . 'element/navigation.php');?>
         <div id='page-wrapper' class='content'>
             <div class='card card-full card-primary border-0'>
-                <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Invoice( 1 );?> Collections</h4></div>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Collection' );?>
 				<div class="mobile card-body bg-darker text-white"><?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
                     \singleton\bootstrap::getInstance( )->card_row_form_autocomplete(
@@ -139,25 +139,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Description', 'Description' );
                         ?></tr><tr class='desktop'><?php
                             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                                'Territory', 'Territories', 
-                                isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null, 
-                                isset( $_GET[ 'Territory_Name' ] ) ? $_GET[ 'Territory_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                                'Territory', 'Territories',
+                                isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
+                                isset( $_GET[ 'Territory_Name' ] ) ? $_GET[ 'Territory_Name' ] : null
                             );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                                'Customer', 'Customers', 
-                                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
-                                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                                'Customer', 'Customers',
+                                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
                             );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                                'Location', 'Locations', 
-                                isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
-                                isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                                'Location', 'Locations',
+                                isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                                isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
                             );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                                'Job', 'Jobs', 
-                                isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
-                                isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                                'Job', 'Jobs',
+                                isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+                                isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null
                             );
                             \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
                             \singleton\table::getInstance( )->th_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
