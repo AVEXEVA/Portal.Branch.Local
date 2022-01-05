@@ -339,9 +339,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     ) AS [Job_Created] ON Job_Created.Customer = Owner.ID
                                     LEFT JOIN (
                                         SELECT  Location.Owner AS Customer,
-                                                Count( Violation.ID ) AS Count 
-                                        FROM    Violation 
-                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc 
+                                                Count( Violation.ID ) AS Count
+                                        FROM    Violation
+                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                                         WHERE   Violation.Status IN ( 'Completed', 'Dismissed' )
                                         GROUP BY    Location.Owner
                                     ) AS [Closed] ON Closed.Customer = Owner.ID
@@ -678,7 +678,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         <div class='col-3'>Portal:</div>
                                         <div class='col-8'><select
                                             <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
-                                            class='form-control edit'
+                                            class='form-control'
                                             name='Internet' >
                                             <option value=''>Select</option>
                                             <option value='0' <?php echo $Customer[ 'Internet' ] == 0 ? 'selected' : null;?>>Disabled</option>
@@ -688,12 +688,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     <div class='row g-0' <?php echo $Customer[ 'Internet' ] == 0 ? "style='display:none;'" : null;?>>
                                         <div class='col-1'>&nbsp;</div>
                                         <div class='col-3'>Username:</div>
-                                        <div class='col-8'><input type='text' class='form-control edit' name='Login' value='<?php echo $Customer[ 'Login' ];?>' /></div>
+                                        <div class='col-8'><input type='text' class='form-control' name='Login' value='<?php echo $Customer[ 'Login' ];?>' /></div>
                                     </div>
                                     <div class='row g-0' <?php echo $Customer[ 'Internet' ] == 0 ? "style='display:none;'" : null;?>>
                                         <div class='col-1'>&nbsp;</div>
                                         <div class='col-3'>Password:</div>
-                                        <div class='col-8'><input type='password' class='form-control edit' name='Login' value='<?php echo $Customer[ 'Login' ];?>' name='Password' value='<?php echo $Customer[ 'Password' ];?>' /></div>
+                                        <div class='col-8'><input type='password' class='form-control' name='Login' value='<?php echo $Customer[ 'Login' ];?>' name='Password' value='<?php echo $Customer[ 'Password' ];?>' /></div>
                                     </div>
                                     <div class='row g-0'>
                                         <div class='col-1'>&nbsp;</div>
@@ -701,7 +701,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         <div class='col-8'>
                                             <select
                                                 <?php echo check( privilege_execute, level_server, isset( $Privileges[ 'Customer' ] ) ? $Privileges[ 'Customer' ] : 0 ) ? null : 'disabled';?>
-                                                class='form-control edit'
+                                                class='form-control'
                                                 name='Geofence' >
                                                   <option value=''>Select</option>
                                                   <option value='0' <?php echo $Customer[ 'Geofence' ] == 0 ? 'selected' : null;?>>Disabled</option>
