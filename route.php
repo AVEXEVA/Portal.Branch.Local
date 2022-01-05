@@ -254,18 +254,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         'Violations_Preliminary_Report' => isset( $_GET[ 'Violations_Preliminary_Report' ] ) ? $_GET[ 'Violations_Preliminary_Report' ] : null,
         'Violations_Job_Created' => isset( $_GET[ 'Violations_Job_Created' ] ) ? $_GET[ 'Violations_Job_Created' ] : null
       ) : sqlsrv_fetch_array($result);
-
       if( isset( $_POST ) && count( $_POST ) > 0 ){
         $Route[ 'Name' ]      = isset( $_POST[ 'Name' ] )    ? $_POST[ 'Name' ]    : $Route[ 'Name' ];
-        $Route[ 'Employee_Name' ]      = isset( $_POST[ 'Employee' ] )    ? $_POST[ 'Employee' ]    : $Route[ 'Employee_Name' ];
+        $Route[ 'Employee_ID' ]      = isset( $_POST[ 'Employee_ID' ] )    ? $_POST[ 'Employee_ID' ]    : $Route[ 'Employee_ID' ];
+        $Route[ 'Employee_Name' ]      = isset( $_POST[ 'Employee_Name' ] )    ? $_POST[ 'Employee_Name' ]    : $Route[ 'Employee_Name' ];
         if( empty( $_POST[ 'ID' ] ) ){
-
           $result = \singleton\database::getInstance( )->query(
             null,
             " DECLARE @MAXID INT;
               DECLARE @fWork INT;
               SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Route ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Route ) END ;
-              SET @fWork = ( SELECT Emp.fWork FROM Emp WHERE Emp.fFirst + ' ' + Emp.Last = ? );
+              SET @fWork = ( SELECT Emp.fWork FROM Emp WHERE Emp.ID = ? );
               INSERT INTO Route(
                 ID,
                 Name,
@@ -274,13 +273,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               VALUES ( @MAXID + 1, ?, @fWork );
               SELECT @MAXID + 1;",
             array(
-              $Route[ 'Employee_Name' ],
-              $Route[ 'Name' ]
+              $Route[ 'Employee_ID' ],
+              $Route[ 'Name' ],
             )
           );
+          var_dump( sqlsrv_errors( ) );
           sqlsrv_next_result( $result );
           $Route[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
           header( 'Location: route.php?ID=' . $Route[ 'ID' ] );
           exit;
         } else {
@@ -301,7 +300,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         }
       }
 $locations = \singleton\database::getInstance( )->query(
-
     null,
       " SELECT Loc,Tag,fLong,Latt
         FROM   Loc
@@ -312,8 +310,6 @@ $locationArr = array();
 $finalLoc= [];
 if( $locations ) {
     while ($locationArr = sqlsrv_fetch_array($locations, SQLSRV_FETCH_ASSOC)) {
-
-
         $finalLoc[] = ['ID'=>$locationArr['Loc'],'Tag'=>$locationArr['Tag'],'Latitude'=>$locationArr['Latt'],'Longitude'=>$locationArr['fLong']];
     }
 }
@@ -405,7 +401,7 @@ if( $locations ) {
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                   <?php
-                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Route Name', $Route[ 'Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Route[ 'Name' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Route[ 'Employee_ID' ], $Route[ 'Employee_Name' ] );
                   ?>
                 </div>

@@ -206,22 +206,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             )
             : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
-          $Proposal[ 'Name' ]             = isset( $_POST[ 'Name' ] )        ? $_POST[ 'Name' ]         : $Proposal[ 'Name' ];
-          $Proposal[ 'Contact_ID' ]       = isset( $_POST[ 'Contact_ID' ] )     ? $_POST[ 'Contact_ID' ]      : $Proposal[ 'Contact_ID' ];
-          $Proposal[ 'Job_ID' ]           = isset( $_POST[ 'Job_ID' ] )         ? $_POST[ 'Job_ID' ]          : $Proposal[ 'Job_ID' ];
-          $Proposal[ 'Location_ID' ]      = isset( $_POST[ 'Location_ID' ] )    ? $_POST[ 'Location_ID' ]     : $Proposal[ 'Location_ID' ];
-          $Proposal[ 'Employee_ID' ]      = isset( $_POST[ 'Employee_ID' ] )    ? $_POST[ 'Employee_ID' ]     : $Proposal[ 'Employee_ID' ];
-          $Proposal[ 'Date' ]             = isset( $_POST[ 'Date' ] )        ? $_POST[ 'Date' ]         : $Proposal[ 'Date' ];
-          $Proposal[ 'Type' ]             = isset( $_POST[ 'Type' ] )        ? $_POST[ 'Type' ]         : $Proposal[ 'Type' ];
-          $Proposal[ 'Notes' ]            = isset( $_POST[ 'Notes' ] )       ? $_POST[ 'Notes' ]        : $Proposal[ 'Notes' ];
-          $Proposal[ 'Probability' ]      = isset( $_POST[ 'Probability' ] ) ? $_POST[ 'Probability' ]  : $Proposal[ 'Probability' ];
-          $Proposal[ 'Cost' ]             = isset( $_POST[ 'Cost' ] )        ? $_POST[ 'Cost' ]         : $Proposal[ 'Cost' ];
-          $Proposal[ 'Hours' ]            = isset( $_POST[ 'Hours' ] )       ? $_POST[ 'Hours' ]        : $Proposal[ 'Hours' ];
-          $Proposal[ 'Labor' ]            = isset( $_POST[ 'Labor' ] )       ? $_POST[ 'Labor' ]        : $Proposal[ 'Labor' ];
-          $Proposal[ 'Overhead' ]         = isset( $_POST[ 'Overhead' ] )    ? $_POST[ 'Overhead' ]     : $Proposal[ 'Overhead' ];
-          $Proposal[ 'Price' ]            = isset( $_POST[ 'Price' ] )       ? $_POST[ 'Price' ]        : $Proposal[ 'Price' ];
-          $Proposal[ 'Profit' ]           = isset( $_POST[ 'Profit' ] )      ? $_POST[ 'Profit' ]       : $Proposal[ 'Profit' ];
-          $Proposal[ 'Notes' ]            = isset( $_POST[ 'Remarks' ] )     ? $_POST[ 'Remarks' ]      : $Proposal[ 'Notes' ];
+          $Proposal[ 'Name' ]             = isset( $_POST[ 'Name' ] )        ? $_POST[ 'Name' ]               : $Proposal[ 'Name' ];
+          $Proposal[ 'Contact_ID' ]       = isset( $_POST[ 'Contact_ID' ] )  ? $_POST[ 'Contact_ID' ]         : $Proposal[ 'Contact_ID' ];
+          $Proposal[ 'Contact_Name' ]     = isset( $_POST[ 'Contact_Name' ] )? $_POST[ 'Contact_Name' ]       : $Proposal[ 'Contact_Name' ];
+          $Proposal[ 'Job_ID' ]           = isset( $_POST[ 'Job_ID' ] )      ? $_POST[ 'Job_ID' ]             : $Proposal[ 'Job_ID' ];
+          $Proposal[ 'Job_Name' ]         = isset( $_POST[ 'Job_Name' ] )    ? $_POST[ 'Job_Name' ]           : $Proposal[ 'Job_Name' ];
+          $Proposal[ 'Location_ID' ]      = isset( $_POST[ 'Location_ID' ] ) ? $_POST[ 'Location_ID' ]        : $Proposal[ 'Location_ID' ];
+          $Proposal[ 'Location_Name' ]    = isset( $_POST[ 'Location_Name' ] ) ? $_POST[ 'Location_Name' ]    : $Proposal[ 'Location_Name' ];
+          $Proposal[ 'Employee_ID' ]      = isset( $_POST[ 'Employee_ID' ] ) ? $_POST[ 'Employee_ID' ]        : $Proposal[ 'Employee_ID' ];
+          $Proposal[ 'Employee_Name' ]    = isset( $_POST[ 'Employee_Name' ] ) ? $_POST[ 'Employee_Name' ]    : $Proposal[ 'Employee_Name' ];
+          $Proposal[ 'Description' ]      = isset( $_POST[ 'Description' ] ) ? $_POST[ 'Description' ]        : $Proposal[ 'Description' ];
+          $Proposal[ 'Date' ]             = isset( $_POST[ 'Date' ] )        ? $_POST[ 'Date' ]               : $Proposal[ 'Date' ];
+          $Proposal[ 'Type' ]             = isset( $_POST[ 'Type' ] )        ? $_POST[ 'Type' ]               : $Proposal[ 'Type' ];
+          $Proposal[ 'Notes' ]            = isset( $_POST[ 'Notes' ] )       ? $_POST[ 'Notes' ]              : $Proposal[ 'Notes' ];
+          $Proposal[ 'Probability' ]      = isset( $_POST[ 'Probability' ] ) ? $_POST[ 'Probability' ]        : $Proposal[ 'Probability' ];
+          $Proposal[ 'Cost' ]             = isset( $_POST[ 'Cost' ] )        ? $_POST[ 'Cost' ]               : $Proposal[ 'Cost' ];
+          $Proposal[ 'Hours' ]            = isset( $_POST[ 'Hours' ] )       ? $_POST[ 'Hours' ]              : $Proposal[ 'Hours' ];
+          $Proposal[ 'Labor' ]            = isset( $_POST[ 'Labor' ] )       ? $_POST[ 'Labor' ]              : $Proposal[ 'Labor' ];
+          $Proposal[ 'Overhead' ]         = isset( $_POST[ 'Overhead' ] )    ? $_POST[ 'Overhead' ]           : $Proposal[ 'Overhead' ];
+          $Proposal[ 'Price' ]            = isset( $_POST[ 'Price' ] )       ? $_POST[ 'Price' ]              : $Proposal[ 'Price' ];
+          $Proposal[ 'Profit' ]           = isset( $_POST[ 'Profit' ] )      ? $_POST[ 'Profit' ]             : $Proposal[ 'Profit' ];
+          $Proposal[ 'Notes' ]            = isset( $_POST[ 'Remarks' ] )     ? $_POST[ 'Remarks' ]            : $Proposal[ 'Notes' ];
           /*$Proposal[ 'Sales_Tax_Rate' ]      = isset( $_POST[ 'Sales_Tax_Rate' ] )    ? $_POST[ 'Sales_Tax_Rate' ]    : $Proposal[ 'Sales_Tax_Rate' ];
           $Proposal[ 'Sales_Tax' ]      = isset( $_POST[ 'Sales_Tax' ] )    ? $_POST[ 'Sales_Tax' ]    : $Proposal[ 'Sales_Tax' ];*/
           if( empty( $_POST[ 'ID' ] ) ){
@@ -298,9 +303,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 WHERE   Estimate.ID = ?;",
                 array(
                   $Proposal[ 'Job_ID' ],
+                  $Proposal[ 'Job_Name' ],
                   $Proposal[ 'Contact_ID' ],
+                  $Proposal[ 'Contact_Name' ],
                   $Proposal[ 'Location_ID' ],
+                  $Proposal[ 'Location_Name' ],
                   $Proposal[ 'Employee_ID'],
+                  $Proposal[ 'Employee_Name'],
                   $Proposal[ 'Description' ],
                   $Proposal[ 'Name' ],
                   $Proposal[ 'Date' ],
@@ -351,6 +360,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					                	            Job_Type.Type AS Name
 					                	    FROM    JobType AS Job_Type;"
 					                	);
+                            $Job_Types = array();
 					                	if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){ $Job_Types[ $row[ 'ID' ] ] = $row[ 'Name' ]; } }
 					                	\singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Proposal[ 'Type' ], $Job_Types );
 					             	?>

@@ -104,7 +104,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               		Job.fDesc             AS Name,
               		Job.fDate             AS Date,
 	                Job.BHour             AS Budgeted_Hours,
-         			    JobType.Type          AS Type,
+                  Job.Type              AS Job_Type_ID,
+         			    JobType.Type          AS Job_Type_Name,
       				    Job.Remarks      		  AS Notes,
                   Job.Status            AS Status,
                   Emp.fFirst            AS Employee_First_Name,
@@ -123,8 +124,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               		Zone.Name             AS Division_Name,
               		Customer.ID           AS Customer_ID,
               		Customer.Name     	  AS Customer_Name,
-              	 	Owner.Status       	  AS Customer_Status,
-              		Owner.Elevs    		    AS Customer_Elevators,
               		Customer.Street       AS Customer_Street,
               		Customer.City         AS Customer_City,
               		Customer.State        AS Customer_State,
@@ -306,20 +305,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Name
          )
        );
-      //var_dump( sqlsrv_errors( ) );
-       $Job =   (       empty( $ID )
-                        &&    !empty( $Name )
-                        &&    !$result
-                      ) || (  empty( $ID )
-                        &&    empty( $Name )
-                      )  ? array(
+       $Job =   empty( $ID ) ? array(
           'ID' => null,
           'Name' => null,
           'Date' => null,
           'Type' => null,
           'Notes' => null,
           'Status' => null,
-          'Job_Types' => null,
+          'Job_Type_ID' => isset( $_GET[ 'Job_Type_ID' ] ) ? $_GET[ 'Job_Type_ID' ] : null,
+          'Job_Type_Name' => isset( $_GET[ 'Job_Type_Name' ] ) ? $_GET[ 'Job_Type_Name' ] : null,
           'Location_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
           'Location_Name' => isset( $_GET [ 'Location_Name' ] ) ? $_GET ['Location_Name'] : null,
           'Location_Street' => null,
@@ -348,214 +342,55 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Contracts_Open' => isset( $_GET[ 'Contracts_Open' ] ) ? $_GET[ 'Contracts_Open' ] : null,
           'Contracts_Closed' => isset( $_GET[ 'Contracts_Closed' ] ) ? $_GET[ 'Contracts_Closed' ] : null
         ) : sqlsrv_fetch_array($result);
-
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           $Job[ 'Name' ] = isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Job[ 'Name' ];
-          $Job[ 'Customer_Name' ] = isset( $_POST[ 'Customer' ] ) ? $_POST[ 'Customer' ] : $Job[ 'Customer_Name' ];
-          $Job[ 'Location_Name' ] = isset( $_POST[ 'Location' ] ) ? $_POST[ 'Location' ] : $Job[ 'Location_Name' ];
-          $Job[ 'Unit_Name' ] = isset( $_POST[ 'Unit' ] ) ? $_POST[ 'Unit' ] : $Job[ 'Unit_Name' ];
+          $Job[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Job[ 'Customer_Name' ];
+          $Job[ 'Customer_ID' ] = isset( $_POST[ 'Customer_ID' ] ) ? $_POST[ 'Customer_ID' ] : $Job[ 'Customer_ID' ];
+          $Job[ 'Location_Name' ] = isset( $_POST[ 'Location_Name' ] ) ? $_POST[ 'Location_Name' ] : $Job[ 'Location_Name' ];
+          $Job[ 'Location_ID' ] = isset( $_POST[ 'Location_ID' ] ) ? $_POST[ 'Location_ID' ] : $Job[ 'Location_ID' ];
+          $Job[ 'Unit_Name' ] = isset( $_POST[ 'Unit_Name' ] ) ? $_POST[ 'Unit_Name' ] : $Job[ 'Unit_Name' ];
+          $Job[ 'Unit_ID' ] = isset( $_POST[ 'Unit_ID' ] ) ? $_POST[ 'Unit_ID' ] : $Job[ 'Unit_ID' ];
           $Job[ 'Date' ] = isset( $_POST[ 'Date' ] ) ? date( 'Y-m-d h:i:s', strtotime( $_POST[ 'Date' ] ) ) : $Job[ 'Date' ];
-          $Job[ 'Type' ] = isset( $_POST[ 'Type' ] ) ? $_POST[ 'Type' ] : $Job[ 'Type' ];
-          $Job[ 'Job_Types' ] = isset( $_POST[ 'Job_Types' ] ) ? $_POST[ 'Job_Types' ] : $Job[ 'Job_Types' ];
+          $Job[ 'Job_Type_ID' ] = isset( $_POST[ 'Job_Type_ID' ] ) ? $_POST[ 'Job_Type_ID' ] : $Job[ 'Job_Type_ID' ];
+          $Job[ 'Job_Type_Name' ] = isset( $_POST[ 'Job_Type_Name' ] ) ? $_POST[ 'Job_Type_Name' ] : $Job[ 'Job_Type_Name' ];
           $Job[ 'Notes' ] = isset( $_POST[ 'Notes' ] ) ? $_POST[ 'Notes' ] : $Job[ 'Notes' ];
+          $Job[ 'Status' ] = isset( $_POST[ 'Status' ] ) ? $_POST[ 'Status' ] : $Job[ 'Status' ];
           if( empty( $_POST[ 'ID' ] ) ){
             $result = \singleton\database::getInstance( )->query(
               null,
               " DECLARE @MAXID INT;
-                DECLARE @Customer INT;
-                DECLARE @Location INT;
-                DECLARE @Unit INT;
-                DECLARE @Type INT;
                 SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Job ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Job ) END ;
-                SET @Customer = ( SELECT Owner.ID FROM Owner LEFT JOIN Rol ON Owner.Rol = Rol.ID WHERE Rol.Name = ? );
-                SET @Location = ( SELECT Loc.Loc FROM Loc WHERE Loc.Tag = ? AND Loc.Owner = @Customer );
-                SET @Unit = ( SELECT Elev.State + ' ' + Elev.Unit FROM Elev WHERE Elev.Owner = @Customer AND Elev.Loc = @Location AND Elev.State = ? );
-                SET @Type = ( SELECT JobType.ID FROM JobType WHERE JobType.Type = ? );
                 INSERT INTO Job(
                   ID,
+                  fDesc,
+                  fDate,
                   Owner,
                   Loc,
                   Elev,
                   Type,
-                  fDesc,
                   Status,
-                  Remarks," .
-                  /*,
-                  PO,
-                  Rev,
-                  Mat,
-                  Labor,
-                  Cost,
-                  Profit,
-                  Ratio,
-                  Reg,
-                  OT,
-                  DT,
-                  TT,
-                  Hour,
-                  BRev,
-                  BLabor,
-                  BCost,
-                  BProfit,
-                  BRatio,
-                  BHour,
-                  Template,
-                  fDate,
-                  Comm,
-                  WageC,
-                  NT,
-                  Post,
-                  EN,
-                  Certified,
-                  Apprentice,
-                  UseDed,
-                  BillRate,
-                  Markup,
-                  PType,
-                  Charge,
-                  Amount,
-                  GL,
-                  GLRev,
-                  GandA,
-                  OHLabor,
-                  LastOH,
-                  etc,
-                  ETCModifier,
-                  FP,
-                  fGroup,
-                  CType,
-                  Elevs,
-                  RateTravel,
-                  RateOT,
-                  RateNT,
-                  RateDT,
-                  RateMileage,
-                  CloseDate,
-                  SPHandle,
-                  SRemarks,
-                  LCode,
-                  CreditCard,
-                  NCSLock,
-                  Source,
-                  Audit,
-                  AuditBy,
-                  AuditDate,
-                  Reopen,
-                  fInt,
-                  NCSClose,
-                  Comments,
-                  Level,
-                  TechAlert,
-                  EstDate,
-                  DueDate,
-                  Tech,
-                  TechOrRoute,
-                  TFMID,
-                  TFMSource,*/ "
-                  fLong,
-                  Latt,
+                  Remarks,
                   Custom1, Custom2, Custom3, Custom4, Custom5,
                   Custom6, Custom7, Custom8, Custom9, Custom10,
                   Custom11, Custom12, Custom13, Custom14, Custom15,
-                  Custom16, Custom17, Custom18, Custom19, Custom20" . /*
-                  TFMCustom1, TFMCustom2, TFMCustom3, TFMCustom4, TFMCustom5*/ "
-                  , Rev, Mat, Labor, Cost, Profit, Ratio, Reg, OT, DT, TT, Hour, BRev, BMat, BLabor, BCost, BProfit, BRatio, BHour, NT
+                  Custom16, Custom17, Custom18, Custom19, Custom20,
+                  Rev, Mat, Labor, Cost, Profit, Ratio, Reg, OT, DT, TT, Hour, BRev, BMat, BLabor, BCost, BProfit, BRatio, BHour, NT
                 )
-                VALUES ( @MAXID + 1, @Customer, @Location, @Unit, @Type, " . implode( ',', array_fill( 0, 25 /*99*/, '?' ) ) . ", " . implode( ',', array_fill( 0, 19, '0' ) ) . ");
+                VALUES ( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?," . implode( ',', array_fill( 0, 20, "''" ) ) . ", " . implode( ',', array_fill( 0, 19, '0' ) ) . ");
                 SELECT @MAXID + 1;",
               array(
-                $Job[ 'Customer_Name' ],
-                $Job[ 'Location_Name' ],
-                $Job[ 'Unit_Name' ],
-                $Job[ 'Type' ],
                 $Job[ 'Name' ],
+                $Job[ 'Date' ],
+                $Job[ 'Customer_ID' ],
+                $Job[ 'Location_ID' ],
+                $Job[ 'Unit_ID' ],
+                $Job[ 'Job_Type_ID' ],
                 $Job[ 'Status' ],
-                $Job[ 'Notes' ],
-                $Job[ 'Location_Latitude'],
-                $Job[ 'Location_Longitude'],
-                /*null,//PO
-                0,//Rev
-                0,//Mat
-                0,//Labor
-                0,//Cost
-                0,//Profit
-                0,//Ratio
-                0,//Reg
-                0,//OT
-                0,//DT
-                0,//TT
-                0,//Hour
-                0,//BRev
-                0,//BMat
-                0,//BLabor
-                0,//BCost
-                0,//BProfit
-                0,//BRatio
-                0,//Template
-                null,//fDate
-                null,//Comm
-                null,//WageC
-                null,//NT
-                0,//Post
-                null,//EN
-                null,//Cerfied
-                null,//Apprentice
-                null,//UseCat
-                null,//UseDed
-                null,//BillRate
-                null,//Markup
-                null,//PType
-                null,//Charge
-                null,//Amount
-                null,//GL
-                null,//GLRev
-                null,//GandA
-                null,//OHLabor
-                null,//LastOH
-                null,//etc
-                null,//ETCModifier
-                null,//FP
-                null,//fGroup
-                null,//CType
-                null,//Elevs
-                null,//RateTravel
-                null,//RateOT
-                null,//RateNT
-                null,//RateDT
-                null,//RateMileage
-                null,//CloseDate
-                null,//SPHandle
-                null,//SRemarks
-                null,//LCode
-                null,//CreditCard
-                null,//NCSLock
-                null,//Source
-                null,//Audit
-                null,//AuditBy
-                null,//ReOpen
-                null,//fInt
-                null,//NCSClose
-                null,//Comments
-                null,//Level
-                null,//TechAlert
-                null,//EstDate
-                null,//DueDate
-                null,//TFMID
-                null,//TFMSource
-                null,
-                null,
-                null,*/
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null/*,
-                ' ', ' ', ' ', ' ', ' '*/
+                $Job[ 'Notes' ]
               )
             );
-            //var_dump( sqlsrv_errors( ) ) ;
             sqlsrv_next_result( $result );
             $Job[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
             header( 'Location: job.php?ID=' . $Job[ 'ID' ] );
             exit;
           } else {
@@ -568,7 +403,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 SET @Location = ( SELECT Top 1 Loc.Loc FROM Loc WHERE Loc.Tag = ? AND Loc.Owner = @Customer );
                 SET @Unit = ( SELECT Top 1 Elev.State + ' ' + Elev.Unit FROM Elev WHERE Elev.Owner = @Customer AND Elev.Loc = @Location AND Elev.State = ? );
                 UPDATE  Job
-                SET     Job.Owner = @Customer,
+                SET Job.Owner = @Customer,
                 		Job.Loc = @Location,
                 		Job.Elev = @Unit,
                 		Job.Type = ?,
@@ -578,10 +413,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 WHERE   Job.ID = ?;",
               array(
               	$Job[ 'Customer_Name' ],
+                $Job[ 'Customer_ID' ],
               	$Job[ 'Location_Name' ],
+                $Job[ 'Location_ID' ],
               	$Job[ 'Unit_Name' ],
-              	$Job[ 'Type' ],
-                $Job[ 'Job_Types' ],
+                $Job[ 'Unit_ID' ],
+              	$Job[ 'Job_Type_ID' ],
+                $Job[ 'Job_Type_Name' ],
                 $Job[ 'Name' ],
                 $Job[ 'Date' ],
                 $Job[ 'Notes' ],
@@ -623,10 +461,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   null,
                   " SELECT  Job_Type.ID   AS ID,
                             Job_Type.Type AS Name
-                    FROM    JobType AS Job_Type;"
+                    FROM    JobType AS Job_Types;"
                 );
+                $Job_Types = array();
                 if( $result ){while ( $row = sqlsrv_fetch_array( $result ) ){ $Job_Types[ $row[ 'ID' ] ] = $row[ 'Name' ]; } }
-                \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Job[ 'Type' ], $Job_Types );
+                \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Job[ 'Job_Type_ID' ], $Job_Types );
               ?>
               <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Job[ 'Customer_ID' ], $Job[ 'Customer_Name' ] );?>
               <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Job[ 'Location_ID' ], $Job[ 'Location_Name' ] );?>

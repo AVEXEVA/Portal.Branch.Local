@@ -70,7 +70,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }}
     if(   !isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Employee' ] )
-        ||  !check( privilege_read, level_group, $Privileges[ 'Employee' ] )
+        ||  !check( privilege_read, level_owner, $Privileges[ 'Employee' ] )
     ){ ?><?php print json_encode( array( 'data' => array( ) ) );?><?php }
     else {
       $output = array(
@@ -80,10 +80,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             'aaData'            =>  array(),
             'options'         => array( )
         );
-
       $conditions = array( );
       $search   = array( );
-
       if( isset( $_GET[ 'First_Name' ] ) && !in_array( $_GET[ 'First_Name' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['First_Name'];
         $conditions[] = "Employee.fFirst LIKE '%' + ? + '%'";
@@ -96,8 +94,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters[ ] = $_GET[ 'search' ];
         $search[ ] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
       }
-
-
       $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
       $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
 
@@ -116,9 +112,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Direction = isset( $_GET[ 'order' ] ) && in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
         ? $_GET['order']['dir']
         : 'ASC';
-
       $parameters[ ] = $_GET[ 'search' ];
-
     $sQuery =
       "   SELECT  Top 10
               tbl.ID,
@@ -140,7 +134,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             ) AS tbl
       WHERE     tbl.FieldValue LIKE '%' + ? + '%'
       GROUP BY tbl.ID,  tbl.FieldName, tbl.FieldValue;;";
-
     $rResult = $database->query(
       null,
       $sQuery,

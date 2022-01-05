@@ -84,7 +84,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Name'];
-      $conditions[] = "( Unit.City_ID LIKE '%' + ? + '%' OR Unit.Building_ID LIKE '%' + ? + '%' )";
+      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.Unit LIKE '%' + ? + '%' )";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -111,14 +111,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     /*Search Filters*/
     if( isset( $_GET[ 'search' ] ) ){
 
-           $search[] = " Unit.City_ID LIKE '%' + ? + '%'";
-        $parameters[] = $_GET[ 'search' ];
+      $search[] = " Unit.State LIKE '%' + ? + '%'";
+      $parameters[] = $_GET[ 'search' ];
 
-            $search[] = " Unit.Building_ID LIKE '%' + ? + '%'";
-          $parameters[] = $_GET[ 'search' ];
+      $search[] = " Unit.Unit LIKE '%' + ? + '%'";
+      $parameters[] = $_GET[ 'search' ];
 
-            $search[] = "Customer.Name LIKE '%' + ? + '%'";
-            $parameters[] = $_GET[ 'search' ];
+      $search[] = "Customer.Name LIKE '%' + ? + '%'";
+      $parameters[] = $_GET[ 'search' ];
 
       $search[] = "Location.Tag LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];

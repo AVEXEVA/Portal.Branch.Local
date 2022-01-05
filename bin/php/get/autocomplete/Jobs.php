@@ -112,9 +112,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Status'];
       $conditions[] = "Job.Status LIKE '%' + ? + '%'";
     }
-    $conditions[] = "Job.Type <> 9";
+    //$conditions[] = "Job.Type <> 9";
 
-    /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
+    if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
       $parameters[] = $_GET['Search'];
       $search[] = "Job.ID LIKE '%' + ? + '%'";
@@ -174,7 +174,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                             attr.insRow.value('.', 'nvarchar(max)') as FieldValue
                     FROM    ( Select i.ID,  convert(xml, (select i.* for xml raw)) as insRowCol
-                              FROM ( 
+                              FROM (
                                 SELECT  *
                                 FROM  (
                                         SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
