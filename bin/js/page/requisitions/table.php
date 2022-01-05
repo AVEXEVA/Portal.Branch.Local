@@ -12,8 +12,6 @@ $( document ).ready( function( ){
     } );
     var Table_Requisitions = $('#Table_Requisitions').DataTable( {
         <?php \singleton\datatables::getInstance()->preferences( );?>,
-
-
         ajax      : {
             url : 'bin/php/get/Requisitions.php',
             <?php \singleton\datatables::getInstance()->ajax_data( );?>
