@@ -1,14 +1,14 @@
 <?php
 $result = \singleton\database::getInstance( )->query(
     null,
-    "   SELECT  TicketO.* 
-        FROM    TicketO 
-                LEFT JOIN Emp ON TicketO.fWork = Emp.fWork 
-        WHERE       Emp.ID = ? 
-                AND TicketO.High = 1 
-                AND TicketO.Assigned < 5 
-                AND TicketO.ID NOT IN ( 
-                    SELECT  Alert.Ticket 
+    "   SELECT  TicketO.*
+        FROM    TicketO
+                LEFT JOIN Emp ON TicketO.fWork = Emp.fWork
+        WHERE       Emp.ID = ?
+                AND TicketO.High = 1
+                AND TicketO.Assigned < 5
+                AND TicketO.ID NOT IN (
+                    SELECT  Alert.Ticket
                     FROM    Portal.dbo.Alert
                 );",
     array(
@@ -20,7 +20,7 @@ if( $result ){
   while( $row = sqlsrv_fetch_array( $result ) ){
     $database->query(
         null,
-        "   INSERT INTO Alert(Ticket) 
+        "   INSERT INTO Alert(Ticket)
             VALUES(?);",
         array(
             $row['ID']
@@ -68,7 +68,7 @@ if( $result ){
     <div class='row'>
       <div class='col-6'>
         <form action='#' method='POST'>
-          <select name='Database' onChange="$( this ).closest( 'form' ).submit( );"><?php 
+          <select name='Database' onChange="$( this ).closest( 'form' ).submit( );"><?php
             $result = \singleton\database::getInstance( )->query(
               'Portal',
               "   SELECT  [Database].[Name]
@@ -79,7 +79,7 @@ if( $result ){
           ?></select>
         </form>
       </div>
-      <div class='col-6'><a class='text-white' href='login.php?Logout'><span class='desktop'>Logout</span> <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a></div>
+      <div class='col-6'><a class='text-white' href='../index.php?Logout'><span class='desktop'>Logout</span> <?php \singleton\fontawesome::getInstance( )->Logout( 1 );?></a></div>
     </div>
 	</div>
 </nav>
