@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-     <?php 
+     <?php
      	$_GET[ 'Bootstrap' ] = '5.1';
      	$_GET[ 'Entity_CSS' ] = 1;
      	require( bin_meta . 'index.php');
@@ -116,7 +116,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		        </div>
 				<div class='card-body bg-darker'>
 					<table id='Table_Contacts' class='display' cellspacing='0' width='100%'>
-						<thead class='text-white border border-white'><tr><?php 
+						<thead><tr><?php 
 							\singleton\table::getInstance( )->th( 'ID', 'ID' );
 							\singleton\table::getInstance( )->th( 'Contact', 'Other' );
 							\singleton\table::getInstance( )->th( 'Type', 'Other' );

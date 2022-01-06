@@ -127,8 +127,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	$Name
             )
         );
+        var_dump(sqlsrv_errors ( ) );
         $Lead = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
-        	'ID' => null,
+        	'ID'   => isset( $_GET [ 'ID' ] )  ? $_GET ['ID'] : null,
         	'Name' => null,
         	'RolType' => null,
         	'Rol' => null,
@@ -154,8 +155,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Customer_ID' => null,
           'Customer_Name' => null
         ) : sqlsrv_fetch_array( $result );
-
-
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           $Lead[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) 		? $_POST[ 'Name' ] 			: $Lead[ 'Name' ];
           $Lead[ 'RolType' ] 	= isset( $_POST[ 'RolType' ] ) 		? $_POST[ 'RolType' ] 			: $Lead[ 'RolType' ];
@@ -178,26 +177,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Lead[ 'Longitude' ] 		= isset( $_POST[ 'Longitude' ] ) 			? $_POST[ 'Longitude' ] 			: $Lead[ 'Longitude' ];
         	$Lead[ 'GeoLock'] 	= isset( $_POST[ 'GeoLock' ] )		? $_POST[ 'GeoLock' ]  	: $Lead[ 'GeoLock' ];
         	$Lead[ 'Country'] = isset( $_POST[ 'Country' ] )	? $_POST[ 'Country' ] 	: $Lead[ 'Country' ];
-          $Lead[ 'Customer_Name' ] 	= isset( $_POST[ 'Customer' ] ) 		? $_POST[ 'Customer' ] 			: $Lead[ 'Customer_Name' ];
-
+          $Lead[ 'Customer_Name' ] 	= isset( $_POST[ 'Customer_Name' ] ) 		? $_POST[ 'Customer_Name' ] 			: $Lead[ 'Customer_Name' ];
+          $Lead[ 'Customer_ID' ] 	= isset( $_POST[ 'Customer_ID' ] ) 		? $_POST[ 'Customer_ID' ] 			: $Lead[ 'Customer_ID' ];
         	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         		$result = \singleton\database::getInstance( )->query(
     	    		null,
     	    		"	DECLARE @MAXID INT;
-    	    			DECLARE @Customer INT;
             			SET @MAXID = CASE WHEN ( SELECT Max( Lead.ID ) FROM dbo.Lead ) IS NULL THEN 0 ELSE ( SELECT Max( Lead.ID ) FROM dbo.Lead ) END;
-            			SET @Customer = ( SELECT Top 1 Owner.ID FROM dbo.Owner LEFT JOIN dbo.Rol ON Owner.Rol = Rol.ID WHERE Rol.Name = ? );
-            			INSERT INTO dbo.Lead( ID, Owner, fDesc, RolType, Rol, Type, Address, City, Zip, Status, Probability, Level, Revenue, Cost, Labor, Profit, Ratio, Remarks, Latt, fLong, Country, GeoLock )
-    	    			VALUES( @MAXID + 1, @Customer, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            			INSERT INTO dbo.Lead(
+                    ID,
+                    Owner,
+                    fDesc,
+                    RolType,
+                    Rol,
+                    Type,
+                    Address,
+                    City,
+                    State,
+                    Zip,
+                    Status,
+                    Probability,
+                    Level,
+                    Revenue,
+                    Cost,
+                    Labor,
+                    Profit,
+                    Ratio,
+                    Remarks,
+                    Latt,
+                    fLong,
+                    Country,
+                    GeoLock
+                  )
+    	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
             			SELECT @MAXID + 1;",
     	    		array(
-                $Lead[ 'Customer_Name' ],
+                $Lead[ 'Customer_ID' ],
                 $Lead[ 'Name' ],
-                $Lead[ 'RolType' ],
+                !empty( $Lead[ 'RolType' ] ) ? $Lead[ 'RolType' ] : 0,
                 $Lead[ 'Rol' ],
-                $Lead[ 'Type' ],
+                !empty( $Lead[ 'Type' ] ) ? $Lead[ 'Type' ] : 0,
                 $Lead[ 'Street' ],
                 $Lead[ 'City' ],
+                $Lead[ 'State' ],
     	    			$Lead[ 'Zip' ],
     	    			$Lead[ 'Status' ],
     	    			$Lead[ 'Probability' ],
@@ -206,7 +228,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    			!empty( $Lead[ 'Cost' ] ) ? $Lead[ 'Cost' ] : 0,
     	    			!empty( $Lead[ 'Labor' ] ) ? $Lead[ 'Labor' ] : 0,
                 !empty( $Lead[ 'Profit' ] ) ? $Lead[ 'Profit' ] : 0,
-                $Lead[ 'Ratio' ],
+                !empty( $Lead[ 'Ratio' ] ) ? $Lead[ 'Ratio' ] : 0,
                 $Lead[ 'Notes' ],
                 $Lead[ 'Latitude' ],
                 $Lead[ 'Longitude' ],
@@ -216,7 +238,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    	);
             sqlsrv_next_result( $result );
             $Lead[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-          //  header( 'Location: lead.php?ID=' . $Lead[ 'ID' ] );
+            header( 'Location: lead.php?ID=' . $Lead[ 'ID' ] );
         	} else {
     	    	\singleton\database::getInstance( )->query(
     	    		null,
@@ -232,12 +254,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	      					[Lead].Owner = (
     	      						SELECT 	ID
     	      						FROM 	(
-                                SELECT  Owner.ID,
-                                        Rol.Name,
-                                        Owner.Status
-                                FROM    Owner
-                                        LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                              ) AS Customer
+                        SELECT  Owner.ID,
+                                Rol.Name,
+                                Owner.Status
+                        FROM    Owner
+                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                      ) AS Customer
     	      						WHERE 	Customer.Name = ?
     	      					),
                       [Lead].Status = ?,
@@ -267,6 +289,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    			$Lead[ 'Status' ],
     	    			$Lead[ 'Probability' ],
     	    			$Lead[ 'Level' ],
+                $Lead[ 'Status' ],
     	    			$Lead[ 'Revenue' ],
                 $Lead[ 'Cost' ],
                 $Lead[ 'Labor' ],
@@ -282,6 +305,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    	);
     	    }
         }
+  var_dump(sqlsrv_errors ( ) );
 ?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -298,208 +322,64 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require( bin_php . 'element/navigation.php'); ?>
     <div id="page-wrapper" class='content'>
       <div class='card card-primary'>
-        <div class='card-heading'>
-          <div class='row g-0 px-3 py-2'>
-            <div class='col-12 col-lg-6'>
-                <h5><?php \singleton\fontawesome::getInstance( )->Customer( 1 );?><a href='leads.php?<?php
-                  echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Leads' ][ 0 ] : array( ) );
-                ?>'>Leads</a>: <span><?php
-                  echo is_null( $Lead[ 'ID' ] )
-                      ? 'New'
-                      : '#' . $Lead[ 'ID' ];
-                ?></span></h5>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'>
-                    <button
-                        class='form-control rounded'
-                        onClick="document.location.href='lead.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Save( 1 );?><span class='desktop'> Save</span></button>
+        <form action='lead.php?ID=<?php echo $Lead[ 'ID' ];?>' method='POST'>
+            <input type='hidden' name='ID' value='<?php echo $Lead[ 'ID' ];?>' />
+            <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Lead', 'Leads', $Lead[ 'ID' ] );?>
+            <div class='card-body bg-dark text-white'>
+                <div class='row g-0' data-masonry='{"percentPosition": true }'>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Leads' ] ) && $_SESSION[ 'Cards' ][ 'Leads' ] == 0 ? "style='display:none;'" : null;?>>
+                <?php
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Lead[ 'Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Lead[ 'Customer_ID' ], $Lead[ 'Customer_Name' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Type', $Lead[ 'Type' ], array(
+                        'General' => 'General',
+                        'Bank' => 'Bank',
+                        'Churches' => 'Churches',
+                        'Hospitals' => 'Hospitals',
+                        'Property Manage' => 'Property Manage',
+                        'Restaraunts' => 'Restaraunts',
+                        'Schools' => 'Schools'
+                    ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Lead['Street'].' '.$Lead['City'].' '.$Lead[ 'State' ].' '.$Lead[ 'Zip' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Lead[ 'Street' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Lead[ 'City' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Lead[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Lead[ 'Zip' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Lead[ 'Status' ], array(
+                        '0' => 'Active',
+                        '1' => 'Inactive',
+                        '2' => 'Hold',
+                        '3' => 'Sold',
+                        '4' => 'Quoted'
+                    ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Probability', $Lead[ 'Probability' ], array(
+                        '0' => 'Excellent',
+                        '1' => 'Very Good',
+                        '2' => 'Good',
+                        '3' => 'Average',
+                        '4' => 'Poor'
+                      ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Level', $Lead[ 'Level' ] );; ?>
                   </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='lead.php?ID=<?php echo $User[ 'ID' ];?>';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-                  </div>
-                  <div class='col-4'>
-                      <button
-                        class='form-control rounded'
-                        onClick="document.location.href='lead.php';"
-                      ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
-                  </div>
-              </div>
-            </div>
-            <div class='col-6 col-lg-3'>
-                <div class='row g-0'>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo !is_null( $User[ 'ID' ] ) ? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) - 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Previous( 1 );?><span class='desktop'> Previous</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='leads.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button></div>
-                  <div class='col-4'><button class='form-control rounded' onClick="document.location.href='lead.php?ID=<?php echo !is_null( $User[ 'ID' ] )? array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true )[ array_search( $User[ 'ID' ], array_keys( $_SESSION[ 'Tables' ][ 'Users' ], true ) ) + 1 ] : null;?>';"><?php \singleton\fontawesome::getInstance( 1 )->Next( 1 );?><span class='desktop'> Next</span></button></div>
                 </div>
+                  </div>
+                    <div class='card card-primary my-3 col-12 col-lg-3'>
+                    <?php \singleton\bootstrap::getInstance( )->card_header( 'Profit-Loss', 'Leads', 'Leads', 'Customer', $Lead[ 'ID' ] );?>
+                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Leads' ] ) && $_SESSION[ 'Cards' ][ 'Leads' ] == 0 ? "style='display:none;'" : null; ?> </div>
+                    <?php
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Revenue', $Lead[ 'Revenue' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Cost', $Lead[ 'Cost' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Labor', $Lead[ 'Labor' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Profit', $Lead[ 'Profit' ] );?>
             </div>
           </div>
-        </div>
-        <div class='card-body bg-dark text-white'>
-          <div class='card-columns'>
-        		<div class='card card-primary my-3'><form action='lead.php?ID=<?php echo $Lead[ 'ID' ];?>' method='POST'>
-              <div class='card-heading'>
-                <div class='row g-0 px-3 py-2'>
-                  <div class='col-10'><h5><?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span>Infomation</span></h5></div>
-                  <div class='col-2'>&nbsp;</div>
-                </div>
-              </div>
-              <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                <input type='hidden' name='ID' value='<?php echo $Lead[ 'ID' ];?>' />
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Name:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Name' value='<?php echo $Lead['Name'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?> Contact:</div>
-                  <div class='col-6'>
-                    <input type='text' autocomplete='off' class='form-control edit' name='Customer' value='<?php echo $Lead[ 'Customer_Name' ];?>' />
-                    <script>
-                      $( 'input[name="Customer"]' )
-                          .typeahead({
-                              minLength : 3,
-                              hint: true,
-                              highlight: true,
-                              limit : 5,
-                              display : 'FieldValue',
-                              source: function( query, result ){
-                                  $.ajax({
-                                      url : 'bin/php/get/search/Customers.php',
-                                      method : 'GET',
-                                      data    : {
-                                          search :  $('input:visible[name="Customer"]').val( )
-                                      },
-                                      dataType : 'json',
-                                      beforeSend : function( ){
-                                          abort( );
-                                      },
-                                      success : function( data ){
-                                          result( $.map( data, function( item ){
-                                              return item.FieldValue;
-                                          } ) );
-                                      }
-                                  });
-                              },
-                              afterSelect: function( value ){
-                                  $( 'input[name="Customer"]').val( value );
-                                  $( 'input[name="Customer"]').closest( 'form' ).submit( );
-                              }
-                          }
-                      );
-                    </script>
-                  </div>
-                  <div class='col-2'><button class='h-100 w-100' type='button' onClick="document.location.href='customer.php?ID=<?php echo $Location[ 'Customer_ID' ];?>';"><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Customer(1);?>Type:</div>
-                  <div class='col-8'><select name='Type' class='form-control edit'>
-                    <option value=''>Select</option>
-                    <option value='General' <?php echo $Lead[ 'Type' ] == 'General' ? 'selected' : null;?>>General</option>
-                    <option value='Bank' <?php echo $Lead[ 'Type' ] == 'Bank' ? 'selected' : null;?>>Bank</option>
-                    <option value='Churches' <?php echo $Lead[ 'Type' ] == 'Churches' ? 'selected' : null;?>>Churches</option>
-                    <option value='Commercial' <?php echo $Lead[ 'Type' ] == 'Commercial' ? 'selected' : null;?>>Commercial</option>
-                    <option value='Hospitals' <?php echo $Lead[ 'Type' ] == 'Hospitals' ? 'selected' : null;?>>General</option>
-                    <option value='Property Manage' <?php echo $Lead[ 'Type' ] == 'Property Manage' ? 'selected' : null;?>>Property Manage</option>
-                    <option value='Restaraunts' <?php echo $Lead[ 'Type' ] == 'General' ? 'selected' : null;?>>Restaraunts</option>
-                    <option value='Schools' <?php echo $Lead[ 'Type' ] == 'Schools' ? 'selected' : null;?>>Schools</option>
-                  </select></div>
-                </div>
-
-                <div class='row g-0'>
-                  <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?> State:</div>
-                  <div class='col-8'><select class='form-control edit' name='State'>
-                    <option <?php echo $Lead[ 'State' ] == 'AL' ? 'selected' : null;?> value='AL'>Alabama</option>
-                    <option <?php echo $Lead[ 'State' ] == 'AK' ? 'selected' : null;?> value='AK'>Alaska</option>
-                    <option <?php echo $Lead[ 'State' ] == 'AZ' ? 'selected' : null;?> value='AZ'>Arizona</option>
-                    <option <?php echo $Lead[ 'State' ] == 'AR' ? 'selected' : null;?> value='AR'>Arkansas</option>
-                    <option <?php echo $Lead[ 'State' ] == 'CA' ? 'selected' : null;?> value='CA'>California</option>
-                    <option <?php echo $Lead[ 'State' ] == 'CO' ? 'selected' : null;?> value='CO'>Colorado</option>
-                    <option <?php echo $Lead[ 'State' ] == 'CT' ? 'selected' : null;?> value='CT'>Connecticut</option>
-                    <option <?php echo $Lead[ 'State' ] == 'DE' ? 'selected' : null;?> value='DE'>Delaware</option>
-                    <option <?php echo $Lead[ 'State' ] == 'DC' ? 'selected' : null;?> value='DC'>District Of Columbia</option>
-                    <option <?php echo $Lead[ 'State' ] == 'FL' ? 'selected' : null;?> value='FL'>Florida</option>
-                    <option <?php echo $Lead[ 'State' ] == 'GA' ? 'selected' : null;?> value='GA'>Georgia</option>
-                    <option <?php echo $Lead[ 'State' ] == 'HI' ? 'selected' : null;?> value='HI'>Hawaii</option>
-                    <option <?php echo $Lead[ 'State' ] == 'ID' ? 'selected' : null;?> value='ID'>Idaho</option>
-                    <option <?php echo $Lead[ 'State' ] == 'IL' ? 'selected' : null;?> value='IL'>Illinois</option>
-                    <option <?php echo $Lead[ 'State' ] == 'IN' ? 'selected' : null;?> value='IN'>Indiana</option>
-                    <option <?php echo $Lead[ 'State' ] == 'IA' ? 'selected' : null;?> value='IA'>Iowa</option>
-                    <option <?php echo $Lead[ 'State' ] == 'KS' ? 'selected' : null;?> value='KS'>Kansas</option>
-                    <option <?php echo $Lead[ 'State' ] == 'KY' ? 'selected' : null;?> value='KY'>Kentucky</option>
-                    <option <?php echo $Lead[ 'State' ] == 'LA' ? 'selected' : null;?> value='LA'>Louisiana</option>
-                    <option <?php echo $Lead[ 'State' ] == 'ME' ? 'selected' : null;?> value='ME'>Maine</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MD' ? 'selected' : null;?> value='MD'>Maryland</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MA' ? 'selected' : null;?> value='MA'>Massachusetts</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MI' ? 'selected' : null;?> value='MI'>Michigan</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MN' ? 'selected' : null;?> value='MN'>Minnesota</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MS' ? 'selected' : null;?> value='MS'>Mississippi</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MO' ? 'selected' : null;?> value='MO'>Missouri</option>
-                    <option <?php echo $Lead[ 'State' ] == 'MT' ? 'selected' : null;?> value='MT'>Montana</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NE' ? 'selected' : null;?> value='NE'>Nebraska</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NV' ? 'selected' : null;?> value='NV'>Nevada</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NH' ? 'selected' : null;?> value='NH'>New Hampshire</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NJ' ? 'selected' : null;?> value='NJ'>New Jersey</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NM' ? 'selected' : null;?> value='NM'>New Mexico</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NY' ? 'selected' : null;?> value='NY'>New York</option>
-                    <option <?php echo $Lead[ 'State' ] == 'NC' ? 'selected' : null;?> value='NC'>North Carolina</option>
-                    <option <?php echo $Lead[ 'State' ] == 'ND' ? 'selected' : null;?> value='ND'>North Dakota</option>
-                    <option <?php echo $Lead[ 'State' ] == 'OH' ? 'selected' : null;?> value='OH'>Ohio</option>
-                    <option <?php echo $Lead[ 'State' ] == 'OK' ? 'selected' : null;?> value='OK'>Oklahoma</option>
-                    <option <?php echo $Lead[ 'State' ] == 'OR' ? 'selected' : null;?> value='OR'>Oregon</option>
-                    <option <?php echo $Lead[ 'State' ] == 'PA' ? 'selected' : null;?> value='PA'>Pennsylvania</option>
-                    <option <?php echo $Lead[ 'State' ] == 'RI' ? 'selected' : null;?> value='RI'>Rhode Island</option>
-                    <option <?php echo $Lead[ 'State' ] == 'SC' ? 'selected' : null;?> value='SC'>South Carolina</option>
-                    <option <?php echo $Lead[ 'State' ] == 'SD' ? 'selected' : null;?> value='SD'>South Dakota</option>
-                    <option <?php echo $Lead[ 'State' ] == 'TN' ? 'selected' : null;?> value='TN'>Tennessee</option>
-                    <option <?php echo $Lead[ 'State' ] == 'TX' ? 'selected' : null;?> value='TX'>Texas</option>
-                    <option <?php echo $Lead[ 'State' ] == 'UT' ? 'selected' : null;?> value='UT'>Utah</option>
-                    <option <?php echo $Lead[ 'State' ] == 'VT' ? 'selected' : null;?> value='VT'>Vermont</option>
-                    <option <?php echo $Lead[ 'State' ] == 'VA' ? 'selected' : null;?> value='VA'>Virginia</option>
-                    <option <?php echo $Lead[ 'State' ] == 'WA' ? 'selected' : null;?> value='WA'>Washington</option>
-                    <option <?php echo $Lead[ 'State' ] == 'WV' ? 'selected' : null;?> value='WV'>West Virginia</option>
-                    <option <?php echo $Lead[ 'State' ] == 'WI' ? 'selected' : null;?> value='WI'>Wisconsin</option>
-                    <option <?php echo $Lead[ 'State' ] == 'WY' ? 'selected' : null;?> value='WY'>Wyoming</option>
-                  </select></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-1'>&nbsp;</div>
-                  <div class='col-3 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Blank(1);?> Zip:</div>
-                  <div class='col-8'><input type='text' class='form-control edit' name='Zip' value='<?php echo $Lead['Zip'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Revenue:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Revenue' value='<?php echo $Lead['Revenue'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Cost:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Cost' value='<?php echo $Lead['Cost'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Labor:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Labor' value='<?php echo $Lead['Labor'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Profit:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Profit' value='<?php echo $Lead['Profit'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Note(1);?> Notes:</div>
-                  <div class='col-8'><textarea rows='8' type='text' class='form-control edit animation-focus' name='Notes'><?php echo $Lead['Notes'];?></textarea></div>
-                </div>
-              </div>
-              <div class='card-footer'><button class='form-control' type='submit'>Save</button></div>
-            </form></div>
-        	</div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </body>
 </html>
 <?php
