@@ -418,15 +418,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	$Location[ 'Sales_Tax' ] = isset( $_POST[ 'Sales_Tax' ] ) ? $_POST[ 'Sales_Tax' ] : $Location[ 'Sales_Tax' ];
     	$Location[ 'In_Use' ] = isset( $_POST[ 'In_Use' ] ) ? $_POST[ 'In_Use' ] : $Location[ 'In_Use' ];
     	$Location[ 'Customer_ID' ] = isset( $_POST[ 'Customer_ID' ] ) ? $_POST[ 'Customer_ID' ] : $Location[ 'Customer_ID' ];
-    	$Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Location[ 'Customer_Name' ];
+      $Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Location[ 'Customer_Name' ];
+      $Location[ 'Route_ID' ] = isset( $_POST[ 'Route_ID' ] ) ? $_POST[ 'Route_ID' ] : $Location[ 'Route_ID' ];
+      $Location[ 'Route_Name' ] = isset( $_POST[ 'Route_Name' ] ) ? $_POST[ 'Route_Name' ] : $Location[ 'Route_Name' ];
 
     	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
     		$result = \singleton\database::getInstance( )->query(
 	    		null,
 	    		"	DECLARE @MAXID INT;
         		SET @MAXID = CASE WHEN ( SELECT Max( Loc ) FROM dbo.Loc ) IS NULL THEN 0 ELSE ( SELECT Max( Loc ) FROM dbo.Loc ) END;
-        		INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse )
-	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        		INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse, Route )
+	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
         		SELECT @MAXID + 1;",
 	    		array(
 	    			$Location[ 'Customer_ID' ],
@@ -441,7 +443,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    			is_null( $Location[ 'Maintenance' ] ) ? 0 : $Location[ 'Maintenance' ],
 	    			is_null( $Location[ 'Geofence' ] ) ? 0 : $Location[ 'Geofence' ],
 	    			is_null( $Location[ 'Sales_Tax' ] ) ? 0 : $Location[ 'Sales_Tax' ],
-	    			is_null( $Location[ 'In_Use' ] ) ? 0 : $Location[ 'In_Use' ]
+	    			is_null( $Location[ 'In_Use' ] ) ? 0 : $Location[ 'In_Use' ],
+            $Location[ 'Route_ID' ]
 	    		)
 	    	);
         	$Location[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
@@ -460,17 +463,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      					Loc.Latt = ?,
 	      					Loc.fLong = ?,
 	      					Loc.Maint = ?,
-	      					Loc.Owner = (
-	      						SELECT 	ID
-	      						FROM 	(
-                            SELECT  Owner.ID,
-                                    Rol.Name,
-                                    Owner.Status
-                            FROM    Owner
-                                    LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                          ) AS Customer
-	      						WHERE 	Customer.Name = ?
-	      					)
+	      					Loc.Owner = ?,
+                  Loc.Route = ?
 	    			WHERE 	Loc.Loc= ?;",
 	    		array(
 	    			$Location[ 'Name' ],
@@ -482,7 +476,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    			$Location[ 'Latitude' ],
 	    			$Location[ 'Longitude' ],
 	    			$Location[ 'Maintenance' ],
-	    			$Location[ 'Customer_Name' ],
+	    			$Location[ 'Customer_ID' ],
+            $Location[ 'Route_ID' ],
 	    			$Location[ 'ID' ]
 	    		)
 	    	);

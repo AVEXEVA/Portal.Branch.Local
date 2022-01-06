@@ -100,6 +100,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET[ 'Building_ID' ];
       $conditions[] = "Unit.Unit LIKE '%' + ? + '%' ";
     }
+    if( isset($_GET[ 'Territory_ID' ] ) && !in_array( $_GET[ 'Territory_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Territory_ID'];
+      $conditions[] = "Territory.ID LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Territory_Name' ] ) && !in_array( $_GET[ 'Territory_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Territory_Name'];
+      $conditions[] = "Territory.Name LIKE '%' + ? + '%'";
+    }
     if( isset($_GET[ 'Division_ID' ] ) && !in_array( $_GET[ 'Division_ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Division_ID'];
       $conditions[] = "Division.ID LIKE '%' + ? + '%'";
@@ -107,6 +115,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( isset($_GET[ 'Division_Name' ] ) && !in_array( $_GET[ 'Division_Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Division_Name'];
       $conditions[] = "Division.Name LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Route_ID' ] ) && !in_array( $_GET[ 'Route_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Route_ID'];
+      $conditions[] = "Route.ID LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Route_Name' ] ) && !in_array( $_GET[ 'Route_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Route_Name'];
+      $conditions[] = "Route.Name LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Customer_Name' ] ) && !in_array( $_GET[ 'Customer_Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer_Name'];
@@ -157,12 +173,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       0 =>  'Unit.ID',
       1 =>  'Unit.State',
       2 =>  'Unit.Unit',
-      3 =>  'Division.Name',
-      4 =>  'Customer.Name',
-      3 =>  'Loc.Tag',
-      5 =>  'Unit.Type',
-      6 =>  'Unit.Status',
-      7 =>  'Ticket.ID'
+      3 =>  'Territory.Name',
+      4 =>  'Division.Name',
+      5 =>  'Route.Name',
+      6 =>  'Customer.Name',
+      7 =>  'Loc.Tag',
+      8 =>  'Unit.Type',
+      9 =>  'Unit.Status',
+      10 =>  'Ticket.ID'
     );
 
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
@@ -182,6 +200,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Territory.Name            AS Territory_Name,
                           Division.ID               AS Division_ID,
                           Division.Name             AS Division_Name,
+                          Route.ID                  AS Route_ID,
+                          Route.Name                AS Route_Name,
                           Customer.ID               AS Customer_ID,
                           Customer.Name             AS Customer_Name,
                           Location.Loc              AS Location_ID,
@@ -201,8 +221,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           END AS Status
                   FROM    Elev AS Unit
                           LEFT JOIN Loc   AS Location   ON Unit.Loc = Location.Loc
-                          LEFT JOIN Zone  AS Division   ON Division.ID = Location.Zone
                           LEFT JOIN Terr  AS Territory  ON Territory.ID = Location.Terr
+                          LEFT JOIN Zone  AS Division   ON Division.ID = Location.Zone
+                          LEFT JOIN Route               ON Route.ID = Location.Route
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name
@@ -258,7 +279,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Unit.Status AS Status
                     FROM    Elev AS Unit
                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                            LEFT JOIN Terr  AS Territory  ON Territory.ID = Location.Terr
                             LEFT JOIN Zone AS Division ON Division.ID = Location.Zone
+                            LEFT JOIN Route               ON Route.ID = Location.Route
                             LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name

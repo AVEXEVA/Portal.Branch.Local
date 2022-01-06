@@ -136,14 +136,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
                             Locations.Count AS Locations,
                             Units.Count AS Units,
-                            Violation.Count As Violations,
-                            Ticket.Assigned,
-                            Attendance.[End] ,
-                            Attendance.[Start]
+                            Violations.Count As Violations
                     FROM    Route
                             LEFT JOIN Emp AS Employee ON Route.Mech = Employee.fWork
-                            LEFT JOIN TicketO AS Ticket ON Ticket.fWork = Employee.fWork
-                              LEFT JOIN Attendance ON Attendance.[User] = Employee.ID
                             LEFT JOIN (
                               SELECT    Loc.Route,
                                         Count( Loc.Loc ) AS Count,
@@ -157,27 +152,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         ) AS Units ON Loc.Loc = Units.Loc
                               GROUP BY  Loc.Route
                             ) AS Locations ON Route.ID = Locations.Route
-                            LEFT JOIN (
-                              SELECT    Loc.Route,
-                                        Sum( Units.Count ) AS Count
-                              FROM      Loc
-                                        LEFT JOIN (
-                                          SELECT    Elev.Loc,
-                                                    Count( Elev.ID ) AS Count
-                                          FROM      Elev
-                                          GROUP BY  Elev.Loc
-                                        ) AS Units ON Loc.Loc = Units.Loc
-                              GROUP BY  Loc.Route
-                            ) AS Units ON Route.ID = Locations.Route
-                            LEFT JOIN (
-                              SELECT  Loc.Route,  
-                                      COUNT( Violation.ID ) AS Count 
-                              FROM Violation 
-                              LEFT JOIN Loc ON Violation.Loc = Loc.ID GROUP BY Loc.Route
-                            ) AS Violation ON Route.ID = Locations.Route
+                            LEFT JOIN   (
+                                          SELECT    Loc.Route,
+                                                    Sum( Units.Count ) AS Count
+                                          FROM      Loc
+                                                    LEFT JOIN (
+                                                      SELECT    Elev.Loc,
+                                                                Count( Elev.ID ) AS Count
+                                                      FROM      Elev
+                                                      GROUP BY  Elev.Loc
+                                                    ) AS Units ON Loc.Loc = Units.Loc
+                                          GROUP BY  Loc.Route
+                                        ) AS Units ON Route.ID = Units.Route
+                            LEFT JOIN   (
+                                          SELECT    Loc.Route,  
+                                                    COUNT( Violation.ID ) AS Count 
+                                          FROM      Violation 
+                                                    LEFT JOIN Loc ON Violation.Loc = Loc.ID
+                                          GROUP BY  Loc.Route
+                                        ) AS Violations ON Route.ID = Violations.Route
                           WHERE   ({$conditions}) AND ({$search})
-                               ) AS Tbl
-                          WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
+                       ) AS Tbl
+                  WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
   //    echo $sQuery;
       $rResult = $database->query(
         null,

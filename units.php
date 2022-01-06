@@ -118,6 +118,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             \singleton\table::getInstance( )->th( 'Building_ID', 'Building_ID' );
             \singleton\table::getInstance( )->th( 'Territory', 'Territory' );
             \singleton\table::getInstance( )->th( 'Division', 'Division' );
+            \singleton\table::getInstance( )->th( 'Route', 'Route' );
             \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
             \singleton\table::getInstance( )->th( 'Location', 'Location' );
             \singleton\table::getInstance( )->th( 'Type', 'Type' );
@@ -137,6 +138,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               'Division', 'Divisions', 
               isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null, 
               isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null 
+            );
+            \singleton\table::getInstance( )->th_autocomplete( 
+              'Route', 'Routes', 
+              isset( $_GET[ 'Route_ID' ] ) ? $_GET[ 'Route_ID' ] : null, 
+              isset( $_GET[ 'Route_Name' ] ) ? $_GET[ 'Route_Name' ] : null 
             );
             \singleton\table::getInstance( )->th_autocomplete( 
               'Customer', 'Customers', 
