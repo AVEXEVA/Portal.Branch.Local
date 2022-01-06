@@ -104,8 +104,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Customer'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Location'];
+    if( isset($_GET[ 'Location_ID' ] ) && !in_array( $_GET[ 'Location_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_ID'];
+      $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location_Name' ] ) && !in_array( $_GET[ 'Location_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_Name'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
@@ -136,7 +140,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $Columns = array(
       0 =>  'Unit.ID',
       1 =>  'Unit.State',
-      2 =>  'Loc.Tag',
+      2 =>  'Location.Tag',
       3 =>  'Unit.Unit',
       4 =>  'Unit.Type',
       5 =>  'Unit.Status'
@@ -162,7 +166,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Unit.Type AS Type,
                           Unit.fDesc AS Name,
                           Ticket.ID AS Ticket_ID,
-                          CASE  WHEN Unit.Status = 0 THEN 'Enabled' 
+                          CASE  WHEN Unit.Status = 0 THEN 'Enabled'
                                 WHEN Unit.Status = 1 THEN 'Disabled'
                                 WHEN Unit.Status = 2 THEN 'Demolished'
                                 ELSE 'Other'

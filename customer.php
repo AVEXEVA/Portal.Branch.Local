@@ -114,14 +114,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         Rolodex.City       AS City,
                         Rolodex.State      AS State,
                         Rolodex.Zip        AS Zip,
-                        Rolodex.Latt 	   AS Latitude,
+                        Rolodex.Latt 	     AS Latitude,
                         Rolodex.fLong      AS Longitude,
                         Customer.Status    AS Status,
-						Rolodex.Website    AS Website,
-						Customer.Internet  AS Internet,
-						Customer.fLogin    AS Login,
-						Customer.Password  AS Password,
-						Rolodex.Geolock    AS Geofence,
+              					Rolodex.Website    AS Website,
+              					Customer.Internet  AS Internet,
+              					Customer.fLogin    AS Login,
+              					Customer.Password  AS Password,
+              					Rolodex.Geolock    AS Geofence,
                         CASE    WHEN Locations.Count IS NULL THEN 0
                                 ELSE Locations.Count END AS Locations_Count,
                         CASE    WHEN Locations.Maintained IS NULL THEN 0
@@ -393,6 +393,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	$ID
             )
         );
+
         $Customer = (  !$result )
             ? array(
             	'ID'        => isset( $_GET [ 'ID' ] )         ? $_GET ['ID'] : null,
@@ -410,37 +411,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	'Zip'       => isset( $_GET [ 'Zip' ] )        ? $_GET ['Zip'] : null,
             	'Latitude'  => isset( $_GET [ 'Latitude' ] )   ? $_GET ['Latitude'] : null,
             	'Longitude' => isset( $_GET [ 'Longitude' ] )  ? $_GET ['Longitude'] : null,
-                'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
-                'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
-                'Rolodex'   => isset( $_GET [ 'Rolodex' ] )    ? $_GET ['Rolodex'] : null,
-                'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
-                'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
-                'Contact'   => isset( $_GET [ 'Contact' ] )    ? $_GET [ 'Contact' ] : null,
-                'Locations_Count ' => null,
-                'Locations_Maintained' => null,
-                'Locations_Unmaintained' => null,
-                'Units_Count' => null,
-                'Units_Elevators' => null,
-                'Units_Escalators' => null,
-                'Units_Moving_Walk' => null,
-                'Units_Other' => null,
-                'Jobs_Open' => null,
-                'Jobs_On_Hold' => null,
-                'Jobs_Closed' => null,
-                'Tickets_Open' => null,
-                'Tickets_Assigned' => null,
-                'Tickets_En_Route' => null,
-                'Tickets_On_Site' => null,
-                'Tickets_Reviewing' => null,
-                'Violations_Preliminary_Report' => null,
-                'Violations_Job_Created' => null,
-                'Violations_Closed' => null,
-                'Invoices_Open' => null,
-                'Invoices_Closed' => null,
-                'Proposals_Open' => null,
-                'Proposals_Closed' => null
+              'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
+              'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
+              'Rolodex'   => isset( $_GET [ 'Rolodex' ] )    ? $_GET ['Rolodex'] : null,
+              'Phone'     => isset( $_GET [ 'Phone' ] )      ? $_GET ['Phone'] : null,
+              'Email'     => isset( $_GET [ 'Email' ] )      ? $_GET ['Email'] : null,
+              'Contact'   => isset( $_GET [ 'Contact' ] )    ? $_GET [ 'Contact' ] : null,
+              'Locations_Count ' => null,
+              'Locations_Maintained' => null,
+              'Locations_Unmaintained' => null,
+              'Units_Count' => null,
+              'Units_Elevators' => null,
+              'Units_Escalators' => null,
+              'Units_Moving_Walk' => null,
+              'Units_Other' => null,
+              'Jobs_Open' => null,
+              'Jobs_On_Hold' => null,
+              'Jobs_Closed' => null,
+              'Tickets_Open' => null,
+              'Tickets_Assigned' => null,
+              'Tickets_En_Route' => null,
+              'Tickets_On_Site' => null,
+              'Tickets_Reviewing' => null,
+              'Violations_Preliminary_Report' => null,
+              'Violations_Job_Created' => null,
+              'Violations_Closed' => null,
+              'Invoices_Open' => null,
+              'Invoices_Closed' => null,
+              'Proposals_Open' => null,
+              'Proposals_Closed' => null
             )
             : sqlsrv_fetch_array($result);
+
         //Binds $ID, $Name, $Customer and query values into the $result variable
 
         if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -450,7 +452,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Customer[ 'Phone' ] 		    = isset( $_POST[ 'Phone' ] ) 	   ? $_POST[ 'Phone' ] 	   : $Customer[ 'Phone' ];
         	$Customer[ 'Email' ] 		    = isset( $_POST[ 'Email' ] ) 	   ? $_POST[ 'Email' ] 	   : $Customer[ 'Email' ];
         	$Customer[ 'Login' ] 		    = isset( $_POST[ 'Login' ] ) 	   ? $_POST[ 'Login' ] 	   : $Customer[ 'Login' ];
-        	$Customer[ 'Password' ]     = isset( $_POST[ 'Password' ] )  ? $_POST[ 'Password' ]  : $Customer[ 'Password' ];
         	$Customer[ 'Geofence' ]     = isset( $_POST[ 'Geofence' ] )  ? $_POST[ 'Geofence' ]  : $Customer[ 'Geofence' ];
         	$Customer[ 'Type' ]         = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Customer[ 'Type' ];
         	$Customer[ 'Status' ] 	    = isset( $_POST[ 'Status' ] ) 	 ? $_POST[ 'Status' ] 	 : $Customer[ 'Status' ];
@@ -482,7 +483,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         					fLong,
         					Geolock
         				)
-        				VALUES( @MAXID + 1 , 0, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        				VALUES( @MAXID + 1 , 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Customer[ 'Name' ],
@@ -498,6 +499,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         			)
         		);
         		sqlsrv_next_result( $result );
+            //Update query to fill values for $Customer and appends to $result for any updated colums
                 //Update query to fill values for $Customer and appends to $result for any updated colums
         		$Customer[ 'Rolodex' ] = sqlsrv_fetch_array( $result )[ 0 ];
                 // finds any result with the value of 0/ null
@@ -545,6 +547,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				$Customer[ 'Internet' ]
         			)
         		);
+
                 // query that inserts values into the $Customer [rolodex] variable datatable and appends it to the $result variable
         		sqlsrv_next_result( $result );
         		$Customer[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
@@ -603,6 +606,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	}
         }
         // if any fields are 0/null, attempt to update said colums from owner/rol ID
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -662,7 +666,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 <!-- Card hedding, that holds customer contacts, with a post call that gets customer contact information based on $Customer ID  -->
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Contacts', 'Contact', 'Contacts', 'Customer', $Customer[ 'ID' ] );?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Contacts' ] ) && $_SESSION[ 'Cards' ][ 'Contacts' ] == 0 ? "style='display:none;'" : null;?>>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Contact', $Customer[ 'Contact' ] );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Contact', $Customer[ 'Contact' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input_tel( 'Phone', $Customer[ 'Phone' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $Customer[ 'Email' ] );?>
                                 </div>

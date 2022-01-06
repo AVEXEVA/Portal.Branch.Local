@@ -96,8 +96,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Customer'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Location' ] ) && !empty( $_GET[ 'Location' ] ) ){
-      $parameters[] = $_GET['Location'];
+    if( isset($_GET[ 'Location_ID' ] ) && !empty( $_GET[ 'Location_ID' ] ) ){
+      $parameters[] = $_GET['Location_ID'];
+      $conditions[] = "Loc.Loc LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location_Name' ] ) && !empty( $_GET[ 'Location_Name' ] ) ){
+      $parameters[] = $_GET['Location_Name'];
       $conditions[] = "Loc.Tag LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Job' ] ) && !empty( $_GET[ 'Job' ] ) ){
