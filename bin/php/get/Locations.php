@@ -199,7 +199,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           CASE  WHEN Location.Maint = 0 THEN 'Active' 
                                 ELSE 'Inactive' END AS Maintained,
                           CASE  WHEN Location.Status = 0 THEN 'Active' 
-                                ELSE 'Inactive' END AS Status
+                                ELSE 'Inactive' END AS Status,
+                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0 
+                                ELSE Tickets_Assigned.Count END AS Tickets_Assigned,
+                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0 
+                                ELSE Tickets_Active.Count END AS Tickets_Active
                   FROM    Loc AS Location
                           LEFT JOIN (
                               SELECT  Owner.ID,
@@ -222,6 +226,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM      Elev 
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
+                          LEFT JOIN (
+                            SELECT    Tickets.Location,
+                                      Sum( Tickets.Count ) AS Count
+                            FROM      ( 
+                                        (
+                                          SELECT    TicketO.LID AS Location,
+                                                    Count( TicketO.ID ) AS Count
+                                          FROM      TicketO
+                                          WHERE     TicketO.Assigned = 1
+                                          GROUP BY  TicketO.LID
+                                        )
+                                      ) AS Tickets
+                            GROUP BY  Tickets.Location
+                          ) AS Tickets_Assigned ON Tickets_Assigned.Location = Location.Loc
+                          LEFT JOIN (
+                            SELECT    Tickets.Location,
+                                      Sum( Tickets.Count ) AS Count
+                            FROM      ( 
+                                        (
+                                          SELECT    TicketO.LID AS Location,
+                                                    Count( TicketO.ID ) AS Count
+                                          FROM      TicketO
+                                          WHERE           TicketO.Assigned >= 2
+                                                    AND   TicketO.Assigned <= 3
+                                          GROUP BY  TicketO.LID
+                                        )
+                                      ) AS Tickets
+                            GROUP BY  Tickets.Location
+                          ) AS Tickets_Active ON Tickets_Active.Location = Location.Loc
                           LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
                           
                   WHERE   ({$conditions}) AND ({$search})

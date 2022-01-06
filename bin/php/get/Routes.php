@@ -135,8 +135,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Employee.ID AS Employee_ID,
                             Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
                             Locations.Count AS Locations,
-                            Units.Count AS Units,
-                            Violations.Count As Violations
+                            Units_Elevators.Count AS Units_Elevators,
+                            Units_Other.Count AS Units_Other,
+                            Violations_Office.Count As Violations_Office,
+                            Violations_Field.Count As Violations_Field,
+                            Tickets_Assigned.Count AS Tickets_Assigned,
+                            Tickets_Active.Count AS Tickets_Active
                     FROM    Route
                             LEFT JOIN Emp AS Employee ON Route.Mech = Employee.fWork
                             LEFT JOIN (
@@ -160,17 +164,69 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                                       SELECT    Elev.Loc,
                                                                 Count( Elev.ID ) AS Count
                                                       FROM      Elev
+                                                      WHERE     Elev.Type IN ( 'Elevator', 'Roped Hydro', 'Hydraulic' )
                                                       GROUP BY  Elev.Loc
                                                     ) AS Units ON Loc.Loc = Units.Loc
                                           GROUP BY  Loc.Route
-                                        ) AS Units ON Route.ID = Units.Route
+                                        ) AS Units_Elevators ON Route.ID = Units_Elevators.Route
+                            LEFT JOIN   (
+                                          SELECT    Loc.Route,
+                                                    Sum( Units.Count ) AS Count
+                                          FROM      Loc
+                                                    LEFT JOIN (
+                                                      SELECT    Elev.Loc,
+                                                                Count( Elev.ID ) AS Count
+                                                      FROM      Elev
+                                                      WHERE     Elev.Type NOT IN ( 'Elevator', 'Roped Hydro', 'Hydraulic' )
+                                                      GROUP BY  Elev.Loc
+                                                    ) AS Units ON Loc.Loc = Units.Loc
+                                          GROUP BY  Loc.Route
+                                        ) AS Units_Other ON Route.ID = Units_Other.Route
                             LEFT JOIN   (
                                           SELECT    Loc.Route,  
                                                     COUNT( Violation.ID ) AS Count 
                                           FROM      Violation 
-                                                    LEFT JOIN Loc ON Violation.Loc = Loc.ID
+                                                    LEFT JOIN Loc ON Violation.Loc = Loc.Loc
+                                          WHERE     Violation.Status = 'Preliminary Report'
                                           GROUP BY  Loc.Route
-                                        ) AS Violations ON Route.ID = Violations.Route
+                                        ) AS Violations_Office ON Route.ID = Violations_Office.Route
+                            LEFT JOIN   (
+                                          SELECT    Loc.Route,  
+                                                    COUNT( Violation.ID ) AS Count 
+                                          FROM      Violation 
+                                                    LEFT JOIN Loc ON Violation.Loc = Loc.Loc
+                                          WHERE     Violation.Status = 'Job Created'
+                                          GROUP BY  Loc.Route
+                                        ) AS Violations_Field ON Route.ID = Violations_Field.Route
+                            LEFT JOIN   (
+                                          SELECT    Loc.Route,  
+                                                    Sum( Tickets.Count ) AS Count 
+                                          FROM      (
+                                                      SELECT    TicketO.LID AS Location,
+                                                                Count( TicketO.ID ) AS Count
+                                                      FROM      TicketO
+                                                      WHERE     TicketO.Level = 1
+                                                                AND TicketO.Assigned = 1
+                                                      GROUP BY  TicketO.LID
+                                                    ) AS Tickets
+                                                    LEFT JOIN Loc ON Tickets.Location = Loc.Loc
+                                          GROUP BY  Loc.Route
+                                        ) AS Tickets_Assigned ON Route.ID = Tickets_Assigned.Route
+                            LEFT JOIN   (
+                                          SELECT    Loc.Route,  
+                                                    Sum( Tickets.Count ) AS Count 
+                                          FROM      (
+                                                      SELECT    TicketO.LID AS Location,
+                                                                Count( TicketO.ID ) AS Count
+                                                      FROM      TicketO
+                                                      WHERE         TicketO.Level = 1
+                                                                AND TicketO.Assigned >= 2
+                                                                AND TicketO.Assigned <= 3
+                                                      GROUP BY  TicketO.LID
+                                                    ) AS Tickets
+                                                    LEFT JOIN Loc ON Tickets.Location = Loc.Loc
+                                          GROUP BY  Loc.Route
+                                        ) AS Tickets_Active ON Route.ID = Tickets_Active.Route
                           WHERE   ({$conditions}) AND ({$search})
                        ) AS Tbl
                   WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";

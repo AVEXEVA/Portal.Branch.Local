@@ -130,6 +130,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 \singleton\table::getInstance( )->th( 'State', 'State' );
                 \singleton\table::getInstance( )->th( 'Zip', 'Zip' );
                 \singleton\table::getInstance( )->th( 'Units', 'Units' );
+                \singleton\table::getInstance( )->th_2( 'Tickets', 'Tickets' );
                 \singleton\table::getInstance( )->th( 'Maintained', 'Maintained' );
                 \singleton\table::getInstance( )->th( 'Status', 'Status' );
               ?></tr><tr class='form-desktop'><?php 
@@ -156,6 +157,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 \singleton\table::getInstance( )->th_input( 'State', isset( $_GET[ 'State' ] ) ? $_GET[ 'State' ] : null );
                 \singleton\table::getInstance( )->th_input( 'Zip', isset( $_GET[ 'Zip' ] ) ? $_GET[ 'Zip' ] : null );
                 \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Assigned', isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null );
+                \singleton\table::getInstance( )->th_input( 'Active', isset( $_GET[ 'Tickets_Active' ] ) ? $_GET[ 'Tickets_Active' ] : null );
                 \singleton\table::getInstance( )->th_select( 'Maintained', isset( $_GET[ 'Maintained' ] ) ? $_GET[ 'Maintained' ] : null, array( 0 => 'Disabled', 1 => 'Enabled' ) );
                 \singleton\table::getInstance( )->th_select( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, array( 0 => 'Disabled', 1 => 'Enabled' ) );
               ?></tr></thead>

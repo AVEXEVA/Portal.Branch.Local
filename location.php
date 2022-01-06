@@ -454,17 +454,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    	\singleton\database::getInstance( )->query(
 	    		null,
 	    		"	UPDATE 	Loc
-	    			SET 	Loc.Tag = ?,
-	                Loc.Status = ?,
-	      					Loc.Address = ?,
-	      					Loc.City = ?,
-	      					Loc.State = ?,
-	      					Loc.Zip = ?,
-	      					Loc.Latt = ?,
-	      					Loc.fLong = ?,
-	      					Loc.Maint = ?,
-	      					Loc.Owner = ?,
-                  Loc.Route = ?
+	    			SET 	  Loc.Tag = ?,
+                    Loc.Status = ?,
+	      					  Loc.Address = ?,
+	      					  Loc.City = ?,
+	      					  Loc.State = ?,
+	      					  Loc.Zip = ?,
+	      					  Loc.Latt = ?,
+	      					  Loc.fLong = ?,
+	      					  Loc.Maint = ?,
+	      					  Loc.Owner = ?,
+                    Loc.Route = ?
 	    			WHERE 	Loc.Loc= ?;",
 	    		array(
 	    			$Location[ 'Name' ],
