@@ -123,8 +123,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             \singleton\table::getInstance( )->th( 'Location', 'Location' );
             \singleton\table::getInstance( )->th( 'Type', 'Type' );
             \singleton\table::getInstance( )->th( 'Status', 'Status' );
-            \singleton\table::getInstance( )->th( 'Tickets', 'Tickets' );
-            \singleton\table::getInstance( )->th( 'Last_Ticket', 'Last_Ticket' );
+            \singleton\table::getInstance( )->th_2( 'Tickets', 'Tickets' );
             ?><tr class='desktop'><?php
             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
             \singleton\table::getInstance( )->th_input( 'City_ID', isset( $_GET[ 'City_ID' ] ) ? $_GET[ 'City_ID' ] : null );
@@ -156,8 +155,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             );
             \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
             \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
-            \singleton\table::getInstance( )->th_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null );
-            \singleton\table::getInstance( )->th_input( 'Ticket_ID', isset( $_GET[ 'Ticket_ID' ] ) ? $_GET[ 'Ticket_ID' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Assigned', isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Active', isset( $_GET[ 'Tickets_Active' ] ) ? $_GET[ 'Tickets_Active' ] : null );
             ?> </tr></thead>
           </table>
         </form></div>

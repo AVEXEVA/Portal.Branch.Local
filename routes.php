@@ -109,15 +109,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           \singleton\table::getInstance( )->th( 'Route Name', 'Route Name' );
                           \singleton\table::getInstance( )->th( 'Person', 'Person' );
                           \singleton\table::getInstance( )->th( 'Locations', 'Locations' );
-                          \singleton\table::getInstance( )->th( 'Units', 'Units' );
-                          \singleton\table::getInstance( )->th( 'Violations', 'Violations' );
+                          \singleton\table::getInstance( )->th_2( 'Units', 'Units' );
+                          \singleton\table::getInstance( )->th_2( 'Violations', 'Violations' );
+                          \singleton\table::getInstance( )->th_2( 'Tickets', 'Tickets' );
                         ?><tr class='desktop'><?php
                           \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Person', isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Violations', isset( $_GET[ 'Violations' ] ) ? $_GET[ 'Violations' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Elevators', isset( $_GET[ 'Units_Elevators' ] ) ? $_GET[ 'Units_Elevators' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Others', isset( $_GET[ 'Units_Others' ] ) ? $_GET[ 'Units_Others' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Office', isset( $_GET[ 'Violations_Office' ] ) ? $_GET[ 'Violations_Office' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Field', isset( $_GET[ 'Violations_Field' ] ) ? $_GET[ 'Violations_Field' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Assigned', isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Active', isset( $_GET[ 'Tickets_Active' ] ) ? $_GET[ 'Tickets_Active' ] : null );
                       ?></tr></thead>
                     </table>
                 </form></div>

@@ -21,8 +21,12 @@ $( document ).ready( function( ){
           <?php \singleton\datatables::getInstance( )->Name( 'Route' );?>,
           <?php \singleton\datatables::getInstance( )->Employee( );?>,
           <?php \singleton\datatables::getInstance( )->Locations( 'Route', 'ID' );?>,
-          <?php \singleton\datatables::getInstance( )->Units( 'Route', 'ID' );?>,
-          <?php \singleton\datatables::getInstance( )->Violations( 'Route', 'ID' );?>
+          <?php \singleton\datatables::getInstance( )->data_column( 'Units_Elevators' );?>,
+          <?php \singleton\datatables::getInstance( )->data_column( 'Units_Others' );?>,
+          <?php \singleton\datatables::getInstance( )->data_column( 'Violations_Office' );?>,
+          <?php \singleton\datatables::getInstance( )->data_column( 'Violations_Field' );?>,
+          <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Assigned' );?>,
+          <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Active' );?>
       ],
       <?php \singleton\datatables::getInstance( )->buttons( 'route', 'routes', 'ID' );?>,
       <?php \singleton\datatables::getInstance( )->initComplete( 'routes' );?>

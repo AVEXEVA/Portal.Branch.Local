@@ -5,6 +5,14 @@ class table extends \singleton\index {
 		$icon = is_null( $icon ) ? $label : $icon;
 		?><th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
 	}
+	public function th_2( $label, $icon = null ){
+		$icon = is_null( $icon ) ? $label : $icon;
+		?><th class='text-white border border-white' colspan='2'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
+	}
+	public function th_3( $label, $icon = null ){
+		$icon = is_null( $icon ) ? $label : $icon;
+		?><th class='text-white border border-white' colspan='3'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
+	}
 	public function th_input( $label, $value ){ ?><th class='text-white border border-white'><input autocomplete='off' class='form-control redraw' type='text' name='<?php echo $label;?>' placeholder='<?php echo str_replace( '_', ' ', $label );?>' value='<?php echo $value;?>' /></th><?php }
 	public function th_input_entity( $Entity, $ID, $Name ){ ?><th class='text-white border border-white'>
 		<input autocomplete='off' class='form-control redraw' type='hidden' name='<?php echo $Entity;?>_ID' placeholder='<?php echo $Entity;?>' value='<?php echo $ID;?>' />
