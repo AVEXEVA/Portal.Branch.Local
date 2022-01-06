@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
     <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-    <?php  
+    <?php
         $_GET[ 'Bootstrap' ] = '5.1';
         $_GET[ 'Entity_CSS' ] = 1;
         require( bin_meta . 'index.php');
@@ -109,11 +109,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Start_Date', isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'End_Date', isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Amount', isset( $_GET[ 'Amount' ] ) ? $_GET[ 'Amount' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Cycle', isset( $_GET[ 'Cycle' ] ) ? $_GET[ 'Cycle' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Cycle', isset( $_GET[ 'Billing_Cycle' ] ) ? $_GET[ 'Billing_Cycle' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Factor', isset( $_GET[ 'Esc. Factor' ] ) ? $_GET[ 'Esc. Factor' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Date', isset( $_GET[ 'Esc. Date' ] ) ? $_GET[ 'Esc. Date' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Type', isset( $_GET[ 'Esc. Type' ] ) ? $_GET[ 'Esc. Type' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Cycle', isset( $_GET[ 'Esc. Cycle' ] ) ? $_GET[ 'Esc. Cycle' ] : null, false, false, false, 'redraw' );?>
+                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Cycle', isset( $_GET[ 'Billing_Escalation_Cycle' ] ) ? $_GET[ 'Billing_Escalation_Cycle' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Remarks', isset( $_GET[ 'Remarks' ] ) ? $_GET[ 'Remarks' ] : null, false, false, false, 'redraw' );?>
                 </div>
                 <div class="card-body bg-dark">
@@ -127,39 +127,39 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'End_Date', 'End_Date' );
                             \singleton\table::getInstance( )->th( 'Length', 'Length' );
                             \singleton\table::getInstance( )->th( 'Amount', 'Amount' );
-                            \singleton\table::getInstance( )->th( 'Cycle', 'Cycle' );
+                            \singleton\table::getInstance( )->th( 'Cycle', 'Billing_Cycle' );
                             \singleton\table::getInstance( )->th( 'Esc. Factor', 'Esc. Factor' );
                             \singleton\table::getInstance( )->th( 'Esc. Date', 'Esc. Date' );
                             \singleton\table::getInstance( )->th( 'Esc. Type', 'Esc. Type' );
-                            \singleton\table::getInstance( )->th( 'Esc. Cycle', 'Esc. Cycle' );
+                            \singleton\table::getInstance( )->th( 'Esc. Cycle', 'Billing_Escalation_Cycle' );
                             \singleton\table::getInstance( )->th( 'Link', 'Link' );
                             \singleton\table::getInstance( )->th( 'Remarks', 'Remarks' );
             			?></tr><tr class='form-desktop'><?php
                             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                              'Customer', 'Customers', 
-                              isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
-                              isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                              'Customer', 'Customers',
+                              isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                              isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
                             );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                              'Location', 'Locations', 
-                              isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
-                              isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                              'Location', 'Locations',
+                              isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                              isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
                             );
-                            \singleton\table::getInstance( )->th_autocomplete( 
-                              'Job', 'Jobs', 
-                              isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
-                              isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
+                            \singleton\table::getInstance( )->th_autocomplete(
+                              'Job', 'Jobs',
+                              isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null,
+                              isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null
                             );
                             \singleton\table::getInstance( )->th_input( 'Start_Date', isset( $_GET[ 'Start_Date' ] ) ? $_GET[ 'Start_Date' ] : null );
                             \singleton\table::getInstance( )->th_input( 'End_Date', isset( $_GET[ 'End_Date' ] ) ? $_GET[ 'End_Date' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Length', isset( $_GET[ 'Length' ] ) ? $_GET[ 'Length' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Amount', isset( $_GET[ 'Amount' ] ) ? $_GET[ 'Amount' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Cycle', isset( $_GET[ 'Cycle' ] ) ? $_GET[ 'Cycle' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Cycle', isset( $_GET[ 'Billing_Cycle' ] ) ? $_GET[ 'Billing_Cycle' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Esc. Factor', isset( $_GET[ 'Esc. Factor' ] ) ? $_GET[ 'Esc. Factor' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Esc. Date', isset( $_GET[ 'Esc. Date' ] ) ? $_GET[ 'Esc. Date' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Esc. Type', isset( $_GET[ 'Esc. Type' ] ) ? $_GET[ 'Esc. Type' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Esc. Cycle', isset( $_GET[ 'Esc. Cycle' ] ) ? $_GET[ 'Esc. Cycle' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Esc. Cycle', isset( $_GET[ 'Billing_Escalation_Cycle' ] ) ? $_GET[ 'Billing_Escalation_Cycle' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Link', isset( $_GET[ 'Link' ] ) ? $_GET[ 'Link' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Remarks', isset( $_GET[ 'Remarks' ] ) ? $_GET[ 'Remarks' ] : null );
                         ?></tr></thead>
