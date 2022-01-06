@@ -106,13 +106,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         ELSE Units.Elevators END AS Units_Elevators,
                 CASE    WHEN Units.Escalators IS NULL THEN 0
                         ELSE Units.Escalators END AS Units_Escalators,
-                CASE    WHEN Units.Other IS NULL THEN 0
-                        ELSE Units.Other END AS Units_Other,
-                Tickets.Unassigned    AS Tickets_Open,
-                Tickets.Assigned      AS Tickets_Assigned,
-                Tickets.En_Route      AS Tickets_En_Route,
-                Tickets.On_Site       AS Tickets_On_Site,
-                Tickets.Reviewing     AS Tickets_Reviewing,
+                CASE    WHEN Units.Moving_Walks IS NULL THEN 0
+                        ELSE Units.Moving_Walks END AS Units_Moving_Walks,
+                CASE    WHEN Units.Others IS NULL THEN 0
+                        ELSE Units.Others END AS Units_Others,
+                CASE    WHEN Tickets.Unassigned IS NULL THEN 0
+                        ELSE Tickets.Unassigned END AS Tickets_Open,
+                CASE    WHEN Tickets.Assigned IS NULL THEN 0
+                        ELSE Tickets.Assigned END AS Tickets_Assigned,
+                CASE    WHEN Tickets.En_Route IS NULL THEN 0
+                        ELSE Tickets.En_Route END AS Tickets_En_Route,
+                CASE    WHEN Tickets.On_Site IS NULL THEN 0
+                        ELSE Tickets.On_Site END AS Tickets_On_Site,
+                CASE    WHEN Tickets.Reviewing IS NULL THEN 0
+                        ELSE Tickets.Reviewing END AS Tickets_Reviewing,
                 CASE    WHEN Violations.Preliminary IS NULL THEN 0
                         ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
                 CASE    WHEN Violations.Job_Created IS NULL THEN 0
@@ -124,35 +131,43 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 Sum( Units.Count ) AS Count,
                                 Sum( Elevators.Count) AS Elevators,
                                 Sum( Escalators.Count ) AS Escalators,
-                                Sum( Other.Count ) AS Other
+                                SUM( Moving_Walk.Count ) AS Moving_Walks,
+                                Sum( Others.Count ) AS Others
                     FROM        Loc AS Location
                                 LEFT JOIN (
                                     SELECT      Unit.Loc AS Location,
                                                 Count( Unit.ID ) AS Count
                                     FROM        Elev AS Unit
                                     GROUP BY    Unit.Loc
-                                ) AS Units ON Units.Location = Location.Loc
+                                ) AS [Units] ON Units.Location = Location.Loc
                                 LEFT JOIN (
                                     SELECT      Unit.Loc AS Location,
                                                 Count( Unit.ID ) AS Count
                                     FROM        Elev AS Unit
-                                    WHERE       Unit.Type = 'Elevator'
+                                    WHERE       Unit.Type IN ( 'Elevator', 'Roped Hydro', 'Hydraulic' )
                                     GROUP BY    Unit.Loc
-                                ) AS Elevators ON Elevators.Location = Location.Loc
+                                ) AS [Elevators] ON Elevators.Location = Location.Loc
                                 LEFT JOIN (
                                     SELECT      Unit.Loc AS Location,
                                                 Count( Unit.ID ) AS Count
                                     FROM        Elev AS Unit
                                     WHERE       Unit.Type = 'Escalator'
                                     GROUP BY    Unit.Loc
-                                ) AS Escalators ON Escalators.Location = Location.Loc
+                                ) AS [Escalators] ON Escalators.Location = Location.Loc
                                 LEFT JOIN (
                                     SELECT      Unit.Loc AS Location,
                                                 Count( Unit.ID ) AS Count
                                     FROM        Elev AS Unit
-                                    WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                                    WHERE       Unit.Type = 'Moving Walk'
                                     GROUP BY    Unit.Loc
-                                ) AS Other ON Other.Location = Location.Loc
+                                ) AS [Moving_Walk] ON Escalators.Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Unit.Loc AS Location,
+                                                Count( Unit.ID ) AS Count
+                                    FROM        Elev AS Unit
+                                    WHERE       Unit.Type NOT IN ( 'Elevator', 'Roped Hydro', 'Hydraulic', 'Escalator', 'Moving Walk' ) OR Unit.Type IS NULL
+                                    GROUP BY    Unit.Loc
+                                ) AS [Others] ON Others.Location = Location.Loc
                     GROUP BY    Location.Route
                 ) AS Units ON Units.Route = Route.ID
                 LEFT JOIN (
@@ -407,31 +422,32 @@ if( $locations ) {
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Route', $Route[ 'ID' ] );?>
-                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Route=' . $Route[ 'ID' ] );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Route[ 'Units_Elevators' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] . '&Type=Elevator');?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Route[ 'Units_Escalators' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] ) . '&Type=Escalator';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Route[ 'Units_Other' ], true, true, 'units.php?Route=' . $Route[ 'ID' ] ) . '&Type=Other';?>
-                </div>
+                  <?php \singleton\bootstrap::getInstance( )->card_header( 'Units', 'Unit', 'Units', 'Route_ID', $Route[ 'ID' ] );?>
+                  <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Units' ] ) && $_SESSION[ 'Cards' ][ 'Units' ] == 0 ? "style='display:none;'" : null;?>>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Route[ 'Units_Elevators' ], true, true, 'units.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Type=Elevator');?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Route[ 'Units_Escalators' ], true, true, 'units.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Type=Escalator' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Moving_Walks', $Route[ 'Units_Moving_Walks' ], true, true, 'units.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Type=Escalator' );?>
+                      <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Others', $Route[ 'Units_Others' ], true, true, 'units.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Type=Other' );?>
+                  </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Route', $Route[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Route_ID', $Route[ 'ID' ] );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Route=' . $Route[ 'ID' ] );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Route[ 'Tickets_Open' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] . '&Status=0');?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Route[ 'Tickets_Assigned' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=1';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En_Route', $Route[ 'Tickets_En_Route' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=2';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On_Site', $Route[ 'Tickets_On_Site' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=3';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Route[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Route=' . $Route[ 'ID' ] ) . '&Status=6';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Route[ 'Tickets_Open' ], true, true, 'tickets.php?Route_ID=' . $Route[ 'ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Route[ 'Tickets_Assigned' ], true, true, 'tickets.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Status=1' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En_Route', $Route[ 'Tickets_En_Route' ], true, true, 'tickets.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Status=2' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On_Site', $Route[ 'Tickets_On_Site' ], true, true, 'tickets.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Status=3' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Route[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Status=6' );?>
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violation', 'Violations', 'Route', $Route[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Violations', 'Violation', 'Violations', 'Route_ID', $Route[ 'ID' ] );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Violations' ] ) && $_SESSION[ 'Cards' ][ 'Violations' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route=' . $Route[ 'ID' ] );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Route[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] . '&Status=Preliminary Report');?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Route[ 'Violations_Job_Created' ], true, true, 'violations.php?Route=' . $Route[ 'ID' ] ) . '&Status=Job Created';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'violations.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Preliminary', $Route[ 'Violations_Preliminary_Report' ], true, true, 'violations.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Status=Preliminary Report');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Ongoing', $Route[ 'Violations_Job_Created' ], true, true, 'violations.php?Route_ID=' . $Route[ 'ID' ] . '&Route_Name=' . $Route[ 'Name' ] . '&Status=Job Created' );?>
                 </div>
               </div>
             </div>

@@ -125,6 +125,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
               \singleton\table::getInstance( )->th( 'Description', 'Description' );
             ?><tr class='desktop'><?php
+              \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ]  : null );
               \singleton\table::getInstance( )->th_autocomplete( 
                 'Customer', 'Customers', 
                 isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
@@ -134,6 +135,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Location', 'Locations', 
                 isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
                 isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+              );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Job', 'Jobs', 
+                isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
+                isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
               );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
               \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );

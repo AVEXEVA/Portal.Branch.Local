@@ -3,9 +3,9 @@ namespace singleton;
 class table extends \singleton\index {
 	public function th( $label, $icon = null ){
 		$icon = is_null( $icon ) ? $label : $icon;
-		?><th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo $label;?></th><?php
+		?><th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
 	}
-	public function th_input( $label, $value ){ ?><th class='text-white border border-white'><input autocomplete='off' class='form-control redraw' type='text' name='<?php echo $label;?>' placeholder='<?php echo $label;?>' value='<?php echo $value;?>' /></th><?php }
+	public function th_input( $label, $value ){ ?><th class='text-white border border-white'><input autocomplete='off' class='form-control redraw' type='text' name='<?php echo $label;?>' placeholder='<?php echo str_replace( '_', ' ', $label );?>' value='<?php echo $value;?>' /></th><?php }
 	public function th_input_entity( $Entity, $ID, $Name ){ ?><th class='text-white border border-white'>
 		<input autocomplete='off' class='form-control redraw' type='hidden' name='<?php echo $Entity;?>_ID' placeholder='<?php echo $Entity;?>' value='<?php echo $ID;?>' />
 		<input autocomplete='off' class='form-control redraw' type='text' name='<?php echo $Entity;?>_Name' placeholder='<?php echo $Entity;?>' value='<?php echo $Name;?>' />

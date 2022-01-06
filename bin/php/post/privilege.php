@@ -216,7 +216,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     'Code',
                     'Unit',
                     'Violation',
-                    'Map'
+                    'Map',
+                    'Invoice'
                 ) AS $Access ){
                     \singleton\database::getInstance( )->query(
                         'Portal',
@@ -261,7 +262,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     'Unit',
                     'Violation',
                     'Map',
-                    'User'
+                    'User',
+                    'Employee',
+                    'Invoice'
                 ) AS $Access ){
                     \singleton\database::getInstance( )->query(
                         'Portal',

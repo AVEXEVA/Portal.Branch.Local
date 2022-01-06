@@ -334,4 +334,4 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 </div>
 </body>
 </html><?php }
-}?>
+} else {?><script>document.location.href='../index.php';</script><?php }?>

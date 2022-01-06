@@ -523,7 +523,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.<?php echo ucfirst( $key );?> !== null && row.<?php echo ucfirst( $key );?> != 0
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>=" + row.<?php echo $Reference_Key;?> + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $key;?></a></div>" +
+                                    "<div class='col-12'><a href='<?php echo $key;?>.php?<?php echo $Reference;?>_ID=" + row.ID + "&<?php echo $Reference;?>_Name=" + row.Name + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $key;?></a></div>" +
                                 "</div>"
                             :   '';
                     default :

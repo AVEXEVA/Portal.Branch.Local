@@ -134,10 +134,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 ELSE Units.Elevators END AS Units_Elevators,
                         CASE    WHEN Units.Escalators IS NULL THEN 0
                                 ELSE Units.Escalators END AS Units_Escalators,
-                        CASE    WHEN Units.Moving_Walk IS NULL THEN 0
-                                ELSE Units.Moving_Walk END AS Units_Moving_Walk,
-                        CASE    WHEN Units.Other IS NULL THEN 0
-                                ELSE Units.Other END AS Units_Other,
+                        CASE    WHEN Units.Moving_Walks IS NULL THEN 0
+                                ELSE Units.Moving_Walks END AS Units_Moving_Walks,
+                        CASE    WHEN Units.Others IS NULL THEN 0
+                                ELSE Units.Others END AS Units_Others,
                         CASE    WHEN Jobs.[Open] IS NULL THEN 0
                                 ELSE Jobs.[Open] END AS Jobs_Open,
                         CASE    WHEN Jobs.[On_Hold] IS NULL THEN 0
@@ -198,8 +198,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         Sum( Units.Count ) AS Count,
                                         Sum( Elevators.Count) AS Elevators,
                                         Sum( Escalators.Count ) AS Escalators,
-                                        SUM( Moving_Walk.Count ) AS Moving_Walk,
-                                        Sum( Other.Count ) AS Other
+                                        SUM( Moving_Walk.Count ) AS Moving_Walks,
+                                        Sum( Others.Count ) AS Others
                             FROM        Owner
                                         LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner
                                         LEFT JOIN (
@@ -233,9 +233,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             SELECT      Unit.Loc AS Location,
                                                         Count( Unit.ID ) AS Count
                                             FROM        Elev AS Unit
-                                            WHERE       Unit.Type NOT IN ( 'Elevator', 'Escalator' )
+                                            WHERE       Unit.Type NOT IN ( 'Elevator', 'Roped Hydro', 'Hydraulic', 'Escalator', 'Moving Walk' ) OR Unit.Type IS NULL
                                             GROUP BY    Unit.Loc
-                                        ) AS [Other] ON Other.Location = Location.Loc
+                                        ) AS [Others] ON Others.Location = Location.Loc
                             GROUP BY    Owner.ID
                         ) AS Units ON Units.Customer = Customer.ID
                         LEFT JOIN (
@@ -423,8 +423,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               'Units_Count' => null,
               'Units_Elevators' => null,
               'Units_Escalators' => null,
-              'Units_Moving_Walk' => null,
-              'Units_Other' => null,
+              'Units_Moving_Walks' => null,
+              'Units_Others' => null,
               'Jobs_Open' => null,
               'Jobs_On_Hold' => null,
               'Jobs_Closed' => null,
@@ -470,10 +470,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         			"	DECLARE @MAXID INT;
         				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
         				INSERT INTO Rol(
-    						  ID,
+    						ID,
         					Type,
         					Name,
-                  Contact,
+                            Contact,
         					Website,
         					Address,
         					City,
@@ -487,7 +487,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SELECT @MAXID + 1;",
         			array(
         				$Customer[ 'Name' ],
-                $Customer[ 'Contact' ],
+                        $Customer[ 'Contact' ],
         				$Customer[ 'Website' ],
         				$Customer[ 'Street' ],
         				$Customer[ 'City' ],
@@ -650,8 +650,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                             0 => 'Disabled',
                                             1 => 'Enabled'
                                         ) );
-                    								    \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Customer[ 'Website' ] );
-                    								    \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Customer['Street'].' '.$Customer['City'].' '.$Customer[ 'State' ].' '.$Customer[ 'Zip' ] );
+        							    \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Customer[ 'Website' ] );
+        							    \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Customer['Street'].' '.$Customer['City'].' '.$Customer[ 'State' ].' '.$Customer[ 'Zip' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Customer[ 'Street' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Customer[ 'City' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Customer[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
@@ -729,7 +729,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] );?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Customer[ 'Units_Elevators' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Elevator');?>
                                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Customer[ 'Units_Escalators' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Escalator' );?>
-                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Customer[ 'Units_Other' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Other' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Moving_Walks', $Customer[ 'Units_Moving_Walks' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Escalator' );?>
+                                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Others', $Customer[ 'Units_Others' ], true, true, 'units.php?Customer_ID=' . $Customer[ 'ID' ] . '&Customer_Name=' . $Customer[ 'Name' ] . '&Type=Other' );?>
                                 </div>
                             </div>
                             <div class='card card-primary my-3 col-12 col-lg-3'>
