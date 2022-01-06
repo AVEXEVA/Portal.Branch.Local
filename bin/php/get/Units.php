@@ -193,6 +193,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+
                           Unit.ID                   AS ID,
                           Unit.State                As City_ID,
                           Unit.Unit                 AS Building_ID,

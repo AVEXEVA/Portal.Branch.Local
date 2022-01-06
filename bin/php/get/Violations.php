@@ -104,8 +104,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET[ 'Date_End' ];
       $conditions[] = "Violation.fDate Like <= ?";
     }
-    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Location'];
+    if( isset($_GET[ 'Location_ID' ] ) && !in_array( $_GET[ 'Location_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_ID'];
+      $conditions[] = "Location.Loc LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location_Name' ] ) && !in_array( $_GET[ 'Location_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_Name'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
@@ -126,9 +130,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       )
     ) . "'";
 
-  
 
-    
+
+
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search = $search == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
@@ -163,11 +167,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Customer.Name       AS Customer,
                           Location.Loc        AS Location_ID,
                           Location.Tag        AS Location_Name,
-                          Location.Tag        AS Locations,
-                          Unit.ID        AS Unit_ID,
-                          Unit.Unit        AS Units,    
-                          Unit.State        AS Unit_City_ID,
-                          Unit.Unit        AS Unit_Building_ID,
+                          Location.Address    AS Location_Street,
+                          Location.City       AS Location_City,
+                          Location.State      AS Location_State,
+                          Location.Zip        AS Location_Zip,
+                          Unit.ID             AS Unit_ID,
+                          Unit.Unit           AS Units,
+                          Unit.State          AS Unit_City_ID,
+                          Unit.Unit           AS Unit_Building_ID,
                           Violation.Status    AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
@@ -181,15 +188,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
-  
+
       $rResult = $database->query(
         null,
         $sQuery,
         $parameters
       ) or die(print_r(sqlsrv_errors()));
 
-        $sQueryRow="SELECT 
-                        Violation.ID        AS ID,                   
+        $sQueryRow="SELECT
+                        Violation.ID        AS ID,
                         Unit.Unit        AS Units
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
@@ -200,7 +207,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Location.Owner = Customer.ID
-                  WHERE   ({$conditions}) AND ({$search})  "; 
+                  WHERE   ({$conditions}) AND ({$search})  ";
 
         $fResult = \singleton\database::getInstance( )->query(
             null,
@@ -233,11 +240,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       );
 
       while ( $Row = sqlsrv_fetch_array( $rResult ) ){
-      	
+
         $Row['Date'] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
         $output['aaData'][]       = $Row;
       }
       echo json_encode( $output );
-   
+
   }
 }?>

@@ -87,7 +87,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php  
+  <?php
     $_GET[ 'Bootstrap' ] = '5.1';
     $_GET[ 'Entity_CSS' ] = 1;
     require( bin_meta . 'index.php');
@@ -100,8 +100,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require( bin_php . 'element/navigation.php');?>
     <div id='page-wrapper' class='content'>
 			<div class='card card-full card-primary border-0'>
-				<div class='card-heading'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
-        <div class='card-body mobile'><?php 
+				<div class='card-heading bg-white text-black'><h3><?php \singleton\fontawesome::getInstance( )->Customer();?> Leads</h3></div>
+        <div class='mobile card-body bg-dark text-white'><?php 
           \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );
           \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );
         ?></div>
@@ -121,10 +121,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
               \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
-              \singleton\table::getInstance( )->th_autocomplete( 
-                'Customer', 'Customers', 
-                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
-                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+              \singleton\table::getInstance( )->th_autocomplete(
+                'Customer', 'Customers',
+                isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
               );
               \singleton\table::getInstance( )->th_input( 'Address', isset( $_GET[ 'Address' ] ) ? $_GET[ 'Address' ] : null );
               \singleton\table::getInstance( )->th_input( 'Contact', isset( $_GET[ 'Contact' ] ) ? $_GET[ 'Contact' ] : null );
