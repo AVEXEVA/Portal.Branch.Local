@@ -19,11 +19,10 @@ $( document ).ready( function( ){
     },
     columns: [
       <?php \singleton\datatables::getInstance( )->ID( 'Lead' );?>,
-      <?php \singleton\datatables::getInstance( )->Name( 'Lead' );?>,    
+      <?php \singleton\datatables::getInstance( )->Name( 'Lead' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Type' );?>,
       <?php \singleton\datatables::getInstance( )->Customer( );?>,
       <?php \singleton\datatables::getInstance( )->data_column_address( );?>,
-      <?php \singleton\datatables::getInstance( )->Contact( );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Probability' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Level' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Status' );?>

@@ -212,10 +212,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Zip              AS Location_Zip,
                           Unit.fDesc                AS Description,
                           Unit.Type                 AS Type,
-                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0
-                                ELSE Tickets_Assigned.Count END AS Tickets_Assigned,
-                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0
-                                ELSE Tickets_Active.Count END AS Tickets_Active,
+                          Tickets.Count             AS Tickets,
                           Ticket.ID                 AS Ticket_ID,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled' 
                                 WHEN Unit.Status = 1 THEN 'Disabled'
@@ -241,27 +238,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           SELECT    TicketO.LElev AS Unit_ID,
                                                     Count( TicketO.ID ) AS Count
                                           FROM      TicketO
-                                          WHERE     TicketO.Assigned = 1
-                                          GROUP BY  TicketO.LElev
-                                        )
-                                      ) AS Tickets
-                            GROUP BY  Tickets.Unit_ID
-                          ) AS Tickets_Assigned ON Tickets_Assigned.Unit_ID = Unit.ID
-                          LEFT JOIN (
-                            SELECT    Tickets.Unit_ID,
-                                      Sum( Tickets.Count ) AS Count
-                            FROM      ( 
-                                        (
-                                          SELECT    TicketO.LElev AS Unit_ID,
-                                                    Count( TicketO.ID ) AS Count
-                                          FROM      TicketO
                                           WHERE     TicketO.Assigned >= 2
                                                     AND TicketO.Assigned <= 3
                                           GROUP BY  TicketO.LElev
                                         )
                                       ) AS Tickets
                             GROUP BY  Tickets.Unit_ID
-                          ) AS Tickets_Active ON Tickets_Active.Unit_ID = Unit.ID
+                          ) AS Tickets ON Tickets.Unit_ID = Unit.ID
                           LEFT JOIN (
                             SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                                       TicketD.Elev AS Unit,
