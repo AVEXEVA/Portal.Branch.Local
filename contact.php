@@ -102,20 +102,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       "	SELECT 	Top 1
                 Contact.*
         FROM    (
-              SELECT 	Rol.ID 		  AS ID,
-                      Rol.Name    AS Name,
-                      Rol.Contact AS Contact,
-                      Rol.Type    AS Type,
-                      Rol.Phone   AS Phone,
-                      Rol.Email   AS Email,
-                      Rol.Address AS Street,
-                      Rol.City    AS City,
-                      Rol.State   AS State,
-                      Rol.Zip     AS Zip,
-                      Rol.Latt 	  AS Latitude,
-                      Rol.fLong   AS Longitude,
-                      Rol.Website AS Website,
-                      Rol.Geolock AS Geofence
+              SELECT 	Rol.ID 		    AS ID,
+                      Rol.Name      AS Name,
+                      Rol.Contact   AS Contact,
+                      Rol.Type      AS Type,
+                      Rol.Phone     AS Phone,
+                      Rol.Email     AS Email,
+                      Rol.Address   AS Street,
+                      Rol.City      AS City,
+                      Rol.State     AS State,
+                      Rol.Zip       AS Zip,
+                      Rol.Latt 	    AS Latitude,
+                      Rol.fLong     AS Longitude,
+                      Rol.Position  AS Position,
+                      Rol.Website   AS Website,
+                      Rol.Geolock   AS Geofence
             FROM      Rol
                 ) AS Contact
         WHERE   	Contact.ID = ?;",
@@ -142,23 +143,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'Email'   =>  null,
       'Rolodex' => null,
       'Phone' => null,
+      'Position' => null,
       'Email' => null
     ) : sqlsrv_fetch_array($result);
 
 
     if( isset( $_POST ) && count( $_POST ) > 0 ){
-      $Contact[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Contact[ 'Name' ];
-      $Contact[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Contact[ 'Contact' ];
-      $Contact[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	 ? $_POST[ 'Phone' ] 	 : $Contact[ 'Phone' ];
-      $Contact[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	 ? $_POST[ 'Email' ] 	 : $Contact[ 'Email' ];
-      $Contact[ 'Type' ]     = isset( $_POST[ 'Type' ] ) 	   ? $_POST[ 'Type' ] 	   : $Contact[ 'Type' ];
-      $Contact[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	 ? $_POST[ 'Website' ] 	 : $Contact[ 'Website' ];
-      $Contact[ 'Street' ] 	= isset( $_POST[ 'Street' ] ) 	 ? $_POST[ 'Street' ] 	 : $Contact[ 'Street' ];
-      $Contact[ 'City' ] 		= isset( $_POST[ 'City' ] ) 	 ? $_POST[ 'City' ] 	 : $Contact[ 'City' ];
-      $Contact[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	 ? $_POST[ 'State' ] 	 : $Contact[ 'State' ];
-      $Contact[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		 ? $_POST[ 'Zip' ] 		 : $Contact[ 'Zip' ];
-      $Contact[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )  ? $_POST[ 'Latitude' ]  : $Contact[ 'Latitude' ];
-      $Contact[ 'Longitude' ] 	= isset( $_POST[ 'Longitude' ] ) ? $_POST[ 'Longitude' ] : $Contact[ 'Longitude' ];
+      $Contact[ 'Name' ] 		  = isset( $_POST[ 'Name' ] ) 	    ? $_POST[ 'Name' ] 	     : $Contact[ 'Name' ];
+      $Contact[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] )    ? $_POST[ 'Contact' ]    : $Contact[ 'Contact' ];
+      $Contact[ 'Phone' ] 		= isset( $_POST[ 'Phone' ] ) 	    ? $_POST[ 'Phone' ] 	   : $Contact[ 'Phone' ];
+      $Contact[ 'Email' ] 		= isset( $_POST[ 'Email' ] ) 	    ? $_POST[ 'Email' ] 	   : $Contact[ 'Email' ];
+      $Contact[ 'Type' ]      = isset( $_POST[ 'Type' ] ) 	    ? $_POST[ 'Type' ] 	     : $Contact[ 'Type' ];
+      $Contact[ 'Position' ] 	= isset( $_POST[ 'Position' ] )   ? $_POST[ 'Position' ]   : $Contact[ 'Position' ];
+      $Contact[ 'Website' ] 	= isset( $_POST[ 'Website' ] ) 	  ? $_POST[ 'Website' ]    : $Contact[ 'Website' ];
+      $Contact[ 'Street' ] 	  = isset( $_POST[ 'Street' ] ) 	  ? $_POST[ 'Street' ] 	   : $Contact[ 'Street' ];
+      $Contact[ 'City' ] 		  = isset( $_POST[ 'City' ] ) 	    ? $_POST[ 'City' ] 	     : $Contact[ 'City' ];
+      $Contact[ 'State' ] 		= isset( $_POST[ 'State' ] ) 	    ? $_POST[ 'State' ] 	   : $Contact[ 'State' ];
+      $Contact[ 'Zip' ] 			= isset( $_POST[ 'Zip' ] ) 		    ? $_POST[ 'Zip' ] 		   : $Contact[ 'Zip' ];
+      $Contact[ 'Latitude' ] 	= isset( $_POST[ 'Latitude' ] )   ? $_POST[ 'Latitude' ]   : $Contact[ 'Latitude' ];
+      $Contact[ 'Longitude' ] = isset( $_POST[ 'Longitude' ] )  ? $_POST[ 'Longitude' ]  : $Contact[ 'Longitude' ];
 
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
@@ -181,9 +184,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               fLong,
               Geolock,
               Since,
-              Last
+              Last,
+              Position
             )
-            VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
             SELECT @MAXID + 1;",
           array(
             $Contact[ 'Type' ],
@@ -200,7 +204,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $Contact[ 'Longitude' ],
             !is_null( $Contact[ 'Geofence' ] ) ? $Contact[ 'Geofence' ] : 0,
             date("Y-m-d H:i:s"),
-            date("Y-m-d H:i:s")
+            date("Y-m-d H:i:s"),
+            $Contact[ 'Position' ]
           )
         );
         sqlsrv_next_result( $result );
@@ -224,6 +229,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Rol.fLong = ?,
                     Rol.Phone = ?,
                     Rol.EMail = ?,
+                    Rol.Position = ?,
                     Rol.Last = ?
             WHERE 	Rol.ID = ?;",
           array(
@@ -239,6 +245,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $Contact[ 'Longitude' ],
             $Contact[ 'Phone' ],
             $Contact[ 'Email' ],
+            $Contact[ 'Position' ],
             date("Y-m-d H:i:s"),
             $Contact[ 'ID' ]
           )
@@ -249,7 +256,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-  <?php  
+  <?php
     $_GET[ 'Bootstrap' ] = '5.1';
     $_GET[ 'Entity_CSS' ] = 1;
     require( bin_meta . 'index.php');
@@ -276,11 +283,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   \singleton\bootstrap::getInstance( )->card_row_form_input( 'Contact', $Contact[ 'Contact' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_email( 'Email', $Contact[ 'Email' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_tel( 'Phone', $Contact[ 'Phone' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input( 'Position', $Contact[ 'Position' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Address', 'https://maps.google.com/?q=' . $Contact['Street'].' '.$Contact['City'].' '.$Contact[ 'State' ].' '.$Contact[ 'Zip' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Street', $Contact[ 'Street' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Contact[ 'City' ] );
                   \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Contact[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
-                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', 'Zip', $Contact[ 'Zip' ] );
+                  \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Contact[ 'Zip' ] );
                 ?>
               </div>
             </div>

@@ -446,7 +446,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             // if the $_Post is set and the count is null, select if available
         	$Customer[ 'Name' ] 		    = isset( $_POST[ 'Name' ] ) 	   ? $_POST[ 'Name' ] 	   : $Customer[ 'Name' ];
-            $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] )   ? $_POST[ 'Contact' ]   : $Customer[ 'Contact' ];
+          $Customer[ 'Contact' ] 	    = isset( $_POST[ 'Contact' ] )   ? $_POST[ 'Contact' ]   : $Customer[ 'Contact' ];
         	$Customer[ 'Phone' ] 		    = isset( $_POST[ 'Phone' ] ) 	   ? $_POST[ 'Phone' ] 	   : $Customer[ 'Phone' ];
         	$Customer[ 'Email' ] 		    = isset( $_POST[ 'Email' ] ) 	   ? $_POST[ 'Email' ] 	   : $Customer[ 'Email' ];
         	$Customer[ 'Login' ] 		    = isset( $_POST[ 'Login' ] ) 	   ? $_POST[ 'Login' ] 	   : $Customer[ 'Login' ];
@@ -472,7 +472,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     						  ID,
         					Type,
         					Name,
-                            Contact,
+                  Contact,
         					Website,
         					Address,
         					City,
@@ -486,7 +486,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         				SELECT @MAXID + 1;",
         			array(
         				$Customer[ 'Name' ],
-                        $Customer[ 'Contact' ],
+                $Customer[ 'Contact' ],
         				$Customer[ 'Website' ],
         				$Customer[ 'Street' ],
         				$Customer[ 'City' ],
@@ -574,7 +574,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        		null,
 	        		"	UPDATE 	Rol
 	        			SET 	Rol.Name = ?,
-                                Rol.Contact = ?,
+                      Rol.Contact = ?,
   	        					Rol.Website = ?,
   	        					Rol.Address = ?,
   	        					Rol.City = ?,
@@ -587,7 +587,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        			WHERE 	Rol.ID = ?;",
 	        		array(
 	        			$Customer[ 'Name' ],
-                        $Customer[ 'Contact' ],
+                $Customer[ 'Contact' ],
 	        			$Customer[ 'Website' ],
 	        			$Customer[ 'Street' ],
 	        			$Customer[ 'City' ],

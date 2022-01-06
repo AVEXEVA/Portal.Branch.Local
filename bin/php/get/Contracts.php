@@ -112,8 +112,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = date('Y-m-d', strtotime( $_GET['End_Date'] ) );
       $conditions[] = "Contract.BFinish <= ?";
     }
-    if( isset($_GET[ 'Cycle' ] ) && !empty( $_GET[ 'Cycle' ] ) ){
-      $parameters[] = $_GET['Cycle'];
+    if( isset($_GET[ 'Billing_Cycle' ] ) && !empty( $_GET[ 'Billing_Cycle' ] ) ){
+      $parameters[] = $_GET['Billing_Cycle'];
       $conditions[] = "Contract.BCycle LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Amount_Start' ] ) && !in_array( $_GET[ 'Amount_Start' ], array( '', ' ', null ) ) ){
@@ -140,8 +140,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Escalation_Type'];
       $conditions[] = "Contract.BEscType LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Escalation_Cycle' ] ) && !in_array( $_GET[ 'Escalation_Cycle' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Escalation_Cycle'];
+    if( isset($_GET[ 'Billing_Escalation_Cycle' ] ) && !in_array( $_GET[ 'Billing_Escalation_Cycle' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Billing_Escalation_Cycle'];
       $conditions[] = "Contract.BEscCycle LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Link' ] ) && !in_array( $_GET[ 'Link' ], array( '', ' ', null ) ) ){
@@ -215,6 +215,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Job.fDesc           AS Job_Name,
                             Contract.BStart     AS Start_Date,
                             Contract.BFinish    AS End_Date,
+                            Contract.BCycle     AS Billing_Cycle,
                             CASE  WHEN Contract.BAmt IS NULL THEN 0
                                   ELSE Contract.BAmt END AS Amount,
                             Contract.BLenght    AS Length,
@@ -230,7 +231,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Contract.BEscFact   AS Escalation_Factor,
                             Contract.EscLast    AS Escalation_Date,
                             Contract.BEscType   AS Escalation_Type,
-                            Contract.BEscCycle  AS Escalation_Cycle,
+                            Contract.BEscCycle  AS Billing_Escalation_Cycle,
                             Job.Custom15        AS Link,
                             Job.Remarks         AS Remarks
                     FROM    Contract
@@ -299,7 +300,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       //$Row[ 'Link' ]            = $matches[ 0 ];
       $output['aaData'][]       = $Row;
     }
-    $output[ 'options' ][ 'Cycle' ] = array(
+    $output[ 'options' ][ 'Billing_Cycle' ] = array(
       array(
         'label' => 'Monthly',
         'value' => 0

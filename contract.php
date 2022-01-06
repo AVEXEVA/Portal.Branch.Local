@@ -172,7 +172,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $ID
       )
     );
-    //var_dump( sqlsrv_errors( ) );
     $Contract =   (       empty( $ID )
                     &&    !$result
                   ) || (  empty( $ID ) )
@@ -225,8 +224,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       'Off_Service' => null
                     )
                   : sqlsrv_fetch_array($result);
-
-
     if( isset( $_POST ) && count( $_POST ) > 0 ){
       //Foreign Keys
       $Contract[ 'Customer_ID' ]                = isset( $_POST[ 'Customer_ID' ] )               ? $_POST[ 'Customer_ID' ]                                               : $Contract[ 'Customer_ID' ];
@@ -386,7 +383,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Start', $Contract[ 'Billing_Start' ], 'Start' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Billing_Finish', $Contract[ 'Billing_Finish' ], 'Finish' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Length', $Contract[ 'Billing_Length' ] );
-                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Billing_Amount', $Contract[ 'Billing_Amount' ] );
                   ?>
                 </div>
@@ -396,7 +393,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Escalation' ] ) && $_SESSION[ 'Cards' ][ 'Escalation' ] == 0 ? "style='display:none;'" : null;?>>
                   <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Escalation_Last', $Contract[ 'Escalation_Last' ], 'Escalated' );
-                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle', 'Billing_Escalation_Cycle', $Contract[ 'Billing_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Cycle',  $Contract[ 'Billing_Escalation_Cycle' ],  array( 0 => 'Monthly', 1 => 'Bi-Monthly', 2 => 'Quarterly', 3 => 'Trimester', 4 => 'Semi-Annually', 5 => 'Annually', 6 => 'Never' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_number( 'Billing_Escalation_Factor', $Contract[ 'Billing_Escalation_Factor' ], 'Factor' );
                   ?>
                 </div>
@@ -410,18 +407,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Collections', 'Collection', 'Collections', 'Contract', $Contract[ 'ID' ] );?>
-             
               <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Collections' ] ) && $_SESSION[ 'Cards' ][ 'Collections' ] == 0 ? "style='display:none;'" : null;?> style='display:none;'>
                 <?php if(isset($Privileges['Collection']) && $Privileges['Collection']['Customer'] >= 4) {?>
                 <div class='row g-0'>
                     <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Balance</div>
                     <div class='col-6'><input class='form-control' type='text' readonly name='Balance' value='<?php
-                    $r = \singleton\database::getInstance( )->query(null,"
-                      SELECT Sum( OpenAR.Balance ) AS Balance
-                      FROM   OpenAR
+                    $r = \singleton\database::getInstance( )->query(null,
+                      " SELECT Sum( OpenAR.Balance ) AS Balance
+                        FROM   OpenAR
                            LEFT JOIN Loc AS Location ON OpenAR.Loc = Location.Loc
-                      WHERE  Location.Owner = ?
+                        WHERE  Location.Owner = ?
                     ;",array($Contract[ 'Owner' ]));
                     $Balance = $r ? sqlsrv_fetch_array($r)['Balance'] : 0;
                     echo money_format('%(n',$Balance);
@@ -431,12 +426,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <?php }?>
               </div>
             </div>
-            </div>
           </div>
-        </form>
-      </div>
-		</div>
+        </div>
+      </form>
+    </div>
 	</div>
+</div>
 </body>
 </html>
 <?php
