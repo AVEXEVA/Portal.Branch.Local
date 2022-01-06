@@ -469,10 +469,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         			"	DECLARE @MAXID INT;
         				SET @MAXID = CASE WHEN ( SELECT Max( ID ) FROM Rol ) IS NULL THEN 0 ELSE ( SELECT Max( ID ) FROM Rol ) END ;
         				INSERT INTO Rol(
-    						  ID,
+    						ID,
         					Type,
         					Name,
-                  Contact,
+                            Contact,
         					Website,
         					Address,
         					City,
@@ -482,11 +482,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         					fLong,
         					Geolock
         				)
-        				VALUES( @MAXID + 1 , 0, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        				VALUES( @MAXID + 1 , 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
         				SELECT @MAXID + 1;",
         			array(
         				$Customer[ 'Name' ],
-                $Customer[ 'Contact' ],
+                        $Customer[ 'Contact' ],
         				$Customer[ 'Website' ],
         				$Customer[ 'Street' ],
         				$Customer[ 'City' ],
