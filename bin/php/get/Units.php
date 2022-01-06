@@ -238,12 +238,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           SELECT    TicketO.LElev AS Unit_ID,
                                                     Count( TicketO.ID ) AS Count
                                           FROM      TicketO
+                                          WHERE     TicketO.Assigned >= 2
+                                                    AND TicketO.Assigned <= 3
                                           GROUP BY  TicketO.LElev
-                                        ) UNION ALL (
-                                          SELECT    TicketD.Elev AS Unit_ID,
-                                                    Count( TicketD.ID ) AS Count
-                                          FROM      TicketD
-                                          GROUP BY  TicketD.Elev
                                         )
                                       ) AS Tickets
                             GROUP BY  Tickets.Unit_ID
