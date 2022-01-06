@@ -22,8 +22,12 @@ function search( link ){
                           search                :  $('input:visible[name="Search"]').val(),
                           ID                    :  $('input:visible[name="ID"]').val( ),
                           Customer              :  $('input:visible[name="Customer"]').val( ),
-                          Location              :  $('input:visible[name="Location"]').val( ),
-                          Units                  :  $('input:visible[name="Units"]').val( ),
+                          Address               : $('input:visible[name="Address"]').val( ),
+                          City                  :  $('input:visible[name="City"]').val( ),
+                          Street                :  $('input:visible[name="Street"]').val( ),
+                          State                 :  $('input:visible[name="State"]').val( ),
+                          Zip                   :  $('select:visible[name="Zip"]').val( ),
+                          Units                 :  $('input:visible[name="Units"]').val( ),
                           Status                :  $('select:visible[name="Status"]').val( ),
                           Date                  :  $('input:visible[name="Date"]').val( )
 

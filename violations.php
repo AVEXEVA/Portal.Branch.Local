@@ -100,28 +100,28 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="mobile card-body bg-dark text-white"><form action='violations.php'>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Address', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
                   </div>
                   <div class='card-body bg-dark'>
                     <table id='Table_Violations' class='display' cellspacing='0' width='100%'>
                       <thead class='text-white border border-white'><?php
                           \singleton\table::getInstance( )->th( 'ID', 'ID' );
                           \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
-                          \singleton\table::getInstance( )->th( 'Location', 'Location' );
+                          \singleton\table::getInstance( )->th( 'Address', 'Address' );
                           \singleton\table::getInstance( )->th( 'Date', 'Locations' );
                           \singleton\table::getInstance( )->th( 'Units', 'Units' );
                           \singleton\table::getInstance( )->th( 'Status', 'Status' );
                         ?><tr class='desktop'><?php
                           \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-                          \singleton\table::getInstance( )->th_autocomplete( 
-                            'Customer', 'Customers', 
-                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
-                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null 
+                          \singleton\table::getInstance( )->th_autocomplete(
+                            'Customer', 'Customers',
+                            isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+                            isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null
                           );
-                          \singleton\table::getInstance( )->th_autocomplete( 
-                            'Location', 'Locations', 
-                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
-                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
+                          \singleton\table::getInstance( )->th_autocomplete(
+                            'Location', 'Locations',
+                            isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+                            isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
                           );
                           \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
