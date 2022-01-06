@@ -130,9 +130,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               Division.ID                AS ID,
                               Division.Name              AS Name,
                               Locations.Count            AS Locations,
-                              Units.Count                AS Units,
-                              Violations.Count           AS Violations,
-                              Tickets.Count              AS Tickets
+                              CASE  WHEN Units_Elevators.Count IS NULL THEN 0
+                                    ELSE Units_Elevators.Count END AS Units_Elevators,
+                              CASE  WHEN Units_Escalators.Count IS NULL THEN 0
+                                    ELSE Units_Escalators.Count END AS Units_Escalators,
+                              CASE  WHEN Units_Others.Count IS NULL THEN 0
+                                    ELSE Units_Others.Count END AS Units_Others,
+                              CASE  WHEN Violations_Office.Count IS NULL THEN 0
+                                    ELSE Violations_Office.Count END AS Violations_Office,
+                              CASE  WHEN Violations_Field.Count IS NULL THEN 0
+                                    ELSE Violations_Field.Count END AS Violations_Field,
+                              CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0
+                                    ELSE Tickets_Assigned.Count END AS Tickets_Assigned,
+                              CASE  WHEN Tickets_Active.Count IS NULL THEN 0
+                                    ELSE Tickets_Active.Count END AS Tickets_Active
                       FROM    Zone AS Division
                               LEFT JOIN (
                                 SELECT    Loc.Zone AS Division,
@@ -145,22 +156,58 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           Count( Elev.ID ) AS Count 
                                 FROM      Elev 
                                           LEFT JOIN Loc ON Elev.Loc = Loc.Loc
+                                WHERE     Elev.Type IN ( 'Elevator', 'Roped Hydro', 'Hydraulic' )
                                 GROUP BY  Loc.Zone
-                              ) AS Units ON Units.Division = Division.ID
+                              ) AS Units_Elevators ON Units_Elevators.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( Elev.ID ) AS Count 
+                                FROM      Elev 
+                                          LEFT JOIN Loc ON Elev.Loc = Loc.Loc
+                                WHERE     Elev.Type IN ( 'Escalator' )
+                                GROUP BY  Loc.Zone
+                              ) AS Units_Escalators ON Units_Escalators.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( Elev.ID ) AS Count 
+                                FROM      Elev 
+                                          LEFT JOIN Loc ON Elev.Loc = Loc.Loc
+                                WHERE     Elev.Type NOT IN ( 'Elevator', 'Roped Hydro', 'Hydraulic', 'Escalator' )
+                                GROUP BY  Loc.Zone
+                              ) AS Units_Others ON Units_Others.Division = Division.ID
                               LEFT JOIN (
                                 SELECT    Loc.Zone AS Division,
                                           Count( Violation.ID ) AS Count 
                                 FROM      Violation 
                                           LEFT JOIN Loc ON Violation.Loc = Loc.Loc
+                                WHERE     Violation.Status = 'Preliminary Report'
                                 GROUP BY  Loc.Zone
-                              ) AS Violations ON Violations.Division = Division.ID
+                              ) AS Violations_Office ON Violations_Office.Division = Division.ID
                               LEFT JOIN (
                                 SELECT    Loc.Zone AS Division,
-                                          Count( TicketD.ID ) AS Count 
-                                FROM      TicketD 
-                                          LEFT JOIN Loc ON TicketD.Loc = Loc.Loc
+                                          Count( Violation.ID ) AS Count 
+                                FROM      Violation 
+                                          LEFT JOIN Loc ON Violation.Loc = Loc.Loc
+                                WHERE     Violation.Status = 'Job Created'
                                 GROUP BY  Loc.Zone
-                              ) AS Tickets ON Tickets.Division = Division.ID
+                              ) AS Violations_Field ON Violations_Field.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( TicketO.ID ) AS Count 
+                                FROM      TicketO
+                                          LEFT JOIN Loc ON TicketO.LID = Loc.Loc
+                                WHERE     TicketO.Assigned = 1
+                                GROUP BY  Loc.Zone
+                              ) AS Tickets_Assigned ON Tickets_Assigned.Division = Division.ID
+                              LEFT JOIN (
+                                SELECT    Loc.Zone AS Division,
+                                          Count( TicketO.ID ) AS Count 
+                                FROM      TicketO
+                                          LEFT JOIN Loc ON TicketO.LID = Loc.Loc
+                                WHERE         TicketO.Assigned >= 2
+                                          AND TicketO.Assigned <= 3
+                                GROUP BY  Loc.Zone
+                              ) AS Tickets_Active ON Tickets_Assigned.Division = Division.ID
                       WHERE   ({$conditions}) AND ({$search})
                     ) AS Tbl
               WHERE     Tbl.ROW_COUNT >= ?
