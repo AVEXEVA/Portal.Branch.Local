@@ -147,14 +147,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			            	            Rolodex.Contact   	AS Contact_Name,
 			            	            Customer.ID       	AS Customer_ID,
 			            	            Customer.Name 	  	AS Customer_Name,
-			            	            Lead.Probability  	AS Probability,
+			            	           CASE WHEN Lead.Probability = 0 THEN 'Excellent'
+                                    WHEN Lead.Probability = 1 THEN 'Very Good'
+                                    WHEN Lead.Probability = 2 THEN 'Good'
+                                    WHEN Lead.Probability = 3 THEN 'Average'
+                                    WHEN Lead.Probability = 4 THEN 'Quoted'
+                                END AS  Probability,
 			            	            Lead.Level        	AS Level,
-			            	            CASE  	WHEN Lead.Status = 0 THEN 'Open'
-			            	            		WHEN Lead.Status = 1 THEN 'Canceled'
-			            	            		WHEN Lead.Status = 2 THEN 'Withdrawn'
-			            	            		WHEN Lead.Status = 3 THEN 'Disqualified'
-			            	            		WHEN Lead.Status = 4 THEN 'Award Successful'
-			            	            		WHEN Lead.Status = 5 THEN 'Award Competitor'
+			            	           CASE WHEN Lead.Status = 0 THEN 'Active'
+			            	            		WHEN Lead.Status = 1 THEN 'Inactive'
+			            	            		WHEN Lead.Status = 2 THEN 'Hold'
+			            	            		WHEN Lead.Status = 3 THEN 'Sold'
+			            	            		WHEN Lead.Status = 4 THEN 'Quoted'
 			            	            END AS Status,
 			            	            Lead.Type 		    AS Type,
 			            	            Lead.Address      	AS Street,
@@ -170,7 +174,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
 					                    ) AS Customer ON Lead.Owner = Customer.ID
 					                    LEFT JOIN Rol AS Rolodex ON Lead.Rol = Rolodex.ID
-			                  	WHERE   	({$conditions}) 
+			                  	WHERE   	({$conditions})
 			                  			AND ({$search})
 		             		) AS Tbl
 		            WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";

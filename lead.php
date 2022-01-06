@@ -127,8 +127,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	$Name
             )
         );
+        var_dump(sqlsrv_errors ( ) );
         $Lead = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
-        	'ID' => null,
+        	'ID'   => isset( $_GET [ 'ID' ] )  ? $_GET ['ID'] : null,
         	'Name' => null,
         	'RolType' => null,
         	'Rol' => null,
@@ -154,8 +155,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           'Customer_ID' => null,
           'Customer_Name' => null
         ) : sqlsrv_fetch_array( $result );
-
-
         if( isset( $_POST ) && count( $_POST ) > 0 ){
           $Lead[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) 		? $_POST[ 'Name' ] 			: $Lead[ 'Name' ];
           $Lead[ 'RolType' ] 	= isset( $_POST[ 'RolType' ] ) 		? $_POST[ 'RolType' ] 			: $Lead[ 'RolType' ];
@@ -178,26 +177,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	$Lead[ 'Longitude' ] 		= isset( $_POST[ 'Longitude' ] ) 			? $_POST[ 'Longitude' ] 			: $Lead[ 'Longitude' ];
         	$Lead[ 'GeoLock'] 	= isset( $_POST[ 'GeoLock' ] )		? $_POST[ 'GeoLock' ]  	: $Lead[ 'GeoLock' ];
         	$Lead[ 'Country'] = isset( $_POST[ 'Country' ] )	? $_POST[ 'Country' ] 	: $Lead[ 'Country' ];
-          $Lead[ 'Customer_Name' ] 	= isset( $_POST[ 'Customer' ] ) 		? $_POST[ 'Customer' ] 			: $Lead[ 'Customer_Name' ];
-
+          $Lead[ 'Customer_Name' ] 	= isset( $_POST[ 'Customer_Name' ] ) 		? $_POST[ 'Customer_Name' ] 			: $Lead[ 'Customer_Name' ];
+          $Lead[ 'Customer_ID' ] 	= isset( $_POST[ 'Customer_ID' ] ) 		? $_POST[ 'Customer_ID' ] 			: $Lead[ 'Customer_ID' ];
         	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         		$result = \singleton\database::getInstance( )->query(
     	    		null,
     	    		"	DECLARE @MAXID INT;
-    	    			DECLARE @Customer INT;
             			SET @MAXID = CASE WHEN ( SELECT Max( Lead.ID ) FROM dbo.Lead ) IS NULL THEN 0 ELSE ( SELECT Max( Lead.ID ) FROM dbo.Lead ) END;
-            			SET @Customer = ( SELECT Top 1 Owner.ID FROM dbo.Owner LEFT JOIN dbo.Rol ON Owner.Rol = Rol.ID WHERE Rol.Name = ? );
-            			INSERT INTO dbo.Lead( ID, Owner, fDesc, RolType, Rol, Type, Address, City, Zip, Status, Probability, Level, Revenue, Cost, Labor, Profit, Ratio, Remarks, Latt, fLong, Country, GeoLock )
-    	    			VALUES( @MAXID + 1, @Customer, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            			INSERT INTO dbo.Lead(
+                    ID,
+                    Owner,
+                    fDesc,
+                    RolType,
+                    Rol,
+                    Type,
+                    Address,
+                    City,
+                    State,
+                    Zip,
+                    Status,
+                    Probability,
+                    Level,
+                    Revenue,
+                    Cost,
+                    Labor,
+                    Profit,
+                    Ratio,
+                    Remarks,
+                    Latt,
+                    fLong,
+                    Country,
+                    GeoLock
+                  )
+    	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
             			SELECT @MAXID + 1;",
     	    		array(
-                $Lead[ 'Customer_Name' ],
+                $Lead[ 'Customer_ID' ],
                 $Lead[ 'Name' ],
-                $Lead[ 'RolType' ],
+                !empty( $Lead[ 'RolType' ] ) ? $Lead[ 'RolType' ] : 0,
                 $Lead[ 'Rol' ],
-                $Lead[ 'Type' ],
+                !empty( $Lead[ 'Type' ] ) ? $Lead[ 'Type' ] : 0,
                 $Lead[ 'Street' ],
                 $Lead[ 'City' ],
+                $Lead[ 'State' ],
     	    			$Lead[ 'Zip' ],
     	    			$Lead[ 'Status' ],
     	    			$Lead[ 'Probability' ],
@@ -206,7 +228,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    			!empty( $Lead[ 'Cost' ] ) ? $Lead[ 'Cost' ] : 0,
     	    			!empty( $Lead[ 'Labor' ] ) ? $Lead[ 'Labor' ] : 0,
                 !empty( $Lead[ 'Profit' ] ) ? $Lead[ 'Profit' ] : 0,
-                $Lead[ 'Ratio' ],
+                !empty( $Lead[ 'Ratio' ] ) ? $Lead[ 'Ratio' ] : 0,
                 $Lead[ 'Notes' ],
                 $Lead[ 'Latitude' ],
                 $Lead[ 'Longitude' ],
@@ -216,7 +238,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    	);
             sqlsrv_next_result( $result );
             $Lead[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-          //  header( 'Location: lead.php?ID=' . $Lead[ 'ID' ] );
+            header( 'Location: lead.php?ID=' . $Lead[ 'ID' ] );
         	} else {
     	    	\singleton\database::getInstance( )->query(
     	    		null,
@@ -232,12 +254,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	      					[Lead].Owner = (
     	      						SELECT 	ID
     	      						FROM 	(
-                                SELECT  Owner.ID,
-                                        Rol.Name,
-                                        Owner.Status
-                                FROM    Owner
-                                        LEFT JOIN Rol ON Owner.Rol = Rol.ID
-                              ) AS Customer
+                        SELECT  Owner.ID,
+                                Rol.Name,
+                                Owner.Status
+                        FROM    Owner
+                                LEFT JOIN Rol ON Owner.Rol = Rol.ID
+                      ) AS Customer
     	      						WHERE 	Customer.Name = ?
     	      					),
                       [Lead].Status = ?,
@@ -267,6 +289,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    			$Lead[ 'Status' ],
     	    			$Lead[ 'Probability' ],
     	    			$Lead[ 'Level' ],
+                $Lead[ 'Status' ],
     	    			$Lead[ 'Revenue' ],
                 $Lead[ 'Cost' ],
                 $Lead[ 'Labor' ],
@@ -282,6 +305,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	    	);
     	    }
         }
+  var_dump(sqlsrv_errors ( ) );
 ?><!DOCTYPE html>
 <html lang="en" style="min-height:100%;height:100%;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;height:100%;">
 <head>
@@ -298,13 +322,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <?php require( bin_php . 'element/navigation.php'); ?>
     <div id="page-wrapper" class='content'>
       <div class='card card-primary'>
-        <form action='leads.php?ID=<?php echo $Lead[ 'ID' ];?>' method='POST'>
+        <form action='lead.php?ID=<?php echo $Lead[ 'ID' ];?>' method='POST'>
             <input type='hidden' name='ID' value='<?php echo $Lead[ 'ID' ];?>' />
             <?php \singleton\bootstrap::getInstance( )->primary_card_header( 'Lead', 'Leads', $Lead[ 'ID' ] );?>
             <div class='card-body bg-dark text-white'>
                 <div class='row g-0' data-masonry='{"percentPosition": true }'>
               <div class='card card-primary my-3 col-12 col-lg-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Leads' ] ) && $_SESSION[ 'Cards' ][ 'Leads' ] == 0 ? "style='display:none;'" : null;?>>
                 <?php
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Lead[ 'Name' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Lead[ 'Customer_ID' ], $Lead[ 'Customer_Name' ] );
@@ -322,37 +347,39 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Lead[ 'City' ] );
                     \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Lead[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'Zip', $Lead[ 'Zip' ] );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Latitude',  $Lead[ 'Latitude' ] );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Longitude',  $Lead[ 'Longitude' ] );
-                ?>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Revenue:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Revenue' value='<?php echo $Lead['Revenue'];?>' /></div>
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Lead[ 'Status' ], array(
+                        '0' => 'Active',
+                        '1' => 'Inactive',
+                        '2' => 'Hold',
+                        '3' => 'Sold',
+                        '4' => 'Quoted'
+                    ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_select( 'Probability', $Lead[ 'Probability' ], array(
+                        '0' => 'Excellent',
+                        '1' => 'Very Good',
+                        '2' => 'Good',
+                        '3' => 'Average',
+                        '4' => 'Poor'
+                      ) );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_sub_number( 'Level', $Lead[ 'Level' ] );; ?>
+                  </div>
                 </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Cost:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Cost' value='<?php echo $Lead['Cost'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Labor:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Labor' value='<?php echo $Lead['Labor'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Dollar(1);?> Profit:</div>
-                  <div class='col-8'><input type='text' class='form-control edit animation-focus' name='Profit' value='<?php echo $Lead['Profit'];?>' /></div>
-                </div>
-                <div class='row g-0'>
-                  <div class='col-4 border-bottom border-white my-auto'><?php \singleton\fontawesome::getInstance( )->Note(1);?> Notes:</div>
-                  <div class='col-8'><textarea rows='8' type='text' class='form-control edit animation-focus' name='Notes'><?php echo $Lead['Notes'];?></textarea></div>
-                </div>
-              </div>
-              <div class='card-footer'><button class='form-control' type='submit'>Save</button></div>
-            </form></div>
-        	</div>
+                  </div>
+                    <div class='card card-primary my-3 col-12 col-lg-3'>
+                    <?php \singleton\bootstrap::getInstance( )->card_header( 'Profit-Loss', 'Leads', 'Leads', 'Customer', $Lead[ 'ID' ] );?>
+                    <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Leads' ] ) && $_SESSION[ 'Cards' ][ 'Leads' ] == 0 ? "style='display:none;'" : null; ?> </div>
+                    <?php
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Revenue', $Lead[ 'Revenue' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Cost', $Lead[ 'Cost' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Labor', $Lead[ 'Labor' ] );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Profit', $Lead[ 'Profit' ] );?>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </body>
 </html>
 <?php
