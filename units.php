@@ -101,26 +101,43 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Unit( 1 );?> Units</h4></div>
         <div class='mobile card-body bg-dark text-white'><form action='units.php'>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'City_ID', isset( $_GET[ 'City_ID' ] ) ? $_GET[ 'City_ID' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Building_ID', isset( $_GET[ 'Building_ID' ] ) ? $_GET[ 'Building_ID' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Territory', isset( $_GET[ 'Territory' ] ) ? $_GET[ 'Territory' ] : null, false, false, false, 'redraw' );?>
+          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Division', isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );?>
           <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Last_Ticket', isset( $_GET[ 'Last_Ticket' ] ) ? $_GET[ 'Last_Ticket' ] : null, false, false, false, 'redraw' );?>
         </div>
         <div class='card-body bg-dark'>
           <table id='Table_Units' class='display' cellspacing='0' width='100%'>
             <thead class='text-white border border-white'> <?php
             \singleton\table::getInstance( )->th( 'ID', 'ID' );
-            \singleton\table::getInstance( )->th( 'Name', 'Name' );
+            \singleton\table::getInstance( )->th( 'City_ID', 'City_ID' );
+            \singleton\table::getInstance( )->th( 'Building_ID', 'Building_ID' );
+            \singleton\table::getInstance( )->th( 'Territory', 'Territory' );
+            \singleton\table::getInstance( )->th( 'Division', 'Division' );
             \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
             \singleton\table::getInstance( )->th( 'Location', 'Location' );
             \singleton\table::getInstance( )->th( 'Type', 'Type' );
             \singleton\table::getInstance( )->th( 'Status', 'Status' );
+            \singleton\table::getInstance( )->th( 'Tickets', 'Tickets' );
             \singleton\table::getInstance( )->th( 'Last_Ticket', 'Last_Ticket' );
             ?><tr class='desktop'><?php
             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-            \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
+            \singleton\table::getInstance( )->th_input( 'City_ID', isset( $_GET[ 'City_ID' ] ) ? $_GET[ 'City_ID' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Building_ID', isset( $_GET[ 'Building_ID' ] ) ? $_GET[ 'Building_ID' ] : null );
+            \singleton\table::getInstance( )->th_autocomplete( 
+              'Territory', 'Territories', 
+              isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null, 
+              isset( $_GET[ 'Territory_Name' ] ) ? $_GET[ 'Territory_Name' ] : null 
+            );
+            \singleton\table::getInstance( )->th_autocomplete( 
+              'Division', 'Divisions', 
+              isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null, 
+              isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null 
+            );
             \singleton\table::getInstance( )->th_autocomplete( 
               'Customer', 'Customers', 
               isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
@@ -133,6 +150,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             );
             \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
             \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
+            \singleton\table::getInstance( )->th_input( 'Tickets', isset( $_GET[ 'Tickets' ] ) ? $_GET[ 'Tickets' ] : null );
             \singleton\table::getInstance( )->th_input( 'Ticket_ID', isset( $_GET[ 'Ticket_ID' ] ) ? $_GET[ 'Ticket_ID' ] : null );
             ?> </tr></thead>
           </table>

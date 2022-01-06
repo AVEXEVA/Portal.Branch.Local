@@ -100,12 +100,32 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET[ 'Building_ID' ];
       $conditions[] = "Unit.Unit LIKE '%' + ? + '%' ";
     }
-    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Customer'];
+    if( isset($_GET[ 'Division_ID' ] ) && !in_array( $_GET[ 'Division_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Division_ID'];
+      $conditions[] = "Division.ID LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Division_Name' ] ) && !in_array( $_GET[ 'Division_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Division_Name'];
+      $conditions[] = "Division.Name LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Customer_Name' ] ) && !in_array( $_GET[ 'Customer_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer_Name'];
       $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Location'];
+    if( isset($_GET[ 'Customer_ID' ] ) && !in_array( $_GET[ 'Customer_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer_ID'];
+      $conditions[] = "Customer.ID LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Customer_Name' ] ) && !in_array( $_GET[ 'Customer_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Customer_Name'];
+      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location_ID' ] ) && !in_array( $_GET[ 'Location_ID' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_ID'];
+      $conditions[] = "Location.ID LIKE '%' + ? + '%'";
+    }
+    if( isset($_GET[ 'Location_Name' ] ) && !in_array( $_GET[ 'Location_Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location_Name'];
       $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
@@ -136,10 +156,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $Columns = array(
       0 =>  'Unit.ID',
       1 =>  'Unit.State',
-      2 =>  'Loc.Tag',
-      3 =>  'Unit.Unit',
-      4 =>  'Unit.Type',
-      5 =>  'Unit.Status'
+      2 =>  'Unit.Unit',
+      3 =>  'Division.Name',
+      4 =>  'Customer.Name',
+      3 =>  'Loc.Tag',
+      5 =>  'Unit.Type',
+      6 =>  'Unit.Status',
+      7 =>  'Ticket.ID'
     );
 
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
@@ -152,29 +175,58 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                          Unit.ID AS ID,
-                          Unit.State As City_ID,
-                          Customer.ID AS Customer_ID,
-                          Customer.Name AS Customer_Name,
-                          Location.Loc AS Location_ID,
-                          Location.Tag AS Location_Name,
-                          Unit.Unit AS Building_ID,
-                          Unit.Type AS Type,
-                          Unit.fDesc AS Name,
-                          Ticket.ID AS Ticket_ID,
+                          Unit.ID                   AS ID,
+                          Unit.State                As City_ID,
+                          Unit.Unit                 AS Building_ID,
+                          Territory.ID              AS Territory_ID,
+                          Territory.Name            AS Territory_Name,
+                          Division.ID               AS Division_ID,
+                          Division.Name             AS Division_Name,
+                          Customer.ID               AS Customer_ID,
+                          Customer.Name             AS Customer_Name,
+                          Location.Loc              AS Location_ID,
+                          Location.Tag              AS Location_Name,
+                          Location.Address          AS Location_Street,
+                          Location.City             AS Location_City,
+                          Location.State            AS Location_State,
+                          Location.Zip              AS Location_Zip,
+                          Unit.fDesc                AS Description,
+                          Unit.Type                 AS Type,
+                          Tickets.Count             AS Tickets,
+                          Ticket.ID                 AS Ticket_ID,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled' 
                                 WHEN Unit.Status = 1 THEN 'Disabled'
                                 WHEN Unit.Status = 2 THEN 'Demolished'
                                 ELSE 'Other'
                           END AS Status
                   FROM    Elev AS Unit
-                          LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                          LEFT JOIN Loc   AS Location   ON Unit.Loc = Location.Loc
+                          LEFT JOIN Zone  AS Division   ON Division.ID = Location.Zone
+                          LEFT JOIN Terr  AS Territory  ON Territory.ID = Location.Terr
                           LEFT JOIN (
                             SELECT  Owner.ID,
                                     Rol.Name
                             FROM    Owner
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                           ) AS Customer ON Unit.Owner = Customer.ID
+                          LEFT JOIN (
+                            SELECT    Tickets.Unit_ID,
+                                      Sum( Tickets.Count ) AS Count
+                            FROM      ( 
+                                        (
+                                          SELECT    TicketO.LElev AS Unit_ID,
+                                                    Count( TicketO.ID ) AS Count
+                                          FROM      TicketO
+                                          GROUP BY  TicketO.LElev
+                                        ) UNION ALL (
+                                          SELECT    TicketD.Elev AS Unit_ID,
+                                                    Count( TicketD.ID ) AS Count
+                                          FROM      TicketD
+                                          GROUP BY  TicketD.Elev
+                                        )
+                                      ) AS Tickets
+                            GROUP BY  Tickets.Unit_ID
+                          ) AS Tickets ON Tickets.Unit_ID = Unit.ID
                           LEFT JOIN (
                             SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
                                       TicketD.Elev AS Unit,
@@ -206,6 +258,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Unit.Status AS Status
                     FROM    Elev AS Unit
                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                            LEFT JOIN Zone AS Division ON Division.ID = Location.Zone
                             LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name
