@@ -15,9 +15,13 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->ID( 'Division' );?>,  
       <?php \singleton\datatables::getInstance( )->Name( 'Division' );?>,
       <?php \singleton\datatables::getInstance( )->Locations( 'Division', 'ID'  );?>,
-      <?php \singleton\datatables::getInstance( )->Units( 'Division', 'ID'  );?>,
-      <?php \singleton\datatables::getInstance( )->Violations( 'Division', 'ID'  );?>,
-      <?php \singleton\datatables::getInstance( )->Tickets( 'Division', 'ID' );?>        
+      <?php \singleton\datatables::getInstance( )->data_column( 'Units_Elevators'  );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Units_Escalators' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Units_Others' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Violations_Office' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Violations_Field' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Assigned' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Active' );?>
     ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'divisions' );?>,
     <?php \singleton\datatables::getInstance( )->buttons( 'division', 'divisions', 'ID' );?>
