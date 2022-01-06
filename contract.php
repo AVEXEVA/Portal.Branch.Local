@@ -137,7 +137,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                       CASE    WHEN Invoices.[Open] IS NULL THEN 0
                               ELSE Invoices.[Open] END AS Invoices_Open,
                       CASE    WHEN Invoices.[Closed] IS NULL THEN 0
-                              ELSE Invoices.[Closed] END AS Invoices_Closed
+                              ELSE Invoices.[Closed] END AS Invoices_Closed,
+                      CASE    WHEN Tickets.Unassigned IS NULL THEN 0
+                              ELSE Tickets.Unassigned END AS Tickets_Open,
+                      CASE    WHEN Tickets.Assigned IS NULL THEN 0
+                              ELSE Tickets.Assigned END AS Tickets_Assigned,
+                      CASE    WHEN Tickets.En_Route IS NULL THEN 0
+                              ELSE Tickets.En_Route END AS Tickets_En_Route,
+                      CASE    WHEN Tickets.On_Site IS NULL THEN 0
+                              ELSE Tickets.On_Site END AS Tickets_On_Site,
+                      CASE    WHEN Tickets.Reviewing IS NULL THEN 0
+                              ELSE Tickets.Reviewing END AS Tickets_Reviewing
             FROM      dbo.[Contract]
                       LEFT JOIN Job AS Job      ON Job.ID = Contract.Job
                       LEFT JOIN Loc AS Location ON Location.Loc = Contract.Loc
@@ -167,6 +177,55 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                     GROUP BY  Invoice.Job
                                   ) AS [Closed] ON Job.ID = [Closed].Job
                       ) AS Invoices ON Invoices.Job = Job.ID
+                      LEFT JOIN (
+                        SELECT  Job.ID AS Job,
+                                Unassigned.Count AS Unassigned,
+                                Assigned.Count AS Assigned,
+                                En_Route.Count AS En_Route,
+                                On_Site.Count AS On_Site,
+                                Reviewing.Count AS Reviewing
+                        FROM    Job AS Job
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 0
+                                  GROUP BY  Job.ID
+                                ) AS Unassigned ON Unassigned.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 1
+                                  GROUP BY  Job.ID
+                                ) AS Assigned ON Assigned.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 2
+                                  GROUP BY  Job.ID
+                                ) AS En_Route ON En_Route.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 3
+                                  GROUP BY  Job.ID
+                                ) AS On_Site ON On_Site.Job = Job.ID
+                                LEFT JOIN (
+                                  SELECT    Job.ID AS Job,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Job AS Job ON Job.ID = TicketO.Job
+                                  WHERE     TicketO.Assigned = 6
+                                  GROUP BY  Job.ID
+                                ) AS Reviewing ON Reviewing.Job = Job.ID
+                    ) AS Tickets ON Tickets.Job = Contract.Job
             WHERE   	[Contract].ID = ?;",
       array(
         $ID
@@ -399,11 +458,22 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
-                <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Contract', $Contract[ 'ID' ] );?>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Job_ID', $Contract[ 'Job_ID' ] );?>
+                <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Job_ID=' . $Contract[ 'Job_ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Contract[ 'Tickets_Open' ], true, true, 'tickets.php?Job_ID=' . $Contract[ 'Job_ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Contract[ 'Tickets_Assigned' ], true, true, 'tickets.php?Job_ID=' . $Contract[ 'Job_ID' ] ) . '&Status=1';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Contract[ 'Tickets_En_Route' ], true, true, 'tickets.php?Job_ID=' . $Contract[ 'Job_ID' ] ) . '&Status=2';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Contract[ 'Tickets_On_Site' ], true, true, 'tickets.php?Job_ID=' . $Contract[ 'Job_ID' ] ) . '&Status=3';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Contract[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Job_ID=' . $Contract[ 'Job_ID' ] ) . '&Status=6';?>
+                </div>
+              </div>
+              <div class='card card-primary my-3 col-12 col-lg-3'>
+                <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Job_ID', $Contract[ 'Job_ID' ] );?>
                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $Contract[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Contract=' . $Contract[ 'ID' ] );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Contract[ 'Invoices_Open' ], true, true, 'invoices.php?Contract=' . $Contract[ 'ID' ] . '&Status=0');?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Contract[ 'Invoices_Closed' ], true, true, 'invoices.php?Contract=' . $Contract[ 'ID' ] ) . '&Status=1';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Job_ID=' . $Contract[ 'Job_ID' ] );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Contract[ 'Invoices_Open' ], true, true, 'invoices.php?Job_ID=' . $Contract[ 'Job_ID' ] . '&Status=0');?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Contract[ 'Invoices_Closed' ], true, true, 'invoices.php?Job_ID=' . $Contract[ 'Job_ID' ] ) . '&Status=1';?>
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>
