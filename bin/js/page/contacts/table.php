@@ -29,6 +29,7 @@ function search( link ){
                         Type : $('select:visible[name="Type"]').val( ),
                         Division : $('select:visible[name="Division"]').val( ),
                         Route : $('select:visible[name="Route"]').val( ),
+                        Position : $('input:visible[name="Position"]').val( ),
                         Address : $('input:visible[name="Address"]').val( ),
                         City :  $('input:visible[name="City"]').val( ),
                         Street :  $('input:visible[name="Street"]').val( ),
@@ -83,10 +84,10 @@ $(document).ready(function( ){
                                     return "<div class='row'>" +
                                                 "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
-                                default : 
+                                default :
                                     return null;
                             }
-                        default : 
+                        default :
                             return data;
                     }
                 }
