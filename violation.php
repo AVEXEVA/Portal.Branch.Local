@@ -189,10 +189,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               )    ? array(
       	'ID' => null,
         'Name' => null,
-        'Customer_ID' => null,
-        'Customer_Name' => isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null,
-        'Location_ID' => null,
-        'Location_Name' => isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null,
+        'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
+        'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
+        'Location_Name' => isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
+        'Location_Name' => isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null,
         'Location_Street' => null,
         'Location_City' => null,
         'Location_State' => null,
@@ -533,7 +533,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card card-primary my-3 col-12 col-lg-3'>
                     <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' );?>
                         <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
-                          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', $Violation[ 'Name' ] );?>
+                          <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Violation[ 'Customer_ID' ], $Violation[ 'Customer_Name'], empty( $Violation[ 'ID']) ? 'notSubmitted' : 'form' );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_select( 'Status', $Violation[ 'Status' ], array( 0 => 'Disabled', 1 => 'Enabled' ) );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Violation[ 'Date' ] );?>
                           <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Violation[ 'Location_ID' ], $Violation[ 'Location_Name' ], empty( $Violation[ 'ID' ] )  ? 'notSubmitted' : 'form' );?>
