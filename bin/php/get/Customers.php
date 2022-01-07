@@ -114,7 +114,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $parameters[] = $_GET['Invoices'];
           $conditions[] = "Customer.Invoice LIKE '%' + ? + '%'";
         }
-
         if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
           $parameters[] = $_GET['Search'];
@@ -160,11 +159,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 CASE    WHEN Customer.Status = 0 THEN 'Enabled'
                                         WHEN Customer.Status = 1 THEN 'Disabled'
                                         ELSE 'Error' END AS Status,
-                                CASE    WHEN Locations.Count IS NULL THEN 0 
+                                CASE    WHEN Locations.Count IS NULL THEN 0
                                         ELSE Locations.Count END AS Locations,
                                 CASE    WHEN Units.Count IS NULL THEN 0
                                         ELSE Units.Count END AS Units,
-                                CASE    WHEN Jobs.Count IS NULL THEN 0 
+                                CASE    WHEN Jobs.Count IS NULL THEN 0
                                         ELSE Jobs.Count END AS Jobs,
                                 CASE    WHEN Tickets.Count IS NULL THEN 0
                                         ELSE Tickets.Count END AS Tickets,
