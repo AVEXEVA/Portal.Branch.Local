@@ -135,7 +135,7 @@ class datatables extends \singleton\index {
     public function button_export( ){ ?>{ extend: 'csv', className: 'form-control', text : "<?php \singleton\fontawesome::getInstance( )->Export( 1 );?><span class='desktop'>Export</span>" }<?php }
     //Helper for Columns
     public function data_column( $key ){
-        ?>{ 
+        ?>{
             data : '<?php echo $key;?>',
             render : function( data, type, row, meta ){
                 switch( type ){
@@ -146,8 +146,8 @@ class datatables extends \singleton\index {
                     default:
                         return '';
                 }
-            } 
-        }<?php 
+            }
+        }<?php
     }
     public function data_column_currency( $key ){
     	?>{
@@ -158,7 +158,7 @@ class datatables extends \singleton\index {
     					return 	row.<?php echo $key;?> !== null && row.<?php echo $key;?> != 0 && row.<?php echo $key;?> != '.00'
     						?	dollarUSLocale.format(row.<?php echo $key;?>)
     						:	'';
-    				deafult : 
+    				deafult :
     					return '';
     			}
     		}
@@ -195,7 +195,7 @@ class datatables extends \singleton\index {
                   case 'display' :
                       return  row.<?php echo $key;?> !== null && row.<?php echo $key;?> != ''
                           ?   "<div class='row'>" +
-                                  "<div class='col-12'><a href='<?php echo strtolower( $page );?>.php?<?php echo $key;?>=" + row.<?php echo $key;?> + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
+                                  "<div class='col-12'><a href='<?php echo strtolower( $page);?>.php?ID=" + row.ID + "&Name=" + row.Name + "'><?php \singleton\fontawesome::getInstance( )->$reference( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
                               "</div>"
                           :   '';
                   default :
@@ -275,7 +275,7 @@ class datatables extends \singleton\index {
     }
 
     //Columns
-    public function ID( $reference, $page = null ){ self::data_column_id( $reference, 'ID', $page ); } 
+    public function ID( $reference, $page = null ){ self::data_column_id( $reference, 'ID', $page ); }
     public function Name( $reference, $page = null ){ self::data_column_link( $reference, 'Name', $page ); }
     public function Date( $key = 'Date' ){
         ?>{
@@ -401,7 +401,7 @@ class datatables extends \singleton\index {
             render : function( data, type, row, meta ){
                 switch( type ){
                     case 'display':
-                        return row.Employee_ID !== null 
+                        return row.Employee_ID !== null
                             ?   "<a href='user.php?ID=" + row.Employee_ID + "'><?php \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Employee_Name + "</a>"
                             :   null;
                     default :

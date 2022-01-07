@@ -94,6 +94,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Invoice.fDesc             AS Description,
                     Invoice.fDate             AS Date,
                     Invoice.Amount 	          AS Amount,
+                    Invoice.Custom1 	        AS Due,
                     Invoice.STax              AS Sales_Tax,
                     Invoice.Total             AS Total,
                     Invoice.Taxable           AS Taxable,
@@ -144,12 +145,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 $ID
             )
         );
-        $Invoice =     ( empty( $ID ) &&  !$result) 
-                    || ( empty( $ID ) )   
+        $Invoice =     ( empty( $ID ) &&  !$result)
+                    || ( empty( $ID ) )
             ? array(
                 'ID'                   => null,
                 'Description'          => null,
                 'Date'                 => null,
+                'Due'                  => null,
                 'Amount'               => null,
                 'Sales_Tax'            => null,
                 'Total'                => null,
@@ -180,16 +182,19 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Employee_Last_Name'   => null,
         ) : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
-            $Invoice[ 'Location_ID' ] 	= isset( $_POST[ 'Location_ID' ] )  	? $_POST[ 'Location_ID' ]       : $Invoice[ 'Location_ID' ];
-            $Invoice[ 'Location_Name' ] = isset( $_POST[ 'Location_Name' ] )  	? $_POST[ 'Location_Name' ]     : $Invoice[ 'Location_Name' ];
-            $Invoice[ 'Job_ID' ] 		= isset( $_POST[ 'Job_ID' ] )  			? $_POST[ 'Job_ID' ]       		: $Invoice[ 'Job_ID' ];
-            $Invoice[ 'Job_Name' ] 		= isset( $_POST[ 'Job_Name' ] )  		? $_POST[ 'Job_Name' ]       	: $Invoice[ 'Job_Name' ];
-            $Invoice[ 'Description' ] 	= isset( $_POST[ 'Description' ] ) 		? $_POST[ 'Description' ]  		: $Invoice[ 'Description' ];
+            $Invoice[ 'Location_ID' ] 	= isset( $_POST[ 'Location_ID' ] )  ? $_POST[ 'Location_ID' ]     : $Invoice[ 'Location_ID' ];
+            $Invoice[ 'Location_Name' ] = isset( $_POST[ 'Location_Name' ] )? $_POST[ 'Location_Name' ]   : $Invoice[ 'Location_Name' ];
+            $Invoice[ 'Job_ID' ] 		    = isset( $_POST[ 'Job_ID' ] )  			? $_POST[ 'Job_ID' ]       		: $Invoice[ 'Job_ID' ];
+            $Invoice[ 'Job_Name' ] 		  = isset( $_POST[ 'Job_Name' ] )  		? $_POST[ 'Job_Name' ]       	: $Invoice[ 'Job_Name' ];
+            $Invoice[ 'Description' ] 	= isset( $_POST[ 'Description' ] ) 	? $_POST[ 'Description' ]  		: $Invoice[ 'Description' ];
+            $Invoice[ 'Customer_ID' ]   = isset( $_POST[ 'Customer_ID' ] )  ? $_POST[ 'Customer_ID' ]     : $Invoice[ 'Customer_ID' ];
+            $Invoice[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] )? $_POST[ 'Customer_Name' ]   : $Invoice[ 'Customer_Name' ];
             $Invoice[ 'Date' ]          = isset( $_POST[ 'Date' ] )      		? $_POST[ 'Date' ]           	: $Invoice[ 'Date' ];
-            $Invoice[ 'Amount' ] 		= isset( $_POST[ 'Amount' ] ) 	 		? $_POST[ 'Amount' ] 	      	: $Invoice[ 'Amount' ];
-            $Invoice[ 'Taxable' ] 		= isset( $_POST[ 'Taxable' ] ) 	 		? $_POST[ 'Taxable' ] 	      	: $Invoice[ 'Taxable' ];
+            $Invoice[ 'Due' ]           = isset( $_POST[ 'Due' ] )      		? $_POST[ 'Due' ]           	: $Invoice[ 'Due' ];
+            $Invoice[ 'Amount' ] 	    	= isset( $_POST[ 'Amount' ] ) 	 		? $_POST[ 'Amount' ] 	      	: $Invoice[ 'Amount' ];
+            $Invoice[ 'Taxable' ] 	   	= isset( $_POST[ 'Taxable' ] ) 	 		? $_POST[ 'Taxable' ] 	      : $Invoice[ 'Taxable' ];
             $Invoice[ 'Sales_Tax' ]     = isset( $_POST[ 'Sales_Tax' ] ) 		? $_POST[ 'Sales_Tax' ] 	  	: $Invoice[ 'Sales_Tax' ];
-            $Invoice[ 'Total' ] 	    = isset( $_POST[ 'Total' ] ) 	 		? $_POST[ 'Total' ]          	: $Invoice[ 'Total' ];
+            $Invoice[ 'Total' ] 	      = isset( $_POST[ 'Total' ] ) 	 		  ? $_POST[ 'Total' ]          	: $Invoice[ 'Total' ];
             if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
                 $result = \singleton\database::getInstance( )->query(
                     null,
@@ -234,6 +239,34 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 );
                 sqlsrv_next_result( $result );
                 $Invoice[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+                \singleton\database::getInstance( )->query(
+                  null,
+                  "INSERT INTO OpenAR(
+                    Ref,
+                    Loc,
+                    fDate,
+                    Due,
+                    Type,
+                    fDesc,
+                    Original,
+                    Balance,
+                    Selected,
+                    TransID
+                  )
+                  VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                  array(
+                    $Invoice['ID'],
+                    $Invoice['Location_ID'],
+                    $Invoice['Date'],
+                    $Invoice['Due'],
+                    $Invoice['Type'],
+                    $Invoice['Description'],
+                    $Invoice['Original'],
+                    $Invoice['Balance'],
+                    $Invoice['Selected'],
+                    $Invoice['Transaction_ID']
+                  )
+                );
                 header( 'Location: invoice.php?ID=' . $Invoice[ 'ID' ] );
                 exit;
             } else {
@@ -287,6 +320,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Invoice[ 'Job_ID' ], $Invoice[ 'Job_Name' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Description', $Invoice[ 'Description' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Invoice[ 'Date' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Due', $Invoice[ 'Due' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Amount', $Invoice[ 'Amount' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Sales_Tax', $Invoice[ 'Sales_Tax' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Total', $Invoice[ 'Total' ] );?>
@@ -409,16 +443,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             </tr>
                             <tr style='border-top:2px solid black;'><td colspan='5' style='padding:10px;text-align:center;'>Invoices not paid within terms may be subject to a service charge of 1.5% per month, or the maximum permitted by law.</td></tr>
                         </tbody>
-                    </table>
-                </div>
-                <div class='row' style='position:fixed;bottom:0;width:100%;'>
-                    <h4 style='text-align:center;'><b>Nouveau Elevator Industries, Inc.</b></h4>
-                    <div style='text-align:center;'>47-55 37th Street LIC, NY 11101 TEL:718.349.4700 FAX: 718.383.3218</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+                        </table>
+                            </div>
+                            <div class='row' style='position:fixed;bottom:0;width:100%;'>
+                            <h4 style='text-align:center;'><b>Nouveau Elevator Industries, Inc.</b></h4>
+                            <div style='text-align:center;'>47-55 37th Street LIC, NY 11101 TEL:718.349.4700 FAX: 718.383.3218</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </body>
 </html><?php
     }
 } else {?><html><head><script>document.location.href='../login.php?Forward=invoice<?php echo (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) ? 's.php' : ".php?ID={$_GET['ID']}";?>';</script></head></html><?php }?>

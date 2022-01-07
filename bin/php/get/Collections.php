@@ -189,7 +189,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         7 =>  'OpenAR.Due',
         8 =>  'OpenAR.Original',
         9 =>  'OpenAR.Balance',
-        10 =>  'OpenAR.fDesc'
+        10 => 'OpenAR.fDesc'
     );
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
@@ -201,25 +201,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                     SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                            OpenAR.Ref AS ID,
-                            Customer.ID AS Customer_ID,
-                            Customer.Name AS Customer_Name,
-                            Location.Loc AS Location_ID,
-                            Location.Tag AS Location_Name,
-                            Location.Address AS Location_Street,
-                            Location.City AS Location_City,
-                            Location.State AS Location_State,
-                            Location.Zip AS Location_Zip,
-                            Job.ID AS Job_ID,
-                            Job.fDesc AS Job_Name,
-                            JobType.Type AS Type,
-                            OpenAR.fDate AS Date,
-                            OpenAR.Due AS Due,
-                            OpenAR.Original AS Original,
-                            OpenAR.Balance AS Balance,
-                            OpenAR.fDesc AS Description,
-                            Territory.ID AS Territory_ID,
-                            Territory.Name AS Territory_Name
+                            OpenAR.Ref        AS ID,
+                            Customer.ID       AS Customer_ID,
+                            Customer.Name     AS Customer_Name,
+                            Location.Loc      AS Location_ID,
+                            Location.Tag      AS Location_Name,
+                            Location.Address  AS Location_Street,
+                            Location.City     AS Location_City,
+                            Location.State    AS Location_State,
+                            Location.Zip      AS Location_Zip,
+                            Job.ID            AS Job_ID,
+                            Job.fDesc         AS Job_Name,
+                            JobType.Type      AS Type,
+                            OpenAR.fDate      AS Date,
+                            OpenAR.Due        AS Due,
+                            OpenAR.Original   AS Original,
+                            OpenAR.Balance    AS Balance,
+                            OpenAR.fDesc      AS Description,
+                            Territory.ID      AS Territory_ID,
+                            Territory.Name    AS Territory_Name
                     FROM    OpenAR
                             LEFT JOIN Invoice      ON OpenAR.Ref  = Invoice.Ref
                             LEFT JOIN Loc AS Location ON OpenAR.Loc  = Location.Loc
