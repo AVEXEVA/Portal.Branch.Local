@@ -80,7 +80,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         array(
           $_SESSION[ 'Connection' ][ 'User' ],
           date('Y-m-d H:i:s'),
-          'customers.php'
+          'get/units.php'
         )
       );
 
@@ -211,10 +211,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.State            AS Location_State,
                           Location.Zip              AS Location_Zip,
                           Unit.fDesc                AS Description,
-                          CASE  WHEN Unit.Type =  0 THEN 'Elevator'
-                                WHEN Unit.Type =  1 THEN 'Escalator'
-                                WHEN Unit.Type =  2 THEN 'Moving-Walk'
-                          END AS Type,
+                          Unit.Type                 AS Type,
                           Tickets.Count             AS Tickets,
                           Ticket.ID                 AS Ticket_ID,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled'
