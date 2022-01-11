@@ -60,6 +60,7 @@ $( document ).ready( function( ){
 			<?php \singleton\datatables::getInstance( )->ID( 'Unit' );?>,
 			<?php \singleton\datatables::getInstance( )->data_column( 'City_ID' );?>,
 			<?php \singleton\datatables::getInstance( )->data_column( 'Building_ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Division( );?>,
 			<?php \singleton\datatables::getInstance( )->Route( );?>,
 			<?php \singleton\datatables::getInstance( )->Customer( );?>,
 			<?php \singleton\datatables::getInstance( )->Location( );?>,
