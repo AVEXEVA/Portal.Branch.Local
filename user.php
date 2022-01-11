@@ -100,15 +100,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
 
     $User = empty( $ID )  ? array(
-                'ID' => null,
-                'Email' => null,
-                'Password' => null,
-                'Verified' => null,
-                'Branch' => null,
-                'Branch_Type' => null,
-                'Branch_ID' => null,
-                'Picture' => null,
-                'Picture_Type' => null
+                'ID'                    => isset( $_GET [ 'ID' ] )           ? $_GET ['ID']           : null,
+                'Email'                 => isset( $_GET [ 'Email' ] )        ? $_GET ['Email']        : null,
+                'Password'              => isset( $_GET [ 'Password' ] )     ? $_GET ['Password']     : null,
+                'Verified'              => isset( $_GET [ 'Verified' ] )     ? $_GET ['Verified']     : null,
+                'Branch'                => isset( $_GET [ 'Branch' ] )       ? $_GET ['Branch']       : null,
+                'Branch_Type'           => isset( $_GET [ 'Branch_Type' ] )  ? $_GET ['Branch_Type']  : null,
+                'Branch_ID'             => isset( $_GET [ 'Branch_ID' ] )    ? $_GET ['Branch_ID']    : null,
+                'Picture'               => isset( $_GET [ 'Picture' ] )      ? $_GET ['Picture']      : null,
+                'Picture_Type'          => isset( $_GET [ 'Picture_Type' ] ) ? $_GET ['Picture_Type'] : null
     ) : sqlsrv_fetch_array( $result );
     $result = \singleton\database::getInstance( )->query(
       $User[ 'Branch' ],
@@ -117,25 +117,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
                 Employee.fFirst                       AS Employee_First_Name,
                 Employee.Last                         AS Employee_Last_Name
-        FROM    Emp AS Employee 
+        FROM    Emp AS Employee
         WHERE   Employee.ID = ?;",
-      array( 
+      array(
         $User[ 'Branch_ID' ]
       )
     );
     //var_dump( sqlsrv_errors( ) );
-    $Employee = $result ? sqlsrv_fetch_array( $result ) : array( 
+    $Employee = $result ? sqlsrv_fetch_array( $result ) : array(
       'Employee_ID' => null,
-      'Employee_Work_ID' => null,
+      'Employee_Work_ID'              => isset( $_GET [ 'Employee_Work_ID' ] )     ? $_GET ['Employee_Work_ID']   : null,
       'Employee_Name' => null,
       'Employee_First_Name' => null,
       'Employee_Last_Name' => null
     );
-    $User = ( !empty( $User[ 'Branch_ID' ] ) && is_array( $Employee ) && count( $Employee ) > 0 ) 
+    $User = ( !empty( $User[ 'Branch_ID' ] ) && is_array( $Employee ) && count( $Employee ) > 0 )
       ? array_merge( $User, $Employee )
-      : array_merge( $User, array( 
-      'Employee_ID' => null,
-      'Employee_Work_ID' => null,
+      : array_merge( $User, array(
+      'Employee_ID'                   => isset( $_GET [ 'Employee_ID' ] )          ? $_GET ['Employee_ID']   : null,
+      'Employee_Work_ID'              => isset( $_GET [ 'Employee_Work_ID' ] )     ? $_GET ['Employee_Work_ID']   : null,
       'Employee_Name' => null,
       'Employee_First_Name' => null,
       'Employee_Last_Name' => null
@@ -247,9 +247,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $User[ 'Employee_ID' ], $User[ 'Employee_Name' ] );?>
                   <div class='row'>
                     <div class='col-4'><?php \singleton\fontawesome::getInstance( )->Blank( 1 );?>Image:</div>
-                    <div class='col-8'><?php 
+                    <div class='col-8'><?php
                       if(isset($User['Picture']) && strlen($User['Picture']) > 0){
-                        ?><img width='100%' src="<?php print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];?>" /><?php 
+                        ?><img width='100%' src="<?php print "data:" . $User['Picture_Type'] . ";base64, " . $User['Picture'];?>" /><?php
                       }?><input type='file' name='Picture' class='form-control edit' /></div>
                   </div>
                 </div>

@@ -356,54 +356,66 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     )    || (empty( $ID )
                       &&  empty( $Name )
                     )    ? array(
-                    	'ID' => null,
-                      'Name' => null,
-                    	'SMan' => null,
+                    	'ID'                               => isset( $_GET [ 'ID' ] )                           ? $_GET ['ID'] : null,
+                      'Name'                             => isset( $_GET [ 'Name' ] )                         ? $_GET ['Name'] : null,
+                    	'SMAN' => null,
                     	'SDesc' => null,
-                    	'Remarks' => null,
+                    	'Description' => null,
                     	'Count' => null,
                     	'Symbol' => null,
                     	'EN' => null,
                     	'Address' => null,
-                      'Employee_Name' => null,
-                      'Employee_ID' => null,
+                      'Employee_Name'                   => isset( $_GET [ 'Employee_Name' ] )                 ? $_GET ['Employee_Name'] : null,
+                      'Employee_ID'                     => isset( $_GET [ 'Employee_ID' ] )                   ? $_GET ['Employee_ID']   : null,
                       //Totals
-                      'Locations_Count' => null,
-                      'Locations_Maintained' => null,
-                      'Locations_Unmaintained' => null,
-                      'Units_Count' => null,
-                      'Units_Elevators' => null,
-                      'Units_Escalators' => null,
-                      'Units_Other' => null,
-                      'Jobs_Open' => null,
-                      'Jobs_On_Hold' => null,
-                      'Jobs_Closed' => null,
-                      'Tickets_Open' => null,
-                      'Tickets_Assigned' => null,
-                      'Tickets_En_Route' => null,
-                      'Tickets_On_Site' => null,
-                      'Tickets_Reviewing' => null,
-                      'Violations_Preliminary_Report' => null,
-                      'Violations_Job_Created' => null,
-                      'Invoices_Open' => null,
-                      'Invoices_Closed' => null,
-                      'Proposals_Open' => null,
-                      'Proposals_Closed' => null
+                      'Locations_Count'                 => isset( $_GET [ 'Locations_Count' ] )               ? $_GET ['Locations_Count']   : null,
+                      'Locations_Maintained'            => isset( $_GET [ 'Locations_Maintained' ] )          ? $_GET ['Locations_Maintained']   : null,
+                      'Locations_Unmaintained'          => isset( $_GET [ 'Locations_Unmaintained' ] )        ? $_GET ['Locations_Unmaintained']   : null,
+                      'Units_Count'                     => isset( $_GET [ 'Units_Count' ] )                   ? $_GET ['Units_Count']   : null,
+                      'Units_Elevators'                 => isset( $_GET [ 'Units_Elevators' ] )               ? $_GET ['Units_Elevators']   : null,
+                      'Units_Escalators'                => isset( $_GET [ 'Units_Escalators' ] )              ? $_GET ['Units_Escalators']   : null,
+                      'Units_Other'                     => isset( $_GET [ 'Units_Other' ] )                   ? $_GET ['Units_Other']   : null,
+                      'Jobs_Open'                       => isset( $_GET [ 'Jobs_Open' ] )                     ? $_GET ['Jobs_Open']   : null,
+                      'Jobs_On_Hold'                    => isset( $_GET [ 'Jobs_On_Hold' ] )                  ? $_GET ['Jobs_On_Hold']   : null,
+                      'Jobs_Closed'                     => isset( $_GET [ 'Jobs_Closed' ] )                   ? $_GET ['Jobs_Closed']   : null,
+                      'Tickets_Open'                    => isset( $_GET [ 'Tickets_Open' ] )                  ? $_GET ['Tickets_Open']   : null,
+                      'Tickets_Assigned'                => isset( $_GET [ 'Tickets_Assigned' ] )              ? $_GET ['Tickets_Assigned']   : null,
+                      'Tickets_En_Route'                => isset( $_GET [ 'Tickets_En_Route' ] )              ? $_GET ['Tickets_En_Route']   : null,
+                      'Tickets_On_Site'                 => isset( $_GET [ 'Tickets_On_Site' ] )               ? $_GET ['Tickets_On_Site']   : null,
+                      'Tickets_Reviewing'               => isset( $_GET [ 'Tickets_Reviewing' ] )             ? $_GET ['Tickets_Reviewing']   : null,
+                      'Violations_Preliminary_Report'   => isset( $_GET [ 'Violations_Preliminary_Report' ] ) ? $_GET ['Violations_Preliminary_Report']   : null,
+                      'Violations_Job_Created'          => isset( $_GET [ 'Violations_Job_Created' ] )        ? $_GET ['Violations_Job_Created']   : null,
+                      'Invoices_Open'                   => isset( $_GET [ 'Invoices_Open' ] )                 ? $_GET ['Invoices_Open']   : null,
+                      'Invoices_Closed'                 => isset( $_GET [ 'Invoices_Closed' ] )               ? $_GET ['Invoices_Closed']   : null,
+                      'Proposals_Open'                  => isset( $_GET [ 'Proposals_Open' ] )                ? $_GET ['Proposals_Open']   : null,
+                      'Proposals_Closed'                => isset( $_GET [ 'Proposals_Closed' ] )              ? $_GET ['Proposals_Closed']   : null
     ) : sqlsrv_fetch_array($result);
-    //Binds $ID, $Name, $Territory and query values into the $resultesult variable
+    //Binds $ID, $Name, $Territory an
     if( isset( $_POST ) && count( $_POST ) > 0 ){
       // if the $_Post is set and the count is null, select if available
-      $Territory[ 'ID' ] 		     = isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Territory[ 'ID' ];
-      $Territory[ 'Name' ] 	     = isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Territory[ 'Name' ];
-      $Territory[ 'Employee_ID' ] 	 = isset( $_POST[ 'Employee_ID' ] )   ? $_POST[ 'Employee_ID' ]   : $Territory[ 'Employee_ID' ];
-      $Territory[ 'Employee_Name' ]  = isset( $_POST[ 'Employee_Name' ] ) ? $_POST[ 'Employee_Name' ] : $Territory[ 'Employee_Name' ];
-      $Territory[ 'SMan' ] 		   = isset( $_POST[ 'SMan' ] ) 	 ? $_POST[ 'SMan' ] 	 : $Territory[ 'SMan' ];
-      $Territory[ 'SDesc' ] 	   = isset( $_POST[ 'SDesc' ] ) 	 ? $_POST[ 'SDesc' ] 	 : $Territory[ 'SDesc' ];
-      $Territory[ 'Remarks' ]    = isset( $_POST[ 'Remarks' ] ) 	 ? $_POST[ 'Remarks' ] 	 : $Territory[ 'Remarks' ];
-      $Territory[ 'Count' ]      = isset( $_POST[ 'Count' ] )  ? $_POST[ 'Count' ]  : $Territory[ 'Count' ];
-      $Territory[ 'Symbol' ]     = isset( $_POST[ 'Symbol' ] )  ? $_POST[ 'Symbol' ]  : $Territory[ 'Symbol' ];
-      $Territory[ 'EN' ]         = isset( $_POST[ 'EN' ] ) 	   ? $_POST[ 'EN' ] 	   : $Territory[ 'EN' ];
-      $Territory[ 'Address' ]    = isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
+      $Territory[ 'ID' ] 		                         = isset( $_POST[ 'ID' ] ) 	                          ? $_POST[ 'ID' ] 	                          : $Territory[ 'ID' ];
+      $Territory[ 'Name' ] 	                         = isset( $_POST[ 'Name' ] )                          ? $_POST[ 'Name' ]                          : $Territory[ 'Name' ];
+      $Territory[ 'Employee_ID' ] 	                 = isset( $_POST[ 'Employee_ID' ] )                   ? $_POST[ 'Employee_ID' ]                   : $Territory[ 'Employee_ID' ];
+      $Territory[ 'Employee_Name' ]                  = isset( $_POST[ 'Employee_Name' ] )                 ? $_POST[ 'Employee_Name' ]                 : $Territory[ 'Employee_Name' ];
+      $Territory[ 'SMAN' ] 		                       = isset( $_POST[ 'SMAN' ] ) 	                        ? $_POST[ 'SMAN' ] 	                        : $Territory[ 'SMAN' ];
+      $Territory[ 'Description' ] 	                 = isset( $_POST[ 'Description' ] ) 	                ? $_POST[ 'Description' ] 	                : $Territory[ 'Description' ];
+      $Territory[ 'Count' ]                          = isset( $_POST[ 'Count' ] )                         ? $_POST[ 'Count' ]                         : $Territory[ 'Count' ];
+      $Territory[ 'Symbol' ]                         = isset( $_POST[ 'Symbol' ] )                        ? $_POST[ 'Symbol' ]                        : $Territory[ 'Symbol' ];
+      $Territory[ 'EN' ]                             = isset( $_POST[ 'EN' ] ) 	                          ? $_POST[ 'EN' ] 	                          : $Territory[ 'EN' ];
+      $Territory[ 'Units_Count' ]                    = isset( $_POST[ 'Units_Count' ] ) 	                ? $_POST[ 'Units_Count' ] 	                : $Territory[ 'Units_Count' ];
+      $Territory[ 'Units_Elevators' ]                = isset( $_POST[ 'Units_Elevators' ] ) 	            ? $_POST[ 'Units_Elevators' ] 	            : $Territory[ 'Units_Elevators' ];
+      $Territory[ 'Units_Other' ]                    = isset( $_POST[ 'Units_Other' ] ) 	                ? $_POST[ 'Units_Other' ] 	                : $Territory[ 'Units_Other' ];
+      $Territory[ 'Tickets_Open' ]                   = isset( $_POST[ 'Tickets_Open' ] )                  ? $_POST[ 'Tickets_Open' ]                  : $Territory[ 'Tickets_Open' ];
+      $Territory[ 'Tickets_Assigned' ]               = isset( $_POST[ 'Tickets_Assigned' ] )              ? $_POST[ 'Tickets_Assigned' ] 	            : $Territory[ 'Tickets_Assigned' ];
+      $Territory[ 'Tickets_En_Route' ]               = isset( $_POST[ 'Tickets_En_Route' ] )              ? $_POST[ 'Tickets_En_Route' ] 	            : $Territory[ 'Tickets_En_Route' ];
+      $Territory[ 'Tickets_On_Site' ]                = isset( $_POST[ 'Tickets_On_Site' ] )               ? $_POST[ 'Tickets_On_Site' ] 	            : $Territory[ 'Tickets_On_Site' ];
+      $Territory[ 'Tickets_Reviewing' ]              = isset( $_POST[ 'Tickets_Reviewing' ] )             ? $_POST[ 'Tickets_Reviewing' ] 	          : $Territory[ 'Tickets_Reviewing' ];
+      $Territory[ 'Violations_Preliminary_Report' ]  = isset( $_POST[ 'Violations_Preliminary_Report' ] ) ? $_POST[ 'Violations_Preliminary_Report' ] : $Territory[ 'Violations_Preliminary_Report' ];
+      $Territory[ 'Violations_Job_Created' ]         = isset( $_POST[ 'Violations_Job_Created' ] ) 	      ? $_POST[ 'Violations_Job_Created' ] 	      : $Territory[ 'Violations_Job_Created' ];
+      $Territory[ 'Invoices_Open' ]                  = isset( $_POST[ 'Invoices_Open' ] ) 	              ? $Invoices_Open[ 'Address' ] 	            : $Territory[ 'Invoices_Open' ];
+      $Territory[ 'Invoices_Closed' ]                = isset( $_POST[ 'Invoices_Closed' ] ) 	            ? $Invoices_Open[ 'Invoices_Closed' ] 	    : $Territory[ 'Invoices_Closed' ];
+      $Territory[ 'Proposals_Open' ]                 = isset( $_POST[ 'Proposals_Open' ] ) 	              ? $Invoices_Open[ 'Proposals_Open' ] 	      : $Territory[ 'Proposals_Open' ];
+      $Territory[ 'Proposals_Closed' ]               = isset( $_POST[ 'Proposals_Closed' ] ) 	            ? $Invoices_Open[ 'Proposals_Closed' ] 	    : $Territory[ 'Proposals_Closed' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
@@ -424,7 +436,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           array(
             $Territory[ 'Name' ],
             $Territory[ 'SDesc' ],
-            $Territory[ 'Remarks' ],
+            $Territory[ 'Description' ],
             $Territory[ 'Count' ],
             $Territory[ 'Symbol' ],
             $Territory[ 'EN' ],
@@ -457,8 +469,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             WHERE 	Terr.ID = ?;",
           array(
             $Territory[ 'Name' ],
-            $Territory[ 'SMan' ],
-            $Territory[ 'SDesc' ],
+            $Territory[ 'SMAN' ],
+            $Territory[ 'Description' ],
             $Territory[ 'Remarks' ],
             $Territory[ 'Count' ],
             $Territory[ 'Symbol' ],
