@@ -19,6 +19,7 @@ function search( link ){
                     method : 'GET',
                     data    : {
                         ID                :  $('input:visible[name="ID"]').val( ),
+                        Employee          :  $('input:visible[name="Employee"]').val( ),
                         Location          :  $('input:visible[name="Location"]').val( ),
                         Unit              :  $('input:visible[name="Unit"]').val( ),
                         Leads             :  $('input:visible[name="Leads"]').val( ),
@@ -84,7 +85,7 @@ $( document ).ready( function( ){
                     }
                 };
                 d.ID = $('input[name="ID"]').val( );
-                d.Name = $('input[name="Name"]').val( );
+                d.Employee = $('input[name="Employee"]').val( );
                 d.Location = $('input[name="Location"]').val( );
                 d.Unit = $('input[name="Unit"]').val( );
                 d.Lead = $('input[name="Lead"]').val( );
@@ -96,11 +97,11 @@ $( document ).ready( function( ){
         },
         columns: [
             <?php \singleton\datatables::getInstance( )->ID( 'Territory' );?>,
-            <?php \singleton\datatables::getInstance( )->Employee( );?>,
+            <?php \singleton\datatables::getInstance( )->Employee( 'Employee' );?>,
             <?php \singleton\datatables::getInstance( )->Locations( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Units( 'Territory', 'ID' );?>,
-            <?php \singleton\datatables::getInstance( )->Proposals( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Leads( 'Territory', 'ID' );?>,
+            <?php \singleton\datatables::getInstance( )->Proposals( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Collections( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Invoices( 'Territory', 'ID' );?>
         ],
@@ -126,7 +127,7 @@ $( document ).ready( function( ){
                 action : function( e, dt, node, config ){
                     d = { }
                     d.ID = $('input[name="ID"]').val( );
-                    d.Name = $('input[name="Name"]').val( );
+                    d.Employee = $('input[name="Employee"]').val( );
                     d.Location = $('input[name="Location"]').val( );
                     d.Unit = $('input[name="Unit"]').val( );
                     d.Lead = $('input[name="Lead"]').val( );

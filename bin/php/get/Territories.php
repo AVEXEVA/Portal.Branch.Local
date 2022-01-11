@@ -95,9 +95,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Territory.ID LIKE '%' + ? + '%'";
 	    }
-      if( isset( $_GET[ 'Contact' ] ) && !in_array(  $_GET[ 'Contact' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Contact'];
-      $conditions[] = "Territory.Contact LIKE '%' + ? + '%'";
+      if( isset( $_GET[ 'Name' ] ) && !in_array(  $_GET[ 'Name' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Name'];
+      $conditions[] = "Territory.Name LIKE '%' + ? + '%'";
       }
       if( isset( $_GET[ 'Address' ] ) && !in_array( $_GET[ 'Address' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Address'];
