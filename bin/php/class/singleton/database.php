@@ -18,7 +18,7 @@ class database extends \singleton\index {
 	    'ReturnDatesAsStrings'	=>	true,
 	    'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 	    'TraceOn' 				=> 	false
-	);
+	); 
 	protected function __construct( ){
 		if( is_array( $this->databases ) && count( $this->databases ) > 0 ){
 			foreach( $this->databases as $database ){

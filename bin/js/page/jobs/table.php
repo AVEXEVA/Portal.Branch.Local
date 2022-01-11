@@ -26,7 +26,7 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->Status( );?>,
       <?php \singleton\datatables::getInstance( )->Tickets( 'Job', 'ID' );?>,
       <?php \singleton\datatables::getInstance( )->Invoices( 'Job', 'ID' );?>,
-      <?php \singleton\datatables::getInstance( )->Tickets( 'Job', 'ID' )?>
+      <?php \singleton\datatables::getInstance( )->data_column( 'Hours' )?>
     ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'jobs' );?>,
     <?php \singleton\datatables::getInstance( )->buttons( 'job', 'jobs', 'ID' );?>

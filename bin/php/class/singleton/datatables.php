@@ -513,7 +513,7 @@ class datatables extends \singleton\index {
     public function TimeRoute( ){ self::Time( 'Time_Route' ); }
     public function TimeSite( ){ self::Time( 'Time_Site' ); }
     public function TimeCompleted( ){ self::Time( 'Time_Completed' ); }
-    public function data_column_count( $key, $Reference, $Reference_Key, $icon = 'blank', $page = null ){
+    public function data_column_count( $key, $Reference, $Reference_Key, $icon = 'blank', $page = null, $params = null ){
         $page = is_null( $page ) ? $key : $page;
         ?>{
             data : '<?php echo ucfirst( $key );?>',
@@ -522,7 +522,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.<?php echo ucfirst( $key );?> !== null && row.<?php echo ucfirst( $key );?> != 0
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='<?php echo $page;?>.php?<?php echo $Reference;?>_ID=" + row.ID + "&<?php echo $Reference;?>_Name=" + row.Name + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $page;?></a></div>" +
+                                    "<div class='col-12'><a href='<?php echo $page;?>.php?<?php echo $Reference;?>_ID=" + row.ID + "&<?php echo $Reference;?>_Name=" + row.Name + "&<?php echo $params;?>'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $page;?></a></div>" +
                                 "</div>"
                             :   '';
                     default :

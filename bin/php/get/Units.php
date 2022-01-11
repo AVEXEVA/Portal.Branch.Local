@@ -194,6 +194,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
                           Unit.ID                   AS ID,
+                          Unit.State                AS Name,
                           Unit.State                As City_ID,
                           Unit.Unit                 AS Building_ID,
                           Territory.ID              AS Territory_ID,
@@ -212,13 +213,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.Zip              AS Location_Zip,
                           Unit.fDesc                AS Description,
                           Unit.Type                 AS Type,
-                          Tickets.Count             AS Tickets,
-                          Ticket.ID                 AS Ticket_ID,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled'
                                 WHEN Unit.Status = 1 THEN 'Disabled'
                                 WHEN Unit.Status = 2 THEN 'Demolished'
                                 ELSE 'Other'
-                          END AS Status
+                          END AS Status,
+                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0
+                                ELSE Tickets_Assigned.Count END AS Tickets_Assigned,
+                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0
+                                ELSE Tickets_Active.Count END AS Tickets_Active
                   FROM    Elev AS Unit
                           LEFT JOIN Loc   AS Location   ON Unit.Loc = Location.Loc
                           LEFT JOIN Terr  AS Territory  ON Territory.ID = Location.Terr
@@ -238,20 +241,27 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           SELECT    TicketO.LElev AS Unit_ID,
                                                     Count( TicketO.ID ) AS Count
                                           FROM      TicketO
+                                          WHERE     TicketO.Assigned = 1
+                                          GROUP BY  TicketO.LElev
+                                        )
+                                      ) AS Tickets
+                            GROUP BY  Tickets.Unit_ID
+                          ) AS Tickets_Assigned ON Tickets_Assigned.Unit_ID = Unit.ID
+                          LEFT JOIN (
+                            SELECT    Tickets.Unit_ID,
+                                      Sum( Tickets.Count ) AS Count
+                            FROM      (
+                                        (
+                                          SELECT    TicketO.LElev AS Unit_ID,
+                                                    Count( TicketO.ID ) AS Count
+                                          FROM      TicketO
                                           WHERE     TicketO.Assigned >= 2
                                                     AND TicketO.Assigned <= 3
                                           GROUP BY  TicketO.LElev
                                         )
                                       ) AS Tickets
                             GROUP BY  Tickets.Unit_ID
-                          ) AS Tickets ON Tickets.Unit_ID = Unit.ID
-                          LEFT JOIN (
-                            SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
-                                      TicketD.Elev AS Unit,
-                                      TicketD.ID ,
-                                      TicketD.EDate AS Date
-                            FROM      TicketD
-                          ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
+                          ) AS Tickets_Active ON Tickets_Active.Unit_ID = Unit.ID
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";

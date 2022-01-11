@@ -477,12 +477,12 @@ VALUES( @MAXID + 1 ,
 							<div class='card card-primary my-3 col-12 col-lg-3'>
 		                        <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Unit', $Unit[ 'ID' ] );?>
 		                        <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Unit=' . $Unit[ 'ID' ] );?>
-		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Unit[ 'Tickets_Open' ], true, true, 'tickets.php?Unit=' . $Unit[ 'ID' ] . '&Status=0');?>
-		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Unit[ 'Tickets_Assigned' ], true, true, 'tickets.php?Unit=' . $Unit[ 'ID' ] ) . '&Status=1';?>
-		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Unit[ 'Tickets_En_Route' ], true, true, 'tickets.php?Unit=' . $Unit[ 'ID' ] ) . '&Status=2';?>
-		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Unit[ 'Tickets_On_Site' ], true, true, 'tickets.php?Unit=' . $Unit[ 'ID' ] ) . '&Status=3';?>
-		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Unit[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Unit=' . $Unit[ 'ID' ] ) . '&Status=6';?>
+		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Unit_ID=' . $Unit[ 'ID' ] );?>
+		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Unit[ 'Tickets_Open' ], true, true, 'tickets.php?Unit_ID=' . $Unit[ 'ID' ] . '&Status=0' );?>
+		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Unit[ 'Tickets_Assigned' ], true, true, 'tickets.php?Unit_ID=' . $Unit[ 'ID' ] . '&Status=1' );?>
+		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Unit[ 'Tickets_En_Route' ], true, true, 'tickets.php?Unit_ID=' . $Unit[ 'ID' ] . '&Status=2' );?>
+		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Unit[ 'Tickets_On_Site' ], true, true, 'tickets.php?Unit_ID=' . $Unit[ 'ID' ] . '&Status=3' );?>
+		                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Unit[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Unit_ID=' . $Unit[ 'ID' ] . '&Status=6' );?>
 		                        </div>
 		                    </div>
 		                    <div class='card card-primary my-3 col-12 col-lg-3'>
