@@ -15,13 +15,13 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->ID( 'Division' );?>,  
       <?php \singleton\datatables::getInstance( )->Name( 'Division' );?>,
       <?php \singleton\datatables::getInstance( )->Locations( 'Division', 'ID'  );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Units_Elevators'  );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Units_Escalators' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Units_Others' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Violations_Office' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Violations_Field' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Assigned' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Active' );?>
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Units_Elevators', 'Division', 'ID', 'Unit', 'units' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Units_Escalators', 'Division', 'ID', 'Unit', 'units' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Units_Others', 'Division', 'ID', 'Unit', 'units' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Violations_Office', 'Division', 'ID', 'violation', 'violations' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Violations_Field', 'Division', 'ID', 'violation', 'violations'  );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Assigned', 'Division', 'ID', 'Ticket', 'tickets'  );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Active', 'Division', 'ID', 'Ticket', 'tickets'  );?>
     ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'divisions' );?>,
     <?php \singleton\datatables::getInstance( )->buttons( 'division', 'divisions', 'ID' );?>
