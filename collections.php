@@ -118,7 +118,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Total', isset( $_GET[ 'Total' ] ) ? $_GET[ 'Total' ] : null );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );
                     ?><div class='row'><div class='col-12'><input type='submit' value='Submit' /></div></div>
@@ -134,7 +134,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Type', 'Type' );
                             \singleton\table::getInstance( )->th( 'Date', 'Date' );
                             \singleton\table::getInstance( )->th( 'Due', 'Due' );
-                            \singleton\table::getInstance( )->th( 'Original', 'Original' );
+                            \singleton\table::getInstance( )->th( 'Total', 'Total' );
                             \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
                             \singleton\table::getInstance( )->th( 'Description', 'Description' );
                         ?></tr><tr class='desktop'><?php
@@ -162,7 +162,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
                             \singleton\table::getInstance( )->th_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
                             \singleton\table::getInstance( )->th_input_date( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-                            \singleton\table::getInstance( )->th_input_currency( 'Original', isset( $_GET[ 'Original' ] ) ? $_GET[ 'Original' ] : null );
+                            \singleton\table::getInstance( )->th_input_currency( 'Total', isset( $_GET[ 'Total' ] ) ? $_GET[ 'Total' ] : null );
                             \singleton\table::getInstance( )->th_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
                         ?></tr></thead>

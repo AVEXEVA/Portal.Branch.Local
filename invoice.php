@@ -121,12 +121,15 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Route.Name                AS Route_Name,
                     Employee.ID               AS Employee_ID,
                     Employee.fFirst           AS Employee_First_Name,
-                    Employee.Last             AS Employee_Last_Name
+                    Employee.Last             AS Employee_Last_Name,
+                    OpenAR.Due                AS Due,
+                    OpenAR.Balance            AS Balance
             FROM    Invoice
                     LEFT JOIN Loc             AS Location ON Invoice.Loc      = Location.Loc
                     LEFT JOIN Job 	          AS Job	    ON Invoice.Job      = Job.ID
                     LEFT JOIN Zone 	          AS Division ON Location.Zone    = Division.ID
                     LEFT JOIN Route           AS Route	  ON Location.Route   = Route.ID
+                    LEFT JOIN OpenAR          AS OpenAR	  ON Invoice.Ref      = Invoice.Ref
                     LEFT JOIN (
                       SELECT  Customer.ID     AS ID,
                               Rolodex.Name    AS Name,
@@ -180,6 +183,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Employee_ID'          => null,
                 'Employee_First_Name'  => null,
                 'Employee_Last_Name'   => null,
+                'Balance'              => null,
+                'Original'             => null,
         ) : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
             $Invoice[ 'Location_ID' ] 	= isset( $_POST[ 'Location_ID' ] )  ? $_POST[ 'Location_ID' ]     : $Invoice[ 'Location_ID' ];
@@ -195,6 +200,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $Invoice[ 'Taxable' ] 	   	= isset( $_POST[ 'Taxable' ] ) 	 		? $_POST[ 'Taxable' ] 	      : $Invoice[ 'Taxable' ];
             $Invoice[ 'Sales_Tax' ]     = isset( $_POST[ 'Sales_Tax' ] ) 		? $_POST[ 'Sales_Tax' ] 	  	: $Invoice[ 'Sales_Tax' ];
             $Invoice[ 'Total' ] 	      = isset( $_POST[ 'Total' ] ) 	 		  ? $_POST[ 'Total' ]          	: $Invoice[ 'Total' ];
+            $Invoice[ 'Balance' ] 	    = isset( $_POST[ 'Balance' ] ) 	 		? $_POST[ 'Balance' ]        	: $Invoice[ 'Balance' ];
+            $Invoice[ 'Total' ] 	      = isset( $_POST[ 'Total' ] ) 	 	    ? $_POST[ 'Total' ]           : $Invoice[ 'Total' ];
             if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
                 $result = \singleton\database::getInstance( )->query(
                     null,
@@ -207,6 +214,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             fDate,
                             fDesc,
                             Amount,
+                            Total,
                             Taxable,
                             STax,
                             TFMID,
@@ -215,6 +223,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         )
                         VALUES(
                             @MAXID + 1,
+                            ?,
                             ?,
                             ?,
                             ?,
@@ -233,6 +242,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         !empty( $Invoice[ 'Date' ] ) ? $Invoice[ 'Date' ] : date( 'Y-m-d h:i:s' ),
                         $Invoice[ 'Description' ],
                         !empty( $Invoice[ 'Amount' ] ) ? $Invoice[ 'Amount' ] : 0,
+                        !empty( $Invoice[ 'Total' ] ) ? $Invoice[ 'Total' ] : 0,
                         !empty( $Invoice[ 'Taxable' ] ) ? $Invoice[ 'Taxable' ] : 0,
                         !empty( $Invoice[ 'Sales_Tax' ] ) ? $Invoice[ 'Sales_Tax' ] : 0
                     )
@@ -321,9 +331,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Description', $Invoice[ 'Description' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Invoice[ 'Date' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Due', $Invoice[ 'Due' ] );?>
-                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Amount', $Invoice[ 'Amount' ] );?>
-                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Sales_Tax', $Invoice[ 'Sales_Tax' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Total', $Invoice[ 'Total' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Sales_Tax', $Invoice[ 'Sales_Tax' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', $Invoice[ 'Balance' ] );?>
                             </div>
                         </div>
                     </div>

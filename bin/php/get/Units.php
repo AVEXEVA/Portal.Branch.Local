@@ -211,10 +211,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.State            AS Location_State,
                           Location.Zip              AS Location_Zip,
                           Unit.fDesc                AS Description,
-                          Unit.Type                 AS Type,
+                          CASE  WHEN Unit.Type =  0 THEN 'Elevator'
+                                WHEN Unit.Type =  1 THEN 'Escalator'
+                                WHEN Unit.Type =  2 THEN 'Moving-Walk'
+                          END AS Type,
                           Tickets.Count             AS Tickets,
                           Ticket.ID                 AS Ticket_ID,
-                          CASE  WHEN Unit.Status = 0 THEN 'Enabled' 
+                          CASE  WHEN Unit.Status = 0 THEN 'Enabled'
                                 WHEN Unit.Status = 1 THEN 'Disabled'
                                 WHEN Unit.Status = 2 THEN 'Demolished'
                                 ELSE 'Other'
@@ -233,7 +236,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN (
                             SELECT    Tickets.Unit_ID,
                                       Sum( Tickets.Count ) AS Count
-                            FROM      ( 
+                            FROM      (
                                         (
                                           SELECT    TicketO.LElev AS Unit_ID,
                                                     Count( TicketO.ID ) AS Count

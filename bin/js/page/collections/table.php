@@ -25,8 +25,8 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->Type('Type');?>,
       <?php \singleton\datatables::getInstance( )->Date('Date');?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Due' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Original' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Amount' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Total' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column( 'Balance' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Description' );?>
     ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'collections' );?>,
