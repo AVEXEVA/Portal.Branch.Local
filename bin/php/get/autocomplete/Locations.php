@@ -141,7 +141,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $sQuery,
       $parameters
     ) or die(print_r(sqlsrv_errors()));
-
     $output = array( );
       while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
         $output[]       = $Row;

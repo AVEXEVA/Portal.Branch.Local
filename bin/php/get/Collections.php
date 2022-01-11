@@ -148,6 +148,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters[] = $_GET['Description'];
         $conditions[] = "OpenAR.fDesc < ?";
     }
+    if( isset($_GET[ 'Total' ] ) && !in_array( $_GET[ 'Total' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Total'];
+        $conditions[] = "Invoice.Total < ?";
+    }
     /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
       $parameters[] = $_GET['Search'];
@@ -187,7 +191,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         5 =>  'JobType.Type',
         6 =>  'OpenAR.fDate',
         7 =>  'OpenAR.Due',
-        8 =>  'OpenAR.Original',
+        8 =>  'Invoice.Total',
         9 =>  'OpenAR.Balance',
         10 => 'OpenAR.fDesc'
     );
@@ -210,6 +214,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Location.City     AS Location_City,
                             Location.State    AS Location_State,
                             Location.Zip      AS Location_Zip,
+                            Invoice.Total     AS Total,
                             Job.ID            AS Job_ID,
                             Job.fDesc         AS Job_Name,
                             JobType.Type      AS Type,

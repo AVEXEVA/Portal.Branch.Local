@@ -96,7 +96,7 @@ $( document ).ready( function( ){
         },
         columns: [
             <?php \singleton\datatables::getInstance( )->ID( 'Territory' );?>,
-            <?php \singleton\datatables::getInstance( )->Name( 'Territory' );?>,
+            <?php \singleton\datatables::getInstance( )->Employee( );?>,
             <?php \singleton\datatables::getInstance( )->Locations( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Units( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Proposals( 'Territory', 'ID' );?>,

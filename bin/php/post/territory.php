@@ -25,7 +25,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		          Emp.fFirst + ' ' + Emp.Last AS Name,
 		          Emp.Title AS Title,
 		          Emp.Field   AS Field
-		  FROM  Emp
+		  FROM    Emp
 		  WHERE   Emp.ID = ?;",
 		array(
 		  	$_SESSION[ 'Connection' ][ 'User' ]
@@ -152,7 +152,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 							$database->query(null,"DELETE FROM dbo.Rol WHERE Rol.ID = ?;",array($Rolodex_ID));
 						}
 					}
-					$database->query(null,"DELETE FROM [Owner] WHERE [Owner].[ID] = ?;",array($ID));
+					$database->query(null,"DELETE FROM Terr WHERE Terr.[ID] = ?;",array($ID));
 				}
 				print json_encode(array('data'=>array()));
 			}
