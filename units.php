@@ -114,6 +114,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             \singleton\table::getInstance( )->th( 'ID', 'ID' );
             \singleton\table::getInstance( )->th( 'City_ID', 'City_ID' );
             \singleton\table::getInstance( )->th( 'Building_ID', 'Building_ID' );
+            \singleton\table::getInstance( )->th( 'Division', 'Division' );
             \singleton\table::getInstance( )->th( 'Route', 'Route' );
             \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
             \singleton\table::getInstance( )->th( 'Location', 'Location' );
@@ -124,6 +125,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
             \singleton\table::getInstance( )->th_input( 'City_ID', isset( $_GET[ 'City_ID' ] ) ? $_GET[ 'City_ID' ] : null );
             \singleton\table::getInstance( )->th_input( 'Building_ID', isset( $_GET[ 'Building_ID' ] ) ? $_GET[ 'Building_ID' ] : null );
+            \singleton\table::getInstance( )->th_autocomplete(
+              'Division', 'Divisions',
+              isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null,
+              isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null
+            );
             \singleton\table::getInstance( )->th_autocomplete(
               'Route', 'Routes',
               isset( $_GET[ 'Route_ID' ] ) ? $_GET[ 'Route_ID' ] : null,
