@@ -89,17 +89,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $result = \singleton\database::getInstance( )->query(
       null,
-      " SELECT 	Territory.ID             AS ID,
-                Territory.Name           AS Name,
-              	Territory.SMan           AS SMAN,
-                Territory.SDesc          AS Description,
-                Territory.Remarks        AS Remarks,
-                Territory.Count          AS Count,
-                Territory.Symbol         AS Symbol,
-                Territory.EN             AS EN,
-    	          Territory.Address        AS Address,
-                Territory.TFMID          AS TFMID,
-                Territory.TFMSource      AS TFMSource,
+      " SELECT 	Territory.ID                          AS ID,
+                Territory.Name                        AS Name,
+              	Territory.SMan                        AS SMAN,
+                Territory.SDesc                       AS Description,
+                Territory.Remarks                     AS Remarks,
+                Territory.Count                       AS Count,
+                Territory.Symbol                      AS Symbol,
+                Territory.EN                          AS EN,
+    	          Territory.Address                     AS Address,
+                Employee.ID                           AS Employee_ID,
+                Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
                 CASE    WHEN Locations.Count IS NULL THEN 0
                         ELSE Locations.Count END AS Locations_Count,
                 CASE    WHEN Locations.Maintained IS NULL THEN 0
@@ -143,6 +143,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 CASE    WHEN Proposals.[Closed] IS NULL THEN 0
                         ELSE Proposals.[Closed] END AS Proposals_Closed
         FROM    Terr AS Territory
+                LEFT JOIN Emp  AS Employee  ON  Employee.fWork = Territory.ID
                 LEFT JOIN (
                     SELECT      Location.Terr AS Territory,
                                 Sum( Maintained.Count ) AS Maintained,
@@ -348,7 +349,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $Name
       )
     );
-    //var_dump( sqlsrv_errors( ) );
+    ( sqlsrv_errors( ) );
     $Territory =   (      empty( $ID )
                       &&  !empty( $Name )
                       &&  !$result
@@ -364,8 +365,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     	'Symbol' => null,
                     	'EN' => null,
                     	'Address' => null,
-                      'TFMID' => null,
-                    	'TFMSource' => null,
+                      'Employee_Name' => null,
+                      'Employee_ID' => null,
                       //Totals
                       'Locations_Count' => null,
                       'Locations_Maintained' => null,
@@ -394,6 +395,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       // if the $_Post is set and the count is null, select if available
       $Territory[ 'ID' ] 		     = isset( $_POST[ 'ID' ] ) 	 ? $_POST[ 'ID' ] 	 : $Territory[ 'ID' ];
       $Territory[ 'Name' ] 	     = isset( $_POST[ 'Name' ] ) ? $_POST[ 'Name' ] : $Territory[ 'Name' ];
+      $Territory[ 'Employee_ID' ] 	 = isset( $_POST[ 'Employee_ID' ] )   ? $_POST[ 'Employee_ID' ]   : $Territory[ 'Employee_ID' ];
+      $Territory[ 'Employee_Name' ]  = isset( $_POST[ 'Employee_Name' ] ) ? $_POST[ 'Employee_Name' ] : $Territory[ 'Employee_Name' ];
       $Territory[ 'SMan' ] 		   = isset( $_POST[ 'SMan' ] ) 	 ? $_POST[ 'SMan' ] 	 : $Territory[ 'SMan' ];
       $Territory[ 'SDesc' ] 	   = isset( $_POST[ 'SDesc' ] ) 	 ? $_POST[ 'SDesc' ] 	 : $Territory[ 'SDesc' ];
       $Territory[ 'Remarks' ]    = isset( $_POST[ 'Remarks' ] ) 	 ? $_POST[ 'Remarks' ] 	 : $Territory[ 'Remarks' ];
@@ -401,10 +404,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Territory[ 'Symbol' ]     = isset( $_POST[ 'Symbol' ] )  ? $_POST[ 'Symbol' ]  : $Territory[ 'Symbol' ];
       $Territory[ 'EN' ]         = isset( $_POST[ 'EN' ] ) 	   ? $_POST[ 'EN' ] 	   : $Territory[ 'EN' ];
       $Territory[ 'Address' ]    = isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
-      $Territory[ 'TFMID' ] 	   = isset( $_POST[ 'TFMID' ] ) 	 ? $_POST[ 'TFMID' ] 	 : $Territory[ 'TFMID' ];
-      $Territory[ 'TFMSource' ]  = isset( $_POST[ 'TFMSource' ] )  ? $_POST[ 'TFMSource' ]  : $Territory[ 'TFMSource' ];
-      $Territory[ 'Address' ] 	 = isset( $_POST[ 'Address' ] ) 	 ? $_POST[ 'Address' ] 	 : $Territory[ 'Address' ];
-      $Territory[ 'Price' ] 	   = isset( $_POST[ 'Price' ] ) 	 ? $_POST[ 'Price' ] 	 : $Territory[ 'Price' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
@@ -418,14 +417,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               Count,
               Symbol,
               EN,
-              Address,
-              TFMID,
-              TFMSource
+              Address
             )
-            VALUES( @MAXID + 1 , ?, ?, ?, ?, ?, ?, ?, ?, ? );
+            VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ? );
             SELECT @MAXID + 1;",
           array(
-          	$Territory[ 'ID' ],
             $Territory[ 'Name' ],
             $Territory[ 'SDesc' ],
             $Territory[ 'Remarks' ],
@@ -433,9 +429,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $Territory[ 'Symbol' ],
             $Territory[ 'EN' ],
             $Territory[ 'Address' ],
-            $Territory[ 'TFMID' ],
-            $Territory[ 'TFMSource' ],
-            $Territory[ 'Price' ]
           )
         );
         sqlsrv_next_result( $result );
@@ -451,18 +444,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       } else {
         \singleton\database::getInstance( )->query(
           null,
-          "	UPDATE 	Territory
-            SET     Territory.ID = ?,
-                    Territory.Name = ?,
-                    Territory.SMan = ?,
-                    Territory.SDesc = ?,
-                    Territory.Remarks = ?,
-                    Territory.Count = ?,
-                    Territory.Symbol = ?,
-                    Territory.EN = ?,
-                    Territory.Address = ?,
-                    Territory.TFMID = ?,
-                    Territory.TFMSource = ?,
+          "	UPDATE 	Terr
+            SET     Terr.ID = ?,
+                    Terr.Name = ?,
+                    Terr.SMan = ?,
+                    Terr.SDesc = ?,
+                    Terr.Remarks = ?,
+                    Terr.Count = ?,
+                    Terr.Symbol = ?,
+                    Terr.EN = ?,
+                    Terr.Address = ?,
             WHERE 	Terr.ID = ?;",
           array(
             $Territory[ 'Name' ],
@@ -472,10 +463,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $Territory[ 'Count' ],
             $Territory[ 'Symbol' ],
             $Territory[ 'EN' ],
-            $Territory[ 'Address' ],
-            $Territory[ 'TFMID' ],
-            $Territory[ 'TFMSource' ],
-            $Territory[ 'Price' ]
+            $Territory[ 'Address' ]
           )
         );
       }
@@ -490,7 +478,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
      <?php	require( bin_css  . 'index.php');?>
      <?php  require( bin_js   . 'index.php');?>
 </head>
-<body onload='finishLoadingPage();'>
+<body>
   <div id="wrapper">
     <?php require(bin_php .'element/navigation.php');?>
     <div id="page-wrapper" class='content'>
@@ -503,6 +491,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               <div class='card card-primary my-3 col-12 col-lg-3'>
                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Locations', 'Location', 'Locations', 'Territory', $Territory[ 'ID' ] );?>
                 <div class='card-body bg-dark text-white' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Territories' ] == 0 ? "style='display:none;'" : null;?>>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Territory[ 'Employee_ID' ], $Territory[ 'Employee_Name' ] ); ?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'locations.php?Territory=' . $Territory[ 'ID' ] );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Total', $Territory[ 'Locations_Count' ], true, true, 'locations.php?Territory=' . $Territory[ 'ID' ] . '&Status=Preliminary Report');?>
                 </div>

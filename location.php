@@ -124,7 +124,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Territory.ID 		     AS Territory_ID,
                     Territory.Name       AS Territory_Name,
                     Division.ID 		     AS Division_ID,
-                    Division.Name 		    AS Division_Name,
+                    Division.Name 		   AS Division_Name,
                     CASE    WHEN Units.Count IS NULL THEN 0
                             ELSE Units.Count END AS Units_Count,
                     CASE    WHEN Units.Elevators IS NULL THEN 0
@@ -377,7 +377,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     	'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
     	'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
     	'Division_ID' => isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null,
-    	'Division_Name' => isset( $_GET[ 'Division' ] ) ? $_GET[ 'Division' ] : null,
+    	'Division_Name' => isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null,
     	'Route_ID' => isset( $_GET[ 'Route_ID' ] ) ? $_GET[ 'Route_ID' ] : null,
     	'Route_Name' => isset( $_GET[ 'Route_Name' ] ) ? $_GET[ 'Route_Name' ] : null,
     	'Territory_ID' => isset( $_GET[ 'Territory_ID' ] ) ? $_GET[ 'Territory_ID' ] : null,
@@ -421,14 +421,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $Location[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Location[ 'Customer_Name' ];
       $Location[ 'Route_ID' ] = isset( $_POST[ 'Route_ID' ] ) ? $_POST[ 'Route_ID' ] : $Location[ 'Route_ID' ];
       $Location[ 'Route_Name' ] = isset( $_POST[ 'Route_Name' ] ) ? $_POST[ 'Route_Name' ] : $Location[ 'Route_Name' ];
+      $Location[ 'Division_ID' ] = isset( $_POST[ 'Division_ID' ] ) ? $_POST[ 'Division_ID' ] : $Location[ 'Division_ID' ];
+      $Location[ 'Division_Name' ] = isset( $_POST[ 'Division_Name' ] ) ? $_POST[ 'Division_Name' ] : $Location[ 'Division_Name' ];
 
     	if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
     		$result = \singleton\database::getInstance( )->query(
 	    		null,
 	    		"	DECLARE @MAXID INT;
         		SET @MAXID = CASE WHEN ( SELECT Max( Loc ) FROM dbo.Loc ) IS NULL THEN 0 ELSE ( SELECT Max( Loc ) FROM dbo.Loc ) END;
-        		INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse, Route )
-	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+        		INSERT INTO dbo.Loc( Loc, Owner, Tag, Status, Address, City, State, Zip, Latt, fLong, Maint, Geolock, STax, InUse, Route, Zone )
+	    			VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
         		SELECT @MAXID + 1;",
 	    		array(
 	    			$Location[ 'Customer_ID' ],
@@ -444,7 +446,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    			is_null( $Location[ 'Geofence' ] ) ? 0 : $Location[ 'Geofence' ],
 	    			is_null( $Location[ 'Sales_Tax' ] ) ? 0 : $Location[ 'Sales_Tax' ],
 	    			is_null( $Location[ 'In_Use' ] ) ? 0 : $Location[ 'In_Use' ],
-            $Location[ 'Route_ID' ]
+            $Location[ 'Route_ID' ],
+            $Location[ 'Division_ID' ]
 	    		)
 	    	);
         	$Location[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
@@ -464,7 +467,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      					  Loc.fLong = ?,
 	      					  Loc.Maint = ?,
 	      					  Loc.Owner = ?,
-                    Loc.Route = ?
+                    Loc.Route = ?,
+                    Loc.Zone = ?,
 	    			WHERE 	Loc.Loc= ?;",
 	    		array(
 	    			$Location[ 'Name' ],
@@ -478,6 +482,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    			$Location[ 'Maintenance' ],
 	    			$Location[ 'Customer_ID' ],
             $Location[ 'Route_ID' ],
+            $Location[ 'Division_ID' ],
 	    			$Location[ 'ID' ]
 	    		)
 	    	);
@@ -585,7 +590,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Types', 'units.php?Location=' . $Location[ 'ID' ] );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Elevators', $Location[ 'Units_Elevators' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] . '&Type=Elevator');?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Location[ 'Units_Escalators' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Escalator';?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Escalators', $Location[ 'Units_Other' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Other';?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Other', $Location[ 'Units_Other' ], true, true, 'units.php?Location=' . $Location[ 'ID' ] ) . '&Type=Other';?>
                 </div>
               </div>
               <div class='card card-primary my-3 col-12 col-lg-3'>

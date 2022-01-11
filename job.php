@@ -307,7 +307,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
        );
        $Job =   empty( $ID ) ? array(
           'ID' => null,
-          'Name' => null,
+          'Name' => isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null,
           'Date' => null,
           'Type' => null,
           'Notes' => null,
@@ -396,30 +396,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           } else {
             \singleton\database::getInstance( )->query(
               null,
-              " DECLARE @Customer INT;
-                DECLARE @Location INT;
-                DECLARE @Unit INT;
-                SET @Customer = ( SELECT Top 1 Owner.ID FROM Owner LEFT JOIN Rol ON Owner.Rol = Rol.ID WHERE Rol.Name = ? );
-                SET @Location = ( SELECT Top 1 Loc.Loc FROM Loc WHERE Loc.Tag = ? AND Loc.Owner = @Customer );
-                SET @Unit = ( SELECT Top 1 Elev.State + ' ' + Elev.Unit FROM Elev WHERE Elev.Owner = @Customer AND Elev.Loc = @Location AND Elev.State = ? );
-                UPDATE  Job
-                SET Job.Owner = @Customer,
-                		Job.Loc = @Location,
-                		Job.Elev = @Unit,
+              " UPDATE  Job
+                SET Job.Owner = ?,
+                		Job.Loc = ?,
+                		Job.Elev = ?,
                 		Job.Type = ?,
                 		Job.fDesc = ?,
                 		Job.fDate = ?,
                     Job.Remarks = ?
                 WHERE   Job.ID = ?;",
               array(
-              	$Job[ 'Customer_Name' ],
                 $Job[ 'Customer_ID' ],
-              	$Job[ 'Location_Name' ],
                 $Job[ 'Location_ID' ],
-              	$Job[ 'Unit_Name' ],
                 $Job[ 'Unit_ID' ],
               	$Job[ 'Job_Type_ID' ],
-                $Job[ 'Job_Type_Name' ],
                 $Job[ 'Name' ],
                 $Job[ 'Date' ],
                 $Job[ 'Notes' ],

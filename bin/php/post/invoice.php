@@ -85,7 +85,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		if(isset($_POST['action']) && $_POST['action'] == 'delete'){
 			if(isset($_POST['data']) && count($_POST['data']) > 0){
 				foreach($_POST['data'] as $ID){
-					$database->query(null,"DELETE FROM dbo.Invoice WHERE Invoice.Ref = ?;",array($ID));
+					$database->query(null,"DELETE
+                                FROM dbo.OpenAR
+                                WHERE OpenAR.Ref = ?;",array($ID));
 				}
 				print json_encode(array('data'=>array()));
 			}

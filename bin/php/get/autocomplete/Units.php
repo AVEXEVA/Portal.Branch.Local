@@ -71,8 +71,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if(     !isset( $Connection[ 'ID' ] )
         ||  !isset( $Privileges[ 'Unit' ] )
         ||  !check( privilege_read, level_group, $Privileges[ 'Unit' ] )
-    ){ ?><?php require('404.html');?><?php }
-    else {
+      ){ ?><?php print json_encode( array( 'data' => array( ) ) );?><?php }
+      else {
 
     $conditions = array( );
     $search = array( );
@@ -84,7 +84,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Name'];
-      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.Unit LIKE '%' + ? + '%' )";
+      $conditions[] = "( Unit.Name LIKE '%' + ? + '%' OR Unit.State LIKE '%' + ? + '%' )";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -107,11 +107,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters [] = $User[ 'fWork' ];
         $conditions[] = "Unit.ID IN ( SELECT Ticket.Unit FROM ( ( SELECT TicketO.fWork AS Field, TicketO.LElev AS Unit FROM TicketO ) UNION ALL ( SELECT TicketD.fWork AS Field, TicketD.Elev AS Unit FROM TicketD ) ) AS Ticket WHERE Ticket.Field = ? GROUP BY Ticket.Unit)";
     }*/
-
     /*Search Filters*/
     if( isset( $_GET[ 'search' ] ) ){
 
-      $search[] = " Unit.State LIKE '%' + ? + '%'";
+      $search[] = " Unit.ID LIKE '%' + ? + '%'";
+      $parameters[] = $_GET[ 'search' ];
+
+      $search[] = " Unit.Name LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];
 
       $search[] = " Unit.Unit LIKE '%' + ? + '%'";
@@ -125,12 +127,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
       $search[] = "Unit.Type LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];
-
-        }
-
-        $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
-        $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-
+    }
+      $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
+      $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
     //    $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
       //  $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
         $parameters[] = $_GET[ 'search' ];
@@ -154,36 +153,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 tbl.FieldName,
                 tbl.FieldValue
           FROM 		(
-
                 SELECT
+                    insRowTbl.ID,
                     attr.insRow.value('local-name(.)', 'nvarchar(128)') as FieldName,
                     attr.insRow.value('.', 'nvarchar(max)') as FieldValue
-                FROM ( Select
-                          i.ID, convert(xml, (select i.* for xml raw)) as insRowCol
-                       FROM (
-
-                     ( SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                             Unit.ID AS ID,
-                             Unit.Name AS Name,
-                             Customer.ID AS Customer_ID,
-                             Customer.Name AS Customer_Name,
-                             Location.Loc AS Location_ID,
-                             Location.Tag AS Location_Name,
-                     FROM    Unit
-                             LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                FROM ( Select i.ID, convert(xml, (select i.* for xml raw)) as insRowCol
+                       FROM ( (
+                         SELECT Top 100
+                               Unit.ID AS ID,
+                               Unit.Name AS Name,
+                       FROM    Elev As Unit
+                               LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
+                               LEFT JOIN (
+                                 SELECT  Owner.ID,
+                                         Rol.Name
+                                 FROM    Owner
+                                         LEFT JOIN Rol ON Rol.ID = Owner.Rol
+                             ) AS Customer ON Unit.Owner = Customer.ID
                              LEFT JOIN (
-                               SELECT  Owner.ID,
-                                       Rol.Name
-                               FROM    Owner
-                                       LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                           ) AS Customer ON Unit.Owner = Customer.ID
-                           LEFT JOIN (
-                             SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
-                                       TicketD.Elev AS Unit,
-                                       TicketD.ID,
-                                       TicketD.EDate AS Date
-                             FROM      TicketD
-                           ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
+                               SELECT    ROW_NUMBER() OVER ( PARTITION BY TicketD.Elev ORDER BY TicketD.EDate DESC ) AS ROW_COUNT,
+                                         TicketD.Elev AS Unit,
+                                         TicketD.ID,
+                                         TicketD.EDate AS Date
+                               FROM      TicketD
+                             ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
                    /*  WHERE   ({$conditions}) AND ({$search}) */
         ) ) as i
         ) as insRowTbl
@@ -198,9 +191,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $sQuery,
       $parameters
     ) or die(print_r(sqlsrv_errors()));
-
-
-
     $output = array( );
       while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
         $output[]   		= $Row;
