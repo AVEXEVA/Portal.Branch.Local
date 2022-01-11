@@ -63,6 +63,7 @@ $( document ).ready( function( ){
             <?php \singleton\datatables::getInstance( )->Customer( );?>,
             <?php \singleton\datatables::getInstance( )->Location( );?>,
             <?php \singleton\datatables::getInstance( )->Job( );?>,
+            <?php \singleton\datatables::getInstance( )->Status('Status');?>,
             <?php \singleton\datatables::getInstance( )->Type('Type');?>,
             <?php \singleton\datatables::getInstance( )->Date('Date');?>,
             <?php \singleton\datatables::getInstance( )->data_column( 'Due' );?>,

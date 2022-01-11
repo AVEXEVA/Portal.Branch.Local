@@ -334,7 +334,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                               ) AS [Closed] ON Location.Loc = [Closed].Location
                   ) AS Invoices ON Invoices.Location = Location.Loc
                   LEFT JOIN (
-                    SELECT    Location.ID AS Location,
+                    SELECT    Location.Loc AS Location,
                               [Open].Count AS [Open],
                               [Closed].Count AS Closed
                     FROM      Loc AS Location
@@ -344,24 +344,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 FROM      Estimate
                                 WHERE     Estimate.Status = 0
                                 GROUP BY  Estimate.LocID
-                              ) AS [Open] ON Location.ID = [Open].Location
+                              ) AS [Open] ON Location.Loc = [Open].Location
                               LEFT JOIN (
                                 SELECT    Estimate.LocID AS Location,
                                           Count( Estimate.ID ) AS Count
                                 FROM      Estimate
                                 WHERE     Estimate.Status = 1
                                 GROUP BY  Estimate.LocID
-                              ) AS [Closed] ON Location.ID = [Closed].Location
+                              ) AS [Closed] ON Location.Loc = [Closed].Location
                   ) AS Proposals ON Proposals.Location = Location.Loc
 
-            WHERE   	Location.Loc = ?
-            		  OR 	Location.Tag = ?;",
+            WHERE   	Location.Loc = ?;",
         array(
-        	$ID,
-        	$Name
+        	$ID
         )
     );
-    //var_dump( sqlsrv_errors( ) );
     $Location = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
     	'ID' => null,
     	'Name' => null,

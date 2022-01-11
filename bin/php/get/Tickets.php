@@ -144,6 +144,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      $parameters[] = $_GET['Employee_Name'];
 	      $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
 	    }
+	    if( isset( $_GET[ 'Division_ID' ] ) && !in_array( $_GET[ 'Division_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Division_ID'];
+	      $conditions[] = "Division.ID LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Division_Name' ] ) && !in_array( $_GET[ 'Division_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Division_Name'];
+	      $conditions[] = "Division.Name LIKE '%' + ? + '%'";
+	    }
 	    if( isset( $_GET[ 'Customer_ID' ] ) && !in_array( $_GET[ 'Customer_ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Customer_ID'];
 	      $conditions[] = "Customer.ID LIKE '%' + ? + '%'";
@@ -170,7 +178,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    }
 	    if( isset( $_GET[ 'Job_ID' ] ) && !in_array( $_GET[ 'Job_ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Job_ID'];
-	      $conditions[] = "Job.ID LIKE '%' + ? + '%'"; 
+	      $conditions[] = "Job.ID = ?"; 
 	    }
 	    if( isset( $_GET[ 'Job_Name' ] ) && !in_array( $_GET[ 'Job_Name' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Job_Name'];
@@ -279,6 +287,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						Location.City 					AS Location_City,
 						Location.State 					AS Location_State,
 						Location.Zip 					AS Location_Zip,
+						Division.ID 					AS Division_ID,
+						Division.Name 					AS Division_Name,
 						Job.ID  						AS Job_ID,
 						Job.fDesc 						AS Job_Name,
 						JobType.Type 					AS Type,
@@ -344,6 +354,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						) AS Ticket
 						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
 						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
+						LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
 						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
 						LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
 						LEFT JOIN (
@@ -415,6 +426,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
 						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
 						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
+						LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
 						LEFT JOIN (
                     	    SELECT  Owner.ID,
                     	            Rol.Name 

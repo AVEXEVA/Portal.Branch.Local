@@ -439,13 +439,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <div class='card card-primary my-3 col-12 col-lg-3'>
                         <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Employee', $Employee[ 'ID' ] );?>
                         <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Employee=' . $Employee[ 'ID' ] );?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Employee[ 'Tickets_Open' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] . '&Status=0');?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Employee[ 'Tickets_Assigned' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=1';?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Employee[ 'Tickets_En_Route' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=2';?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Employee[ 'Tickets_On_Site' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=3';?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Employee[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=6';?>
-                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Completed', $Employee[ 'Tickets_Completed' ], true, true, 'tickets.php?Employee=' . $Employee[ 'ID' ] ) . '&Status=4';?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Employee_ID=' . $Employee[ 'ID' ] );?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Employee[ 'Tickets_Open' ], true, true, 'tickets.php?EmployeEmployee_IDe=' . $Employee[ 'ID' ] . '&Status=0');?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Employee[ 'Tickets_Assigned' ], true, true, 'tickets.php?Employee_ID=' . $Employee[ 'ID' ] . '&Status=1');?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Employee[ 'Tickets_En_Route' ], true, true, 'tickets.php?Employee_ID=' . $Employee[ 'ID' ] . '&Status=2');?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Employee[ 'Tickets_On_Site' ], true, true, 'tickets.php?Employee_ID=' . $Employee[ 'ID' ] . '&Status=3');?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Employee[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Employee_ID=' . $Employee[ 'ID' ] . '&Status=6');?>
+                            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Completed', $Employee[ 'Tickets_Completed' ], true, true, 'tickets.php?Employee_ID=' . $Employee[ 'ID' ] . '&Status=4');?>
                         </div>
                     </div>
                 </div>

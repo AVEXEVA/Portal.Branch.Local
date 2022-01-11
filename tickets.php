@@ -113,6 +113,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             <thead><tr class='text-center'><?php
               \singleton\table::getInstance( )->th( 'ID', 'ID' );
               \singleton\table::getInstance( )->th( 'Employee', 'Employee' );
+              \singleton\table::getInstance( )->th( 'Division', 'Division' );
               \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
               \singleton\table::getInstance( )->th( 'Location', 'Location' );
               \singleton\table::getInstance( )->th( 'Unit', 'Unit' );
@@ -127,7 +128,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th( 'Hours', 'Hours' );
             ?></tr><tr class='desktop'><?php
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-              \singleton\table::getInstance( )->th_autocomplete( 'Person', 'Persons', isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null, isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Employee', 'Employees', 
+                isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null, 
+                isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null 
+              );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Division', 'Divisions', 
+                isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null, 
+                isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null 
+              );
               \singleton\table::getInstance( )->th_autocomplete( 
                 'Customer', 'Customers', 
                 isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null, 
@@ -138,8 +148,16 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null, 
                 isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null 
               );
-              \singleton\table::getInstance( )->th_autocomplete( 'Unit', 'Units', isset( $_GET[ 'Unit_ID' ] ) ? $_GET[ 'Unit_ID' ] : null, isset( $_GET[ 'Unit_Name' ] ) ? $_GET[ 'Unit_Name' ] : null );
-              \singleton\table::getInstance( )->th_autocomplete( 'Job', 'Jobs', isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Unit', 'Units', 
+                isset( $_GET[ 'Unit_ID' ] ) ? $_GET[ 'Unit_ID' ] : null, 
+                isset( $_GET[ 'Unit_Name' ] ) ? $_GET[ 'Unit_Name' ] : null 
+              );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Job', 'Jobs', 
+                isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
+                isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
+              );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
               \singleton\table::getInstance( )->th_select( 'Level', isset( $_GET[ 'Level' ] ) ? $_GET[ 'Level' ] : null, array(
                 1  => 'Service Call',

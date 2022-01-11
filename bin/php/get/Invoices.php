@@ -80,17 +80,21 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters[] = $_GET['ID'];
         $conditions[] = "Invoice.Ref LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Customer'];
-        $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
+    if( isset($_GET[ 'Customer_ID' ] ) && !in_array( $_GET[ 'Customer_ID' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Customer_ID'];
+        $conditions[] = "Customer.ID = ?";
     }
-    if( isset($_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Location'];
-        $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
+    if( isset($_GET[ 'Location_ID' ] ) && !in_array( $_GET[ 'Location_ID' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Location_ID'];
+        $conditions[] = "Location.Loc = ?";
     }
-    if( isset($_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Job'];
-        $conditions[] = "Job.Job LIKE '%' + ? + '%'";
+    if( isset($_GET[ 'Job_ID' ] ) && !in_array( $_GET[ 'Job_ID' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Job_ID'];
+        $conditions[] = "Job.ID = ?";
+    }
+    if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
+        $parameters[] = $_GET['Status'];
+        $conditions[] = "Invoice.Status LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Type'];
