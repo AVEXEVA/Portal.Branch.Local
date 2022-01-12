@@ -466,36 +466,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card card-primary my-3 col-12 col-lg-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Tickets', 'Ticket', 'Tickets', 'Job', $Job[ 'ID' ] );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Tickets' ] ) && $_SESSION[ 'Cards' ][ 'Tickets' ] == 0 ? "style='display:none;'" : null;?>>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Job=' . $Job[ 'ID' ] );?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Tickets_Open' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Job[ 'Tickets_Assigned' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Job[ 'Tickets_En_Route' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=2';?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Job[ 'Tickets_On_Site' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=3';?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Job[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Job=' . $Job[ 'ID' ] ) . '&Status=6';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'tickets.php?Job_ID=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Tickets_Open' ], true, true, 'tickets.php?Job_ID=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Assigned', $Job[ 'Tickets_Assigned' ], true, true, 'tickets.php?Job_ID=' . $Job[ 'ID' ]. '&Status=1');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'En Route', $Job[ 'Tickets_En_Route' ], true, true, 'tickets.php?Job_ID=' . $Job[ 'ID' ] . '&Status=2');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'On Site', $Job[ 'Tickets_On_Site' ], true, true, 'tickets.php?Job_ID=' . $Job[ 'ID' ] . '&Status=3');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Reviewing', $Job[ 'Tickets_Reviewing' ], true, true, 'tickets.php?Job_ID=' . $Job[ 'ID' ] . '&Status=6');?>
             </div>
           </div>
           <div class='card card-primary my-3 col-12 col-lg-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Invoices', 'Invoice', 'Invoices', 'Job', $Job[ 'ID' ] );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Invoices' ] ) && $_SESSION[ 'Cards' ][ 'Invoices' ] == 0 ? "style='display:none;'" : null;?>>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Job=' . $Job[ 'ID' ] );?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Invoices_Open' ], true, true, 'invoices.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Invoices_Closed' ], true, true, 'invoices.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'invoices.php?Job_ID=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Invoices_Open' ], true, true, 'invoices.php?Job_ID=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Invoices_Closed' ], true, true, 'invoices.php?Job_ID=' . $Job[ 'ID' ] . '&Status=1');?>
             </div>
           </div>
           <div class='card card-primary my-3 col-12 col-lg-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Contracts', 'Contract', 'Contracts', 'Job', $Job[ 'ID' ] );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Contracts' ] ) && $_SESSION[ 'Cards' ][ 'Contracts' ] == 0 ? "style='display:none;'" : null;?>>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'contracts.php?Job=' . $Job[ 'ID' ] );?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Contracts_Open' ], true, true, 'contracts.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Contracts_Closed' ], true, true, 'contracts.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'contracts.php?Job_ID=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Contracts_Open' ], true, true, 'contracts.php?Job_ID=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Contracts_Closed' ], true, true, 'contracts.php?Job_ID=' . $Job[ 'ID' ] . '&Status=1');?>
             </div>
           </div>
           <div class='card card-primary my-3 col-12 col-lg-3'>
             <?php \singleton\bootstrap::getInstance( )->card_header( 'Proposals', 'Proposal', 'Proposals', 'Job', $Job[ 'ID' ] );?>
             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Proposals' ] ) && $_SESSION[ 'Cards' ][ 'Proposals' ] == 0 ? "style='display:none;'" : null;?>>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Job=' . $Job[ 'ID' ] );?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Proposals_Open' ], true, true, 'proposals.php?Job=' . $Job[ 'ID' ] . '&Status=0');?>
-              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Proposals_Closed' ], true, true, 'proposals.php?Job=' . $Job[ 'ID' ] ) . '&Status=1';?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_aggregated( 'Statuses', 'proposals.php?Job_ID=' . $Job[ 'ID' ] );?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Open', $Job[ 'Proposals_Open' ], true, true, 'proposals.php?Job_ID=' . $Job[ 'ID' ] . '&Status=0');?>
+              <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Closed', $Job[ 'Proposals_Closed' ], true, true, 'proposals.php?Job_ID=' . $Job[ 'ID' ] . '&Status=1');?>
             </div>
           </div>
         </div>

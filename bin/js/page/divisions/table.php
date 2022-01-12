@@ -18,8 +18,8 @@ $( document ).ready( function( ){
       <?php \singleton\datatables::getInstance( )->data_column_count( 'Units_Elevators', 'Division', 'ID', 'Unit', 'units' );?>,
       <?php \singleton\datatables::getInstance( )->data_column_count( 'Units_Escalators', 'Division', 'ID', 'Unit', 'units' );?>,
       <?php \singleton\datatables::getInstance( )->data_column_count( 'Units_Others', 'Division', 'ID', 'Unit', 'units' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column_count( 'Violations_Office', 'Division', 'ID', 'violation', 'violations' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column_count( 'Violations_Field', 'Division', 'ID', 'violation', 'violations'  );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Violations_Office', 'Division', 'ID', 'Violation', 'violations' );?>,
+      <?php \singleton\datatables::getInstance( )->data_column_count( 'Violations_Field', 'Division', 'ID', 'Violation', 'violations'  );?>,
       <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Assigned', 'Division', 'ID', 'Ticket', 'tickets'  );?>,
       <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Active', 'Division', 'ID', 'Ticket', 'tickets'  );?>
     ],
