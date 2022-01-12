@@ -118,6 +118,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
               \singleton\table::getInstance( )->th( 'Location', 'Location' );
               \singleton\table::getInstance( )->th( 'Job', 'Job' );
+              \singleton\table::getInstance( )->th( 'Status', 'Status' );
               \singleton\table::getInstance( )->th( 'Type', 'Type' );
               \singleton\table::getInstance( )->th( 'Date', 'Date' );
               \singleton\table::getInstance( )->th( 'Due', 'Due' );
@@ -141,6 +142,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 isset( $_GET[ 'Job_ID' ] ) ? $_GET[ 'Job_ID' ] : null, 
                 isset( $_GET[ 'Job_Name' ] ) ? $_GET[ 'Job_Name' ] : null 
               );
+              \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
               \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
               \singleton\table::getInstance( )->th_input( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
               \singleton\table::getInstance( )->th_input( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );

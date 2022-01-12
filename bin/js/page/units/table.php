@@ -66,8 +66,8 @@ $( document ).ready( function( ){
 			<?php \singleton\datatables::getInstance( )->Location( );?>,
 			<?php \singleton\datatables::getInstance( )->Type();?>,
 			<?php \singleton\datatables::getInstance( )->Status();?>,
-			<?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Assigned' );?>,
-            <?php \singleton\datatables::getInstance( )->data_column( 'Tickets_Active' );?>
+			<?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Assigned', 'Unit', 'ID', 'Ticket', 'tickets' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Active', 'Unit', 'ID', 'Ticket', 'tickets' );?>
 		],
 		<?php \singleton\datatables::getInstance( )->buttons('unit', 'units', 'ID' );?>,
         <?php \singleton\datatables::getInstance( )->initComplete( 'units' );?>

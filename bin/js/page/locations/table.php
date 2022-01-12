@@ -74,8 +74,8 @@ $(document).ready(function( ){
             <?php \singleton\datatables::getInstance( )->data_column('State');?>,
             <?php \singleton\datatables::getInstance( )->data_column('Zip');?>,
             <?php \singleton\datatables::getInstance( )->data_column('Units');?>,
-            <?php \singleton\datatables::getInstance( )->data_column('Tickets_Active');?>,
-            <?php \singleton\datatables::getInstance( )->data_column('Tickets_Assigned');?>,
+            <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Assigned', 'Location', 'ID', 'Ticket', 'tickets', 'Status=1'  );?>,
+            <?php \singleton\datatables::getInstance( )->data_column_count( 'Tickets_Active', 'Location', 'ID', 'Ticket', 'tickets', 'Status=2'  );?>,
             <?php \singleton\datatables::getInstance( )->data_column('Maintained');?>,
             <?php \singleton\datatables::getInstance( )->data_column('Status');?>            
         ],

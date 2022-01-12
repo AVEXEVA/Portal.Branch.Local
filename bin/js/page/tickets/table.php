@@ -72,12 +72,15 @@ $(document).ready(function( ){
         },
         columns: [
             <?php \singleton\datatables::getInstance( )->ID('ticket.php','Ticket');?>,
-            <?php \singleton\datatables::getInstance( )->Employee();?>,            
+            <?php \singleton\datatables::getInstance( )->Employee();?>,
+            <?php \singleton\datatables::getInstance( )->Division();?>,            
             <?php \singleton\datatables::getInstance( )->Customer();?>,
             <?php \singleton\datatables::getInstance( )->Location(1);?>,
             <?php \singleton\datatables::getInstance( )->Unit();?>,
             <?php \singleton\datatables::getInstance( )->Job();?>,
+            <?php \singleton\datatables::getInstance( )->data_column( 'Level' );?>,
             <?php \singleton\datatables::getInstance( )->data_column( 'Type' );?>,
+            <?php \singleton\datatables::getInstance( )->data_column( 'Status' );?>,
             <?php \singleton\datatables::getInstance( )->date( 'Date' );?>,
             <?php /*\singleton\datatables::getInstance( )->data_column( 'Level' );?>,
             <?php \singleton\datatables::getInstance( )->Status();?>,
@@ -85,8 +88,7 @@ $(document).ready(function( ){
             <?php \singleton\datatables::getInstance( )->Time( 'En_Route' );?>,
             <?php \singleton\datatables::getInstance( )->Time( 'On_Site' );?>,
             <?php \singleton\datatables::getInstance( )->Time( 'Completed' );?>,
-            <?php \singleton\datatables::getInstance( )->TicketHours();?>,
-            <?php \singleton\datatables::getInstance( )->TicketLSD();?>            
+            <?php \singleton\datatables::getInstance( )->TicketHours();?>
         ],
         <?php \singleton\datatables::getInstance( )->initComplete( 'tickets' );?>,
         <?php \singleton\datatables::getInstance( )->buttons( 'ticket', 'tickets', 'ID' );?>

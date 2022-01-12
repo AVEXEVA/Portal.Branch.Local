@@ -136,25 +136,53 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Ticket.ID LIKE '%' + ? + '%'";
 	    }
-	    if( isset( $_GET[ 'Person' ] ) && !in_array( $_GET[ 'Person' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Person'];
+	    if( isset( $_GET[ 'Employee_ID' ] ) && !in_array( $_GET[ 'Employee_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Employee_ID'];
+	      $conditions[] = "Employee.ID = ?";
+	    }
+	    if( isset( $_GET[ 'Employee_Name' ] ) && !in_array( $_GET[ 'Employee_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Employee_Name'];
 	      $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
 	    }
-	    if( isset( $_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Customer'];
+	    if( isset( $_GET[ 'Division_ID' ] ) && !in_array( $_GET[ 'Division_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Division_ID'];
+	      $conditions[] = "Division.ID LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Division_Name' ] ) && !in_array( $_GET[ 'Division_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Division_Name'];
+	      $conditions[] = "Division.Name LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Customer_ID' ] ) && !in_array( $_GET[ 'Customer_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Customer_ID'];
+	      $conditions[] = "Customer.ID LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Customer_Name' ] ) && !in_array( $_GET[ 'Customer_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Customer_Name'];
 	      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
 	    }
-	    if( isset( $_GET[ 'Location' ] ) && !in_array( $_GET[ 'Location' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Location'];
+	    if( isset( $_GET[ 'Location_ID' ] ) && !in_array( $_GET[ 'Location_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Location_ID'];
+	      $conditions[] = "Location.Loc LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Location_Name' ] ) && !in_array( $_GET[ 'Location_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Location_Name'];
 	      $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
 	    }
-	    if( isset( $_GET[ 'Unit' ] ) && !in_array( $_GET[ 'Unit' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Unit'];
-	      $conditions[] = "Unit.State + ' ' + Unit.Unit LIKE '%' + ? + '%'";
+	    if( isset( $_GET[ 'Unit_ID' ] ) && !in_array( $_GET[ 'Unit_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Unit_ID'];
+	      $conditions[] = "Unit.ID = ?";
 	    }
-	    if( isset( $_GET[ 'Job' ] ) && !in_array( $_GET[ 'Job' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Job'];
-	      $conditions[] = "CAST(Job.ID as VARCHAR( 25 ) ) + ' ' + Job.fDesc LIKE '%' + ? + '%'"; 
+	    if( isset( $_GET[ 'Unit_Name' ] ) && !in_array( $_GET[ 'Unit_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Unit_Name'];
+	      $conditions[] = "Unit.State LIKE '%' + ? + '%'";
+	    }
+	    if( isset( $_GET[ 'Job_ID' ] ) && !in_array( $_GET[ 'Job_ID' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Job_ID'];
+	      $conditions[] = "Job.ID = ?"; 
+	    }
+	    if( isset( $_GET[ 'Job_Name' ] ) && !in_array( $_GET[ 'Job_Name' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET['Job_Name'];
+	      $conditions[] = "Job.fDesc LIKE '%' + ? + '%'"; 
 	    }
 	    if( isset( $_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Type'];
@@ -166,7 +194,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    }
 	    if( isset( $_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Status'];
-	      $conditions[] = "Ticket.Status LIKE '%' + ? + '%'";
+	      $conditions[] = "Ticket.Status = ?";
 	    }
 	    if( isset( $_GET[ 'Start_Date' ] ) && !in_array( $_GET[ 'Start_Date' ], array( '', ' ', null ) ) ){
 			$parameters[] = $_GET['Start_Date'];
@@ -250,35 +278,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						Ticket.ID 						AS ID,
 						Ticket.Date 					AS Date,
 						Ticket.Description 				AS Description,
+						Ticket.Level 					AS Level,
 						Customer.ID  					AS Customer_ID,
 						Customer.Name 					AS Customer_Name,
 						Location.Loc 					AS Location_ID,
-						Location.Tag 					AS Location_Tag,
+						Location.Tag 					AS Location_Name,
 						Location.Address 				AS Location_Street,
 						Location.City 					AS Location_City,
 						Location.State 					AS Location_State,
 						Location.Zip 					AS Location_Zip,
+						Division.ID 					AS Division_ID,
+						Division.Name 					AS Division_Name,
 						Job.ID  						AS Job_ID,
 						Job.fDesc 						AS Job_Name,
-						JobType.Type 					AS Job_Type,
-						Ticket.Level 					AS Level,
+						JobType.Type 					AS Type,
 						Unit.ID 					 	AS Unit_ID,
+						Unit.State 						AS Unit_Name,
 						Unit.State 						AS Unit_City_ID,
 						Unit.Unit 						AS Unit_Building_ID,
 						Ticket.Hours 					AS Hours,
 						Ticket.Status 	 				AS Status,
 						Ticket.Payroll  				AS Payroll,
-						Employee.fFirst + ' ' + Employee.Last AS Person,
 						Employee.ID 					AS Employee_ID,
+						Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
 						CASE 	WHEN Ticket.Time_Route = '1899-12-30 00:00:00.000' THEN null 
 								ELSE Ticket.Time_Route 
-						END AS Time_Site,
+						END AS En_Route,
 						CASE 	WHEN Ticket.Time_Site = '1899-12-30 00:00:00.000' THEN null 
 								ELSE Ticket.Time_Site 
-						END AS Time_Route,
+						END AS On_Site,
 						CASE 	WHEN Ticket.Time_Completed = '1899-12-30 00:00:00.000' THEN null 
 								ELSE Ticket.Time_Completed 
-						END AS Time_Completed,
+						END AS Completed,
 						CASE 	WHEN Ticket.Resolution LIKE '%LSD%' THEN 1
 								ELSE 0 
 						END AS LSD
@@ -323,6 +354,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						) AS Ticket
 						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
 						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
+						LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
 						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
 						LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
 						LEFT JOIN (
@@ -331,7 +363,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM    Owner 
                                     LEFT JOIN Rol ON Rol.ID = Owner.Rol
                         ) AS Customer ON Job.Owner = Customer.ID
-						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
+						LEFT JOIN Elev AS Unit ON Ticket.Unit = Unit.ID
 				WHERE 	({$conditions}) AND ({$search})
 			) AS Tbl 
 			WHERE 		Tbl.ROW_COUNT >= ?
@@ -344,11 +376,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 		while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
 	      $Ticket[ 'Status' ]    		= $Statuses[ $Ticket[ 'Status' ] ];
-	      $Ticket[ 'Level' ]      		= $Levels[ $Ticket[ 'Level' ] ];
-          $Ticket[ 'Date' ]       		= date( 'm/d/Y', strtotime( $Ticket[ 'Date' ] ) );
-          $Ticket[ 'Time_Route' ] 		= date( 'h:i A', strtotime( $Ticket['Time_Route' ] ) );
-          $Ticket[ 'Time_Site' ]  		= date( 'h:i A', strtotime( $Ticket['Time_Site' ] ) );
-          $Ticket[ 'Time_Completed' ]  	= date( 'h:i A', strtotime( $Ticket['Time_Completed' ] ) );
+	      $Ticket[ 'Level' ]      		= isset( $Levels[ $Ticket[ 'Level' ] ] ) ? $Levels[ $Ticket[ 'Level' ] ] : 'Error';
+          $Ticket[ 'Date' ]       		= is_null( $Ticket[ 'Date' ] )      ? null : date( 'm/d/Y', strtotime( $Ticket[ 'Date' ] ) );
+          $Ticket[ 'En_Route' ] 		= is_null( $Ticket[ 'En_Route' ] )  ? null : date( 'h:i A', strtotime( $Ticket['En_Route' ] ) );
+          $Ticket[ 'On_Site' ]  		= is_null( $Ticket[ 'On_Site' ] )   ? null : date( 'h:i A', strtotime( $Ticket['On_Site' ] ) );
+          $Ticket[ 'Completed' ]  		= is_null( $Ticket[ 'Completed' ] ) ? null : date( 'h:i A', strtotime( $Ticket['Completed' ] ) );
 	      $output[ 'aaData' ][]   		= $Ticket;
 	    }
 
@@ -394,6 +426,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
 						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
 						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
+						LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
 						LEFT JOIN (
                     	    SELECT  Owner.ID,
                     	            Rol.Name 
@@ -402,7 +435,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     	) AS Customer ON Job.Owner = Customer.ID
 						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
 			WHERE 		({$conditions}) AND ({$search});";
-
+		
 	    $stmt = \singleton\database::getInstance( )->query( 
 	    	null, 
 	    	$sQueryRow, 

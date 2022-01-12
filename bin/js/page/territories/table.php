@@ -103,7 +103,7 @@ $( document ).ready( function( ){
             <?php \singleton\datatables::getInstance( )->Leads( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Proposals( 'Territory', 'ID' );?>,
             <?php \singleton\datatables::getInstance( )->Collections( 'Territory', 'ID' );?>,
-            <?php \singleton\datatables::getInstance( )->Invoices( 'Territory', 'ID' );?>
+            <?php \singleton\datatables::getInstance( )->Invoices( 'Invoices', 'ID' );?>
         ],
         buttons: [
             {

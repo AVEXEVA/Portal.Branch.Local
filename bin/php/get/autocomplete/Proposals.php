@@ -149,10 +149,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       8 =>  'Estimate.Price',
       9 =>  'Estimate.Status'
     );
-    $Order = isset( $Columns[ $_GET['order']['column'] ] )
+    $Order = isset( $_GET[ 'order' ] ) && isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
         : "Estimate.ID";
-    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
+    $Direction = isset( $_GET[ 'order' ] ) && in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
       ? $_GET['order']['dir']
       : 'ASC';
     $sQuery =
@@ -206,7 +206,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       null,
       $sQuery,
       $parameters
-    ) or die(print_r(sqlsrv_errors()));
+    ) or die(print_r(sqlsrv_errors());
 
     $output = array( );
       while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
