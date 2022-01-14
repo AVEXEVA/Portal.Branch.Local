@@ -22,6 +22,26 @@ class datatables extends \singleton\index {
           selector : 'td.ID'
         }<?php
     }
+    public function preferences_paging_off( ){
+        ?>dom            : "<'row'<'col-sm-9'B><'col-sm-3 search'>><'row'<'col-sm-12't>>",
+        processing     : true,
+        serverSide     : true,
+        autoWidth      : false,
+        searching      : false,
+        lengthChange   : false,
+        scrollResize   : true,
+        //scrollY        : 100,
+        //scroller       : false,
+        //scrollCollapse : true,
+        paging         : false,
+        orderCellsTop  : true,
+        autoWidth      : true,
+        responsive     : true,
+        select         : {
+          style : 'multi',
+          selector : 'td.ID'
+        }<?php
+    }
     public function initComplete( $reference ){
         ?>initComplete : function( ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control redraw' />" );
@@ -149,6 +169,39 @@ class datatables extends \singleton\index {
             }
         }<?php
     }
+    public function data_column_bit( $key ){
+        ?>{
+            data : '<?php echo $key;?>',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.<?php echo $key;?> != null && row.<?php echo $key;?> != '' && row.<?php echo $key;?> != '1'
+                            ?   'No'
+                            :   'Yes'
+                    default:
+                        return '';
+                }
+            }
+        }<?php
+    }
+    public function data_column_hide( $key ){
+        ?>{
+            data : '<?php echo $key;?>',
+            className : 'hidden',
+            targets : 0,
+            visible : false,
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display':
+                        return row.<?php echo $key;?> != null && row.<?php echo $key;?> != ''
+                            ?   row.<?php echo $key;?>
+                            :   '';
+                    default:
+                        return '';
+                }
+            }
+        }<?php
+    }
     public function data_column_currency( $key ){
     	?>{
     		data : '<?php echo $key;?>',
@@ -184,6 +237,24 @@ class datatables extends \singleton\index {
               }
           }
       }<?php
+    }
+    public function data_column_url( $key, $key_url ){?>
+        {
+            className : '<?php echo $key;?>',
+            data : '<?php echo $key;?>',
+            render : function( data, type, row, meta ){
+                switch( type ){
+                    case 'display' :
+                        return  row.<?php echo $key;?> !== null && row.<?php echo $key;?> != ''
+                            ?   "<div class='row'>" +
+                                    "<div class='col-12'><a href='" + row.<?php echo $key_url;?> + "'><?php \singleton\fontawesome::getInstance( )->$key( 1 );?> " + row.<?php echo $key;?> + "</a></div>" +
+                                "</div>"
+                            :   '';
+                    default :
+                        return '';
+                }
+            }
+        }<?php
     }
     public function data_column_link( $reference, $key, $page = null ){
         $page = is_null( $page ) ? $reference : $page;

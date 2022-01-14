@@ -1,0 +1,1 @@
+<script src='bin/js/page/work_orders/table.php?<?php echo rand( 1000, 999999 );?>&<?php echo isset( $_GET[ 'RowGroup1' ] ) ? 'RowGroup1=' . $_GET[ 'RowGroup1' ] : null;?>&<?php echo isset( $_GET[ 'RowGroup2' ] ) ? 'RowGroup2' . $_GET[ 'RowGroup2' ] : null;?>'></script>

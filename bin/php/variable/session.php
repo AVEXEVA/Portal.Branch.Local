@@ -5,9 +5,9 @@ $_SESSION[ 'Database' ] = isset( $_POST[ 'Database' ] )
 		? $_POST[ 'Database' ] 
 		: ( isset( $_SESSION[ 'Database' ] ) 
 			?	$_SESSION[ 'Database' ]
-			:	'Demo'
+			:	'N-FL'
 		);
-\singleton\database::getInstance( )->changeDefault( isset( $_SESSION[ 'Database' ] ) ? $_SESSION[ 'Database' ] : 'Demo' );
+\singleton\database::getInstance( )->changeDefault( isset( $_SESSION[ 'Database' ] ) ? $_SESSION[ 'Database' ] : 'N-FL' );
 
 $_SESSION[ 'Tables' ] = isset( $_SESSION[ 'Tables' ] ) 
 		?	$_SESSION[ 'Tables' ]

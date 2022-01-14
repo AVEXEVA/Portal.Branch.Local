@@ -133,12 +133,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 
 	    if( isset( $_GET[ 'ID' ] ) && !in_array(  $_GET[ 'ID' ], array( '', ' ', null ) ) ){
-	      $parameters[] = intval( $_GET['ID'] );
+	      $parameters[] = $_GET['ID'];
 	      $conditions[] = "Ticket.ID LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Open' ] ) && !in_array(  $_GET[ 'Open' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET[ 'Open' ];
-	      $conditions[] = "Ticket.[Open] = ?";
 	    }
 	    if( isset( $_GET[ 'Employee_ID' ] ) && !in_array( $_GET[ 'Employee_ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Employee_ID'];
@@ -155,14 +151,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    if( isset( $_GET[ 'Division_Name' ] ) && !in_array( $_GET[ 'Division_Name' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Division_Name'];
 	      $conditions[] = "Division.Name LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Route_ID' ] ) && !in_array( $_GET[ 'Route_ID' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Route_ID'];
-	      $conditions[] = "Route.ID LIKE '%' + ? + '%'";
-	    }
-	    if( isset( $_GET[ 'Route_Name' ] ) && !in_array( $_GET[ 'Route_Name' ], array( '', ' ', null ) ) ){
-	      $parameters[] = $_GET['Route_Name'];
-	      $conditions[] = "Route.Name LIKE '%' + ? + '%'";
 	    }
 	    if( isset( $_GET[ 'Customer_ID' ] ) && !in_array( $_GET[ 'Customer_ID' ], array( '', ' ', null ) ) ){
 	      $parameters[] = $_GET['Customer_ID'];
@@ -247,7 +235,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      	default : break;
 	      }
 	    }
-	    
+	    if( isset( $_GET[ 'RowGroup1' ] ) && !in_array(  $_GET[ 'RowGroup1' ], array( '', ' ', null ) ) ){
+	      $parameters[] = $_GET[ 'RowGroup1' ];
+	      $conditions[] = "Ticket.RowGroup1 LIKE '%' + ? + '%'";
+	    }
 		/*Search Filters*/
 		//if( isset( $_GET[ 'search' ] ) ){ }
 		
@@ -258,76 +249,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
 		/*ROW NUMBER*/
 		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] - 25 : 0;
-		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
+		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 9999;
 
 		/*Order && Direction*/
 		//update columns from bin/js/tickets/table.js
 		$Columns = array(
-			0 =>  'Ticket.ID',
-			1 =>  "Employee.fFirst + ' ' + Employee.Last",
-			2 =>  'Customer.Name',
-			3 =>  'Location.Tag',
-			4 =>  "Unit.State + ' - ' + Unit.Unit",
-			5 =>  'Job.ID',
-			6 =>  "JobType.Type + ' ' + Ticket.Level",
-			7 =>  'Ticket.Date',
-			8 =>  'Ticket.Time_Route',
-			8 =>  'Ticket.Time_Site',
-			9 =>  'Ticket.Time_Completed'
+			0 =>  "CASE 	WHEN Ticket.Level = 1  THEN 'Service Call'  WHEN Ticket.Level = 10 THEN 'Maintenance' WHEN Ticket.Level = 3  THEN 'Modernization' ELSE 'Other' END",
+			1 =>  "CASE 	WHEN Ticket.Level = 1  THEN Employee.fFirst + ' ' + Employee.Last  WHEN Ticket.Level = 10 THEN Route.Name WHEN Ticket.Level = 3  THEN Job.fDesc ELSE 'Other' END",
+			2 =>  'Ticket.ID',
+			3 =>  "Employee.fFirst + ' ' + Employee.Last",
+			4 =>  'Customer.Name',
+			5 =>  'Location.Tag',
+			6 =>  "Unit.State + ' - ' + Unit.Unit",
+			7 =>  'Job.ID',
+			8 =>  "JobType.Type + ' ' + Ticket.Level",
+			9 =>  'Ticket.Date',
+			10 =>  'Ticket.Time_Route',
+			11 =>  'Ticket.Time_Site',
+			12 =>  'Ticket.Time_Completed'
 	    );
-	    $Order = isset( $Columns[ $_GET['order']['column'] ] )
-	        ? $Columns[ $_GET['order']['column'] ]
-	        : "Ticket.ID";
-	    $Direction = in_array( $_GET['order']['dir'], array( 'asc', 'desc', 'ASC', 'DESC' ) )
-	      ? $_GET['order']['dir']
-	      : 'ASC';
+	    $Order = $Columns[ 0 ];
+	    $Direction = 'ASC';
+
+	    $Order2 = $Columns[ 1 ];
+	    $Direction2 = 'ASC';
 
 		/*Perform Query*/
 		$Query = "
 			SELECT 	*
 			FROM 	(
-				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-						Ticket.ID 						AS ID,
-						Ticket.Date 					AS Date,
-						Ticket.Description 				AS Description,
-						Ticket.Level 					AS Level,
-						Ticket.[Open] 					AS [Open],
-						Customer.ID  					AS Customer_ID,
-						Customer.Name 					AS Customer_Name,
-						Location.Loc 					AS Location_ID,
-						Location.Tag 					AS Location_Name,
-						Location.Address 				AS Location_Street,
-						Location.City 					AS Location_City,
-						Location.State 					AS Location_State,
-						Location.Zip 					AS Location_Zip,
-						Division.ID 					AS Division_ID,
-						Division.Name 					AS Division_Name,
-						Route.ID 						AS Route_ID,
-						Route.Name 						AS Route_Name,
-						Job.ID  						AS Job_ID,
-						Job.fDesc 						AS Job_Name,
-						JobType.Type 					AS Type,
-						Unit.ID 					 	AS Unit_ID,
-						Unit.State 						AS Unit_Name,
-						Unit.State 						AS Unit_City_ID,
-						Unit.Unit 						AS Unit_Building_ID,
-						Ticket.Hours 					AS Hours,
-						Ticket.Status 	 				AS Status,
-						Ticket.Payroll  				AS Payroll,
-						Employee.ID 					AS Employee_ID,
-						Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
-						CASE 	WHEN Ticket.Time_Route = '1899-12-30 00:00:00.000' THEN null 
-								ELSE Ticket.Time_Route 
-						END AS En_Route,
-						CASE 	WHEN Ticket.Time_Site = '1899-12-30 00:00:00.000' THEN null 
-								ELSE Ticket.Time_Site 
-						END AS On_Site,
-						CASE 	WHEN Ticket.Time_Completed = '1899-12-30 00:00:00.000' THEN null 
-								ELSE Ticket.Time_Completed 
-						END AS Completed,
-						CASE 	WHEN Ticket.Resolution LIKE '%LSD%' THEN 1
-								ELSE 0 
-						END AS LSD
+				SELECT 	Ticket.RowGroup2 AS RowGroup2,
+						Ticket.RowLink,
+						Count( Ticket.ID ) AS Count
 				FROM 	(
 							(
 								SELECT 	TicketO.ID       	AS ID,
@@ -345,47 +298,44 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				           	     		TicketO.TimeSite    AS Time_Site,
 				           	     		TicketO.TimeComp    AS Time_Completed,
 				           	     		'' 					AS Resolution,
-				           	     		1					AS [Open]
+				           	     		CASE 	WHEN TicketO.Level = 1   THEN 'Service Call'  
+				           	     				WHEN TicketO.Level = 10  THEN 'Maintenance' 
+				           	     				WHEN TicketO.Level = 3   THEN 'Modernization' 
+				           	     				ELSE 'Other' 
+				           	     		END AS RowGroup1,
+				           	     		CASE 	WHEN TicketO.Level = 1  THEN Employee.fFirst + ' ' + Employee.Last 
+												WHEN TicketO.Level = 10 THEN 'Route #' + Route.Name
+												WHEN TicketO.Level = 3  THEN Job.fDesc
+												ELSE 'Other'
+										END AS RowGroup2,
+										CASE 	WHEN TicketO.Level = 1  THEN 'tickets.php?Open=1&Employee_ID=' + cast( Employee.ID AS VARCHAR( 255 ) ) + '&Employee_Name=' + Employee.Name
+												WHEN TicketO.Level = 10 THEN 'tickets.php?Open=1&Route_ID=' + cast( Route.ID AS varchar( 255 ) ) + '&Route_Name=' + Route.Name
+												WHEN TicketO.Level = 3  THEN 'tickets.php?Open=1&Job_ID' + cast( Job.ID AS varchar( 255 ) ) + '&Job_Name=' + Job.fDesc
+												ELSE 'Other'
+										END AS RowLink
 						 		FROM   	TicketO
 						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
 	                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
-							) UNION ALL (
-								SELECT 	TicketD.ID      	AS ID,
-										TicketD.EDate   	AS Date,
-										TicketD.fWork 		AS Field,
-										TicketD.Loc 		AS Location,
-										TicketD.Job 		AS Job,
-										TicketD.Elev		AS Unit, 
-										TicketD.Total 		AS Hours,
-										TicketD.Level 		AS Level,
-										4					AS Status,
-										TicketD.fDesc 		AS Description,
-										TicketD.ClearPR 	AS Payroll,
-										TicketD.TimeRoute 	AS Time_Route,
-				           	     		TicketD.TimeSite    AS Time_Site,
-				           	     		TicketD.TimeComp    AS Time_Completed,
-				           	     		TicketD.DescRes 	AS Resolution,
-				           	     		0					AS [Open]
-							 	FROM   	TicketD
+	                					LEFT JOIN Emp 		   AS Employee ON TicketO.fWork    = Employee.fWork
+										LEFT JOIN Loc          AS Location ON TicketO.LID = Location.Loc
+										LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
+										LEFT JOIN Job          AS Job      ON TicketO.Job      = Job.ID
+										LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
+										LEFT JOIN Route 	   AS Route    ON Location.Route  = Route.ID
+										LEFT JOIN (
+				                            SELECT  Owner.ID,
+				                                    Rol.Name 
+				                            FROM    Owner 
+				                                    LEFT JOIN Rol ON Rol.ID = Owner.Rol
+				                        ) AS Customer ON Job.Owner = Customer.ID
+										LEFT JOIN Elev AS Unit ON TicketO.LElev = Unit.ID
+
 							)
 						) AS Ticket
-						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
-						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
-						LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
-						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
-						LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
-						LEFT JOIN (
-                            SELECT  Owner.ID,
-                                    Rol.Name 
-                            FROM    Owner 
-                                    LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                        ) AS Customer ON Job.Owner = Customer.ID
-						LEFT JOIN Elev AS Unit ON Ticket.Unit = Unit.ID
-						LEFT JOIN Route ON Location.Route = Route.ID
 				WHERE 	({$conditions}) AND ({$search})
-			) AS Tbl 
-			WHERE 		Tbl.ROW_COUNT >= ?
-					AND Tbl.ROW_COUNT <= ?;";
+				GROUP BY 	Ticket.RowGroup2,
+							Ticket.RowLink
+			) AS Tbl;";
 
 		$rResult = \singleton\database::getInstance( )->query(
 			null,
@@ -394,17 +344,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		) or die(print_r(sqlsrv_errors()));
 
 		while ( $Ticket = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
-	      $Ticket[ 'Status' ]    		= $Statuses[ $Ticket[ 'Status' ] ];
-	      $Ticket[ 'Level' ]      		= isset( $Levels[ $Ticket[ 'Level' ] ] ) ? $Levels[ $Ticket[ 'Level' ] ] : 'Error';
-          $Ticket[ 'Date' ]       		= is_null( $Ticket[ 'Date' ] )      ? null : date( 'm/d/Y', strtotime( $Ticket[ 'Date' ] ) );
-          $Ticket[ 'En_Route' ] 		= is_null( $Ticket[ 'En_Route' ] )  ? null : date( 'h:i A', strtotime( $Ticket['En_Route' ] ) );
-          $Ticket[ 'On_Site' ]  		= is_null( $Ticket[ 'On_Site' ] )   ? null : date( 'h:i A', strtotime( $Ticket['On_Site' ] ) );
-          $Ticket[ 'Completed' ]  		= is_null( $Ticket[ 'Completed' ] ) ? null : date( 'h:i A', strtotime( $Ticket['Completed' ] ) );
 	      $output[ 'aaData' ][]   		= $Ticket;
 	    }
-
 		$sQueryRow = "
-	        SELECT 		Count( Ticket.ID ) AS Count
+	        SELECT 		Ticket.RowGroup1,
+				        Count( Ticket.ID ) AS Count
 			FROM 		(
 							(
 								SELECT 	TicketO.ID       	AS ID,
@@ -420,44 +364,39 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			        	   	     		TicketO.TimeRoute 	AS Time_Route,
 			        	   	     		TicketO.TimeSite    AS Time_Site,
 			        	   	     		TicketO.TimeComp    AS Time_Completed,
-				    	       	     		'' 				AS Resolution,
-				    	       	     	1					AS [Open]
+				    	       	     	'' 					AS Resolution,
+				    	       	     	CASE 	WHEN TicketO.Level = 1   THEN 'Service Call'  
+				           	     				WHEN TicketO.Level = 10  THEN 'Maintenance' 
+				           	     				WHEN TicketO.Level = 3   THEN 'Modernization' 
+				           	     				ELSE 'Other' 
+				           	     		END AS RowGroup1,
+				           	     		CASE 	WHEN TicketO.Level = 1  THEN Employee.fFirst + ' ' + Employee.Last 
+												WHEN TicketO.Level = 10 THEN 'Route #' + Route.Name
+												WHEN TicketO.Level = 3  THEN Job.fDesc
+												ELSE 'Other'
+										END AS RowGroup2
 						 		FROM   	TicketO
 						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
-                						LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
-							) UNION ALL (
-								SELECT 	TicketD.ID      AS ID,
-										TicketD.EDate   AS Date,
-										TicketD.fWork 	AS Field,
-										TicketD.Loc 	AS Location,
-										TicketD.Job 	AS Job,
-										TicketD.Elev	AS Unit,
-										TicketD.Total 	AS Hours,
-										TicketD.Level 	AS Level,
-										4				AS Status,
-										TicketD.ClearPR AS Payroll,
-										TicketD.TimeRoute 	AS Time_Route,
-			        	   	     		TicketD.TimeSite    AS Time_Site,
-			        	   	     		TicketD.TimeComp    AS Time_Completed,
-				    	       	     	TicketD.DescRes 	AS Resolution,
-				    	       	     	0 					AS [Open]
-							 	FROM   	TicketD
+	                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
+	                					LEFT JOIN Emp 		   AS Employee ON TicketO.fWork    = Employee.fWork
+										LEFT JOIN Loc          AS Location ON TicketO.LID = Location.Loc
+										LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
+										LEFT JOIN Job          AS Job      ON TicketO.Job      = Job.ID
+										LEFT JOIN JobType 	   AS JobType  ON Job.Type 		  = JobType.ID
+										LEFT JOIN Route 	   AS Route    ON Location.Route  = Route.ID
+										LEFT JOIN (
+				                            SELECT  Owner.ID,
+				                                    Rol.Name 
+				                            FROM    Owner 
+				                                    LEFT JOIN Rol ON Rol.ID = Owner.Rol
+				                        ) AS Customer ON Job.Owner = Customer.ID
+										LEFT JOIN Elev AS Unit ON TicketO.LElev = Unit.ID
 							)
 						) AS Ticket
-						LEFT JOIN Emp 		   AS Employee ON Ticket.Field    = Employee.fWork
-						LEFT JOIN Loc          AS Location ON Ticket.Location = Location.Loc
-						LEFT JOIN Job          AS Job      ON Ticket.Job      = Job.ID
-						LEFT JOIN Zone 		   AS Division ON Location.Zone   = Division.ID
-						LEFT JOIN (
-                    	    SELECT  Owner.ID,
-                    	            Rol.Name 
-                    	    FROM    Owner 
-                    	            LEFT JOIN Rol ON Rol.ID = Owner.Rol
-                    	) AS Customer ON Job.Owner = Customer.ID
-						LEFT JOIN Elev         AS Unit     ON Ticket.Unit     = Unit.ID
-						LEFT JOIN Route ON Location.Route = Route.ID
-			WHERE 		({$conditions}) AND ({$search});";
-		
+						
+			WHERE 		({$conditions}) AND ({$search})
+			GROUP BY 	Ticket.RowGroup1;";
+		//echo $sQueryRow;
 	    $stmt = \singleton\database::getInstance( )->query( 
 	    	null, 
 	    	$sQueryRow, 
@@ -472,9 +411,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	                	(
 	                		SELECT 	TicketO.ID
 	                		FROM 	TicketO
-	                	) UNION ALL (
-	                		SELECT 	TicketD.ID
-	                		FROM 	TicketD
 	                	)
 	            	) AS Ticket;";
 	    $rResultTotal = \singleton\database::getInstance( )->query(

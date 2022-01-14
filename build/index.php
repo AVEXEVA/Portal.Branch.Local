@@ -3,7 +3,7 @@
 //require( 'sql/index.php' );
 
 /*********ACTIONS******/
-//require( 'build/truncation.php' );
+require( 'build/truncation.php' );
 
 /*********DATA*********/
 require( 'build/databases.php' );
