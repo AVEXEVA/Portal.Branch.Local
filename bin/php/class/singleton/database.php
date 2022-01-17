@@ -1,8 +1,7 @@
 <?php
 namespace singleton;
 class database extends \singleton\index {
-	private $default = 'Demo';
-	private $resources = array( );
+	private $default = null;
 	private $databases = array( );
 	private $host = '20.124.200.54';
 	private $user = 'sa';
@@ -30,18 +29,19 @@ class database extends \singleton\index {
 			$this->databases[ ] = $row[ 'Name' ];	
 			$options = $this->options;
 			$options[ 'Database' ] = $database;
-			$this->resources[ $database ] = sqlsrv_connect( $this->host, $options );
+			$this->databases[ $database ] = sqlsrv_connect( $this->host, $options );
+			if( $row[ 'Default' ] == 1 ){ $this->default = $row[ 'Name' ]; }
 		} }
 	}
 	public function query( $database, $query, $parameters = array( ) ){
 		return is_null ( $database ) || !in_array( $database, array_keys( $this->resources ) )
 			?	sqlsrv_query(
-					$this->resources[ $this->default ],
+					$this->databases[ $this->default ],
 					$query,
 					$parameters
 				)
 			: 	sqlsrv_query(
-					$this->resources[ $database ],
+					$this->databases[ $database ],
 					$query,
 					$parameters
 				);
