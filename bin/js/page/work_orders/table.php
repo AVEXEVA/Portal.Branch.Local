@@ -86,7 +86,7 @@ $(document).ready(function( ){
                     if( $( this ).children( ':first-child' ).html( ) == '<?php echo $_GET[ 'RowGroup1' ];?>' ){
                         $( this ).after( "<tr><td><table id='<?php echo str_replace( ' ', '_', $_GET[ 'RowGroup1' ] );?>'></table></td></tr>" );
                         $( "#<?php echo str_replace( ' ', '_', $_GET[ 'RowGroup1' ] );?>" ).DataTable( {
-                            <?php \singleton\datatables::getInstance( )->preferences_paging_off( );?>,
+                            <?php \singleton\datatables::getInstance( )->preferences_only_table( );?>,
                             ajax: {
                                     url     : 'bin/php/get/Work_Orders_RowGroup.php?RowGroup1=<?php echo $_GET[ 'RowGroup1' ];?>'
                             },
