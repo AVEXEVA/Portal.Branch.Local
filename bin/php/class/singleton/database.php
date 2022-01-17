@@ -3,32 +3,38 @@ namespace singleton;
 class database extends \singleton\index {
 	private $default = 'Demo';
 	private $resources = array( );
-	private $databases = array(
-		'Portal',
-		'Development',
-		'Demo'
-	);
+	private $databases = array( 'Portal' );
 	private $host = '20.124.200.54';
 	private $user = 'sa';
 	private $password = '007!Youknowwhattodo!';
 	private $options = array(
-		'Database' 				=> 	null,
-	    'Uid' 					=> 	'sa',
-	    'PWD' 					=> 	'007!Youknowwhattodo!',
-	    'ReturnDatesAsStrings'	=>	true,
-	    'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
-	    'TraceOn' 				=> 	false
+		'Database' 				=> 	'Portal',
+		'Uid' 					=> 	'sa',
+		'PWD' 					=> 	'007!Youknowwhattodo!',
+		'ReturnDatesAsStrings'	=>	true,
+		'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
+		'TraceOn' 				=> 	false
 	);
 	protected function __construct( ){
-		if( is_array( $this->databases ) && count( $this->databases ) > 0 ){
-			foreach( $this->databases as $database ){
-				if( is_string( $database ) && strlen( $database ) > 0 ){
-					$options = $this->options;
-					$options[ 'Database' ] = $database;
-					$this->resources[ $database ] = sqlsrv_connect( $this->host, $options );
-				}
-			}
-		}
+		self::connect( );
+	}
+	private function connect( ){
+		$Database = sqlsrv_connect( 
+			$this->host,
+			$this->options
+		);
+		$result = sqlsrv_query(
+			$Database,
+			"	SELECT 	Database.Name
+				FROM 	Portal.dbo.Database
+				WHERE 	Database.Status = 1;"
+		);
+		if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){
+			$this->databases[ ] = $row[ 'Name' ];	
+			$options = $this->options;
+			$options[ 'Database' ] = $database;
+			$this->resources[ $database ] = sqlsrv_connect( $this->host, $options );
+		} }
 	}
 	public function query( $database, $query, $parameters = array( ) ){
 		return is_null ( $database ) || !in_array( $database, array_keys( $this->resources ) )
