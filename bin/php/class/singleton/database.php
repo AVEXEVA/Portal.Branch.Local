@@ -22,15 +22,16 @@ class database extends \singleton\index {
 		);
 		$result = sqlsrv_query(
 			$this->databases[ 'Portal' ],
-			"	SELECT 	Database.Name
-				FROM 	Portal.dbo.Database
-				WHERE 	Database.Status = 1;"
+			"	SELECT 	[Database].Name,
+						[Database].[Default]
+				FROM 	[Database]
+				WHERE 	[Database].[Status] = 1;"
 		);
 		if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){
 			$this->databases[ ] = $row[ 'Name' ];	
 			$options = $this->options;
-			$options[ 'Database' ] = $database;
-			$this->databases[ $database ] = sqlsrv_connect( $this->host, $options );
+			$options[ 'Database' ] = $row[ 'Name' ];
+			$this->databases[ $row[ 'Name' ] ] = sqlsrv_connect( $this->host, $options );
 			if( $row[ 'Default' ] == 1 ){ $this->default = $row[ 'Name' ]; }
 		} }
 	}

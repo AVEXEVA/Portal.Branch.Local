@@ -25,13 +25,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		          Emp.fFirst + ' ' + Emp.Last AS Name,
 		          Emp.Title AS Title,
 		          Emp.Field   AS Field
-		  FROM  Emp
+		  FROM    Emp
 		  WHERE   Emp.ID = ?;",
 		array(
 		  	$_SESSION[ 'Connection' ][ 'User' ]
 		)
 	);
-	$User   = sqlsrv_fetch_array( $result );
+	$User   = $result ? sqlsrv_fetch_array( $result ) : null;
 	//Privileges
 	$Access = 0;
 	$Hex = 0;
