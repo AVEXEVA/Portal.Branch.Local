@@ -16,9 +16,6 @@ class database extends \singleton\index {
 		'TraceOn' 				=> 	false
 	);
 	protected function __construct( ){
-		self::connect( );
-	}
-	private function connect( ){
 		$Database = sqlsrv_connect( 
 			$this->host,
 			$this->options
