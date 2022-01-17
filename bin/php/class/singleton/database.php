@@ -5,9 +5,8 @@ class database extends \singleton\index {
 	private $resources = array( );
 	private $databases = array(
 		'Portal',
-		'Nei',
-		'N-FL',
-		'Dev01'
+		'Development',
+		'Demo'
 	);
 	private $host = '20.124.200.54';
 	private $user = 'sa';
