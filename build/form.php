@@ -38,12 +38,14 @@
 						if( $row[ 'Name' ] == 'Portal' ){
 							?><div class='row'>
 								<label class='col-4'><?php echo $row[ 'Name' ];?></label>
-								<input class='col-8' name='Portal' type='checkbox' value='1' checked disabled />
+								<input class='col-4' name='Portal' type='checkbox' value='1' checked disabled />
+								<input class='col-4' name='Portal' type='checkbox' value='0' disabled />
 							</div><?php
 						} else {
 							?><div class='row'>
 								<label class='col-4'><?php echo $row[ 'Name' ];?></label>
-								<input onChange='updateDatabases( );' class='col-8' name='Databases[ ]' type='checkbox' value='<?php echo $row[ 'Name' ];?>' />
+								<input onChange='updateDatabases( );' class='col-4' name='Databases[ ]' type='checkbox' value='<?php echo $row[ 'Name' ];?>' />
+								<input onChange='updateDatabases( );' class='col-4' name='Defaults[ ]' type='checkbox' value='<?php echo $row[ 'Name' ];?>' />
 							</div><?php
 						}
 					}}?>
