@@ -234,6 +234,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Customers</div>
         </div>
       </div><?php } ?>
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Ticket' ] ) ? $Privileges[ 'Ticket' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='work_orders.php'">
+        <div class='p-1 border'>
+          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Ticket(3);?></div>
+          <div class ='nav-text'>Dispatch</div>
+        </div>
+      </div><?php } ?>
       <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Division' ] ) ? $Privileges[ 'Division' ] : 0 ) ){
         ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='divisions.php'">
         <div class='p-1 border'>
@@ -329,6 +335,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Violations</div>
         </div>
       </div><?php } ?>
+      
     </section>
   </div>
 </div>

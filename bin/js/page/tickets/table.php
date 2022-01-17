@@ -72,8 +72,10 @@ $(document).ready(function( ){
         },
         columns: [
             <?php \singleton\datatables::getInstance( )->ID('ticket.php','Ticket');?>,
+            <?php \singleton\datatables::getInstance( )->data_column_bit( 'Open' );?>,
             <?php \singleton\datatables::getInstance( )->Employee();?>,
-            <?php \singleton\datatables::getInstance( )->Division();?>,            
+            <?php \singleton\datatables::getInstance( )->Division();?>,
+            <?php \singleton\datatables::getInstance( )->Route();?>,
             <?php \singleton\datatables::getInstance( )->Customer();?>,
             <?php \singleton\datatables::getInstance( )->Location(1);?>,
             <?php \singleton\datatables::getInstance( )->Unit();?>,

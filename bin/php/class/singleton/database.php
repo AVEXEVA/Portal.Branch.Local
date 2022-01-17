@@ -6,6 +6,7 @@ class database extends \singleton\index {
 	private $databases = array(
 		'Portal',
 		'Nei',
+		'N-FL',
 		'Dev01'
 	);
 	private $host = '172.16.12.44';
