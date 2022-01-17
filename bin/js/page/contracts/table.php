@@ -70,7 +70,6 @@ $( document ).ready( function() {
       <?php \singleton\datatables::getInstance( )->data_column( 'Escalation_Type' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Billing_Escalation_Cycle' );?>,
       <?php \singleton\datatables::getInstance( )->data_column( 'Link' );?>,
-      <?php \singleton\datatables::getInstance( )->data_column( 'Remarks' );?>
     ],
     <?php \singleton\datatables::getInstance( )->initComplete( 'contracts' );?>,
     <?php \singleton\datatables::getInstance( )->buttons( 'contract', 'contracts', 'ID' );?>
