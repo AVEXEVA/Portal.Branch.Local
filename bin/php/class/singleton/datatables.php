@@ -42,6 +42,29 @@ class datatables extends \singleton\index {
           selector : 'td.ID'
         }<?php
     }
+    public function preferences_only_table( ){
+        ?>dom            : "t",
+        processing     : true,
+        serverSide     : true,
+        autoWidth      : false,
+        searching      : false,
+        lengthChange   : false,
+        scrollResize   : true,
+        //scrollY        : 100,
+        //scroller       : false,
+        //scrollCollapse : true,
+        paging         : false,
+        orderCellsTop  : true,
+        autoWidth      : true,
+        responsive     : true,
+        drawCallback   : function() {
+        	$("#<?php echo $_GET[ 'RowGroup1' ];?> thead").remove();
+    	},
+        select         : {
+          style : 'multi',
+          selector : 'td.ID'
+        }<?php
+    }
     public function initComplete( $reference ){
         ?>initComplete : function( ){
             $("div.search").html( "<input type='text' name='Search' placeholder='Search' class='form-control redraw' />" );
