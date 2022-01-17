@@ -3,7 +3,7 @@ namespace singleton;
 class database extends \singleton\index {
 	private $default = 'Demo';
 	private $resources = array( );
-	private $databases = array( 'Portal' );
+	private $databases = array( );
 	private $host = '20.124.200.54';
 	private $user = 'sa';
 	private $password = '007!Youknowwhattodo!';
@@ -16,12 +16,12 @@ class database extends \singleton\index {
 		'TraceOn' 				=> 	false
 	);
 	protected function __construct( ){
-		$Database = sqlsrv_connect( 
+		$this->databases[ 'Portal' ] = sqlsrv_connect( 
 			$this->host,
 			$this->options
 		);
 		$result = sqlsrv_query(
-			$Database,
+			$this->databases[ 'Portal' ],
 			"	SELECT 	Database.Name
 				FROM 	Portal.dbo.Database
 				WHERE 	Database.Status = 1;"
