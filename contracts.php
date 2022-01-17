@@ -114,7 +114,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Date', isset( $_GET[ 'Esc. Date' ] ) ? $_GET[ 'Esc. Date' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Type', isset( $_GET[ 'Esc. Type' ] ) ? $_GET[ 'Esc. Type' ] : null, false, false, false, 'redraw' );?>
                     <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Esc. Cycle', isset( $_GET[ 'Billing_Escalation_Cycle' ] ) ? $_GET[ 'Billing_Escalation_Cycle' ] : null, false, false, false, 'redraw' );?>
-                    <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Remarks', isset( $_GET[ 'Remarks' ] ) ? $_GET[ 'Remarks' ] : null, false, false, false, 'redraw' );?>
                 </div>
                 <div class="card-body bg-dark">
 					<table id='Table_Contracts' class='display' cellspacing='0' width='100%'>
@@ -133,7 +132,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Esc. Type', 'Esc. Type' );
                             \singleton\table::getInstance( )->th( 'Esc. Cycle', 'Billing_Escalation_Cycle' );
                             \singleton\table::getInstance( )->th( 'Link', 'Link' );
-                            \singleton\table::getInstance( )->th( 'Remarks', 'Remarks' );
             			?></tr><tr class='form-desktop'><?php
                             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
                             \singleton\table::getInstance( )->th_autocomplete(
@@ -161,7 +159,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th_input( 'Esc. Type', isset( $_GET[ 'Esc. Type' ] ) ? $_GET[ 'Esc. Type' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Esc. Cycle', isset( $_GET[ 'Billing_Escalation_Cycle' ] ) ? $_GET[ 'Billing_Escalation_Cycle' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Link', isset( $_GET[ 'Link' ] ) ? $_GET[ 'Link' ] : null );
-                            \singleton\table::getInstance( )->th_input( 'Remarks', isset( $_GET[ 'Remarks' ] ) ? $_GET[ 'Remarks' ] : null );
                         ?></tr></thead>
                     </table>
                 </div>
