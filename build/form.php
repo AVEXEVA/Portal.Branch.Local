@@ -14,7 +14,7 @@
 			$.ajax( {
 				processData: false,
 				contentType: false,
-				url : 'post/database.php',
+				url : 'build/post/database.php',
 				data : formData,
 				method : 'POST',
 				success : function( code ){ }
@@ -28,7 +28,7 @@
   		<div class='card card-primary p-3 col-lg-3 text-white'>
   			<div class='card-heading'>Databases</div>
   			<div class='card-body'>
-			  	<form id='Databases' action='#' method='POST' class='p-3'><?php 
+			  	<form id='Databases' action='index.php' method='POST' class='p-3'><?php 
 				  	$result = \singleton\database::getInstance( )->query( 
 						Portal,
 						"	SELECT 	[Database].[Name] 

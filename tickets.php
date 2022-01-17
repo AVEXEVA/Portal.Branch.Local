@@ -112,8 +112,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
             <thead><tr class='text-center'><?php
               \singleton\table::getInstance( )->th( 'ID', 'ID' );
+              \singleton\table::getInstance( )->th( 'Open', 'Open' );
               \singleton\table::getInstance( )->th( 'Employee', 'Employee' );
               \singleton\table::getInstance( )->th( 'Division', 'Division' );
+              \singleton\table::getInstance( )->th( 'Route', 'Route' );
               \singleton\table::getInstance( )->th( 'Customer', 'Customer' );
               \singleton\table::getInstance( )->th( 'Location', 'Location' );
               \singleton\table::getInstance( )->th( 'Unit', 'Unit' );
@@ -128,6 +130,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               \singleton\table::getInstance( )->th( 'Hours', 'Hours' );
             ?></tr><tr class='desktop'><?php
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
+              \singleton\table::getInstance( )->th_select( 'Open', isset( $_GET[ 'Open' ] ) ? $_GET[ 'Open' ] : null, array(
+                0 => 'No',
+                1 => 'Yes'
+              ) );
               \singleton\table::getInstance( )->th_autocomplete( 
                 'Employee', 'Employees', 
                 isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null, 
@@ -137,6 +143,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Division', 'Divisions', 
                 isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null, 
                 isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null 
+              );
+              \singleton\table::getInstance( )->th_autocomplete( 
+                'Route', 'Routes', 
+                isset( $_GET[ 'Route_ID' ] ) ? $_GET[ 'Route_ID' ] : null, 
+                isset( $_GET[ 'Route_Name' ] ) ? $_GET[ 'Route_Name' ] : null 
               );
               \singleton\table::getInstance( )->th_autocomplete( 
                 'Customer', 'Customers', 

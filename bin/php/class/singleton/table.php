@@ -5,6 +5,10 @@ class table extends \singleton\index {
 		$icon = is_null( $icon ) ? $label : $icon;
 		?><th class='text-white border border-white'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
 	}
+	public function th_hide( $label, $icon = null ){
+		$icon = is_null( $icon ) ? $label : $icon;
+		?><th class='text-white border border-white hidden'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
+	}
 	public function th_2( $label, $icon = null ){
 		$icon = is_null( $icon ) ? $label : $icon;
 		?><th class='text-white border border-white' colspan='2'><?php \singleton\fontawesome::getInstance( )->$icon( );?> <?php echo str_replace( '_', ' ', $label );?></th><?php
