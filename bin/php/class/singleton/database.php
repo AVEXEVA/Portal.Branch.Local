@@ -1,20 +1,20 @@
 <?php
 namespace singleton;
 class database extends \singleton\index {
-	private $default = 'Dev01';
+	private $default = 'Demo';
 	private $resources = array( );
 	private $databases = array(
 		'Portal',
-		'Nei',
-		'Dev01'
+		'Demo',
+		'Development'
 	);
-	private $host = '172.16.12.44';
+	private $host = '20.124.200.54';
 	private $user = 'sa';
-	private $password = 'SQLABC!23456';
+	private $password = '007!Youknowwhattodo!';
 	private $options = array(
 		'Database' 				=> 	null,
 	    'Uid' 					=> 	'sa',
-	    'PWD' 					=> 	'SQLABC!23456',
+	    'PWD' 					=> 	'007!Youknowwhattodo!',
 	    'ReturnDatesAsStrings'	=>	true,
 	    'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 	    'TraceOn' 				=> 	false
@@ -43,7 +43,7 @@ class database extends \singleton\index {
 					$parameters
 				);
 	}
-	public function changeDefault( $database = 'Dev01' ){
+	public function changeDefault( $database = 'Demo' ){
 		if( in_array( $database, $this->databases ) ){
 			$this->default = $database;
 		}
