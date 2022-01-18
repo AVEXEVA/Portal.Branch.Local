@@ -103,6 +103,30 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $parameters[] = $_GET['Address'];
         $conditions[] = "Territory.Address + ' ' + Territory.City + ' ' + Territory.State + ' ' + Territory.Zip LIKE '%' + ? + '%'";
       }
+      if( isset( $_GET[ 'Employee' ] ) && !in_array(  $_GET[ 'Employee' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Employee'];
+      $conditions[] = "Employee.Name LIKE '%' + ? + '%'";
+      }
+      if( isset( $_GET[ 'Location' ] ) && !in_array(  $_GET[ 'Location' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Location'];
+      $conditions[] = "Location.Tag LIKE '%' + ? + '%'";
+      }
+      if( isset( $_GET[ 'Unit' ] ) && !in_array(  $_GET[ 'Unit' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Unit'];
+      $conditions[] = "Unit.Name LIKE '%' + ? + '%'";
+      }
+      if( isset( $_GET[ 'Proposal' ] ) && !in_array(  $_GET[ 'Proposal' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Proposal'];
+      $conditions[] = "Territory.Name LIKE '%' + ? + '%'";
+      }
+      if( isset( $_GET[ 'Collection' ] ) && !in_array(  $_GET[ 'Collection' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Collection'];
+      $conditions[] = "Territory.Name LIKE '%' + ? + '%'";
+      }
+      if( isset( $_GET[ 'Invoice' ] ) && !in_array(  $_GET[ 'Invoice' ], array( '', ' ', null ) ) ){
+      $parameters[] = $_GET['Invoice'];
+      $conditions[] = "Territory.Name LIKE '%' + ? + '%'";
+      }
 		/*Search Filters*/
 		//if( isset( $_GET[ 'search' ] ) ){ }
 
@@ -115,8 +139,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		$parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] -25 : 0;
 		$parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 25 : 0;
 
-		/*Order && Direction*/
-		//update columns from bin/js/tickets/table.js
 		$Columns = array(
 			0 =>  'Territory.ID',
 			1 =>  'Territory.Contact'
@@ -142,8 +164,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						Territory.EN  				   	      AS EN,
 						Territory.Address 				      AS Address,
 						Territory.TFMID 					      AS TFMID,
-            Territory.TFMSource 	   		    AS TFMSource
+            Territory.TFMSource 	   		    AS TFMSource,
+            Location.Loc                    AS Location_ID,
+            Location.Tag                    AS Location_Name,
+            Unit.ID                         AS Unit_ID,
+            Unit.Unit                       AS Unit_Name
 				FROM 	Terr AS Territory
+        LEFT JOIN dbo.Loc  AS Location ON  Location.Loc     =  Territory.Address
+        LEFT JOIN dbo.Elev AS Unit     ON  Unit.ID          =  Territory.Count
 				WHERE 	({$conditions}) AND ({$search})
 			) AS Tbl
 			WHERE 		Tbl.ROW_COUNT >= ?
