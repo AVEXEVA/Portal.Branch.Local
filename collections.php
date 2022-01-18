@@ -117,9 +117,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     );
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, false, false, false, 'redraw' );
                     \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Total', isset( $_GET[ 'Total' ] ) ? $_GET[ 'Total' ] : null );
-                    \singleton\bootstrap::getInstance( )->card_row_form_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Total', isset( $_GET[ 'Total' ] ) ? $_GET[ 'Total' ] : null );
+                    \singleton\bootstrap::getInstance( )->card_row_form_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
                     \singleton\bootstrap::getInstance( )->card_row_form_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null, false, false, false, 'redraw' );
                     ?><div class='row'><div class='col-12'><input type='submit' value='Submit' /></div></div>
                 </div>
@@ -162,8 +162,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
                             \singleton\table::getInstance( )->th_input_date( 'Date', isset( $_GET[ 'Date' ] ) ? $_GET[ 'Date' ] : null );
                             \singleton\table::getInstance( )->th_input_date( 'Due', isset( $_GET[ 'Due' ] ) ? $_GET[ 'Due' ] : null );
-                            \singleton\table::getInstance( )->th_input_currency( 'Total', isset( $_GET[ 'Total' ] ) ? $_GET[ 'Total' ] : null );
-                            \singleton\table::getInstance( )->th_input_currency( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Total', isset( $_GET[ 'Total' ] ) ? $_GET[ 'Total' ] : null );
+                            \singleton\table::getInstance( )->th_input( 'Balance', isset( $_GET[ 'Balance' ] ) ? $_GET[ 'Balance' ] : null );
                             \singleton\table::getInstance( )->th_input( 'Description', isset( $_GET[ 'Description' ] ) ? $_GET[ 'Description' ] : null );
                         ?></tr></thead>
                     </table>

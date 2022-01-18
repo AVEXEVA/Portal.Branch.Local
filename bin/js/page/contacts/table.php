@@ -74,15 +74,15 @@ $(document).ready(function( ){
                             switch( row.Type ){
                                 case 'Customer':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='customer.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='customer.php?ID=" + row.ID + "'><?php echo \singleton\fontawesome::getInstance( )->Customer( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
                                 case 'Location':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='location.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Location( 1 );?>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='location.php?ID=" + row.ID + "'><?php echo \singleton\fontawesome::getInstance( )->Location( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
                                 case 'Employee':
                                     return "<div class='row'>" +
-                                                "<div class='col-12'><a href='employee.php?Name=" + row.Name + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Name + "</a></div>" +
+                                                "<div class='col-12'><a href='employee.php?ID=" + row.ID + "'><?php echo \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Name + "</a></div>" +
                                             "</div>";
                                 default :
                                     return null;

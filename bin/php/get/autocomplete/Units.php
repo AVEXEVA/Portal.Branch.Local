@@ -84,7 +84,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Name' ] ) && !in_array( $_GET[ 'Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Name'];
-      $conditions[] = "( Unit.Name LIKE '%' + ? + '%' OR Unit.State LIKE '%' + ? + '%' )";
+      $conditions[] = "( Unit.State LIKE '%' + ? + '%' OR Unit.State LIKE '%' + ? + '%' )";
     }
     if( isset($_GET[ 'Customer' ] ) && !in_array( $_GET[ 'Customer' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer'];
@@ -113,7 +113,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $search[] = " Unit.ID LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];
 
-      $search[] = " Unit.Name LIKE '%' + ? + '%'";
+      $search[] = " Unit.State LIKE '%' + ? + '%'";
       $parameters[] = $_GET[ 'search' ];
 
       $search[] = " Unit.Unit LIKE '%' + ? + '%'";
@@ -161,7 +161,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                        FROM ( (
                          SELECT Top 100
                                Unit.ID AS ID,
-                               Unit.Name AS Name,
+                               Unit.State AS Name
                        FROM    Elev As Unit
                                LEFT JOIN Loc AS Location ON Unit.Loc = Location.Loc
                                LEFT JOIN (
@@ -177,7 +177,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                          TicketD.EDate AS Date
                                FROM      TicketD
                              ) AS Ticket ON Ticket.Unit = Unit.ID AND Ticket.ROW_COUNT = 1
-                   /*  WHERE   ({$conditions}) AND ({$search}) */
+                     WHERE   ({$conditions}) AND ({$search})
         ) ) as i
         ) as insRowTbl
       CROSS APPLY insRowTbl.insRowCol.nodes('/row/@*') as attr(insRow)

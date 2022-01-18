@@ -27,5 +27,22 @@ if( isset( $_POST[ 'Databases' ] ) ){
 				array( $row[ 'Name' ] )
 			);
 		}
+		if( in_array( $row[ 'Name' ], $_POST[ 'Defaults' ] ) ){
+			\singleton\database::getInstance( )->query( 
+				'Portal',
+				"	UPDATE 	[Database]
+					SET 	[Database].[Default] = 1
+					WHERE 	[Database].[Name]   = ?;",
+				array( $row[ 'Name' ] )
+			);
+		} else {
+			\singleton\database::getInstance( )->query( 
+				'Portal',
+				"	UPDATE 	[Database]
+					SET 	[Database].[Default] = 0
+					WHERE 	[Database].[Name]   = ?;",
+				array( $row[ 'Name' ] )
+			);
+		}
 	}}
 }?>

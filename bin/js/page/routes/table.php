@@ -19,7 +19,7 @@ $( document ).ready( function( ){
       columns : [
           <?php \singleton\datatables::getInstance( )->ID( 'Route' );?>,
           <?php \singleton\datatables::getInstance( )->Name( 'Route' );?>,
-          <?php \singleton\datatables::getInstance( )->Employee( );?>,
+          <?php \singleton\datatables::getInstance( )->Employee( 'Employee' );?>,
           <?php \singleton\datatables::getInstance( )->Locations( 'Route', 'ID' );?>,
           <?php \singleton\datatables::getInstance( )->data_column( 'Units_Elevators' );?>,
           <?php \singleton\datatables::getInstance( )->data_column( 'Units_Others' );?>,

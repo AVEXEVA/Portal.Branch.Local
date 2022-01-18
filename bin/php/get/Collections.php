@@ -282,8 +282,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     while ( $Row = sqlsrv_fetch_array( $rResult ) ){
         $Row[ 'Date' ] = date( 'm/d/Y', strtotime( $Row[ 'Date' ] ) );
         $Row[ 'Due' ] = date( 'm/d/Y', strtotime( $Row[ 'Due' ] ) );
-        $Row[ 'Original' ] = number_format( $Row[ 'Original' ], 2);
-        $Row[ 'Balance' ] = number_format( $Row[ 'Balance' ], 2);
+        $Row[ 'Total' ]    =  '$' .number_format( $Row[ 'Total' ], 2);
+        $Row[ 'Original' ] =  '$' .number_format( $Row[ 'Original' ], 2);
+        $Row[ 'Balance' ]  =  '$' .number_format( $Row[ 'Balance' ],  2);
         $output['aaData'][]   = $Row;
     }
     echo json_encode( $output );

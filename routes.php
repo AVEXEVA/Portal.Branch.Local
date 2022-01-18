@@ -100,14 +100,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 <div class="mobile card-body bg-dark text-white"><form action='routes.php'>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
                   <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Name', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Person', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
+                  <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Employee', isset( $_GET[ 'Employee' ] ) ? $_GET[ 'Employee' ] : null, false, false, false, 'redraw' );?>
                 </div>
                 <div class="card-body bg-dark">
                     <table id='Table_Routes' class='display' cellspacing='0' width='100%'>
                         <thead class='text-white border border-white'><?php
                           \singleton\table::getInstance( )->th( 'ID', 'ID' );
                           \singleton\table::getInstance( )->th( 'Route Name', 'Route Name' );
-                          \singleton\table::getInstance( )->th( 'Person', 'Person' );
+                          \singleton\table::getInstance( )->th( 'Employee', 'Employee' );
                           \singleton\table::getInstance( )->th( 'Locations', 'Locations' );
                           \singleton\table::getInstance( )->th_2( 'Units', 'Units' );
                           \singleton\table::getInstance( )->th_2( 'Violations', 'Violations' );
@@ -115,7 +115,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                         ?><tr class='desktop'><?php
                           \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Name', isset( $_GET[ 'Name' ] ) ? $_GET[ 'Name' ] : null );
-                          \singleton\table::getInstance( )->th_input( 'Person', isset( $_GET[ 'Person' ] ) ? $_GET[ 'Person' ] : null );
+                          \singleton\table::getInstance( )->th_input( 'Employee', isset( $_GET[ 'Employee' ] ) ? $_GET[ 'Employee' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Elevators', isset( $_GET[ 'Units_Elevators' ] ) ? $_GET[ 'Units_Elevators' ] : null );
                           \singleton\table::getInstance( )->th_input( 'Others', isset( $_GET[ 'Units_Others' ] ) ? $_GET[ 'Units_Others' ] : null );

@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   $result = \singleton\database::getInstance( )->query(
     'Portal',
     "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           dechex( $Privilege[ 'Department' ] ),
           dechex( $Privilege[ 'Database' ] ),
           dechex( $Privilege[ 'Server' ] ),
-          dechex( $Privilege[ 'Other' ] ), 
+          dechex( $Privilege[ 'Other' ] ),
           dechex( $Privilege[ 'Token' ] ),
           dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -125,7 +125,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     if( isset($_GET[ 'Street' ] ) && !in_array( $_GET[ 'Street' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Street'];
       $conditions[] = "Location.Address LIKE '%' + ? + '%'";
-    } 
+    }
     if( isset($_GET[ 'City' ] ) && !in_array( $_GET[ 'City' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['City'];
       $conditions[] = "Location.City LIKE '%' + ? + '%'";
@@ -154,11 +154,11 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 
     $conditions = $conditions == array( ) ? "NULL IS NULL" : implode( ' AND ', $conditions );
     $search     = $search     == array( ) ? "NULL IS NULL" : implode( ' OR ', $search );
-    
+
     /*ROW NUMBER*/
     $parameters[] = isset( $_GET[ 'start' ] ) && is_numeric( $_GET[ 'start' ] ) ? $_GET[ 'start' ] : 0;
     $parameters[] = isset( $_GET[ 'length' ] ) && is_numeric( $_GET[ 'length' ] ) && $_GET[ 'length' ] != -1 ? $_GET[ 'start' ] + $_GET[ 'length' ] + 10 : 25;
-    
+
     $Columns = array(
       0 =>  'Location.Loc',
       1 =>  'Location.Tag',
@@ -178,38 +178,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                          Location.Loc           AS ID,
-                          Location.Tag           AS Name,
-                          Customer.ID           AS Customer_ID,
+                          Location.Loc            AS ID,
+                          Location.Tag            AS Name,
+                          Customer.ID             AS Customer_ID,
                           Customer.Name           AS Customer_Name,
-                          Location_Type.Name   AS Type,
-                          Zone.Name            AS Division_ID,
-                          Zone.Name            AS Division_Name,
-                          Route.ID           AS Route_ID,
-                          Route.Name           AS Route_Name,
-                          Employee.ID          AS Mechanic_ID,
+                          Location_Type.Name      AS Type,
+                          Zone.ID                 AS Division_ID,
+                          Zone.Name               AS Division_Name,
+                          Route.ID                AS Route_ID,
+                          Route.Name              AS Route_Name,
+                          Employee.ID             AS Mechanic_ID,
                           Employee.fFirst + ' ' + Employee.Last AS Mechanic_Name,
-                          Location.Address     AS Street,
-                          Location.City          AS City,
-                          Location.State         AS State,
-                          Location.Zip           AS Zip,
+                          Location.Address        AS Street,
+                          Location.City           AS City,
+                          Location.State          AS State,
+                          Location.Zip            AS Zip,
                           CASE  WHEN  Location_Units.Count IS NULL THEN 0
-                                ELSE  Location_Units.Count 
+                                ELSE  Location_Units.Count
                           END AS Units,
-                          CASE  WHEN Location.Maint = 0 THEN 'Active' 
+                          CASE  WHEN Location.Maint = 0 THEN 'Active'
                                 ELSE 'Inactive' END AS Maintained,
-                          CASE  WHEN Location.Status = 0 THEN 'Active' 
+                          CASE  WHEN Location.Status = 0 THEN 'Active'
                                 ELSE 'Inactive' END AS Status,
-                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0 
+                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0
                                 ELSE Tickets_Assigned.Count END AS Tickets_Assigned,
-                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0 
+                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0
                                 ELSE Tickets_Active.Count END AS Tickets_Active
                   FROM    Loc AS Location
                           LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name,
-                                      Owner.Status 
-                              FROM    Owner 
+                                      Owner.Status
+                              FROM    Owner
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Location.Owner = Customer.ID
                           LEFT JOIN (
@@ -218,18 +218,18 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM      Elev
                             GROUP BY  Elev.Loc
                           ) AS Location_Type ON Location_Type.Location = Location.Loc
-                          LEFT JOIN Zone ON Location.Zone = Zone.ID 
+                          LEFT JOIN Zone ON Location.Zone = Zone.ID
                           LEFT JOIN Route ON Location.Route = Route.ID
                           LEFT JOIN (
                             SELECT    Elev.Loc AS Location,
                                       Count( Elev.ID ) AS Count
-                            FROM      Elev 
+                            FROM      Elev
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
                           LEFT JOIN (
                             SELECT    Tickets.Location,
                                       Sum( Tickets.Count ) AS Count
-                            FROM      ( 
+                            FROM      (
                                         (
                                           SELECT    TicketO.LID AS Location,
                                                     Count( TicketO.ID ) AS Count
@@ -243,7 +243,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN (
                             SELECT    Tickets.Location,
                                       Sum( Tickets.Count ) AS Count
-                            FROM      ( 
+                            FROM      (
                                         (
                                           SELECT    TicketO.LID AS Location,
                                                     Count( TicketO.ID ) AS Count
@@ -256,7 +256,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             GROUP BY  Tickets.Location
                           ) AS Tickets_Active ON Tickets_Active.Location = Location.Loc
                           LEFT JOIN Emp AS Employee ON Employee.fWork = Route.Mech
-                          
+
                   WHERE   ({$conditions}) AND ({$search})
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
@@ -265,7 +265,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     Location_Materials.Materials AS Materials*/
     /*LEFT JOIN (
       SELECT    Job.Loc AS Location,
-                Sum( Invoice.Amount ) AS Revenue 
+                Sum( Invoice.Amount ) AS Revenue
       FROM      Invoice
                 LEFT JOIN Job ON Invoice.Job = Job.ID
       GROUP BY  Job.Loc
@@ -310,8 +310,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     ) AS Location_Materials ON Location_Materials.Location = Location.Loc*/
     $rResult = $database->query(
       null,
-      $sQuery, 
-      $parameters 
+      $sQuery,
+      $parameters
     ) or die(print_r(sqlsrv_errors()));
 
     while ( $Row = sqlsrv_fetch_array( $rResult, SQLSRV_FETCH_ASSOC ) ){
@@ -333,7 +333,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.State       AS State,
                           Location.Zip         AS Zip,
                           CASE  WHEN  Location_Units.Count IS NULL THEN 0
-                                ELSE  Location_Units.Count 
+                                ELSE  Location_Units.Count
                           END AS Units,
                           Location.Maint       AS Maintained,
                           Location.Status      AS Status
@@ -341,8 +341,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           LEFT JOIN (
                               SELECT  Owner.ID,
                                       Rol.Name,
-                                      Owner.Status 
-                              FROM    Owner 
+                                      Owner.Status
+                              FROM    Owner
                                       LEFT JOIN Rol ON Owner.Rol = Rol.ID
                           ) AS Customer ON Location.Owner = Customer.ID
                           LEFT JOIN (
@@ -351,12 +351,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             FROM      Elev
                             GROUP BY  Elev.Loc
                           ) AS Location_Type ON Location_Type.Location = Location.Loc
-                          LEFT JOIN Zone ON Location.Zone = Zone.ID 
+                          LEFT JOIN Zone ON Location.Zone = Zone.ID
                           LEFT JOIN Route ON Location.Route = Route.ID
                           LEFT JOIN (
                             SELECT    Elev.Loc AS Location,
                                       Count( Elev.ID ) AS Count
-                            FROM      Elev 
+                            FROM      Elev
                             GROUP BY  Elev.Loc
                           ) AS Location_Units ON Location_Units.Location = Location.Loc
                   WHERE   ({$conditions}) AND ({$search})
@@ -370,7 +370,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $rResultTotal = $database->query(null,  $sQuery, $parameters ) or die(print_r(sqlsrv_errors()));
     $aResultTotal = sqlsrv_fetch_array($rResultTotal);
     $iTotal = $aResultTotal[0];
-    
+
     $output[ 'iTotalRecords' ] = $iTotal;
     $output[ 'iTotalDisplayRecords' ] = $iFilteredTotal;
 

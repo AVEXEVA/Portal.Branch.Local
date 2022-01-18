@@ -25,13 +25,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		          Emp.fFirst + ' ' + Emp.Last AS Name,
 		          Emp.Title AS Title,
 		          Emp.Field   AS Field
-		  FROM  Emp
+		  FROM    Emp
 		  WHERE   Emp.ID = ?;",
 		array(
 		  	$_SESSION[ 'Connection' ][ 'User' ]
 		)
 	);
-	$User   = sqlsrv_fetch_array( $result );
+	$User   = $result ? sqlsrv_fetch_array( $result ) : null;
 	//Privileges
 	$Access = 0;
 	$Hex = 0;
@@ -68,7 +68,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	dechex( $Privilege[ 'Internet' ] )
         ) );
     }}
-    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php 
+    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php
       header( 'Location: ../index.php' );
       exit;
     ?><?php }
@@ -335,7 +335,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Violations</div>
         </div>
       </div><?php } ?>
-      
+
     </section>
   </div>
 </div>
