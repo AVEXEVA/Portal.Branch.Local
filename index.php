@@ -68,7 +68,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         	dechex( $Privilege[ 'Internet' ] )
         ) );
     }}
-    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php 
+    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php
       header( 'Location: ../index.php' );
       exit;
     ?><?php }
@@ -335,7 +335,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Violations</div>
         </div>
       </div><?php } ?>
-      
+
     </section>
   </div>
 </div>

@@ -133,9 +133,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             \singleton\table::getInstance( )->th( 'Job', 'Job' );
                             \singleton\table::getInstance( )->th( 'Type', 'Type' );
                             \singleton\table::getInstance( )->th( 'Date', 'Date' );
-                            \singleton\table::getInstance( )->th( 'Due', 'Due' );
-                            \singleton\table::getInstance( )->th( 'Total', 'Total' );
-                            \singleton\table::getInstance( )->th( 'Balance', 'Balance' );
+                            \singleton\table::getInstance( )->th_4( 'Due', 'Due' );
+                            \singleton\table::getInstance( )->th_4( 'Total', 'Total' );
+                            \singleton\table::getInstance( )->th_4( 'Balance', 'Balance' );
                             \singleton\table::getInstance( )->th( 'Description', 'Description' );
                         ?></tr><tr class='desktop'><?php
                             \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
