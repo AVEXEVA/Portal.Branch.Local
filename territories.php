@@ -104,7 +104,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class='card-heading'><h4><?php \singleton\fontawesome::getInstance( )->Territory( 1 );?> Territories</h4></div>
   				<div class="mobile card-body bg-dark text-white"><form action='territories.php'>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null, false, false, false, 'redraw' );?>
-            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Employee', isset( $_GET[ 'Employee' ] ) ? $_GET[ 'Employee' ] : null, false, false, false, 'redraw' );?>
+            <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Employee', isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null, false, false, false, 'redraw' );?>
             <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Leads', isset( $_GET[ 'Leads' ] ) ? $_GET[ 'Leads' ] : null, false, false, false, 'redraw' );?>
@@ -125,7 +125,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 \singleton\table::getInstance( )->th( 'Invoices', 'Invoices' );
     			    ?><tr class='desktop'><?php
               \singleton\table::getInstance( )->th_input( 'ID', isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null );
-              \singleton\table::getInstance( )->th_input( 'Employee', isset( $_GET[ 'Employee' ] ) ? $_GET[ 'Employee' ] : null );
+              \singleton\table::getInstance( )->th_input( 'Employee', isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null );
               \singleton\table::getInstance( )->th_input( 'Locations', isset( $_GET[ 'Locations' ] ) ? $_GET[ 'Locations' ] : null );
               \singleton\table::getInstance( )->th_input( 'Units', isset( $_GET[ 'Units' ] ) ? $_GET[ 'Units' ] : null );
               \singleton\table::getInstance( )->th_input( 'Lead', isset( $_GET[ 'Lead' ] ) ? $_GET[ 'Lead' ] : null );

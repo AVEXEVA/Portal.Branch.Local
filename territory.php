@@ -143,7 +143,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 CASE    WHEN Proposals.[Closed] IS NULL THEN 0
                         ELSE Proposals.[Closed] END AS Proposals_Closed
         FROM    Terr AS Territory
-                LEFT JOIN Emp  AS Employee  ON  Employee.fWork = Territory.ID
+                LEFT JOIN Emp  AS Employee  ON  Employee.fFirst = Territory.ID
                 LEFT JOIN (
                     SELECT      Location.Terr AS Territory,
                                 Sum( Maintained.Count ) AS Maintained,
@@ -356,39 +356,39 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     )    || (empty( $ID )
                       &&  empty( $Name )
                     )    ? array(
-                    	'ID'                               => isset( $_GET [ 'ID' ] )                           ? $_GET ['ID'] : null,
-                      'Name'                             => isset( $_GET [ 'Name' ] )                         ? $_GET ['Name'] : null,
-                    	'SMAN' => null,
-                    	'SDesc' => null,
-                    	'Description' => null,
-                    	'Count' => null,
-                    	'Symbol' => null,
-                    	'EN' => null,
-                    	'Address' => null,
-                      'Employee_Name'                   => isset( $_GET [ 'Employee_Name' ] )                 ? $_GET ['Employee_Name'] : null,
-                      'Employee_ID'                     => isset( $_GET [ 'Employee_ID' ] )                   ? $_GET ['Employee_ID']   : null,
-                      //Totals
-                      'Locations_Count'                 => isset( $_GET [ 'Locations_Count' ] )               ? $_GET ['Locations_Count']   : null,
-                      'Locations_Maintained'            => isset( $_GET [ 'Locations_Maintained' ] )          ? $_GET ['Locations_Maintained']   : null,
-                      'Locations_Unmaintained'          => isset( $_GET [ 'Locations_Unmaintained' ] )        ? $_GET ['Locations_Unmaintained']   : null,
-                      'Units_Count'                     => isset( $_GET [ 'Units_Count' ] )                   ? $_GET ['Units_Count']   : null,
-                      'Units_Elevators'                 => isset( $_GET [ 'Units_Elevators' ] )               ? $_GET ['Units_Elevators']   : null,
-                      'Units_Escalators'                => isset( $_GET [ 'Units_Escalators' ] )              ? $_GET ['Units_Escalators']   : null,
-                      'Units_Other'                     => isset( $_GET [ 'Units_Other' ] )                   ? $_GET ['Units_Other']   : null,
-                      'Jobs_Open'                       => isset( $_GET [ 'Jobs_Open' ] )                     ? $_GET ['Jobs_Open']   : null,
-                      'Jobs_On_Hold'                    => isset( $_GET [ 'Jobs_On_Hold' ] )                  ? $_GET ['Jobs_On_Hold']   : null,
-                      'Jobs_Closed'                     => isset( $_GET [ 'Jobs_Closed' ] )                   ? $_GET ['Jobs_Closed']   : null,
-                      'Tickets_Open'                    => isset( $_GET [ 'Tickets_Open' ] )                  ? $_GET ['Tickets_Open']   : null,
-                      'Tickets_Assigned'                => isset( $_GET [ 'Tickets_Assigned' ] )              ? $_GET ['Tickets_Assigned']   : null,
-                      'Tickets_En_Route'                => isset( $_GET [ 'Tickets_En_Route' ] )              ? $_GET ['Tickets_En_Route']   : null,
-                      'Tickets_On_Site'                 => isset( $_GET [ 'Tickets_On_Site' ] )               ? $_GET ['Tickets_On_Site']   : null,
-                      'Tickets_Reviewing'               => isset( $_GET [ 'Tickets_Reviewing' ] )             ? $_GET ['Tickets_Reviewing']   : null,
-                      'Violations_Preliminary_Report'   => isset( $_GET [ 'Violations_Preliminary_Report' ] ) ? $_GET ['Violations_Preliminary_Report']   : null,
-                      'Violations_Job_Created'          => isset( $_GET [ 'Violations_Job_Created' ] )        ? $_GET ['Violations_Job_Created']   : null,
-                      'Invoices_Open'                   => isset( $_GET [ 'Invoices_Open' ] )                 ? $_GET ['Invoices_Open']   : null,
-                      'Invoices_Closed'                 => isset( $_GET [ 'Invoices_Closed' ] )               ? $_GET ['Invoices_Closed']   : null,
-                      'Proposals_Open'                  => isset( $_GET [ 'Proposals_Open' ] )                ? $_GET ['Proposals_Open']   : null,
-                      'Proposals_Closed'                => isset( $_GET [ 'Proposals_Closed' ] )              ? $_GET ['Proposals_Closed']   : null
+      	'ID'                              => isset( $_GET [ 'ID' ] )                            ? $_GET ['ID'] : null,
+        'Name'                            => isset( $_GET [ 'Name' ] )                          ? $_GET ['Name'] : null,
+      	'SMAN'                            => isset( $_GET [ 'SMAN' ] )                          ? $_GET ['SMAN'] : null,
+      	'SDesc'                           => isset( $_GET [ 'SDesc' ] )                         ? $_GET ['SDesc'] : null,
+      	'Description'                     => isset( $_GET [ 'Description' ] )                   ? $_GET ['Description'] : null,
+      	'Count'                           => isset( $_GET [ 'Count' ] )                         ? $_GET ['Count'] : null,
+      	'Symbol'                          => isset( $_GET [ 'Symbol' ] )                        ? $_GET ['Symbol'] : null,
+      	'EN'                              => isset( $_GET [ 'EN' ] )                            ? $_GET ['EN'] : null,
+        'Address'                         => isset( $_GET [ 'Address' ] )                       ? $_GET ['Address'] : null,
+        'Employee_Name'                   => isset( $_GET [ 'Employee_Name' ] )                 ? $_GET ['Employee_Name'] : null,
+        'Employee_ID'                     => isset( $_GET [ 'Employee_ID' ] )                   ? $_GET ['Employee_ID']   : null,
+        //Totals
+        'Locations_Count'                 => isset( $_GET [ 'Locations_Count' ] )               ? $_GET ['Locations_Count']   : null,
+        'Locations_Maintained'            => isset( $_GET [ 'Locations_Maintained' ] )          ? $_GET ['Locations_Maintained']   : null,
+        'Locations_Unmaintained'          => isset( $_GET [ 'Locations_Unmaintained' ] )        ? $_GET ['Locations_Unmaintained']   : null,
+        'Units_Count'                     => isset( $_GET [ 'Units_Count' ] )                   ? $_GET ['Units_Count']   : null,
+        'Units_Elevators'                 => isset( $_GET [ 'Units_Elevators' ] )               ? $_GET ['Units_Elevators']   : null,
+        'Units_Escalators'                => isset( $_GET [ 'Units_Escalators' ] )              ? $_GET ['Units_Escalators']   : null,
+        'Units_Other'                     => isset( $_GET [ 'Units_Other' ] )                   ? $_GET ['Units_Other']   : null,
+        'Jobs_Open'                       => isset( $_GET [ 'Jobs_Open' ] )                     ? $_GET ['Jobs_Open']   : null,
+        'Jobs_On_Hold'                    => isset( $_GET [ 'Jobs_On_Hold' ] )                  ? $_GET ['Jobs_On_Hold']   : null,
+        'Jobs_Closed'                     => isset( $_GET [ 'Jobs_Closed' ] )                   ? $_GET ['Jobs_Closed']   : null,
+        'Tickets_Open'                    => isset( $_GET [ 'Tickets_Open' ] )                  ? $_GET ['Tickets_Open']   : null,
+        'Tickets_Assigned'                => isset( $_GET [ 'Tickets_Assigned' ] )              ? $_GET ['Tickets_Assigned']   : null,
+        'Tickets_En_Route'                => isset( $_GET [ 'Tickets_En_Route' ] )              ? $_GET ['Tickets_En_Route']   : null,
+        'Tickets_On_Site'                 => isset( $_GET [ 'Tickets_On_Site' ] )               ? $_GET ['Tickets_On_Site']   : null,
+        'Tickets_Reviewing'               => isset( $_GET [ 'Tickets_Reviewing' ] )             ? $_GET ['Tickets_Reviewing']   : null,
+        'Violations_Preliminary_Report'   => isset( $_GET [ 'Violations_Preliminary_Report' ] ) ? $_GET ['Violations_Preliminary_Report']   : null,
+        'Violations_Job_Created'          => isset( $_GET [ 'Violations_Job_Created' ] )        ? $_GET ['Violations_Job_Created']   : null,
+        'Invoices_Open'                   => isset( $_GET [ 'Invoices_Open' ] )                 ? $_GET ['Invoices_Open']   : null,
+        'Invoices_Closed'                 => isset( $_GET [ 'Invoices_Closed' ] )               ? $_GET ['Invoices_Closed']   : null,
+        'Proposals_Open'                  => isset( $_GET [ 'Proposals_Open' ] )                ? $_GET ['Proposals_Open']   : null,
+        'Proposals_Closed'                => isset( $_GET [ 'Proposals_Closed' ] )              ? $_GET ['Proposals_Closed']   : null
     ) : sqlsrv_fetch_array($result);
     //Binds $ID, $Name, $Territory an
     if( isset( $_POST ) && count( $_POST ) > 0 ){
@@ -424,6 +424,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             INSERT INTO Terr(
               ID,
               Name,
+              SMan,
               SDesc,
               Remarks,
               Count,
@@ -431,16 +432,17 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               EN,
               Address
             )
-            VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ? );
+            VALUES( @MAXID + 1, ?, ?, ?, ?, ?, ?, ?, ? );
             SELECT @MAXID + 1;",
           array(
             $Territory[ 'Name' ],
+            $Territory[ 'SMAN' ],
             $Territory[ 'SDesc' ],
             $Territory[ 'Description' ],
             $Territory[ 'Count' ],
             $Territory[ 'Symbol' ],
             $Territory[ 'EN' ],
-            $Territory[ 'Address' ],
+            $Territory[ 'Address' ]
           )
         );
         sqlsrv_next_result( $result );

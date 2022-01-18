@@ -87,7 +87,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Customer_ID !== null && row.Customer_ID != ''
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i> Proposal #" + row.Customer_Name + "</a></div>" +
+                              "<div class='col-12'><a href='customer.php?ID=" + row.Customer_ID + "'><i class='fa fa-link fa-fw fa-1x'></i>" + row.Customer_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -101,7 +101,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Location_ID !== null && row.Location_ID != ''
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='customer.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i> Proposal #" + row.Location_Name + "</a></div>" +
+                              "<div class='col-12'><a href='customer.php?ID=" + row.Location_ID + "'><i class='fa fa-building fa-fw fa-1x'></i> " + row.Location_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
@@ -115,7 +115,7 @@ $( document ).ready( function( ){
               case 'display' :
                   return  row.Contact_ID !== null
                       ?   "<div class='row'>" +
-                              "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><i class='fa fa-user fa-fw fa-1x'></i> Proposal #" + row.Contact_Name + "</a></div>" +
+                              "<div class='col-12'><a href='contact.php?ID=" + row.Contact_ID + "'><i class='fa fa-user fa-fw fa-1x'></i> " + row.Contact_Name + "</a></div>" +
                           "</div>"
                       :   null;
               default :
