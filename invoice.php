@@ -328,6 +328,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Location', 'Locations', $Invoice[ 'Location_ID' ], $Invoice[ 'Location_Name' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Job', 'Jobs', $Invoice[ 'Job_ID' ], $Invoice[ 'Job_Name' ] );?>
+                                <?php \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Customer', 'Customers', $Invoice[ 'Customer_ID' ], $Invoice[ 'Customer_Name' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_textarea( 'Description', $Invoice[ 'Description' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Date', $Invoice[ 'Date' ] );?>
                                 <?php \singleton\bootstrap::getInstance( )->card_row_form_input_date( 'Due', $Invoice[ 'Due' ] );?>

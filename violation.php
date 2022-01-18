@@ -158,7 +158,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                             Rol.Name
                     FROM    Owner
                             LEFT JOIN Rol            ON Owner.Rol       = Rol.ID
-                  ) AS Customer                      ON Customer.ID     = Job.Owner
+                  ) AS Customer                      ON Job.Owner       = Customer.ID
                   LEFT JOIN Loc        AS Location   ON Violation.Loc   = Location.Loc
                   LEFT JOIN Elev       AS Unit       ON Violation.Elev  = Unit.ID
                   LEFT JOIN Quote      AS Quote      ON Violation.Quote = Quote.Ref
@@ -306,7 +306,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $Violation[ 'idTestItem' ]        = isset( $_POST[ 'idTestItem' ] )      ? $_POST[ 'idTestItem' ]           : $Violation[ 'idTestItem' ];
           //print_r($Violation);die;
           if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
-
       		$result = \singleton\database::getInstance( )->query(
       			null,
       			"INSERT INTO Violation(

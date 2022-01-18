@@ -175,7 +175,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Unit.Unit           AS Units,
                           Unit.State          AS Unit_City_ID,
                           Unit.Unit           AS Unit_Building_ID,
-                          Violation.Status    AS Status
+                          CASE  WHEN Violation.Status = 1 THEN 'Enabled'
+                                WHEN Violation.Status = 0 THEN 'Disabled'
+                                END AS Status
                   FROM    Violation
                           LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
                           LEFT JOIN Elev AS Unit ON Unit.ID = Violation.Elev
