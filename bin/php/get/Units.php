@@ -212,7 +212,10 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.State            AS Location_State,
                           Location.Zip              AS Location_Zip,
                           Unit.fDesc                AS Description,
-                          Unit.Type                 AS Type,
+                          CASE  WHEN Unit.Type = 0 THEN 'Elevator'
+                                WHEN Unit.Type = 1 THEN 'Escalator'
+                                WHEN Unit.Type = 2 THEN 'Moving-Walk'
+                          END AS Type,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled'
                                 WHEN Unit.Status = 1 THEN 'Disabled'
                                 WHEN Unit.Status = 2 THEN 'Demolished'

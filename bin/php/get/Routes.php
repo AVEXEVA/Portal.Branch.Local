@@ -38,8 +38,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $result = \singleton\database::getInstance( )->query(
         'Portal',
         "   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner], 
-                    [Privilege].[Group], 
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
                     [Privilege].[Department],
                     [Privilege].[Database],
                     [Privilege].[Server],
@@ -54,7 +54,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     );
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-        
+
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -63,7 +63,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             dechex( $Privilege[ 'Department' ] ),
             dechex( $Privilege[ 'Database' ] ),
             dechex( $Privilege[ 'Server' ] ),
-            dechex( $Privilege[ 'Other' ] ), 
+            dechex( $Privilege[ 'Other' ] ),
             dechex( $Privilege[ 'Token' ] ),
             dechex( $Privilege[ 'Internet' ] )
         ) );
@@ -75,7 +75,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     else {
       \singleton\database::getInstance( )->query(
         null,
-        " INSERT INTO Activity([User], [Date], [Page] ) 
+        " INSERT INTO Activity([User], [Date], [Page] )
           VALUES( ?, ?, ? );",
         array(
           $_SESSION[ 'Connection' ][ 'User' ],
@@ -95,7 +95,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       if( isset($_GET[ 'Person' ] ) && !in_array( $_GET[ 'Person' ], array( '', ' ', null ) ) ){
         $parameters[] = $_GET['Person'];
         $conditions[] = "Employee.fFirst + ' ' + Employee.Last LIKE '%' + ? + '%'";
-      }      
+      }
 
       /*if( isset( $_GET[ 'Search' ] ) && !in_array( $_GET[ 'Search' ], array( '', ' ', null ) )  ){
 
@@ -118,7 +118,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         1 =>  'Route.Name',
         2 =>  'Route.Status',
         3 =>  'Locations.Count',
-        4 =>  'Units.Count'
+        4 =>  'Units.Count',
+        5 =>  'Violation.Count',
+        6 =>  'Tickets.Count'
       );
     $Order = isset( $Columns[ $_GET['order']['column'] ] )
         ? $Columns[ $_GET['order']['column'] ]
@@ -183,24 +185,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           GROUP BY  Loc.Route
                                         ) AS Units_Other ON Route.ID = Units_Other.Route
                             LEFT JOIN   (
-                                          SELECT    Loc.Route,  
-                                                    COUNT( Violation.ID ) AS Count 
-                                          FROM      Violation 
+                                          SELECT    Loc.Route,
+                                                    COUNT( Violation.ID ) AS Count
+                                          FROM      Violation
                                                     LEFT JOIN Loc ON Violation.Loc = Loc.Loc
                                           WHERE     Violation.Status = 'Preliminary Report'
                                           GROUP BY  Loc.Route
                                         ) AS Violations_Office ON Route.ID = Violations_Office.Route
                             LEFT JOIN   (
-                                          SELECT    Loc.Route,  
-                                                    COUNT( Violation.ID ) AS Count 
-                                          FROM      Violation 
+                                          SELECT    Loc.Route,
+                                                    COUNT( Violation.ID ) AS Count
+                                          FROM      Violation
                                                     LEFT JOIN Loc ON Violation.Loc = Loc.Loc
                                           WHERE     Violation.Status = 'Job Created'
                                           GROUP BY  Loc.Route
                                         ) AS Violations_Field ON Route.ID = Violations_Field.Route
                             LEFT JOIN   (
-                                          SELECT    Loc.Route,  
-                                                    Sum( Tickets.Count ) AS Count 
+                                          SELECT    Loc.Route,
+                                                    Sum( Tickets.Count ) AS Count
                                           FROM      (
                                                       SELECT    TicketO.LID AS Location,
                                                                 Count( TicketO.ID ) AS Count
@@ -213,8 +215,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                           GROUP BY  Loc.Route
                                         ) AS Tickets_Assigned ON Route.ID = Tickets_Assigned.Route
                             LEFT JOIN   (
-                                          SELECT    Loc.Route,  
-                                                    Sum( Tickets.Count ) AS Count 
+                                          SELECT    Loc.Route,
+                                                    Sum( Tickets.Count ) AS Count
                                           FROM      (
                                                       SELECT    TicketO.LID AS Location,
                                                                 Count( TicketO.ID ) AS Count

@@ -55,6 +55,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   $Privileges = array();
   if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
+<<<<<<< HEAD
       $key = $Privilege['Access'];
       unset( $Privilege[ 'Access' ] );
       $Privileges[ $key ] = implode( '', array(
@@ -72,6 +73,26 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     header( 'Location: ../index.php' );
     exit;
   } else {
+=======
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php
+      header( 'Location: ../index.php' );
+      exit;
+    ?><?php }
+    else {
+>>>>>>> 1f7bf2acf6711eea660114175dc2bb1e69ceca32
       \singleton\database::getInstance( )->query(
         null,
         " INSERT INTO Activity([User], [Date], [Page] )
@@ -339,7 +360,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           <div class ='nav-text'>Violations</div>
         </div>
       </div><?php } ?>
-      
+
     </section>
   </div>
 </div>

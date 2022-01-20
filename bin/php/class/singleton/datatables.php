@@ -496,7 +496,7 @@ class datatables extends \singleton\index {
                 switch( type ){
                     case 'display':
                         return row.Employee_ID !== null
-                            ?   "<a href='user.php?ID=" + row.Employee_ID + "'><?php \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Employee_Name + "</a>"
+                            ?   "<a href='employee.php?ID=" + row.Employee_ID + "'><?php \singleton\fontawesome::getInstance( )->Employee( 1 );?>" + row.Employee_Name + "</a>"
                             :   null;
                     default :
                         return data;

@@ -99,23 +99,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     <div id="page-wrapper" class='content'>
       <div class="card card-full card-primary border-0">
         <div class="card-heading"><h4><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?> Work Orders</h4></div>
-        <div class="mobile card-body bg-dark text-white"><form action='locations.php'>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Search', isset( $_GET[ 'Search' ] ) ? $_GET[ 'Search' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Employee', isset( $_GET[ 'Employee' ] ) ? $_GET[ 'Employee' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Customer', isset( $_GET[ 'Customer' ] ) ? $_GET[ 'Customer' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Location', isset( $_GET[ 'Location' ] ) ? $_GET[ 'Location' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Unit', isset( $_GET[ 'Unit' ] ) ? $_GET[ 'Unit' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Job', isset( $_GET[ 'Job' ] ) ? $_GET[ 'Job' ] : null, false, false, false, 'redraw' );?>
-          <?php \singleton\bootstrap::getInstance( )->card_row_form_input( 'Title', isset( $_GET[ 'Title' ] ) ? $_GET[ 'Title' ] : null, false, false, false, 'redraw' );?>
-        </div>
         <div class="card-body bg-dark">
           <table id='Table_Tickets' class='display' cellspacing='0' width='100%'>
             <thead><tr class='text-center'><?php
             	\singleton\table::getInstance( )->th( 'Services', 'RowGroup1' );
-				\singleton\table::getInstance( )->th_hide( 'Count', 'Count' );
+				      \singleton\table::getInstance( )->th_hide( 'Count', 'Count' );
             ?></tr><tr class='desktop'><?php
             	\singleton\table::getInstance( )->th_hide( 'RowGroup1', 'RowGroup1' );
-				\singleton\table::getInstance( )->th_hide( 'Count', 'Count' );
+				      \singleton\table::getInstance( )->th_hide( 'Count', 'Count' );
             ?></tr></thead>
           </table>
         </div>
