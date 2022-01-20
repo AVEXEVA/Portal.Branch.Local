@@ -1,23 +1,27 @@
 html {
   min-height:100%;
-  webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-  height:100%;
+  webkit-background-size : cover;
+  -moz-background-size : cover;
+  -o-background-size : cover;
+  background-size : cover;
+  height : 100%;
 }
 body {
-  min-height:100%;
-  background-size:cover;
-  height:100%;
-  background-color:#1d1d1d;
+  min-height : 100%;
+  background-size : cover;
+  height : 100%;
+  background-color : #1d1d1d;
 }
 
 input:valid {  }
-input:invalid { background-color:#ff3232; }
+input:invalid { background-color : #ff3232; }
 
 input, textarea, select, option {
-  background-color:white;
+  background-color : white;
+}
+
+button {
+  text-align : center;
 }
 
 pre {

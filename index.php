@@ -5,19 +5,19 @@ if( session_id( ) == '' || !isset($_SESSION)) {
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
   //Connection
-    $result = \singleton\database::getInstance( )->query(
-      'Portal',
-      " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
-        WHERE       [Connection].[User] = ?
-                AND [Connection].[Hash] = ?;",
-      array(
-        $_SESSION[ 'Connection' ][ 'User' ],
-        $_SESSION[ 'Connection' ][ 'Hash' ]
-      )
-    );
-    $Connection = sqlsrv_fetch_array($result);
-    //User
+  $result = \singleton\database::getInstance( )->query(
+    'Portal',
+    " SELECT  [Connection].[ID]
+      FROM    dbo.[Connection]
+      WHERE       [Connection].[User] = ?
+              AND [Connection].[Hash] = ?;",
+    array(
+      $_SESSION[ 'Connection' ][ 'User' ],
+      $_SESSION[ 'Connection' ][ 'Hash' ]
+    )
+  );
+  $Connection = sqlsrv_fetch_array($result);
+  //User
 	$result = \singleton\database::getInstance( )->query(
 		null,
 		" SELECT  Emp.fFirst  AS First_Name,
@@ -51,10 +51,29 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		array(
 		  	$_SESSION[ 'Connection' ][ 'User' ]
 		)
-	);
-    $Privileges = array();
-    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+  );
+  $Privileges = array();
+  if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
+<<<<<<< HEAD
+      $key = $Privilege['Access'];
+      unset( $Privilege[ 'Access' ] );
+      $Privileges[ $key ] = implode( '', array(
+      	dechex( $Privilege[ 'Owner' ] ),
+      	dechex( $Privilege[ 'Group' ] ),
+      	dechex( $Privilege[ 'Department' ] ),
+      	dechex( $Privilege[ 'Database' ] ),
+      	dechex( $Privilege[ 'Server' ] ),
+      	dechex( $Privilege[ 'Other' ] ),
+      	dechex( $Privilege[ 'Token' ] ),
+      	dechex( $Privilege[ 'Internet' ] )
+      ) );
+  }}
+  if(!isset( $Connection[ 'ID' ] ) ){
+    header( 'Location: ../index.php' );
+    exit;
+  } else {
+=======
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -73,6 +92,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       exit;
     ?><?php }
     else {
+>>>>>>> 1f7bf2acf6711eea660114175dc2bb1e69ceca32
       \singleton\database::getInstance( )->query(
         null,
         " INSERT INTO Activity([User], [Date], [Page] )
@@ -81,58 +101,56 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           $_SESSION[ 'Connection' ][ 'User' ],
           date('Y-m-d H:i:s'),
           'index.php'
-      )
-    );
-    $userId= $_SESSION[ 'Connection' ][ 'User' ];
- $query="SELECT Picture, Picture_Type AS Type,email FROM [User] WHERE ID = ?;";
-    $image_result = $database->query(
-      'Portal',
-      $query,
-      array(
-        $userId
-      )
-    );
+        )
+      );
+      $result = $database->query(
+        'Portal',
+        " SELECT  [User].[ID],
+                  [User].[Email],
+                  [User].[Branch_Type],
+                  [User].[Picture], 
+                  [User].[Picture_Type]
+          FROM    [User] 
+          WHERE   [User].[ID] = ?;",
+        array(
+          $_SESSION[ 'Connection' ][ 'User' ]
+        )
+      );
+      $User = $result ? sqlsrv_fetch_array( $result ) : null;
 ?><!DOCTYPE html>
 <html lang='en'>
 <head>
   <title><?php echo $_SESSION[ 'Connection' ][ 'Branch' ];?> | Portal</title>
-     <?php  $_GET[ 'Bootstrap' ] = '5.1';?>
-     <?php  $_GET[ 'Entity_CSS' ] = 1;?>
-     <?php	require( bin_meta . 'index.php');?>
-     <?php	require( bin_css  . 'index.php');?>
-     <?php  require( bin_js   . 'index.php');?>
+  <?php
+    $_GET[ 'Bootstrap' ] = '5.1';
+    $_GET[ 'Entity_CSS' ] = 1;
+    require( bin_meta . 'index.php');
+    require( bin_css  . 'index.php');
+    require( bin_js   . 'index.php');
+  ?>
 </head>
 <body>
   <?php require( bin_php . 'element/navigation.php');?>
   <div id='page-wrapper' class='content'>
     <section id='account-menu' style='padding:50px;background-color:#0f0f0f;'>
       <div class='row'>
-        <?php
-          if( $image_result ){
-            $row = sqlsrv_fetch_array( $image_result );
-            if( is_null( $row[ 'Picture' ] ) ){
-              ?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /><div class="text-white"><?php echo $row['email'];  ?></div></button></div><?php
-            } else {
-              ?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $row['Type'] . ";base64, " . $row['Picture'];?>'  style='max-width:100%;max-height:200px;' /><div class="text-white"><?php echo $row['email'];  ?></div></button></div><?php
-            }
-          } else {?><div class='offset-3 col-6'><button class='slim' style='text-align:center;' onClick="browseProfilePicture( );"><img src='bin/media/images/icons/avatar.png'  style='max-width:100%;max-height:200px;' /></button><div class="text-white"><?php echo $row['email'];  ?></div></div><?php }?>
-        <div class='col-3'><button class='slim text-center text-white' onClick="document.location.href='settings.php';" style='text-align:right;'><i class="fas fa-user-cog fa-2x"></i></button></div>
-      </div>
-      <div style='height:5px;'>&nbsp;</div>
-      <div class='row'>
-        <div class='col-2'>&nbsp;</div>
-        <div class='col-8 text-center text-white'><?php echo $User[ 'Name' ];?></div>
-        <div class='col-2'>&nbsp;</div>
-      </div>
-      <div class='row'>
-        <div class='col-2'>&nbsp;</div>
-        <div class='col-8 text-center text-white'><?php echo $User[ 'Title' ];?></div>
-        <div class='col-2'>&nbsp;</div>
+        <?php 
+          if( !is_null( $User ) && isset( $User[ 'Picture' ] ) && !empty( $User[ 'Picture' ] ) ){
+            ?><div class='offset-3 col-6'><button class='slim' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $User[ 'Picture_Type' ] . ";base64, " . $User[ 'Picture' ];?>'  style='max-width:100%;max-height:200px;' /><div class="text-white"><?php echo $User[ 'Email'  ];  ?></div></button></div><?php
+          } else {
+            ?><div class='offset-3 col-6 text-center'>
+              <button class='slim' onClick="browseProfilePicture( );">
+                <img src='bin/media/image/avatar.png'  style='max-width:100%;max-height:150px;' />
+              </button>
+              <div class="text-white"><?php echo $User[ 'Email' ];  ?></div>
+            </div><?php
+          }
+        ?>
       </div>
     </section>
-    <?php if( $User[ 'Field' ] == 1 ){
-        $r = $database->query(null, "SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL",array($_SESSION[ 'Connection' ][ 'User' ]));
-        if($r){$Attendance_Activity = sqlsrv_fetch_array($r);}
+    <?php if( $User[ 'Branch_Type' ] == 'Field' ){
+      $r = $database->query(null, "SELECT * FROM Attendance WHERE Attendance.[User] = ? AND Attendance.[End] IS NULL",array($_SESSION[ 'Connection' ][ 'User' ]));
+      if($r){$Attendance_Activity = sqlsrv_fetch_array($r);}
     ?><div class='card bg-darker text-light'>
       <div class='card-header bg-white text-black text-center'>Field Work</div>
       <div class='card-body'>
@@ -279,6 +297,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         <div class='p-1 border'>
           <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Location(3);?></div>
           <div class ='nav-text'>Locations</div>
+        </div>
+      </div><?php } ?>
+      <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Map' ] ) ? $Privileges[ 'Map' ] : 0 ) ){
+        ?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='map.php'">
+        <div class='p-1 border'>
+          <div class='nav-icon'><?php \singleton\fontawesome::getInstance( )->Map(3);?></div>
+          <div class ='nav-text'>Map</div>
         </div>
       </div><?php } ?>
       <?php if( check( privilege_read, level_group, isset( $Privileges[ 'Proposal' ] ) ? $Privileges[ 'Proposal' ] : 0 ) ){?><div class='link-page text-white col-xl-1 col-3' onclick="document.location.href='proposals.php'">
