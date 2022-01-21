@@ -4,40 +4,40 @@ if( session_id( ) == '' || !isset($_SESSION)) {
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-  //Connection
+  	//Connection
     $result = \singleton\database::getInstance( )->query(
-      'Portal',
-      " SELECT  [Connection].[ID]
-        FROM    dbo.[Connection]
-        WHERE       [Connection].[User] = ?
-                AND [Connection].[Hash] = ?;",
-      array(
-        $_SESSION[ 'Connection' ][ 'User' ],
-        $_SESSION[ 'Connection' ][ 'Hash' ]
-      )
+      	'Portal',
+      	" 	SELECT  [Connection].[ID]
+	        FROM    dbo.[Connection]
+        	WHERE       [Connection].[User] = ?
+                	AND [Connection].[Hash] = ?;",
+      	array(
+	        $_SESSION[ 'Connection' ][ 'User' ],
+    	    $_SESSION[ 'Connection' ][ 'Hash' ]
+      	)
     );
     $Connection = sqlsrv_fetch_array($result);
     //User
-  $result = \singleton\database::getInstance( )->query(
-    null,
-    " SELECT  Emp.fFirst  AS First_Name,
-              Emp.Last    AS Last_Name,
-              Emp.fFirst + ' ' + Emp.Last AS Name,
-              Emp.Title AS Title,
-              Emp.Field   AS Field
-      FROM  Emp
-      WHERE   Emp.ID = ?;",
-    array(
-        $_SESSION[ 'Connection' ][ 'User' ]
-    )
-  );
-  $User   = sqlsrv_fetch_array( $result );
-  //Privileges
-  $Access = 0;
-  $Hex = 0;
-  $result = \singleton\database::getInstance( )->query(
-    'Portal',
-    "   SELECT  [Privilege].[Access],
+  	$result = \singleton\database::getInstance( )->query(
+    	null,
+    	" 	SELECT  Emp.fFirst  AS First_Name,
+              		Emp.Last    AS Last_Name,
+              		Emp.fFirst + ' ' + Emp.Last AS Name,
+              		Emp.Title AS Title,
+            	  	Emp.Field   AS Field
+      		FROM  	Emp
+      		WHERE   Emp.ID = ?;",
+    	array(
+    	    $_SESSION[ 'Connection' ][ 'User' ]
+	    )
+  	);
+  	$User   = sqlsrv_fetch_array( $result );
+  	//Privileges
+  	$Access = 0;
+  	$Hex = 0;
+  	$result = \singleton\database::getInstance( )->query(
+  		'Portal',
+    	"   SELECT  [Privilege].[Access],
                     [Privilege].[Owner],
                     [Privilege].[Group],
                     [Privilege].[Department],
@@ -46,12 +46,12 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     [Privilege].[Other],
                     [Privilege].[Token],
                     [Privilege].[Internet]
-      FROM      dbo.[Privilege]
-      WHERE     Privilege.[User] = ?;",
-    array(
-        $_SESSION[ 'Connection' ][ 'User' ],
-    )
-  );
+	      	FROM    dbo.[Privilege]
+	      	WHERE   Privilege.[User] = ?;",
+    	array(
+        	$_SESSION[ 'Connection' ][ 'User' ],
+    	)
+  	);
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
 
@@ -110,25 +110,13 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						<div class='col-12 col-lg-6'>
 							<h5><?php \singleton\fontawesome::getInstance( )->Map( 1 );?> Map</h5>
 						</div>
-						<div class='col-6 col-lg-3'>
+						<div class='offset-lg-3 col-6 col-lg-3'>
 							<div class='row g-0'>
-								<div class='col-4'>
+								<div class='offset-6 col-4'>
 									<button
 										class='form-control rounded'
 										type='submit'
 									><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'>Refresh</span></button>
-								</div>
-								<div class='col-4'>
-									<button
-										class='form-control rounded'
-										onClick="document.location.href='map.php?ID=<?php echo $User[ 'ID' ];?>';"
-									><?php \singleton\fontawesome::getInstance( 1 )->Refresh( 1 );?><span class='desktop'> Refresh</span></button>
-								</div>
-								<div class='col-4'>
-									<button 
-										class='form-control rounded' 
-										onClick="document.location.href='customers.php?<?php echo http_build_query( is_array( $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] ) ? $_SESSION[ 'Tables' ][ 'Users' ][ 0 ] : array( ) );?>';"
-									><?php \singleton\fontawesome::getInstance( 1 )->Table( 1 );?><span class='desktop'> Table</span></button>
 								</div>
 							</div>
 						</div>
@@ -179,7 +167,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 					</div>
 				</div>
 				<div class='card-body'>
-					<div id='map' style='height:450px;'>&nbsp;</div>
+					<div id='map' style='height:600px;'>&nbsp;</div>
 				</div>
 			</form></div>
 		</div>
@@ -187,7 +175,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 	<script type="text/javascript">
 		//Statics / Helpers
-		function symbol( number ) {
+		function circle( number ) {
 			var fill = '#fff';
 			switch( number ){
 				case 0 :  fill = '#fff';break;
@@ -212,7 +200,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		  	// use SVG without base64 see: https://css-tricks.com/probably-dont-base64-svg/
 		  	return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 		}
-		/*function symbol( icon, color) {
+		function pin( icon, color) {
 			switch( icon ){
 				case 'pin' : 
 					return {
@@ -226,7 +214,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			   	default : 
 			   		return symbol( 'pin', color );
 			};
-		}*/
+		}
+		function switchSVG( Entity, number ){
+			switch( Entity ){
+				case 'Location': return circle( number );
+				case 'Employee': return pin( 'pin', 'green' );
+				case 'Ticket': return pin( 'pin', 'black' );
+			}
+		}
 		//Map
 		var _map_ 	= null;
 		var markers = new Array( );
@@ -257,7 +252,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		      	success:function( json ){
 		      		var rows = JSON.parse( json )[ 'aaData' ];
 		      		for( index in rows){ mark( entities, rows[ index ] ); }
-		      		getting[ entities ] = 1;
+		      		getting[ entities ] = 0;
 		      	}
 		    });
 		}
@@ -271,47 +266,73 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   					)
   				);
   				markers[ row.Entity + '_' + row.ID ].setTitle( row.Name );
-  				markers[ row.Entity + '_' + row.ID ].setIcon( symbol( row.Tickets_Active ) );
+  				//markers[ row.Entity + '_' + row.ID ].setIcon( symbol( row.Tickets_Active ) );
   			} else {
   				markers[ row.Entity + '_' + row.ID ] = new google.maps.Marker({
-  					id    : row.Entity + '_' + row.ID,
+  					id    	 : row.Entity + '_' + row.ID,
   					map      : _map_,
-  					
   					position : new google.maps.LatLng(
-  						row.Latitude, 
-  						row.Longitude
+		  						row.Latitude, 
+		  						row.Longitude
   					),
   					title    : row.Name,
-  					icon  : symbol( row.Tickets_Active ),
-  					color : row.Color
+  					icon     : switchSVG( row.Entity, row.Tickets_Active )
   				});
   			}
 
   			markers[ row.Entity + '_' + row.ID ].addListener(
   				'click',
   				function(){
-  					new google.maps.InfoWindow({
-  						content : 	"<div class='card card-primary text-black' style='width:450pxpx;'>" +
-  										"<div class='card-heading'><h6>" + row.Name + "</h6></div>" +
-  										"<div class='card-body' style='font-size:16px;'>" +
-  											"<div class='row g-0'>" +
-  												"<div class='col-1'><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?></div>" +
-  												"<div class='col-5'>Tickets:</div>" +
-  												"<div class='col-6'>&nbsp;</div>" +
-  											"</div>" +
-  											"<div class='row g-0'>" +
-  												"<div class='col-2'>&nbsp;</div>" +
-  												"<div class='col-4'>Assigned:</div>" +
-  												"<div class='col-6'><a href='tickets.php?Location_ID=" + row.ID + "&Location_Name=" + row.Name + "&Status=1'>" + row.Tickets_Assigned + " ticket(s)</a></div>" +
-  											"</div>" +
-  											"<div class='row g-0' >" +
-  												"<div class='col-2'>&nbsp;</div>" +
-  												"<div class='col-4'>Active:</div>" +
-  												"<div class='col-5'><a href='tickets.php?Location_ID=" + row.ID + "&Location_Name=" + row.Name + "&Status=3'>" + row.Tickets_Active + " ticket(s)</a></div>" +
-  											"</div>" +
-  										"</div>" +
-  									"</div>"
-  					}).open( _map_, this );
+  					switch( row.Entity ){
+  						case 'Location':
+	  						new google.maps.InfoWindow({
+			  						content : 	"<div class='card card-primary text-black' style='width:450pxpx;'>" +
+			  										"<div class='card-heading'><h6>" + row.Name + "</h6></div>" +
+			  										"<div class='card-body' style='font-size:16px;'>" +
+			  											"<div class='row g-0'>" +
+			  												"<div class='col-1'><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?></div>" +
+			  												"<div class='col-5'>Tickets:</div>" +
+			  												"<div class='col-6'>&nbsp;</div>" +
+			  											"</div>" +
+			  											"<div class='row g-0'>" +
+			  												"<div class='col-2'>&nbsp;</div>" +
+			  												"<div class='col-4'>Assigned:</div>" +
+			  												"<div class='col-6'><a href='tickets.php?Location_ID=" + row.ID + "&Location_Name=" + row.Name + "&Status=1'>" + row.Tickets_Assigned + " ticket(s)</a></div>" +
+			  											"</div>" +
+			  											"<div class='row g-0' >" +
+			  												"<div class='col-2'>&nbsp;</div>" +
+			  												"<div class='col-4'>Active:</div>" +
+			  												"<div class='col-5'><a href='tickets.php?Location_ID=" + row.ID + "&Location_Name=" + row.Name + "&Status=3'>" + row.Tickets_Active + " ticket(s)</a></div>" +
+			  											"</div>" +
+			  										"</div>" +
+			  									"</div>"
+			  					}).open( _map_, this );
+	  						break;
+  						case 'Employee':
+  							new google.maps.InfoWindow({
+			  						content : 	"<div class='card card-primary text-black' style='width:450pxpx;'>" +
+			  										"<div class='card-heading'><h6>" + row.Name + "</h6></div>" +
+			  										"<div class='card-body' style='font-size:16px;'>" +
+			  											"<div class='row g-0'>" +
+			  												"<div class='col-1'><?php \singleton\fontawesome::getInstance( )->Employee( 1 );?></div>" +
+			  												"<div class='col-5'>Tickets:</div>" +
+			  												"<div class='col-6'>&nbsp;</div>" +
+			  											"</div>" +
+			  											"<div class='row g-0'>" +
+			  												"<div class='col-2'>&nbsp;</div>" +
+			  												"<div class='col-4'>Assigned:</div>" +
+			  												"<div class='col-6'><a href='employee.php?ID=" + row.ID + "''>" + row.Tickets_Assigned + " ticket(s)</a></div>" +
+			  											"</div>" +
+			  											"<div class='row g-0' >" +
+			  												"<div class='col-2'>&nbsp;</div>" +
+			  												"<div class='col-4'>Active:</div>" +
+			  												"<div class='col-5'><a href='employee.php?ID=" + row.ID + "'>" + row.Tickets_Active + " ticket(s)</a></div>" +
+			  											"</div>" +
+			  										"</div>" +
+			  									"</div>"
+			  					}).open( _map_, this );
+  							break;
+  					}
   				}
   			);
   			markers[ row.Entity + '_' + row.ID ].addListener( 
@@ -341,30 +362,45 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			      	}
 			    );
 			}
-		    /*get( 
-				'Users',
-				{
-					Status          : 1,
-					Active          : 1,
-		      		Supervisor_ID 	: '<?php echo isset( $_GET[ 'Supervisor_ID']) 	? $_GET[ 'Supervisor_ID' ] 	: null;?>',
-		      		User_ID  		: '<?php echo isset( $_GET[ 'User_ID']) 		? $_GET[ 'User_ID' ] 		: null;?>'
-		      	}
-		    );*/
-		    /*get( 
-				'Tickets',
-				{
-					start 		 : 0,
-					length       : 9999999,
-					draw 		 : draw_number,
-					order 		 : {
-						column 	 : 0,
-						dir 	 : 'asc'
-					},
-		      		Open  : 1,
-		      		Type  : <?php echo isset( $_GET[ 'Type' ] )  ? $_GET[ 'Type' ]  : 'null';?>,
-		      		Level : <?php echo isset( $_GET[ 'Level' ] ) ? $_GET[ 'Level' ] : 'null';?>
-		      	}
-		    );*/
+		    if( getting.Users == 0){
+		    	getting.Users = 1;
+		    	get( 
+					'Employees',
+					{
+						start 		 : 0,
+						length       : 9999999,
+						draw 		 : draw_number,
+						order 		 : {
+							column 	 : 0,
+							dir 	 : 'asc'
+						},
+						Status          : 1,
+						Active          : 1,
+			      		Supervisor_ID 	: '<?php echo isset( $_GET[ 'Supervisor_ID']) 	? $_GET[ 'Supervisor_ID' ] 	: null;?>',
+			      		User_ID  		: '<?php echo isset( $_GET[ 'User_ID']) 		? $_GET[ 'User_ID' ] 		: null;?>'
+			      	}
+			    );
+		    }
+		    if( getting.Tickets == 0 ){
+		    	getting.Users = 1;
+		    	get( 
+					'Tickets',
+					{
+						start 		 : 0,
+						length       : 9999999,
+						draw 		 : draw_number,
+						order 		 : {
+							column 	 : 0,
+							dir 	 : 'asc'
+						},
+			      		Open  : 1,
+			      		LSD   : 1,
+			      		Status : 1,
+			      		Type  : <?php echo isset( $_GET[ 'Type' ] ) && !empty( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ]  : 'null';?>,
+			      		Level : <?php echo isset( $_GET[ 'Level' ] ) && !empty( $_GET[ 'Level' ] ) ? $_GET[ 'Level' ] : 'null';?>
+			      	}
+			    );
+		    }
 			setTimeout( function( ){
 				gets( )
 			}, 2500 );

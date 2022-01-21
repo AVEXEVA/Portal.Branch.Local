@@ -117,14 +117,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                     SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                            Employee.ID          AS ID,
-                            Employee.fFirst      AS First_Name,
-                            Employee.Last        AS Last_Name,
-                            tblWork.Super   AS Supervisor,
-                            tblWork.Latt   AS Latitude,
-                            tblWork.fLong   AS Longitude
+                            'Employee'                            AS Entity,
+                            Employee.ID                           AS ID,
+                            Employee.fFirst + ' ' + Employee.Last AS Name,
+                            Employee.fFirst                       AS First_Name,
+                            Employee.Last                         AS Last_Name,
+                            tblWork.Super                         AS Supervisor,
+                            tblWork.Latt                          AS Latitude,
+                            tblWork.fLong                         AS Longitude,
+                            CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0 
+                                  ELSE Tickets_Assigned.Count END       AS Tickets_Assigned,
+                            CASE  WHEN Tickets_Active.Count IS NULL THEN 0 
+                                  ELSE Tickets_Active.Count END         AS Tickets_Active
                     FROM    dbo.Emp AS Employee
                             LEFT JOIN dbo.tblWork ON 'A' + convert(varchar(10), Employee.ID) + ',' = tblWork.Members
+                            LEFT JOIN (
+                              SELECT    Tickets.Field_ID,
+                                        Sum( Tickets.Count ) AS Count
+                              FROM      (
+                                          (
+                                            SELECT    TicketO.fWork AS Field_ID,
+                                                      Count( TicketO.ID ) AS Count
+                                            FROM      TicketO
+                                            WHERE     TicketO.Assigned = 1
+                                            GROUP BY  TicketO.fWork
+                                          )
+                                        ) AS Tickets
+                              GROUP BY  Tickets.Field_ID
+                            ) AS Tickets_Assigned ON Tickets_Assigned.Field_ID = Employee.fWork
+                            LEFT JOIN (
+                              SELECT    Tickets.Field_ID,
+                                        Sum( Tickets.Count ) AS Count
+                              FROM      (
+                                          (
+                                            SELECT    TicketO.fWork AS Field_ID,
+                                                      Count( TicketO.ID ) AS Count
+                                            FROM      TicketO
+                                            WHERE           TicketO.Assigned >= 2
+                                                      AND   TicketO.Assigned <= 3
+                                            GROUP BY  TicketO.fWork
+                                          )
+                                        ) AS Tickets
+                              GROUP BY  Tickets.Field_ID
+                            ) AS Tickets_Active ON Tickets_Active.Field_ID = Employee.fWork
                     WHERE   {$conditions}
                 ) AS Tbl
                 WHERE Tbl.ROW_COUNT BETWEEN ? AND ?;";
