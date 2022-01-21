@@ -14,19 +14,19 @@ class database extends \singleton\index {
 	);
 	protected function __construct( ){
 		$this->default = 'Portal';
-		$this->databases[ 'Portal' ] = sqlsrv_connect( 
+		$this->databases[ 'Portal' ] = sqlsrv_connect(
 			$this->host,
 			$this->options
 		);
 		$result = sqlsrv_query(
 			$this->databases[ 'Portal' ],
 			"	SELECT 	[Database].Name,
-						[Database].[Default]
-				FROM 	[Database]
+								[Database].[Default]
+				FROM 		[Database]
 				WHERE 	[Database].[Status] = 1;"
 		);
 		if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){
-			$this->databases[ ] = $row[ 'Name' ];	
+			$this->databases[ ] = $row[ 'Name' ];
 			$options = $this->options;
 			$options[ 'Database' ] = $row[ 'Name' ];
 			$this->databases[ $row[ 'Name' ] ] = sqlsrv_connect( $this->host, $options );

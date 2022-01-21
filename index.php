@@ -54,23 +54,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   );
   $Privileges = array();
   if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-      $key = $Privilege['Access'];
-      unset( $Privilege[ 'Access' ] );
-      $Privileges[ $key ] = implode( '', array(
-      	dechex( $Privilege[ 'Owner' ] ),
-      	dechex( $Privilege[ 'Group' ] ),
-      	dechex( $Privilege[ 'Department' ] ),
-      	dechex( $Privilege[ 'Database' ] ),
-      	dechex( $Privilege[ 'Server' ] ),
-      	dechex( $Privilege[ 'Other' ] ),
-      	dechex( $Privilege[ 'Token' ] ),
-      	dechex( $Privilege[ 'Internet' ] )
-      ) );
-  }}
-  if(!isset( $Connection[ 'ID' ] ) ){
-    header( 'Location: ../index.php' );
-    exit;
-  } else {
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+        	dechex( $Privilege[ 'Owner' ] ),
+        	dechex( $Privilege[ 'Group' ] ),
+        	dechex( $Privilege[ 'Department' ] ),
+        	dechex( $Privilege[ 'Database' ] ),
+        	dechex( $Privilege[ 'Server' ] ),
+        	dechex( $Privilege[ 'Other' ] ),
+        	dechex( $Privilege[ 'Token' ] ),
+        	dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(!isset( $Connection[ 'ID' ] ) ){ ?><?php
+      header( 'Location: ../index.php' );
+      exit;
+    ?><?php }
+    else {
       \singleton\database::getInstance( )->query(
         null,
         " INSERT INTO Activity([User], [Date], [Page] )
@@ -86,9 +87,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         " SELECT  [User].[ID],
                   [User].[Email],
                   [User].[Branch_Type],
-                  [User].[Picture], 
+                  [User].[Picture],
                   [User].[Picture_Type]
-          FROM    [User] 
+          FROM    [User]
           WHERE   [User].[ID] = ?;",
         array(
           $_SESSION[ 'Connection' ][ 'User' ]
@@ -112,7 +113,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   <div id='page-wrapper' class='content'>
     <section id='account-menu' style='padding:50px;background-color:#0f0f0f;'>
       <div class='row'>
-        <?php 
+        <?php
           if( !is_null( $User ) && isset( $User[ 'Picture' ] ) && !empty( $User[ 'Picture' ] ) ){
             ?><div class='offset-3 col-6'><button class='slim' onClick="browseProfilePicture( );"><img class='round border border-white' src='<?php print "data:" . $User[ 'Picture_Type' ] . ";base64, " . $User[ 'Picture' ];?>'  style='max-width:100%;max-height:200px;' /><div class="text-white"><?php echo $User[ 'Email'  ];  ?></div></button></div><?php
           } else {
