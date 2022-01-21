@@ -187,7 +187,32 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 	<script type="text/javascript">
 		//Statics / Helpers
-		function symbol( icon, color) {
+		function symbol( number ) {
+			var fill = '#fff';
+			switch( number ){
+				case 0 :  fill = '#fff';break;
+				case 1 :  fill = '#eee';break;
+				case 2 :  fill = '#ddd';break;
+				case 3 :  fill = '#ccc';break;
+				case 4 :  fill = '#bbb';break;
+				case 5 :  fill = '#aaa';break;
+				case 6 :  fill = '#999';break;
+				case 7 :  fill = '#888';break;
+				case 8 :  fill = '#777';break;
+				case 9 :  fill = '#666';break;
+				case 10 : fill = '#555';break;
+				case 11 : fill = '#444';break;
+				case 12 : fill = '#333';break;
+				case 13 : fill = '#222';break;
+				case 14 : fill = '#111';break;
+				default : fill = '#000';break;
+			}
+		  	// inline your SVG image with number variable
+		  	var svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewBox="0 0 25 25"> <defs> <rect id="path-1" width="25" height="25"/> <mask id="mask-2" width="25" height="25" x="0" y="0" fill="white"> <use xlink:href="#path-1"/> </mask> </defs> <g id="Page-1" fill="none" fill-rule="evenodd"> <g id="Phone-Portrait---320" transform="translate(-209 -51)"> <g id="Group" transform="translate(209 51)"> <use id="Rectangle" fill="' + fill + '" stroke="#F44336" 		stroke-width="4" mask="url(#mask-2)" xlink:href="#path-1"/> <text id="1" fill="#20539F" font-family="NunitoSans-ExtraBold, Nunito Sans" font-size="18" font-weight="600" letter-spacing=".104" text-anchor="middle" x="50%" y="16">' + number + '</text> </g> </g> </g> </svg>';		
+		  	// use SVG without base64 see: https://css-tricks.com/probably-dont-base64-svg/
+		  	return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+		}
+		/*function symbol( icon, color) {
 			switch( icon ){
 				case 'pin' : 
 					return {
@@ -201,7 +226,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			   	default : 
 			   		return symbol( 'pin', color );
 			};
-		}
+		}*/
 		//Map
 		var _map_ 	= null;
 		var markers = new Array( );
@@ -237,6 +262,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    });
 		}
 		function mark( entities, row ){
+			if( row.Tickets_Active == 0 ){ return; }
 			if( markers[ row.Entity + '_' + row.ID ] ){
   				markers[ row.Entity + '_' + row.ID ].setPosition( 
   					new google.maps.LatLng(
@@ -245,7 +271,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   					)
   				);
   				markers[ row.Entity + '_' + row.ID ].setTitle( row.Name );
-  				markers[ row.Entity + '_' + row.ID ].setIcon( symbol( 'pin', row.Color ) );
+  				markers[ row.Entity + '_' + row.ID ].setIcon( symbol( row.Tickets_Active ) );
   			} else {
   				markers[ row.Entity + '_' + row.ID ] = new google.maps.Marker({
   					id    : row.Entity + '_' + row.ID,
@@ -256,10 +282,38 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   						row.Longitude
   					),
   					title    : row.Name,
-  					icon  : symbol( 'pin', row.Color ),
+  					icon  : symbol( row.Tickets_Active ),
   					color : row.Color
   				});
   			}
+
+  			markers[ row.Entity + '_' + row.ID ].addListener(
+  				'click',
+  				function(){
+  					new google.maps.InfoWindow({
+  						content : 	"<div class='card card-primary text-black' style='width:450pxpx;'>" +
+  										"<div class='card-heading'><h6>" + row.Name + "</h6></div>" +
+  										"<div class='card-body' style='font-size:16px;'>" +
+  											"<div class='row g-0'>" +
+  												"<div class='col-1'><?php \singleton\fontawesome::getInstance( )->Ticket( 1 );?></div>" +
+  												"<div class='col-5'>Tickets:</div>" +
+  												"<div class='col-6'>&nbsp;</div>" +
+  											"</div>" +
+  											"<div class='row g-0'>" +
+  												"<div class='col-2'>&nbsp;</div>" +
+  												"<div class='col-4'>Assigned:</div>" +
+  												"<div class='col-6'><a href='tickets.php?Location_ID=" + row.ID + "&Location_Name=" + row.Name + "&Status=1'>" + row.Tickets_Assigned + " ticket(s)</a></div>" +
+  											"</div>" +
+  											"<div class='row g-0' >" +
+  												"<div class='col-2'>&nbsp;</div>" +
+  												"<div class='col-4'>Active:</div>" +
+  												"<div class='col-5'><a href='tickets.php?Location_ID=" + row.ID + "&Location_Name=" + row.Name + "&Status=3'>" + row.Tickets_Active + " ticket(s)</a></div>" +
+  											"</div>" +
+  										"</div>" +
+  									"</div>"
+  					}).open( _map_, this );
+  				}
+  			);
   			markers[ row.Entity + '_' + row.ID ].addListener( 
   				'dblclick', 
   				function() { document.location.href= row.Entity.toLowerCase( ) + '.php?ID=' + row.ID; }
