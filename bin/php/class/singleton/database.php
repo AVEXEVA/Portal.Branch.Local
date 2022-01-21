@@ -3,30 +3,30 @@ namespace singleton;
 class database extends \singleton\index {
 	private $default = null;
 	private $databases = array( );
-	private $host = '172.16.12.44';
+	private $host = '20.124.200.54';
 	private $options = array(
 		'Database' 				=> 	'Portal',
 		'Uid' 					=> 	'sa',
-		'PWD' 					=> 	'SQLABC!23456',
+		'PWD' 					=> 	'007!Youknowwhattodo!',
 		'ReturnDatesAsStrings'	=>	true,
 		'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 		'TraceOn' 				=> 	false
 	);
 	protected function __construct( ){
 		$this->default = 'Portal';
-		$this->databases[ 'Portal' ] = sqlsrv_connect( 
+		$this->databases[ 'Portal' ] = sqlsrv_connect(
 			$this->host,
 			$this->options
 		);
 		$result = sqlsrv_query(
 			$this->databases[ 'Portal' ],
 			"	SELECT 	[Database].Name,
-						[Database].[Default]
-				FROM 	[Database]
+								[Database].[Default]
+				FROM 		[Database]
 				WHERE 	[Database].[Status] = 1;"
 		);
 		if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){
-			$this->databases[ ] = $row[ 'Name' ];	
+			$this->databases[ ] = $row[ 'Name' ];
 			$options = $this->options;
 			$options[ 'Database' ] = $row[ 'Name' ];
 			$this->databases[ $row[ 'Name' ] ] = sqlsrv_connect( $this->host, $options );
