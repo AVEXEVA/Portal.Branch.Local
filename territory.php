@@ -115,8 +115,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Territory.TFMID         AS TFMID,
                     Territory.TFMSource     AS TFMSource,
                     Employee.ID             AS Employee_ID,
-                    Employee.fFirst         AS Employee_First,
-                    Employee.Last           AS Employee_Last,
+                    Employee.fFirst + ' ' + Employee.Last AS Employee_Name,
                     Rolodex.Website         AS Website,
                     Rolodex.City            AS City,
                     Rolodex.State           AS State,
@@ -124,58 +123,77 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                     Rolodex.Contact         AS Contact,
                     Rolodex.Phone           AS Phone,
                     Rolodex.Email           AS Email,
-                    CASE    WHEN Units.Count IS NULL THEN 0
-                            ELSE Units.Count END AS Units_Count,
-                    CASE    WHEN Units.Elevators IS NULL THEN 0
-                            ELSE Units.Elevators END AS Units_Elevators,
-                    CASE    WHEN Units.Escalators IS NULL THEN 0
-                            ELSE Units.Escalators END AS Units_Escalators,
-                    CASE    WHEN Units.Moving_Walks IS NULL THEN 0
-                            ELSE Units.Moving_Walks END AS Units_Moving_Walks,
-                    CASE    WHEN Units.Others IS NULL THEN 0
-                            ELSE Units.Others END AS Units_Others,
-                    CASE    WHEN Jobs.[Open] IS NULL THEN 0
-                            ELSE Jobs.[Open] END AS Jobs_Open,
-                    CASE    WHEN Jobs.[On_Hold] IS NULL THEN 0
-                            ELSE Jobs.[On_Hold] END AS Jobs_On_Hold,
-                    CASE    WHEN Jobs.[Closed] IS NULL THEN 0
-                            ELSE Jobs.[Closed] END AS Jobs_Closed,
-                    CASE    WHEN Tickets.Unassigned IS NULL THEN 0
-                            ELSE Tickets.Unassigned END AS Tickets_Open,
-                    CASE    WHEN Tickets.Assigned IS NULL THEN 0
-                            ELSE Tickets.Assigned END AS Tickets_Assigned,
-                    CASE    WHEN Tickets.En_Route IS NULL THEN 0
-                            ELSE Tickets.En_Route END AS Tickets_En_Route,
-                    CASE    WHEN Tickets.On_Site IS NULL THEN 0
-                            ELSE Tickets.On_Site END AS Tickets_On_Site,
-                    CASE    WHEN Tickets.Reviewing IS NULL THEN 0
-                            ELSE Tickets.Reviewing END AS Tickets_Reviewing,
-                    CASE    WHEN Violations.Preliminary IS NULL THEN 0
-                            ELSE Violations.Preliminary END AS Violations_Preliminary_Report,
-                    CASE    WHEN Violations.Job_Created IS NULL THEN 0
-                            ELSE Violations.Job_Created END AS Violations_Job_Created,
-                    CASE    WHEN Violations.Closed IS NULL THEN 0
-                            ELSE Violations.Closed END AS Violations_Closed,
-                    CASE    WHEN Invoices.[Open] IS NULL THEN 0
-                            ELSE Invoices.[Open] END AS Invoices_Open,
-                    CASE    WHEN Invoices.[Closed] IS NULL THEN 0
-                            ELSE Invoices.[Closed] END AS Invoices_Closed,
-                    CASE    WHEN Proposals.[Open] IS NULL THEN 0
-                            ELSE Proposals.[Open] END AS Proposals_Open,
-                    CASE    WHEN Proposals.[Closed] IS NULL THEN 0
-                            ELSE Proposals.[Closed] END AS Proposals_Closed
-                    FROM    Terr  AS Territory
+                    CASE    WHEN Locations.Units IS NULL THEN 0
+                            ELSE Locations.Units END AS Units_Count,
+                    CASE    WHEN Locations.Elevators IS NULL THEN 0
+                            ELSE Locations.Elevators END AS Units_Elevators,
+                    CASE    WHEN Locations.Escalators IS NULL THEN 0
+                            ELSE Locations.Escalators END AS Units_Escalators,
+                    CASE    WHEN Locations.Moving_Walks IS NULL THEN 0
+                            ELSE Locations.Moving_Walks END AS Units_Moving_Walks,
+                    CASE    WHEN Locations.Others IS NULL THEN 0
+                            ELSE Locations.Others END AS Units_Others,
+                    CASE    WHEN Locations.[Jobs_Open] IS NULL THEN 0
+                            ELSE Locations.[Jobs_Open] END AS Jobs_Open,
+                    CASE    WHEN Locations.[Jobs_On_Hold] IS NULL THEN 0
+                            ELSE Locations.[Jobs_On_Hold] END AS Jobs_On_Hold,
+                    CASE    WHEN Locations.[Jobs_Closed] IS NULL THEN 0
+                            ELSE Locations.[Jobs_Closed] END AS Jobs_Closed,
+                    CASE    WHEN Locations.Tickets_Unassigned IS NULL THEN 0
+                            ELSE Locations.Tickets_Unassigned END AS Tickets_Open,
+                    CASE    WHEN Locations.Tickets_Assigned IS NULL THEN 0
+                            ELSE Locations.Tickets_Assigned END AS Tickets_Assigned,
+                    CASE    WHEN Locations.Tickets_En_Route IS NULL THEN 0
+                            ELSE Locations.Tickets_En_Route END AS Tickets_En_Route,
+                    CASE    WHEN Locations.Tickets_On_Site IS NULL THEN 0
+                            ELSE Locations.Tickets_On_Site END AS Tickets_On_Site,
+                    CASE    WHEN Locations.Tickets_Reviewing IS NULL THEN 0
+                            ELSE Locations.Tickets_Reviewing END AS Tickets_Reviewing,
+                    CASE    WHEN Locations.Violations_Preliminary IS NULL THEN 0
+                            ELSE Locations.Violations_Preliminary END AS Violations_Preliminary_Report,
+                    CASE    WHEN Locations.Violations_Job_Created IS NULL THEN 0
+                            ELSE Locations.Violations_Job_Created END AS Violations_Job_Created,
+                    CASE    WHEN Locations.Violations_Closed IS NULL THEN 0
+                            ELSE Locations.Violations_Closed END AS Violations_Closed,
+                    CASE    WHEN Locations.[Invoices_Open] IS NULL THEN 0
+                            ELSE Locations.[Invoices_Open] END AS Invoices_Open,
+                    CASE    WHEN Locations.[Invoices_Closed] IS NULL THEN 0
+                            ELSE Locations.[Invoices_Closed] END AS Invoices_Closed,
+                    CASE    WHEN Locations.[Proposals_Open] IS NULL THEN 0
+                            ELSE Locations.[Proposals_Open] END AS Proposals_Open,
+                    CASE    WHEN Locations.[Proposals_Closed] IS NULL THEN 0
+                            ELSE Locations.[Proposals_Closed] END AS Proposals_Closed,
+                    CASE    WHEN Locations_Maintained.Count IS NULL THEN 0
+                            ELSE Locations_Maintained.Count END AS Locations_Maintained,
+                    CASE    WHEN Locations_Unmaintained.Count IS NULL THEN 0
+                            ELSE Locations_Unmaintained.Count END AS Locations_Unmaintained
+            FROM    Terr  AS Territory
                     LEFT JOIN Emp AS Employee ON Territory.SMan = Employee.ID
                     LEFT JOIN Rol AS Rolodex  ON Employee.Rol   = Rolodex.ID
                     LEFT JOIN (
-                      SELECT    Location.Terr               AS Territory,
-                                Count( Location.Loc )       AS Location,
-                                Sum(   Contacts.Count )     AS Contacts,
-                                Sum(   Units.Count )        AS  Units,
-                                Sum(   Elevators.Count )    AS  Elevators,
-                                Sum(   Escalators.Count )   AS  Escalators,
-                                Sum(   Moving_Walk.Count )  AS  Moving_Walks,
-                                Sum(   Others.Count )       AS  Others
+                      SELECT    Location.Terr                           AS  [Territory],
+                                Count( Location.Loc )                   AS  [Locations],
+                                Sum( Contacts.Count )                   AS  [Contacts],
+                                Sum( Units.Count )                      AS  [Units],
+                                Sum( Elevators.Count )                  AS  [Elevators],
+                                Sum( Escalators.Count )                 AS  [Escalators],
+                                Sum( Moving_Walks.Count )               AS  [Moving_Walks],
+                                Sum( Others.Count )                     AS  [Others],
+                                Sum( [Proposals_Open].Count )           AS  [Proposals_Open],
+                                Sum( [Proposals_Closed].Count )         AS  [Proposals_Closed],
+                                Sum( [Invoices_Open].Count )            AS  [Invoices_Open],
+                                Sum( [Invoices_Closed].Count )          AS  [Invoices_Closed],
+                                Sum( Violations_Preliminary.Count )     AS  [Violations_Preliminary],
+                                Sum( Violations_Job_Created.Count )     AS  [Violations_Job_Created],
+                                Sum( Violations_Closed.Count )          AS  [Violations_Closed],
+                                Sum( Tickets_Unassigned.Count )         AS  [Tickets_Unassigned],
+                                Sum( Tickets_Assigned.Count )           AS  [Tickets_Assigned],
+                                Sum( Tickets_En_Route.Count )           AS  [Tickets_En_Route],
+                                Sum( Tickets_On_Site.Count  )           AS  [Tickets_On_Site],
+                                Sum( Tickets_Reviewing.Count )          AS  [Tickets_Reviewing],
+                                Sum( [Jobs_Open].Count )                AS  [Jobs_Open],
+                                Sum( [Jobs_On_Hold].Count )             AS  [Jobs_On_Hold],
+                                Sum( [Jobs_Closed].Count )              AS  [Jobs_Closed]
                       FROM      Loc AS Location
                                 LEFT JOIN (
                                   SELECT    Rolodex.Name AS Name,
@@ -217,187 +235,141 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                   WHERE     Elev.Type NOT IN ( 'Elevator', 'Escalator', 'Moving Walk' )
                                   GROUP BY  Elev.Loc
                                 ) AS Others ON Location.Loc = Others.Location
+                                LEFT JOIN (
+                                  SELECT    Estimate.LocID AS Location,
+                                            Count( Estimate.ID ) AS Count
+                                  FROM      Estimate
+                                  WHERE     Estimate.Status = 0
+                                  GROUP BY  Estimate.LocID
+                                ) AS [Proposals_Open] ON Location.Loc = [Proposals_Open].Location
+                                LEFT JOIN (
+                                  SELECT    Estimate.LocID AS Location,
+                                            Count( Estimate.ID ) AS Count
+                                  FROM      Estimate
+                                  WHERE     Estimate.Status = 1
+                                  GROUP BY  Estimate.LocID
+                                ) AS [Proposals_Closed] ON Location.Loc = [Proposals_Closed].Location
+                                LEFT JOIN (
+                                  SELECT    Invoice.Loc AS Location,
+                                            Count( Invoice.Ref ) AS Count
+                                  FROM      Invoice
+                                  WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
+                                  GROUP BY  Invoice.Loc
+                                ) AS [Invoices_Open] ON Location.Terr = [Invoices_Open].Location
+                                LEFT JOIN (
+                                  SELECT    Invoice.Loc AS Location,
+                                            Count( Invoice.Ref ) AS Count
+                                  FROM      Invoice
+                                  WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
+                                  GROUP BY  Invoice.Loc
+                                ) AS [Invoices_Closed] ON Location.Terr = [Invoices_Closed].Location
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( Violation.ID ) AS Count
+                                  FROM      Violation
+                                            LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                  WHERE     Violation.Status = 'Preliminary Report'
+                                  GROUP BY  Location.Loc
+                                ) AS [Violations_Preliminary] ON Violations_Preliminary.Location = Location.Loc
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( Violation.ID ) AS Count
+                                  FROM      Violation
+                                            LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                  WHERE     Violation.Status = 'Job Created'
+                                  GROUP BY  Location.Loc
+                                ) AS [Violations_Job_Created] ON Violations_Job_Created.Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT  Location.Loc AS Location,
+                                            Count( Violation.ID ) AS Count
+                                    FROM    Violation
+                                            LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
+                                    WHERE   Violation.Status IN ( 'Completed', 'Dismissed' )
+                                    GROUP BY    Location.Loc
+                                ) AS [Violations_Closed] ON Violations_Closed.Location = Location.Loc
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                  WHERE     TicketO.Assigned = 0
+                                  GROUP BY  Location.Loc
+                                ) AS [Tickets_Unassigned] ON Tickets_Unassigned.Location = Location.Loc
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                  WHERE     TicketO.Assigned = 1
+                                  GROUP BY  Location.Loc
+                                ) AS [Tickets_Assigned] ON Tickets_Assigned.Location = Location.Loc
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                  WHERE     TicketO.Assigned = 2
+                                  GROUP BY  Location.Loc
+                                ) AS [Tickets_En_Route] ON Tickets_En_Route.Location = Location.Loc
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                  WHERE     TicketO.Assigned = 3
+                                  GROUP BY  Location.Loc
+                                ) AS [Tickets_On_Site] ON Tickets_On_Site.Location = Location.Loc
+                                LEFT JOIN (
+                                  SELECT    Location.Loc AS Location,
+                                            Count( TicketO.ID ) AS Count
+                                  FROM      TicketO
+                                            LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
+                                  WHERE     TicketO.Assigned = 6
+                                  GROUP BY  Location.Loc
+                                ) AS [Tickets_Reviewing] ON Tickets_Reviewing.Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Job.Loc AS Location,
+                                                Count( Job.ID ) AS Count
+                                    FROM        Job
+                                    WHERE       Job.Status = 0
+                                    GROUP BY    Job.Loc
+                                ) AS [Jobs_Open] ON [Jobs_Open].Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Job.Loc AS Location,
+                                                Count( Job.ID ) AS Count
+                                    FROM        Job
+                                    WHERE       Job.Status = 2
+                                    GROUP BY    Job.Loc
+                                ) AS [Jobs_On_Hold] ON [Jobs_On_Hold].Location = Location.Loc
+                                LEFT JOIN (
+                                    SELECT      Job.Loc AS Location,
+                                                Count( Job.ID ) AS Count
+                                    FROM        Job
+                                    WHERE       Job.Status = 1
+                                    GROUP BY    Job.Loc
+                                ) AS [Jobs_Closed] ON [Jobs_Closed].Location = Location.Loc
                       GROUP BY  Location.Terr
                     ) AS  Locations ON Locations.Territory = Territory.ID
-                  LEFT JOIN (
-                      SELECT      Location.Terr        AS Territory,
-                                  Sum( [Open].Count )   AS [Open],
-                                  Sum( [Closed].Count ) AS Closed
-                      FROM        Loc AS Location
-                                  LEFT JOIN (
-                                    SELECT    Estimate.LocID AS Location,
-                                              Count( Estimate.ID ) AS Count
-                                    FROM      Estimate
-                                    WHERE     Estimate.Status = 0
-                                    GROUP BY  Estimate.LocID
-                                  ) AS [Open] ON Location.Loc = [Open].Location
-                                  LEFT JOIN (
-                                    SELECT    Estimate.LocID AS Location,
-                                              Count( Estimate.ID ) AS Count
-                                    FROM      Estimate
-                                    WHERE     Estimate.Status = 1
-                                    GROUP BY  Estimate.LocID
-                                  ) AS [Closed] ON Location.Loc = [Closed].Location
-                      GROUP BY    Location.Owner
-                    ) AS Proposals ON Proposals.Customer = Customer.ID
-                  LEFT JOIN (
-                      SELECT      Location.Terr          AS Territory,
-                                  Sum( [Open].Count )     AS [Open],
-                                  Sum( [Closed].Count )   AS Closed
-                      FROM        Loc AS Location
-                                  LEFT JOIN (
-                                    SELECT    Invoice.Loc AS Location,
-                                              Count( Invoice.Ref ) AS Count
-                                    FROM      Invoice
-                                    WHERE     Invoice.Ref IN ( SELECT Ref FROM OpenAR )
-                                    GROUP BY  Invoice.Loc
-                                  ) AS [Open] ON Location.Loc = [Open].Location
-                                  LEFT JOIN (
-                                    SELECT    Invoice.Loc AS Location,
-                                              Count( Invoice.Ref ) AS Count
-                                    FROM      Invoice
-                                    WHERE     Invoice.Ref NOT IN ( SELECT Ref FROM OpenAR )
-                                    GROUP BY  Invoice.Loc
-                                  ) AS [Closed] ON Location.Loc = [Closed].Location
-                      GROUP BY    Location.Owner
-                  ) AS Invoices ON Invoices.Customer = Customer.ID
-                        LEFT JOIN (
-                            SELECT  Location.Terr     AS Territory,
-                                    Preliminary.Count AS Preliminary,
-                                    Job_Created.Count AS Job_Created,
-                                    Closed.Count AS Closed
-                            FROM    Owner
-                                    LEFT JOIN (
-                                      SELECT    Location.Loc AS Territory,
-                                                Count( Violation.ID ) AS Count
-                                      FROM      Violation
-                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                                      WHERE     Violation.Status = 'Preliminary Report'
-                                      GROUP BY  Location.Owner
-                                    ) AS [Preliminary] ON Preliminary.Customer = Owner.ID
-                                    LEFT JOIN (
-                                      SELECT    Location.Loc AS Territory,
-                                                Count( Violation.ID ) AS Count
-                                      FROM      Violation
-                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                                      WHERE     Violation.Status = 'Job Created'
-                                      GROUP BY  Location.Owner
-                                    ) AS [Job_Created] ON Job_Created.Customer = Owner.ID
-                                    LEFT JOIN (
-                                        SELECT  Location.Loc AS Terr,
-                                                Count( Violation.ID ) AS Count
-                                        FROM    Violation
-                                                LEFT JOIN Loc AS Location ON Location.Loc = Violation.Loc
-                                        WHERE   Violation.Status IN ( 'Completed', 'Dismissed' )
-                                        GROUP BY    Location.Owner
-                                    ) AS [Closed] ON Closed.Customer = Owner.ID
-                        ) AS Violations ON Violations.Customer = Customer.ID
-                          LEFT JOIN (
-                              SELECT  Location.Loc        AS Territory,
-                                      Unassigned.Count    AS Unassigned,
-                                      Assigned.Count      AS Assigned,
-                                      En_Route.Count      AS En_Route,
-                                      On_Site.Count       AS On_Site,
-                                      Reviewing.Count     AS Reviewing
-                              FROM    Owner
-                                      LEFT JOIN (
-                                        SELECT    Location.Terr AS Location,
-                                                  Count( TicketO.ID ) AS Count
-                                        FROM      TicketO
-                                                  LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                                        WHERE     TicketO.Assigned = 0
-                                        GROUP BY  Location.Terr
-                                      ) AS [Unassigned] ON Unassigned.Customer = Owner.ID
-                                      LEFT JOIN (
-                                        SELECT    Location.Terr AS Location,
-                                                  Count( TicketO.ID ) AS Count
-                                        FROM      TicketO
-                                                  LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                                        WHERE     TicketO.Assigned = 1
-                                        GROUP BY  Location.Terr
-                                      ) AS [Assigned] ON Assigned.Customer = Owner.ID
-                                      LEFT JOIN (
-                                        SELECT    Location.Terr AS Location,
-                                                  Count( TicketO.ID ) AS Count
-                                        FROM      TicketO
-                                                  LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                                        WHERE     TicketO.Assigned = 2
-                                        GROUP BY  Location.Terr
-                                      ) AS [En_Route] ON En_Route.Customer = Owner.ID
-                                      LEFT JOIN (
-                                        SELECT    Location.Terr AS Location,
-                                                  Count( TicketO.ID ) AS Count
-                                        FROM      TicketO
-                                                  LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                                        WHERE     TicketO.Assigned = 3
-                                        GROUP BY  Location.Terr
-                                      ) AS [On_Site] ON On_Site.Customer = Owner.ID
-                                      LEFT JOIN (
-                                        SELECT    Location.Terr AS Location,
-                                                  Count( TicketO.ID ) AS Count
-                                        FROM      TicketO
-                                                  LEFT JOIN Loc AS Location ON Location.Loc = TicketO.LID
-                                        WHERE     TicketO.Assigned = 6
-                                        GROUP BY  Location.Terr
-                                      ) AS [Reviewing] ON Reviewing.Customer = Owner.ID
-                          ) AS Tickets ON Tickets.Customer = Customer.ID
-                            LEFT JOIN (
-                                SELECT  Location.Terr   AS Territory,
-                                        [Open].Count    AS [Open],
-                                        [On_Hold].Count AS On_Hold,
-                                        [Closed].Count  AS Closed
-                                FROM    Owner
-                                    LEFT JOIN (
-                                        SELECT      Job.Location AS Location,
-                                                    Count( Job.ID ) AS Count
-                                        FROM        Job
-                                        WHERE       Job.Status = 0
-                                        GROUP BY    Job.Owner
-                                    ) AS [Open] ON [Open].Customer = Owner.ID
-                                    LEFT JOIN (
-                                        SELECT      Job.Location AS Location,
-                                                    Count( Job.ID ) AS Count
-                                        FROM        Job
-                                        WHERE       Job.Status = 2
-                                        GROUP BY    Job.Owner
-                                    ) AS [On_Hold] ON [On_Hold].Customer = Owner.ID
-                                    LEFT JOIN (
-                                        SELECT      Job.Location AS Location,
-                                                    Count( Job.ID ) AS Count
-                                        FROM        Job
-                                        WHERE       Job.Status = 1
-                                        GROUP BY    Job.Owner
-                                    ) AS [Closed] ON [Closed].Customer = Owner.ID
-                            ) AS Jobs ON Jobs.Customer = Customer.ID
-                          LEFT JOIN (
-                                        SELECT      Location.Terr AS Territory,
-                                                    Sum( Maintained.Count ) AS Maintained,
-                                                    Sum( Unmaintained.Count ) AS Unmaintained,
-                                                    Count( Location.Loc ) AS Count
-                                        FROM        Location
-                                        LEFT JOIN Loc AS Location ON Owner.ID = Location.Owner
-                                        LEFT JOIN (
-                                        SELECT      Location.Loc AS Location,
-                                                    Count( Location.Loc ) AS Count
-                                        FROM        Loc AS Location
-                                        WHERE       Location.Maint = 1
-                                        GROUP BY    Location.Loc
-                                    ) AS [Maintained] ON Location.Loc = Maintained.Location
-                                    LEFT JOIN (
-                                        SELECT      Location.Loc AS Location,
-                                                    Count( Location.Loc ) AS Count
-                                        FROM        Loc AS Location
-                                        WHERE       Location.Maint = 0
-                                        GROUP BY    Location.Loc
-                                        ) AS [Unmaintained] ON Location.Loc = Unmaintained.Location
-                              GROUP BY    Owner.ID
-                          ) AS Locations ON Locations.Customer = Customer.ID
-                      WHERE       Territory.ID = ?;",
+                    LEFT JOIN (
+                          SELECT      Location.Terr AS Territory,
+                                      Count( Location.Loc ) AS Count
+                          FROM        Loc AS Location
+                          WHERE       Location.Maint = 1
+                          GROUP BY    Location.Terr
+                    ) AS [Locations_Maintained] ON Territory.ID = Locations_Maintained.Territory
+                    LEFT JOIN (
+                          SELECT      Location.Terr AS Territory,
+                                      Count( Location.Loc ) AS Count
+                          FROM        Loc AS Location
+                          WHERE       Location.Maint <> 1
+                          GROUP BY    Location.Terr
+                    ) AS [Locations_Unmaintained] ON Territory.ID = Locations_Unmaintained.Territory
+            WHERE   Territory.ID = ?;",
         array(
           $ID
         )
     );
-    var_dump(sqlsrv_errors ( ) );
+var_dump(sqlsrv_errors ( ) );
     $Territory = in_array( $ID, array( null, 0, '', ' ' ) ) || !$result ? array(
       'ID' => null,
       'Name' => null,
@@ -420,8 +392,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'Customer_ID' => isset( $_GET[ 'Customer_ID' ] ) ? $_GET[ 'Customer_ID' ] : null,
       'Customer_Name' => isset( $_GET[ 'Customer_Name' ] ) ? $_GET[ 'Customer_Name' ] : null,
       'Employee_ID' => isset( $_GET[ 'Employee_ID' ] ) ? $_GET[ 'Employee_ID' ] : null,
-      'Employee_First' => isset( $_GET[ 'Employee_First' ] ) ? $_GET[ 'Employee_First' ] : null,
-      'Employee_Last' => isset( $_GET[ 'Employee_Last' ] ) ? $_GET[ 'Employee_Last' ] : null,
+      'Employee_Name' => isset( $_GET[ 'Employee_Name' ] ) ? $_GET[ 'Employee_Name' ] : null,
       'Division_ID' => isset( $_GET[ 'Division_ID' ] ) ? $_GET[ 'Division_ID' ] : null,
       'Division_Name' => isset( $_GET[ 'Division_Name' ] ) ? $_GET[ 'Division_Name' ] : null,
       'Route_ID' => isset( $_GET[ 'Route_ID' ] ) ? $_GET[ 'Route_ID' ] : null,
@@ -453,30 +424,34 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       'Proposals_Closed' => isset( $_GET[ 'Proposals_Closed' ] ) ? $_GET[ 'Proposals_Closed' ] : null
     ) : sqlsrv_fetch_array( $result );
     if( isset( $_POST ) && count( $_POST ) > 0 ){
-      $Territory[ 'Name' ] 	= isset( $_POST[ 'Name' ] ) 		? $_POST[ 'Name' ] 			: $Territory[ 'Name' ];
-      $Territory[ 'SMAN' ] 	= isset( $_POST[ 'SMAN' ] ) 		? $_POST[ 'SMAN' ] 		: $Territory[ 'SMAN' ];
-      $Territory[ 'SDesc' ] 	= isset( $_POST[ 'SDesc' ] ) 		? $_POST[ 'SDesc' ] 		: $Territory[ 'SDesc' ];
-      $Territory[ 'Remarks' ] 	= isset( $_POST[ 'Remarks' ] ) 		? $_POST[ 'Remarks' ] 		: $Territory[ 'Remarks' ];
-      $Territory[ 'Count' ] 	= isset( $_POST[ 'Count' ] ) 		? $_POST[ 'Count' ] 		: $Territory[ 'Count' ];
-      $Territory[ 'Symbol' ] 	= isset( $_POST[ 'Symbol' ] ) 		? $_POST[ 'Symbol' ] 		: $Territory[ 'Symbol' ];
-      $Territory[ 'EN' ] 	= isset( $_POST[ 'EN' ] ) 		? $_POST[ 'EN' ] 		: $Territory[ 'EN' ];
-      $Territory[ 'Address' ] 	= isset( $_POST[ 'EN' ] ) 		? $_POST[ 'EN' ] 		: $Territory[ 'EN' ];
-      $Territory[ 'TFMID' ] 	= isset( $_POST[ 'TFMID' ] ) 		? $_POST[ 'TFMID' ] 		: $Territory[ 'TFMID' ];
+      $Territory[ 'Name' ] 	      = isset( $_POST[ 'Name' ] ) 		? $_POST[ 'Name' ] 			: $Territory[ 'Name' ];
+      $Territory[ 'SMAN' ]       	= isset( $_POST[ 'SMAN' ] ) 		? $_POST[ 'SMAN' ] 		: $Territory[ 'SMAN' ];
+      $Territory[ 'SDesc' ] 	    = isset( $_POST[ 'SDesc' ] ) 		? $_POST[ 'SDesc' ] 		: $Territory[ 'SDesc' ];
+      $Territory[ 'Remarks' ] 	  = isset( $_POST[ 'Remarks' ] ) 		? $_POST[ 'Remarks' ] 		: $Territory[ 'Remarks' ];
+      $Territory[ 'Count' ] 	    = isset( $_POST[ 'Count' ] ) 		? $_POST[ 'Count' ] 		: $Territory[ 'Count' ];
+      $Territory[ 'Symbol' ]    	= isset( $_POST[ 'Symbol' ] ) 		? $_POST[ 'Symbol' ] 		: $Territory[ 'Symbol' ];
+      $Territory[ 'EN' ] 	        = isset( $_POST[ 'EN' ] ) 		? $_POST[ 'EN' ] 		: $Territory[ 'EN' ];
+      $Territory[ 'Address' ]    	= isset( $_POST[ 'EN' ] ) 		? $_POST[ 'EN' ] 		: $Territory[ 'EN' ];
+      $Territory[ 'TFMID' ] 	    = isset( $_POST[ 'TFMID' ] ) 		? $_POST[ 'TFMID' ] 		: $Territory[ 'TFMID' ];
       $Territory[ 'TFMSource' ] 	= isset( $_POST[ 'TFMSource' ] ) 		? $_POST[ 'TFMSource' ] 		: $Territory[ 'TFMSource' ];
-      $Territory[ 'City' ] 	= isset( $_POST[ 'City' ] ) 		? $_POST[ 'City' ] 			: $Territory[ 'City' ];
-      $Territory[ 'State' ] 	= isset( $_POST[ 'State' ] ) 		? $_POST[ 'State' ] 		: $Territory[ 'State' ];
-      $Territory[ 'Zip' ] 		= isset( $_POST[ 'Zip' ] ) 			? $_POST[ 'Zip' ] 			: $Territory[ 'Zip' ];
-      $Territory[ 'TFMID' ] 	= isset( $_POST[ 'TFMID' ] ) 		? $_POST[ 'TFMID' ] 			: $Territory[ 'TFMID' ];
+      $Territory[ 'City' ] 	      = isset( $_POST[ 'City' ] ) 		? $_POST[ 'City' ] 			: $Territory[ 'City' ];
+      $Territory[ 'State' ] 	    = isset( $_POST[ 'State' ] ) 		? $_POST[ 'State' ] 		: $Territory[ 'State' ];
+      $Territory[ 'Zip' ] 		    = isset( $_POST[ 'Zip' ] ) 			? $_POST[ 'Zip' ] 			: $Territory[ 'Zip' ];
+      $Territory[ 'TFMID' ] 	    = isset( $_POST[ 'TFMID' ] ) 		? $_POST[ 'TFMID' ] 			: $Territory[ 'TFMID' ];
       $Territory[ 'TFMSource' ] 	= isset( $_POST[ 'TFMSource' ] ) 		? $_POST[ 'TFMSource' ] 			: $Territory[ 'TFMSource' ];
       $Territory[ 'Maintenance' ] = isset( $_POST[ 'Maintenance' ] ) ? $_POST[ 'Maintenance' ] : $Territory[ 'Maintenance' ];
-      $Territory[ 'Sales_Tax' ] = isset( $_POST[ 'Sales_Tax' ] ) ? $_POST[ 'Sales_Tax' ] : $Territory[ 'Sales_Tax' ];
-      $Territory[ 'In_Use' ] = isset( $_POST[ 'In_Use' ] ) ? $_POST[ 'In_Use' ] : $Territory[ 'In_Use' ];
-      $Territory[ 'Customer_ID' ] = isset( $_POST[ 'Customer_ID' ] ) ? $_POST[ 'Customer_ID' ] : $Territory[ 'Customer_ID' ];
+      $Territory[ 'Sales_Tax' ]   = isset( $_POST[ 'Sales_Tax' ] ) ? $_POST[ 'Sales_Tax' ] : $Territory[ 'Sales_Tax' ];
+      $Territory[ 'In_Use' ]      = isset( $_POST[ 'In_Use' ] ) ? $_POST[ 'In_Use' ] : $Territory[ 'In_Use' ];
+      $Territory[ 'Employee_ID' ] = isset( $_POST[ 'Employee_ID' ] ) ? $_POST[ 'Employee_ID' ] : $Territory[ 'Employee_ID' ];
+      $Territory[ 'Employee_Name' ] = isset( $_POST[ 'Employee_Name' ] ) ? $_POST[ 'Employee_Name' ] : $Territory[ 'Employee_Name' ];
+      $Territory[ 'Customer_ID' ]   = isset( $_POST[ 'Customer_ID' ] ) ? $_POST[ 'Customer_ID' ] : $Territory[ 'Customer_ID' ];
       $Territory[ 'Customer_Name' ] = isset( $_POST[ 'Customer_Name' ] ) ? $_POST[ 'Customer_Name' ] : $Territory[ 'Customer_Name' ];
-      $Territory[ 'Route_ID' ] = isset( $_POST[ 'Route_ID' ] ) ? $_POST[ 'Route_ID' ] : $Territory[ 'Route_ID' ];
-      $Territory[ 'Route_Name' ] = isset( $_POST[ 'Route_Name' ] ) ? $_POST[ 'Route_Name' ] : $Territory[ 'Route_Name' ];
-      $Territory[ 'Division_ID' ] = isset( $_POST[ 'Division_ID' ] ) ? $_POST[ 'Division_ID' ] : $Territory[ 'Division_ID' ];
+      $Territory[ 'Route_ID' ]      = isset( $_POST[ 'Route_ID' ] ) ? $_POST[ 'Route_ID' ] : $Territory[ 'Route_ID' ];
+      $Territory[ 'Route_Name' ]    = isset( $_POST[ 'Route_Name' ] ) ? $_POST[ 'Route_Name' ] : $Territory[ 'Route_Name' ];
+      $Territory[ 'Division_ID' ]   = isset( $_POST[ 'Division_ID' ] ) ? $_POST[ 'Division_ID' ] : $Territory[ 'Division_ID' ];
       $Territory[ 'Division_Name' ] = isset( $_POST[ 'Division_Name' ] ) ? $_POST[ 'Division_Name' ] : $Territory[ 'Division_Name' ];
+      $Territory[ 'Locations_Maintained' ] = isset( $_POST[ 'Locations_Maintained' ] ) ? $_POST[ 'Locations_Maintained' ] : $Territory[ 'Locations_Maintained' ];
+      $Territory[ 'Locations_Unmaintained' ] = isset( $_POST[ 'Locations_Unmaintained' ] ) ? $_POST[ 'Locations_Unmaintained' ] : $Territory[ 'Locations_Unmaintained' ];
       if( in_array( $_POST[ 'ID' ], array( null, 0, '', ' ' ) ) ){
         $result = \singleton\database::getInstance( )->query(
           null,
@@ -510,7 +485,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             is_null( $Territory[ 'TFMSource' ] ) ? 0 : $Territory[ 'TFMSource' ]
           )
         );
-        var_dump(sqlsrv_errors ( ) );
+
         sqlsrv_next_result( $result );
           $Territory[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
           //header( 'Location: territory.php?ID=' . $Territory[ 'ID' ] );
@@ -544,7 +519,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         );
       }
     }
-    var_dump(sqlsrv_errors ( ) );
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -573,7 +548,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 <?php \singleton\bootstrap::getInstance( )->card_header( 'Information' ); ?>
                                 <div class='card-body bg-dark' <?php echo isset( $_SESSION[ 'Cards' ][ 'Infomation' ] ) && $_SESSION[ 'Cards' ][ 'Infomation' ] == 0 ? "style='display:none;'" : null;?>>
                                     <?php
-                                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Territory[ 'Employee_ID' ], $Territory[ 'Employee_First' ] && $Territory['Employee_Last'] );
+                                        \singleton\bootstrap::getInstance( )->card_row_form_autocomplete( 'Employee', 'Employees', $Territory[ 'Employee_ID' ], $Territory[ 'Employee_Name' ] );
                       							    \singleton\bootstrap::getInstance( )->card_row_form_input_url( 'Website', $Territory[ 'Website' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_input_sub( 'City', $Territory[ 'City' ] );
                                         \singleton\bootstrap::getInstance( )->card_row_form_select_sub( 'State', $Territory[ 'State' ],  array( 'AL'=>'Alabama', 'AK'=>'Alaska', 'AZ'=>'Arizona', 'AR'=>'Arkansas', 'CA'=>'California', 'CO'=>'Colorado', 'CT'=>'Connecticut', 'DE'=>'Delaware', 'DC'=>'District of Columbia', 'FL'=>'Florida', 'GA'=>'Georgia', 'HI'=>'Hawaii', 'ID'=>'Idaho', 'IL'=>'Illinois', 'IN'=>'Indiana', 'IA'=>'Iowa', 'KS'=>'Kansas', 'KY'=>'Kentucky', 'LA'=>'Louisiana', 'ME'=>'Maine', 'MD'=>'Maryland', 'MA'=>'Massachusetts', 'MI'=>'Michigan', 'MN'=>'Minnesota', 'MS'=>'Mississippi', 'MO'=>'Missouri', 'MT'=>'Montana', 'NE'=>'Nebraska', 'NV'=>'Nevada', 'NH'=>'New Hampshire', 'NJ'=>'New Jersey', 'NM'=>'New Mexico', 'NY'=>'New York', 'NC'=>'North Carolina', 'ND'=>'North Dakota', 'OH'=>'Ohio', 'OK'=>'Oklahoma', 'OR'=>'Oregon', 'PA'=>'Pennsylvania', 'RI'=>'Rhode Island', 'SC'=>'South Carolina', 'SD'=>'South Dakota', 'TN'=>'Tennessee', 'TX'=>'Texas', 'UT'=>'Utah', 'VT'=>'Vermont', 'VA'=>'Virginia', 'WA'=>'Washington', 'WV'=>'West Virginia', 'WI'=>'Wisconsin', 'WY'=>'Wyoming' ) );
