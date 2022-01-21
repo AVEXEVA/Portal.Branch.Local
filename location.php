@@ -447,9 +447,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $Location[ 'Division_ID' ]
 	    		)
 	    	);
-        	$Location[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
-
-        	header( 'Location: location.php?ID=' . $Location[ 'ID' ] );
+        sqlsrv_next_result( $result );
+        $Location[ 'ID' ] = sqlsrv_fetch_array( $result )[ 0 ];
+        header( 'Location: location.php?ID=' . $Location[ 'ID' ] );
     	} else {
 	    	\singleton\database::getInstance( )->query(
 	    		null,

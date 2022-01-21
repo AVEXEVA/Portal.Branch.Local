@@ -178,32 +178,35 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     $sQuery = " SELECT *
                 FROM (
                   SELECT  ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
-                          Location.Loc            AS ID,
-                          Location.Tag            AS Name,
-                          Customer.ID             AS Customer_ID,
-                          Customer.Name           AS Customer_Name,
-                          Location_Type.Name      AS Type,
-                          Zone.ID                 AS Division_ID,
-                          Zone.Name               AS Division_Name,
-                          Route.ID                AS Route_ID,
-                          Route.Name              AS Route_Name,
-                          Employee.ID             AS Mechanic_ID,
+                          'Location'                            AS Entity,
+                          Location.Loc                          AS ID,
+                          Location.Tag                          AS Name,
+                          Customer.ID                           AS Customer_ID,
+                          Customer.Name                         AS Customer_Name,
+                          Location_Type.Name                    AS Type,
+                          Zone.ID                               AS Division_ID,
+                          Zone.Name                             AS Division_Name,
+                          Route.ID                              AS Route_ID,
+                          Route.Name                            AS Route_Name,
+                          Employee.ID                           AS Mechanic_ID,
                           Employee.fFirst + ' ' + Employee.Last AS Mechanic_Name,
-                          Location.Address        AS Street,
-                          Location.City           AS City,
-                          Location.State          AS State,
-                          Location.Zip            AS Zip,
+                          Location.Address                      AS Street,
+                          Location.City                         AS City,
+                          Location.State                        AS State,
+                          Location.Zip                          AS Zip,
+                          Location.Latt                         AS Latitude,
+                          Location.fLong                        AS Longitude,
                           CASE  WHEN  Location_Units.Count IS NULL THEN 0
-                                ELSE  Location_Units.Count
-                          END AS Units,
-                          CASE  WHEN Location.Maint = 0 THEN 'Active'
-                                ELSE 'Inactive' END AS Maintained,
-                          CASE  WHEN Location.Status = 0 THEN 'Active'
-                                ELSE 'Inactive' END AS Status,
-                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0
+                                ELSE  Location_Units.Count 
+                          END                                   AS Units,
+                          CASE  WHEN Location.Maint = 0 THEN 'Active' 
+                                ELSE 'Inactive' END             AS Maintained,
+                          CASE  WHEN Location.Status = 0 THEN 'Active' 
+                                ELSE 'Inactive' END             AS Status,
+                          CASE  WHEN Tickets_Assigned.Count IS NULL THEN 0 
                                 ELSE Tickets_Assigned.Count END AS Tickets_Assigned,
-                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0
-                                ELSE Tickets_Active.Count END AS Tickets_Active
+                          CASE  WHEN Tickets_Active.Count IS NULL THEN 0 
+                                ELSE Tickets_Active.Count END   AS Tickets_Active
                   FROM    Loc AS Location
                           LEFT JOIN (
                               SELECT  Owner.ID,

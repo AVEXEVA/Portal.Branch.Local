@@ -98,7 +98,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $result = \singleton\database::getInstance( )->query(
         	null,
             "	SELECT 	Top 1
-            			Customer.*
+            			Ticket.*
             	FROM    (
             				SELECT 	Owner.ID    AS ID,
                 						Owner.Type  AS Type,
@@ -121,41 +121,36 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           									Rol.Geolock AS Geofence
 							    FROM    Owner
 									        LEFT JOIN Rol ON Owner.Rol = Rol.ID
-            		) AS Customer
-            	WHERE   	Customer.ID = ?
-            			OR 	Customer.Name = ?;",
+            		) AS Ticket
+            	WHERE  Ticket.ID = ?;",
             array(
-            	$ID,
-            	$Name
+            	$ID
             )
         );
-        $Customer =   (       empty( $ID )
-                        &&    !empty( $Name )
-                        &&    !$result
-                      ) || (  empty( $ID )
-                        &&    empty( $Name )
-                      )  ? array(
-        	'ID' => null,
-        	'Name' => null,
-        	'Login' => null,
-        	'Password' => null,
-        	'Geofence' => null,
-        	'Type' => null,
-        	'Status' => null,
-        	'Website' => null,
-        	'Internet' => null,
-        	'Street' => null,
-        	'City' => null,
-        	'State' => null,
-        	'Zip' => null,
-        	'Latitude' => null,
-        	'Longitude' => null,
-          'Phone'   =>  null,
-          'Email'   =>  null,
-        	'Rolodex' => null,
-          'Phone' => null,
-          'Email' => null
-        ) : sqlsrv_fetch_array($result);
+        $Customer = empty( $ID )
+            ?   array(
+                    'ID' => null,
+                    'Name' => null,
+                    'Login' => null,
+                    'Password' => null,
+                    'Geofence' => null,
+                    'Type' => null,
+                    'Status' => null,
+                    'Website' => null,
+                    'Internet' => null,
+                    'Street' => null,
+                    'City' => null,
+                    'State' => null,
+                    'Zip' => null,
+                    'Latitude' => null,
+                    'Longitude' => null,
+                    'Phone'   =>  null,
+                    'Email'   =>  null,
+                    'Rolodex' => null,
+                    'Phone' => null,
+                    'Email' => null
+                ) 
+            : sqlsrv_fetch_array($result);
         if( isset( $_POST ) && count( $_POST ) > 0 ){
         	$Customer[ 'Name' ] 		= isset( $_POST[ 'Name' ] ) 	 ? $_POST[ 'Name' ] 	 : $Customer[ 'Name' ];
   	      $Customer[ 'Contact' ] 	= isset( $_POST[ 'Contact' ] ) ? $_POST[ 'Contact' ] : $Customer[ 'Contact' ];

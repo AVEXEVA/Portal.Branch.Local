@@ -292,6 +292,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 						Ticket.Description 				AS Description,
 						Ticket.Level 					AS Level,
 						Ticket.[Open] 					AS [Open],
+						Ticket.Latitude 				AS Latitude,
+						Ticket.Longitude 				AS Longitude,
 						Customer.ID  					AS Customer_ID,
 						Customer.Name 					AS Customer_Name,
 						Location.Loc 					AS Location_ID,
@@ -345,7 +347,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				           	     		TicketO.TimeSite    AS Time_Site,
 				           	     		TicketO.TimeComp    AS Time_Completed,
 				           	     		'' 					AS Resolution,
-				           	     		1					AS [Open]
+				           	     		1					AS [Open],
+				           	     		TicketO.fLong 		AS Longitude,
+				           	     		TicketO.Latt 		AS Latitude
 						 		FROM   	TicketO
 						        		LEFT JOIN TickOStatus 	ON TicketO.Assigned = TickOStatus.Ref
 	                					LEFT JOIN TicketDPDA 	ON TicketDPDA.ID 	= TicketO.ID
@@ -365,7 +369,9 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 				           	     		TicketD.TimeSite    AS Time_Site,
 				           	     		TicketD.TimeComp    AS Time_Completed,
 				           	     		TicketD.DescRes 	AS Resolution,
-				           	     		0					AS [Open]
+				           	     		0					AS [Open],
+				           	     		TicketD.fLong 		AS Longitude,
+				           	     		TicketD.Latt 		AS Latitude
 							 	FROM   	TicketD
 							)
 						) AS Ticket
