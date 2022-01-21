@@ -3,11 +3,11 @@ namespace singleton;
 class database extends \singleton\index {
 	private $default = null;
 	private $databases = array( );
-	private $host = '172.16.12.44';
+	private $host = '20.124.200.54';
 	private $options = array(
 		'Database' 				=> 	'Portal',
 		'Uid' 					=> 	'sa',
-		'PWD' 					=> 	'SQLABC!23456',
+		'PWD' 					=> 	'007!Youknowwhattodo!',
 		'ReturnDatesAsStrings'	=>	true,
 		'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 		'TraceOn' 				=> 	false
