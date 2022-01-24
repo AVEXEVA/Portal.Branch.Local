@@ -1,10 +1,10 @@
 <?php
 if( session_id( ) == '' || !isset($_SESSION)) {
-    session_start( [ 'read_and_close' => true ] );
+    session_start( );
     require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
 }
 if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
-  //Connection
+    //Connection
     $result = \singleton\database::getInstance( )->query(
       'Portal',
       " SELECT  [Connection].[ID]
@@ -52,7 +52,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	);
     $Privileges = array();
     if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
-
         $key = $Privilege['Access'];
         unset( $Privilege[ 'Access' ] );
         $Privileges[ $key ] = implode( '', array(
@@ -72,56 +71,137 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     ){ ?><?php require('404.html');?><?php }
     else {
         \singleton\database::getInstance( )->query(
-          null,
-          " INSERT INTO Activity([User], [Date], [Page] )
-            VALUES( ?, ?, ? );",
-          array(
-            $_SESSION[ 'Connection' ][ 'User' ],
-            date('Y-m-d H:i:s'),
-            'ticket.php?ID=' . ( isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null )
-        )
-      );
-    	$ID = isset( $_GET[ 'ID' ] )
-			? $_GET[ 'ID' ]
-			: (
-				isset( $_POST[ 'ID' ] )
-					? $_POST[ 'ID' ]
-					: null
-			);
-		$Name = isset( $_GET[ 'Name' ] )
-    		? $_GET[ 'Name' ]
-    		: (
-    			isset( $_POST[ 'Name' ] )
-    				? $_POST[ 'Name' ]
-    				: null
-    		);
+            null,
+            "   INSERT INTO Activity([User], [Date], [Page] )
+                VALUES( ?, ?, ? );",
+            array(
+                $_SESSION[ 'Connection' ][ 'User' ],
+                date('Y-m-d H:i:s'),
+                'ticket.php?ID=' . ( isset( $_GET[ 'ID' ] ) ? $_GET[ 'ID' ] : null )
+            )
+        );
+        $ID = isset( $_GET[ 'ID' ] )
+        	? $_GET[ 'ID' ]
+        	: (
+        		isset( $_POST[ 'ID' ] )
+        			? $_POST[ 'ID' ]
+        			: null
+        	);
         $result = \singleton\database::getInstance( )->query(
         	null,
             "	SELECT 	Top 1
             			Ticket.*
             	FROM    (
-            				SELECT 	Owner.ID    AS ID,
-                						Owner.Type  AS Type,
-                						Rol.ID 		AS Rolodex,
-                        		Rol.Name    AS Name,
-                            Rol.Phone   AS Phone,
-                            Rol.Email   AS Email,
-                            Rol.Contact AS Contact,
-                        		Rol.Address AS Street,
-      	                    Rol.City    AS City,
-      	                    Rol.State   AS State,
-      	                    Rol.Zip     AS Zip,
-      	                    Rol.Latt 	AS Latitude,
-      	                    Rol.fLong   AS Longitude,
-      	                    Owner.Status  AS Status,
-          									Rol.Website AS Website,
-          									Owner.Internet AS Internet,
-          									Owner.fLogin AS Login,
-          									Owner.Password AS Password,
-          									Rol.Geolock AS Geofence
-							    FROM    Owner
-									        LEFT JOIN Rol ON Owner.Rol = Rol.ID
-            		) AS Ticket
+            			    (
+                                SELECT  TicketO.ID                 AS ID,
+                                        TicketO.CDate              AS Created,
+                                        TicketO.DDate              AS Dispatched,
+                                        TicketO.EDate              AS Date,
+                                        TicketO.Level              AS Level_ID,
+                                        TicketO.Est                AS Time_Estimate,
+                                        TicketO.fWork              AS Field_ID,
+                                        TicketO.DWork              AS Employee_CallSign,
+                                        TicketO.Type               AS Job_Type_ID,
+                                        TicketO.Cat                AS Category,
+                                        TicketO.fDesc              AS Description,
+                                        TicketO.Who                AS ,
+                                        TicketO.fBy                AS ,
+                                        TicketO.LType              AS ,
+                                        TicketO.LID                AS ,
+                                        TicketO.LElev              AS ,
+                                        TicketO.LDesc1             AS ,
+                                        TicketO.LDesc2             AS ,
+                                        TicketO.LDesc3             AS ,
+                                        TicketO.LDesc4             AS ,
+                                        
+                            ) UNION ALL (
+                                SELECT  TicketD.ID                 AS ID,
+                                        TicketD.CDate              AS Created,
+                                        TicketD.DDate              AS Dispatched,
+                                        TicketD.EDate              AS Date,
+                                        TicketD.fWork              AS Field_ID,
+                                        TicketD.Job                AS Job_ID,
+                                        TicketD.Loc                AS Location_ID,
+                                        TicketD.Elev               AS Unit_ID,
+                                        TicketD.Type               AS Job_Type_ID,
+                                        TicketD.Charge             AS Chargeable,
+                                        TicketD.fDesc              AS Description,
+                                        TicketD.DescRes            AS Resolution,
+                                        TicketD.ClearCheck         AS Checked,
+                                        TicketD.ClearPR            AS Payrolled,
+                                        TicketD.Total              AS Hours_Total,
+                                        TicketD.Reg                AS Hours_Regular,
+                                        TicketD.OT                 AS Hours_Overtime,
+                                        TicketD.DT                 AS Hours_Doubletime,
+                                        TicketD.TT                 AS Hours_Traveltime,
+                                        TicketD.Zone               AS Expenses_Zone,
+                                        TicketD.OtherE             AS Expenses_Other,
+                                        TicketD.Status             AS Status,
+                                        TicketD.Invoice            AS Invoice_ID,
+                                        TicketD.Level              AS Level_ID,
+                                        TicketD.Est                AS Time_Estimate,
+                                        TicketD.Cat                AS Category,
+                                        TicketD.Who                AS ,
+                                        TicketD.fBy                AS ,
+                                        TicketD.SMile              AS ,
+                                        TicketD.EMile              AS ,
+                                        TicketD.fLong              AS Longitude,
+                                        TicketD.Latt               AS Latitude,
+                                        TicketD.WageC              AS Wage_ID,
+                                        TicketD.CauseID            AS ,
+                                        TicketD.CauseDesc          AS ,
+                                        TicketD.fGroup             AS ,
+                                        TicketD.PriceL             AS ,
+                                        TicketD.WorkOrder          AS Work_Order_ID,
+                                        TicketD.TimeRoute          AS Time_En_Route,
+                                        TicketD.TimeSite           AS Time_Site,
+                                        TicketD.TimeComp           AS Time_Completed,
+                                        TicketD.Source             AS Source,
+                                        TicketD.CTime              AS ,
+                                        TicketD.DTime              AS ,
+                                        TicketD.ETime              AS ,
+                                        TicketD.Internet           AS ,
+                                        TicketD.RBy                AS ,
+                                        TicketD.Custom1            AS ,
+                                        TicketD.Custom2            AS ,
+                                        TicketD.Custom3            AS ,
+                                        TicketD.Custom4            AS ,
+                                        TicketD.Custom5            AS ,
+                                        TicketD.BRemarks           AS ,
+                                        TicketD.WorkComplete       AS ,
+                                        TicketD.BReview            AS ,
+                                        TicketD.PRWBR              AS ,
+                                        TicketD.CPhone             AS ,
+                                        TicketD.RegTrav            AS ,
+                                        TicketD.OTTrav             AS ,
+                                        TicketD.DTTrav             AS ,
+                                        TicketD.NTTrav             AS ,
+                                        TicketD.Custom6            AS ,
+                                        TicketD.Custom7            AS ,
+                                        TicketD.Custom8            AS ,
+                                        TicketD.Custom9            AS ,
+                                        TicketD.Custom10           AS ,
+                                        TicketD.Email              AS Emailed,
+                                        TicketD.AID                AS ,
+                                        TicketD.idTestItem         AS ,
+                                        TicketD.idRolCustomContact AS ,
+                                        TicketD.Recommendations    AS ,
+                                        TicketD.downtime           AS ,
+                                        TicketD.Comments           AS ,
+                                        TicketD.PartsUsed          AS ,
+                                        TicketD.SignatureText      AS ,
+                                        TicketD.ResolveSource      AS ,
+                                        TicketD.TFMCustom1         AS ,
+                                        TicketD.TFMCustom2         AS ,
+                                        TicketD.TFMCustom3         AS ,
+                                        TicketD.TFMCustom4         AS ,
+                                        TicketD.TFMCustom5         AS ,
+                                        TicketD.ManualInvoice      AS ,
+                                        TicketD.StartBreak         AS ,
+                                        TicketD.EndBreak           AS 
+                                FROM    TicketD
+                            )	
+                        ) AS Ticket
             	WHERE  Ticket.ID = ?;",
             array(
             	$ID
