@@ -465,7 +465,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	      					  Loc.Maint = ?,
 	      					  Loc.Owner = ?,
                     Loc.Route = ?,
-                    Loc.Zone = ?,
+                    Loc.Zone = ?
 	    			WHERE 	Loc.Loc= ?;",
 	    		array(
 	    			$Location[ 'Name' ],

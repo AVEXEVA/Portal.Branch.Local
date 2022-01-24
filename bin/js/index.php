@@ -30,7 +30,7 @@ function watchSuccess(position){
     gpsData.append("Longitude",position.coords.longitude);
     gpsData.append("Time_Stamp",position.timestamp);
     $.ajax({
-      url:"bin/php/post/updateGPS.php",
+      url:"bin/php/post/GPS.php",
       method:"POST",
       data:gpsData,
       cache:false,

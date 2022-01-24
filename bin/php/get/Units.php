@@ -124,10 +124,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
       $parameters[] = $_GET['Route_Name'];
       $conditions[] = "Route.Name LIKE '%' + ? + '%'";
     }
-    if( isset($_GET[ 'Customer_Name' ] ) && !in_array( $_GET[ 'Customer_Name' ], array( '', ' ', null ) ) ){
-      $parameters[] = $_GET['Customer_Name'];
-      $conditions[] = "Customer.Name LIKE '%' + ? + '%'";
-    }
     if( isset($_GET[ 'Customer_ID' ] ) && !in_array( $_GET[ 'Customer_ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Customer_ID'];
       $conditions[] = "Customer.ID LIKE '%' + ? + '%'";
@@ -138,7 +134,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Location_ID' ] ) && !in_array( $_GET[ 'Location_ID' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Location_ID'];
-      $conditions[] = "Location.ID LIKE '%' + ? + '%'";
+      $conditions[] = "Location.Loc LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Location_Name' ] ) && !in_array( $_GET[ 'Location_Name' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Location_Name'];

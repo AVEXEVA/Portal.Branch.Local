@@ -242,8 +242,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	    }
 	    if( isset( $_GET[ 'LSD' ] ) && !in_array( $_GET[ 'LSD' ], array( '', ' ', null ) ) ){
 	      switch( $_GET[ 'LSD'] ){
-	      	case 0:	$conditions[ ] = "Ticket.Resolution NOT LIKE '%LSD%'";break;
-	      	case 1:	$conditions[ ] = "Ticket.Resolution LIKE '%LSD%'";break;
+	      	case 0:	$conditions[ ] = "Ticket.Description NOT LIKE '%LSD%'";break;
+	      	case 1:	$conditions[ ] = "( Ticket.Description LIKE '%LSD%' OR Ticket.Description LIKE '%Shutdown%' )";break;
 	      	default : break;
 	      }
 	    }
@@ -287,6 +287,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			SELECT 	*
 			FROM 	(
 				SELECT 	ROW_NUMBER() OVER (ORDER BY {$Order} {$Direction}) AS ROW_COUNT,
+						'Ticket'						AS Entity,
 						Ticket.ID 						AS ID,
 						Ticket.Date 					AS Date,
 						Ticket.Description 				AS Description,
@@ -392,7 +393,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			) AS Tbl 
 			WHERE 		Tbl.ROW_COUNT >= ?
 					AND Tbl.ROW_COUNT <= ?;";
-
+				
 		$rResult = \singleton\database::getInstance( )->query(
 			null,
 			$Query,
@@ -426,6 +427,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			        	   	     		TicketO.TimeRoute 	AS Time_Route,
 			        	   	     		TicketO.TimeSite    AS Time_Site,
 			        	   	     		TicketO.TimeComp    AS Time_Completed,
+			        	   	     		TicketO.fDesc 		AS Description,
 				    	       	     		'' 				AS Resolution,
 				    	       	     	1					AS [Open]
 						 		FROM   	TicketO
@@ -445,6 +447,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 										TicketD.TimeRoute 	AS Time_Route,
 			        	   	     		TicketD.TimeSite    AS Time_Site,
 			        	   	     		TicketD.TimeComp    AS Time_Completed,
+			        	   	     		TicketD.fDesc 		AS Description,
 				    	       	     	TicketD.DescRes 	AS Resolution,
 				    	       	     	0 					AS [Open]
 							 	FROM   	TicketD
