@@ -262,7 +262,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    });
 		}
 		function mark( entities, row ){
-			if( row.Tickets_Active == 0 ){ return; }
+			//if( row.Tickets_Active == 0 ){ return; }
 			if( markers[ row.Entity + '_' + row.ID ] ){
   				markers[ row.Entity + '_' + row.ID ].setPosition(
   					new google.maps.LatLng(
@@ -383,25 +383,25 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 			      	}
 			    );
 			}
-		    if( getting.Users == 0){
-		    	getting.Users = 1;
-		    	get(
-					'Employees',
-					{
-						start 		 : 0,
-						length       : 9999999,
-						draw 		 : draw_number,
-						order 		 : {
-							column 	 : 0,
-							dir 	 : 'asc'
-						},
-						Status          : 1,
-						Active          : 1,
-			      		Supervisor_ID 	: '<?php echo isset( $_GET[ 'Supervisor_ID']) 	? $_GET[ 'Supervisor_ID' ] 	: null;?>',
-			      		User_ID  		: '<?php echo isset( $_GET[ 'User_ID']) 		? $_GET[ 'User_ID' ] 		: null;?>'
-			      	}
-			    );
-		    }
+		  if( getting.Users == 0){
+	    	getting.Users = 1;
+	    	get(
+				'Employees',
+				{
+					start 		 : 0,
+					length       : 9999999,
+					draw 		 : draw_number,
+					order 		 : {
+						column 	 : 0,
+						dir 	 : 'asc'
+					},
+					Status          : 1,
+					Active          : 1,
+		      		Supervisor_ID 	: '<?php echo isset( $_GET[ 'Supervisor_ID']) 	? $_GET[ 'Supervisor_ID' ] 	: null;?>',
+		      		User_ID  		: '<?php echo isset( $_GET[ 'User_ID']) 		? $_GET[ 'User_ID' ] 		: null;?>'
+		      	}
+		    );
+	    }
 			setTimeout( function( ){
 				gets( )
 			}, 2500 );
