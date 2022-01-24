@@ -88,9 +88,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
           &&  isset( $User[ 'Branch' ] ) && !empty( $User[ 'Branch' ] )
           &&  isset( $User[ 'Branch_ID' ] ) && !empty( $User[ 'Branch_ID' ] )
       ){
-        $timestamp = floor($_POST['Time_Stamp'] / 1000); // Get seconds from milliseconds
-        $datetime = new DateTime('@'.$timestamp);
-        $_POST['Time_Stamp'] = $datetime->format('Y-m-d H:i:s');
         \singleton\database::getInstance( )->query(
           $User[ 'Branch' ],
           "     UPDATE  tblWork
@@ -105,7 +102,6 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               $User[ 'Branch_ID' ]
             )
         );
-        var_dump( sqlsrv_errors( ) );
         \singleton\database::getInstance( )->query( 
           $User[ 'Branch' ],
           " INSERT INTO GPS( [Employee_ID], Latitude, Longitude, Altitude, Accuracy, Time_Stamp, User_Agent ) 
