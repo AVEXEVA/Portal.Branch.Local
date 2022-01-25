@@ -113,7 +113,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         $conditions[] = "JobType.Type LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Date_Start' ] ) && !in_array( $_GET[ 'Date_Start' ], array( '', ' ', null ) ) ){
-        $parameters[] = $_GET['Date_Start'];
+        $parameters[] = date( 'Y-m-d', strtotime( $_GET[ 'Date_Start' ] ) );
         $conditions[] = "OpenAR.fDate >= ?";
     }
     if( isset($_GET[ 'Date_End' ] ) && !in_array( $_GET[ 'Date_End' ], array( '', ' ', null ) ) ){
