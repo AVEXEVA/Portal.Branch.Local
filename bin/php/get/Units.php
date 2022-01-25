@@ -142,7 +142,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
     }
     if( isset($_GET[ 'Type' ] ) && !in_array( $_GET[ 'Type' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Type'];
-      $conditions[] = "Unit.Type LIKE '%' + ? + '%'";
+      $conditions[] = "Unit.[Type] LIKE '%' + ? + '%'";
     }
     if( isset($_GET[ 'Status' ] ) && !in_array( $_GET[ 'Status' ], array( '', ' ', null ) ) ){
       $parameters[] = $_GET['Status'] ;
@@ -208,10 +208,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                           Location.State            AS Location_State,
                           Location.Zip              AS Location_Zip,
                           Unit.fDesc                AS Description,
-                          CASE  WHEN Unit.Type = 0 THEN 'Elevator'
-                                WHEN Unit.Type = 1 THEN 'Escalator'
-                                WHEN Unit.Type = 2 THEN 'Moving-Walk'
-                          END AS Type,
+                          Unit.Type                 AS Type,
                           CASE  WHEN Unit.Status = 0 THEN 'Enabled'
                                 WHEN Unit.Status = 1 THEN 'Disabled'
                                 WHEN Unit.Status = 2 THEN 'Demolished'

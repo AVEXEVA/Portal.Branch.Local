@@ -3,11 +3,11 @@ namespace singleton;
 class database extends \singleton\index {
 	private $default = null;
 	private $databases = array( );
-	private $host = '20.124.200.54';
+	private $host = '172.16.12.44';
 	private $options = array(
 		'Database' 				=> 	'Portal',
 		'Uid' 					=> 	'sa',
-		'PWD' 					=> 	'007!Youknowwhattodo!',
+		'PWD' 					=> 	'SQLABC!23456',
 		'ReturnDatesAsStrings'	=>	true,
 		'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
 		'TraceOn' 				=> 	false
@@ -20,9 +20,9 @@ class database extends \singleton\index {
 		);
 		$result = sqlsrv_query(
 			$this->databases[ 'Portal' ],
-			"	SELECT 	[Database].Name,
-								[Database].[Default]
-				FROM 		[Database]
+			"	SELECT 	[Database].[Name],
+						[Database].[Default]
+				FROM 	[Database]
 				WHERE 	[Database].[Status] = 1;"
 		);
 		if( $result ){ while( $row = sqlsrv_fetch_array( $result ) ){

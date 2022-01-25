@@ -38,14 +38,14 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	$result = \singleton\database::getInstance( )->query(
 		'Portal',
 		"   SELECT  [Privilege].[Access],
-                    [Privilege].[Owner],
-                    [Privilege].[Group],
-                    [Privilege].[Department],
-                    [Privilege].[Database],
-                    [Privilege].[Server],
-                    [Privilege].[Other],
-                    [Privilege].[Token],
-                    [Privilege].[Internet]
+                [Privilege].[Owner],
+                [Privilege].[Group],
+                [Privilege].[Department],
+                [Privilege].[Database],
+                [Privilege].[Server],
+                [Privilege].[Other],
+                [Privilege].[Token],
+                [Privilege].[Internet]
 		  FROM      dbo.[Privilege]
 		  WHERE     Privilege.[User] = ?;",
 		array(
@@ -145,7 +145,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
               isset( $_GET[ 'Location_ID' ] ) ? $_GET[ 'Location_ID' ] : null,
               isset( $_GET[ 'Location_Name' ] ) ? $_GET[ 'Location_Name' ] : null
             );
-            \singleton\table::getInstance( )->th_input( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null );
+            \singleton\table::getInstance( )->th_select( 'Type', isset( $_GET[ 'Type' ] ) ? $_GET[ 'Type' ] : null, array( 'Elevator' => 'Elevator', 'Escalator' => 'Escalator' ) );
             \singleton\table::getInstance( )->th_input( 'Status', isset( $_GET[ 'Status' ] ) ? $_GET[ 'Status' ] : null );
             \singleton\table::getInstance( )->th_input( 'Assigned', isset( $_GET[ 'Tickets_Assigned' ] ) ? $_GET[ 'Tickets_Assigned' ] : null );
             \singleton\table::getInstance( )->th_input( 'Active', isset( $_GET[ 'Tickets_Active' ] ) ? $_GET[ 'Tickets_Active' ] : null );

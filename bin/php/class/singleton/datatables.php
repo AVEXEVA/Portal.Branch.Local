@@ -97,6 +97,7 @@ class datatables extends \singleton\index {
         ?>buttons: [
             <?php \singleton\datatables::getInstance( )->button_url( $plural );?>,
             <?php \singleton\datatables::getInstance( )->button_print( );?>,
+            <?php \singleton\datatables::getInstance( )->button_email( $singular, $plural );?>,
             <?php \singleton\datatables::getInstance( )->button_reset( $plural );?>,
             <?php \singleton\datatables::getInstance( )->button_create( $singular );?>,
             <?php \singleton\datatables::getInstance( )->button_edit( $singular, $key );?>,
@@ -163,6 +164,26 @@ class datatables extends \singleton\index {
                     },
                     success : function(response){
                       Table_<?php echo ucfirst( $plural );?>.draw();
+                    }
+                })
+            }
+        }<?php
+    }
+    public function button_email( $singular, $plural ){
+        ?>{
+            text : "<?php \singleton\fontawesome::getInstance( )->Email( );?><span class='desktop'>Email</span>",
+            className: 'form-control',
+            action : function( e, dt, node, config ){
+                var rows = dt.rows( { selected : true } ).indexes( );
+                var dte = dt.cells( rows, 0 ).data( ).toArray( );
+                $.ajax ({
+                    url    : 'bin/php/post/email_<?php echo $singular;?>.php',
+                    method : 'POST',
+                    data   : {
+                      data : dte
+                    },
+                    success : function(response){
+                      alert( 'Successfully Sent Email(s)' );
                     }
                 })
             }
@@ -616,7 +637,7 @@ class datatables extends \singleton\index {
                     case 'display' :
                         return  row.<?php echo ucfirst( $key );?> !== null && row.<?php echo ucfirst( $key );?> != 0
                             ?   "<div class='row'>" +
-                                    "<div class='col-12'><a href='<?php echo $page;?>.php?<?php echo $Reference;?>_ID=" + row.ID + "&<?php echo $Reference;?>_Name=" + row.Name + "&<?php echo $params;?>'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $page;?></a></div>" +
+                                    "<div class='col-12'><a href='<?php echo $page;?>.php?<?php echo $params;?>&<?php echo $Reference;?>_ID=" + row.ID + "&<?php echo $Reference;?>_Name=" + row.Name + "'><?php \singleton\fontawesome::getInstance( )->$icon( 1 );?> " + row.<?php echo ucfirst( $key );?> + " <?php echo $page;?></a></div>" +
                                 "</div>"
                             :   '';
                     default :

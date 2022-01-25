@@ -89,7 +89,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                   [User].[Verified] AS Verified,
                   [User].[Branch] AS Branch,
                   [User].[Branch_Type] AS Branch_Type,
-                  [User].[Branch_ID] AS Branch_ID,
+                  [User].[Branch_ID] AS Employee_ID,
                   [User].[Picture] AS Picture,
                   [User].[Picture_Type] AS Picture_Type
           FROM    dbo.[User]
@@ -106,7 +106,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 'Verified'              => isset( $_GET [ 'Verified' ] )     ? $_GET ['Verified']     : null,
                 'Branch'                => isset( $_GET [ 'Branch' ] )       ? $_GET ['Branch']       : null,
                 'Branch_Type'           => isset( $_GET [ 'Branch_Type' ] )  ? $_GET ['Branch_Type']  : null,
-                'Branch_ID'             => isset( $_GET [ 'Branch_ID' ] )    ? $_GET ['Branch_ID']    : null,
+                'Employee_ID'             => isset( $_GET [ 'Employee_ID' ] )    ? $_GET ['Employee_ID']    : null,
                 'Picture'               => isset( $_GET [ 'Picture' ] )      ? $_GET ['Picture']      : null,
                 'Picture_Type'          => isset( $_GET [ 'Picture_Type' ] ) ? $_GET ['Picture_Type'] : null
     ) : sqlsrv_fetch_array( $result );
@@ -120,33 +120,24 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         FROM    Emp AS Employee
         WHERE   Employee.ID = ?;",
       array(
-        $User[ 'Branch_ID' ]
+        $User[ 'Employee_ID' ]
       )
     );
     //var_dump( sqlsrv_errors( ) );
     $Employee = $result ? sqlsrv_fetch_array( $result ) : array(
-      'Employee_ID' => null,
       'Employee_Work_ID'              => isset( $_GET [ 'Employee_Work_ID' ] )     ? $_GET ['Employee_Work_ID']   : null,
       'Employee_Name' => null,
       'Employee_First_Name' => null,
       'Employee_Last_Name' => null
     );
-    $User = ( !empty( $User[ 'Branch_ID' ] ) && is_array( $Employee ) && count( $Employee ) > 0 )
-      ? array_merge( $User, $Employee )
-      : array_merge( $User, array(
-      'Employee_ID'                   => isset( $_GET [ 'Employee_ID' ] )          ? $_GET ['Employee_ID']   : null,
-      'Employee_Work_ID'              => isset( $_GET [ 'Employee_Work_ID' ] )     ? $_GET ['Employee_Work_ID']   : null,
-      'Employee_Name' => null,
-      'Employee_First_Name' => null,
-      'Employee_Last_Name' => null
-    ) );
+    $User = array_merge( $User, $Employee );
     if( isset( $_POST ) && count( $_POST ) > 0 ){
       $User[ 'Email' ] = isset( $_POST[ 'Email' ] ) ? $_POST[ 'Email' ] : $User[ 'Email' ];
       $User[ 'Password' ] = isset( $_POST[ 'Password' ] ) ? $_POST[ 'Password' ] : $User[ 'Password' ];
       $User[ 'Verified' ] = isset( $_POST[ 'Verified' ] ) ? $_POST[ 'Verified' ] : $User[ 'Verified' ];
       $User[ 'Branch' ] = isset( $_POST[ 'Branch' ] ) ? $_POST[ 'Branch' ] : $User[ 'Branch' ];
       $User[ 'Branch_Type' ] = isset( $_POST[ 'Branch_Type' ] ) ? $_POST[ 'Branch_Type' ] : $User[ 'Branch_Type' ];
-      $User[ 'Branch_ID' ] = isset( $_POST[ 'Branch_ID' ] ) ? $_POST[ 'Branch_ID' ] : $User[ 'Branch_ID' ];
+      $User[ 'Employee_ID' ] = isset( $_POST[ 'Employee_ID' ] ) ? $_POST[ 'Employee_ID' ] : $User[ 'Employee_ID' ];
       $User[ 'Picture' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? base64_encode( file_get_contents( $_FILES[ 'Picture' ][ 'tmp_name' ] ) ) : $User[ 'Picture' ];
       $User[ 'Picture_Type' ] = isset($_FILES[ 'Picture' ] ) &&  ( $_FILES[ 'Picture' ][ 'tmp_name' ]!="" ) &&  (strlen( $_FILES[ 'Picture' ][ 'tmp_name' ] ) > 1) ? $_POST[ 'Picture_Type' ] : $User[ 'Picture_Type' ];
       if( empty( $_POST[ 'ID' ] ) ){
@@ -161,7 +152,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                 is_null( $User[ 'Verified' ] ) ? 0 : $User[ 'Verified' ],
                 $User[ 'Branch' ],
                 $User[ 'Branch_Type' ],
-                $User[ 'Branch_ID' ],
+                $User[ 'Employee_ID' ],
                 array(
                   $User[ 'Picture' ],
                   SQLSRV_PARAM_IN,
@@ -190,7 +181,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             $User[ 'Email' ],
             $User[ 'Branch' ],
             $User[ 'Branch_Type' ],
-            $User[ 'Branch_ID' ],
+            $User[ 'Employee_ID' ],
             array(
               $User[ 'Picture' ],
               SQLSRV_PARAM_IN,

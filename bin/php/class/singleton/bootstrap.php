@@ -238,7 +238,8 @@ class bootstrap extends \singleton\index {
       ?>><?php \singleton\fontawesome::getInstance( )->Search( 1 );?></button></div>
     </div><?php
 	}
-  public function autocomplete( $singular, $plural, $id, $name, $type ){
+  public function autocomplete( $singular, $plural, $id, $name, $type, $Key_Name = null ){
+    $Key_Name = is_null( $Key_Name ) ? $singular . '_ID' : $Key_Name;
   	$class = '';
   	switch( $type ){
   		case 'form':
@@ -251,7 +252,7 @@ class bootstrap extends \singleton\index {
   			$class = 'redraw';
   			break;
   	}
-    ?><input placeholder='<?php echo $singular;?>' type='hidden' autocomplete='off' class='form-control <?php echo $class;?>' name='<?php echo $singular;?>_ID' value='<?php echo $id;?>' />
+    ?><input placeholder='<?php echo $singular;?>' type='hidden' autocomplete='off' class='form-control <?php echo $class;?>' name='<?php echo $Key_Name;?>' value='<?php echo $id;?>' />
     <input placeholder='<?php echo $singular;?>' type='text' autocomplete='off' class='form-control' name='<?php echo $singular;?>_Name' value='<?php echo $name;?>' />
     <script>
       $( 'input[name="<?php echo $singular;?>_Name"]' )
@@ -297,6 +298,7 @@ class bootstrap extends \singleton\index {
       );
     </script><?php
   }
+
 	public function card_row_form_textarea( $singular, $value ){
 		?><div class='row g-0'>
       <?php self::card_row_label( $singular );?>

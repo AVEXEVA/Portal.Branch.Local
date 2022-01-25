@@ -1,8 +1,70 @@
 <?php
-
+namespace pdf;
 require('/var/www/html/Portal.Branch.Local/bin/library/fpdf/fpdf.php');
 
-class PDF extends FPDF {
+class PPDF extends \FPDF {
+  public $X = 0;
+  public $Y = 0;
+  public $LnHeight = 5;
+  public $keyWidth = 20;
+  public $valueWidth = 50;
+  public $blankWidth = 40;
+  public $fontSize = 10;
+  function TrackXY( $Width, $Height ){
+    $this->X = $Width;
+    $this->Y = $Height;
+  }
+  function cell_header( $key ){
+    self::fontBold( );
+    self::fontWhite ();
+    $this->Cell( $this->keyWidth + $this->valueWidth, $this->LnHeight, 'Customer', 1, 0, 'C', true  );
+    self::TrackXY(
+      $this->X + $this->keyWidth + $this->valueWidth,
+      $this->Y + $this->LnHeight
+    );
+  }
+
+  function cell_key( $key = null ) {
+    self::fill( );
+    self::fontWhite( );
+    self::fontbold( );
+    $this->Cell( $this->keyWidth, $this->LnHeight, str_pad( $key, 20, ' ', STR_PAD_LEFT ), 1, 0, 'R', true );
+    self::TrackXY( $this->X + $this->keyWidth, $this->Y + $this->LnHeight );
+  }
+  function cell_value( $value = null) {
+    self::fontBlack( );
+    self::font( );
+    $this->Cell( $this->valueWidth, $this->LnHeight, $value, 1, 0, 'L', false );
+    self::TrackXY( $this->X + $this->valueWidth, $this->Y + $this->LnHeight );
+  }
+  function cell_key_value( $key, $value) {
+    $this->cell_key( $key );
+    $this->cell_value( $value );
+  }
+  function cell_block( $header, $array = array( ) ) {
+    $this->cell_header( $header );
+    if( count( $array ) > 0){
+      foreach( $array as $key=>$value ){
+        $this->cell_key_value( $key, $value );
+      }
+    }
+  }
+  function cell_blank( $key, $value) {
+    $this->Cell( $this->blankWidth, $this->LnHeight, '' );
+    $this->X = $this->X + $this->blankWidth;
+    $this->Y = $this->Y + $this->LnHeight;
+  }
+  function nLn() {
+    $this->Ln(  $this->LnHeight );
+    self::TrackXY( 0, $this->Y + $this->LnHeight );
+  }
+  function fontWhite( ){ $this->SetTextColor( 255, 255, 255 ); }
+  function fontBlack( ){ $this->SetTextColor( 0, 0, 0 ); }
+  function font( ){ $this->SetFont('Arial','', $this->fontSize ); }
+  function fontBold( ){ $this->SetFont('Arial','B',$this->fontSize ); }
+  function fill( ){ $this->SetFillColor( 50, 50, 50 ); }
+}
+class Invoice extends \pdf\PPDF {
     public $args;
     // Page header
     function __construct( $orientation, $unit, $size, $args ){
@@ -27,7 +89,6 @@ class PDF extends FPDF {
         $this->Ln(5);
 
     }
-
     function NouveauElevator()
     {
         // Logo
@@ -72,13 +133,13 @@ class PDF extends FPDF {
         $this->Ln(5);
         $this->SetFont('Arial','B',10);
         $this->SetTextColor( 255, 255, 255 );
-        $this->Cell(80, 5, 'Customer', 1, 0, 'C', true  );
+        $this->cell_header( 'Customer' );
         $this->Cell(40, 5,  null, 0, 0, 'C', 0);
-        $this->Cell(70, 5, 'Account', 1, 0, 'C', true  );
+        $this->cell_header( 'Account' );
         $this->Ln(5);
-        self::BillTo( );
+        self::Name( );
         $this->Cell(  40, 5, '',  0);
-        self::Account( );
+        self::Location( );
 
         //Attn
         $this->Ln(5);
@@ -101,13 +162,12 @@ class PDF extends FPDF {
         $this->Cell(40, 5, '',  0);
 
     }
-    function BillTo( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell(20,5, 'Name:',1,0,'R',true);
+    function Name( ){
+        $this->cell_key( 'Name' );
         $this->SetTextColor( 50, 50, 50 );
         $this->SetFont('Arial','',10);
-        $this->Cell(60,5, str_pad( $this->args[ 'Customer_Name' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+        $this->cell_value( $this->args[ 'Customer_Name' ] );
+        //$this->Cell(60,5, str_pad( , 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
     }
     function Attn( ){
         $this->SetFont('Arial','B',10);
@@ -133,7 +193,7 @@ class PDF extends FPDF {
         $this->SetTextColor( 0, 0, 0 );
         $this->Cell(60,5, str_pad( $this->args[ 'Customer_City' ] . ', ' . $this->args[ 'Customer_City' ] . ' ' . $this->args[ 'Customer_Zip' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
     }
-    function Account( ){
+    function Location( ){
         $this->SetFont('Arial','B',10);
         $this->SetTextColor( 255, 255, 255 );
         $this->Cell( 20, 5, 'Location:', 1, 0, 'R',  true );
@@ -155,7 +215,7 @@ class PDF extends FPDF {
         $this->Cell( 20, 5, 'Amount:', 1, 0, 'R', true );
         $this->SetFont('Arial','',10);
         $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, '$' . number_format( $this->args[ 'Amount' ], 2 ), 1, 0, 'L' );
+        $this->Cell( 50, 5, '$' . number_format( $this->args[ 'Invoice_Amount' ], 2 ), 1, 0, 'L' );
     }
     function Paid( ){
         $this->SetFont('Arial','B',10);
@@ -177,12 +237,12 @@ class PDF extends FPDF {
         $this->SetTextColor( 255, 255, 255 );
         $this->Cell(80, 5, 'Customer', 1, 0, 'C', true  );
         $this->Cell(40, 5,  null, 0, 0, 'C', 0);
-        $this->Cell(70, 5, 'Account', 1, 0, 'C', true  );
+        $this->Cell(70, 5, 'Location', 1, 0, 'C', true  );
         $this->Ln(5);
-        self::BillTo( );
+        self::Name( );
         $this->Cell(  40, 5, '',  0);
         $this->SetTextColor( 0, 0, 0 );
-        self::Account( );
+        self::Location( );
         $this->Ln(5);
         self::Attn( );
         $this->Cell(  40, 5, '',  0);
@@ -415,51 +475,5 @@ class PDF extends FPDF {
     }
 }
 
-$pdf = new PDF(
-    'P',
-    'mm',
-    'A4',
-    array(
-        'Customer_Name'         => 'Northwell',
-        'Customer_Street'       => '12345 Fifth Avenue',
-        'Customer_City'         => 'Manhattan',
-        'Customer_State'        => 'NY',
-        'Customer_Zip'          => 12345,
-        'Contact_Name'          => 'Joe Schmoe',
-        'Location_Name'         => '481 8th Avenue',
-        'Invoice_ID'            => 752348,
-        'Invoice_Price'         => 510.87,
-        'Invoice_Taxable'       => 0,
-        'Invoice_Subtotal'      => 0,
-        'Invoice_Sales_Tax'     => 0,
-        'Invoice_Amount'        => 556.21,
-        'Invoice_Paid'          => 0,
-        'Unit_Name'             => '1P12345',
-        'Description'           => 'something goes here',
-        'Date'                  => '1/24/2022',
-        'Job'                   =>  'Job description',
-        'Terms'                 => 'Terms go here',
-        'PONumber'              =>  'PO# 15754213',
-        'InvoiceNumber'         =>  '123156421',
-        'Type'                  => ' Maintainence',
-        'Invoice_Description'   => "Preventative maintenance service for the period of January, 2022 per
-your contract MAINTENANCE - One (1) Elevator.
-Nouveau Elevator News
-https://www.nouveauelevator.com/nyc-dob-service-update/
-Notice:
-As per the Dept. of Buildings, Testing is required to be filed within 21 Days of the Inspection.
-Affirmations of Correction are to be made within 90 Days of the Inspection.
-AOC's are required to be submitted within 14 Days of the Correction.
- 1.00
- "
-      )
-);
-$pdf->AliasNbPages();
-$pdf->AddPage();
-$pdf->SetFont('Times','',12);
-for($i=1;$i<=40;$i++){
-    //$pdf->Cell(0,10,'Printing line number '.$i,0,1);
-}
-$pdf->Output();
 
 ?>

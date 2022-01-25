@@ -262,7 +262,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 		    });
 		}
 		function mark( entities, row ){
-			//if( row.Tickets_Active == 0 ){ return; }
+			if( row.Tickets_Active == 0 ){ return; }
 			if( markers[ row.Entity + '_' + row.ID ] ){
   				markers[ row.Entity + '_' + row.ID ].setPosition(
   					new google.maps.LatLng(

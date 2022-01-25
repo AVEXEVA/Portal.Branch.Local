@@ -2,69 +2,7 @@
 
 require('/var/www/html/Portal.Branch.Local/bin/library/fpdf/fpdf.php');
 
-class PPDF extends FPDF {
-  public $X = 0;
-  public $Y = 0;
-  public $LnHeight = 5;
-  public $keyWidth = 20;
-  public $valueWidth = 50;
-  public $blankWidth = 40;
-  public $fontSize = 10;
-  function TrackXY( $Width, $Height ){
-    $this->X = $Width;
-    $this->Y = $Height;
-  }
-  function cell_header( $key ){
-    self::fontBold( );
-    self::fontWhite ();
-    $this->Cell( $this->keyWidth + $this->valueWidth, $this->LnHeight, 'Customer', 1, 0, 'C', true  );
-    self::TrackXY(
-      $this->X + $this->keyWidth + $this->valueWidth,
-      $this->Y + $this->LnHeight
-    );
-  }
-
-  function cell_key( $key = null ) {
-    self::fill( );
-    self::fontWhite( );
-    self::fontbold( );
-    $this->Cell( $this->keyWidth, $this->LnHeight, str_pad( $key, 20, ' ', STR_PAD_LEFT ), 1, 0, 'R', true );
-    self::TrackXY( $this->X + $this->keyWidth, $this->Y + $this->LnHeight );
-  }
-  function cell_value( $value = null) {
-    self::fontBlack( );
-    self::font( );
-    $this->Cell( $this->valueWidth, $this->LnHeight, $value, 1, 0, 'L', false );
-    self::TrackXY( $this->X + $this->valueWidth, $this->Y + $this->LnHeight );
-  }
-  function cell_key_value( $key, $value) {
-    $this->cell_key( $key );
-    $this->cell_value( $value );
-  }
-  function cell_block( $header, $array = array( ) ) {
-    $this->cell_header( $header );
-    if( count( $array ) > 0){
-      foreach( $array as $key=>$value ){
-        $this->cell_key_value( $key, $value );
-      }
-    }
-  }
-  function cell_blank( $key, $value) {
-    $this->Cell( $this->blankWidth, $this->LnHeight, '' );
-    $this->X = $this->X + $this->blankWidth;
-    $this->Y = $this->Y + $this->LnHeight;
-  }
-  function nLn() {
-    $this->Ln(  $this->LnHeight );
-    self::TrackXY( 0, $this->Y + $this->LnHeight );
-  }
-  function fontWhite( ){ $this->SetTextColor( 255, 255, 255 ); }
-  function fontBlack( ){ $this->SetTextColor( 0, 0, 0 ); }
-  function font( ){ $this->SetFont('Arial','', $this->fontSize ); }
-  function fontBold( ){ $this->SetFont('Arial','B',$this->fontSize ); }
-  function fill( ){ $this->SetFillColor( 50, 50, 50 ); }
-}
-class PDF extends PPDF {
+class PDF extends FPDF {
     public $args;
     // Page header
     function __construct( $orientation, $unit, $size, $args ){
@@ -89,6 +27,7 @@ class PDF extends PPDF {
         $this->Ln(5);
 
     }
+
     function NouveauElevator()
     {
         // Logo
@@ -133,13 +72,13 @@ class PDF extends PPDF {
         $this->Ln(5);
         $this->SetFont('Arial','B',10);
         $this->SetTextColor( 255, 255, 255 );
-        $this->cell_header( 'Customer' );
+        $this->Cell(80, 5, 'Customer', 1, 0, 'C', true  );
         $this->Cell(40, 5,  null, 0, 0, 'C', 0);
-        $this->cell_header( 'Account' );
+        $this->Cell(70, 5, 'Account', 1, 0, 'C', true  );
         $this->Ln(5);
-        self::Name( );
+        self::BillTo( );
         $this->Cell(  40, 5, '',  0);
-        self::Location( );
+        self::Account( );
 
         //Attn
         $this->Ln(5);
@@ -162,12 +101,13 @@ class PDF extends PPDF {
         $this->Cell(40, 5, '',  0);
 
     }
-    function Name( ){
-        $this->cell_key( 'Name' );
+    function BillTo( ){
+        $this->SetFont('Arial','B',10);
+        $this->SetTextColor( 255, 255, 255 );
+        $this->Cell(20,5, 'Name:',1,0,'R',true);
         $this->SetTextColor( 50, 50, 50 );
         $this->SetFont('Arial','',10);
-        $this->cell_value( $this->args[ 'Customer_Name' ] );
-        //$this->Cell(60,5, str_pad( , 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+        $this->Cell(60,5, str_pad( $this->args[ 'Customer_Name' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
     }
     function Attn( ){
         $this->SetFont('Arial','B',10);
@@ -193,7 +133,7 @@ class PDF extends PPDF {
         $this->SetTextColor( 0, 0, 0 );
         $this->Cell(60,5, str_pad( $this->args[ 'Customer_City' ] . ', ' . $this->args[ 'Customer_City' ] . ' ' . $this->args[ 'Customer_Zip' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
     }
-    function Location( ){
+    function Account( ){
         $this->SetFont('Arial','B',10);
         $this->SetTextColor( 255, 255, 255 );
         $this->Cell( 20, 5, 'Location:', 1, 0, 'R',  true );
@@ -237,12 +177,12 @@ class PDF extends PPDF {
         $this->SetTextColor( 255, 255, 255 );
         $this->Cell(80, 5, 'Customer', 1, 0, 'C', true  );
         $this->Cell(40, 5,  null, 0, 0, 'C', 0);
-        $this->Cell(70, 5, 'Location', 1, 0, 'C', true  );
+        $this->Cell(70, 5, 'Account', 1, 0, 'C', true  );
         $this->Ln(5);
-        self::Name( );
+        self::BillTo( );
         $this->Cell(  40, 5, '',  0);
         $this->SetTextColor( 0, 0, 0 );
-        self::Location( );
+        self::Account( );
         $this->Ln(5);
         self::Attn( );
         $this->Cell(  40, 5, '',  0);

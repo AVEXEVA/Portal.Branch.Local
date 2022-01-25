@@ -1,159 +1,242 @@
 <?php
-session_start( [ 'read_and_close' => true ] );
-require('../index.php');
-if(isset($_SESSION['User'],$_SESSION['Hash'])){
-    $r = $database->query(null,"SELECT * FROM Connection WHERE Connector = ? AND Hash = ?;",array($_SESSION['User'],$_SESSION['Hash']));
-    $array = sqlsrv_fetch_array($r);
-    if(!isset($_SESSION['Branch']) || $_SESSION['Branch'] == 'Nouveau Elevator'){
-        $database->query($Portal,"INSERT INTO Activity([User], [Date], [Page]) VALUES(?,?,?);",array($_SESSION['User'],date("Y-m-d H:i:s"), "ticket.php"));
-        $r = $database->query(null,"SELECT *, fFirst AS First_Name, Last as Last_Name FROM Emp WHERE ID= ?",array($_SESSION['User']));
-        $My_User = sqlsrv_fetch_array($r);
-        $Field = ($My_User['Field'] == 1 && $My_User['Title'] != "OFFICE") ? True : False;
-        $r = $database->query($Portal,"
-            SELECT Access, Owner, Group, Other
-            FROM   Privilege
-            WHERE  User_ID = ?
-        ;",array($_SESSION['User']));
-        $My_Privileges = array();
-        while($array2 = sqlsrv_fetch_array($r)){$My_Privileges[$array2['Access']] = $array2;}
-        $Privileged = FALSE;
-        if(isset($My_Privileges['Ticket']) && $My_Privileges['Ticket']['Owner'] >= 4 && $My_Privileges['Ticket']['Group'] >= 4 && $My_Privileges['Location']['Other'] >= 4){$Privileged = TRUE;}
-        elseif($My_Privileges['Ticket']['Group'] >= 4){
-            $r = $database->query(  null,"SELECT LID FROM nei.dbo.TicketO WHERE TicketO.ID='{$_POST['ID']}'");
-            $r2 = $database->query( null,"SELECT Loc FROM nei.dbo.TicketD WHERE TicketD.ID='{$_POST['ID']}'");
-            $r3 = $database->query( null,"SELECT Loc FROM nei.dbo.TicketDArchive WHERE TicketDArchive.ID='{$_POST['ID']}'");
-            $r = sqlsrv_fetch_array($r);
-            $r2 = sqlsrv_fetch_array($r2);
-            $r3 = sqlsrv_fetch_array($r3);
-            $Location = NULL;
-            if(is_array($r)){$Location = $r['LID'];}
-            elseif(is_array($r2)){$Location = $r2['Loc'];}
-            elseif(is_array($r3)){$Location = $r3['Loc'];}
-            if(!is_null($Location)){
-                $r = $database->query(  null,"SELECT ID FROM nei.dbo.TicketO WHERE TicketO.LID='{$Location}' AND fWork='{$My_User['fWork']}'");
-                $r2 = $database->query( null,"SELECT ID FROM nei.dbo.TicketD WHERE TicketD.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
-                $r3 = $database->query( null,"SELECT ID FROM nei.dbo.TicketDArchive WHERE TicketDArchive.Loc='{$Location}' AND fWork='{$My_User['fWork']}'");
-                if($r || $r2 || $r3){
-                    if($r){$a = sqlsrv_fetch_array($r);}
-                    if($r2){$a2 = sqlsrv_fetch_array($r2);}
-                    if($r3){$a3 = sqlsrv_fetch_array($r3);}
-                    if($a || $a2 || $a3){
-                        $Privileged = true;
-                    }
-                }
-            }
-            if(!$Privileged){
-                if($My_Privileges['Ticket']['Owner'] >= 4 && is_numeric($_POST['ID'])){
-                    $r = $database->query(  null,"SELECT ID FROM nei.dbo.TicketO WHERE TicketO.ID='{$_POST['ID']}' AND fWork='{$User['fWork']}'");
-                    $r2 = $database->query( null,"SELECT ID FROM nei.dbo.TicketD WHERE TicketD.ID='{$_POST['ID']}' AND fWork='{$User['fWork']}'");
-                    $r3 = $database->query( null,"SELECT ID FROM nei.dbo.TicketDArchive WHERE TicketDArchive.ID='{$_POST['ID']}' AND fWork='{$User['fWork']}'");
-                    if($r || $r2 || $r3){
-                        if($r){$a = sqlsrv_fetch_array($r);}
-                        if($r2){$a2 = sqlsrv_fetch_array($r2);}
-                        if($r3){$a3 = sqlsrv_fetch_array($r3);}
-                        if($a || $a2 || $a3){
-                            $Privileged = true;
-                        }
-                    }
-                }
-            }
-        }
-    } elseif($_SESSION['Branch'] == 'Customer' && is_numeric($_POST['ID'])){
-            $r  = $database->query( null,"SELECT Loc.Loc FROM nei.dbo.TicketO        LEFT JOIN nei.dbo.Loc ON TicketO.LID        = Loc.Loc WHERE TicketO.ID=?        AND Loc.Owner = ?;",array($_POST['ID'],$_SESSION['Branch_ID']));
-            $r2 = $database->query( null,"SELECT Loc.Loc FROM nei.dbo.TicketD        LEFT JOIN nei.dbo.Loc ON TicketD.Loc        = Loc.Loc WHERE TicketD.ID=?        AND Loc.Owner = ?;",array($_POST['ID'],$_SESSION['Branch_ID']));
-            $r3 = $database->query( null,"SELECT Loc.Loc FROM nei.dbo.TicketDArchive LEFT JOIN nei.dbo.Loc ON TicketDArchive.Loc = Loc.Loc WHERE TicketDArchive.ID=? AND Loc.Owner = ?;",array($_POST['ID'],$_SESSION['Branch_ID']));
-            if($r || $r2 || $r3){
-                if($r){$a = sqlsrv_fetch_array($r);}else{$a = false;}
-                if($r2){$a2 = sqlsrv_fetch_array($r2);}else{$a2 = false;}
-                if($r3){$a3 = sqlsrv_fetch_array($r3);}else{$a3 = false;}
-                if($a || $a2 || $a3){
-                    $Privileged = true;
-                }
-            }
-    }
-    if(!isset($array['ID'],$_POST['ID'])  || !$Privileged && is_numeric($_POST['ID'])){?><html><head></head></html><?php }
-    else {
-      $database->query(null,"UPDATE nei.dbo.TicketO SET TicketO.Assigned = 6 WHERE TicketO.ID = ?",array($_POST['ID']));
-      if(isset($_POST['Email']) && strlen($_POST['Email']) > 0){
-        $_SERVER['SERVER_NAME'] = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : "Nouveau_Elevator_Portal";
-        function generateMessageID()
-        {
-          return sprintf(
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+if( session_id( ) == '' || !isset($_SESSION)) {
+    session_start( );
+    require( '/var/www/html/Portal.Branch.Local/bin/php/index.php' );
+    require('/var/www/html/Portal.Branch.Local/bin/library/phpmailer/src/Exception.php');
+    require('/var/www/html/Portal.Branch.Local/bin/library/phpmailer/src/PHPMailer.php');
+    require('/var/www/html/Portal.Branch.Local/bin/library/phpmailer/src/SMTP.php');
+    $_SERVER['SERVER_NAME'] = isset($_SERVER['SERVER_NAME']) 
+        ? $_SERVER['SERVER_NAME'] 
+        : "Nouveau_Elevator_Portal";
+    function generateMessageID() {
+        return sprintf(
             "<%s.%s@%s>",
             base_convert(microtime(), 10, 36),
             base_convert(bin2hex(openssl_random_pseudo_bytes(8)), 16, 36),
             $_SERVER['SERVER_NAME']
-          );
+        );
+    }
+}
+if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash' ] ) ){
+  //Connection
+    $result = \singleton\database::getInstance( )->query(
+      'Portal',
+      " SELECT  [Connection].[ID]
+        FROM    dbo.[Connection]
+        WHERE       [Connection].[User] = ?
+                AND [Connection].[Hash] = ?;",
+      array(
+        $_SESSION[ 'Connection' ][ 'User' ],
+        $_SESSION[ 'Connection' ][ 'Hash' ]
+      )
+    );
+    $Connection = sqlsrv_fetch_array($result);
+    //User
+    $result = \singleton\database::getInstance( )->query(
+        null,
+        " SELECT  Emp.fFirst  AS First_Name,
+                  Emp.Last    AS Last_Name,
+                  Emp.fFirst + ' ' + Emp.Last AS Name,
+                  Emp.Title AS Title,
+                  Emp.Field   AS Field
+          FROM  Emp
+          WHERE   Emp.ID = ?;",
+        array(
+            $_SESSION[ 'Connection' ][ 'User' ]
+        )
+    );
+    $User   = sqlsrv_fetch_array( $result );
+    //Privileges
+    $result = \singleton\database::getInstance( )->query(
+        'Portal',
+        "   SELECT  [Privilege].[Access],
+                    [Privilege].[Owner],
+                    [Privilege].[Group],
+                    [Privilege].[Department],
+                    [Privilege].[Database],
+                    [Privilege].[Server],
+                    [Privilege].[Other],
+                    [Privilege].[Token],
+                    [Privilege].[Internet]
+          FROM      dbo.[Privilege]
+          WHERE     Privilege.[User] = ?;",
+        array(
+            $_SESSION[ 'Connection' ][ 'User' ],
+        )
+    );
+    $Privileges = array();
+    if( $result ){while( $Privilege = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) ){
+        $key = $Privilege['Access'];
+        unset( $Privilege[ 'Access' ] );
+        $Privileges[ $key ] = implode( '', array(
+            dechex( $Privilege[ 'Owner' ] ),
+            dechex( $Privilege[ 'Group' ] ),
+            dechex( $Privilege[ 'Department' ] ),
+            dechex( $Privilege[ 'Database' ] ),
+            dechex( $Privilege[ 'Server' ] ),
+            dechex( $Privilege[ 'Other' ] ),
+            dechex( $Privilege[ 'Token' ] ),
+            dechex( $Privilege[ 'Internet' ] )
+        ) );
+    }}
+    if(     !isset( $Connection[ 'ID' ] )
+        ||  !isset( $Privileges[ 'Invoice' ] )
+        ||  !check( privilege_read, level_group, $Privileges[ 'Invoice' ] )
+    ){ ?><?php require('404.html');?><?php }
+    else {
+        var_dump( $_POST );
+        $query = "  SELECT  TOP 1
+                            Invoice.Ref               AS ID,
+                            Invoice.fDesc             AS Description,
+                            Invoice.fDate             AS Date,
+                            Invoice.Amount            AS Amount,
+                            Invoice.Custom1             AS Due,
+                            Invoice.STax              AS Sales_Tax,
+                            Invoice.Total             AS Total,
+                            Invoice.Taxable           AS Taxable,
+                            Customer.ID               AS Customer_ID,
+                            Customer.Name             AS Customer_Name,
+                            Customer.Street           AS Customer_Street,
+                            Customer.City             AS Customer_City,
+                            Customer.State            AS Customer_State,
+                            Customer.Zip              AS Customer_Zip,
+                            Customer.Contact          AS Customer_Contact,
+                            Location.Loc              AS Location,
+                            Location.Loc              AS Location_ID,
+                            Location.Tag              AS Location_Name,
+                            Location.Address          AS Location_Street,
+                            Location.City             AS Location_City,
+                            Location.State            AS Location_State,
+                            Location.Zip              AS Location_Zip,
+                            Job.ID                    AS Job_ID,
+                            Job.fDesc                 AS Job_Name,
+                            Job_Type.Type             AS Job_Type,
+                            Division.ID               AS Division_ID,
+                            Division.Name             AS Division_Name,
+                            Route.ID                  AS Route_ID,
+                            Route.Name                AS Route_Name,
+                            Employee.ID               AS Employee_ID,
+                            Employee.fFirst           AS Employee_First_Name,
+                            Employee.Last             AS Employee_Last_Name,
+                            OpenAR.Due                AS Due,
+                            OpenAR.Balance            AS Balance,
+                            Rolodex.Contact           AS Contact_Name,
+                            Rolodex.EMail             AS Contact_Email
+                    FROM    Invoice
+                            LEFT JOIN Loc             AS Location ON Invoice.Loc      = Location.Loc
+                            LEFT JOIN Job             AS Job        ON Invoice.Job      = Job.ID
+                            LEFT JOIN Zone            AS Division ON Location.Zone    = Division.ID
+                            LEFT JOIN Route           AS Route    ON Location.Route   = Route.ID
+                            LEFT JOIN OpenAR          AS OpenAR   ON Invoice.Ref      = Invoice.Ref
+                            LEFT JOIN (
+                              SELECT  Customer.ID     AS ID,
+                                      Rolodex.Name    AS Name,
+                                      Rolodex.Contact AS Contact,
+                                      Rolodex.Address AS Street,
+                                      Rolodex.City    AS City,
+                                      Rolodex.State   AS State,
+                                      Rolodex.Zip     AS Zip
+                              FROM    Owner           AS Customer
+                                      LEFT JOIN Rol   AS Rolodex  ON Customer.Rol     = Rolodex.ID
+                            ) AS Customer                         ON Location.Owner   = Customer.ID
+                            LEFT JOIN Emp             AS Employee ON Route.Mech       = Employee.fWork
+                            LEFT JOIN JobType         AS Job_Type ON Job.Type         = Job_Type.ID
+                            LEFT JOIN Rol             AS Rolodex  ON Location.Rol     = Rolodex.ID
+                    WHERE   Invoice.Ref = ?;";
+        foreach( $_POST[ 'data' ] as $index=>$ID ){
+            //SQL
+            $parameters = array( $ID );
+            $result = \singleton\database::getInstance( )->query(
+                null,
+                $query,
+                $parameters
+            );    
+            $Invoice = $result ? sqlsrv_fetch_array( $result ) : null;
+            $Invoice = array(
+                'Customer_Name'         => $Invoice[ 'Customer_Name' ],
+                'Customer_Street'       => $Invoice[ 'Customer_Street' ],
+                'Customer_City'         => $Invoice[ 'Customer_City' ],
+                'Customer_State'        => $Invoice[ 'Customer_State' ],
+                'Customer_Zip'          => $Invoice[ 'Customer_Zip' ],
+                'Contact_Name'          => $,
+                'Location_Name'         => '481 8th Avenue',
+                'Invoice_ID'            => 752348,
+                'Invoice_Price'         => 510.87,
+                'Invoice_Taxable'       => 0,
+                'Invoice_Subtotal'      => 0,
+                'Invoice_Sales_Tax'     => 0,
+                'Invoice_Amount'        => 556.21,
+                'Invoice_Paid'          => 0,
+                'Unit_Name'             => '1P12345',
+                'Description'           => 'something goes here',
+                'Date'                  => '1/24/2022',
+                'Job'                   =>  'Job description',
+                'Terms'                 => 'Terms go here',
+                'PONumber'              =>  'PO# 15754213',
+                'InvoiceNumber'         =>  '123156421',
+                'Type'                  => ' Maintainence',
+                'Contact_Email'         => 'psperanza@nouveauelevator.com',
+                'Invoice_Description'   => "Preventative maintenance service for the period of January, 2022 per
+your contract MAINTENANCE - One (1) Elevator.
+Nouveau Elevator News
+https://www.nouveauelevator.com/nyc-dob-service-update/
+Notice:
+As per the Dept. of Buildings, Testing is required to be filed within 21 Days of the Inspection.
+Affirmations of Correction are to be made within 90 Days of the Inspection.
+AOC's are required to be submitted within 14 Days of the Correction.
+1.00
+"
+            );
+            //Message
+            $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+            try {
+                //Server settings
+                $mail->SMTPDebug = 2;                                       // Enable verbose debug output
+                $mail->isSMTP();                                            // Set mailer to use SMTP
+                $mail->Host       = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+                $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+                $mail->Username   = 'webservices@nouveauelevator.com';                     // SMTP username
+                $mail->Password   = 'daxlxnzndgvwczth';                               // SMTP password
+                $mail->SMTPSecure = 'tls';                                  // Enable TLS encryption, `ssl` also accepted
+                $mail->Port       = 587;                                    // TCP port to connect to
+
+                //Recipients
+                $mail->setFrom('webservices@nouveauelevator.com', 'Web Services');
+                $mail->addAddress( $Invoice[ 'Contact_Email' ] );
+                $mail->addReplyTo('webservices@nouveauelevator.com', 'NoReply');
+
+
+                $pdf = new \pdf\Invoice(
+                    'P',
+                    'mm',
+                    'A4',
+                    $Invoice
+                );
+                $pdf->AliasNbPages();
+                $pdf->AddPage();
+                $path = '/var/www/html/Portal.Branch.Local/bin/pdf/Invoice/' . $Invoice[ 'Invoice_ID' ] . '.pdf';
+                
+                $mail->addStringAttachment( $pdf->Output( $path, 'S' ), 'Invoice_' . $Invoice[ 'Invoice_ID' ] );
+                // Attachments
+                //$mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
+                //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
+                $subject = "Nouveau Elevator - Invoice #" . $Invoice[ 'Invoice_ID' ];
+                $message = "Please find Invoice #" . $Invoice[ 'Invoice_ID' ] . " attached.";
+                // Content
+                $mail->isHTML( false );
+                $mail->Subject = $subject;
+                $mail->Body    = $message;
+                //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+                $mail->send();
+                echo 'Message has been sent';
+            } catch (Exception $e) {
+                echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
         }
-        $r = $database->query(null,"
-          SELECT  TicketDPDA.*,
-                  OwnerWithRol.Name AS Customer,
-                  Loc.Tag AS Location,
-                  Job.fDesc AS Job,
-                  Elev.Unit AS Unit,
-                  Emp.fFirst + ' ' + Emp.Last AS Worker
-          FROM    nei.dbo.TicketDPDA
-                  LEFT JOIN nei.dbo.Job           ON TicketDPDA.Job   = Job.ID
-                  LEFT JOIN nei.dbo.OwnerWithRol  ON Job.OWner        = OwnerWithRol.ID
-                  LEFT JOIN nei.dbo.Loc           ON TicketDPDA.Loc   = Loc.Loc
-                  LEFT JOIN nei.dbo.Elev          ON TicketDPDA.Elev  = Elev.ID
-                  LEFT JOIN Emp           ON TicketDPDA.fWork = Emp.fWork
-          WHERE   TicketDPDA.ID = ?
-        ;",array($_POST['ID']));
-
-        $Ticket = $r ? sqlsrv_fetch_array($r) : Null;
-
-        $r = $database->query(null,"SELECT * FROM PDATicketSignature WHERE PDATicketSignature.PDATicketID = ?;",array($_POST['ID']));
-        $signature = $r ? sqlsrv_fetch_array($r)['Signature'] : Null;
-        $to = $_POST['Email'];
-        $from = "WebServices@NouveauElevator.com";
-        $replyto = $from;
-        $date = date("Y-m-d H:i:s");
-        $subject = "Assistance: Ticket #{$_POST['ID']}";
-        $On_Site = date("H:i A",strtotime($Ticket['TimeSite']));
-        $Completed = date("H:i A",strtotime($Ticket['TimeComp']));
-        $message = "<html>
-<head>
-<style>
-td {padding:5px;}
-tr {border-bottom:#555555;}
-</style>
-</head>
-<body>
-<table width='500px' style='background-color:#353535;color:white;'><tbody>
-<tr><td colspan='2' style='font-size:18px;background-color:#252525;'><img src='https://www.nouveauelevator.com/Images/Icons/logo.png' width='25px' /> Nouveau Elevator</td></tr>
-<tr><td colspan='2' style='text-decoration:underline;font-weight:bold;font-size:18px;background-color:#252525;'>Ticket #{$_POST['ID']}</td></tr>
-<tr><td style='font-weight:bold;'>Location:</td><td>{$Ticket['Location']}</td></tr>
-<tr><td style='font-weight:bold;'>Unit:</td><td>{$Ticket['Unit']}</td></tr>
-<tr><td style='font-weight:bold;'>Worker:</td><td>{$Ticket['Worker']}</td></tr>
-<tr><td style='font-weight:bold;'>Description:</td><td>{$Ticket['fDesc']}</td></tr>
-<tr><td style='font-weight:bold;'>Accepted:</td><td>{$On_Site}</td></tr>
-<tr><td style='font-weight:bold;'>Completed:</td><td>{$Completed}</td></tr>
-<tr><td style='font-weight:bold;'>Regular:</td><td>{$Ticket['Reg']}</td></tr>
-<tr><td style='font-weight:bold;'>Differential:</td>{$Ticket['TT']}</td></tr>
-<tr><td style='font-weight:bold;'>Overtime:</td><td>{$Ticket['OT']}</td></tr>
-<tr><td style='font-weight:bold;'>Doubletime:</td><td>{$Ticket['DT']}</td></tr>
-<tr><td style='font-weight:bold;'>Total</td><td>{$Ticket['Total']}</td></tr>
-<tr><td style='font-weight:bold;'>Resolution:</td><td/>{$Ticket['DescRes']}</td></tr>
-<tr><td style='font-weight:bold;'>Signee:</td><td>{$Ticket['SignatureText']}</td></tr>
-<tr><td colspan='2' style='background-color:white;text-align:center;padding:25px;'><img style='-webkit-filter: invert(1);filter: invert(1);' src='https://www.nouveauelevator.com/portal/media/images/signatures/{$_POST['ID']}.jpg' /></td></tr>
-</tbody></table>
-</body>
-</html>";
-        $Arranger = "WebServices";
-
-        $headers = array();
-        $headers[] = "MIME-Version: 1.0";
-        $headers[] = "Content-Type: text/html; charset=UTF-8";
-        $headers[] = "Mesaage-id: " .generateMessageID();
-        $headers[] = "From: 'WebServices' <$from>";
-        $headers[] = "Reply-To: $Arranger <$replyto>";
-        $headers[] = "Date: $date";
-        $headers[] = "Return-Path: <$from>";
-        $headers[] = "X-Priority: 3";//1 = High, 3 = Normal, 5 = Low
-        $headers[] = "X-Mailer: PHP/" . phpversion();
-        //$_SESSION['Email'] = $_POST['Email'];
-        mail($to, $subject, $message, implode("\r\n", $headers));
-      }
+        
     }
 }?>

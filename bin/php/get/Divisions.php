@@ -207,7 +207,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                 WHERE         TicketO.Assigned >= 2
                                           AND TicketO.Assigned <= 3
                                 GROUP BY  Loc.Zone
-                              ) AS Tickets_Active ON Tickets_Assigned.Division = Division.ID
+                              ) AS Tickets_Active ON Tickets_Active.Division = Division.ID
                       WHERE   ({$conditions}) AND ({$search})
                     ) AS Tbl
               WHERE     Tbl.ROW_COUNT >= ?
