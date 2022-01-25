@@ -36,6 +36,13 @@ class bootstrap extends \singleton\index {
                     type='button'
                   ><?php \singleton\fontawesome::getInstance( 1 )->Add( 1 );?><span class='desktop'> New</span></button>
                 </div>
+								<div class='col-4'>
+                  <button
+                    class='form-control rounded'
+                    onClick="document.location.href='pdf.php?Entity=<?php echo $singular;?>&ID=<?php echo $primary_key;?>';"
+                    type='button'
+                  ><?php \singleton\fontawesome::getInstance( 1 )->Info( 1 );?><span class='desktop'>pdf</span></button>
+                </div>
               </div>
             </div>
             <div class='col-6 col-lg-3'>

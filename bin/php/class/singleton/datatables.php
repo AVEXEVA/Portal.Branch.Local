@@ -102,13 +102,21 @@ class datatables extends \singleton\index {
             <?php \singleton\datatables::getInstance( )->button_create( $singular );?>,
             <?php \singleton\datatables::getInstance( )->button_edit( $singular, $key );?>,
             <?php \singleton\datatables::getInstance( )->button_delete( $singular, $plural );?>,
-            <?php \singleton\datatables::getInstance( )->button_export( );?>
-        ]<?php
+            <?php \singleton\datatables::getInstance( )->button_export( );?>,
+            <?php \singleton\datatables::getInstance( )->button_pdf( );?>
+      ]<?php
     }
     public function button_print( ){
         ?>{
             extend : 'print',
             text : "<?php \singleton\fontawesome::getInstance( )->Print( 1 );?><span class='desktop'>Print</span>",
+            className : 'form-control'
+        }<?php
+    }
+    public function button_pdf( ){
+        ?>{
+            action : function( e, dt, node, config) { },
+            text : "<?php \singleton\fontawesome::getInstance( )->Info( 1 );?><span class='desktop'>pdf</span>",
             className : 'form-control'
         }<?php
     }

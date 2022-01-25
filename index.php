@@ -7,7 +7,7 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
   //Connection
   $result = \singleton\database::getInstance( )->query(
     'Portal',
-    " SELECT  [Connection].[ID]
+    " SELECT      [Connection].[ID]
       FROM    dbo.[Connection]
       WHERE       [Connection].[User] = ?
               AND [Connection].[Hash] = ?;",

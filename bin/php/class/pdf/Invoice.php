@@ -23,7 +23,6 @@ class PPDF extends \FPDF {
       $this->Y + $this->LnHeight
     );
   }
-
   function cell_key( $key = null ) {
     self::fill( );
     self::fontWhite( );
@@ -47,8 +46,8 @@ class PPDF extends \FPDF {
       foreach( $array as $key=>$value ){
         $this->cell_key_value( $key, $value );
       }
-    }
   }
+}
   function cell_blank( $key, $value) {
     $this->Cell( $this->blankWidth, $this->LnHeight, '' );
     $this->X = $this->X + $this->blankWidth;
@@ -69,25 +68,24 @@ class Invoice extends \pdf\PPDF {
     // Page header
     function __construct( $orientation, $unit, $size, $args ){
         $this->args = $args;
-        $this->SetFillColor( 50, 50, 50 );
+        $this->fill( 50, 50, 50 );
         parent::__construct( $orientation, $unit, $size );
     }
     function Header(){
-        $this->SetFillColor( 50, 50, 50 );
+        $this->fill();
         self::NouveauElevator( );
         $this->Ln(10);
         self::BillSummary( );
         self::Invoice();
         $this->Ln(5);
-        $this->Cell(  120, 5, '',  0);
+        $this->Cell(  110, 5, '',  0);
         self::Amount( );
         $this->Ln(5);
-        $this->Cell(  120, 5, '',  0);
+        $this->Cell(  110, 5, '',  0);
         self::Paid( );
         $this->Ln(5);
         self::LinePerforation( );
         $this->Ln(5);
-
     }
     function NouveauElevator()
     {
@@ -103,36 +101,35 @@ class Invoice extends \pdf\PPDF {
         $this->Ln(5);
         self::URL( );
     }
-
     function Address( ){
-        $this->SetFont('Arial','B',8);
+        $this->fontBold();
         $this->Cell(150,5, 'addr:',0,0,'R');//
-        $this->SetFont('Arial','',8);
+        $this->font();
         $this->Cell(50,5, str_pad( '47-55 37th Street LIC, NY 1181', 35, ' ', STR_PAD_RIGHT ), 0, 0, 'L' );
     }
     function Telephone( ){
-        $this->SetFont('Arial','B',8);
+        $this->fontBold();
         $this->Cell(150,5, '   tel: ',0,0,'R');//
-        $this->SetFont('Arial','',8);
+        $this->font();
         $this->Cell(50,5, str_pad( '(718) 349-4700', 35, ' ', STR_PAD_RIGHT ), 0, 0, 'L' );
     }
     function Fax( ){
-        $this->SetFont('Arial','B',8);
+        $this->fontBold();
         $this->Cell(150,5, '  fax:',0,0,'R');//
-        $this->SetFont('Arial','',8);
+        $this->font();
         $this->Cell(50,5, str_pad( '(718) 383-3218', 35, ' ', STR_PAD_RIGHT ), 0, 0, 'L' );
     }
     function URL( ){
-        $this->SetFont('Arial','B',8);
+        $this->fontBold();
         $this->Cell(150,5,'   url:',0,0,'R');//
-        $this->SetFont('Arial','',8);
+        $this->font();
         $this->Cell(50,5, str_pad( 'www.NouveauElevator.com', 35, ' ', STR_PAD_RIGHT ), 0, 0, 'L' );
     }
     function Billsummary( ){
         //CustomerName\
         $this->Ln(5);
         $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
+        $this->fontWhite();
         $this->cell_header( 'Customer' );
         $this->Cell(40, 5,  null, 0, 0, 'C', 0);
         $this->cell_header( 'Account' );
@@ -151,11 +148,9 @@ class Invoice extends \pdf\PPDF {
         $this->Ln(5);
         self::Street( );
         $this->Cell(40, 5, '',  0);
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
+        $this->fontBold();
+        $this->fontWhite();
         $this->Cell(70, 5, 'Invoice', 1, 0, 'C', true  );
-
-
         //City, State Zip
         $this->Ln(5);
         self::CityStateZip( );
@@ -163,85 +158,47 @@ class Invoice extends \pdf\PPDF {
 
     }
     function Name( ){
-        $this->cell_key( 'Name' );
-        $this->SetTextColor( 50, 50, 50 );
-        $this->SetFont('Arial','',10);
-        $this->cell_value( $this->args[ 'Customer_Name' ] );
+        $this->cell_key_value( 'Name',  $this->args[ 'Customer_Name' ] );
         //$this->Cell(60,5, str_pad( , 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
     }
     function Attn( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell(20,5, 'Attn:',1,0,'R',true);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->SetFont('Arial','',10);
-        $this->Cell(60,5, str_pad( $this->args[ 'Contact_Name' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value( 'attn' , $this->args[ 'Contact_Name' ]);
     }
     function Street( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell(20,5, 'Address:',1,0,'R',true);
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell(60,5, str_pad( $this->args[ 'Customer_Street' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+        $this->cell_key_value('Street' , $this->args[ 'Customer_Street' ] );
     }
     function CityStateZip( ){
-        $this->SetTextColor( 255, 255, 255 );
-        $this->SetFont('Arial','B',10);
         $this->Cell(20,5, '',0,0,'R');
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell(60,5, str_pad( $this->args[ 'Customer_City' ] . ', ' . $this->args[ 'Customer_City' ] . ' ' . $this->args[ 'Customer_Zip' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+        $this->cell_value( $this->args[ 'Customer_City' ] . ', ' . $this->args[ 'Customer_City' ] . ' ' . $this->args[ 'Customer_Zip' ] );
     }
     function Location( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell( 20, 5, 'Location:', 1, 0, 'R',  true );
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, $this->args[ 'Location_Name' ], 1, 0, 'L' );
+        $this->cell_key_value( 'Location' , $this->args[ 'Location_Name' ]);
     }
     function Invoice( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell( 20, 5, 'Reference:', 1, 0, 'R',  true);
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, $this->args[ 'Invoice_ID' ], 1, 0, 'L' );
+        $this->cell_key_value(  'Invoice' , $this->args[ 'Invoice_ID' ]);
     }
     function Amount( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell( 20, 5, 'Amount:', 1, 0, 'R', true );
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, '$' . number_format( $this->args[ 'Invoice_Amount' ], 2 ), 1, 0, 'L' );
+        $this->cell_key_value( 'Amount', '$'.number_format ( $this->args[ 'Amount' ]));
     }
     function Paid( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell( 20, 5, 'Paid:', 1, 0, 'R', true );
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, '$', 1, 0, 'L' );
+        $this->cell_key_value( 'Paid', '$'.number_format ( $this->args[ 'Paid' ]));
     }
     function LinePerforation( ){
         $this->cell( 200, 5, 'Please detach this portion and return with payment', 0, 1, 'C' );
         $this->cell( 200, 5, '---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------', 0, 1, 'C' );
     }
-
     function BillsummaryBottom( ){
         //Customer
         $this->Ln(5);
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell(80, 5, 'Customer', 1, 0, 'C', true  );
+        $this->fontBold();
+        $this->fontWhite();
+        $this->Cell(70, 5, 'Customer', 1, 0, 'C', true  );
         $this->Cell(40, 5,  null, 0, 0, 'C', 0);
         $this->Cell(70, 5, 'Location', 1, 0, 'C', true  );
         $this->Ln(5);
         self::Name( );
         $this->Cell(  40, 5, '',  0);
-        $this->SetTextColor( 0, 0, 0 );
+        $this->fontBlack();
         self::Location( );
         $this->Ln(5);
         self::Attn( );
@@ -249,31 +206,16 @@ class Invoice extends \pdf\PPDF {
         $this->Unit( );
         $this->Ln(5);
         self::Street( );
-
-
         $this->Ln(5);
         self::CityStateZip( );
         $this->Cell(  120, 5, '',  0);
-        self::Unit();
         $this->Cell(  40, 5, '',  0);
     }
-
-
     function InvoiceTitle( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell( 20, 5, 'Invoice', 1, 0, 'R', true );
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, $this->args['Invoice_ID'], 1, 0, 'C' );
+        $this->cell_key_value('InvoiceTitle', $this->args['Invoice_ID']);
     }
     function Unit( ){
-        $this->SetFont('Arial','B',10);
-        $this->SetTextColor( 255, 255, 255 );
-        $this->Cell( 20, 5, 'Unit', 1, 0, 'R', true );
-        $this->SetFont('Arial','',10);
-        $this->SetTextColor( 0, 0, 0 );
-        $this->Cell( 50, 5, $this->args[ 'Unit_Name' ], 1, 0, 'L' );
+        $this->cell_key_value('Unit', $this->args[ 'Unit_Name' ]);
     }
     // Page footer
     function InvoiceTable() {
@@ -288,13 +230,14 @@ class Invoice extends \pdf\PPDF {
       $this->Ln(10);
       self::Disclaimer();
       $this->Ln(10);
-      $this->SetTextColor( 255, 255, 255 );
+      $this->fontWhite();
       self::Description( );
-      self::UnitTable();
+      self::Data();
+      self::QuantityTable();
       self::Price( );
       self::AmountTable();
       $this->Ln();
-      $this->SetTextColor( 0, 0, 0 );
+      $this->fontBlack();
       self::PageTable();
       $this->Ln();
       self::InvoiceMoney( );
@@ -302,68 +245,43 @@ class Invoice extends \pdf\PPDF {
 
     }
     function Date( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(15,5, 'Date:',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(49,5, str_pad( $this->args[ 'Date' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value('Date', $this->args[ 'Date' ]);
     }
     function Terms ( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(15,5, 'Terms',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(49,5, str_pad( $this->args[ 'Terms' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value( 'Terms',  $this->args[ 'Terms' ] );
     }
     function Job ( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(15,5, 'Job',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(49,5, str_pad( $this->args[ 'Job' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value('Job' , $this->args[ 'Job' ] );
     }
     function PONumber ( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(15,5, 'PO#',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(49,5, str_pad( $this->args[ 'PONumber' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value('PONumber' , $this->args[ 'PONumber' ]);
     }
     function InvoiceNumber ( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(15,5, 'Invoice#',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(49,5, str_pad( $this->args[ 'InvoiceNumber' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value(  'Invoice' , $this->args[ 'InvoiceNumber' ] );
     }
     function Type ( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(15,5, 'Type',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(49,5, str_pad( $this->args[ 'Type' ], 35, ' ', STR_PAD_RIGHT ), 1, 0, 'L' );
+      $this->cell_key_value(  'Type' , $this->args[ 'Type' ] );
     }
     function Description ( ){
-      $this->SetFont('Arial','B',10);
-      $this->Cell(120,10, 'Description',1,0,'C', true);
-      $this->SetFont('Arial','',10);
+      $this->fontBold();
+      $this->Cell(100,10, 'Description',1,0,'C', true);
+      $this->font();
     }
-    function UnitTable ( ){
-      $this->SetFont('Arial','B',10);
-      $this->Cell(25,10, 'Unit',1,0,'C', true);
+    function Data ( ){
+      $this->fontBold();
+      $this->Cell(20,10, 'Data',1,0,'C', true);
+      $this->font();
+    }
+    function QuantityTable ( ){
+      $this->fontBold();
+      $this->Cell(25,10, 'Quantity',1,0,'C', true);
     }
     function Price ( ){
-      $this->SetFont('Arial','B',10);
+      $this->fontBold();
       $this->Cell(30,10, 'Price',1,0,'C', true);
     }
     function AmountTable ( ){
-      $this->SetFont('Arial','B',10);
+      $this->fontBold();
       $this->Cell(17,10, 'Amount',1,0,'C', true);
     }
     function PageTable ( ){
@@ -382,11 +300,11 @@ class Invoice extends \pdf\PPDF {
       $this->Cell(25,75, 'Each',1,0,'C');
     }
     function InvoicePriceLiteral( ){
-      $this->SetFont('Arial','B',10);
+      $this->fontBold();
       $this->Cell(30,75, '$' . number_format( $this->args[ 'Invoice_Price' ], 2 ),1,0,'C');
     }
     function InvoiceAmountLiteral( ){
-      $this->SetFont('Arial','B',10);
+      $this->fontBold();
       $this->Cell(17,75, '$' . number_format( $this->args[ 'Invoice_Amount' ], 2 ),1,0,'C');
     }
     function InvoiceMoney( ){
@@ -406,60 +324,35 @@ class Invoice extends \pdf\PPDF {
       self::TotalBottom();
     }
     function BottomPadding( ){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(120,10, '',0,0,'C');
-      $this->SetFont('Arial','',10);
+      $this->fontWhite();
+      $this->fontBold();
+      $this->Cell(122,10, '',0,0,'C');
+      $this->font();
     }
     function PriceBottom(){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(36,5, 'Price:',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(36,5, '$' . number_format( $this->args[ 'Invoice_Price' ], 2 ),1,0,'L');
+      $this->cell_key_value( 'Price', '$'.number_format ( $this->args[ 'Invoice_Price' ]));
     }
     function TaxableBottom(){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(36,5, 'Taxable:',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(36,5, '$' . number_format( $this->args[ 'Invoice_Taxable' ], 2 ),1,0,'L');
+      $this->cell_key_value( 'Taxable', '$'.number_format ( $this->args[ 'Invoice_Taxable' ]));
     }
     function SubtotalBottom(){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(36,5, 'Subtotal:',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(36,5, '$'. number_format( $this->args[ 'Invoice_Subtotal' ], 2 ),1,0,'L');
+      $this->cell_key_value( 'Subtotal', '$'.number_format ( $this->args[ 'Invoice_Subtotal' ]));
     }
     function SalesTaxBottom(){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(36,5, 'Sales Tax:',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(36,5, '$' . number_format( $this->args[ 'Invoice_Sales_Tax' ], 2 ),1,0,'L');
+      $this->cell_key_value( 'Sales Tax', '$'.number_format ( $this->args[ 'Invoice_Sales_Tax' ]));
     }
     function TotalBottom(){
-      $this->SetTextColor( 255, 255, 255 );
-      $this->SetFont('Arial','B',10);
-      $this->Cell(36,5, 'Total:',1,0,'R',true);
-      $this->SetTextColor( 0, 0, 0 );
-      $this->SetFont('Arial','',10);
-      $this->Cell(36,5, '$' . number_format( $this->args[ 'Invoice_Amount' ], 2 ),1,0,'L');
+      $this->cell_key_value( 'Total', '$'.number_format ( $this->args[ 'Invoice_Amount' ]));
     }
     function Disclaimer ( ){
           $this->SetFont('Arial','B',9);
           $this->Cell(192 ,10, 'Invoices not paid within terms may be subject to a service charge of 1.5% per month, or the maximum permitted by law.',1,0,'L');
-          $this->SetFont('Arial','',10);
+          $this->font();
     }
 
     function Footer()
     {
-        $this->SetFillColor( 50, 50, 50 );
+        $this->fill();
         self::BillSummaryBottom();
         self::InvoiceTable();
 
@@ -474,6 +367,5 @@ class Invoice extends \pdf\PPDF {
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
     }
 }
-
 
 ?>

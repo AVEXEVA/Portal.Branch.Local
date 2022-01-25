@@ -5,12 +5,12 @@ class database extends \singleton\index {
 	private $databases = array( );
 	private $host = '20.124.200.54';
 	private $options = array(
-		'Database' 				=> 	'Portal',
-		'Uid' 					=> 	'sa',
-		'PWD' 					=> 	'007!Youknowwhattodo!',
+		'Database' 							=> 	'Portal',
+		'Uid' 									=> 	'sa',
+		'PWD' 									=> 	'007!Youknowwhattodo!',
 		'ReturnDatesAsStrings'	=>	true,
-		'CharacterSet' 			=> 	SQLSRV_ENC_CHAR,
-		'TraceOn' 				=> 	false
+		'CharacterSet' 					=> 	SQLSRV_ENC_CHAR,
+		'TraceOn' 							=> 	false
 	);
 	protected function __construct( ){
 		$this->default = 'Portal';
