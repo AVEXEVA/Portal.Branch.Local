@@ -87,97 +87,101 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
         ||  !check( privilege_read, level_group, $Privileges[ 'Invoice' ] )
     ){ ?><?php require('404.html');?><?php }
     else {
-        var_dump( $_POST );
         $query = "  SELECT  TOP 1
-                            Invoice.Ref               AS ID,
-                            Invoice.fDesc             AS Description,
-                            Invoice.fDate             AS Date,
-                            Invoice.Amount            AS Amount,
-                            Invoice.Custom1             AS Due,
-                            Invoice.STax              AS Sales_Tax,
-                            Invoice.Total             AS Total,
-                            Invoice.Taxable           AS Taxable,
-                            Customer.ID               AS Customer_ID,
-                            Customer.Name             AS Customer_Name,
-                            Customer.Street           AS Customer_Street,
-                            Customer.City             AS Customer_City,
-                            Customer.State            AS Customer_State,
-                            Customer.Zip              AS Customer_Zip,
-                            Customer.Contact          AS Customer_Contact,
-                            Location.Loc              AS Location,
-                            Location.Loc              AS Location_ID,
-                            Location.Tag              AS Location_Name,
-                            Location.Address          AS Location_Street,
-                            Location.City             AS Location_City,
-                            Location.State            AS Location_State,
-                            Location.Zip              AS Location_Zip,
-                            Job.ID                    AS Job_ID,
-                            Job.fDesc                 AS Job_Name,
-                            Job_Type.Type             AS Job_Type,
-                            Division.ID               AS Division_ID,
-                            Division.Name             AS Division_Name,
-                            Route.ID                  AS Route_ID,
-                            Route.Name                AS Route_Name,
-                            Employee.ID               AS Employee_ID,
-                            Employee.fFirst           AS Employee_First_Name,
-                            Employee.Last             AS Employee_Last_Name,
-                            OpenAR.Due                AS Due,
-                            OpenAR.Balance            AS Balance,
-                            Rolodex.Contact           AS Contact_Name,
-                            Rolodex.EMail             AS Contact_Email
+                            Invoice.Ref                         AS ID,
+                            Invoice.fDesc                       AS Description,
+                            Invoice.fDate                       AS Date,
+                            Invoice.Amount                      AS Price,
+                            Invoice.Amount                      AS Amount,
+                            Invoice.STax                        AS Sales_Tax,
+                            Invoice.Total                       AS Total,
+                            Invoice.Taxable                     AS Taxable,
+                            OpenAR.Original - OpenAR.Balance    AS Paid,
+                            OpenAR.Balance                      AS Due,
+                            Customer.ID                         AS Customer_ID,
+                            Customer.Name                       AS Customer_Name,
+                            Customer.Street                     AS Customer_Street,
+                            Customer.City                       AS Customer_City,
+                            Customer.State                      AS Customer_State,
+                            Customer.Zip                        AS Customer_Zip,
+                            Customer.Contact                    AS Customer_Contact,
+                            Location.Loc                        AS Location,
+                            Location.Loc                        AS Location_ID,
+                            Location.Tag                        AS Location_Name,
+                            Location.Address                    AS Location_Street,
+                            Location.City                       AS Location_City,
+                            Location.State                      AS Location_State,
+                            Location.Zip                        AS Location_Zip,
+                            Job.ID                              AS Job_ID,
+                            Job.fDesc                           AS Job_Name,
+                            Job_Type.Type                       AS Job_Type,
+                            Division.ID                         AS Division_ID,
+                            Division.Name                       AS Division_Name,
+                            Route.ID                            AS Route_ID,
+                            Route.Name                          AS Route_Name,
+                            Employee.ID                         AS Employee_ID,
+                            Employee.fFirst                     AS Employee_First_Name,
+                            Employee.Last                       AS Employee_Last_Name,
+                            OpenAR.Due                          AS Due,
+                            OpenAR.Balance                      AS Balance,
+                            Rolodex.Contact                     AS Contact_Name,
+                            Rolodex.EMail                       AS Contact_Email
                     FROM    Invoice
-                            LEFT JOIN Loc             AS Location ON Invoice.Loc      = Location.Loc
-                            LEFT JOIN Job             AS Job        ON Invoice.Job      = Job.ID
-                            LEFT JOIN Zone            AS Division ON Location.Zone    = Division.ID
-                            LEFT JOIN Route           AS Route    ON Location.Route   = Route.ID
-                            LEFT JOIN OpenAR          AS OpenAR   ON Invoice.Ref      = Invoice.Ref
+                            LEFT JOIN Loc                       AS Location ON Invoice.Loc      = Location.Loc
+                            LEFT JOIN Job                       AS Job      ON Invoice.Job      = Job.ID
+                            LEFT JOIN Zone                      AS Division ON Location.Zone    = Division.ID
+                            LEFT JOIN Route                     AS Route    ON Location.Route   = Route.ID
+                            LEFT JOIN OpenAR                    AS OpenAR   ON Invoice.Ref      = OpenAR.Ref
                             LEFT JOIN (
-                              SELECT  Customer.ID     AS ID,
-                                      Rolodex.Name    AS Name,
-                                      Rolodex.Contact AS Contact,
-                                      Rolodex.Address AS Street,
-                                      Rolodex.City    AS City,
-                                      Rolodex.State   AS State,
-                                      Rolodex.Zip     AS Zip
-                              FROM    Owner           AS Customer
-                                      LEFT JOIN Rol   AS Rolodex  ON Customer.Rol     = Rolodex.ID
-                            ) AS Customer                         ON Location.Owner   = Customer.ID
-                            LEFT JOIN Emp             AS Employee ON Route.Mech       = Employee.fWork
-                            LEFT JOIN JobType         AS Job_Type ON Job.Type         = Job_Type.ID
-                            LEFT JOIN Rol             AS Rolodex  ON Location.Rol     = Rolodex.ID
+                              SELECT  Customer.ID               AS ID,
+                                      Rolodex.Name              AS Name,
+                                      Rolodex.Contact           AS Contact,
+                                      Rolodex.Address           AS Street,
+                                      Rolodex.City              AS City,
+                                      Rolodex.State             AS State,
+                                      Rolodex.Zip               AS Zip
+                              FROM    Owner                     AS Customer
+                                      LEFT JOIN Rol             AS Rolodex  ON Customer.Rol     = Rolodex.ID
+                            ) AS Customer                                   ON Location.Owner   = Customer.ID
+                            LEFT JOIN Emp                       AS Employee ON Route.Mech       = Employee.fWork
+                            LEFT JOIN JobType                   AS Job_Type ON Job.Type         = Job_Type.ID
+                            LEFT JOIN Rol                       AS Rolodex  ON Location.Rol     = Rolodex.ID
                     WHERE   Invoice.Ref = ?;";
         foreach( $_POST[ 'data' ] as $index=>$ID ){
             //SQL
-            $parameters = array( $ID );
             $result = \singleton\database::getInstance( )->query(
                 null,
                 $query,
-                $parameters
-            );    
-            $Invoice = $result ? sqlsrv_fetch_array( $result ) : null;
-            $Invoice = array(
+                array( $ID )
+            ); 
+            $Invoice = $result 
+                ? sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC ) 
+                : null;
+            $OpenAR = array(
                 'Customer_Name'         => $Invoice[ 'Customer_Name' ],
                 'Customer_Street'       => $Invoice[ 'Customer_Street' ],
                 'Customer_City'         => $Invoice[ 'Customer_City' ],
                 'Customer_State'        => $Invoice[ 'Customer_State' ],
                 'Customer_Zip'          => $Invoice[ 'Customer_Zip' ],
-                'Contact_Name'          => $,
-                'Location_Name'         => '481 8th Avenue',
-                'Invoice_ID'            => 752348,
-                'Invoice_Price'         => 510.87,
-                'Invoice_Taxable'       => 0,
-                'Invoice_Subtotal'      => 0,
-                'Invoice_Sales_Tax'     => 0,
-                'Invoice_Amount'        => 556.21,
-                'Invoice_Paid'          => 0,
-                'Unit_Name'             => '1P12345',
-                'Description'           => 'something goes here',
-                'Date'                  => '1/24/2022',
-                'Job'                   =>  'Job description',
-                'Terms'                 => 'Terms go here',
-                'PONumber'              =>  'PO# 15754213',
-                'InvoiceNumber'         =>  '123156421',
-                'Type'                  => ' Maintainence',
+                'Contact_Name'          => $Invoice[ 'Contact_Name' ],
+                'Location_ID'           => $Invoice[ 'Location_ID' ],
+                'Location_Name'         => $Invoice[ 'Location_Name' ],
+                'Invoice_ID'            => $Invoice[ 'ID' ],
+                'Invoice_Price'         => $Invoice[ 'Amount' ],
+                'Invoice_Taxable'       => $Invoice[ 'Taxable' ],
+                'Invoice_Subtotal'      => $Invoice[ 'Total' ],
+                'Invoice_Sales_Tax'     => $Invoice[ 'Sales_Tax' ],
+                'Invoice_Amount'        => $Invoice[ 'Amount' ],
+                'Invoice_Paid'          => $Invoice[ 'Paid' ],
+                'Unit_ID'               => $Invoice[ 'Unit_ID' ],
+                'Unit_Name'             => $Invoice[ 'Unit_Name' ],
+                'Description'           => $Invoice[ 'Description' ],
+                'Date'                  => $Invoice[ 'Date' ],
+                'Job'                   => $Invoice[ 'Job' ],
+                'Terms'                 => 'NET 30',
+                'PONumber'              => '',
+                'InvoiceNumber'         => '',
+                'Type'                  => 'Maintainence',
                 'Contact_Email'         => 'psperanza@nouveauelevator.com',
                 'Invoice_Description'   => "Preventative maintenance service for the period of January, 2022 per
 your contract MAINTENANCE - One (1) Elevator.
@@ -205,7 +209,24 @@ AOC's are required to be submitted within 14 Days of the Correction.
 
                 //Recipients
                 $mail->setFrom('webservices@nouveauelevator.com', 'Web Services');
-                $mail->addAddress( $Invoice[ 'Contact_Email' ] );
+
+                $result = \singleton\database::getInstance( )->query(
+                    null,
+                    "   SELECT  Contact.EMail AS Email
+                        FROM    Contact 
+                        WHERE       Contact.Name    = ?
+                                AND Contact.Type    = 4
+                                AND Contact.Invoice = 1;",
+                    array(
+                        $Invoice[ 'Location_Name' ]
+                    )
+                );
+                if( !$result ){ continue; }
+                while( $row = sqlsrv_fetch_array( $result ) ){
+                    var_dump( $row[ 'Email' ] );
+                    //$mail->addAddress( $row[ 'Email' ] );
+                }
+
                 $mail->addReplyTo('webservices@nouveauelevator.com', 'NoReply');
 
 
@@ -213,7 +234,7 @@ AOC's are required to be submitted within 14 Days of the Correction.
                     'P',
                     'mm',
                     'A4',
-                    $Invoice
+                    $OpenAR
                 );
                 $pdf->AliasNbPages();
                 $pdf->AddPage();
@@ -231,7 +252,7 @@ AOC's are required to be submitted within 14 Days of the Correction.
                 $mail->Body    = $message;
                 //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
-                $mail->send();
+                //$mail->send();
                 echo 'Message has been sent';
             } catch (Exception $e) {
                 echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";

@@ -94,67 +94,93 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
             	FROM    (
             			    (
                                 SELECT  TicketO.ID                      AS ID,
-                                        TicketO.CDate                   AS Created,
-                                        TicketO.DDate                   AS Dispatched,
-                                        TicketO.EDate                   AS Date,
+                                        TicketO.WorkOrder               AS Work_Order,
+                                        /*Job*/
+                                        Job.ID                          AS Job_ID,
+                                        JobType.ID                      AS Job_Type_Id,
+                                        /*ForeignKeys*/
+                                        /*Customer*/
+                                        Customer.ID                     AS Customer_ID,
+                                        Customer.Name                   AS Customer_Name,
+                                        /*Route*/
+                                        Route.ID                        AS Route_ID,
+                                        Route.Name                      AS Route_Name,
+                                        /*Territory*/
+                                        Territory.ID                    AS Territory_ID,
+                                        Territory.Name                  AS Territory_Name,
+                                        /*Level*/
                                         TicketO.Level                   AS Level_ID,
-                                        TicketO.Est                     AS Time_Estimate,
-                                        TicketO.fWork                   AS Field_ID,
-                                        TicketO.DWork                   AS Employee_CallSign,
-                                        TicketO.Type                    AS Job_Type_ID,
-                                        TicketO.Cat                     AS Category,
-                                        TicketO.fDesc                   AS Description,
-                                        TicketO.Who                     AS Contact_Name,
-                                        TicketO.fBy                     AS Dispatcher_Name,
-                                        TicketO.LType                   AS Location_Type,
-                                        TicketO.LID                     AS Location_ID,
+                                        CASE    WHEN TicketO.Level = 0  THEN  ''
+                                                WHEN TicketO.Level = 1  THEN 'Service Call'
+                                                WHEN TicketO.Level = 2  THEN 'Trucking'
+                                                WHEN TicketO.Level = 3  THEN 'Modernization'
+                                                WHEN TicketO.Level = 4  THEN 'Violations'
+                                                WHEN TicketO.Level = 5  THEN 'Level 5'
+                                                WHEN TicketO.Level = 6  THEN 'Repair'
+                                                WHEN TicketO.Level = 7  THEN 'Annual'
+                                                WHEN TicketO.Level = 8  THEN 'Escalator'
+                                                WHEN TicketO.Level = 9  THEN 'Email'
+                                                WHEN TicketO.Level = 10 THEN 'Maintenance'
+                                                WHEN TicketO.Level = 11 THEN 'Survey'
+                                                WHEN TicketO.Level = 12 THEN 'Engineering'
+                                                WHEN TicketO.Level = 13 THEN 'Support',
+                                                WHEN TicketO.Level = 14 THEN 'M&R'
+                                        END AS Level,
+                                        /*GPS*/
+                                        TicketO.gpsStatus               AS GPS_Status,
+                                        TicketO.fLong                   AS Longitude,
+                                        TicketO.Latt                    AS Latitude,
+                                        TicketO.City                    AS City,
+                                        TicketO.State                   AS State,
+                                        TicketO.Zip                     AS Zip,
+                                        /*Unit*/
                                         TicketO.LElev                   AS Unit_ID,
+                                        TicketO.fGroup                  AS Unit_Group,
+                                        /*Location*/
+                                        TicketO.LID                     AS Location_ID,
+                                        TicketO.LType                   AS Location_Type,
                                         TicketO.LDesc1                  AS Location_Street,
                                         TicketO.LDesc2                  AS Location_city,
                                         TicketO.LDesc3                  AS Location_state,
                                         TicketO.LDesc4                  AS Location_Zip,
-                                        TicketO.Nature                  AS Nature,
-                                        TicketO.Job                     AS Job_ID,
-                                        TicketO.Assigned                AS Status,
-                                        TicketO.City                    AS City,
-                                        TicketO.State                   AS State,
-                                        TicketO.Zip                     AS Zip,
-                                        TicketO.Owner                   AS Customer_ID,
-                                        TicketO.Route                   AS Route_ID,
-                                        TicketO.Terr                    AS Territory_ID,
-                                        TicketO.fLong                   AS Longitude,
-                                        TicketO.Latt                    AS Latitude,
+                                        /*Employee*/
+                                        TicketO.fWork                   AS Field_ID,
+                                        TicketO.DWork                   AS Employee_CallSign,
+                                        /*Contact*/
+                                        TicketO.idRolCustomContact      AS Contact_ID,
+                                        TicketO.Who                     AS Contact_Name,
+                                        TicketO.CPhone                  AS Contact_Phone,
                                         TicketO.CallIn                  AS Called_In,
-                                        TicketO.SpecType                AS Special_Type,
-                                        TicketO.SpecID                  AS Special_ID,
-                                        TicketO.EN                      AS EN,
-                                        TicketO.Notes                   AS Notes,
-                                        TicketO.fGroup                  AS Unit_Group,
-                                        TicketO.Source                  AS Source,
-                                        TicketO.High                    AS Priority,
-                                        TicketO.Confirmed               AS Confirmed,
                                         TicketO.Phone                   AS Phone,
                                         TicketO.Phone2                  AS Phone_Alternate,
-                                        TicketO.PriceL                  AS Price_Level,
-                                        TicketO.Locked                  AS Locked,
-                                        TicketO.Follow                  AS Follow_Up,
-                                        
-                                        TicketO.WorkOrder               AS Work_Order,
+                                        /*WeakKeys*/
+                                        TicketO.fBy                     AS Dispatcher_Name,
+                                        /*Dates*/
+                                        TicketO.CDate                   AS Created,
+                                        TicketO.DDate                   AS Dispatched,
+                                        TicketO.EDate                   AS Last,
+                                        /*Times*/
                                         TicketO.TimeRoute               AS Time_En_Route,
                                         TicketO.TimeSite                AS Time_On_Site,
                                         TicketO.TimeComp                AS Time_Completed,
-                                        TicketO.HandHeldFieldsUpdated   AS Fields_Updated,
-                                        TicketO.AID                     AS AID,
+                                        TicketO.Est                     AS Time_Estimate,
+                                        /*Scope*/
+                                        TicketO.Nature                  AS Nature,
+                                        TicketO.Assigned                AS Status,
+                                        TicketO.High                    AS Priority,
+                                        TicketO.Confirmed               AS Confirmed,
+                                        TicketO.Cat                     AS Category,
+                                        TicketO.Notes                   AS Notes,
+                                        TicketO.fDesc                   AS Description,
                                         TicketO.BRemarks                AS Remarks,
-                                        TicketO.CPhone                  AS Contact_Phone,
-
-                                        TicketO.SMile                   AS SMile,
-                                        TicketO.EMile                   AS EMile,
-                                        TicketO.idRolCustomContact      AS Contact_ID,
-                                        TicketO.gpsStatus               AS GPS_Status,
-                                        TicketO.ResolveSource           AS Source,
+                                        TicketO.Follow                  AS Follow_Up,
+                                        TicketO.Locked                  AS Locked,
                                         TicketO.Comments                AS Comments,
-                                        TicketO.Internet                AS Internet,
+                                        /*Sales*/
+                                        TicketO.PriceL                  AS Price_Level,
+                                        TicketO.SpecType                AS Special_Type,
+                                        TicketO.SpecID                  AS Special_ID,
+                                        /*Customs*/
                                         TicketO.Custom1                 AS Custom1,
                                         TicketO.Custom2                 AS Custom2,
                                         TicketO.Custom3                 AS Custom3,
@@ -170,24 +196,49 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         TicketO.TFMCustom3              AS TFMCustom3,
                                         TicketO.TFMCustom4              AS TFMCustom4,
                                         TicketO.TFMCustom5              AS TFMCustom5                                       
+                                        /*Other*/
+                                        TicketO.EN                      AS EN,
+                                        TicketO.SMile                   AS SMile,
+                                        TicketO.EMile                   AS EMile,
+                                        /*Platform*/
+                                        TicketO.AID                     AS AID,
+                                        TicketO.Source                  AS Source,
+                                        TicketO.ResolveSource           AS Source,
+                                        TicketO.Internet                AS Internet,
+                                        TicketO.HandHeldFieldsUpdated   AS Fields_Updated,
                             ) UNION ALL (
                                 SELECT  TicketD.ID                 AS ID,
                                         TicketD.WorkOrder          AS Work_Order_ID,
-                                        /*Job*/
-                                        TicketD.Job                AS Job_ID,
-                                        TicketD.Type               AS Job_Type_ID,
                                         /*ForeignKeys*/
-                                        TicketD.Loc                AS Location_ID,
-                                        TicketD.fWork              AS Field_ID,
-                                        TicketD.Elev               AS Unit_ID,
-                                        TicketD.Invoice            AS Invoice_ID,
-                                        
-                                        TicketD.idTestItem         AS Inspection_ID,
-                                        /*WeakKeys*/
-                                        TicketD.fGroup             AS Unit_Group,
+                                        /*Job*/
+                                        Job.ID                     AS Job_ID,
+                                        JobType.ID                 AS Job_Type_ID,
+                                        /*Location*/
+                                        Location.Loc               AS Location_ID,
+                                        Location.Tag               AS Location_Tag,
+                                        /*Unit*/
+                                        Unit.ID                    AS Unit_ID,
+                                        Unit.State                 AS Unit_Name,
+                                        /*Employee*/
+                                        Employee.ID                AS Employee_ID,
+                                        Employee.fWork             AS Employee_Work_ID,
+                                        /*Customer*/
+                                        Customer.ID                AS Customer_ID,
+                                        Customer.Name              AS Customer_Name,
+                                        /*Route*/
+                                        Route.ID                   AS Route_ID,
+                                        Route.Name                 AS Route_Name,
+                                        /*Territory*/
+                                        Territory.ID               AS Territory_ID,
+                                        Territory.Name             AS Territory_Name,
+                                        /*Invoice*/
+                                        Invoice.Ref                AS Invoice_ID,
                                         /*Contact*/
-                                        TicketD.idRolCustomContact AS Contact_ID,
-                                        TicketD.Who                AS Contact_Name,
+                                        Contact.ID                 AS Contact_ID,
+                                        Contact.Contact            AS Contact_Name,
+                                        /*Inspection*/
+                                        Inspection.ID              AS Inspection_ID,
+                                        /*WeakKeys*/
                                         TicketD.fBy                AS Dispatcher_Name,
                                         TicketD.RBy                AS Reciever_Name,
                                         TicketD.CPhone             AS Caller_Phone,
@@ -275,6 +326,20 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
                                         TicketD.TFMCustom4         AS TFMCustom4,
                                         TicketD.TFMCustom5         AS TFMCustom5
                                 FROM    TicketD
+                                        LEFT JOIN Job               AS Job        ON TicketD.Job                = Job.ID
+                                        LEFT JOIN (
+                                            SELECT  Owner.ID        AS ID,
+                                                    Rolodex.Name    AS Name
+                                            FROM    Owner
+                                                    LEFT JOIN Rol   AS Rolodex    ON Owner.Rol                  = Rolodex.ID
+                                        )                           AS Customer   ON Customer.ID                = Job.Owner
+                                        LEFT JOIN Loc               AS Location   ON Job.Loc                    = Location.Loc
+                                        LEFT JOIN Elev              AS Unit       ON TicketD.Elev               = Unit.ID
+                                        LEFT JOIN Route             AS Route      ON Location.Route             = Route.ID
+                                        LEFT JOIN Terr              AS Territory  ON Location.Terr              = Territory.ID
+                                        LEFT JOIN Emp               AS Employee   ON TicketD.fWork              = Employee.fWork
+                                        LEFT JOIN Rol               AS Contact    ON TicketD.idRolCustomContact = Contact.ID
+                                        LEFT JOIN Invoice           AS Invoice    ON TicketD.Invoice            = Invoice.ID
                             )	
                         ) AS Ticket
             	WHERE  Ticket.ID = ?;",
@@ -453,8 +518,8 @@ if( isset( $_SESSION[ 'Connection' ][ 'User' ], $_SESSION[ 'Connection' ][ 'Hash
 	        			$Customer[ 'Zip' ],
 	        			$Customer[ 'Latitude' ],
 	        			$Customer[ 'Longitude' ],
-                $Customer[ 'Phone' ],
-                $Customer[ 'Email' ],
+                        $Customer[ 'Phone' ],
+                        $Customer[ 'Email' ],
 	        			$Customer[ 'Rolodex' ]
 	        		)
 	        	);
